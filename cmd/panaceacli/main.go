@@ -2,9 +2,11 @@ package main
 
 import (
 	"fmt"
+	"net/http"
 	"os"
 	"path"
 
+	"github.com/rakyll/statik/fs"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
@@ -48,7 +50,7 @@ import (
 	stakingclient "github.com/cosmos/cosmos-sdk/x/staking/client"
 	aolClient "github.com/medibloc/panacea-core/x/aol/client"
 
-	_ "github.com/cosmos/cosmos-sdk/client/lcd/statik"
+	_ "github.com/medibloc/panacea-core/client/lcd/statik"
 )
 
 func main() {
@@ -172,6 +174,8 @@ func txCmd(cdc *amino.Codec, mc []sdk.ModuleClients) *cobra.Command {
 // NOTE: details on the routes added for each module are in the module documentation
 // NOTE: If making updates here you also need to update the test helper in client/lcd/test_helper.go
 func registerRoutes(rs *lcd.RestServer) {
+	registerSwaggerUI(rs)
+
 	rpc.RegisterRoutes(rs.CliCtx, rs.Mux)
 	tx.RegisterRoutes(rs.CliCtx, rs.Mux, rs.Cdc)
 	auth.RegisterRoutes(rs.CliCtx, rs.Mux, rs.Cdc, at.StoreKey)
@@ -182,6 +186,15 @@ func registerRoutes(rs *lcd.RestServer) {
 	gov.RegisterRoutes(rs.CliCtx, rs.Mux, rs.Cdc)
 	mintrest.RegisterRoutes(rs.CliCtx, rs.Mux, rs.Cdc)
 	aolrest.RegisterRoutes(rs.CliCtx, rs.Mux, rs.Cdc, aol.StoreKey)
+}
+
+func registerSwaggerUI(rs *lcd.RestServer) {
+	statikFS, err := fs.New()
+	if err != nil {
+		panic(err)
+	}
+	staticServer := http.FileServer(statikFS)
+	rs.Mux.PathPrefix("/swagger-ui/").Handler(http.StripPrefix("/swagger-ui/", staticServer))
 }
 
 func initConfig(cmd *cobra.Command) error {

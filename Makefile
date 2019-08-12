@@ -1,6 +1,9 @@
 VERSION := $(shell echo $(shell git describe --tags) | sed 's/^v//')
 COMMIT := $(shell git log -1 --format='%H')
+GOBIN ?= $(GOPATH)/bin
 GOSUM := $(shell which gosum)
+
+export GO111MODULE = on
 
 
 ifeq ($(WITH_CLEVELDB),yes)
@@ -24,19 +27,36 @@ ldflags += $(LDFLAGS)
 ldflags := $(strip $(ldflags))
 BUILD_FLAGS := -tags "$(build_tags)" -ldflags '$(ldflags)'
 
-
 all: lint install
 
-install: go.sum
-		go install -mod=readonly $(BUILD_FLAGS) ./cmd/panacead
-		go install -mod=readonly $(BUILD_FLAGS) ./cmd/panaceacli
-		go install -mod=readonly $(BUILD_FLAGS) ./cmd/panaceakeyutil
-
-go.sum: go.mod
-		@echo "--> Ensure dependencies have not been modified"
-		GO111MODULE=on go mod verify
+########################################
+### Testing
 
 lint:
 	golangci-lint run
 	find . -name '*.go' -type f -not -path "./vendor*" -not -path "*.git*" | xargs gofmt -d -s
 	go mod verify
+
+
+########################################
+### Build/Install
+
+build: go.sum
+	go build -mode=readonly $(BUILD_FLAGS) -o build/panacead ./cmd/panacead
+	go build -mode=readonly $(BUILD_FLAGS) -o build/panaceacli ./cmd/panaceacli
+	go build -mode=readonly $(BUILD_FLAGS) -o build/panaceakeyutil ./cmd/panaceakeyutil
+
+update_panacea_lite_docs:
+	@statik -src=client/lcd/swagger-ui -dest=client/lcd -f
+
+install: go.sum update_panacea_lite_docs
+	go install -mod=readonly $(BUILD_FLAGS) ./cmd/panacead
+	go install -mod=readonly $(BUILD_FLAGS) ./cmd/panaceacli
+	go install -mod=readonly $(BUILD_FLAGS) ./cmd/panaceakeyutil
+
+########################################
+### Tools & dependencies
+
+go.sum: go.mod
+	@echo "--> Ensure dependencies have not been modified"
+	@go mod verify
