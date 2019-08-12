@@ -27,7 +27,7 @@ ldflags += $(LDFLAGS)
 ldflags := $(strip $(ldflags))
 BUILD_FLAGS := -tags "$(build_tags)" -ldflags '$(ldflags)'
 
-all: lint install
+all: get_tools lint install
 
 ########################################
 ### Testing
@@ -56,6 +56,10 @@ install: go.sum update_panacea_lite_docs
 
 ########################################
 ### Tools & dependencies
+
+get_tools:
+	go get github.com/rakyll/statik
+	go get github.com/golangci/golangci-lint/cmd/golangci-lint
 
 go.sum: go.mod
 	@echo "--> Ensure dependencies have not been modified"
