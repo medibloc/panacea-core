@@ -42,9 +42,9 @@ lint:
 ### Build/Install
 
 build: go.sum
-	go build -mode=readonly $(BUILD_FLAGS) -o build/panacead ./cmd/panacead
-	go build -mode=readonly $(BUILD_FLAGS) -o build/panaceacli ./cmd/panaceacli
-	go build -mode=readonly $(BUILD_FLAGS) -o build/panaceakeyutil ./cmd/panaceakeyutil
+	go build -mod=readonly $(BUILD_FLAGS) -o build/panacead ./cmd/panacead
+	go build -mod=readonly $(BUILD_FLAGS) -o build/panaceacli ./cmd/panaceacli
+	go build -mod=readonly $(BUILD_FLAGS) -o build/panaceakeyutil ./cmd/panaceakeyutil
 
 update_panacea_lite_docs:
 	@statik -src=client/lcd/swagger-ui -dest=client/lcd -f
