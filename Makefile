@@ -27,7 +27,7 @@ ldflags += $(LDFLAGS)
 ldflags := $(strip $(ldflags))
 BUILD_FLAGS := -tags "$(build_tags)" -ldflags '$(ldflags)'
 
-all: get_tools lint install
+all: get_tools install
 
 ########################################
 ### Testing
