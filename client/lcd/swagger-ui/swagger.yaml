@@ -241,11 +241,11 @@ paths:
         - application/json
       parameters:
         - in: query
-          name: tag
+          name: action
           type: string
-          description: "transaction tags such as 'action=submit-proposal' and 'proposer=panacea1qjnq8zufus54zyzk44z6k4zp3yawy2hnhhlm0u' which results in the following endpoint: 'GET /txs?action=submit-proposal&proposer=panacea1qjnq8zufus54zyzk44z6k4zp3yawy2hnhhlm0u'"
+          description: "transaction tags such as 'action=add_record' which results in the following endpoint: 'GET /txs?action=add_record'"
           required: true
-          x-example: ''
+          x-example: 'send'
         - in: query
           name: page
           description: Page number
