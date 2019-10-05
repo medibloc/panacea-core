@@ -13,7 +13,7 @@ require (
 	github.com/spf13/viper v1.4.0
 	github.com/stretchr/testify v1.4.0
 	github.com/tendermint/go-amino v0.15.0
-	github.com/tendermint/tendermint v0.31.5
+	github.com/tendermint/tendermint v0.31.9
 )
 
-replace github.com/cosmos/cosmos-sdk => github.com/medibloc/cosmos-sdk v0.35.1-beta
+replace github.com/cosmos/cosmos-sdk => github.com/medibloc/cosmos-sdk v0.35.2
