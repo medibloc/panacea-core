@@ -17,4 +17,4 @@ require (
 	golang.org/x/sys v0.0.0-20190911201528-7ad0cfa0b7b5 // indirect
 )
 
-replace github.com/cosmos/cosmos-sdk => github.com/medibloc/cosmos-sdk v0.35.3
+replace github.com/cosmos/cosmos-sdk => github.com/medibloc/cosmos-sdk v0.35.3-internal
