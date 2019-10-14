@@ -15,6 +15,7 @@ require (
 	github.com/tendermint/go-amino v0.15.0
 	github.com/tendermint/tendermint v0.31.9
 	golang.org/x/sys v0.0.0-20190911201528-7ad0cfa0b7b5 // indirect
+	google.golang.org/genproto v0.0.0-20180831171423-11092d34479b // indirect
 )
 
 replace github.com/cosmos/cosmos-sdk => github.com/medibloc/cosmos-sdk v0.35.3
