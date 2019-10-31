@@ -1,7 +1,7 @@
 # Panacea-Core
 ![banner](docs/banner.png)
 
-**[MediBloc](https://medibloc.org)**, We introduce blockChain which is base of recreation of medical experience.    
+**[MediBloc](https://medibloc.org)**, We introduce blockchain which is the key infrastrucuture for our services to reinvent the healthcare experience.
 
 **Key Features:**
 
