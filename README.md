@@ -12,7 +12,7 @@
 
  Core builds on [Tendermint](https://github.com/tendermint/tendermint) consensus and the [Cosmos SDK](https://github.com/cosmos/cosmos-sdk) toolkits. Please make sure to study these projects as well if you are not already familiar.
 
-**Note**: Requires [Go 1.12+](https://golang.org/dl/)
+**Note**: Requires [Go 1.13+](https://golang.org/dl/)
 
 ## Status
 
