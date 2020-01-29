@@ -2,14 +2,14 @@ package main
 
 import (
 	"encoding/json"
+	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
-	"github.com/medibloc/panacea-core/types/util"
 	"io"
 
 	"github.com/cosmos/cosmos-sdk/server"
 	"github.com/cosmos/cosmos-sdk/x/genaccounts"
 	genaccscli "github.com/cosmos/cosmos-sdk/x/genaccounts/client/cli"
-	"github.com/medibloc/panacea-core/x/staking"
+	"github.com/cosmos/cosmos-sdk/x/staking"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -17,7 +17,8 @@ import (
 	"github.com/tendermint/tendermint/libs/cli"
 	"github.com/tendermint/tendermint/libs/log"
 
-	"github.com/cosmos/cosmos-sdk/baseapp"
+	"github.com/medibloc/panacea-core/types/util"
+
 	"github.com/cosmos/cosmos-sdk/store"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	genutilcli "github.com/cosmos/cosmos-sdk/x/genutil/client/cli"
@@ -50,21 +51,16 @@ func main() {
 		PersistentPreRunE: server.PersistentPreRunEFn(ctx),
 	}
 
-	rootCmd.AddCommand(
-		genutilcli.InitCmd(ctx, cdc, app.ModuleBasics, app.DefaultNodeHome),
-		genutilcli.CollectGenTxsCmd(ctx, cdc, genaccounts.AppModuleBasic{}, app.DefaultNodeHome),
-		genutilcli.MigrateGenesisCmd(ctx, cdc),
-		genutilcli.GenTxCmd(
-			ctx, cdc, app.ModuleBasics, staking.AppModuleBasic{},
-			genaccounts.AppModuleBasic{}, app.DefaultNodeHome, app.DefaultCLIHome,
-		),
-		genutilcli.ValidateGenesisCmd(ctx, cdc, app.ModuleBasics),
-		// AddGenesisAccountCmd allows users to add accounts to the genesis file
-		genaccscli.AddGenesisAccountCmd(ctx, cdc, app.DefaultNodeHome, app.DefaultCLIHome),
-		client.NewCompletionCmd(rootCmd, true),
-		testnetCmd(ctx, cdc, app.ModuleBasics, genaccounts.AppModuleBasic{}),
-		replayCmd(),
-	)
+	rootCmd.AddCommand(genutilcli.InitCmd(ctx, cdc, app.ModuleBasics, app.DefaultNodeHome))
+	rootCmd.AddCommand(genutilcli.CollectGenTxsCmd(ctx, cdc, genaccounts.AppModuleBasic{}, app.DefaultNodeHome))
+	rootCmd.AddCommand(genutilcli.MigrateGenesisCmd(ctx, cdc))
+	rootCmd.AddCommand(genutilcli.GenTxCmd(ctx, cdc, app.ModuleBasics, staking.AppModuleBasic{},
+		genaccounts.AppModuleBasic{}, app.DefaultNodeHome, app.DefaultCLIHome))
+	rootCmd.AddCommand(genutilcli.ValidateGenesisCmd(ctx, cdc, app.ModuleBasics))
+	rootCmd.AddCommand(genaccscli.AddGenesisAccountCmd(ctx, cdc, app.DefaultNodeHome, app.DefaultCLIHome))
+	rootCmd.AddCommand(client.NewCompletionCmd(rootCmd, true))
+	rootCmd.AddCommand(testnetCmd(ctx, cdc, app.ModuleBasics, genaccounts.AppModuleBasic{}))
+	rootCmd.AddCommand(replayCmd())
 
 	server.AddCommands(ctx, cdc, rootCmd, newApp, exportAppStateAndTMValidators)
 
@@ -84,7 +80,6 @@ func newApp(logger log.Logger, db dbm.DB, traceStore io.Writer) abci.Application
 		baseapp.SetPruning(store.NewPruningOptionsFromString(viper.GetString("pruning"))),
 		baseapp.SetMinGasPrices(viper.GetString(server.FlagMinGasPrices)),
 		baseapp.SetHaltHeight(viper.GetUint64(server.FlagHaltHeight)),
-		baseapp.SetHaltTime(viper.GetUint64(server.FlagHaltTime)),
 	)
 }
 
@@ -101,6 +96,6 @@ func exportAppStateAndTMValidators(
 		return aApp.ExportAppStateAndValidators(forZeroHeight, jailWhiteList)
 	}
 
-	aApp := app.NewPanaceaApp(logger, db, traceStore, true, uint(1))
-	return aApp.ExportAppStateAndValidators(forZeroHeight, jailWhiteList)
+	pApp := app.NewPanaceaApp(logger, db, traceStore, true, uint(1))
+	return pApp.ExportAppStateAndValidators(forZeroHeight, jailWhiteList)
 }

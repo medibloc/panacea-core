@@ -1,11 +1,13 @@
 package app
 
 import (
-	"github.com/medibloc/panacea-core/x/crisis"
-	"github.com/medibloc/panacea-core/x/gov"
-	"github.com/medibloc/panacea-core/x/mint"
-	"github.com/medibloc/panacea-core/x/staking"
-
+	"github.com/cosmos/cosmos-sdk/simapp"
+	"github.com/cosmos/cosmos-sdk/x/crisis"
+	"github.com/cosmos/cosmos-sdk/x/genutil"
+	"github.com/cosmos/cosmos-sdk/x/gov"
+	"github.com/cosmos/cosmos-sdk/x/mint"
+	"github.com/cosmos/cosmos-sdk/x/staking"
+	"github.com/medibloc/panacea-core/x/aol"
 	"io"
 	"os"
 
@@ -23,7 +25,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	distr "github.com/cosmos/cosmos-sdk/x/distribution"
 	"github.com/cosmos/cosmos-sdk/x/genaccounts"
-	"github.com/cosmos/cosmos-sdk/x/genutil"
 	"github.com/cosmos/cosmos-sdk/x/params"
 	paramsclient "github.com/cosmos/cosmos-sdk/x/params/client"
 	"github.com/cosmos/cosmos-sdk/x/slashing"
@@ -55,6 +56,7 @@ var (
 		crisis.AppModuleBasic{},
 		slashing.AppModuleBasic{},
 		supply.AppModuleBasic{},
+		aol.AppModuleBasic{},
 	)
 
 	// account permissions
@@ -101,6 +103,7 @@ type PanaceaApp struct {
 	crisisKeeper   crisis.Keeper
 	supplyKeeper   supply.Keeper
 	paramsKeeper   params.Keeper
+	aolKeeper      aol.Keeper
 
 	// Module Manager
 	mm *module.Manager
@@ -120,7 +123,7 @@ func NewPanaceaApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLates
 	keys := sdk.NewKVStoreKeys(
 		bam.MainStoreKey, auth.StoreKey, staking.StoreKey,
 		supply.StoreKey, mint.StoreKey, distr.StoreKey, slashing.StoreKey,
-		gov.StoreKey, params.StoreKey,
+		gov.StoreKey, params.StoreKey, aol.StoreKey,
 	)
 
 	tkeys := sdk.NewTransientStoreKeys(staking.TStoreKey, params.TStoreKey)
@@ -215,6 +218,11 @@ func NewPanaceaApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLates
 		auth.FeeCollectorName,
 	)
 
+	app.aolKeeper = aol.NewKeeper(
+		keys[aol.StoreKey],
+		app.cdc,
+	)
+
 	// register the proposal types
 	govRouter := gov.NewRouter()
 	govRouter.AddRoute(gov.RouterKey, gov.ProposalHandler).
@@ -246,6 +254,7 @@ func NewPanaceaApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLates
 		mint.NewAppModule(app.mintKeeper),
 		slashing.NewAppModule(app.slashingKeeper, app.stakingKeeper),
 		staking.NewAppModule(app.stakingKeeper, app.distrKeeper, app.accountKeeper, app.supplyKeeper),
+		aol.NewAppModule(app.aolKeeper),
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -259,8 +268,9 @@ func NewPanaceaApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLates
 	// properly initialized with tokens from genesis accounts.
 	app.mm.SetOrderInitGenesis(
 		genaccounts.ModuleName, distr.ModuleName, staking.ModuleName,
-		auth.ModuleName, bank.ModuleName, slashing.ModuleName, gov.ModuleName,
-		mint.ModuleName, supply.ModuleName, crisis.ModuleName, genutil.ModuleName,
+		auth.ModuleName, bank.ModuleName, slashing.ModuleName,
+		aol.ModuleName, gov.ModuleName, mint.ModuleName,
+		supply.ModuleName, crisis.ModuleName, genutil.ModuleName,
 	)
 
 	app.mm.RegisterInvariants(&app.crisisKeeper)
@@ -295,7 +305,7 @@ func NewPanaceaApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLates
 }
 
 func (app *PanaceaApp) InitChainer(ctx sdk.Context, req abci.RequestInitChain) abci.ResponseInitChain {
-	var genesisState GenesisState
+	var genesisState simapp.GenesisState
 
 	err := app.cdc.UnmarshalJSON(req.AppStateBytes, &genesisState)
 	if err != nil {
