@@ -1,5 +1,21 @@
 # Panacea DID Method Specification
 
+## Table of Contents
+
+* [Panacea DID](#panacea-did)
+ * [Panacea DID Method Name](#panacea-did-method-name)
+ * [Panacea DID Method Specific Identifier](#panacea-did-method-specific-identifier)
+* [DID Document](#did-document)
+ * [Format](#format)
+ * [CRUD Operations (REST)](#crud-operations-rest)
+	* [Create](#create)
+	* [Read](#read)
+	* [Update](#update)
+	* [Delete](#delete)
+* [Security Considerations](#security-considerations)
+* [Privacy Considerations](#privacy-considerations)
+* [Reference Implementations](#reference-implementations)
+* [References](#references)`
 
 ## Panacea DID
 
@@ -25,7 +41,7 @@ checksum = 4*HEXDIG
 
 JSON-LD
 
-```json
+```
 {
 	"@context": "https://www.w3.org/ns/did/v1",
 	"id": "did:panacea:mainnet:B9334E0F2032DA0748225438D1A67012CA398E3568B68F40016959D80D3AF5D9:16B66EC9",
@@ -61,7 +77,7 @@ TODO: Should be written in the Swagger format
 - Content Type: `application/json`
 - URL Parameters: None
 - Request Body: A DID Document
-```json
+```
 {
 	"@context": "https://www.w3.org/ns/did/v1",
 	"id": "did:panacea:mainnet:B9334E0F2032DA0748225438D1A67012CA398E3568B68F40016959D80D3AF5D9:16B66EC9",
@@ -101,7 +117,7 @@ TODO: Should be written in the Swagger format
 - Content Type: `application/json`
 - URL Paraemeters: None
 - Request Body:
-```json
+```
 {
 	"did": "did:panacea:mainnet:B9334E0F2032DA0748225438D1A67012CA398E3568B68F40016959D80D3AF5D9:16B66EC9"
 }
@@ -142,7 +158,7 @@ TODO: Should be written in the Swagger format
 - Content Type: `application/json`
 - URL Paraemeters: None
 - Request Body: A DID Document
-```json
+```
 {
 	"@context": "https://www.w3.org/ns/did/v1",
 	"id": "did:panacea:mainnet:B9334E0F2032DA0748225438D1A67012CA398E3568B68F40016959D80D3AF5D9:16B66EC9",
@@ -182,7 +198,7 @@ TODO: Should be written in the Swagger format
 - Content Type: `application/json`
 - URL Paraemeters: None
 - Request Body: A DID Document
-```json
+```
 {
 	"@context": "https://www.w3.org/ns/did/v1",
 	"id": "did:panacea:mainnet:B9334E0F2032DA0748225438D1A67012CA398E3568B68F40016959D80D3AF5D9:16B66EC9",
