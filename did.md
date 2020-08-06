@@ -148,7 +148,7 @@ Example:
 Only the DID owner can replace the DID Document using the following transaction.
 ```
 {
-    "type": "create",
+    "type": "update",
     "did": <DID whose document needs to be updated>,
     "document": {
         "publicKey": [{
@@ -174,7 +174,7 @@ Only the DID owner can replace the DID Document using the following transaction.
 Example:
 ```
 {
-    "type": "create",
+    "type": "update",
     "did": "did:panacea:mainnet:DnreD8QqXAQaEW9DwC16Wh",
     "document": {
         "publicKey": [{
