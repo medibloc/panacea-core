@@ -25,13 +25,24 @@
 ### Panacea DID Method Specific Identifier
 
 ```
-panacea-did = "did:panacea:" network-id ":" idstring ":" checksum
-network-id = "mainnet" | "testnet"
-idstring = k*HEXDIG
-checksum = 4*HEXDIG
+panacea-did = "did:panacea:" network-id ":" idstring
+network-id = "mainnet" / "testnet"
+idstring = 21*22(base58)
+base58 = "1" / "2" / "3" / "4" / "5" / "6" / "7" / "8" / "9" / "A" / "B" /
+         "C" / "D" / "E" / "F" / "G" / "H" / "J" / "K" / "L" / "M" / "N" /
+         "P" / "Q" / "R" / "S" / "T" / "U" / "V" / "W" / "X" / "Y" / "Z" /
+         "a" / "b" / "c" / "d" / "e" / "f" / "g" / "h" / "i" / "j" / "k" /
+         "m" / "n" / "o" / "p" / "q" / "r" / "s" / "t" / "u" / "v" / "w" /
+         "x" / "y" / "z"
 ```
-- `idstring`: The transaction hash of the transaction that was submitted to create the DID on Panacea.
-- `checksum`: The first 4 bytes of `SHA3-256(network-id ":" idstring)`
+The `idstring` is a base58-encoded of the first 16 bytes of a 256bit Ed25519 verification key (the public portion of the key pair).
+This gives an length of either 21 or 22 characters, and it means that DIDs are case-sensitive,
+even though the prefix is always lower-case.
+
+Example:
+```
+did:panacea:mainnet:DnreD8QqXAQaEW9DwC16Wh
+```
 
 
 ## Panacea DID Document
@@ -41,21 +52,21 @@ JSON-LD
 ```
 {
     "@context": "https://www.w3.org/ns/did/v1",
-    "id": "did:panacea:mainnet:B9334E0F2032DA0748225438D1A67012CA398E3568B68F40016959D80D3AF5D9:16B66EC9",
+    "id": "did:panacea:mainnet:DnreD8QqXAQaEW9DwC16Wh",
     "authentication": [
         "key1"
     ],
     "publicKey": [
         {
-            "id": "key1"
+            "id": "did:panacea:mainnet:DnreD8QqXAQaEW9DwC16Wh#key1",
             "type": "Ed25519VerificationKey2018",
-            "controller": "did:panacea:mainnet:B9334E0F2032DA0748225438D1A67012CA398E3568B68F40016959D80D3AF5D9:16B66EC9",
+            "controller": "did:panacea:mainnet:DnreD8QqXAQaEW9DwC16Wh",
             "publicKeyBase58": "H3C2AVvLMv6gmMNam3uVAjZpfkcJCwDwnZn6z3wXmqPV"
         }
     ],
     "service": [
         {
-            "id": "service1",
+            "id": "did:panacea:mainnet:DnreD8QqXAQaEW9DwC16Wh#svc1",
             "type": "VerifiableCredentialService",
             "serviceEndpoint": "https://example.com/vc/"
         }
@@ -63,171 +74,152 @@ JSON-LD
 }
 ```
 
-## CRUD Operations (REST)
+## CRUD Operations
 
-TODO: Should be written in the Swagger format
+### Create (Register)
 
-### Create
-
-- URL: `/did/`
-- Method: `/did/`
-- Content Type: `application/json`
-- URL Parameters: None
-- Request Body: A DID Document
+To create a DID Document in Panacea, the following transaction should be submitted.
 ```
 {
-    "@context": "https://www.w3.org/ns/did/v1",
-    "id": "did:panacea:mainnet:B9334E0F2032DA0748225438D1A67012CA398E3568B68F40016959D80D3AF5D9:16B66EC9",
-    "authentication": [
-        "key1"
-    ],
-    "publicKey": [
-        {
-            "id": "key1"
+    "type": "create",
+    "did": <new DID that is being registered>,
+    "document": {
+        "publicKey": [{
+            "id": <a valid unique identifier>,
             "type": "Ed25519VerificationKey2018",
-            "controller": "did:panacea:mainnet:B9334E0F2032DA0748225438D1A67012CA398E3568B68F40016959D80D3AF5D9:16B66EC9",
-            "publicKeyBase58": "H3C2AVvLMv6gmMNam3uVAjZpfkcJCwDwnZn6z3wXmqPV"
-        }
-    ]
+            "publicKeyBase58": <base58-encoded public key of a Ed25519 verification key-pair>,
+        }],
+        "authentication": [{
+            "publicKey": [<reference to a publicKey object>]
+        }],
+        "service": [{
+            "type": <VerifiableCredentialService, ...>,
+            "serviceEndpoint": <A URI for the endpoint>
+        }]
+    }
 }
 ```
-- Success Response
-    - Code: `200 OK`
-    - Body: Unsigned message envelope
-    ```
-    {
-        "mode": "plain",
-        "message": {
-            "operation": "create",
-            "did": "did:panacea:mainnet:B9334E0F2032DA0748225438D1A67012CA398E3568B68F40016959D80D3AF5D9:16B66EC9",
-            "didDocumentBase64": "cXdlcm9pam9pamdkamFk",
-            "timestamp": "2020-12-25T15:31:42.123Z"
-        }
+
+Example:
+```
+{
+    "type": "create",
+    "did": "did:panacea:mainnet:DnreD8QqXAQaEW9DwC16Wh",
+    "document": {
+        "publicKey": [{
+            "id": "did:panacea:mainnet:DnreD8QqXAQaEW9DwC16Wh#key1",
+            "type": "Ed25519VerificationKey2018",
+            "publicKeyBase58": "H3C2AVvLMv6gmMNam3uVAjZpfkcJCwDwnZn6z3wXmqPV"
+        }],
+        "authentication": [{
+            "publicKey": ["did:panacea:mainnet:DnreD8QqXAQaEW9DwC16Wh#key1"]
+        }],
+        "service": [{
+            "type": "VerifiableCredentialService",
+            "serviceEndpoint": "https://example.com/vc/"
+        }]
     }
-    ```
-- Error Response Codes: TO BE DESCRIBED
+}
+```
+
+Possible outcomes include:
+- TBD
 
 ### Read
 
-- URL: `/did/`
-- Method: `GET`
-- Content Type: `application/json`
-- URL Paraemeters: None
-- Request Body:
+A Panacea DID Document can be looked up by the DID using the following transaction.
 ```
 {
-    "did": "did:panacea:mainnet:B9334E0F2032DA0748225438D1A67012CA398E3568B68F40016959D80D3AF5D9:16B66EC9"
+    "type": "read",
+    "did": <DID to be queried>
 }
 ```
-- Success Response
-    - Code: `200 OK`
-    - Body: The latest DID Document in a plain form
-    ```
-    {
-        "@context": "https://www.w3.org/ns/did/v1",
-        "id": "did:panacea:mainnet:B9334E0F2032DA0748225438D1A67012CA398E3568B68F40016959D80D3AF5D9:16B66EC9",
-        "authentication": [
-            "key1"
-        ],
-        "publicKey": [
-            {
-                "id": "key1"
-                "type": "Ed25519VerificationKey2018",
-                "controller": "did:panacea:mainnet:B9334E0F2032DA0748225438D1A67012CA398E3568B68F40016959D80D3AF5D9:16B66EC9",
-                "publicKeyBase58": "H3C2AVvLMv6gmMNam3uVAjZpfkcJCwDwnZn6z3wXmqPV"
-            }
-        ],
-        "service": [
-            {
-                "id": "service1",
-                "type": "VerifiableCredentialService",
-                "serviceEndpoint": "https://example.com/vc/"
-            }
-        ]
-    }
-    ```
-- Error Response Codes: TO BE DESCRIBED
+
+Example:
+```
+{
+    "type": "read",
+    "did": "did:panacea:mainnet:DnreD8QqXAQaEW9DwC16Wh"
+}
+```
 
 ### Update
 
-- URL: `/did/`
-- Method: `PUT`
-- Content Type: `application/json`
-- URL Paraemeters: None
-- Request Body: A DID Document
+Only the DID owner can replace the DID Document using the following transaction.
 ```
 {
-    "@context": "https://www.w3.org/ns/did/v1",
-    "id": "did:panacea:mainnet:B9334E0F2032DA0748225438D1A67012CA398E3568B68F40016959D80D3AF5D9:16B66EC9",
-    "authentication": [
-        "key1"
-    ],
-    "publicKey": [
-        {
-            "id": "key1"
+    "type": "create",
+    "did": <DID whose document needs to be updated>,
+    "document": {
+        "publicKey": [{
+            "id": <a valid unique identifier>,
             "type": "Ed25519VerificationKey2018",
-            "controller": "did:panacea:mainnet:B9334E0F2032DA0748225438D1A67012CA398E3568B68F40016959D80D3AF5D9:16B66EC9",
-            "publicKeyBase58": "H3C2AVvLMv6gmMNam3uVAjZpfkcJCwDwnZn6z3wXmqPV"
-        }
-    ]
+            "publicKeyBase58": <base58-encoded public key of a Ed25519 verification key-pair>,
+        }, {
+            "id": <a valid unique identifier>,
+            "type": "Ed25519VerificationKey2018",
+            "publicKeyBase58": <base58-encoded public key of a Ed25519 verification key-pair>,
+        }],
+        "authentication": [{
+            "publicKey": [<references to publicKey objects>]
+        }],
+        "service": [{
+            "type": <VerifiableCredentialService, ...>,
+            "serviceEndpoint": <A URI for the endpoint>
+        }]
+    }
 }
 ```
-- Success Response
-    - Code: `200 OK`
-    - Body: Unsigned message envelope
-    ```
-    {
-        "mode": "plain",
-        "message": {
-            "operation": "update",
-            "did": "did:panacea:mainnet:B9334E0F2032DA0748225438D1A67012CA398E3568B68F40016959D80D3AF5D9:16B66EC9",
-            "didDocumentBase64": "cXdlcm9panFld2xyanFsa3dlO3JqcQ==",
-            "timestamp": "2020-12-25T17:31:42.123Z"
-        }
+
+Example:
+```
+{
+    "type": "create",
+    "did": "did:panacea:mainnet:DnreD8QqXAQaEW9DwC16Wh",
+    "document": {
+        "publicKey": [{
+            "id": "did:panacea:mainnet:DnreD8QqXAQaEW9DwC16Wh#key1",
+            "type": "Ed25519VerificationKey2018",
+            "publicKeyBase58": "H3C2AVvLMv6gmMNam3uVAjZpfkcJCwDwnZn6z3wXmqPV"
+        }, {
+            "id": "did:panacea:mainnet:DnreD8QqXAQaEW9DwC16Wh#key2",
+            "type": "Ed25519VerificationKey2018",
+            "publicKeyBase58": "VAjZpfkcJCwDwnZn6z3wXmqPVH3C2AVvLMv6gmMNam3u"
+        }],
+        "authentication": [{
+            "publicKey": [
+                "did:panacea:mainnet:DnreD8QqXAQaEW9DwC16Wh#key1",
+                "did:panacea:mainnet:DnreD8QqXAQaEW9DwC16Wh#key2"
+            ]
+        }],
+        "service": [{
+            "type": "VerifiableCredentialService",
+            "serviceEndpoint": "https://example.com/vc/"
+        }]
     }
-    ```
-- Error Response Codes: TO BE DESCRIBED
+}
+```
 
 ### Delete
 
-- URL: `/did/`
-- Method: `DELETE`
-- Content Type: `application/json`
-- URL Paraemeters: None
-- Request Body: A DID Document
+[TODO: This paragraph is temporary. Should be decided how to implement this operation.]
+Internally, the delete operation is processed by setting the DID Document to null.
+
+To delete the DID document, the DID owner should send the following transaction.
 ```
 {
-    "@context": "https://www.w3.org/ns/did/v1",
-    "id": "did:panacea:mainnet:B9334E0F2032DA0748225438D1A67012CA398E3568B68F40016959D80D3AF5D9:16B66EC9",
-    "authentication": [
-        "key1"
-    ],
-    "publicKey": [
-        {
-            "id": "key1"
-            "type": "Ed25519VerificationKey2018",
-            "controller": "did:panacea:mainnet:B9334E0F2032DA0748225438D1A67012CA398E3568B68F40016959D80D3AF5D9:16B66EC9",
-            "publicKeyBase58": "H3C2AVvLMv6gmMNam3uVAjZpfkcJCwDwnZn6z3wXmqPV"
-        }
-    ]
+    "type": "delete",
+    "did": <DID whose document is being deleted>
 }
 ```
-- Success Response
-    - Code: `200 OK`
-    - Body: Unsigned message envelope
-    ```
-    {
-        "mode": "plain",
-        "message": {
-            "operation": "delete",
-            "did": "did:panacea:mainnet:B9334E0F2032DA0748225438D1A67012CA398E3568B68F40016959D80D3AF5D9:16B66EC9",
-            "didDocumentBase64": "cXdlcm9panFld2xyanFsa3dlO3JqcQ==",
-            "timestamp": "2020-12-25T18:31:42.123Z"
-        }
-    }
-    ```
-- Error Response Codes: TO BE DESCRIBED
 
+Example:
+```
+{
+    "type": "delete",
+    "did": "did:panacea:mainnet:DnreD8QqXAQaEW9DwC16Wh"
+}
+```
 
 ## Security Considerations
 
