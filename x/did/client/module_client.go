@@ -26,7 +26,9 @@ func (mc ModuleClient) GetQueryCmd() *cobra.Command {
 		Short: "Querying commands for the did module",
 	}
 
-	didQueryCmd.AddCommand(client.GetCommands()...)
+	didQueryCmd.AddCommand(client.GetCommands(
+		didCmds.GetCmdResolveDID(mc.cdc),
+	)...)
 
 	return didQueryCmd
 }

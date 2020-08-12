@@ -6,7 +6,7 @@ replace golang.org/x/crypto => github.com/tendermint/crypto v0.0.0-2018082004570
 
 require (
 	github.com/bombsimon/wsl v1.2.1 // indirect
-	github.com/btcsuite/btcutil v1.0.2 // indirect
+	github.com/btcsuite/btcutil v1.0.2
 	github.com/cosmos/cosmos-sdk v0.34.7
 	github.com/golangci/golangci-lint v1.22.2 // indirect
 	github.com/gorilla/mux v1.7.0

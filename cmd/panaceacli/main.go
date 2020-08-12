@@ -189,6 +189,7 @@ func registerRoutes(rs *lcd.RestServer) {
 	gov.RegisterRoutes(rs.CliCtx, rs.Mux, rs.Cdc)
 	mintrest.RegisterRoutes(rs.CliCtx, rs.Mux, rs.Cdc)
 	aolrest.RegisterRoutes(rs.CliCtx, rs.Mux, rs.Cdc, aol.StoreKey)
+	//TODO: didrest.RegisterRoutes(rs.CliCtx, rs.Mux, rs.Cdc, did.StoreKey)
 }
 
 func registerSwaggerUI(rs *lcd.RestServer) {

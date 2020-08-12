@@ -35,3 +35,16 @@ func (k Keeper) HasDID(ctx sdk.Context, did types.DID) bool {
 	store := ctx.KVStore(k.storeKey)
 	return store.Has(DIDKey(did))
 }
+
+func (k Keeper) GetDID(ctx sdk.Context, did types.DID) types.DIDDocument {
+	store := ctx.KVStore(k.storeKey)
+	key := DIDKey(did)
+	bz := store.Get(key)
+	if bz == nil {
+		return types.DIDDocument{}
+	}
+
+	var doc types.DIDDocument
+	k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &doc)
+	return doc
+}

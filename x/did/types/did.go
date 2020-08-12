@@ -1,6 +1,7 @@
 package types
 
 import (
+	"encoding/json"
 	"fmt"
 	"regexp"
 
@@ -18,7 +19,7 @@ const (
 
 func NewDID(pubKey crypto.PubKey, keyType PubKeyType) DID {
 	networkID := "testnet" // TODO: get this from somewhere
-	idStr, _ := mustEncodePubKey(pubKey, keyType, 16)
+	idStr := mustPubKeyBase58(pubKey, keyType, 16)
 	return DID(fmt.Sprintf("did:%s:%s:%s", DIDMethod, networkID, idStr))
 }
 
@@ -28,28 +29,48 @@ func (did DID) IsValid() bool {
 	return match
 }
 
+func (did DID) IsEmpty() bool {
+	return did == ""
+}
+
 type DIDDocument struct {
 	ID              DID              `json:"id"`
-	PubKeys         []PubKey         `json:"public_key"`
+	PubKeys         []PubKey         `json:"publicKey"`
 	Authentications []Authentication `json:"authentication"`
 }
+
+type PubKey struct {
+	ID        PubKeyID   `json:"id"`
+	Type      PubKeyType `json:"type"`
+	KeyBase58 string     `json:"publicKeyBase58"`
+}
+
+type PubKeyID string
+type PubKeyType string
+type Authentication PubKeyID
+
+const (
+	ES256K PubKeyType = "Secp256k1VerificationKey2018"
+)
 
 func NewDIDDocument(id DID, pubKey PubKey) DIDDocument {
 	return DIDDocument{
 		ID:              id,
 		PubKeys:         []PubKey{pubKey},
-		Authentications: []Authentication{NewAuthentication(pubKey)},
+		Authentications: []Authentication{Authentication(pubKey.ID)},
 	}
 }
 
-type PubKey struct {
-	ID         string
-	Type       PubKeyType
-	KeyEncoded string
-	Encoding   PubKeyEncoding
+func (doc DIDDocument) IsEmpty() bool {
+	return doc.ID.IsEmpty()
 }
 
-func MustNewPubKey(id string, key crypto.PubKey, keyType PubKeyType) PubKey {
+func (doc DIDDocument) String() string {
+	bz, _ := json.Marshal(doc)
+	return string(bz)
+}
+
+func MustNewPubKey(id PubKeyID, key crypto.PubKey, keyType PubKeyType) PubKey {
 	if id == "" {
 		panic("id shouldn't be empty")
 	}
@@ -60,16 +81,14 @@ func MustNewPubKey(id string, key crypto.PubKey, keyType PubKeyType) PubKey {
 		panic("keyType is invalid")
 	}
 
-	keyEncoded, encoding := mustEncodePubKey(key, keyType, 0)
 	return PubKey{
-		ID:         id,
-		Type:       keyType,
-		KeyEncoded: keyEncoded,
-		Encoding:   encoding,
+		ID:        id,
+		Type:      keyType,
+		KeyBase58: mustPubKeyBase58(key, keyType, 0),
 	}
 }
 
-func mustEncodePubKey(key crypto.PubKey, keyType PubKeyType, truncateLen int) (string, PubKeyEncoding) {
+func mustPubKeyBase58(key crypto.PubKey, keyType PubKeyType, truncateLen int) string {
 	switch keyType {
 	case ES256K:
 		return encodePubKeyES256K(key, truncateLen)
@@ -77,7 +96,7 @@ func mustEncodePubKey(key crypto.PubKey, keyType PubKeyType, truncateLen int) (s
 	panic(fmt.Sprintf("unsupported pubkey type: %v", keyType))
 }
 
-func encodePubKeyES256K(key crypto.PubKey, truncateLen int) (string, PubKeyEncoding) {
+func encodePubKeyES256K(key crypto.PubKey, truncateLen int) string {
 	keyES256K := key.(secp256k1.PubKeySecp256k1)
 
 	var k []byte
@@ -87,14 +106,8 @@ func encodePubKeyES256K(key crypto.PubKey, truncateLen int) (string, PubKeyEncod
 		k = keyES256K[:]
 	}
 
-	return base58.Encode(k), BASE58
+	return base58.Encode(k)
 }
-
-type PubKeyType string
-
-const (
-	ES256K PubKeyType = "Secp256k1VerificationKey"
-)
 
 func (t PubKeyType) IsValid() bool {
 	switch t {
@@ -102,28 +115,4 @@ func (t PubKeyType) IsValid() bool {
 		return true
 	}
 	return false
-}
-
-type PubKeyEncoding string
-
-const (
-	BASE58 PubKeyEncoding = "publicKeyBase58"
-)
-
-func (t PubKeyEncoding) IsValid() bool {
-	switch t {
-	case BASE58:
-		return true
-	}
-	return false
-}
-
-type Authentication struct {
-	PubKeyID string
-}
-
-func NewAuthentication(pubKey PubKey) Authentication {
-	return Authentication{
-		PubKeyID: pubKey.ID,
-	}
 }
