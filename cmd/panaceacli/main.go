@@ -38,6 +38,7 @@ import (
 	staking "github.com/cosmos/cosmos-sdk/x/staking/client/rest"
 	aol "github.com/medibloc/panacea-core/x/aol"
 	aolrest "github.com/medibloc/panacea-core/x/aol/client/rest"
+	did "github.com/medibloc/panacea-core/x/did"
 
 	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
 	bankcmd "github.com/cosmos/cosmos-sdk/x/bank/client/cli"
@@ -49,6 +50,7 @@ import (
 	slashingclient "github.com/cosmos/cosmos-sdk/x/slashing/client"
 	stakingclient "github.com/cosmos/cosmos-sdk/x/staking/client"
 	aolClient "github.com/medibloc/panacea-core/x/aol/client"
+	didClient "github.com/medibloc/panacea-core/x/did/client"
 
 	_ "github.com/medibloc/panacea-core/client/lcd/statik"
 )
@@ -83,6 +85,7 @@ func main() {
 		slashingclient.NewModuleClient(sl.StoreKey, cdc),
 		crisisclient.NewModuleClient(sl.StoreKey, cdc),
 		aolClient.NewModuleClient(aol.StoreKey, cdc),
+		didClient.NewModuleClient(did.StoreKey, cdc),
 	}
 
 	rootCmd := &cobra.Command{
