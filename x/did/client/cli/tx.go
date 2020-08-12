@@ -23,7 +23,7 @@ func GetCmdCreateDID(cdc *codec.Codec) *cobra.Command {
 			privKey := secp256k1.GenPrivKey() //TODO: store this somewhere safely
 			pubKey := privKey.PubKey()
 
-			did := types.NewDID(pubKey)
+			did := types.NewDID(pubKey, types.ES256K)
 			doc := types.NewDIDDocument(
 				did,
 				types.MustNewPubKey("key1", pubKey, types.ES256K),

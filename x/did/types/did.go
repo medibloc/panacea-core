@@ -12,18 +12,19 @@ import (
 type DID string
 
 const (
-	DIDMethod = "panacea"
+	DIDMethod     = "panacea"
+	Base58Charset = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
 )
 
-func NewDID(pubKey crypto.PubKey) DID {
-	networkID := "testnet"    // TODO: get this from somewhere
-	idStr := pubKey.Address() // TODO: correct?
+func NewDID(pubKey crypto.PubKey, keyType PubKeyType) DID {
+	networkID := "testnet" // TODO: get this from somewhere
+	idStr, _ := mustEncodePubKey(pubKey, keyType, 16)
 	return DID(fmt.Sprintf("did:%s:%s:%s", DIDMethod, networkID, idStr))
 }
 
 func (did DID) IsValid() bool {
-	// TODO: check if the pattern is correct, according to the encoding of id-string
-	match, _ := regexp.MatchString("^did:panacea:(mainnet|testnet):[1-9A-Za-z]{21,22}$", string(did))
+	pattern := fmt.Sprintf("^did:panacea:(mainnet|testnet):[%s]{21,22}$", Base58Charset)
+	match, _ := regexp.MatchString(pattern, string(did))
 	return match
 }
 
@@ -59,7 +60,7 @@ func MustNewPubKey(id string, key crypto.PubKey, keyType PubKeyType) PubKey {
 		panic("keyType is invalid")
 	}
 
-	keyEncoded, encoding := mustEncodePubKey(key, keyType)
+	keyEncoded, encoding := mustEncodePubKey(key, keyType, 0)
 	return PubKey{
 		ID:         id,
 		Type:       keyType,
@@ -68,17 +69,25 @@ func MustNewPubKey(id string, key crypto.PubKey, keyType PubKeyType) PubKey {
 	}
 }
 
-func mustEncodePubKey(key crypto.PubKey, keyType PubKeyType) (string, PubKeyEncoding) {
+func mustEncodePubKey(key crypto.PubKey, keyType PubKeyType, truncateLen int) (string, PubKeyEncoding) {
 	switch keyType {
 	case ES256K:
-		return encodePubKeyES256K(key)
+		return encodePubKeyES256K(key, truncateLen)
 	}
 	panic(fmt.Sprintf("unsupported pubkey type: %v", keyType))
 }
 
-func encodePubKeyES256K(key crypto.PubKey) (string, PubKeyEncoding) {
-	k := key.(secp256k1.PubKeySecp256k1)
-	return base58.Encode(k[:]), BASE58
+func encodePubKeyES256K(key crypto.PubKey, truncateLen int) (string, PubKeyEncoding) {
+	keyES256K := key.(secp256k1.PubKeySecp256k1)
+
+	var k []byte
+	if truncateLen > 0 {
+		k = keyES256K[:truncateLen]
+	} else {
+		k = keyES256K[:]
+	}
+
+	return base58.Encode(k), BASE58
 }
 
 type PubKeyType string
