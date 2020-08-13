@@ -221,8 +221,8 @@ func NewPanaceaApp(
 		AddRoute(slashing.QuerierRoute, slashing.NewQuerier(app.slashingKeeper, app.cdc)).
 		AddRoute(staking.QuerierRoute, staking.NewQuerier(app.stakingKeeper, app.cdc)).
 		AddRoute(mint.QuerierRoute, mint.NewQuerier(app.mintKeeper)).
-		AddRoute(aol.QuerierRoute, aol.NewQuerier(app.aolKeeper))
-		//TODO: AddRoute(did.QuerierRoute, did.NewQuerier(app.didKeeper))
+		AddRoute(aol.QuerierRoute, aol.NewQuerier(app.aolKeeper)).
+		AddRoute(did.QuerierRoute, did.NewQuerier(app.didKeeper))
 
 	// initialize BaseApp
 	app.MountStores(

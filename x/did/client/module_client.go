@@ -27,7 +27,7 @@ func (mc ModuleClient) GetQueryCmd() *cobra.Command {
 	}
 
 	didQueryCmd.AddCommand(client.GetCommands(
-	//TODO:
+		didCmds.GetCmdResolveDID(mc.cdc),
 	)...)
 
 	return didQueryCmd
