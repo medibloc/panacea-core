@@ -58,8 +58,8 @@ install: go.sum update_panacea_lite_docs
 ### Tools & dependencies
 
 get_tools:
-	GO111MODULE=off go get github.com/rakyll/statik
-	go get github.com/golangci/golangci-lint/cmd/golangci-lint@v1.22.2
+	go get github.com/rakyll/statik
+	go get github.com/golangci/golangci-lint/cmd/golangci-lint
 
 go.sum: go.mod
 	@echo "--> Ensure dependencies have not been modified"
