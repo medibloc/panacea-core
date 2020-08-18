@@ -29,10 +29,10 @@ func (msg MsgCreateDID) Type() string { return "create_did" }
 
 // VaValidateBasic runs stateless checks on the message.
 func (msg MsgCreateDID) ValidateBasic() sdk.Error {
-	if !msg.DID.IsValid() {
+	if !msg.DID.Valid() {
 		return ErrInvalidDID(msg.DID)
 	}
-	if !msg.Document.IsValid() {
+	if !msg.Document.Valid() {
 		return ErrInvalidDIDDocument()
 	}
 	if msg.OwnerAddress.Empty() {
@@ -73,10 +73,10 @@ func (msg MsgUpdateDID) Type() string { return "update_did" }
 
 // VaValidateBasic runs stateless checks on the message.
 func (msg MsgUpdateDID) ValidateBasic() sdk.Error {
-	if !msg.DID.IsValid() {
+	if !msg.DID.Valid() {
 		return ErrInvalidDID(msg.DID)
 	}
-	if !msg.Document.IsValid() {
+	if !msg.Document.Valid() {
 		return ErrInvalidDIDDocument()
 	}
 	if msg.Signature == nil || len(msg.Signature) == 0 {

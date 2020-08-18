@@ -16,6 +16,7 @@ const (
 	CodeSigVerificationFailed      sdk.CodeType = 107
 	CodeInvalidSecp256k1PrivateKey sdk.CodeType = 108
 	CodeInvalidSecp256k1PublicKey  sdk.CodeType = 109
+	CodeInvalidNetworkID  sdk.CodeType = 110
 )
 
 func ErrDIDExists(did DID) sdk.Error {
@@ -52,4 +53,8 @@ func ErrInvalidSecp256k1PrivateKey(err error) sdk.Error {
 
 func ErrInvalidSecp256k1PublicKey(err error) sdk.Error {
 	return sdk.NewError(DefaultCodespace, CodeInvalidSecp256k1PublicKey, "Invalid Secp256k1 public key: %v", err)
+}
+
+func ErrInvalidNetworkID(id string) sdk.Error {
+	return sdk.NewError(DefaultCodespace, CodeInvalidNetworkID, "Invalid network ID: %s", id)
 }

@@ -11,27 +11,47 @@ import (
 	"github.com/tendermint/tendermint/crypto/secp256k1"
 )
 
-type DID string
-
 const (
 	DIDMethod     = "panacea"
 	Base58Charset = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
 )
 
-func NewDID(pubKey crypto.PubKey, keyType PubKeyType) DID {
-	networkID := "testnet" // TODO: get this from somewhere
+type DID string
+
+func NewDID(networkID NetworkID, pubKey crypto.PubKey, keyType PubKeyType) DID {
 	idStr := newPubKeyBase58(pubKey, keyType, 16)
 	return DID(fmt.Sprintf("did:%s:%s:%s", DIDMethod, networkID, idStr))
 }
 
-func (did DID) IsValid() bool {
-	pattern := fmt.Sprintf("^did:panacea:(mainnet|testnet):[%s]{21,22}$", Base58Charset)
-	match, _ := regexp.MatchString(pattern, string(did))
-	return match
+func (did DID) Valid() bool {
+	pattern := fmt.Sprintf("^did:panacea:%s:[%s]{21,22}$", networkIDRegex(), Base58Charset)
+	matched, _ := regexp.MatchString(pattern, string(did))
+	return matched
 }
 
-func (did DID) IsEmpty() bool {
+func (did DID) Empty() bool {
 	return did == ""
+}
+
+type NetworkID string
+
+const (
+	Mainnet NetworkID = "mainnet"
+	Testnet NetworkID = "testnet"
+)
+
+func NewNetworkID(str string) (NetworkID, error) {
+	switch NetworkID(str) {
+	case Mainnet:
+		return Mainnet, nil
+	case Testnet:
+		return Testnet, nil
+	}
+	return "", ErrInvalidNetworkID(str)
+}
+
+func networkIDRegex() string {
+	return fmt.Sprintf("(%s|%s)", Mainnet, Testnet)
 }
 
 type DIDDocument struct {
@@ -48,19 +68,19 @@ func NewDIDDocument(id DID, pubKey PubKey) DIDDocument {
 	}
 }
 
-func (doc DIDDocument) IsValid() bool {
-	if !doc.ID.IsValid() || doc.PubKeys == nil || doc.Authentications == nil {
+func (doc DIDDocument) Valid() bool {
+	if !doc.ID.Valid() || doc.PubKeys == nil || doc.Authentications == nil {
 		return false
 	}
 
 	for _, pubKey := range doc.PubKeys {
-		if !pubKey.IsValid() {
+		if !pubKey.Valid() {
 			return false
 		}
 	}
 
 	for _, auth := range doc.Authentications {
-		if !auth.IsValid() {
+		if !auth.Valid() {
 			return false
 		}
 		if _, ok := doc.PubKeyByID(PubKeyID(auth)); !ok {
@@ -71,8 +91,8 @@ func (doc DIDDocument) IsValid() bool {
 	return true
 }
 
-func (doc DIDDocument) IsEmpty() bool {
-	return doc.ID.IsEmpty()
+func (doc DIDDocument) Empty() bool {
+	return doc.ID.Empty()
 }
 
 func (doc DIDDocument) String() string {
@@ -134,8 +154,8 @@ func encodePubKeyES256K(key crypto.PubKey, truncateLen int) string {
 	return base58.Encode(k)
 }
 
-func (pk PubKey) IsValid() bool {
-	if pk.ID == "" || !pk.Type.IsValid() {
+func (pk PubKey) Valid() bool {
+	if pk.ID == "" || !pk.Type.Valid() {
 		return false
 	}
 
@@ -150,7 +170,7 @@ const (
 	ES256K PubKeyType = "Secp256k1VerificationKey2018"
 )
 
-func (t PubKeyType) IsValid() bool {
+func (t PubKeyType) Valid() bool {
 	switch t {
 	case ES256K:
 		return true
@@ -161,7 +181,7 @@ func (t PubKeyType) IsValid() bool {
 // TODO: to be extended
 type Authentication PubKeyID
 
-func (a Authentication) IsValid() bool {
+func (a Authentication) Valid() bool {
 	return a != ""
 }
 

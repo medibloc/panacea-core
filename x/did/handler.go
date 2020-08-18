@@ -33,7 +33,7 @@ func handleMsgCreateDID(ctx sdk.Context, keeper Keeper, msg MsgCreateDID) sdk.Re
 
 func handleMsgUpdateDID(ctx sdk.Context, keeper Keeper, msg MsgUpdateDID) sdk.Result {
 	curDoc := keeper.GetDID(ctx, msg.DID)
-	if curDoc.IsEmpty() {
+	if curDoc.Empty() {
 		return types.ErrDIDNotFound(msg.DID).Result()
 	}
 
@@ -44,7 +44,7 @@ func handleMsgUpdateDID(ctx sdk.Context, keeper Keeper, msg MsgUpdateDID) sdk.Re
 
 	pubKeySecp256k1, err := types.NewPubKeyFromBase58(pubKey.KeyBase58)
 	if err != nil {
-		return types.ErrInvalidSecp256k1PrivateKey(err).Result()
+		return types.ErrInvalidSecp256k1PublicKey(err).Result()
 	}
 	if !pubKeySecp256k1.VerifyBytes(msg.Document.GetSignBytes(), msg.Signature) {
 		return types.ErrSigVerificationFailed().Result()

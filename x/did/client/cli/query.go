@@ -22,7 +22,7 @@ func GetCmdResolveDID(cdc *codec.Codec) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 			id := types.DID(args[0])
-			if !id.IsValid() {
+			if !id.Valid() {
 				return types.ErrInvalidDID(id)
 			}
 
@@ -39,7 +39,7 @@ func GetCmdResolveDID(cdc *codec.Codec) *cobra.Command {
 
 			var doc types.DIDDocument
 			cdc.MustUnmarshalJSON(res, &doc)
-			if doc.IsEmpty() {
+			if doc.Empty() {
 				return errors.New("DID not found")
 			}
 			return cliCtx.PrintOutput(doc)

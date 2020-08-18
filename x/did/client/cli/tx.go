@@ -17,9 +17,9 @@ import (
 
 func GetCmdCreateDID(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "create-did",
+		Use:   "create-did [network-id]",
 		Short: "Create a DID",
-		Args:  cobra.ExactArgs(0),
+		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			txBldr := authtxb.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
 			cliCtx := context.NewCLIContext().WithCodec(cdc).WithAccountDecoder(cdc)
@@ -28,7 +28,12 @@ func GetCmdCreateDID(cdc *codec.Codec) *cobra.Command {
 			fmt.Println(base58.Encode(privKey[:])) //TODO: don't print it. store it securely.
 			pubKey := privKey.PubKey()
 
-			did := types.NewDID(pubKey, types.ES256K)
+			networkID, err := types.NewNetworkID(args[0])
+			if err != nil {
+				return err
+			}
+
+			did := types.NewDID(networkID, pubKey, types.ES256K)
 			doc := types.NewDIDDocument(did, types.NewPubKey("key1", pubKey, types.ES256K))
 
 			msg := types.NewMsgCreateDID(did, doc, cliCtx.GetFromAddress())
@@ -51,7 +56,7 @@ func GetCmdUpdateDID(cdc *codec.Codec) *cobra.Command {
 			cliCtx := context.NewCLIContext().WithCodec(cdc).WithAccountDecoder(cdc)
 
 			did := types.DID(args[0])
-			if !did.IsValid() {
+			if !did.Valid() {
 				return types.ErrInvalidDID(did)
 			}
 
@@ -72,7 +77,7 @@ func GetCmdUpdateDID(cdc *codec.Codec) *cobra.Command {
 
 			var doc types.DIDDocument
 			err = json.NewDecoder(file).Decode(&doc)
-			if err != nil || !doc.IsValid() {
+			if err != nil || !doc.Valid() {
 				return types.ErrInvalidDIDDocument()
 			}
 
