@@ -20,7 +20,7 @@ const (
 
 func NewDID(pubKey crypto.PubKey, keyType PubKeyType) DID {
 	networkID := "testnet" // TODO: get this from somewhere
-	idStr := mustPubKeyBase58(pubKey, keyType, 16)
+	idStr := newPubKeyBase58(pubKey, keyType, 16)
 	return DID(fmt.Sprintf("did:%s:%s:%s", DIDMethod, networkID, idStr))
 }
 
@@ -105,25 +105,15 @@ type PubKey struct {
 
 type PubKeyID string
 
-func MustNewPubKey(id PubKeyID, key crypto.PubKey, keyType PubKeyType) PubKey {
-	if id == "" {
-		panic("id shouldn't be empty")
-	}
-	if key == nil {
-		panic("key shouldn't be empty")
-	}
-	if !keyType.IsValid() {
-		panic("keyType is invalid")
-	}
-
+func NewPubKey(id PubKeyID, key crypto.PubKey, keyType PubKeyType) PubKey {
 	return PubKey{
 		ID:        id,
 		Type:      keyType,
-		KeyBase58: mustPubKeyBase58(key, keyType, 0),
+		KeyBase58: newPubKeyBase58(key, keyType, 0),
 	}
 }
 
-func mustPubKeyBase58(key crypto.PubKey, keyType PubKeyType, truncateLen int) string {
+func newPubKeyBase58(key crypto.PubKey, keyType PubKeyType, truncateLen int) string {
 	switch keyType {
 	case ES256K:
 		return encodePubKeyES256K(key, truncateLen)

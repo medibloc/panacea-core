@@ -29,10 +29,7 @@ func GetCmdCreateDID(cdc *codec.Codec) *cobra.Command {
 			pubKey := privKey.PubKey()
 
 			did := types.NewDID(pubKey, types.ES256K)
-			doc := types.NewDIDDocument(
-				did,
-				types.MustNewPubKey("key1", pubKey, types.ES256K),
-			)
+			doc := types.NewDIDDocument(did, types.NewPubKey("key1", pubKey, types.ES256K))
 
 			msg := types.NewMsgCreateDID(did, doc, cliCtx.GetFromAddress())
 			if err := msg.ValidateBasic(); err != nil {
