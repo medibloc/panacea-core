@@ -20,6 +20,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/staking"
 
 	"github.com/medibloc/panacea-core/x/aol"
+	"github.com/medibloc/panacea-core/x/did"
 
 	abci "github.com/tendermint/tendermint/abci/types"
 	cmn "github.com/tendermint/tendermint/libs/common"
@@ -62,6 +63,7 @@ type PanaceaApp struct {
 
 	// custom keys
 	keyAOL *sdk.KVStoreKey
+	keyDID *sdk.KVStoreKey
 
 	// Manage getting and setting accounts
 	accountKeeper       auth.AccountKeeper
@@ -75,8 +77,9 @@ type PanaceaApp struct {
 	crisisKeeper        crisis.Keeper
 	paramsKeeper        params.Keeper
 
-	// custom keeper
+	// custom keepers
 	aolKeeper aol.Keeper
+	didKeeper did.Keeper
 }
 
 // NewPanaceaApp returns a reference to an initialized PanaceaApp.
@@ -110,6 +113,7 @@ func NewPanaceaApp(
 		keyParams:        sdk.NewKVStoreKey(params.StoreKey),
 		tkeyParams:       sdk.NewTransientStoreKey(params.TStoreKey),
 		keyAOL:           sdk.NewKVStoreKey(aol.StoreKey),
+		keyDID:           sdk.NewKVStoreKey(did.StoreKey),
 	}
 
 	app.paramsKeeper = params.NewKeeper(app.cdc, app.keyParams, app.tkeyParams)
@@ -182,6 +186,10 @@ func NewPanaceaApp(
 		app.keyAOL,
 		app.cdc,
 	)
+	app.didKeeper = did.NewKeeper(
+		app.keyDID,
+		app.cdc,
+	)
 
 	// register the staking hooks
 	// NOTE: The stakingKeeper above is passed by reference, so that it can be
@@ -203,7 +211,8 @@ func NewPanaceaApp(
 		AddRoute(slashing.RouterKey, slashing.NewHandler(app.slashingKeeper)).
 		AddRoute(gov.RouterKey, gov.NewHandler(app.govKeeper)).
 		AddRoute(crisis.RouterKey, crisis.NewHandler(app.crisisKeeper)).
-		AddRoute(aol.RouterKey, aol.NewHandler(app.aolKeeper))
+		AddRoute(aol.RouterKey, aol.NewHandler(app.aolKeeper)).
+		AddRoute(did.RouterKey, did.NewHandler(app.didKeeper))
 
 	app.QueryRouter().
 		AddRoute(auth.QuerierRoute, auth.NewQuerier(app.accountKeeper)).
@@ -212,13 +221,14 @@ func NewPanaceaApp(
 		AddRoute(slashing.QuerierRoute, slashing.NewQuerier(app.slashingKeeper, app.cdc)).
 		AddRoute(staking.QuerierRoute, staking.NewQuerier(app.stakingKeeper, app.cdc)).
 		AddRoute(mint.QuerierRoute, mint.NewQuerier(app.mintKeeper)).
-		AddRoute(aol.QuerierRoute, aol.NewQuerier(app.aolKeeper))
+		AddRoute(aol.QuerierRoute, aol.NewQuerier(app.aolKeeper)).
+		AddRoute(did.QuerierRoute, did.NewQuerier(app.didKeeper))
 
 	// initialize BaseApp
 	app.MountStores(
 		app.keyMain, app.keyAccount, app.keyStaking, app.keyMint, app.keyDistr,
 		app.keySlashing, app.keyGov, app.keyFeeCollection, app.keyParams,
-		app.tkeyParams, app.tkeyStaking, app.tkeyDistr, app.keyAOL,
+		app.tkeyParams, app.tkeyStaking, app.tkeyDistr, app.keyAOL, app.keyDID,
 	)
 	app.SetInitChainer(app.initChainer)
 	app.SetBeginBlocker(app.BeginBlocker)
@@ -246,6 +256,7 @@ func MakeCodec() *codec.Codec {
 	auth.RegisterCodec(cdc)
 	crisis.RegisterCodec(cdc)
 	aol.RegisterCodec(cdc)
+	did.RegisterCodec(cdc)
 	sdk.RegisterCodec(cdc)
 	codec.RegisterCrypto(cdc)
 	return cdc
@@ -316,6 +327,7 @@ func (app *PanaceaApp) initFromGenesisState(ctx sdk.Context, genesisState Genesi
 	crisis.InitGenesis(ctx, app.crisisKeeper, genesisState.CrisisData)
 	mint.InitGenesis(ctx, app.mintKeeper, genesisState.MintData)
 	aol.InitGenesis(ctx, app.aolKeeper, genesisState.AOLData)
+	//TODO: did.InitGenesis(ctx, app.didKeeper, genesisState.AOLData)
 
 	// validate genesis state
 	if err := PanaceaValidateGenesisState(genesisState); err != nil {
