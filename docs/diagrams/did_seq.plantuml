@@ -1,0 +1,24 @@
+@startuml
+
+actor Hospital
+actor UserAgent
+actor Insurance
+database Panacea
+
+UserAgent -> Insurance : start process
+Insurance -> UserAgent : request data
+UserAgent -> Hospital : request VerifiableClaims
+Hospital -> Panacea : request DID Document with user's DID
+Panacea -> Hospital : DID Document
+Hospital -> UserAgent : send DID challenge
+UserAgent -> Hospital : answer
+Hospital -> Hospital : verify answer 
+Hospital -> UserAgent : send VerifiableClaims
+UserAgent -> UserAgent : store VerifiableClaims
+UserAgent -> UserAgent : make VerifiablePresentation
+UserAgent -> Insurance : send VerifiablePresentation
+Insurance -> Panacea : request DID Document with hospital's DID
+Panacea -> Insurance : DID Document
+Insurance -> Insurance : verify VerifiableClaims by hospital's signiture
+
+@enduml
