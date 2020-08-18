@@ -145,11 +145,11 @@ func encodePubKeyES256K(key crypto.PubKey, truncateLen int) string {
 }
 
 func (pk PubKey) IsValid() bool {
-	if pk.ID == "" || pk.Type.IsValid() {
+	if pk.ID == "" || !pk.Type.IsValid() {
 		return false
 	}
 
-	pattern := fmt.Sprintf("^[%s]$", Base58Charset)
+	pattern := fmt.Sprintf("^[%s]+$", Base58Charset)
 	matched, _ := regexp.MatchString(pattern, pk.KeyBase58)
 	return matched
 }

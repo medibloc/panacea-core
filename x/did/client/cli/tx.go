@@ -3,7 +3,6 @@ package cli
 import (
 	"encoding/json"
 	"fmt"
-
 	"github.com/btcsuite/btcutil/base58"
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/client/utils"
@@ -13,6 +12,7 @@ import (
 	"github.com/medibloc/panacea-core/x/did/types"
 	"github.com/spf13/cobra"
 	"github.com/tendermint/tendermint/crypto/secp256k1"
+	"os"
 )
 
 func GetCmdCreateDID(cdc *codec.Codec) *cobra.Command {
@@ -46,7 +46,7 @@ func GetCmdCreateDID(cdc *codec.Codec) *cobra.Command {
 
 func GetCmdUpdateDID(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "update-did [did] [priv-key-base58] [pub-key-id] [did-doc]",
+		Use:   "update-did [did] [priv-key-base58] [pub-key-id] [did-doc-path]",
 		Short: "Update a DID Document",
 		Args:  cobra.ExactArgs(4),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -66,10 +66,15 @@ func GetCmdUpdateDID(cdc *codec.Codec) *cobra.Command {
 			}
 			pubKeyID := types.PubKeyID(args[2])
 
-			// TODO: Get a new DID doc via stdin or file. I tried it, but it didn't work because cosmos-sdk also tries to
-			// read a passphrase from stdin.
+			// read an input file of DID document
+			file, err := os.Open(args[3])
+			if err != nil {
+				return err
+			}
+			defer file.Close()
+
 			var doc types.DIDDocument
-			err = json.Unmarshal([]byte(args[3]), &doc)
+			err = json.NewDecoder(file).Decode(&doc)
 			if err != nil || !doc.IsValid() {
 				return types.ErrInvalidDIDDocument()
 			}
