@@ -41,7 +41,7 @@ pipeline {
     post {
         always {
 			ansiColor('xterm') {
-				sh('docker rmi ${IMAGE_NAME} || true')
+				sh 'docker rmi ${IMAGE_NAME_BUILD_ENV} ${IMAGE_NAME} || true'
 			}
         }
         success {
