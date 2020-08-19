@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # A script for deploying two Panacea docker containers on local.
+# This should work for both Linux and macOS.
 #
 # Prerequisites
 # - Docker
