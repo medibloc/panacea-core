@@ -30,7 +30,7 @@ BUILD_FLAGS := -tags "$(build_tags)" -ldflags '$(ldflags)'
 all: get_tools install
 
 ########################################
-### Testing
+### Analyzing
 
 lint:
 	golangci-lint run
@@ -45,6 +45,9 @@ build: go.sum
 	go build -mod=readonly $(BUILD_FLAGS) -o build/panacead ./cmd/panacead
 	go build -mod=readonly $(BUILD_FLAGS) -o build/panaceacli ./cmd/panaceacli
 	go build -mod=readonly $(BUILD_FLAGS) -o build/panaceakeyutil ./cmd/panaceakeyutil
+
+test:
+	go test ./...
 
 update_panacea_lite_docs:
 	@statik -src=client/lcd/swagger-ui -dest=client/lcd -f
