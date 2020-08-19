@@ -2,8 +2,10 @@ pipeline {
     agent any
 
     environment {
-        IMAGE_NAME = "panacea-core"
+        APP_NAME = "panacea-core"
         GIT_COMMIT_HASH = sh (script: "git log -n 1 --pretty=format:'%H'", returnStdout: true)
+		IMAGE_NAME = "${APP_NAME}:${GIT_COMMIT_HASH}"
+		IMAGE_NAME_BUILD_ENV = ${IMAGE_NAME}-build-env
     }
 
     stages {
@@ -15,12 +17,18 @@ pipeline {
         stage('Build') {
             steps {
                 echo 'Building..'
-                sh 'docker build -t ${IMAGE_NAME}:${GIT_COMMIT_HASH} .'
+				ansiColor('xterm') {
+					sh 'docker build --target build-env -t ${IMAGE_NAME_BUILD_ENV} .'
+					sh 'docker build -t ${IMAGE_NAME} .'
+				}
             }
         }
         stage('Test') {
             steps {
                 echo 'Testing..'
+				ansiColor('xterm') {
+					sh 'docker run -a stdout -a stderr ${IMAGE_NAME_BUILD_ENV} /bin/sh -c "go test ./..."'
+				}
             }
         }
         stage('Deploy') {
@@ -32,7 +40,9 @@ pipeline {
 
     post {
         always {
-            sh 'docker rmi ${IMAGE_NAME}:${GIT_COMMIT_HASH} || true'
+			ansiColor('xterm') {
+				sh('docker rmi ${IMAGE_NAME} || true')
+			}
         }
         success {
             slackSend (channel: '#alerts-ci', color: '#00FF00', message: "SUCCESSFUL: '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
