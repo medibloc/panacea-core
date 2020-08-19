@@ -24,7 +24,7 @@ pipeline {
         stage('Test') {
             steps {
                 echo 'Testing..'
-                sh 'docker run -a stdout -a stderr ${IMAGE_NAME_BUILD_ENV} /bin/sh -c "go test ./..."'
+                sh 'docker run --rm -a stdout -a stderr ${IMAGE_NAME_BUILD_ENV} /bin/sh -c "go test ./..."'
             }
         }
         stage('Deploy') {
@@ -36,8 +36,7 @@ pipeline {
 
     post {
         always {
-            sh 'docker rmi ${IMAGE_NAME} || true'
-            sh 'docker rmi ${IMAGE_NAME_BUILD_ENV} || true'
+            sh 'docker rmi ${IMAGE_NAME_BUILD_ENV} ${IMAGE_NAME} || true'
         }
         success {
             slackSend (channel: '#alerts-ci', color: '#00FF00', message: "SUCCESSFUL: '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
