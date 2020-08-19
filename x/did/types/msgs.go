@@ -11,14 +11,14 @@ var (
 
 // MsgCreateDID defines a CreateDID message.
 type MsgCreateDID struct {
-	DID          DID            `json:"did"`
-	Document     DIDDocument    `json:"document"`
-	OwnerAddress sdk.AccAddress `json:"owner_address"`
+	DID         DID            `json:"did"`
+	Document    DIDDocument    `json:"document"`
+	FromAddress sdk.AccAddress `json:"from_address"`
 }
 
 // NewMsgCreateDID is a constructor of MsgCreateDID.
-func NewMsgCreateDID(did DID, doc DIDDocument, ownerAddr sdk.AccAddress) MsgCreateDID {
-	return MsgCreateDID{did, doc, ownerAddr}
+func NewMsgCreateDID(did DID, doc DIDDocument, fromAddr sdk.AccAddress) MsgCreateDID {
+	return MsgCreateDID{did, doc, fromAddr}
 }
 
 // Route returns the name of the module.
@@ -35,8 +35,8 @@ func (msg MsgCreateDID) ValidateBasic() sdk.Error {
 	if !msg.Document.Valid() {
 		return ErrInvalidDIDDocument()
 	}
-	if msg.OwnerAddress.Empty() {
-		return sdk.ErrInvalidAddress(msg.OwnerAddress.String())
+	if msg.FromAddress.Empty() {
+		return sdk.ErrInvalidAddress(msg.FromAddress.String())
 	}
 	return nil
 }
@@ -48,21 +48,21 @@ func (msg MsgCreateDID) GetSignBytes() []byte {
 
 // GetSigners return the addresses of signers that must sign.
 func (msg MsgCreateDID) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{msg.OwnerAddress}
+	return []sdk.AccAddress{msg.FromAddress}
 }
 
 // MsgUpdateDID defines a UpdateDID message.
 type MsgUpdateDID struct {
-	DID          DID            `json:"did"`
-	Document     DIDDocument    `json:"document"`
-	SigPubKeyID  PubKeyID       `json:"sig_pubkey_id"`
-	Signature    []byte         `json:"signature"`
-	OwnerAddress sdk.AccAddress `json:"owner_address"`
+	DID         DID            `json:"did"`
+	Document    DIDDocument    `json:"document"`
+	SigPubKeyID PubKeyID       `json:"sig_pubkey_id"`
+	Signature   []byte         `json:"signature"`
+	FromAddress sdk.AccAddress `json:"from_address"`
 }
 
 // NewMsgUpdateDID is a constructor of MsgUpdateDID.
-func NewMsgUpdateDID(did DID, doc DIDDocument, sigPubKeyID PubKeyID, sig []byte, ownerAddr sdk.AccAddress) MsgUpdateDID {
-	return MsgUpdateDID{did, doc, sigPubKeyID, sig, ownerAddr}
+func NewMsgUpdateDID(did DID, doc DIDDocument, sigPubKeyID PubKeyID, sig []byte, fromAddr sdk.AccAddress) MsgUpdateDID {
+	return MsgUpdateDID{did, doc, sigPubKeyID, sig, fromAddr}
 }
 
 // Route returns the name of the module.
@@ -82,8 +82,8 @@ func (msg MsgUpdateDID) ValidateBasic() sdk.Error {
 	if msg.Signature == nil || len(msg.Signature) == 0 {
 		return ErrInvalidSignature(msg.Signature)
 	}
-	if msg.OwnerAddress.Empty() {
-		return sdk.ErrInvalidAddress(msg.OwnerAddress.String())
+	if msg.FromAddress.Empty() {
+		return sdk.ErrInvalidAddress(msg.FromAddress.String())
 	}
 	return nil
 }
@@ -95,5 +95,5 @@ func (msg MsgUpdateDID) GetSignBytes() []byte {
 
 // GetSigners return the addresses of signers that must sign.
 func (msg MsgUpdateDID) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{msg.OwnerAddress}
+	return []sdk.AccAddress{msg.FromAddress}
 }
