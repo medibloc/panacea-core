@@ -17,18 +17,14 @@ pipeline {
         stage('Build') {
             steps {
                 echo 'Building..'
-				ansiColor('xterm') {
-					sh 'docker build --target build-env -t ${IMAGE_NAME_BUILD_ENV} .'
-					sh 'docker build -t ${IMAGE_NAME} .'
-				}
+                sh 'docker build --target build-env -t ${IMAGE_NAME_BUILD_ENV} .'
+                sh 'docker build -t ${IMAGE_NAME} .'
             }
         }
         stage('Test') {
             steps {
                 echo 'Testing..'
-				ansiColor('xterm') {
-					sh 'docker run -a stdout -a stderr ${IMAGE_NAME_BUILD_ENV} /bin/sh -c "go test ./..."'
-				}
+                sh 'docker run -a stdout -a stderr ${IMAGE_NAME_BUILD_ENV} /bin/sh -c "go test ./..."'
             }
         }
         stage('Deploy') {
@@ -40,9 +36,7 @@ pipeline {
 
     post {
         always {
-			ansiColor('xterm') {
-				sh 'docker rmi ${IMAGE_NAME_BUILD_ENV} ${IMAGE_NAME} || true'
-			}
+            sh 'docker rmi ${IMAGE_NAME_BUILD_ENV} ${IMAGE_NAME} || true'
         }
         success {
             slackSend (channel: '#alerts-ci', color: '#00FF00', message: "SUCCESSFUL: '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
