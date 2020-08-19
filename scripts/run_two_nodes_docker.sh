@@ -61,8 +61,8 @@ docker logs testing1
 $cmd2 panacead init testing2 --chain-id=testing
 cp "${home1}"/panacead/config/genesis.json "${home2}"/panacead/config/
 peer_id="$($cmd2 panaceacli status --node tcp://testing1:26657 | jq .node_info.id | sed 's/"//g')"
-sed -i '' "s/^persistent_peers[[:space:]]*=.*$/persistent_peers = \"${peer_id}@testing1:26656\"/g" ${home2}/panacead/config/config.toml
-grep "^persistent_peers = " ${home2}/panacead/config/config.toml
+sed -i '' "s/^persistent_peers[[:space:]]*=.*$/persistent_peers = \"${peer_id}@testing1:26656\"/g" "${home2}"/panacead/config/config.toml
+grep "^persistent_peers = " "${home2}"/panacead/config/config.toml
 $cmd2_detached panacead start
 docker ps
 docker logs testing2
