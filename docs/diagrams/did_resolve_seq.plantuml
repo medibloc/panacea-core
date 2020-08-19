@@ -1,0 +1,15 @@
+@startuml
+
+actor Hospital
+actor UserAgent
+actor Insurance
+database Panacea
+
+UserAgent -> UserAgent : Sign a Data using private key
+UserAgent -> Insurance : SignedData + DID
+Insurance -> Panacea : resolve user's DID
+Panacea -> Insurance : user's DID document
+Insurance -> Insurance : get public key from DID document
+Insurance -> Insurance : verify the signature using public key
+
+@enduml

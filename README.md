@@ -1,5 +1,5 @@
 # Panacea-Core
-![banner](docs/banner.png)
+![banner](docs/images/banner.png)
 
 **[MediBloc](https://medibloc.org)**, We introduce blockchain which is the key infrastrucuture for our services to reinvent the healthcare experience.
 
