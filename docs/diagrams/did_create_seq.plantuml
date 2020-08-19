@@ -1,0 +1,18 @@
+@startuml
+
+actor Hospital
+actor UserAgent
+actor Insurance
+database Panacea
+
+UserAgent -> UserAgent : create DID using Panacea SDK
+UserAgent -> UserAgent : store private key securely
+UserAgent -> Panacea : register DID
+Hospital -> Hospital : create DID using Panacea SDK
+Hospital -> Hospital : store private key securely
+Hospital -> Panacea : register DID
+Insurance -> Insurance : create DID using Panacea SDK
+Insurance -> Insurance : store private key securely
+Insurance -> Panacea : register DID
+
+@enduml
