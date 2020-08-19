@@ -36,7 +36,7 @@ pipeline {
 
     post {
         always {
-            sh 'docker rmi ${IMAGE_NAME_BUILD_ENV} ${IMAGE_NAME} || true'
+            sh 'docker rmi ${IMAGE_NAME} ${IMAGE_NAME_BUILD_ENV} || true'
         }
         success {
             slackSend (channel: '#alerts-ci', color: '#00FF00', message: "SUCCESSFUL: '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
