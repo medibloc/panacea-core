@@ -24,7 +24,7 @@ pipeline {
         stage('Test') {
             steps {
                 echo 'Testing..'
-                sh 'docker run --rm -a stdout -a stderr ${IMAGE_NAME_BUILD_ENV} /bin/sh -c "go test ./..."'
+                sh 'docker run --rm -a stdout -a stderr ${IMAGE_NAME_BUILD_ENV} make test'
             }
         }
         stage('Deploy') {
