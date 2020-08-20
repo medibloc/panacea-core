@@ -4,8 +4,8 @@ pipeline {
     environment {
         APP_NAME = "panacea-core"
         GIT_COMMIT_HASH = sh (script: "git log -n 1 --pretty=format:'%H'", returnStdout: true)
-		IMAGE_NAME = "${APP_NAME}:${GIT_COMMIT_HASH}"
-		IMAGE_NAME_BUILD_ENV= "${IMAGE_NAME}-build-env"
+	    IMAGE_NAME = "${APP_NAME}:${GIT_COMMIT_HASH}"
+	    IMAGE_NAME_BUILD_ENV= "${IMAGE_NAME}-build-env"
     }
 
     stages {
