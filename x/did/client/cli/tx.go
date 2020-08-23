@@ -61,7 +61,8 @@ func GetCmdCreateDID(cdc *codec.Codec) *cobra.Command {
 			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg}, false)
 		},
 	}
-	cmd.Flags().Bool(flagInteractive, false, "Use BIP39 Mnemonic to generate a private key")
+
+	cmd.Flags().Bool(flagInteractive, false, "Interactively prompt user for BIP39 mnemonic and passphrase")
 	return cmd
 }
 
