@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"bufio"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -22,7 +23,7 @@ import (
 )
 
 const (
-	flagUseMnemonic = "use-mnemonic"
+	flagInteractive = "interactive"
 
 	mnemonicEntropySize = 256
 	defaultAccountForHD = 0
@@ -38,7 +39,7 @@ func GetCmdCreateDID(cdc *codec.Codec) *cobra.Command {
 			txBldr := authtxb.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
 			cliCtx := context.NewCLIContext().WithCodec(cdc).WithAccountDecoder(cdc)
 
-			privKey, err := genPrivKey(viper.GetBool(flagUseMnemonic))
+			privKey, err := genPrivKey(viper.GetBool(flagInteractive))
 			if err != nil {
 				return err
 			}
@@ -60,7 +61,7 @@ func GetCmdCreateDID(cdc *codec.Codec) *cobra.Command {
 			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg}, false)
 		},
 	}
-	cmd.Flags().Bool(flagUseMnemonic, false, "Use BIP39 Mnemonic to generate a private key")
+	cmd.Flags().Bool(flagInteractive, false, "Use BIP39 Mnemonic to generate a private key")
 	return cmd
 }
 
@@ -115,14 +116,16 @@ func GetCmdUpdateDID(cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
-func genPrivKey(useMnemonic bool) (secp256k1.PrivKeySecp256k1, error) {
-	if !useMnemonic {
-		return secp256k1.GenPrivKey(), nil // use OS randomness
-	}
+func genPrivKey(interactive bool) (secp256k1.PrivKeySecp256k1, error) {
+	var err error
+	var mnemonic string
+	var bip39Passphrase string
 
-	mnemonic, err := client.GetString("Enter your BIP39 mnemonic, or hit enter to generate one:", client.BufferStdin())
-	if err != nil {
-		return secp256k1.PrivKeySecp256k1{}, err
+	if interactive {
+		mnemonic, bip39Passphrase, err = readBIP39ParamsFrom(client.BufferStdin())
+		if err != nil {
+			return secp256k1.PrivKeySecp256k1{}, err
+		}
 	}
 
 	if mnemonic == "" { // generate a random mnemonic
@@ -135,17 +138,6 @@ func genPrivKey(useMnemonic bool) (secp256k1.PrivKeySecp256k1, error) {
 			return secp256k1.PrivKeySecp256k1{}, err
 		}
 		fmt.Fprintf(os.Stderr, "A random mnemonic was generated: %s\n", mnemonic)
-	} else if !bip39.IsMnemonicValid(mnemonic) {
-		return secp256k1.PrivKeySecp256k1{}, fmt.Errorf("invalid mnemonic")
-	}
-
-	bip39Passphrase, err := client.GetCheckPassword(
-		"Enter your BIP39 passphrase:",
-		"Repeat the password:",
-		client.BufferStdin(),
-	)
-	if err != nil {
-		return secp256k1.PrivKeySecp256k1{}, err
 	}
 
 	seed, err := bip39.NewSeedWithErrorChecking(mnemonic, bip39Passphrase)
@@ -157,4 +149,32 @@ func genPrivKey(useMnemonic bool) (secp256k1.PrivKeySecp256k1, error) {
 	hdPath := hd.NewFundraiserParams(defaultAccountForHD, sdk.GetConfig().GetCoinType(), defaultIndexForHD).String()
 	masterPriv, chainCode := hd.ComputeMastersFromSeed(seed)
 	return hd.DerivePrivateKeyForPath(masterPriv, chainCode, hdPath)
+}
+
+func readBIP39ParamsFrom(buf *bufio.Reader) (string, string, error) {
+	// mnemonic can be an empty string
+	mnemonic, err := client.GetString("Enter your BIP39 mnemonic, or hit enter to generate one:", buf)
+	if err != nil {
+		return "", "", err
+	}
+	if mnemonic != "" && !bip39.IsMnemonicValid(mnemonic) {
+		return "", "", fmt.Errorf("invalid mnemonic")
+	}
+
+	// passphrase can be an empty string
+	passphrase, err := client.GetString("Enter your BIP39 passphrase, or hit enter:", buf)
+	if err != nil {
+		return "", "", err
+	}
+	if passphrase != "" {
+		repeat, err := client.GetString("Repeat the passphrase:", buf)
+		if err != nil {
+			return "", "", err
+		}
+		if passphrase != repeat {
+			return "", "", fmt.Errorf("passphrases don't match")
+		}
+	}
+
+	return mnemonic, passphrase, nil
 }
