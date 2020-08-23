@@ -98,37 +98,3 @@ func TestKeyType_Valid(t *testing.T) {
 	assert.True(t, ES256K.Valid())
 	assert.False(t, KeyType("invalid").Valid())
 }
-
-func TestPrivKey_Valid(t *testing.T) {
-	did := DID("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP")
-	keyID := NewKeyID(did, "key1")
-
-	k := NewPrivKey(keyID, ES256K, secp256k1.GenPrivKey(), "passwd")
-	assert.True(t, k.Valid())
-
-	k = NewPrivKey("invalid_id", ES256K, secp256k1.GenPrivKey(), "passwd")
-	assert.False(t, k.Valid())
-
-	k = NewPrivKey(keyID, "invalid_type", secp256k1.GenPrivKey(), "passwd")
-	assert.False(t, k.Valid())
-}
-
-func TestPrivKey_Decrypt(t *testing.T) {
-	did := DID("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP")
-	keyID := NewKeyID(did, "key1")
-	privKey := secp256k1.GenPrivKey()
-	k := NewPrivKey(keyID, ES256K, privKey, "passwd")
-
-	decrypted, err := k.Decrypt("passwd")
-	assert.NoError(t, err)
-	assert.Equal(t, privKey, decrypted)
-
-	_, err = k.Decrypt("wrong_passwd")
-	assert.EqualError(t, err, "invalid account password")
-}
-
-func TestNewPubKey(t *testing.T) {
-	did := DID("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP")
-	keyID := NewKeyID(did, "key1")
-	k := NewPubKey(did, ES256K, secp256k1.GenPrivKey().PubKey())
-}
