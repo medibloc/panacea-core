@@ -10,12 +10,14 @@ require (
 	github.com/cosmos/cosmos-sdk v0.34.7
 	github.com/golangci/golangci-lint v1.22.2 // indirect
 	github.com/gorilla/mux v1.7.0
+	github.com/pborman/uuid v1.2.1
 	github.com/rakyll/statik v0.1.6
 	github.com/spf13/cobra v0.0.5
 	github.com/spf13/viper v1.6.1
 	github.com/stretchr/testify v1.4.0
 	github.com/tendermint/go-amino v0.15.0
 	github.com/tendermint/tendermint v0.31.9
+	golang.org/x/crypto v0.0.0-20200115085410-6d4e4cb37c7d
 	golang.org/x/sys v0.0.0-20190911201528-7ad0cfa0b7b5 // indirect
 )
 
