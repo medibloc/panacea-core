@@ -26,7 +26,7 @@ func GetCmdResolveDID(cdc *codec.Codec) *cobra.Command {
 				return types.ErrInvalidDID(id)
 			}
 
-			params := did.ResolveDIDParams{id}
+			params := did.ResolveDIDParams{DID: id}
 			bz, err := cdc.MarshalJSON(params)
 			if err != nil {
 				return err

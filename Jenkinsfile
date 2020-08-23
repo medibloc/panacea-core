@@ -27,6 +27,12 @@ pipeline {
                 sh 'docker run --rm -a stdout -a stderr ${IMAGE_NAME_BUILD_ENV} make test'
             }
         }
+        stage('Analyze') {
+            steps {
+                echo 'Analyzing..'
+                sh 'docker run --rm -a stdout -a stderr ${IMAGE_NAME_BUILD_ENV} make lint'
+            }
+        }
         stage('Deploy') {
             steps {
                 echo 'Deploying..'

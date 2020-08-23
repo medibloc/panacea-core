@@ -16,7 +16,7 @@ const (
 	CodeSigVerificationFailed      sdk.CodeType = 107
 	CodeInvalidSecp256k1PrivateKey sdk.CodeType = 108
 	CodeInvalidSecp256k1PublicKey  sdk.CodeType = 109
-	CodeInvalidNetworkID  sdk.CodeType = 110
+	CodeInvalidNetworkID           sdk.CodeType = 110
 )
 
 func ErrDIDExists(did DID) sdk.Error {
