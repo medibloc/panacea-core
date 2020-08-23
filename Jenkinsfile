@@ -30,7 +30,7 @@ pipeline {
         stage('Analyze') {
             steps {
                 echo 'Analyzing..'
-                sh 'docker run --rm -a stdout -a stderr ${IMAGE_NAME_BUILD_ENV} make lint'
+                sh 'docker run --rm -a stdout -a stderr ${IMAGE_NAME_BUILD_ENV} make get_tools lint'
             }
         }
         stage('Deploy') {
