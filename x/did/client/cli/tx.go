@@ -3,6 +3,8 @@ package cli
 import (
 	"encoding/json"
 	"fmt"
+	"os"
+
 	"github.com/btcsuite/btcutil/base58"
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/client/utils"
@@ -12,7 +14,6 @@ import (
 	"github.com/medibloc/panacea-core/x/did/types"
 	"github.com/spf13/cobra"
 	"github.com/tendermint/tendermint/crypto/secp256k1"
-	"os"
 )
 
 func GetCmdCreateDID(cdc *codec.Codec) *cobra.Command {
@@ -88,6 +89,44 @@ func GetCmdUpdateDID(cdc *codec.Codec) *cobra.Command {
 			}
 
 			msg := types.NewMsgUpdateDID(did, doc, pubKeyID, sig, cliCtx.GetFromAddress())
+			if err := msg.ValidateBasic(); err != nil {
+				return err
+			}
+			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg}, false)
+		},
+	}
+	return cmd
+}
+
+func GetCmdDeleteDID(cdc *codec.Codec) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "delete-did [did] [priv-key-base58] [pub-key-id]",
+		Short: "Delete a DID Document",
+		Args:  cobra.ExactArgs(3),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			txBldr := authtxb.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
+			cliCtx := context.NewCLIContext().WithCodec(cdc).WithAccountDecoder(cdc)
+
+			did := types.DID(args[0])
+			if !did.Valid() {
+				return types.ErrInvalidDID(did)
+			}
+
+			// private key which is corresponding to the public key registered in the DID document
+			// TODO: Don't get this via CLI arg. Implement Wallet.
+			privKey, err := types.NewPrivKeyFromBase58(args[1])
+			if err != nil {
+				return types.ErrInvalidSecp256k1PrivateKey(err)
+			}
+			pubKeyID := types.PubKeyID(args[2])
+
+			// For proving that I know the private key
+			sig, err := privKey.Sign([]byte(types.MsgDeleteDID{}.Type()))
+			if err != nil {
+				return err
+			}
+
+			msg := types.NewMsgDeleteDID(did, pubKeyID, sig, cliCtx.GetFromAddress())
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}

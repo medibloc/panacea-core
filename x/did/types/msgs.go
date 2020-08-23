@@ -7,6 +7,7 @@ import (
 var (
 	_ sdk.Msg = &MsgCreateDID{}
 	_ sdk.Msg = &MsgUpdateDID{}
+	_ sdk.Msg = &MsgDeleteDID{}
 )
 
 // MsgCreateDID defines a CreateDID message.
@@ -95,5 +96,48 @@ func (msg MsgUpdateDID) GetSignBytes() []byte {
 
 // GetSigners return the addresses of signers that must sign.
 func (msg MsgUpdateDID) GetSigners() []sdk.AccAddress {
+	return []sdk.AccAddress{msg.FromAddress}
+}
+
+// MsgDeleteDID defines a UpdateDID message.
+type MsgDeleteDID struct {
+	DID         DID            `json:"did"`
+	SigPubKeyID PubKeyID       `json:"sig_pubkey_id"`
+	Signature   []byte         `json:"signature"`
+	FromAddress sdk.AccAddress `json:"from_address"`
+}
+
+// NewMsgDeleteDID is a constructor of MsgDeleteDID.
+func NewMsgDeleteDID(did DID, sigPubKeyID PubKeyID, sig []byte, fromAddr sdk.AccAddress) MsgDeleteDID {
+	return MsgDeleteDID{did, sigPubKeyID, sig, fromAddr}
+}
+
+// Route returns the name of the module.
+func (msg MsgDeleteDID) Route() string { return RouterKey }
+
+// Type returns the name of the action.
+func (msg MsgDeleteDID) Type() string { return "delete_did" }
+
+// VaValidateBasic runs stateless checks on the message.
+func (msg MsgDeleteDID) ValidateBasic() sdk.Error {
+	if !msg.DID.Valid() {
+		return ErrInvalidDID(msg.DID)
+	}
+	if msg.Signature == nil || len(msg.Signature) == 0 {
+		return ErrInvalidSignature(msg.Signature)
+	}
+	if msg.FromAddress.Empty() {
+		return sdk.ErrInvalidAddress(msg.FromAddress.String())
+	}
+	return nil
+}
+
+// GetSignBytes returns the canonical byte representation of the message. Used to generate a signature.
+func (msg MsgDeleteDID) GetSignBytes() []byte {
+	return sdk.MustSortJSON(didCodec.MustMarshalJSON(msg))
+}
+
+// GetSigners return the addresses of signers that must sign.
+func (msg MsgDeleteDID) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.FromAddress}
 }

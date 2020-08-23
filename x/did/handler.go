@@ -15,6 +15,8 @@ func NewHandler(keeper Keeper) sdk.Handler {
 			return handleMsgCreateDID(ctx, keeper, msg)
 		case MsgUpdateDID:
 			return handleMsgUpdateDID(ctx, keeper, msg)
+		case MsgDeleteDID:
+			return handleMsgDeleteDID(ctx, keeper, msg)
 		default:
 			errMsg := fmt.Sprintf("Unrecognized did Msg type: %v", msg.Type())
 			return sdk.ErrUnknownRequest(errMsg).Result()
@@ -32,24 +34,44 @@ func handleMsgCreateDID(ctx sdk.Context, keeper Keeper, msg MsgCreateDID) sdk.Re
 }
 
 func handleMsgUpdateDID(ctx sdk.Context, keeper Keeper, msg MsgUpdateDID) sdk.Result {
-	curDoc := keeper.GetDID(ctx, msg.DID)
-	if curDoc.Empty() {
-		return types.ErrDIDNotFound(msg.DID).Result()
-	}
-
-	pubKey, ok := curDoc.PubKeyByID(msg.SigPubKeyID)
-	if !ok {
-		return types.ErrPubKeyIDNotFound(msg.SigPubKeyID).Result()
-	}
-
-	pubKeySecp256k1, err := types.NewPubKeyFromBase58(pubKey.KeyBase58)
+	err := verifyDIDOwnership(ctx, keeper, msg.DID, msg.SigPubKeyID, msg.Signature, msg.Document.GetSignBytes())
 	if err != nil {
-		return types.ErrInvalidSecp256k1PublicKey(err).Result()
-	}
-	if !pubKeySecp256k1.VerifyBytes(msg.Document.GetSignBytes(), msg.Signature) {
-		return types.ErrSigVerificationFailed().Result()
+		return err.Result()
 	}
 
 	keeper.SetDID(ctx, msg.DID, msg.Document)
 	return sdk.Result{}
+}
+
+func handleMsgDeleteDID(ctx sdk.Context, keeper Keeper, msg MsgDeleteDID) sdk.Result {
+	err := verifyDIDOwnership(ctx, keeper, msg.DID, msg.SigPubKeyID, msg.Signature, []byte(types.MsgDeleteDID{}.Type()))
+	if err != nil {
+		return err.Result()
+	}
+
+	keeper.DeleteDID(ctx, msg.DID)
+	return sdk.Result{}
+}
+
+func verifyDIDOwnership(ctx sdk.Context, keeper Keeper, did types.DID, keyID types.PubKeyID, sig, data []byte) sdk.Error {
+	doc := keeper.GetDID(ctx, did)
+	if doc.Empty() {
+		return types.ErrDIDNotFound(did)
+	}
+
+	pubKey, ok := doc.PubKeyByID(keyID)
+	if !ok {
+		return types.ErrPubKeyIDNotFound(keyID)
+	}
+
+	pubKeySecp256k1, err := types.NewPubKeyFromBase58(pubKey.KeyBase58)
+	if err != nil {
+		return types.ErrInvalidSecp256k1PublicKey(err)
+	}
+
+	if !pubKeySecp256k1.VerifyBytes(data, sig) {
+		return types.ErrSigVerificationFailed()
+	}
+
+	return nil
 }

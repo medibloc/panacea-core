@@ -16,4 +16,5 @@ var (
 type (
 	MsgCreateDID = types.MsgCreateDID
 	MsgUpdateDID = types.MsgUpdateDID
+	MsgDeleteDID = types.MsgDeleteDID
 )
