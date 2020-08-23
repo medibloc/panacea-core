@@ -33,7 +33,7 @@ all: get_tools install
 ### Analyzing
 
 lint:
-	golangci-lint run
+	golangci-lint run --timeout 5m0s --allow-parallel-runners
 	find . -name '*.go' -type f -not -path "./vendor*" -not -path "*.git*" | xargs gofmt -d -s
 	go mod verify
 
