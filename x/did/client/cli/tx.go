@@ -3,6 +3,13 @@ package cli
 import (
 	"encoding/json"
 	"fmt"
+	"os"
+
+	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/crypto/keys/hd"
+	"github.com/cosmos/go-bip39"
+	"github.com/tendermint/tendermint/crypto/secp256k1"
+
 	"github.com/btcsuite/btcutil/base58"
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/client/utils"
@@ -11,8 +18,15 @@ import (
 	authtxb "github.com/cosmos/cosmos-sdk/x/auth/client/txbuilder"
 	"github.com/medibloc/panacea-core/x/did/types"
 	"github.com/spf13/cobra"
-	"github.com/tendermint/tendermint/crypto/secp256k1"
-	"os"
+	"github.com/spf13/viper"
+)
+
+const (
+	flagUseMnemonic = "use-mnemonic"
+
+	mnemonicEntropySize = 256
+	defaultAccountForHD = 0
+	defaultIndexForHD   = 0
 )
 
 func GetCmdCreateDID(cdc *codec.Codec) *cobra.Command {
@@ -24,15 +38,18 @@ func GetCmdCreateDID(cdc *codec.Codec) *cobra.Command {
 			txBldr := authtxb.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
 			cliCtx := context.NewCLIContext().WithCodec(cdc).WithAccountDecoder(cdc)
 
-			privKey := secp256k1.GenPrivKey()      //TODO: implement wallet
+			privKey, err := genPrivKey(viper.GetBool(flagUseMnemonic))
+			if err != nil {
+				return err
+			}
 			fmt.Println(base58.Encode(privKey[:])) //TODO: don't print it. store it securely.
-			pubKey := privKey.PubKey()
 
 			networkID, err := types.NewNetworkID(args[0])
 			if err != nil {
 				return err
 			}
 
+			pubKey := privKey.PubKey()
 			did := types.NewDID(networkID, pubKey, types.ES256K)
 			doc := types.NewDIDDocument(did, types.NewPubKey("key1", pubKey, types.ES256K))
 
@@ -43,6 +60,7 @@ func GetCmdCreateDID(cdc *codec.Codec) *cobra.Command {
 			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg}, false)
 		},
 	}
+	cmd.Flags().Bool(flagUseMnemonic, false, "Use BIP39 Mnemonic to generate a private key")
 	return cmd
 }
 
@@ -95,4 +113,48 @@ func GetCmdUpdateDID(cdc *codec.Codec) *cobra.Command {
 		},
 	}
 	return cmd
+}
+
+func genPrivKey(useMnemonic bool) (secp256k1.PrivKeySecp256k1, error) {
+	if !useMnemonic {
+		return secp256k1.GenPrivKey(), nil // use OS randomness
+	}
+
+	mnemonic, err := client.GetString("Enter your BIP39 mnemonic, or hit enter to generate one:", client.BufferStdin())
+	if err != nil {
+		return secp256k1.PrivKeySecp256k1{}, err
+	}
+
+	if mnemonic == "" { // generate a random mnemonic
+		entropySeed, err := bip39.NewEntropy(mnemonicEntropySize)
+		if err != nil {
+			return secp256k1.PrivKeySecp256k1{}, err
+		}
+		mnemonic, err = bip39.NewMnemonic(entropySeed[:])
+		if err != nil {
+			return secp256k1.PrivKeySecp256k1{}, err
+		}
+		fmt.Fprintf(os.Stderr, "A random mnemonic was generated: %s\n", mnemonic)
+	} else if !bip39.IsMnemonicValid(mnemonic) {
+		return secp256k1.PrivKeySecp256k1{}, fmt.Errorf("invalid mnemonic")
+	}
+
+	bip39Passphrase, err := client.GetCheckPassword(
+		"Enter your BIP39 passphrase:",
+		"Repeat the password:",
+		client.BufferStdin(),
+	)
+	if err != nil {
+		return secp256k1.PrivKeySecp256k1{}, err
+	}
+
+	seed, err := bip39.NewSeedWithErrorChecking(mnemonic, bip39Passphrase)
+	if err != nil {
+		return secp256k1.PrivKeySecp256k1{}, err
+	}
+
+	//TODO: can I use this?
+	hdPath := hd.NewFundraiserParams(defaultAccountForHD, sdk.GetConfig().GetCoinType(), defaultIndexForHD).String()
+	masterPriv, chainCode := hd.ComputeMastersFromSeed(seed)
+	return hd.DerivePrivateKeyForPath(masterPriv, chainCode, hdPath)
 }
