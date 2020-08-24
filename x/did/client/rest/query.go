@@ -29,9 +29,9 @@ func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Co
 func getDIDHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
-		id, err := types.NewDIDFrom(vars["did"])
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+		id := types.DID(vars["did"])
+		if !id.Valid() {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, "Invalid DID")
 			return
 		}
 
