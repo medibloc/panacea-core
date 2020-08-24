@@ -11,13 +11,13 @@ import (
 )
 
 const (
-	RouteResolveDID = "custom/did/resolveDid"
+	RouteDID = "custom/did/did"
 )
 
-func GetCmdResolveDID(cdc *codec.Codec) *cobra.Command {
+func GetCmdQueryDID(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "resolve-did [did]",
-		Short: "Resolve a DID",
+		Use:   "get-did [did]",
+		Short: "Get a DID",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
@@ -26,13 +26,13 @@ func GetCmdResolveDID(cdc *codec.Codec) *cobra.Command {
 				return types.ErrInvalidDID(id)
 			}
 
-			params := did.ResolveDIDParams{id}
+			params := did.QueryDIDParams{DID: id}
 			bz, err := cdc.MarshalJSON(params)
 			if err != nil {
 				return err
 			}
 
-			res, err := cliCtx.QueryWithData(RouteResolveDID, bz)
+			res, err := cliCtx.QueryWithData(RouteDID, bz)
 			if err != nil {
 				return err
 			}
