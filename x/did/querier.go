@@ -34,7 +34,7 @@ func resolveDID(ctx sdk.Context, path []string, req abci.RequestQuery, k Keeper)
 		return nil, sdk.ErrUnknownRequest(sdk.AppendMsgToErr("incorrectly formated request data", err.Error()))
 	}
 
-	bz, err := codec.MarshalJSONIndent(k.cdc, k.GetDID(ctx, params.DID))
+	bz, err := codec.MarshalJSONIndent(k.cdc, k.GetDIDDocument(ctx, params.DID))
 	if err != nil {
 		return nil, sdk.ErrInternal(sdk.AppendMsgToErr("could not marshal result to JSON", err.Error()))
 	}

@@ -327,7 +327,7 @@ func (app *PanaceaApp) initFromGenesisState(ctx sdk.Context, genesisState Genesi
 	crisis.InitGenesis(ctx, app.crisisKeeper, genesisState.CrisisData)
 	mint.InitGenesis(ctx, app.mintKeeper, genesisState.MintData)
 	aol.InitGenesis(ctx, app.aolKeeper, genesisState.AOLData)
-	//TODO: did.InitGenesis(ctx, app.didKeeper, genesisState.AOLData)
+	did.InitGenesis(ctx, app.didKeeper, genesisState.DIDData)
 
 	// validate genesis state
 	if err := PanaceaValidateGenesisState(genesisState); err != nil {

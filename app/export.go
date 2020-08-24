@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"log"
 
+	"github.com/medibloc/panacea-core/x/did"
+
 	"github.com/medibloc/panacea-core/x/aol"
 
 	abci "github.com/tendermint/tendermint/abci/types"
@@ -52,7 +54,7 @@ func (app *PanaceaApp) ExportAppStateAndValidators(forZeroHeight bool, jailWhite
 		crisis.ExportGenesis(ctx, app.crisisKeeper),
 		slashing.ExportGenesis(ctx, app.slashingKeeper),
 		aol.ExportGenesis(ctx, app.aolKeeper),
-		// did.ExportGenesis(ctx, app.didKeeper), // TODO
+		did.ExportGenesis(ctx, app.didKeeper),
 	)
 	appState, err = codec.MarshalJSONIndent(app.cdc, genState)
 	if err != nil {

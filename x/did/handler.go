@@ -27,12 +27,12 @@ func handleMsgCreateDID(ctx sdk.Context, keeper Keeper, msg MsgCreateDID) sdk.Re
 		return types.ErrDIDExists(msg.DID).Result()
 	}
 
-	keeper.SetDID(ctx, msg.DID, msg.Document)
+	keeper.SetDIDDocument(ctx, msg.DID, msg.Document)
 	return sdk.Result{}
 }
 
 func handleMsgUpdateDID(ctx sdk.Context, keeper Keeper, msg MsgUpdateDID) sdk.Result {
-	curDoc := keeper.GetDID(ctx, msg.DID)
+	curDoc := keeper.GetDIDDocument(ctx, msg.DID)
 	if curDoc.Empty() {
 		return types.ErrDIDNotFound(msg.DID).Result()
 	}
@@ -50,6 +50,6 @@ func handleMsgUpdateDID(ctx sdk.Context, keeper Keeper, msg MsgUpdateDID) sdk.Re
 		return types.ErrSigVerificationFailed().Result()
 	}
 
-	keeper.SetDID(ctx, msg.DID, msg.Document)
+	keeper.SetDIDDocument(ctx, msg.DID, msg.Document)
 	return sdk.Result{}
 }

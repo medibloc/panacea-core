@@ -1,6 +1,8 @@
 package did
 
 import (
+	"bytes"
+
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/medibloc/panacea-core/x/did/types"
@@ -24,21 +26,21 @@ func NewKeeper(storeKey sdk.StoreKey, cdc *codec.Codec) Keeper {
 	}
 }
 
-func (k Keeper) SetDID(ctx sdk.Context, did types.DID, doc types.DIDDocument) {
+func (k Keeper) SetDIDDocument(ctx sdk.Context, did types.DID, doc types.DIDDocument) {
 	store := ctx.KVStore(k.storeKey)
-	key := DIDKey(did)
+	key := DIDDocumenetKey(did)
 	bz := k.cdc.MustMarshalBinaryLengthPrefixed(doc)
 	store.Set(key, bz)
 }
 
 func (k Keeper) HasDID(ctx sdk.Context, did types.DID) bool {
 	store := ctx.KVStore(k.storeKey)
-	return store.Has(DIDKey(did))
+	return store.Has(DIDDocumenetKey(did))
 }
 
-func (k Keeper) GetDID(ctx sdk.Context, did types.DID) types.DIDDocument {
+func (k Keeper) GetDIDDocument(ctx sdk.Context, did types.DID) types.DIDDocument {
 	store := ctx.KVStore(k.storeKey)
-	key := DIDKey(did)
+	key := DIDDocumenetKey(did)
 	bz := store.Get(key)
 	if bz == nil {
 		return types.DIDDocument{}
@@ -47,4 +49,18 @@ func (k Keeper) GetDID(ctx sdk.Context, did types.DID) types.DIDDocument {
 	var doc types.DIDDocument
 	k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &doc)
 	return doc
+}
+
+func (k Keeper) ListDIDs(ctx sdk.Context) []types.DID {
+	store := ctx.KVStore(k.storeKey)
+	dids := make([]types.DID, 0)
+
+	firstKey := DIDDocumenetKey("")
+	iter := sdk.KVStorePrefixIterator(store, firstKey)
+	defer iter.Close()
+	for ; iter.Valid(); iter.Next() {
+		did := types.DID(bytes.Split(iter.Key(), firstKey)[1])
+		dids = append(dids, did)
+	}
+	return dids
 }
