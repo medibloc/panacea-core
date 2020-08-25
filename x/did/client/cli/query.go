@@ -23,10 +23,10 @@ func GetCmdResolveDID(cdc *codec.Codec) *cobra.Command {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 			id := types.DID(args[0])
 			if !id.Valid() {
-				return types.ErrInvalidDID(id)
+				return types.ErrInvalidDID(args[0])
 			}
 
-			params := did.ResolveDIDParams{id}
+			params := did.ResolveDIDParams{DID: id}
 			bz, err := cdc.MarshalJSON(params)
 			if err != nil {
 				return err
