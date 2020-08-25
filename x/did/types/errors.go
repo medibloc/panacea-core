@@ -27,8 +27,8 @@ func ErrInvalidDID(did string) sdk.Error {
 	return sdk.NewError(DefaultCodespace, CodeInvalidDID, "Invalid DID %v", did)
 }
 
-func ErrInvalidDIDDocument() sdk.Error {
-	return sdk.NewError(DefaultCodespace, CodeInvalidDIDDocument, "Invalid DID Document")
+func ErrInvalidDIDDocument(doc DIDDocument) sdk.Error {
+	return sdk.NewError(DefaultCodespace, CodeInvalidDIDDocument, "Invalid DID Document: %v", doc)
 }
 
 func ErrDIDNotFound(did DID) sdk.Error {

@@ -246,8 +246,11 @@ func readDIDDocFrom(path string) (types.DIDDocument, error) {
 	defer file.Close()
 
 	err = json.NewDecoder(file).Decode(&doc)
-	if err != nil || !doc.Valid() {
-		return doc, types.ErrInvalidDIDDocument()
+	if err != nil {
+		return doc, fmt.Errorf("fail to decode DIDDocument JSON: %w", err)
+	}
+	if !doc.Valid() {
+		return doc, types.ErrInvalidDIDDocument(doc)
 	}
 
 	return doc, nil

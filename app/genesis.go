@@ -11,6 +11,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/medibloc/panacea-core/x/did"
+
 	"github.com/medibloc/panacea-core/types/assets"
 	"github.com/medibloc/panacea-core/x/aol"
 
@@ -40,6 +42,7 @@ type GenesisState struct {
 	CrisisData   crisis.GenesisState   `json:"crisis"`
 	SlashingData slashing.GenesisState `json:"slashing"`
 	AOLData      aol.GenesisState      `json:"aol"`
+	DIDData      did.GenesisState      `json:"did"`
 	GenTxs       []json.RawMessage     `json:"gentxs"`
 }
 
@@ -54,7 +57,8 @@ func NewGenesisState(
 	govData gov.GenesisState,
 	crisisData crisis.GenesisState,
 	slashingData slashing.GenesisState,
-	aolData aol.GenesisState) GenesisState {
+	aolData aol.GenesisState,
+	didData did.GenesisState) GenesisState {
 
 	return GenesisState{
 		Accounts:     accounts,
@@ -67,6 +71,7 @@ func NewGenesisState(
 		CrisisData:   crisisData,
 		SlashingData: slashingData,
 		AOLData:      aolData,
+		DIDData:      didData,
 	}
 }
 
@@ -255,6 +260,7 @@ func NewDefaultGenesisState() GenesisState {
 		CrisisData:   crisisGenState,
 		SlashingData: slashingGenState,
 		AOLData:      aol.DefaultGenesisState(),
+		DIDData:      did.DefaultGenesisState(),
 		GenTxs:       nil,
 	}
 }
@@ -298,6 +304,9 @@ func PanaceaValidateGenesisState(genesisState GenesisState) error {
 		return err
 	}
 	if err := aol.ValidateGenesis(genesisState.AOLData); err != nil {
+		return err
+	}
+	if err := did.ValidateGenesis(genesisState.DIDData); err != nil {
 		return err
 	}
 	return nil

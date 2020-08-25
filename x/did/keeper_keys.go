@@ -9,12 +9,12 @@ import (
 var (
 	KeyDelimiter = []byte{0x00}
 
-	DIDKeyPrefix = []byte{0x11} // {Prefix}{DID}
+	DIDDocumentKeyPrefix = []byte{0x11} // {Prefix}{DID}
 )
 
-func DIDKey(did types.DID) []byte {
+func DIDDocumentKey(did types.DID) []byte {
 	return bytes.Join([][]byte{
-		DIDKeyPrefix,
+		DIDDocumentKeyPrefix,
 		[]byte(did),
 	}, KeyDelimiter)
 }

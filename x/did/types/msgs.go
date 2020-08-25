@@ -34,7 +34,7 @@ func (msg MsgCreateDID) ValidateBasic() sdk.Error {
 		return ErrInvalidDID(string(msg.DID))
 	}
 	if !msg.Document.Valid() {
-		return ErrInvalidDIDDocument()
+		return ErrInvalidDIDDocument(msg.Document)
 	}
 	if msg.FromAddress.Empty() {
 		return sdk.ErrInvalidAddress(msg.FromAddress.String())
@@ -78,7 +78,7 @@ func (msg MsgUpdateDID) ValidateBasic() sdk.Error {
 		return ErrInvalidDID(string(msg.DID))
 	}
 	if !msg.Document.Valid() {
-		return ErrInvalidDIDDocument()
+		return ErrInvalidDIDDocument(msg.Document)
 	}
 	if msg.Signature == nil || len(msg.Signature) == 0 {
 		return ErrInvalidSignature(msg.Signature)

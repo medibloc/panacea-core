@@ -29,7 +29,7 @@ func handleMsgCreateDID(ctx sdk.Context, keeper Keeper, msg MsgCreateDID) sdk.Re
 		return types.ErrDIDExists(msg.DID).Result()
 	}
 
-	keeper.SetDID(ctx, msg.DID, msg.Document)
+	keeper.SetDIDDocument(ctx, msg.DID, msg.Document)
 	return sdk.Result{}
 }
 
@@ -40,7 +40,7 @@ func handleMsgUpdateDID(ctx sdk.Context, keeper Keeper, msg MsgUpdateDID) sdk.Re
 		return err.Result()
 	}
 
-	keeper.SetDID(ctx, msg.DID, msg.Document)
+	keeper.SetDIDDocument(ctx, msg.DID, msg.Document)
 	return sdk.Result{}
 }
 
@@ -56,7 +56,7 @@ func handleMsgDeleteDID(ctx sdk.Context, keeper Keeper, msg MsgDeleteDID) sdk.Re
 }
 
 func verifyDIDOwnership(ctx sdk.Context, keeper Keeper, did types.DID, keyID types.KeyID, sig, data []byte) sdk.Error {
-	doc := keeper.GetDID(ctx, did)
+	doc := keeper.GetDIDDocument(ctx, did)
 	if doc.Empty() {
 		return types.ErrDIDNotFound(did)
 	}
