@@ -18,15 +18,28 @@ const (
 
 type DID string
 
-func NewDID(networkID NetworkID, pubKey crypto.PubKey, keyType PubKeyType) DID {
+func NewDID(networkID NetworkID, pubKey crypto.PubKey, keyType KeyType) DID {
 	idStr := newPubKeyBase58(pubKey, keyType, 16)
 	return DID(fmt.Sprintf("did:%s:%s:%s", DIDMethod, networkID, idStr))
 }
 
+func NewDIDFrom(str string) (DID, error) {
+	did := DID(str)
+	if !did.Valid() {
+		return "", ErrInvalidDID(str)
+	}
+	return did, nil
+}
+
 func (did DID) Valid() bool {
-	pattern := fmt.Sprintf("^did:panacea:%s:[%s]{21,22}$", networkIDRegex(), Base58Charset)
+	pattern := fmt.Sprintf("^%s$", didRegex())
 	matched, _ := regexp.MatchString(pattern, string(did))
 	return matched
+}
+
+func didRegex() string {
+	// https://www.w3.org/TR/did-core/#did-syntax
+	return fmt.Sprintf("did:panacea:%s:[%s]{21,22}", networkIDRegex(), Base58Charset)
 }
 
 func (did DID) Empty() bool {
@@ -83,7 +96,7 @@ func (doc DIDDocument) Valid() bool {
 		if !auth.Valid() {
 			return false
 		}
-		if _, ok := doc.PubKeyByID(PubKeyID(auth)); !ok {
+		if _, ok := doc.PubKeyByID(KeyID(auth)); !ok {
 			return false
 		}
 	}
@@ -107,7 +120,7 @@ func (doc DIDDocument) GetSignBytes() []byte {
 
 // PubKeyByID finds a PubKey by ID.
 // If the corresponding PubKey doesn't exist, it returns a false.
-func (doc DIDDocument) PubKeyByID(id PubKeyID) (*PubKey, bool) {
+func (doc DIDDocument) PubKeyByID(id KeyID) (*PubKey, bool) {
 	for i := 0; i < len(doc.PubKeys); i++ {
 		pubKey := &doc.PubKeys[i]
 		if pubKey.ID == id {
@@ -117,15 +130,48 @@ func (doc DIDDocument) PubKeyByID(id PubKeyID) (*PubKey, bool) {
 	return nil, false
 }
 
-type PubKey struct {
-	ID        PubKeyID   `json:"id"`
-	Type      PubKeyType `json:"type"`
-	KeyBase58 string     `json:"publicKeyBase58"`
+type KeyID string
+
+func NewKeyID(did DID, name string) KeyID {
+	// https://www.w3.org/TR/did-core/#fragment
+	return KeyID(fmt.Sprintf("%v#%s", did, name))
 }
 
-type PubKeyID string
+func NewKeyIDFrom(id string) (KeyID, error) {
+	keyID := KeyID(id)
+	if !keyID.Valid() {
+		return "", ErrInvalidKeyID(id)
+	}
+	return keyID, nil
+}
 
-func NewPubKey(id PubKeyID, key crypto.PubKey, keyType PubKeyType) PubKey {
+func (id KeyID) Valid() bool {
+	pattern := fmt.Sprintf("^%s#.+$", didRegex()) //TODO: exclude whitespaces
+	matched, _ := regexp.MatchString(pattern, string(id))
+	return matched
+}
+
+type KeyType string
+
+const (
+	ES256K KeyType = "Secp256k1VerificationKey2018"
+)
+
+func (t KeyType) Valid() bool {
+	switch t {
+	case ES256K:
+		return true
+	}
+	return false
+}
+
+type PubKey struct {
+	ID        KeyID   `json:"id"`
+	Type      KeyType `json:"type"`
+	KeyBase58 string  `json:"publicKeyBase58"`
+}
+
+func NewPubKey(id KeyID, keyType KeyType, key crypto.PubKey) PubKey {
 	return PubKey{
 		ID:        id,
 		Type:      keyType,
@@ -133,7 +179,7 @@ func NewPubKey(id PubKeyID, key crypto.PubKey, keyType PubKeyType) PubKey {
 	}
 }
 
-func newPubKeyBase58(key crypto.PubKey, keyType PubKeyType, truncateLen int) string {
+func newPubKeyBase58(key crypto.PubKey, keyType KeyType, truncateLen int) string {
 	switch keyType {
 	case ES256K:
 		return encodePubKeyES256K(key, truncateLen)
@@ -155,7 +201,7 @@ func encodePubKeyES256K(key crypto.PubKey, truncateLen int) string {
 }
 
 func (pk PubKey) Valid() bool {
-	if pk.ID == "" || !pk.Type.Valid() {
+	if !pk.ID.Valid() || !pk.Type.Valid() {
 		return false
 	}
 
@@ -164,36 +210,21 @@ func (pk PubKey) Valid() bool {
 	return matched
 }
 
-type PubKeyType string
-
-const (
-	ES256K PubKeyType = "Secp256k1VerificationKey2018"
-)
-
-func (t PubKeyType) Valid() bool {
-	switch t {
-	case ES256K:
-		return true
-	}
-	return false
-}
-
 // TODO: to be extended
-type Authentication PubKeyID
+type Authentication KeyID
 
 func (a Authentication) Valid() bool {
-	return a != ""
+	return KeyID(a).Valid()
 }
 
-// NewPrivKeyFromBase58 decodes a base58-encoded Secp256k1 private key.
+// NewPrivKeyFromBytes converts a byte slice into a Secp256k1 private key.
 // It returns an error when the length of the input is invalid.
-func NewPrivKeyFromBase58(b58 string) (secp256k1.PrivKeySecp256k1, error) {
+func NewPrivKeyFromBytes(bz []byte) (secp256k1.PrivKeySecp256k1, error) {
 	var key secp256k1.PrivKeySecp256k1
-	decoded := base58.Decode(b58)
-	if len(decoded) != len(key) {
-		return key, fmt.Errorf("invalid Secp256k1 private key. len:%d, expected:%d", len(decoded), len(key))
+	if len(bz) != len(key) {
+		return key, fmt.Errorf("invalid Secp256k1 private key. len:%d, expected:%d", len(bz), len(key))
 	}
-	copy(key[:], decoded)
+	copy(key[:], bz)
 	return key, nil
 }
 

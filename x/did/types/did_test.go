@@ -1,0 +1,110 @@
+package types
+
+import (
+	"fmt"
+	"testing"
+
+	"github.com/btcsuite/btcutil/base58"
+
+	"github.com/stretchr/testify/require"
+	"github.com/tendermint/tendermint/crypto/secp256k1"
+)
+
+func TestNewDID(t *testing.T) {
+	privKey := secp256k1.GenPrivKey()
+	pubKey := privKey.PubKey()
+
+	did := NewDID(Mainnet, pubKey, ES256K)
+	regex := fmt.Sprintf("^did:panacea:mainnet:[%s]{21,22}$", Base58Charset)
+	require.Regexp(t, regex, did)
+}
+
+func TestNewDIDFrom(t *testing.T) {
+	str := "did:panacea:testnet:KS5zGZt66Me8MCctZBYrP"
+	did, err := NewDIDFrom(str)
+	require.NoError(t, err)
+	require.EqualValues(t, str, did)
+
+	str = "did:panacea:t1estnet:KS5zGZt66Me8MCctZBYrP"
+	_, err = NewDIDFrom(str)
+	require.EqualError(t, err, ErrInvalidDID(str).Error())
+}
+
+func TestDID_Empty(t *testing.T) {
+	require.True(t, DID("").Empty())
+	require.False(t, DID("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP").Empty())
+}
+
+func TestNewNetworkID(t *testing.T) {
+	id, err := NewNetworkID("mainnet")
+	require.NoError(t, err)
+	require.Equal(t, Mainnet, id)
+
+	id, err = NewNetworkID("testnet")
+	require.NoError(t, err)
+	require.Equal(t, Testnet, id)
+
+	_, err = NewNetworkID("testn124et")
+	require.EqualError(t, err, ErrInvalidNetworkID("testn124et").Error())
+}
+
+func TestNewDIDDocument(t *testing.T) {
+	did := DID("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP")
+	keyID := NewKeyID(did, "key1")
+	pubKey := NewPubKey(keyID, ES256K, secp256k1.GenPrivKey().PubKey())
+
+	doc := NewDIDDocument(did, pubKey)
+	require.True(t, doc.Valid())
+	require.Equal(t, did, doc.ID)
+	require.Equal(t, 1, len(doc.PubKeys))
+	require.Equal(t, pubKey, doc.PubKeys[0])
+	require.Equal(t, 1, len(doc.Authentications))
+	require.EqualValues(t, keyID, doc.Authentications[0])
+
+	pubKeyFound, ok := doc.PubKeyByID(keyID)
+	require.True(t, ok)
+	require.Equal(t, pubKey, *pubKeyFound)
+
+	_, ok = doc.PubKeyByID("invalid_key_id")
+	require.False(t, ok)
+}
+
+func TestDIDDocument_Empty(t *testing.T) {
+	did := DID("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP")
+	keyID := NewKeyID(did, "key1")
+	pubKey := NewPubKey(keyID, ES256K, secp256k1.GenPrivKey().PubKey())
+	doc := NewDIDDocument(did, pubKey)
+	require.False(t, doc.Empty())
+
+	require.True(t, DIDDocument{}.Empty())
+}
+
+func TestNewKeyID(t *testing.T) {
+	did := DID("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP")
+	expectedID := fmt.Sprintf("%s#key1", did)
+	id := NewKeyID(did, "key1")
+	require.True(t, id.Valid())
+	require.EqualValues(t, expectedID, id)
+
+	id, err := NewKeyIDFrom(expectedID)
+	require.NoError(t, err)
+	require.EqualValues(t, expectedID, id)
+
+	_, err = NewKeyIDFrom("invalid_id")
+	require.Error(t, err, ErrInvalidKeyID("invalid_id"))
+}
+
+func TestKeyType_Valid(t *testing.T) {
+	require.True(t, ES256K.Valid())
+	require.False(t, KeyType("invalid").Valid())
+}
+
+func TestNewPubKey(t *testing.T) {
+	did := DID("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP")
+	pubKey := secp256k1.GenPrivKey().PubKey()
+	pub := NewPubKey(NewKeyID(did, "key1"), ES256K, pubKey)
+	require.True(t, pub.Valid())
+
+	expected := pubKey.(secp256k1.PubKeySecp256k1)
+	require.Equal(t, expected[:], base58.Decode(pub.KeyBase58))
+}

@@ -34,7 +34,7 @@ func handleMsgCreateDID(ctx sdk.Context, keeper Keeper, msg MsgCreateDID) sdk.Re
 }
 
 func handleMsgUpdateDID(ctx sdk.Context, keeper Keeper, msg MsgUpdateDID) sdk.Result {
-	err := verifyDIDOwnership(ctx, keeper, msg.DID, msg.SigPubKeyID, msg.Signature, msg.Document.GetSignBytes())
+	err := verifyDIDOwnership(ctx, keeper, msg.DID, msg.SigKeyID, msg.Signature, msg.Document.GetSignBytes())
 	if err != nil {
 		return err.Result()
 	}
@@ -44,7 +44,7 @@ func handleMsgUpdateDID(ctx sdk.Context, keeper Keeper, msg MsgUpdateDID) sdk.Re
 }
 
 func handleMsgDeleteDID(ctx sdk.Context, keeper Keeper, msg MsgDeleteDID) sdk.Result {
-	err := verifyDIDOwnership(ctx, keeper, msg.DID, msg.SigPubKeyID, msg.Signature, []byte(types.MsgDeleteDID{}.Type()))
+	err := verifyDIDOwnership(ctx, keeper, msg.DID, msg.SigKeyID, msg.Signature, []byte(types.MsgDeleteDID{}.Type()))
 	if err != nil {
 		return err.Result()
 	}
@@ -53,7 +53,7 @@ func handleMsgDeleteDID(ctx sdk.Context, keeper Keeper, msg MsgDeleteDID) sdk.Re
 	return sdk.Result{}
 }
 
-func verifyDIDOwnership(ctx sdk.Context, keeper Keeper, did types.DID, keyID types.PubKeyID, sig, data []byte) sdk.Error {
+func verifyDIDOwnership(ctx sdk.Context, keeper Keeper, did types.DID, keyID types.KeyID, sig, data []byte) sdk.Error {
 	doc := keeper.GetDID(ctx, did)
 	if doc.Empty() {
 		return types.ErrDIDNotFound(did)
@@ -61,7 +61,7 @@ func verifyDIDOwnership(ctx sdk.Context, keeper Keeper, did types.DID, keyID typ
 
 	pubKey, ok := doc.PubKeyByID(keyID)
 	if !ok {
-		return types.ErrPubKeyIDNotFound(keyID)
+		return types.ErrKeyIDNotFound(keyID)
 	}
 
 	pubKeySecp256k1, err := types.NewPubKeyFromBase58(pubKey.KeyBase58)

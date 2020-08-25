@@ -13,7 +13,7 @@ WORKDIR /src
 COPY . .
 
 # build panacea-core
-RUN make build
+RUN make clean && make build
 
 
 # Final image
