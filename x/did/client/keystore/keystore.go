@@ -179,7 +179,10 @@ func encryptKey(address string, key []byte, passwd string) (encryptedKey, error)
 	}
 
 	// MAC to check whether the decryption password was correct or not
-	mac := newSHA3Keccak256(derivedKey[derivedKeyLen/2:derivedKeyLen], cipherText)
+	mac, err := newSHA3Keccak256(derivedKey[derivedKeyLen/2:derivedKeyLen], cipherText)
+	if err != nil {
+		return encryptedKey{}, err
+	}
 
 	// return a struct which can be marshalled as JSON
 	return encryptedKey{
@@ -242,7 +245,10 @@ func decryptKey(key encryptedKey, passwd string) ([]byte, error) {
 		return nil, fmt.Errorf("fail to derive a key: %w", err)
 	}
 
-	expectedMac := newSHA3Keccak256(derivedKey[derivedKeyLen/2:derivedKeyLen], cipherText)
+	expectedMac, err := newSHA3Keccak256(derivedKey[derivedKeyLen/2:derivedKeyLen], cipherText)
+	if err != nil {
+		return nil, fmt.Errorf("fail to get an expected MAC: %w", err)
+	}
 	if !bytes.Equal(expectedMac, mac) {
 		return nil, fmt.Errorf("mac verification was failed. the password might be wrong.")
 	}
@@ -291,12 +297,14 @@ func aesCTRXOR(key, iv, data []byte) ([]byte, error) {
 }
 
 // newSHA3Keccak256 calculates a SHA3-256 (Keccak256).
-func newSHA3Keccak256(data ...[]byte) []byte {
+func newSHA3Keccak256(data ...[]byte) ([]byte, error) {
 	hash := sha3.New256()
 	for _, b := range data {
-		hash.Write(b)
+		if _, err := hash.Write(b); err != nil {
+			return nil, err
+		}
 	}
-	return hash.Sum(nil)
+	return hash.Sum(nil), nil
 }
 
 func fileExists(path string) bool {
