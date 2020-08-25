@@ -15,7 +15,7 @@ func (k GenesisDIDDocumentKey) Marshal() string {
 func (k *GenesisDIDDocumentKey) Unmarshal(key string) error {
 	did := types.DID(key)
 	if !did.Valid() {
-		return types.ErrInvalidDID(did)
+		return types.ErrInvalidDID(key)
 	}
 
 	k.DID = did
