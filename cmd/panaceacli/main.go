@@ -39,6 +39,7 @@ import (
 	aol "github.com/medibloc/panacea-core/x/aol"
 	aolrest "github.com/medibloc/panacea-core/x/aol/client/rest"
 	did "github.com/medibloc/panacea-core/x/did"
+	didrest "github.com/medibloc/panacea-core/x/did/client/rest"
 
 	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
 	bankcmd "github.com/cosmos/cosmos-sdk/x/bank/client/cli"
@@ -189,7 +190,7 @@ func registerRoutes(rs *lcd.RestServer) {
 	gov.RegisterRoutes(rs.CliCtx, rs.Mux, rs.Cdc)
 	mintrest.RegisterRoutes(rs.CliCtx, rs.Mux, rs.Cdc)
 	aolrest.RegisterRoutes(rs.CliCtx, rs.Mux, rs.Cdc, aol.StoreKey)
-	//TODO: didrest.RegisterRoutes(rs.CliCtx, rs.Mux, rs.Cdc, did.StoreKey)
+	didrest.RegisterRoutes(rs.CliCtx, rs.Mux, rs.Cdc, did.StoreKey)
 }
 
 func registerSwaggerUI(rs *lcd.RestServer) {

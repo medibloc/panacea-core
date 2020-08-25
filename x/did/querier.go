@@ -8,27 +8,27 @@ import (
 )
 
 const (
-	QueryResolveDID = "resolveDid"
+	QueryDID = "did"
 )
 
 // NewQuerier is the module level router for state queries
 func NewQuerier(keeper Keeper) sdk.Querier {
 	return func(ctx sdk.Context, path []string, req abci.RequestQuery) ([]byte, sdk.Error) {
 		switch path[0] {
-		case QueryResolveDID:
-			return resolveDID(ctx, path[1:], req, keeper)
+		case QueryDID:
+			return queryDID(ctx, path[1:], req, keeper)
 		default:
 			return nil, sdk.ErrUnknownRequest("unknown did query endpoint")
 		}
 	}
 }
 
-type ResolveDIDParams struct {
+type QueryDIDParams struct {
 	DID types.DID
 }
 
-func resolveDID(ctx sdk.Context, path []string, req abci.RequestQuery, k Keeper) ([]byte, sdk.Error) {
-	var params ResolveDIDParams
+func queryDID(ctx sdk.Context, path []string, req abci.RequestQuery, k Keeper) ([]byte, sdk.Error) {
+	var params QueryDIDParams
 	err := k.cdc.UnmarshalJSON(req.Data, &params)
 	if err != nil {
 		return nil, sdk.ErrUnknownRequest(sdk.AppendMsgToErr("incorrectly formated request data", err.Error()))
