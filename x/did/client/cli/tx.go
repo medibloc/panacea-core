@@ -114,6 +114,7 @@ func GetCmdUpdateDID(cdc *codec.Codec) *cobra.Command {
 			}
 
 			// For proving that I know the private key
+			// TODO: prevent the double-spending: https://github.com/medibloc/panacea-core/issues/28
 			sig, err := privKey.Sign(doc.GetSignBytes())
 			if err != nil {
 				return err
@@ -153,7 +154,8 @@ func GetCmdDeleteDID(cdc *codec.Codec) *cobra.Command {
 			}
 
 			// For proving that I know the private key
-			sig, err := privKey.Sign([]byte(types.MsgDeleteDID{}.Type()))
+			// TODO: prevent the double-spending: https://github.com/medibloc/panacea-core/issues/28
+			sig, err := privKey.Sign(did.GetSignBytes())
 			if err != nil {
 				return err
 			}

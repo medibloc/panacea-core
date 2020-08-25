@@ -34,6 +34,7 @@ func handleMsgCreateDID(ctx sdk.Context, keeper Keeper, msg MsgCreateDID) sdk.Re
 }
 
 func handleMsgUpdateDID(ctx sdk.Context, keeper Keeper, msg MsgUpdateDID) sdk.Result {
+	// TODO: prevent the double-spending: https://github.com/medibloc/panacea-core/issues/28
 	err := verifyDIDOwnership(ctx, keeper, msg.DID, msg.SigKeyID, msg.Signature, msg.Document.GetSignBytes())
 	if err != nil {
 		return err.Result()
@@ -44,7 +45,8 @@ func handleMsgUpdateDID(ctx sdk.Context, keeper Keeper, msg MsgUpdateDID) sdk.Re
 }
 
 func handleMsgDeleteDID(ctx sdk.Context, keeper Keeper, msg MsgDeleteDID) sdk.Result {
-	err := verifyDIDOwnership(ctx, keeper, msg.DID, msg.SigKeyID, msg.Signature, []byte(types.MsgDeleteDID{}.Type()))
+	// TODO: prevent the double-spending: https://github.com/medibloc/panacea-core/issues/28
+	err := verifyDIDOwnership(ctx, keeper, msg.DID, msg.SigKeyID, msg.Signature, msg.DID.GetSignBytes())
 	if err != nil {
 		return err.Result()
 	}
