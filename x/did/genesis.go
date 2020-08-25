@@ -24,10 +24,14 @@ func InitGenesis(ctx sdk.Context, k Keeper, data GenesisState) {
 }
 
 func ValidateGenesis(data GenesisState) error {
-	for bz := range data.Documents {
+	for bz, doc := range data.Documents {
 		var key GenesisDIDDocumentKey
 		if err := key.Unmarshal(bz); err != nil {
 			return err
+		}
+
+		if !doc.Valid() {
+			return types.ErrInvalidDIDDocument(doc)
 		}
 	}
 	return nil
