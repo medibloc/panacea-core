@@ -48,3 +48,8 @@ func (k Keeper) GetDID(ctx sdk.Context, did types.DID) types.DIDDocument {
 	k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &doc)
 	return doc
 }
+
+func (k Keeper) DeleteDID(ctx sdk.Context, did types.DID) {
+	store := ctx.KVStore(k.storeKey)
+	store.Delete(DIDKey(did))
+}

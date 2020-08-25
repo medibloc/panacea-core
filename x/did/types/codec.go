@@ -14,4 +14,5 @@ func init() {
 func RegisterCodec(cdc *codec.Codec) {
 	cdc.RegisterConcrete(MsgCreateDID{}, "did/MsgCreateDID", nil)
 	cdc.RegisterConcrete(MsgUpdateDID{}, "did/MsgUpdateDID", nil)
+	cdc.RegisterConcrete(MsgDeleteDID{}, "did/MsgDeleteDID", nil)
 }
