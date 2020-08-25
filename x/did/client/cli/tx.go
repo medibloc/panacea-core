@@ -2,17 +2,21 @@ package cli
 
 import (
 	"encoding/json"
-	"fmt"
-	"github.com/btcsuite/btcutil/base58"
+	"os"
+	"path/filepath"
+
+	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/client/utils"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtxb "github.com/cosmos/cosmos-sdk/x/auth/client/txbuilder"
+	"github.com/medibloc/panacea-core/x/did/client/keystore"
 	"github.com/medibloc/panacea-core/x/did/types"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	"github.com/tendermint/tendermint/crypto/secp256k1"
-	"os"
+	"github.com/tendermint/tendermint/libs/cli"
 )
 
 func GetCmdCreateDID(cdc *codec.Codec) *cobra.Command {
@@ -24,8 +28,7 @@ func GetCmdCreateDID(cdc *codec.Codec) *cobra.Command {
 			txBldr := authtxb.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
 			cliCtx := context.NewCLIContext().WithCodec(cdc).WithAccountDecoder(cdc)
 
-			privKey := secp256k1.GenPrivKey()      //TODO: implement wallet
-			fmt.Println(base58.Encode(privKey[:])) //TODO: don't print it. store it securely.
+			privKey := secp256k1.GenPrivKey() //TODO: use mnemonic
 			pubKey := privKey.PubKey()
 
 			networkID, err := types.NewNetworkID(args[0])
@@ -34,7 +37,26 @@ func GetCmdCreateDID(cdc *codec.Codec) *cobra.Command {
 			}
 
 			did := types.NewDID(networkID, pubKey, types.ES256K)
-			doc := types.NewDIDDocument(did, types.NewPubKey("key1", pubKey, types.ES256K))
+			keyID := types.NewKeyID(did, "key1")
+			doc := types.NewDIDDocument(did, types.NewPubKey(keyID, types.ES256K, pubKey))
+
+			passwd, err := client.GetCheckPassword(
+				"Enter a password to encrypt your key for DID to disk:",
+				"Repeat the password:",
+				client.BufferStdin(),
+			)
+			if err != nil {
+				return err
+			}
+
+			ks, err := keystore.NewKeyStore(keystoreBaseDir())
+			if err != nil {
+				return err
+			}
+			_, err = ks.Save(string(keyID), privKey[:], passwd)
+			if err != nil {
+				return err
+			}
 
 			msg := types.NewMsgCreateDID(did, doc, cliCtx.GetFromAddress())
 			if err := msg.ValidateBasic(); err != nil {
@@ -48,37 +70,47 @@ func GetCmdCreateDID(cdc *codec.Codec) *cobra.Command {
 
 func GetCmdUpdateDID(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "update-did [did] [priv-key-base58] [pub-key-id] [did-doc-path]",
+		Use:   "update-did [did] [key-id] [did-doc-path]",
 		Short: "Update a DID Document",
-		Args:  cobra.ExactArgs(4),
+		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			txBldr := authtxb.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
 			cliCtx := context.NewCLIContext().WithCodec(cdc).WithAccountDecoder(cdc)
 
-			did := types.DID(args[0])
-			if !did.Valid() {
-				return types.ErrInvalidDID(did)
-			}
-
-			// private key which is corresponding to the public key registered in the DID document
-			// TODO: Don't get this via CLI arg. Implement Wallet.
-			privKey, err := types.NewPrivKeyFromBase58(args[1])
-			if err != nil {
-				return types.ErrInvalidSecp256k1PrivateKey(err)
-			}
-			pubKeyID := types.PubKeyID(args[2])
-
-			// read an input file of DID document
-			file, err := os.Open(args[3])
+			did, err := types.NewDIDFrom(args[0])
 			if err != nil {
 				return err
 			}
-			defer file.Close()
+			keyID, err := types.NewKeyIDFrom(args[1])
+			if err != nil {
+				return err
+			}
+			// read an input file of DID document
+			doc, err := readDIDDocFrom(args[2])
+			if err != nil {
+				return err
+			}
 
-			var doc types.DIDDocument
-			err = json.NewDecoder(file).Decode(&doc)
-			if err != nil || !doc.Valid() {
-				return types.ErrInvalidDIDDocument()
+			passwd, err := client.GetPassword(
+				"Enter a password to decrypt your key for DID on disk:",
+				client.BufferStdin(),
+			)
+			if err != nil {
+				return err
+			}
+
+			ks, err := keystore.NewKeyStore(keystoreBaseDir())
+			if err != nil {
+				return err
+			}
+			privKeyBytes, err := ks.LoadByAddress(string(keyID), passwd)
+			if err != nil {
+				return err
+			}
+
+			privKey, err := types.NewPrivKeyFromBytes(privKeyBytes)
+			if err != nil {
+				return err
 			}
 
 			// For proving that I know the private key
@@ -87,7 +119,7 @@ func GetCmdUpdateDID(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			msg := types.NewMsgUpdateDID(did, doc, pubKeyID, sig, cliCtx.GetFromAddress())
+			msg := types.NewMsgUpdateDID(did, doc, keyID, sig, cliCtx.GetFromAddress())
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
@@ -95,4 +127,25 @@ func GetCmdUpdateDID(cdc *codec.Codec) *cobra.Command {
 		},
 	}
 	return cmd
+}
+
+func keystoreBaseDir() string {
+	return filepath.Join(viper.GetString(cli.HomeFlag), "did_keystore")
+}
+
+func readDIDDocFrom(path string) (types.DIDDocument, error) {
+	var doc types.DIDDocument
+
+	file, err := os.Open(path)
+	if err != nil {
+		return doc, err
+	}
+	defer file.Close()
+
+	err = json.NewDecoder(file).Decode(&doc)
+	if err != nil || !doc.Valid() {
+		return doc, types.ErrInvalidDIDDocument()
+	}
+
+	return doc, nil
 }
