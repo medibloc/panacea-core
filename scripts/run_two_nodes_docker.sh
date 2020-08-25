@@ -34,18 +34,20 @@ function get_cmd() {
   mode_opt=$1
   container_name=$2
   home=$3
+  port_prefix=$4
   echo "docker run --rm ${mode_opt} --network panacea --name ${container_name} \
   -v ${home}/panacead:/root/.panacead \
   -v ${home}/panaceacli:/root/.panaceacli \
+  -p ${port_prefix}6656:26656 -p ${port_prefix}6657:26657 \
   panacea-core:latest"
 }
 
 # Commands for running each Panacea container.
 # One is for interactive mode, the other is for detached mode.
-cmd1="$(get_cmd "-it" "testing1" "${home1}")"
-cmd1_detached="$(get_cmd "-d" "testing1" "${home1}")"
-cmd2="$(get_cmd "-it" "testing2" "${home2}")"
-cmd2_detached="$(get_cmd "-d" "testing2" "${home2}")"
+cmd1="$(get_cmd "-it" "testing1" "${home1}" "2")"
+cmd1_detached="$(get_cmd "-d" "testing1" "${home1}" "2")"
+cmd2="$(get_cmd "-it" "testing2" "${home2}" "3")"
+cmd2_detached="$(get_cmd "-d" "testing2" "${home2}" "3")"
 
 # Init and run 'testing1' container
 $cmd1 panacead init testing1 --chain-id=testing
