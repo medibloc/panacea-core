@@ -218,9 +218,6 @@ Example:
 
 ### Delete
 
-[TODO: This paragraph is temporary. Should be decided how to implement this operation.]
-Internally, the delete operation is processed by setting the DID Document to null.
-
 To delete the DID document, the DID owner should send the following transaction.
 ```
 {

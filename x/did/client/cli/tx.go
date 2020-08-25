@@ -108,35 +108,59 @@ func GetCmdUpdateDID(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			passwd, err := client.GetPassword(
-				"Enter a password to decrypt your key for DID on disk:",
-				client.BufferStdin(),
-			)
-			if err != nil {
-				return err
-			}
-
-			ks, err := keystore.NewKeyStore(keystoreBaseDir())
-			if err != nil {
-				return err
-			}
-			privKeyBytes, err := ks.LoadByAddress(string(keyID), passwd)
-			if err != nil {
-				return err
-			}
-
-			privKey, err := types.NewPrivKeyFromBytes(privKeyBytes)
+			privKey, err := getPrivKeyFromKeyStore(keyID)
 			if err != nil {
 				return err
 			}
 
 			// For proving that I know the private key
+			// TODO: prevent the double-spending: https://github.com/medibloc/panacea-core/issues/28
 			sig, err := privKey.Sign(doc.GetSignBytes())
 			if err != nil {
 				return err
 			}
 
 			msg := types.NewMsgUpdateDID(did, doc, keyID, sig, cliCtx.GetFromAddress())
+			if err := msg.ValidateBasic(); err != nil {
+				return err
+			}
+			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg}, false)
+		},
+	}
+	return cmd
+}
+
+func GetCmdDeleteDID(cdc *codec.Codec) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "delete-did [did] [key-id]",
+		Short: "Delete a DID Document",
+		Args:  cobra.ExactArgs(2),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			txBldr := authtxb.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
+			cliCtx := context.NewCLIContext().WithCodec(cdc).WithAccountDecoder(cdc)
+
+			did := types.DID(args[0])
+			if !did.Valid() {
+				return types.ErrInvalidDID(string(did))
+			}
+			keyID, err := types.NewKeyIDFrom(args[1])
+			if err != nil {
+				return err
+			}
+
+			privKey, err := getPrivKeyFromKeyStore(keyID)
+			if err != nil {
+				return err
+			}
+
+			// For proving that I know the private key
+			// TODO: prevent the double-spending: https://github.com/medibloc/panacea-core/issues/28
+			sig, err := privKey.Sign(did.GetSignBytes())
+			if err != nil {
+				return err
+			}
+
+			msg := types.NewMsgDeleteDID(did, keyID, sig, cliCtx.GetFromAddress())
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
@@ -227,4 +251,26 @@ func readDIDDocFrom(path string) (types.DIDDocument, error) {
 	}
 
 	return doc, nil
+}
+
+func getPrivKeyFromKeyStore(keyID types.KeyID) (secp256k1.PrivKeySecp256k1, error) {
+	passwd, err := client.GetPassword(
+		"Enter a password to decrypt your key for DID on disk:",
+		client.BufferStdin(),
+	)
+	if err != nil {
+		return secp256k1.PrivKeySecp256k1{}, err
+	}
+
+	ks, err := keystore.NewKeyStore(keystoreBaseDir())
+	if err != nil {
+		return secp256k1.PrivKeySecp256k1{}, err
+	}
+
+	privKeyBytes, err := ks.LoadByAddress(string(keyID), passwd)
+	if err != nil {
+		return secp256k1.PrivKeySecp256k1{}, err
+	}
+
+	return types.NewPrivKeyFromBytes(privKeyBytes)
 }
