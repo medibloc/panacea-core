@@ -12,7 +12,7 @@ var (
 	DIDDocumentKeyPrefix = []byte{0x11} // {Prefix}{DID}
 )
 
-func DIDDocumenetKey(did types.DID) []byte {
+func DIDDocumentKey(did types.DID) []byte {
 	return bytes.Join([][]byte{
 		DIDDocumentKeyPrefix,
 		[]byte(did),

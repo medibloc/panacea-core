@@ -28,19 +28,19 @@ func NewKeeper(storeKey sdk.StoreKey, cdc *codec.Codec) Keeper {
 
 func (k Keeper) SetDIDDocument(ctx sdk.Context, did types.DID, doc types.DIDDocument) {
 	store := ctx.KVStore(k.storeKey)
-	key := DIDDocumenetKey(did)
+	key := DIDDocumentKey(did)
 	bz := k.cdc.MustMarshalBinaryLengthPrefixed(doc)
 	store.Set(key, bz)
 }
 
 func (k Keeper) HasDID(ctx sdk.Context, did types.DID) bool {
 	store := ctx.KVStore(k.storeKey)
-	return store.Has(DIDDocumenetKey(did))
+	return store.Has(DIDDocumentKey(did))
 }
 
 func (k Keeper) GetDIDDocument(ctx sdk.Context, did types.DID) types.DIDDocument {
 	store := ctx.KVStore(k.storeKey)
-	key := DIDDocumenetKey(did)
+	key := DIDDocumentKey(did)
 	bz := store.Get(key)
 	if bz == nil {
 		return types.DIDDocument{}
@@ -55,7 +55,7 @@ func (k Keeper) ListDIDs(ctx sdk.Context) []types.DID {
 	store := ctx.KVStore(k.storeKey)
 	dids := make([]types.DID, 0)
 
-	firstKey := DIDDocumenetKey("")
+	firstKey := DIDDocumentKey("")
 	iter := sdk.KVStorePrefixIterator(store, firstKey)
 	defer iter.Close()
 	for ; iter.Valid(); iter.Next() {
@@ -67,5 +67,5 @@ func (k Keeper) ListDIDs(ctx sdk.Context) []types.DID {
 
 func (k Keeper) DeleteDID(ctx sdk.Context, did types.DID) {
 	store := ctx.KVStore(k.storeKey)
-	store.Delete(DIDKey(did))
+	store.Delete(DIDDocumentKey(did))
 }

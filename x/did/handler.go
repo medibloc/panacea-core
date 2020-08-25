@@ -56,7 +56,7 @@ func handleMsgDeleteDID(ctx sdk.Context, keeper Keeper, msg MsgDeleteDID) sdk.Re
 }
 
 func verifyDIDOwnership(ctx sdk.Context, keeper Keeper, did types.DID, keyID types.KeyID, sig, data []byte) sdk.Error {
-	doc := keeper.GetDID(ctx, did)
+	doc := keeper.GetDIDDocument(ctx, did)
 	if doc.Empty() {
 		return types.ErrDIDNotFound(did)
 	}
