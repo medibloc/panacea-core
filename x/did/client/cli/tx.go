@@ -146,7 +146,6 @@ func genPrivKey(interactive bool) (secp256k1.PrivKeySecp256k1, error) {
 		return secp256k1.PrivKeySecp256k1{}, err
 	}
 
-	//TODO: can I use this?
 	hdPath := hd.NewFundraiserParams(defaultAccountForHD, sdk.GetConfig().GetCoinType(), defaultIndexForHD).String()
 	masterPriv, chainCode := hd.ComputeMastersFromSeed(seed)
 	return hd.DerivePrivateKeyForPath(masterPriv, chainCode, hdPath)
