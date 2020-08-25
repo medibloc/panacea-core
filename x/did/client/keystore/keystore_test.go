@@ -45,10 +45,12 @@ func TestKeyStore_Load_WithInvalidPassword(t *testing.T) {
 
 func TestKeyStore_LoadByAddress_RecentFile(t *testing.T) {
 	ks := newKeyStore(t)
-	ks.Save(address, priv[:], passwd)
+	_, err := ks.Save(address, priv[:], passwd)
+	require.NoError(t, err)
 
 	newPriv := secp256k1.GenPrivKey()
-	ks.Save(address, newPriv[:], passwd)
+	_, err = ks.Save(address, newPriv[:], passwd)
+	require.NoError(t, err)
 
 	privBytes, err := ks.LoadByAddress(address, passwd)
 	require.NoError(t, err)
