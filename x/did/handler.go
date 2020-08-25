@@ -37,9 +37,9 @@ func handleMsgUpdateDID(ctx sdk.Context, keeper Keeper, msg MsgUpdateDID) sdk.Re
 		return types.ErrDIDNotFound(msg.DID).Result()
 	}
 
-	pubKey, ok := curDoc.PubKeyByID(msg.SigPubKeyID)
+	pubKey, ok := curDoc.PubKeyByID(msg.SigKeyID)
 	if !ok {
-		return types.ErrPubKeyIDNotFound(msg.SigPubKeyID).Result()
+		return types.ErrKeyIDNotFound(msg.SigKeyID).Result()
 	}
 
 	pubKeySecp256k1, err := types.NewPubKeyFromBase58(pubKey.KeyBase58)
