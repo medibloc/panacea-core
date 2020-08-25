@@ -1,7 +1,9 @@
 package cli
 
 import (
+	"bufio"
 	"encoding/json"
+	"fmt"
 	"os"
 	"path/filepath"
 
@@ -9,14 +11,24 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/client/utils"
 	"github.com/cosmos/cosmos-sdk/codec"
+	"github.com/cosmos/cosmos-sdk/crypto/keys/hd"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtxb "github.com/cosmos/cosmos-sdk/x/auth/client/txbuilder"
+	"github.com/cosmos/go-bip39"
 	"github.com/medibloc/panacea-core/x/did/client/keystore"
 	"github.com/medibloc/panacea-core/x/did/types"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/tendermint/tendermint/crypto/secp256k1"
 	"github.com/tendermint/tendermint/libs/cli"
+)
+
+const (
+	flagInteractive = "interactive"
+
+	mnemonicEntropySize = 256
+	defaultAccountForHD = 0
+	defaultIndexForHD   = 0
 )
 
 func GetCmdCreateDID(cdc *codec.Codec) *cobra.Command {
@@ -28,14 +40,17 @@ func GetCmdCreateDID(cdc *codec.Codec) *cobra.Command {
 			txBldr := authtxb.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
 			cliCtx := context.NewCLIContext().WithCodec(cdc).WithAccountDecoder(cdc)
 
-			privKey := secp256k1.GenPrivKey() //TODO: use mnemonic
-			pubKey := privKey.PubKey()
+			privKey, err := genPrivKey(viper.GetBool(flagInteractive))
+			if err != nil {
+				return err
+			}
 
 			networkID, err := types.NewNetworkID(args[0])
 			if err != nil {
 				return err
 			}
 
+			pubKey := privKey.PubKey()
 			did := types.NewDID(networkID, pubKey, types.ES256K)
 			keyID := types.NewKeyID(did, "key1")
 			doc := types.NewDIDDocument(did, types.NewPubKey(keyID, types.ES256K, pubKey))
@@ -65,6 +80,8 @@ func GetCmdCreateDID(cdc *codec.Codec) *cobra.Command {
 			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg}, false)
 		},
 	}
+
+	cmd.Flags().Bool(flagInteractive, false, "Interactively prompt user for BIP39 mnemonic and passphrase")
 	return cmd
 }
 
@@ -127,6 +144,68 @@ func GetCmdUpdateDID(cdc *codec.Codec) *cobra.Command {
 		},
 	}
 	return cmd
+}
+
+func genPrivKey(interactive bool) (secp256k1.PrivKeySecp256k1, error) {
+	var err error
+	var mnemonic string
+	var bip39Passphrase string
+
+	if interactive {
+		mnemonic, bip39Passphrase, err = readBIP39ParamsFrom(client.BufferStdin())
+		if err != nil {
+			return secp256k1.PrivKeySecp256k1{}, err
+		}
+	}
+
+	if mnemonic == "" { // generate a random mnemonic
+		entropySeed, err := bip39.NewEntropy(mnemonicEntropySize)
+		if err != nil {
+			return secp256k1.PrivKeySecp256k1{}, err
+		}
+		mnemonic, err = bip39.NewMnemonic(entropySeed[:])
+		if err != nil {
+			return secp256k1.PrivKeySecp256k1{}, err
+		}
+		fmt.Fprintf(os.Stderr, "A random mnemonic was generated: %s\n", mnemonic)
+	}
+
+	seed, err := bip39.NewSeedWithErrorChecking(mnemonic, bip39Passphrase)
+	if err != nil {
+		return secp256k1.PrivKeySecp256k1{}, err
+	}
+
+	hdPath := hd.NewFundraiserParams(defaultAccountForHD, sdk.GetConfig().GetCoinType(), defaultIndexForHD).String()
+	masterPriv, chainCode := hd.ComputeMastersFromSeed(seed)
+	return hd.DerivePrivateKeyForPath(masterPriv, chainCode, hdPath)
+}
+
+func readBIP39ParamsFrom(buf *bufio.Reader) (string, string, error) {
+	// mnemonic can be an empty string
+	mnemonic, err := client.GetString("Enter your BIP39 mnemonic, or hit enter to generate one:", buf)
+	if err != nil {
+		return "", "", err
+	}
+	if mnemonic != "" && !bip39.IsMnemonicValid(mnemonic) {
+		return "", "", fmt.Errorf("invalid mnemonic")
+	}
+
+	// passphrase can be an empty string
+	passphrase, err := client.GetString("Enter your BIP39 passphrase, or hit enter:", buf)
+	if err != nil {
+		return "", "", err
+	}
+	if passphrase != "" {
+		repeat, err := client.GetString("Repeat the passphrase:", buf)
+		if err != nil {
+			return "", "", err
+		}
+		if passphrase != repeat {
+			return "", "", fmt.Errorf("passphrases don't match")
+		}
+	}
+
+	return mnemonic, passphrase, nil
 }
 
 func keystoreBaseDir() string {
