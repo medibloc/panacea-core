@@ -46,6 +46,11 @@ func (did DID) Empty() bool {
 	return did == ""
 }
 
+// GetSignBytes returns a byte array which is used to generate a signature for verifying DID ownership.
+func (did DID) GetSignBytes() []byte {
+	return []byte(did)
+}
+
 type NetworkID string
 
 const (

@@ -64,3 +64,8 @@ func (k Keeper) ListDIDs(ctx sdk.Context) []types.DID {
 	}
 	return dids
 }
+
+func (k Keeper) DeleteDID(ctx sdk.Context, did types.DID) {
+	store := ctx.KVStore(k.storeKey)
+	store.Delete(DIDKey(did))
+}

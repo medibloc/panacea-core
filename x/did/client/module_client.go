@@ -43,6 +43,7 @@ func (mc ModuleClient) GetTxCmd() *cobra.Command {
 	didTxCmd.AddCommand(client.PostCommands(
 		didCmds.GetCmdCreateDID(mc.cdc),
 		didCmds.GetCmdUpdateDID(mc.cdc),
+		didCmds.GetCmdDeleteDID(mc.cdc),
 	)...)
 
 	return didTxCmd
