@@ -6,12 +6,14 @@ pipeline {
         GIT_COMMIT_HASH = sh (script: "git log -n 1 --pretty=format:'%H'", returnStdout: true)
 	    IMAGE_NAME = "${APP_NAME}:${GIT_COMMIT_HASH}"
 	    IMAGE_NAME_BUILD_ENV= "${IMAGE_NAME}-build-env"
+	    ARTIFACT_DIR = "./artifacts"
     }
 
     stages {
         stage('Start') {
             steps {
                 slackSend (channel: '#alerts-ci', color: '#FFFF00', message: "STARTED: '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
+                sh 'mkdir -p ${ARTIFACT_DIR}'
             }
         }
         stage('Build') {
@@ -24,18 +26,32 @@ pipeline {
         stage('Test') {
             steps {
                 echo 'Testing..'
-                sh 'docker run --rm -a stdout -a stderr ${IMAGE_NAME_BUILD_ENV} make test'
+                sh 'docker run --rm -v ${ARTIFACT_DIR}:/src/artifacts ${IMAGE_NAME_BUILD_ENV} make test'
             }
         }
         stage('Analyze') {
             steps {
                 echo 'Analyzing..'
-                sh 'docker run --rm -a stdout -a stderr ${IMAGE_NAME_BUILD_ENV} make get_tools lint'
+                sh 'docker run --rm ${IMAGE_NAME_BUILD_ENV} make get_tools lint'
             }
         }
         stage('Deploy') {
             steps {
                 echo 'Deploying..'
+            }
+        }
+        stage('Publish') {
+            steps {
+                echo 'Publishing..'
+                publishHTML(target: [
+                    allowMissing: false,
+                    alwaysLinkToLastBuild: false,
+                    keepAll: false,
+                    reportDir: '${ARTIFACT_DIR}',
+                    reportFiles: 'coverage.html',
+                    reportName: 'Code Coverage',
+                    reportTitles: '${APP_NAME} Code Coverage'
+                ])
             }
         }
     }
