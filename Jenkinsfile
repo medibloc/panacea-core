@@ -13,7 +13,7 @@ pipeline {
         stage('Start') {
             steps {
                 slackSend (channel: '#alerts-ci', color: '#FFFF00', message: "STARTED: '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
-                sh 'mkdir -p ${ARTIFACT_DIR}'
+                sh 'rm -rf ${ARTIFACT_DIR} && mkdir -p ${ARTIFACT_DIR}'
             }
         }
         stage('Build') {
@@ -47,10 +47,10 @@ pipeline {
                     allowMissing: false,
                     alwaysLinkToLastBuild: false,
                     keepAll: false,
-                    reportDir: 'env.ARTIFACT_DIR',
+                    reportDir: "${ARTIFACT_DIR}",
                     reportFiles: 'coverage.html',
                     reportName: 'Code Coverage',
-                    reportTitles: 'env.APP_NAME Code Coverage'
+                    reportTitles: "${APP_NAME} Code Coverage"
                 ])
             }
         }
