@@ -29,24 +29,24 @@ func handleMsgCreateDID(ctx sdk.Context, keeper Keeper, msg MsgCreateDID) sdk.Re
 		return types.ErrDIDExists(msg.DID).Result()
 	}
 
-	keeper.SetDIDDocument(ctx, msg.DID, msg.Document)
+	docWithSeq := types.NewDIDDocumentWithSeq(msg.Document, types.NewSequence())
+	keeper.SetDIDDocument(ctx, msg.DID, docWithSeq)
 	return sdk.Result{}
 }
 
 func handleMsgUpdateDID(ctx sdk.Context, keeper Keeper, msg MsgUpdateDID) sdk.Result {
-	// TODO: prevent the double-spending: https://github.com/medibloc/panacea-core/issues/28
-	err := verifyDIDOwnership(ctx, keeper, msg.DID, msg.SigKeyID, msg.Signature, msg.Document.GetSignBytes())
+	newSeq, err := verifyDIDOwnership(ctx, keeper, msg.DID, msg.SigKeyID, msg.Signature, msg.Document)
 	if err != nil {
 		return err.Result()
 	}
 
-	keeper.SetDIDDocument(ctx, msg.DID, msg.Document)
+	newDocWithSeq := types.NewDIDDocumentWithSeq(msg.Document, newSeq)
+	keeper.SetDIDDocument(ctx, msg.DID, newDocWithSeq)
 	return sdk.Result{}
 }
 
 func handleMsgDeleteDID(ctx sdk.Context, keeper Keeper, msg MsgDeleteDID) sdk.Result {
-	// TODO: prevent the double-spending: https://github.com/medibloc/panacea-core/issues/28
-	err := verifyDIDOwnership(ctx, keeper, msg.DID, msg.SigKeyID, msg.Signature, msg.DID.GetSignBytes())
+	_, err := verifyDIDOwnership(ctx, keeper, msg.DID, msg.SigKeyID, msg.Signature, msg.DID)
 	if err != nil {
 		return err.Result()
 	}
@@ -55,25 +55,25 @@ func handleMsgDeleteDID(ctx sdk.Context, keeper Keeper, msg MsgDeleteDID) sdk.Re
 	return sdk.Result{}
 }
 
-func verifyDIDOwnership(ctx sdk.Context, keeper Keeper, did types.DID, keyID types.KeyID, sig, data []byte) sdk.Error {
-	doc := keeper.GetDIDDocument(ctx, did)
-	if doc.Empty() {
-		return types.ErrDIDNotFound(did)
+func verifyDIDOwnership(ctx sdk.Context, keeper Keeper, did types.DID, keyID types.KeyID, sig []byte, data types.Signable) (types.Sequence, sdk.Error) {
+	docWithSeq := keeper.GetDIDDocument(ctx, did)
+	if docWithSeq.Empty() {
+		return 0, types.ErrDIDNotFound(did)
 	}
 
-	pubKey, ok := doc.PubKeyByID(keyID)
+	pubKey, ok := docWithSeq.Document.PubKeyByID(keyID)
 	if !ok {
-		return types.ErrKeyIDNotFound(keyID)
+		return 0, types.ErrKeyIDNotFound(keyID)
 	}
 
 	pubKeySecp256k1, err := types.NewPubKeyFromBase58(pubKey.KeyBase58)
 	if err != nil {
-		return types.ErrInvalidSecp256k1PublicKey(err)
+		return 0, types.ErrInvalidSecp256k1PublicKey(err)
 	}
 
-	if !pubKeySecp256k1.VerifyBytes(data, sig) {
-		return types.ErrSigVerificationFailed()
+	newSeq, ok := types.Verify(sig, data, docWithSeq.Seq, pubKeySecp256k1)
+	if !ok {
+		return 0, types.ErrSigVerificationFailed()
 	}
-
-	return nil
+	return newSeq, nil
 }

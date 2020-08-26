@@ -26,24 +26,32 @@ func GetCmdQueryDID(cdc *codec.Codec) *cobra.Command {
 				return types.ErrInvalidDID(args[0])
 			}
 
-			params := did.QueryDIDParams{DID: id}
-			bz, err := cdc.MarshalJSON(params)
+			doc, err := queryDID(cliCtx, id)
 			if err != nil {
 				return err
 			}
-
-			res, err := cliCtx.QueryWithData(RouteDID, bz)
-			if err != nil {
-				return err
-			}
-
-			var doc types.DIDDocument
-			cdc.MustUnmarshalJSON(res, &doc)
-			if doc.Empty() {
-				return errors.New("DID not found")
-			}
-			return cliCtx.PrintOutput(doc)
+			return cliCtx.PrintOutput(doc.Document)
 		},
 	}
 	return cmd
+}
+
+func queryDID(cliCtx context.CLIContext, id types.DID) (types.DIDDocumentWithSeq, error) {
+	bz, err := cliCtx.Codec.MarshalJSON(did.QueryDIDParams{DID: id})
+	if err != nil {
+		return types.DIDDocumentWithSeq{}, err
+	}
+
+	res, err := cliCtx.QueryWithData(RouteDID, bz)
+	if err != nil {
+		return types.DIDDocumentWithSeq{}, err
+	}
+
+	var doc types.DIDDocumentWithSeq
+	cliCtx.Codec.MustUnmarshalJSON(res, &doc)
+	if doc.Empty() {
+		return types.DIDDocumentWithSeq{}, errors.New("DID not found")
+	}
+
+	return doc, nil
 }

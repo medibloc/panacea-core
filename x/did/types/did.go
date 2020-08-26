@@ -222,6 +222,28 @@ func (a Authentication) Valid() bool {
 	return KeyID(a).Valid()
 }
 
+// DIDDocumentWithSeq is for storing a Sequence along with a DIDDocument.
+// The Sequence is used to make DID operations not replay-able. It's used to generate signatures of DID operations.
+type DIDDocumentWithSeq struct {
+	Document DIDDocument `json:"document"`
+	Seq      Sequence    `json:"sequence"`
+}
+
+func NewDIDDocumentWithSeq(doc DIDDocument, seq Sequence) DIDDocumentWithSeq {
+	return DIDDocumentWithSeq{
+		Document: doc,
+		Seq:      seq,
+	}
+}
+
+func (d DIDDocumentWithSeq) Empty() bool {
+	return d.Document.Empty()
+}
+
+func (d DIDDocumentWithSeq) Valid() bool {
+	return d.Document.Valid()
+}
+
 // NewPrivKeyFromBytes converts a byte slice into a Secp256k1 private key.
 // It returns an error when the length of the input is invalid.
 func NewPrivKeyFromBytes(bz []byte) (secp256k1.PrivKeySecp256k1, error) {
