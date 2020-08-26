@@ -150,13 +150,13 @@ func (k mockKeeper) HasDID(ctx sdk.Context, did types.DID) bool {
 }
 
 func (k mockKeeper) GetDIDDocument(ctx sdk.Context, did types.DID) types.DIDDocumentWithSeq {
-	doc, _ := k.docs[did]
+	doc := k.docs[did]
 	return doc
 }
 
 func (k mockKeeper) ListDIDs(ctx sdk.Context) []types.DID {
 	dids := make([]types.DID, 0)
-	for did, _ := range k.docs {
+	for did := range k.docs {
 		dids = append(dids, did)
 	}
 	return dids
