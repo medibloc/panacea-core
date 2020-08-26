@@ -47,7 +47,7 @@ build: go.sum
 	go build -mod=readonly $(BUILD_FLAGS) -o build/panaceakeyutil ./cmd/panaceakeyutil
 
 test:
-	go test ./...
+	go test -coverprofile=coverage.out ./...
 
 update_panacea_lite_docs:
 	@statik -src=client/lcd/swagger-ui -dest=client/lcd -f
