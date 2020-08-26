@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/cosmos/cosmos-sdk/codec"
+
 	"github.com/btcsuite/btcutil/base58"
 
 	"github.com/stretchr/testify/require"
@@ -33,6 +35,13 @@ func TestNewDIDFrom(t *testing.T) {
 func TestDID_Empty(t *testing.T) {
 	require.True(t, DID("").Empty())
 	require.False(t, DID("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP").Empty())
+}
+
+func TestDID_GetSignBytes(t *testing.T) {
+	did := DID("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP")
+	var did2 DID
+	require.NoError(t, codec.New().UnmarshalJSON(did.GetSignBytes(), &did2))
+	require.Equal(t, did, did2)
 }
 
 func TestNewNetworkID(t *testing.T) {
