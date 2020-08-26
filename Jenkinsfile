@@ -47,10 +47,10 @@ pipeline {
                     allowMissing: false,
                     alwaysLinkToLastBuild: false,
                     keepAll: false,
-                    reportDir: '${ARTIFACT_DIR}',
+                    reportDir: 'env.ARTIFACT_DIR',
                     reportFiles: 'coverage.html',
                     reportName: 'Code Coverage',
-                    reportTitles: '${APP_NAME} Code Coverage'
+                    reportTitles: 'env.APP_NAME Code Coverage'
                 ])
             }
         }
