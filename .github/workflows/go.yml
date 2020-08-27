@@ -2,11 +2,9 @@ name: panacea-core
 
 on:
   push:
-    branches:
+    branches:    # only for pushes on master
     - master
-  pull_request:
-    branches:
-    - master
+  pull_request:  # for all PRs regardless of its base branch
 
 jobs:
 
@@ -32,6 +30,8 @@ jobs:
 
     - name: Run golangci-lint
       uses: golangci/golangci-lint-action@v1.2.1
+      with:
+          version: v1.30.0
       
     - name: Deploy
       run: echo "Deploying..."
