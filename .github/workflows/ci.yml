@@ -28,11 +28,6 @@ jobs:
     - name: Test
       run: make test
 
-    - name: Run golangci-lint
-      uses: golangci/golangci-lint-action@v1.2.1
-      with:
-          version: v1.30
-
     - name: Convert coverage to lcov
       uses: jandelgado/gcov2lcov-action@v1.0.2
       with:
@@ -50,3 +45,13 @@ jobs:
       with:
         name: coverage
         path: artifacts/coverage.html
+
+  lint:
+    name: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v1
+        with:
+          version: v1.30
