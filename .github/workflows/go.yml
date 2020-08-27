@@ -2,9 +2,11 @@ name: Go
 
 on:
   push:
-    branches: [ master ]
+    branches:
+    - master
   pull_request:
-    branches: [ master ]
+    branches:
+    - master
 
 jobs:
 
@@ -16,18 +18,20 @@ jobs:
     - name: Set up Go 1.x
       uses: actions/setup-go@v2
       with:
-        go-version: ^1.13
+        go-version: ^1.15
       id: go
 
     - name: Check out code into the Go module directory
       uses: actions/checkout@v2
-
-    - name: Get dependencies
-      run: |
-        go get -v -t -d ./...
 
     - name: Build
       run: make build
 
     - name: Test
       run: make test
+
+    - name: Anaylze
+      run: make lint
+    
+    - name: Deploy
+      run: echo "Deploying..."
