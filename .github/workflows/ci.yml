@@ -28,7 +28,7 @@ jobs:
     - name: Test
       run: make test
 
-    - name: Convert coverage.out to coverage.lcov
+    - name: Convert coverage.out into coverage.lcov
       uses: jandelgado/gcov2lcov-action@v1.0.2
       with:
         infile: artifacts/coverage.out
