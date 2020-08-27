@@ -1,4 +1,4 @@
-name: Go
+name: panacea-core
 
 on:
   push:
@@ -30,8 +30,8 @@ jobs:
     - name: Test
       run: make test
 
-    - name: Anaylze
-      run: make lint
-    
+    - name: Run golangci-lint
+      uses: golangci/golangci-lint-action@v1.2.1
+      
     - name: Deploy
       run: echo "Deploying..."
