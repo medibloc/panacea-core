@@ -9,7 +9,7 @@ on:
 jobs:
 
   build:
-    name: Build
+    name: Build and Test
     runs-on: ubuntu-latest
     steps:
 
@@ -46,8 +46,20 @@ jobs:
         name: coverage
         path: artifacts/coverage.html
 
+    - name: Convert coverage to Cobertura
+      run: |
+        go get github.com/t-yuki/gocover-cobertura
+        gocover-cobertura < coverage.out > coverage.xml
+
+    - name: Report Cobertura report
+      uses: 5monkeys/cobertura-action@master
+      with:
+        path: coverage.xml
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        minimum_coverage: 50
+
   lint:
-    name: lint
+    name: Lint
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
