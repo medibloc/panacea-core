@@ -6,6 +6,9 @@ FROM golang:alpine AS build-env
 ENV PACKAGES curl make git libc-dev bash gcc linux-headers eudev-dev python3
 RUN apk add --no-cache $PACKAGES
 
+# Install minimum Go tools
+RUN go get github.com/golangci/golangci-lint/cmd/golangci-lint
+
 # Set working directory for the build
 WORKDIR /src
 

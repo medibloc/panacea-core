@@ -32,7 +32,7 @@ pipeline {
         stage('Analyze') {
             steps {
                 echo 'Analyzing..'
-                sh 'docker run --rm ${IMAGE_NAME_BUILD_ENV} make get_tools lint'
+                sh 'docker run --rm ${IMAGE_NAME_BUILD_ENV} make lint'
             }
         }
         stage('Deploy') {
