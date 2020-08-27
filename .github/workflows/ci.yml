@@ -47,6 +47,7 @@ jobs:
         path: artifacts/coverage.html
 
   lint:
+    # this action is recommended to be run as a separated job from other jobs (https://github.com/golangci/golangci-lint-action#how-to-use).
     name: Lint
     runs-on: ubuntu-latest
     steps:
