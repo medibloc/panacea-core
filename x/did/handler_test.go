@@ -51,18 +51,24 @@ func TestHandleMsgUpdateDID(t *testing.T) {
 	sig, _ := types.Sign(newDoc, origDoc.Seq, privKey)
 
 	// call
-	res := handleMsgUpdateDID(sdk.Context{}, keeper, MsgUpdateDID{
+	msg := MsgUpdateDID{
 		DID:         did,
 		Document:    newDoc,
 		SigKeyID:    keyID,
 		Signature:   sig,
 		FromAddress: sdk.AccAddress{},
-	})
+	}
+	res := handleMsgUpdateDID(sdk.Context{}, keeper, msg)
 	require.True(t, res.IsOK())
 	require.Equal(t, 1, len(keeper.ListDIDs(sdk.Context{})))
 	updated := keeper.GetDIDDocument(sdk.Context{}, did)
 	require.Equal(t, newDoc, updated.Document)
 	require.Equal(t, origDoc.Seq+1, updated.Seq)
+
+	// call again with the same signature (replay-attack! should be failed!)
+	res = handleMsgUpdateDID(sdk.Context{}, keeper, msg)
+	require.False(t, res.IsOK())
+	require.Equal(t, types.ErrSigVerificationFailed().Code(), res.Code)
 }
 
 func TestHandleMsgDeleteDID(t *testing.T) {
