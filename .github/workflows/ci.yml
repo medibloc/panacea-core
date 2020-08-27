@@ -28,35 +28,23 @@ jobs:
     - name: Test
       run: make test
 
-    - name: Convert coverage to lcov
+    - name: Convert coverage.out to coverage.lcov
       uses: jandelgado/gcov2lcov-action@v1.0.2
       with:
         infile: artifacts/coverage.out
         outfile: artifacts/coverage.lcov
 
-    - name: Report lcov
+    - name: Report coverage.lcov as a comment
       uses: romeovs/lcov-reporter-action@v0.2.16
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         lcov-file: artifacts/coverage.lcov
 
-    - name: Report coverage HTML
+    - name: Publish coverage.html as an artifact
       uses: actions/upload-artifact@master
       with:
         name: coverage
         path: artifacts/coverage.html
-
-    - name: Convert coverage to Cobertura
-      run: |
-        go get github.com/t-yuki/gocover-cobertura
-        gocover-cobertura < coverage.out > coverage.xml
-
-    - name: Report Cobertura report
-      uses: 5monkeys/cobertura-action@master
-      with:
-        path: coverage.xml
-        repo_token: ${{ secrets.GITHUB_TOKEN }}
-        minimum_coverage: 50
 
   lint:
     name: Lint
