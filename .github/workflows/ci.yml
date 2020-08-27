@@ -33,9 +33,6 @@ jobs:
       with:
           version: v1.30
 
-    - name: Deploy
-      run: echo "Deploying..."
-
     - name: Convert coverage to lcov
       uses: jandelgado/gcov2lcov-action@v1.0.2
       with:
@@ -47,3 +44,9 @@ jobs:
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         lcov-file: artifacts/coverage.lcov
+
+    - name: Report coverage HTML
+      uses: actions/upload-artifact@master
+      with:
+        name: coverage
+        path: artifacts/coverage.html
