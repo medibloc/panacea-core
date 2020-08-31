@@ -1,4 +1,4 @@
-name: panacea-core
+name: ci
 
 on:
   push:
@@ -32,6 +32,18 @@ jobs:
       uses: golangci/golangci-lint-action@v1.2.1
       with:
           version: v1.30
-      
+
     - name: Deploy
       run: echo "Deploying..."
+
+    - name: Convert coverage to lcov
+      uses: jandelgado/gcov2lcov-action@v1.0.2
+      with:
+        infile: artifacts/coverage.out
+        outfile: artifacts/coverage.lcov
+
+    - name: Report lcov
+      uses: romeovs/lcov-reporter-action@v0.2.16
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        lcov-file: artifacts/coverage.lcov
