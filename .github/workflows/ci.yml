@@ -1,0 +1,58 @@
+name: ci
+
+on:
+  push:
+    branches:    # only for pushes on master
+    - master
+  pull_request:  # for all PRs regardless of its base branch
+
+jobs:
+
+  build:
+    name: Build and Test
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Set up Go 1.x
+      uses: actions/setup-go@v2
+      with:
+        go-version: ^1.15
+      id: go
+
+    - name: Check out code into the Go module directory
+      uses: actions/checkout@v2
+
+    - name: Build
+      run: make build
+
+    - name: Test
+      run: make test
+
+    - name: Convert coverage.out into coverage.lcov
+      uses: jandelgado/gcov2lcov-action@v1.0.2
+      with:
+        infile: artifacts/coverage.out
+        outfile: artifacts/coverage.lcov
+
+    - name: Report coverage.lcov as a comment
+      uses: romeovs/lcov-reporter-action@v0.2.16
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        lcov-file: artifacts/coverage.lcov
+
+    - name: Publish coverage.html as an artifact
+      uses: actions/upload-artifact@master
+      with:
+        name: coverage
+        path: artifacts/coverage.html
+
+  lint:
+    # this action is recommended to be run as a separated job from other jobs (https://github.com/golangci/golangci-lint-action#how-to-use).
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v1
+        with:
+          version: v1.30
