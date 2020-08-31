@@ -50,7 +50,7 @@ build: go.sum
 
 test:
 	mkdir -p $(ARTIFACT_DIR)
-	go test -coverprofile=$(ARTIFACT_DIR)/coverage.out ./...
+	go test -covermode=count -coverprofile=$(ARTIFACT_DIR)/coverage.out ./...
 	go tool cover -html=$(ARTIFACT_DIR)/coverage.out -o $(ARTIFACT_DIR)/coverage.html
 
 update_panacea_lite_docs:
