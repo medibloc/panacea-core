@@ -27,6 +27,8 @@ ldflags += $(LDFLAGS)
 ldflags := $(strip $(ldflags))
 BUILD_FLAGS := -tags "$(build_tags)" -ldflags '$(ldflags)'
 
+ARTIFACT_DIR := artifacts
+
 all: get_tools install
 
 ########################################
@@ -47,7 +49,9 @@ build: go.sum
 	go build -mod=readonly $(BUILD_FLAGS) -o build/panaceakeyutil ./cmd/panaceakeyutil
 
 test:
-	go test ./...
+	mkdir -p $(ARTIFACT_DIR)
+	go test -coverprofile=$(ARTIFACT_DIR)/coverage.out ./...
+	go tool cover -html=$(ARTIFACT_DIR)/coverage.out -o $(ARTIFACT_DIR)/coverage.html
 
 update_panacea_lite_docs:
 	@statik -src=client/lcd/swagger-ui -dest=client/lcd -f
