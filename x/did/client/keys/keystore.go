@@ -1,4 +1,4 @@
-package keystore
+package keys
 
 import (
 	"bytes"
