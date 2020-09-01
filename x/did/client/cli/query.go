@@ -26,17 +26,17 @@ func GetCmdQueryDID(cdc *codec.Codec) *cobra.Command {
 				return types.ErrInvalidDID(args[0])
 			}
 
-			doc, err := queryDID(cliCtx, id)
+			docWithSeq, err := queryDIDDocumentWithSeq(cliCtx, id)
 			if err != nil {
 				return err
 			}
-			return cliCtx.PrintOutput(doc.Document)
+			return cliCtx.PrintOutput(docWithSeq.Document)
 		},
 	}
 	return cmd
 }
 
-func queryDID(cliCtx context.CLIContext, id types.DID) (types.DIDDocumentWithSeq, error) {
+func queryDIDDocumentWithSeq(cliCtx context.CLIContext, id types.DID) (types.DIDDocumentWithSeq, error) {
 	bz, err := cliCtx.Codec.MarshalJSON(did.QueryDIDParams{DID: id})
 	if err != nil {
 		return types.DIDDocumentWithSeq{}, err
