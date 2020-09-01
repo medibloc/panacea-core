@@ -114,16 +114,24 @@ func TestNewPubKey(t *testing.T) {
 }
 
 func TestDIDDocumentWithSeq_Empty(t *testing.T) {
-	require.False(t, NewDIDDocumentWithSeq(getValidDIDDocument(), NewSequence()).Empty())
+	require.False(t, NewDIDDocumentWithSeq(getValidDIDDocument(), InitialSequence).Empty())
 	require.True(t, DIDDocumentWithSeq{}.Empty())
 }
 
 func TestDIDDocumentWithSeq_Valid(t *testing.T) {
 	doc := getValidDIDDocument()
-	require.True(t, NewDIDDocumentWithSeq(doc, NewSequence()).Valid())
+	require.True(t, NewDIDDocumentWithSeq(doc, InitialSequence).Valid())
 	require.False(t, DIDDocumentWithSeq{
 		Document: DIDDocument{ID: "invalid_did"},
 	}.Valid())
+}
+
+func TestDIDDocumentWithSeq_Deactivate(t *testing.T) {
+	docWithSeq := NewDIDDocumentWithSeq(getValidDIDDocument(), InitialSequence)
+	deactivated := docWithSeq.Deactivate(InitialSequence + 1)
+	require.True(t, deactivated.Deactivated())
+	require.False(t, deactivated.Empty())
+	require.True(t, deactivated.Valid())
 }
 
 func getValidDIDDocument() DIDDocument {

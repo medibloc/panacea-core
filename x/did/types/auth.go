@@ -45,9 +45,7 @@ func mustGetSignBytesWithSeq(data Signable, seq Sequence) []byte {
 // Sequence is a preventative measure to distinguish replayed transactions (replay attack).
 type Sequence uint64
 
-func NewSequence() Sequence {
-	return 0
-}
+const InitialSequence = Sequence(0)
 
 func (s Sequence) next() Sequence {
 	return s + 1

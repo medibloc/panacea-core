@@ -15,8 +15,8 @@ func NewHandler(keeper Keeper) sdk.Handler {
 			return handleMsgCreateDID(ctx, keeper, msg)
 		case MsgUpdateDID:
 			return handleMsgUpdateDID(ctx, keeper, msg)
-		case MsgDeleteDID:
-			return handleMsgDeleteDID(ctx, keeper, msg)
+		case MsgDeactivateDID:
+			return handleMsgDeactivateDID(ctx, keeper, msg)
 		default:
 			errMsg := fmt.Sprintf("Unrecognized did Msg type: %v", msg.Type())
 			return sdk.ErrUnknownRequest(errMsg).Result()
@@ -27,10 +27,13 @@ func NewHandler(keeper Keeper) sdk.Handler {
 func handleMsgCreateDID(ctx sdk.Context, keeper Keeper, msg MsgCreateDID) sdk.Result {
 	cur := keeper.GetDIDDocument(ctx, msg.DID)
 	if !cur.Empty() {
+		if cur.Deactivated() {
+			return types.ErrDIDDeactivated(msg.DID).Result()
+		}
 		return types.ErrDIDExists(msg.DID).Result()
 	}
 
-	seq := types.NewSequence()
+	seq := types.InitialSequence
 
 	_, err := verifyDIDOwnership(msg.Document, seq, msg.Document, msg.SigKeyID, msg.Signature)
 	if err != nil {
@@ -47,6 +50,9 @@ func handleMsgUpdateDID(ctx sdk.Context, keeper Keeper, msg MsgUpdateDID) sdk.Re
 	if docWithSeq.Empty() {
 		return types.ErrDIDNotFound(msg.DID).Result()
 	}
+	if docWithSeq.Deactivated() {
+		return types.ErrDIDDeactivated(msg.DID).Result()
+	}
 
 	newSeq, err := verifyDIDOwnership(msg.Document, docWithSeq.Seq, docWithSeq.Document, msg.SigKeyID, msg.Signature)
 	if err != nil {
@@ -58,18 +64,22 @@ func handleMsgUpdateDID(ctx sdk.Context, keeper Keeper, msg MsgUpdateDID) sdk.Re
 	return sdk.Result{}
 }
 
-func handleMsgDeleteDID(ctx sdk.Context, keeper Keeper, msg MsgDeleteDID) sdk.Result {
+func handleMsgDeactivateDID(ctx sdk.Context, keeper Keeper, msg MsgDeactivateDID) sdk.Result {
 	docWithSeq := keeper.GetDIDDocument(ctx, msg.DID)
 	if docWithSeq.Empty() {
 		return types.ErrDIDNotFound(msg.DID).Result()
 	}
+	if docWithSeq.Deactivated() {
+		return types.ErrDIDDeactivated(msg.DID).Result()
+	}
 
-	_, err := verifyDIDOwnership(msg.DID, docWithSeq.Seq, docWithSeq.Document, msg.SigKeyID, msg.Signature)
+	newSeq, err := verifyDIDOwnership(msg.DID, docWithSeq.Seq, docWithSeq.Document, msg.SigKeyID, msg.Signature)
 	if err != nil {
 		return err.Result()
 	}
 
-	keeper.DeleteDID(ctx, msg.DID)
+	// put a tombstone instead of deletion
+	keeper.SetDIDDocument(ctx, msg.DID, docWithSeq.Deactivate(newSeq))
 	return sdk.Result{}
 }
 

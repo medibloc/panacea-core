@@ -21,7 +21,7 @@ func TestMustGetSignBytesWithSeq(t *testing.T) {
 }
 
 func TestSequence(t *testing.T) {
-	seq := NewSequence()
+	seq := InitialSequence
 	require.Equal(t, Sequence(0), seq)
 
 	nextSeq := seq.next()

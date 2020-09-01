@@ -16,7 +16,6 @@ type Keeper interface {
 	SetDIDDocument(ctx sdk.Context, did types.DID, doc types.DIDDocumentWithSeq)
 	GetDIDDocument(ctx sdk.Context, did types.DID) types.DIDDocumentWithSeq
 	ListDIDs(ctx sdk.Context) []types.DID
-	DeleteDID(ctx sdk.Context, did types.DID)
 }
 
 // didKeeper implements the Keeper interface
@@ -71,9 +70,4 @@ func (k didKeeper) ListDIDs(ctx sdk.Context) []types.DID {
 		dids = append(dids, did)
 	}
 	return dids
-}
-
-func (k didKeeper) DeleteDID(ctx sdk.Context, did types.DID) {
-	store := ctx.KVStore(k.storeKey)
-	store.Delete(DIDDocumentKey(did))
 }

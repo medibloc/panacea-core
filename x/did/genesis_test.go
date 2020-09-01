@@ -25,12 +25,14 @@ func TestGenesis(t *testing.T) {
 	keeper := newMockKeeper()
 	keeper.SetDIDDocument(ctx, did1, doc1)
 	keeper.SetDIDDocument(ctx, did2, doc2)
+	doc2Deactivated := doc2.Deactivate(doc2.Seq + 1)
+	keeper.SetDIDDocument(ctx, did2, doc2Deactivated)
 
 	// export a genesis
 	state := ExportGenesis(ctx, keeper)
 	require.Equal(t, 2, len(state.Documents))
 	require.Equal(t, doc1, state.Documents[newGenesisKey(did1)])
-	require.Equal(t, doc2, state.Documents[newGenesisKey(did2)])
+	require.Equal(t, doc2Deactivated, state.Documents[newGenesisKey(did2)])
 
 	// check if the exported genesis is valid
 	require.NoError(t, ValidateGenesis(state))
@@ -40,7 +42,7 @@ func TestGenesis(t *testing.T) {
 	InitGenesis(ctx, newK, state)
 	require.Equal(t, 2, len(newK.ListDIDs(ctx)))
 	require.Equal(t, doc1, newK.GetDIDDocument(ctx, did1))
-	require.Equal(t, doc2, newK.GetDIDDocument(ctx, did2))
+	require.Equal(t, doc2Deactivated, newK.GetDIDDocument(ctx, did2))
 }
 
 func newGenesisKey(did types.DID) string {

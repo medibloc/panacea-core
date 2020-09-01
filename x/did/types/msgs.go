@@ -7,7 +7,7 @@ import (
 var (
 	_ sdk.Msg = &MsgCreateDID{}
 	_ sdk.Msg = &MsgUpdateDID{}
-	_ sdk.Msg = &MsgDeleteDID{}
+	_ sdk.Msg = &MsgDeactivateDID{}
 )
 
 // MsgCreateDID defines a CreateDID message.
@@ -116,27 +116,27 @@ func (msg MsgUpdateDID) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.FromAddress}
 }
 
-// MsgDeleteDID defines a UpdateDID message.
-type MsgDeleteDID struct {
+// MsgDeactivateDID defines a UpdateDID message.
+type MsgDeactivateDID struct {
 	DID         DID            `json:"did"`
 	SigKeyID    KeyID          `json:"sig_key_id"`
 	Signature   []byte         `json:"signature"`
 	FromAddress sdk.AccAddress `json:"from_address"`
 }
 
-// NewMsgDeleteDID is a constructor of MsgDeleteDID.
-func NewMsgDeleteDID(did DID, sigKeyID KeyID, sig []byte, fromAddr sdk.AccAddress) MsgDeleteDID {
-	return MsgDeleteDID{did, sigKeyID, sig, fromAddr}
+// NewMsgDeactivateDID is a constructor of MsgDeactivateDID.
+func NewMsgDeactivateDID(did DID, sigKeyID KeyID, sig []byte, fromAddr sdk.AccAddress) MsgDeactivateDID {
+	return MsgDeactivateDID{did, sigKeyID, sig, fromAddr}
 }
 
 // Route returns the name of the module.
-func (msg MsgDeleteDID) Route() string { return RouterKey }
+func (msg MsgDeactivateDID) Route() string { return RouterKey }
 
 // Type returns the name of the action.
-func (msg MsgDeleteDID) Type() string { return "delete_did" }
+func (msg MsgDeactivateDID) Type() string { return "deactivate_did" }
 
 // VaValidateBasic runs stateless checks on the message.
-func (msg MsgDeleteDID) ValidateBasic() sdk.Error {
+func (msg MsgDeactivateDID) ValidateBasic() sdk.Error {
 	if !msg.DID.Valid() {
 		return ErrInvalidDID(string(msg.DID))
 	}
@@ -150,11 +150,11 @@ func (msg MsgDeleteDID) ValidateBasic() sdk.Error {
 }
 
 // GetSignBytes returns the canonical byte representation of the message. Used to generate a signature.
-func (msg MsgDeleteDID) GetSignBytes() []byte {
+func (msg MsgDeactivateDID) GetSignBytes() []byte {
 	return sdk.MustSortJSON(didCodec.MustMarshalJSON(msg))
 }
 
 // GetSigners return the addresses of signers that must sign.
-func (msg MsgDeleteDID) GetSigners() []sdk.AccAddress {
+func (msg MsgDeactivateDID) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.FromAddress}
 }
