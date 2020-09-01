@@ -79,12 +79,7 @@ func TestNewDIDDocument(t *testing.T) {
 }
 
 func TestDIDDocument_Empty(t *testing.T) {
-	did := DID("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP")
-	keyID := NewKeyID(did, "key1")
-	pubKey := NewPubKey(keyID, ES256K, secp256k1.GenPrivKey().PubKey())
-	doc := NewDIDDocument(did, pubKey)
-	require.False(t, doc.Empty())
-
+	require.False(t, getValidDIDDocument().Empty())
 	require.True(t, DIDDocument{}.Empty())
 }
 
@@ -116,4 +111,24 @@ func TestNewPubKey(t *testing.T) {
 
 	expected := pubKey.(secp256k1.PubKeySecp256k1)
 	require.Equal(t, expected[:], base58.Decode(pub.KeyBase58))
+}
+
+func TestDIDDocumentWithSeq_Empty(t *testing.T) {
+	require.False(t, NewDIDDocumentWithSeq(getValidDIDDocument(), NewSequence()).Empty())
+	require.True(t, DIDDocumentWithSeq{}.Empty())
+}
+
+func TestDIDDocumentWithSeq_Valid(t *testing.T) {
+	doc := getValidDIDDocument()
+	require.True(t, NewDIDDocumentWithSeq(doc, NewSequence()).Valid())
+	require.False(t, DIDDocumentWithSeq{
+		Document: DIDDocument{ID: "invalid_did"},
+	}.Valid())
+}
+
+func getValidDIDDocument() DIDDocument {
+	did := DID("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP")
+	keyID := NewKeyID(did, "key1")
+	pubKey := NewPubKey(keyID, ES256K, secp256k1.GenPrivKey().PubKey())
+	return NewDIDDocument(did, pubKey)
 }

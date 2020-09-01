@@ -6,7 +6,7 @@ import (
 )
 
 type GenesisState struct {
-	Documents map[string]types.DIDDocument
+	Documents map[string]types.DIDDocumentWithSeq
 }
 
 func DefaultGenesisState() GenesisState {
@@ -31,14 +31,14 @@ func ValidateGenesis(data GenesisState) error {
 		}
 
 		if !doc.Valid() {
-			return types.ErrInvalidDIDDocument(doc)
+			return types.ErrInvalidDIDDocumentWithSeq(doc)
 		}
 	}
 	return nil
 }
 
 func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
-	documentsMap := make(map[string]types.DIDDocument)
+	documentsMap := make(map[string]types.DIDDocumentWithSeq)
 
 	for _, did := range k.ListDIDs(ctx) {
 		key := GenesisDIDDocumentKey{DID: did}.Marshal()

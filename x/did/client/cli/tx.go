@@ -7,6 +7,8 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/tendermint/tendermint/crypto"
+
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/client/utils"
@@ -113,9 +115,8 @@ func GetCmdUpdateDID(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			// For proving that I know the private key
-			// TODO: prevent the double-spending: https://github.com/medibloc/panacea-core/issues/28
-			sig, err := privKey.Sign(doc.GetSignBytes())
+			// For proving that I know the private key. It signs on the DIDDocument.
+			sig, err := sign(cliCtx, did, privKey, doc)
 			if err != nil {
 				return err
 			}
@@ -153,9 +154,8 @@ func GetCmdDeleteDID(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			// For proving that I know the private key
-			// TODO: prevent the double-spending: https://github.com/medibloc/panacea-core/issues/28
-			sig, err := privKey.Sign(did.GetSignBytes())
+			// For proving that I know the private key. It signs on the DID, not DIDDocument.
+			sig, err := sign(cliCtx, did, privKey, did)
 			if err != nil {
 				return err
 			}
@@ -276,4 +276,13 @@ func getPrivKeyFromKeyStore(keyID types.KeyID) (secp256k1.PrivKeySecp256k1, erro
 	}
 
 	return types.NewPrivKeyFromBytes(privKeyBytes)
+}
+
+func sign(cliCtx context.CLIContext, did types.DID, privKey crypto.PrivKey, data types.Signable) ([]byte, error) {
+	// get a DIDDocumentWithSeq to use its Seq for signing
+	doc, err := queryDID(cliCtx, did)
+	if err != nil {
+		return nil, err
+	}
+	return types.Sign(data, doc.Seq, privKey)
 }

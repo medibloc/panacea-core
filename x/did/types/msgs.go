@@ -102,7 +102,7 @@ func (msg MsgUpdateDID) GetSigners() []sdk.AccAddress {
 // MsgDeleteDID defines a UpdateDID message.
 type MsgDeleteDID struct {
 	DID         DID            `json:"did"`
-	SigKeyID    KeyID          `json:"sig_pubkey_id"`
+	SigKeyID    KeyID          `json:"sig_key_id"`
 	Signature   []byte         `json:"signature"`
 	FromAddress sdk.AccAddress `json:"from_address"`
 }

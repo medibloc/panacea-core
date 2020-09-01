@@ -11,7 +11,17 @@ import (
 // Keeper maintains the link to data storage
 // and exposes getter/setter methods for
 // the various parts of the state machine
-type Keeper struct {
+type Keeper interface {
+	Codec() *codec.Codec
+	SetDIDDocument(ctx sdk.Context, did types.DID, doc types.DIDDocumentWithSeq)
+	HasDID(ctx sdk.Context, did types.DID) bool
+	GetDIDDocument(ctx sdk.Context, did types.DID) types.DIDDocumentWithSeq
+	ListDIDs(ctx sdk.Context) []types.DID
+	DeleteDID(ctx sdk.Context, did types.DID)
+}
+
+// didKeeper implements the Keeper interface
+type didKeeper struct {
 	// Unexposed key to access store from sdk.Context
 	storeKey sdk.StoreKey
 
@@ -20,38 +30,42 @@ type Keeper struct {
 
 // NewKeeper creates a new instance of the did Keeper
 func NewKeeper(storeKey sdk.StoreKey, cdc *codec.Codec) Keeper {
-	return Keeper{
+	return didKeeper{
 		storeKey: storeKey,
 		cdc:      cdc,
 	}
 }
 
-func (k Keeper) SetDIDDocument(ctx sdk.Context, did types.DID, doc types.DIDDocument) {
+func (k didKeeper) Codec() *codec.Codec {
+	return k.cdc
+}
+
+func (k didKeeper) SetDIDDocument(ctx sdk.Context, did types.DID, doc types.DIDDocumentWithSeq) {
 	store := ctx.KVStore(k.storeKey)
 	key := DIDDocumentKey(did)
 	bz := k.cdc.MustMarshalBinaryLengthPrefixed(doc)
 	store.Set(key, bz)
 }
 
-func (k Keeper) HasDID(ctx sdk.Context, did types.DID) bool {
+func (k didKeeper) HasDID(ctx sdk.Context, did types.DID) bool {
 	store := ctx.KVStore(k.storeKey)
 	return store.Has(DIDDocumentKey(did))
 }
 
-func (k Keeper) GetDIDDocument(ctx sdk.Context, did types.DID) types.DIDDocument {
+func (k didKeeper) GetDIDDocument(ctx sdk.Context, did types.DID) types.DIDDocumentWithSeq {
 	store := ctx.KVStore(k.storeKey)
 	key := DIDDocumentKey(did)
 	bz := store.Get(key)
 	if bz == nil {
-		return types.DIDDocument{}
+		return types.DIDDocumentWithSeq{}
 	}
 
-	var doc types.DIDDocument
+	var doc types.DIDDocumentWithSeq
 	k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &doc)
 	return doc
 }
 
-func (k Keeper) ListDIDs(ctx sdk.Context) []types.DID {
+func (k didKeeper) ListDIDs(ctx sdk.Context) []types.DID {
 	store := ctx.KVStore(k.storeKey)
 	dids := make([]types.DID, 0)
 
@@ -65,7 +79,7 @@ func (k Keeper) ListDIDs(ctx sdk.Context) []types.DID {
 	return dids
 }
 
-func (k Keeper) DeleteDID(ctx sdk.Context, did types.DID) {
+func (k didKeeper) DeleteDID(ctx sdk.Context, did types.DID) {
 	store := ctx.KVStore(k.storeKey)
 	store.Delete(DIDDocumentKey(did))
 }
