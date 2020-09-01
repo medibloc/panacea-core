@@ -13,28 +13,39 @@ import (
 )
 
 func TestHandleMsgCreateDID(t *testing.T) {
-	did, doc, _, _, keeper := ctx()
+	did, doc, privKey, keyID, keeper := ctx()
+	sig, _ := types.Sign(doc.Document, types.NewSequence(), privKey)
 
-	res := handleMsgCreateDID(sdk.Context{}, keeper, MsgCreateDID{
-		DID:         did,
-		Document:    doc.Document,
-		FromAddress: sdk.AccAddress{},
-	})
+	res := handleMsgCreateDID(sdk.Context{}, keeper, types.NewMsgCreateDID(
+		did, doc.Document, keyID, sig, sdk.AccAddress{},
+	))
 	require.True(t, res.IsOK())
 	require.Equal(t, 1, len(keeper.ListDIDs(sdk.Context{})))
 	require.Equal(t, doc, keeper.GetDIDDocument(sdk.Context{}, did))
 }
 
 func TestHandleMsgCreateDID_Exists(t *testing.T) {
-	did, doc, _, _, keeper := ctx()
+	did, doc, privKey, keyID, keeper := ctx()
+	sig, _ := types.Sign(doc.Document, types.NewSequence(), privKey)
+
 	keeper.SetDIDDocument(sdk.Context{}, did, doc)
 
-	res := handleMsgCreateDID(sdk.Context{}, keeper, MsgCreateDID{
-		DID:         did,
-		Document:    doc.Document,
-		FromAddress: sdk.AccAddress{},
-	})
+	res := handleMsgCreateDID(sdk.Context{}, keeper, types.NewMsgCreateDID(
+		did, doc.Document, keyID, sig, sdk.AccAddress{},
+	))
 	require.Equal(t, types.ErrDIDExists(did).Result(), res)
+}
+
+func TestHandleMsgCreateDID_SigVerificationFailed(t *testing.T) {
+	did, doc, privKey, keyID, keeper := ctx()
+	sig, _ := types.Sign(doc.Document, types.NewSequence(), privKey)
+
+	sig[0] += 1 // pollute the signature
+
+	res := handleMsgCreateDID(sdk.Context{}, keeper, types.NewMsgCreateDID(
+		did, doc.Document, keyID, sig, sdk.AccAddress{},
+	))
+	require.Equal(t, types.ErrSigVerificationFailed().Result(), res)
 }
 
 func TestHandleMsgUpdateDID(t *testing.T) {
@@ -51,13 +62,7 @@ func TestHandleMsgUpdateDID(t *testing.T) {
 	sig, _ := types.Sign(newDoc, origDoc.Seq, privKey)
 
 	// call
-	msg := MsgUpdateDID{
-		DID:         did,
-		Document:    newDoc,
-		SigKeyID:    keyID,
-		Signature:   sig,
-		FromAddress: sdk.AccAddress{},
-	}
+	msg := types.NewMsgUpdateDID(did, newDoc, keyID, sig, sdk.AccAddress{})
 	res := handleMsgUpdateDID(sdk.Context{}, keeper, msg)
 	require.True(t, res.IsOK())
 	require.Equal(t, 1, len(keeper.ListDIDs(sdk.Context{})))
@@ -71,59 +76,61 @@ func TestHandleMsgUpdateDID(t *testing.T) {
 	require.Equal(t, types.ErrSigVerificationFailed().Code(), res.Code)
 }
 
+func TestHandleMsgUpdateDID_DIDNotFound(t *testing.T) {
+	did, origDoc, privKey, keyID, keeper := ctx()
+	newDoc := origDoc.Document
+	sig, _ := types.Sign(newDoc, origDoc.Seq, privKey)
+
+	msg := types.NewMsgUpdateDID(did, newDoc, keyID, sig, sdk.AccAddress{})
+	res := handleMsgUpdateDID(sdk.Context{}, keeper, msg)
+	require.Equal(t, types.ErrDIDNotFound(did).Result(), res)
+}
+
 func TestHandleMsgDeleteDID(t *testing.T) {
 	did, doc, privKey, keyID, keeper := ctx()
 	keeper.SetDIDDocument(sdk.Context{}, did, doc)
 	sig, _ := types.Sign(did, doc.Seq, privKey)
 
-	res := handleMsgDeleteDID(sdk.Context{}, keeper, MsgDeleteDID{
-		DID:         did,
-		SigKeyID:    keyID,
-		Signature:   sig,
-		FromAddress: sdk.AccAddress{},
-	})
+	res := handleMsgDeleteDID(sdk.Context{}, keeper, types.NewMsgDeleteDID(did, keyID, sig, sdk.AccAddress{}))
 	require.True(t, res.IsOK())
 	require.Empty(t, keeper.ListDIDs(sdk.Context{}))
 }
 
-func TestVerifyDIDOwnership(t *testing.T) {
+func TestHandleMsgDeleteDID_DIDNotFound(t *testing.T) {
 	did, doc, privKey, keyID, keeper := ctx()
-	keeper.SetDIDDocument(sdk.Context{}, did, doc)
+	sig, _ := types.Sign(did, doc.Seq, privKey)
+
+	msg := types.NewMsgDeleteDID(did, keyID, sig, sdk.AccAddress{})
+	res := handleMsgDeleteDID(sdk.Context{}, keeper, msg)
+	require.Equal(t, types.ErrDIDNotFound(did).Result(), res)
+}
+
+func TestVerifyDIDOwnership(t *testing.T) {
+	_, doc, privKey, keyID, _ := ctx()
 	data := any("random string")
 	sig, _ := types.Sign(data, doc.Seq, privKey)
 
-	newSeq, err := verifyDIDOwnership(sdk.Context{}, keeper, did, keyID, sig, data)
+	newSeq, err := verifyDIDOwnership(data, doc.Seq, doc.Document, keyID, sig)
 	require.NoError(t, err)
 	require.Equal(t, doc.Seq+1, newSeq)
 }
 
-func TestVerifyDIDOwnership_DIDNotFound(t *testing.T) {
-	did, doc, privKey, keyID, keeper := ctx()
-	data := any("random string")
-	sig, _ := types.Sign(data, doc.Seq, privKey)
-
-	_, err := verifyDIDOwnership(sdk.Context{}, keeper, did, keyID, sig, data)
-	require.EqualError(t, err, types.ErrDIDNotFound(did).Error())
-}
-
 func TestVerifyDIDOwnership_KeyIDNotFound(t *testing.T) {
-	did, doc, privKey, keyID, keeper := ctx()
-	keeper.SetDIDDocument(sdk.Context{}, did, doc)
+	_, doc, privKey, keyID, _ := ctx()
 	data := any("random string")
 	sig, _ := types.Sign(data, doc.Seq, privKey)
 
 	dummyKeyID := keyID + "dummy"
-	_, err := verifyDIDOwnership(sdk.Context{}, keeper, did, dummyKeyID, sig, data)
+	_, err := verifyDIDOwnership(data, doc.Seq, doc.Document, dummyKeyID, sig)
 	require.EqualError(t, err, types.ErrKeyIDNotFound(dummyKeyID).Error())
 }
 
 func TestVerifyDIDOwnership_SigVerificationFailed(t *testing.T) {
-	did, doc, privKey, keyID, keeper := ctx()
-	keeper.SetDIDDocument(sdk.Context{}, did, doc)
+	_, doc, privKey, keyID, _ := ctx()
 	data := any("random string")
 	sig, _ := types.Sign(data, doc.Seq+11234, privKey)
 
-	_, err := verifyDIDOwnership(sdk.Context{}, keeper, did, keyID, sig, data)
+	_, err := verifyDIDOwnership(data, doc.Seq, doc.Document, keyID, sig)
 	require.EqualError(t, err, types.ErrSigVerificationFailed().Error())
 }
 
@@ -148,11 +155,6 @@ func (k mockKeeper) Codec() *codec.Codec {
 
 func (k mockKeeper) SetDIDDocument(ctx sdk.Context, did types.DID, doc types.DIDDocumentWithSeq) {
 	k.docs[did] = doc
-}
-
-func (k mockKeeper) HasDID(ctx sdk.Context, did types.DID) bool {
-	_, ok := k.docs[did]
-	return ok
 }
 
 func (k mockKeeper) GetDIDDocument(ctx sdk.Context, did types.DID) types.DIDDocumentWithSeq {

@@ -14,12 +14,20 @@ var (
 type MsgCreateDID struct {
 	DID         DID            `json:"did"`
 	Document    DIDDocument    `json:"document"`
+	SigKeyID    KeyID          `json:"sig_key_id"`
+	Signature   []byte         `json:"signature"`
 	FromAddress sdk.AccAddress `json:"from_address"`
 }
 
 // NewMsgCreateDID is a constructor of MsgCreateDID.
-func NewMsgCreateDID(did DID, doc DIDDocument, fromAddr sdk.AccAddress) MsgCreateDID {
-	return MsgCreateDID{did, doc, fromAddr}
+func NewMsgCreateDID(did DID, doc DIDDocument, sigKeyID KeyID, sig []byte, fromAddr sdk.AccAddress) MsgCreateDID {
+	return MsgCreateDID{
+		DID:         did,
+		Document:    doc,
+		SigKeyID:    sigKeyID,
+		Signature:   sig,
+		FromAddress: fromAddr,
+	}
 }
 
 // Route returns the name of the module.
@@ -28,13 +36,16 @@ func (msg MsgCreateDID) Route() string { return RouterKey }
 // Type returns the name of the action.
 func (msg MsgCreateDID) Type() string { return "create_did" }
 
-// VaValidateBasic runs stateless checks on the message.
+// ValidateBasic runs stateless checks on the message.
 func (msg MsgCreateDID) ValidateBasic() sdk.Error {
 	if !msg.DID.Valid() {
 		return ErrInvalidDID(string(msg.DID))
 	}
 	if !msg.Document.Valid() {
 		return ErrInvalidDIDDocument(msg.Document)
+	}
+	if msg.Signature == nil || len(msg.Signature) == 0 {
+		return ErrInvalidSignature(msg.Signature)
 	}
 	if msg.FromAddress.Empty() {
 		return sdk.ErrInvalidAddress(msg.FromAddress.String())
@@ -63,7 +74,13 @@ type MsgUpdateDID struct {
 
 // NewMsgUpdateDID is a constructor of MsgUpdateDID.
 func NewMsgUpdateDID(did DID, doc DIDDocument, sigKeyID KeyID, sig []byte, fromAddr sdk.AccAddress) MsgUpdateDID {
-	return MsgUpdateDID{did, doc, sigKeyID, sig, fromAddr}
+	return MsgUpdateDID{
+		DID:         did,
+		Document:    doc,
+		SigKeyID:    sigKeyID,
+		Signature:   sig,
+		FromAddress: fromAddr,
+	}
 }
 
 // Route returns the name of the module.
@@ -72,7 +89,7 @@ func (msg MsgUpdateDID) Route() string { return RouterKey }
 // Type returns the name of the action.
 func (msg MsgUpdateDID) Type() string { return "update_did" }
 
-// VaValidateBasic runs stateless checks on the message.
+// ValidateBasic runs stateless checks on the message.
 func (msg MsgUpdateDID) ValidateBasic() sdk.Error {
 	if !msg.DID.Valid() {
 		return ErrInvalidDID(string(msg.DID))
@@ -108,8 +125,8 @@ type MsgDeleteDID struct {
 }
 
 // NewMsgDeleteDID is a constructor of MsgDeleteDID.
-func NewMsgDeleteDID(did DID, sigPubKeyID KeyID, sig []byte, fromAddr sdk.AccAddress) MsgDeleteDID {
-	return MsgDeleteDID{did, sigPubKeyID, sig, fromAddr}
+func NewMsgDeleteDID(did DID, sigKeyID KeyID, sig []byte, fromAddr sdk.AccAddress) MsgDeleteDID {
+	return MsgDeleteDID{did, sigKeyID, sig, fromAddr}
 }
 
 // Route returns the name of the module.

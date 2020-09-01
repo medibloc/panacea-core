@@ -14,7 +14,6 @@ import (
 type Keeper interface {
 	Codec() *codec.Codec
 	SetDIDDocument(ctx sdk.Context, did types.DID, doc types.DIDDocumentWithSeq)
-	HasDID(ctx sdk.Context, did types.DID) bool
 	GetDIDDocument(ctx sdk.Context, did types.DID) types.DIDDocumentWithSeq
 	ListDIDs(ctx sdk.Context) []types.DID
 	DeleteDID(ctx sdk.Context, did types.DID)
@@ -45,11 +44,6 @@ func (k didKeeper) SetDIDDocument(ctx sdk.Context, did types.DID, doc types.DIDD
 	key := DIDDocumentKey(did)
 	bz := k.cdc.MustMarshalBinaryLengthPrefixed(doc)
 	store.Set(key, bz)
-}
-
-func (k didKeeper) HasDID(ctx sdk.Context, did types.DID) bool {
-	store := ctx.KVStore(k.storeKey)
-	return store.Has(DIDDocumentKey(did))
 }
 
 func (k didKeeper) GetDIDDocument(ctx sdk.Context, did types.DID) types.DIDDocumentWithSeq {

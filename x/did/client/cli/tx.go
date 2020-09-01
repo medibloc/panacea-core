@@ -57,6 +57,11 @@ func GetCmdCreateDID(cdc *codec.Codec) *cobra.Command {
 			keyID := types.NewKeyID(did, "key1")
 			doc := types.NewDIDDocument(did, types.NewPubKey(keyID, types.ES256K, pubKey))
 
+			sig, err := types.Sign(doc, types.NewSequence(), privKey)
+			if err != nil {
+				return err
+			}
+
 			passwd, err := client.GetCheckPassword(
 				"Enter a password to encrypt your key for DID to disk:",
 				"Repeat the password:",
@@ -75,7 +80,7 @@ func GetCmdCreateDID(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			msg := types.NewMsgCreateDID(did, doc, cliCtx.GetFromAddress())
+			msg := types.NewMsgCreateDID(did, doc, keyID, sig, cliCtx.GetFromAddress())
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
@@ -116,7 +121,7 @@ func GetCmdUpdateDID(cdc *codec.Codec) *cobra.Command {
 			}
 
 			// For proving that I know the private key. It signs on the DIDDocument.
-			sig, err := sign(cliCtx, did, privKey, doc)
+			sig, err := signUsingCurrentSeq(cliCtx, did, privKey, doc)
 			if err != nil {
 				return err
 			}
@@ -155,7 +160,7 @@ func GetCmdDeleteDID(cdc *codec.Codec) *cobra.Command {
 			}
 
 			// For proving that I know the private key. It signs on the DID, not DIDDocument.
-			sig, err := sign(cliCtx, did, privKey, did)
+			sig, err := signUsingCurrentSeq(cliCtx, did, privKey, did)
 			if err != nil {
 				return err
 			}
@@ -278,11 +283,11 @@ func getPrivKeyFromKeyStore(keyID types.KeyID) (secp256k1.PrivKeySecp256k1, erro
 	return types.NewPrivKeyFromBytes(privKeyBytes)
 }
 
-func sign(cliCtx context.CLIContext, did types.DID, privKey crypto.PrivKey, data types.Signable) ([]byte, error) {
+func signUsingCurrentSeq(cliCtx context.CLIContext, did types.DID, privKey crypto.PrivKey, data types.Signable) ([]byte, error) {
 	// get a DIDDocumentWithSeq to use its Seq for signing
-	doc, err := queryDID(cliCtx, did)
+	docWithSeq, err := queryDIDDocumentWithSeq(cliCtx, did)
 	if err != nil {
 		return nil, err
 	}
-	return types.Sign(data, doc.Seq, privKey)
+	return types.Sign(data, docWithSeq.Seq, privKey)
 }
