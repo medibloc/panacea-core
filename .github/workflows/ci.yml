@@ -28,18 +28,6 @@ jobs:
     - name: Test
       run: make test
 
-    - name: Convert coverage.out into coverage.lcov
-      uses: jandelgado/gcov2lcov-action@v1.0.2
-      with:
-        infile: artifacts/coverage.out
-        outfile: artifacts/coverage.lcov
-
-    - name: Report coverage.lcov as a comment
-      uses: romeovs/lcov-reporter-action@v0.2.16
-      with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        lcov-file: artifacts/coverage.lcov
-
     - name: Publish coverage.html as an artifact
       uses: actions/upload-artifact@master
       with:

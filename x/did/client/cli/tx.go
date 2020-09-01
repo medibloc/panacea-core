@@ -57,7 +57,7 @@ func GetCmdCreateDID(cdc *codec.Codec) *cobra.Command {
 			keyID := types.NewKeyID(did, "key1")
 			doc := types.NewDIDDocument(did, types.NewPubKey(keyID, types.ES256K, pubKey))
 
-			sig, err := types.Sign(doc, types.NewSequence(), privKey)
+			sig, err := types.Sign(doc, types.InitialSequence, privKey)
 			if err != nil {
 				return err
 			}
@@ -136,10 +136,10 @@ func GetCmdUpdateDID(cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
-func GetCmdDeleteDID(cdc *codec.Codec) *cobra.Command {
+func GetCmdDeactivateDID(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "delete-did [did] [key-id]",
-		Short: "Delete a DID Document",
+		Use:   "deactivate-did [did] [key-id]",
+		Short: "Deactivate a DID Document",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			txBldr := authtxb.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
@@ -165,7 +165,7 @@ func GetCmdDeleteDID(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			msg := types.NewMsgDeleteDID(did, keyID, sig, cliCtx.GetFromAddress())
+			msg := types.NewMsgDeactivateDID(did, keyID, sig, cliCtx.GetFromAddress())
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}

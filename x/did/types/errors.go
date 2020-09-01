@@ -18,6 +18,7 @@ const (
 	CodeInvalidSecp256k1PublicKey sdk.CodeType = 109
 	CodeInvalidNetworkID          sdk.CodeType = 110
 	CodeInvalidDIDDocumentWithSeq sdk.CodeType = 111
+	CodeDIDDeactivated            sdk.CodeType = 112
 )
 
 func ErrDIDExists(did DID) sdk.Error {
@@ -49,7 +50,7 @@ func ErrKeyIDNotFound(id KeyID) sdk.Error {
 }
 
 func ErrSigVerificationFailed() sdk.Error {
-	return sdk.NewError(DefaultCodespace, CodeSigVerificationFailed, "Signature verification was failed")
+	return sdk.NewError(DefaultCodespace, CodeSigVerificationFailed, "DID signature verification was failed")
 }
 
 func ErrInvalidSecp256k1PublicKey(err error) sdk.Error {
@@ -62,4 +63,8 @@ func ErrInvalidNetworkID(id string) sdk.Error {
 
 func ErrInvalidDIDDocumentWithSeq(doc DIDDocumentWithSeq) sdk.Error {
 	return sdk.NewError(DefaultCodespace, CodeInvalidDIDDocumentWithSeq, "Invalid DIDDocumentWithSeq: %v", doc)
+}
+
+func ErrDIDDeactivated(did DID) sdk.Error {
+	return sdk.NewError(DefaultCodespace, CodeDIDDeactivated, "DID was already deactivated: %v", did)
 }

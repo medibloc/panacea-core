@@ -87,6 +87,10 @@ func NewDIDDocument(id DID, pubKey PubKey) DIDDocument {
 }
 
 func (doc DIDDocument) Valid() bool {
+	if doc.Empty() { // deactivated
+		return true
+	}
+
 	if !doc.ID.Valid() || doc.PubKeys == nil || doc.Authentications == nil {
 		return false
 	}
@@ -236,12 +240,25 @@ func NewDIDDocumentWithSeq(doc DIDDocument, seq Sequence) DIDDocumentWithSeq {
 	}
 }
 
+// Empty returns true if all members in DIDDocumentWithSeq are empty.
+// The empty struct means that the entity doesn't exist.
 func (d DIDDocumentWithSeq) Empty() bool {
-	return d.Document.Empty()
+	return d.Document.Empty() && d.Seq == InitialSequence
 }
 
 func (d DIDDocumentWithSeq) Valid() bool {
 	return d.Document.Valid()
+}
+
+// Deactivate creates a new DIDDocumentWithSeq with an empty DIDDocument (tombstone).
+// Note that it requires a new sequence.
+func (d DIDDocumentWithSeq) Deactivate(newSeq Sequence) DIDDocumentWithSeq {
+	return NewDIDDocumentWithSeq(DIDDocument{}, newSeq)
+}
+
+// Deactivated returns true if the DIDDocument has been activated.
+func (d DIDDocumentWithSeq) Deactivated() bool {
+	return d.Document.Empty() && d.Seq != InitialSequence
 }
 
 // NewPrivKeyFromBytes converts a byte slice into a Secp256k1 private key.

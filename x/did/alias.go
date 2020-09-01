@@ -14,7 +14,7 @@ var (
 )
 
 type (
-	MsgCreateDID = types.MsgCreateDID
-	MsgUpdateDID = types.MsgUpdateDID
-	MsgDeleteDID = types.MsgDeleteDID
+	MsgCreateDID     = types.MsgCreateDID
+	MsgUpdateDID     = types.MsgUpdateDID
+	MsgDeactivateDID = types.MsgDeactivateDID
 )

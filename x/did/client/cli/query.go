@@ -1,8 +1,6 @@
 package cli
 
 import (
-	"errors"
-
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/medibloc/panacea-core/x/did"
@@ -50,7 +48,10 @@ func queryDIDDocumentWithSeq(cliCtx context.CLIContext, id types.DID) (types.DID
 	var doc types.DIDDocumentWithSeq
 	cliCtx.Codec.MustUnmarshalJSON(res, &doc)
 	if doc.Empty() {
-		return types.DIDDocumentWithSeq{}, errors.New("DID not found")
+		return types.DIDDocumentWithSeq{}, types.ErrDIDNotFound(id)
+	}
+	if doc.Deactivated() {
+		return types.DIDDocumentWithSeq{}, types.ErrDIDDeactivated(id)
 	}
 
 	return doc, nil

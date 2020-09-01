@@ -1,6 +1,7 @@
 package types_test
 
 import (
+	"os"
 	"testing"
 
 	"github.com/medibloc/panacea-core/x/did/types"
@@ -9,6 +10,11 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
+
+func TestMain(m *testing.M) {
+	sdk.GetConfig().SetBech32PrefixForAccount("panacea", "panaceapub")
+	os.Exit(m.Run())
+}
 
 func TestMsgCreateDID(t *testing.T) {
 	doc := newDIDDocument()
@@ -58,31 +64,30 @@ func TestMsgUpdateDID(t *testing.T) {
 	)
 }
 
-func TestDeleteDID(t *testing.T) {
+func TestDeactivateDID(t *testing.T) {
 	doc := newDIDDocument()
 	sig := []byte("my-sig")
 	fromAddr := getFromAddress(t)
 
-	msg := types.NewMsgDeleteDID(doc.ID, doc.PubKeys[0].ID, sig, fromAddr)
+	msg := types.NewMsgDeactivateDID(doc.ID, doc.PubKeys[0].ID, sig, fromAddr)
 	require.Equal(t, doc.ID, msg.DID)
 	require.Equal(t, doc.PubKeys[0].ID, msg.SigKeyID)
 	require.Equal(t, sig, msg.Signature)
 	require.Equal(t, fromAddr, msg.FromAddress)
 
 	require.Equal(t, types.RouterKey, msg.Route())
-	require.Equal(t, "delete_did", msg.Type())
+	require.Equal(t, "deactivate_did", msg.Type())
 	require.Nil(t, msg.ValidateBasic())
 	require.Equal(t, 1, len(msg.GetSigners()))
 	require.Equal(t, fromAddr, msg.GetSigners()[0])
 
 	require.Equal(t,
-		`{"type":"did/MsgDeleteDID","value":{"did":"did:panacea:testnet:KS5zGZt66Me8MCctZBYrP","from_address":"panacea154p6kyu9kqgvcmq63w3vpn893ssy6anpu8ykfq","sig_key_id":"did:panacea:testnet:KS5zGZt66Me8MCctZBYrP#key1","signature":"bXktc2ln"}}`,
+		`{"type":"did/MsgDeactivateDID","value":{"did":"did:panacea:testnet:KS5zGZt66Me8MCctZBYrP","from_address":"panacea154p6kyu9kqgvcmq63w3vpn893ssy6anpu8ykfq","sig_key_id":"did:panacea:testnet:KS5zGZt66Me8MCctZBYrP#key1","signature":"bXktc2ln"}}`,
 		string(msg.GetSignBytes()),
 	)
 }
 
 func getFromAddress(t *testing.T) sdk.AccAddress {
-	sdk.GetConfig().SetBech32PrefixForAccount("panacea", "panaceapub")
 	fromAddr, err := sdk.AccAddressFromBech32("panacea154p6kyu9kqgvcmq63w3vpn893ssy6anpu8ykfq")
 	require.NoError(t, err)
 	return fromAddr
