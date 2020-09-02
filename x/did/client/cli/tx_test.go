@@ -7,6 +7,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/cosmos/cosmos-sdk/client/context"
+
 	"github.com/medibloc/panacea-core/x/did/client/crypto"
 
 	"github.com/medibloc/panacea-core/x/did/types"
@@ -17,6 +19,24 @@ import (
 func TestMain(m *testing.M) {
 	os.RemoveAll(keystoreBaseDir())
 	os.Exit(m.Run())
+}
+
+// Check if MsgCreateDID is created with the proper signature.
+func TestNewMsgCreateDID(t *testing.T) {
+	privKey, _ := crypto.GenSecp256k1PrivKey("", "")
+
+	// create a message
+	msg, err := newMsgCreateDID(context.CLIContext{}, "testnet", privKey)
+	require.NoError(t, err)
+
+	// check if pubKey is correct
+	pub, _ := msg.Document.PubKeyByID(msg.SigKeyID)
+	pubKey, _ := types.NewPubKeyFromBase58(pub.KeyBase58)
+	require.Equal(t, privKey.PubKey(), pubKey)
+
+	// check if the signature can be verifiable with the initial sequence
+	_, ok := types.Verify(msg.Signature, msg.Document, types.InitialSequence, pubKey)
+	require.True(t, ok)
 }
 
 // Check if empty strings are returned when the interactive mode is disabled.
