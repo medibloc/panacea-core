@@ -117,7 +117,7 @@ func GetCmdUpdateDID(cdc *codec.Codec) *cobra.Command {
 			}
 
 			// For proving that I know the private key. It signs on the DIDDocument.
-			sig, err := signWithSeq(cliCtx, did, privKey, doc)
+			sig, err := signUsingCurrentSeq(cliCtx, did, privKey, doc)
 			if err != nil {
 				return err
 			}
@@ -155,7 +155,7 @@ func GetCmdDeactivateDID(cdc *codec.Codec) *cobra.Command {
 			}
 
 			// For proving that I know the private key. It signs on the DID, not DIDDocument.
-			sig, err := signWithSeq(cliCtx, did, privKey, did)
+			sig, err := signUsingCurrentSeq(cliCtx, did, privKey, did)
 			if err != nil {
 				return err
 			}
@@ -268,8 +268,8 @@ func getPrivKeyFromKeyStore(keyID types.KeyID, reader *bufio.Reader) (secp256k1.
 	return types.NewPrivKeyFromBytes(privKeyBytes)
 }
 
-// signWithSeq generates a signature using the current sequence stored in the blockchain.
-func signWithSeq(cliCtx context.CLIContext, did types.DID, privKey crypto.PrivKey, data types.Signable) ([]byte, error) {
+// signUsingCurrentSeq generates a signature using the current sequence stored in the blockchain.
+func signUsingCurrentSeq(cliCtx context.CLIContext, did types.DID, privKey crypto.PrivKey, data types.Signable) ([]byte, error) {
 	docWithSeq, err := queryDIDDocumentWithSeq(cliCtx, did)
 	if err != nil {
 		return nil, err
