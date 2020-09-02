@@ -27,7 +27,6 @@ const (
 	scryptR         = 8
 	scryptDKLen     = 32
 	saltBytes       = 32
-	derivedKeyLen   = 32
 	cipherAlgorithm = "aes-128-ctr"
 )
 
@@ -173,13 +172,13 @@ func encryptKey(address string, key []byte, passwd string) (encryptedKey, error)
 	}
 
 	// encrypt the key using AES-128-CTR
-	cipherText, err := aesCTRXOR(derivedKey[:derivedKeyLen/2], iv, key[:])
+	cipherText, err := aesCTRXOR(derivedKey[:scryptDKLen/2], iv, key[:])
 	if err != nil {
 		return encryptedKey{}, err
 	}
 
 	// MAC to check whether the decryption password was correct or not
-	mac, err := newSHA3Keccak256(derivedKey[derivedKeyLen/2:derivedKeyLen], cipherText)
+	mac, err := newSHA3Keccak256(derivedKey[scryptDKLen/2:scryptDKLen], cipherText)
 	if err != nil {
 		return encryptedKey{}, err
 	}
@@ -240,12 +239,13 @@ func decryptKey(key encryptedKey, passwd string) ([]byte, error) {
 		return nil, fmt.Errorf("fail to decode salt: %w", err)
 	}
 
-	derivedKey, err := scrypt.Key([]byte(passwd), salt, key.Crypto.KDFParams.N, key.Crypto.KDFParams.R, key.Crypto.KDFParams.P, key.Crypto.KDFParams.DKLen)
+	dkLen := key.Crypto.KDFParams.DKLen
+	derivedKey, err := scrypt.Key([]byte(passwd), salt, key.Crypto.KDFParams.N, key.Crypto.KDFParams.R, key.Crypto.KDFParams.P, dkLen)
 	if err != nil {
 		return nil, fmt.Errorf("fail to derive a key: %w", err)
 	}
 
-	expectedMac, err := newSHA3Keccak256(derivedKey[derivedKeyLen/2:derivedKeyLen], cipherText)
+	expectedMac, err := newSHA3Keccak256(derivedKey[dkLen/2:dkLen], cipherText)
 	if err != nil {
 		return nil, fmt.Errorf("fail to get an expected MAC: %w", err)
 	}
@@ -253,7 +253,7 @@ func decryptKey(key encryptedKey, passwd string) ([]byte, error) {
 		return nil, fmt.Errorf("mac verification was failed. the password might be wrong.")
 	}
 
-	return aesCTRXOR(derivedKey[:derivedKeyLen/2], iv, cipherText)
+	return aesCTRXOR(derivedKey[:dkLen/2], iv, cipherText)
 }
 
 type encryptedKey struct {
