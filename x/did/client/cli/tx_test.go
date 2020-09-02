@@ -7,6 +7,8 @@ import (
 	"strings"
 	"testing"
 
+	sdk "github.com/cosmos/cosmos-sdk/types"
+
 	"github.com/cosmos/cosmos-sdk/client/context"
 
 	"github.com/medibloc/panacea-core/x/did/client/crypto"
@@ -17,7 +19,9 @@ import (
 )
 
 func TestMain(m *testing.M) {
+	sdk.GetConfig().SetBech32PrefixForAccount("panacea", "panaceapub")
 	os.RemoveAll(keystoreBaseDir())
+
 	os.Exit(m.Run())
 }
 
@@ -26,7 +30,7 @@ func TestNewMsgCreateDID(t *testing.T) {
 	privKey, _ := crypto.GenSecp256k1PrivKey("", "")
 
 	// create a message
-	msg, err := newMsgCreateDID(context.CLIContext{}, "testnet", privKey)
+	msg, err := newMsgCreateDID(getCliContext(t), "testnet", privKey)
 	require.NoError(t, err)
 
 	// check if pubKey is correct
@@ -108,4 +112,10 @@ func TestSaveAndGetPrivKeyFromKeyStore(t *testing.T) {
 	privKeyLoaded, err := getPrivKeyFromKeyStore(keyID, reader)
 	require.NoError(t, err)
 	require.Equal(t, privKey, privKeyLoaded)
+}
+
+func getCliContext(t *testing.T) context.CLIContext {
+	fromAddr, err := sdk.AccAddressFromBech32("panacea154p6kyu9kqgvcmq63w3vpn893ssy6anpu8ykfq")
+	require.NoError(t, err)
+	return context.NewCLIContext().WithFromAddress(fromAddr)
 }
