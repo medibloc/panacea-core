@@ -7,8 +7,9 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/medibloc/panacea-core/x/did/client/crypto"
+
 	"github.com/medibloc/panacea-core/x/did/types"
-	"github.com/tendermint/tendermint/crypto/secp256k1"
 
 	"github.com/stretchr/testify/require"
 )
@@ -18,6 +19,7 @@ func TestMain(m *testing.M) {
 	os.Exit(m.Run())
 }
 
+// Check if empty strings are returned when the interactive mode is disabled.
 func TestReadBIP39ParamsFrom_NotInteractive(t *testing.T) {
 	mnemonic, passphrase, err := readBIP39ParamsFrom(false, nil)
 	require.NoError(t, err)
@@ -25,6 +27,7 @@ func TestReadBIP39ParamsFrom_NotInteractive(t *testing.T) {
 	require.Empty(t, passphrase)
 }
 
+// Check if all input values are read correctly.
 func TestReadBIP39ParamsFrom(t *testing.T) {
 	inputMnemonic := "travel broken word scare punch suggest air behind process gather sick void potato double furnace"
 	inputPassphrase := "mypasswd"
@@ -38,6 +41,7 @@ func TestReadBIP39ParamsFrom(t *testing.T) {
 	require.Equal(t, inputPassphrase, passphrase)
 }
 
+// Check if an empty passphrase are accepted.
 func TestReadBIP39ParamsFrom_EmptyPassphrase(t *testing.T) {
 	inputMnemonic := "travel broken word scare punch suggest air behind process gather sick void potato double furnace"
 	reader := bufio.NewReader(strings.NewReader(fmt.Sprintf(
@@ -50,6 +54,7 @@ func TestReadBIP39ParamsFrom_EmptyPassphrase(t *testing.T) {
 	require.Equal(t, "", passphrase)
 }
 
+// Check if an error occurs when passphrases don't match.
 func TestReadBIP39ParamsFrom_PassphraseNotMatched(t *testing.T) {
 	inputMnemonic := "travel broken word scare punch suggest air behind process gather sick void potato double furnace"
 	reader := bufio.NewReader(strings.NewReader(fmt.Sprintf(
@@ -60,6 +65,7 @@ func TestReadBIP39ParamsFrom_PassphraseNotMatched(t *testing.T) {
 	require.Error(t, err, "passphrases don't match")
 }
 
+// Check if an error occurs when mnemonic is invalid.
 func TestReadBIP39ParamsFrom_InvalidMnemonic(t *testing.T) {
 	inputMnemonic := "travel broken"
 	reader := bufio.NewReader(strings.NewReader(fmt.Sprintf(
@@ -70,9 +76,10 @@ func TestReadBIP39ParamsFrom_InvalidMnemonic(t *testing.T) {
 	require.Error(t, err, "invalid mnemonic")
 }
 
+// Check if the private key is stored and loaded correctly by the password specified.
 func TestSaveAndGetPrivKeyFromKeyStore(t *testing.T) {
 	keyID := types.KeyID("key1")
-	privKey := secp256k1.GenPrivKey()
+	privKey, _ := crypto.GenSecp256k1PrivKey("", "")
 
 	reader := bufio.NewReader(strings.NewReader("mypassword1\nmypassword1\n"))
 	require.NoError(t, savePrivKeyToKeyStore(keyID, privKey, reader))

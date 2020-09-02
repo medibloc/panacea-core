@@ -1,11 +1,11 @@
-package keys_test
+package crypto_test
 
 import (
 	"encoding/hex"
 	"os"
 	"testing"
 
-	"github.com/medibloc/panacea-core/x/did/client/keys"
+	"github.com/medibloc/panacea-core/x/did/client/crypto"
 
 	"github.com/stretchr/testify/require"
 	"github.com/tendermint/tendermint/crypto/secp256k1"
@@ -74,8 +74,8 @@ func TestKeyStore_LoadByAddress_NotExist(t *testing.T) {
 	require.Nil(t, privBytes)
 }
 
-func newKeyStore(t *testing.T) *keys.KeyStore {
-	ks, err := keys.NewKeyStore(baseDir)
+func newKeyStore(t *testing.T) *crypto.KeyStore {
+	ks, err := crypto.NewKeyStore(baseDir)
 	require.NoError(t, err)
 	require.NotNil(t, ks)
 

@@ -1,4 +1,4 @@
-package keys
+package crypto
 
 import (
 	"fmt"
@@ -16,10 +16,10 @@ const (
 	defaultIndexForHD   = 0
 )
 
-// GeneratePrivKey generates a Secp256k1 private key from mnemonic anad bip39Passphrase.
+// GenSecp256k1PrivKey generates a Secp256k1 private key from mnemonic anad bip39Passphrase.
 // If mnemonic is an empty string, this function generates a random mnemonic.
 // The bip39Passphrase can be an empty string.
-func GeneratePrivKey(mnemonic, bip39Passphrase string) (secp256k1.PrivKeySecp256k1, error) {
+func GenSecp256k1PrivKey(mnemonic, bip39Passphrase string) (secp256k1.PrivKeySecp256k1, error) {
 	if mnemonic == "" { // generate a random mnemonic
 		entropySeed, err := bip39.NewEntropy(mnemonicEntropySize)
 		if err != nil {
