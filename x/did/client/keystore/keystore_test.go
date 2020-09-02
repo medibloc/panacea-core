@@ -1,6 +1,7 @@
 package keystore_test
 
 import (
+	"encoding/hex"
 	"os"
 	"testing"
 
@@ -16,6 +17,15 @@ var (
 	passwd  = "nein-danke"
 	priv    = secp256k1.GenPrivKey()
 )
+
+// Check if the keystore can decrypt a JSON provided by Web3 Secret Storage Definition
+// https://github.com/ethereum/wiki/wiki/Web3-Secret-Storage-Definition#test-vectors
+func TestKeyStore_DecryptWeb3(t *testing.T) {
+	ks := newKeyStore(t)
+	secret, err := ks.Load("testdata/web3.json", "testpassword")
+	require.NoError(t, err)
+	require.Equal(t, "7a28b5ba57c53603b0b07b56bba752f7784bf506fa95edc395f5cf6c7514fe9d", hex.EncodeToString(secret))
+}
 
 func TestKeyStore_SaveAndLoad(t *testing.T) {
 	ks := newKeyStore(t)

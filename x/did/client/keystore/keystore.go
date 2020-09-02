@@ -5,6 +5,7 @@ import (
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/rand"
+	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
@@ -15,21 +16,24 @@ import (
 	"time"
 
 	"github.com/pborman/uuid"
-	"golang.org/x/crypto/scrypt"
+	"golang.org/x/crypto/pbkdf2"
 	"golang.org/x/crypto/sha3"
 )
 
 const (
 	version         = 3
-	kdf             = "scrypt"
-	scryptN         = 1 << 18
-	scryptP         = 1
-	scryptR         = 8
-	scryptDKLen     = 32
+	kdf             = "pbkdf2"
+	pbkdf2PRFStr    = "hmac-sha256"
+	pbkdf2C         = 262144
+	pbkdf2DKLen     = 32
 	saltBytes       = 32
-	derivedKeyLen   = 32
 	cipherAlgorithm = "aes-128-ctr"
+	cipherKeySize   = 16
+	macKeyOffset    = 16
+	macKeySize      = 16
 )
+
+var pbkdf2PRF = sha256.New
 
 // KeyStore stores an encrypted private key on disk.
 // It implements the Web3 Secret Storage Definition: https://github.com/ethereum/wiki/wiki/Web3-Secret-Storage-Definition.
@@ -160,11 +164,8 @@ func encryptKey(address string, key []byte, passwd string) (encryptedKey, error)
 		return encryptedKey{}, fmt.Errorf("fail to get random for salt: %w", err)
 	}
 
-	// derivedKey from the Scrypt KDF
-	derivedKey, err := scrypt.Key([]byte(passwd), salt, scryptN, scryptR, scryptP, scryptDKLen)
-	if err != nil {
-		return encryptedKey{}, err
-	}
+	// derivedKey from the PBKDF2
+	derivedKey := pbkdf2.Key([]byte(passwd), salt, pbkdf2C, pbkdf2DKLen, pbkdf2PRF)
 
 	// 128-bit initialisation vector for the cipher
 	iv := make([]byte, aes.BlockSize)
@@ -173,13 +174,13 @@ func encryptKey(address string, key []byte, passwd string) (encryptedKey, error)
 	}
 
 	// encrypt the key using AES-128-CTR
-	cipherText, err := aesCTRXOR(derivedKey[:derivedKeyLen/2], iv, key[:])
+	cipherText, err := aesCTRXOR(derivedKey[:cipherKeySize], iv, key[:])
 	if err != nil {
 		return encryptedKey{}, err
 	}
 
 	// MAC to check whether the decryption password was correct or not
-	mac, err := newSHA3Keccak256(derivedKey[derivedKeyLen/2:derivedKeyLen], cipherText)
+	mac, err := newSHA3Keccak256(derivedKey[macKeyOffset:macKeyOffset+macKeySize], cipherText)
 	if err != nil {
 		return encryptedKey{}, err
 	}
@@ -197,10 +198,9 @@ func encryptKey(address string, key []byte, passwd string) (encryptedKey, error)
 			},
 			KDF: kdf,
 			KDFParams: kdfParams{
-				N:     scryptN,
-				R:     scryptR,
-				P:     scryptP,
-				DKLen: scryptDKLen,
+				C:     pbkdf2C,
+				DKLen: pbkdf2DKLen,
+				PRF:   pbkdf2PRFStr,
 				Salt:  hex.EncodeToString(salt),
 			},
 			MAC: hex.EncodeToString(mac),
@@ -217,7 +217,10 @@ func decryptKey(key encryptedKey, passwd string) ([]byte, error) {
 		return nil, fmt.Errorf("unsupported cipher algorithm: %s", key.Crypto.Cipher)
 	}
 	if key.Crypto.KDF != kdf {
-		return nil, fmt.Errorf("unsupported kdf: %s", key.Crypto.Cipher)
+		return nil, fmt.Errorf("unsupported kdf: %s", key.Crypto.KDF)
+	}
+	if key.Crypto.KDFParams.PRF != pbkdf2PRFStr {
+		return nil, fmt.Errorf("unsupported pbkdf2 prf: %s", key.Crypto.KDFParams.PRF)
 	}
 
 	mac, err := hex.DecodeString(key.Crypto.MAC)
@@ -240,12 +243,10 @@ func decryptKey(key encryptedKey, passwd string) ([]byte, error) {
 		return nil, fmt.Errorf("fail to decode salt: %w", err)
 	}
 
-	derivedKey, err := scrypt.Key([]byte(passwd), salt, key.Crypto.KDFParams.N, key.Crypto.KDFParams.R, key.Crypto.KDFParams.P, key.Crypto.KDFParams.DKLen)
-	if err != nil {
-		return nil, fmt.Errorf("fail to derive a key: %w", err)
-	}
+	dkLen := key.Crypto.KDFParams.DKLen
+	derivedKey := pbkdf2.Key([]byte(passwd), salt, key.Crypto.KDFParams.C, dkLen, pbkdf2PRF)
 
-	expectedMac, err := newSHA3Keccak256(derivedKey[derivedKeyLen/2:derivedKeyLen], cipherText)
+	expectedMac, err := newSHA3Keccak256(derivedKey[macKeyOffset:macKeyOffset+macKeySize], cipherText)
 	if err != nil {
 		return nil, fmt.Errorf("fail to get an expected MAC: %w", err)
 	}
@@ -253,7 +254,7 @@ func decryptKey(key encryptedKey, passwd string) ([]byte, error) {
 		return nil, fmt.Errorf("mac verification was failed. the password might be wrong.")
 	}
 
-	return aesCTRXOR(derivedKey[:derivedKeyLen/2], iv, cipherText)
+	return aesCTRXOR(derivedKey[:cipherKeySize], iv, cipherText)
 }
 
 type encryptedKey struct {
@@ -277,10 +278,9 @@ type cipherParams struct {
 }
 
 type kdfParams struct {
-	N     int    `json:"n"`
-	R     int    `json:"r"`
-	P     int    `json:"p"`
+	C     int    `json:"c"`
 	DKLen int    `json:"dklen"`
+	PRF   string `json:"prf"`
 	Salt  string `json:"salt"`
 }
 
@@ -296,9 +296,8 @@ func aesCTRXOR(key, iv, data []byte) ([]byte, error) {
 	return buf, nil
 }
 
-// newSHA3Keccak256 calculates a SHA3-256 (Keccak256).
 func newSHA3Keccak256(data ...[]byte) ([]byte, error) {
-	hash := sha3.New256()
+	hash := sha3.NewLegacyKeccak256()
 	for _, b := range data {
 		if _, err := hash.Write(b); err != nil {
 			return nil, err
