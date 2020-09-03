@@ -76,18 +76,18 @@ The details are described below.
 
 ```json
 {
-  "@context": "https://www.w3.org/ns/did/v1",
-  "id": "did:panacea:mainnet:G3UzSnRRsyApppuHVuaff",
-  "publicKey": [
-    {
-      "id": "did:panacea:mainnet:G3UzSnRRsyApppuHVuaff#key1",
-      "type": "Secp256k1VerificationKey2018",
-      "publicKeyBase58": "dBuN4i7dqwCLzSX7GHBLsfUoXw5RmWQ3DwQ9Ee4bfh5Y"
-    }
-  ],
-  "authentication": [
-    "did:panacea:mainnet:G3UzSnRRsyApppuHVuaff#key1"
-  ]
+    "@context": "https://www.w3.org/ns/did/v1",
+    "id": "did:panacea:mainnet:G3UzSnRRsyApppuHVuaff",
+    "publicKey": [
+        {
+            "id": "did:panacea:mainnet:G3UzSnRRsyApppuHVuaff#key1",
+            "type": "Secp256k1VerificationKey2018",
+            "publicKeyBase58": "dBuN4i7dqwCLzSX7GHBLsfUoXw5RmWQ3DwQ9Ee4bfh5Y"
+        }
+    ],
+    "authentication": [
+        "did:panacea:mainnet:G3UzSnRRsyApppuHVuaff#key1"
+    ]
 }
 ```
 
@@ -104,27 +104,27 @@ The Panacea DID Document doesn't contain the `service` field currently. It would
 To create a DID Document in Panacea, the following transaction should be submitted.
 ```json
 {
-  "type": "did/MsgCreateDID",
-  "value": {
-  "did": "did:panacea:mainnet:DnreD8QqXAQaEW9DwC16Wh",
-    "document": {
-      "@context": "https://www.w3.org/ns/did/v1",
-      "id": "did:panacea:mainnet:G3UzSnRRsyApppuHVuaff",
-      "publicKey": [
-        {
-          "id": "did:panacea:mainnet:G3UzSnRRsyApppuHVuaff#key1",
-          "type": "Secp256k1VerificationKey2018",
-          "publicKeyBase58": "dBuN4i7dqwCLzSX7GHBLsfUoXw5RmWQ3DwQ9Ee4bfh5Y"
-        }
-      ],
-      "authentication": [
-        "did:panacea:mainnet:G3UzSnRRsyApppuHVuaff#key1"
-      ]
-    },
-    "signature": "FLOgUBcMEjKs/o1lgu4Y5Ump/2xee0D0tLsrY9+YVMUD/G/qbSHo3lOJ4Jv2zsDn1grcbIYSQsOvoBTbYXXg3g==",
-    "sig_key_id": "did:panacea:mainnet:G3UzSnRRsyApppuHVuaff#key1",
-    "from_address": "panacea1d58s72gu0mjkw0lkgyvr0eqzz3mv74awfsjslz"
-  }
+    "type": "did/MsgCreateDID",
+    "value": {
+    "did": "did:panacea:mainnet:DnreD8QqXAQaEW9DwC16Wh",
+        "document": {
+            "@context": "https://www.w3.org/ns/did/v1",
+            "id": "did:panacea:mainnet:G3UzSnRRsyApppuHVuaff",
+            "publicKey": [
+                {
+                    "id": "did:panacea:mainnet:G3UzSnRRsyApppuHVuaff#key1",
+                    "type": "Secp256k1VerificationKey2018",
+                    "publicKeyBase58": "dBuN4i7dqwCLzSX7GHBLsfUoXw5RmWQ3DwQ9Ee4bfh5Y"
+                }
+            ],
+            "authentication": [
+                "did:panacea:mainnet:G3UzSnRRsyApppuHVuaff#key1"
+            ]
+        },
+        "signature": "FLOgUBcMEjKs/o1lgu4Y5Ump/2xee0D0tLsrY9+YVMUD/G/qbSHo3lOJ4Jv2zsDn1grcbIYSQsOvoBTbYXXg3g==",
+        "sig_key_id": "did:panacea:mainnet:G3UzSnRRsyApppuHVuaff#key1",
+        "from_address": "panacea1d58s72gu0mjkw0lkgyvr0eqzz3mv74awfsjslz"
+    }
 }
 ```
 The transaction must have a `did` and a `document` which will be stored in the Panacea.
@@ -137,12 +137,12 @@ The `sig_key_id` must be one of the key IDs specified in the `authentication` of
 The source of the `signature` should look like (encoded with Amino):
 ```json
 {
-  "data": {
-    "@context": ...,
-    "id": "did:panacea:...",
-    ...
-  },
-  "sequence": "0"
+    "data": {
+        "@context": ...,
+        "id": "did:panacea:...",
+        ...
+    },
+    "sequence": "0"
 }
 ```
 
@@ -156,28 +156,28 @@ The transaction fails if the same DID exists or if it has been already deactivat
 A Panacea DID Document can be looked up by the following query.
 ```json
 {
-  "did": "did:panacea:mainnet:G3UzSnRRsyApppuHVuaff"
+    "did": "did:panacea:mainnet:G3UzSnRRsyApppuHVuaff"
 }
 ```
 
 If the DID exists (not deactivated yet), the result is:
 ```json
 {
-  "document": {
-    "@context": "https://www.w3.org/ns/did/v1",
-    "id": "did:panacea:mainnet:G3UzSnRRsyApppuHVuaff",
-    "publicKey": [
-      {
-        "id": "did:panacea:mainnet:G3UzSnRRsyApppuHVuaff#key1",
-        "type": "Secp256k1VerificationKey2018",
-        "publicKeyBase58": "dBuN4i7dqwCLzSX7GHBLsfUoXw5RmWQ3DwQ9Ee4bfh5Y"
-      }
-    ],
-    "authentication": [
-      "did:panacea:mainnet:G3UzSnRRsyApppuHVuaff#key1"
-    ]
-  },
-  "sequence": "0"
+    "document": {
+        "@context": "https://www.w3.org/ns/did/v1",
+        "id": "did:panacea:mainnet:G3UzSnRRsyApppuHVuaff",
+        "publicKey": [
+            {
+                "id": "did:panacea:mainnet:G3UzSnRRsyApppuHVuaff#key1",
+                "type": "Secp256k1VerificationKey2018",
+                "publicKeyBase58": "dBuN4i7dqwCLzSX7GHBLsfUoXw5RmWQ3DwQ9Ee4bfh5Y"
+            }
+        ],
+        "authentication": [
+            "did:panacea:mainnet:G3UzSnRRsyApppuHVuaff#key1"
+        ]
+    },
+    "sequence": "0"
 }
 ```
 
@@ -191,32 +191,32 @@ Only the DID owner can replace the DID Document using the following transaction.
 This example is for adding a new public key to the DID document.
 ```json
 {
-  "type": "did/MsgUpdateDID",
-  "value": {
-    "did": "did:panacea:mainnet:DnreD8QqXAQaEW9DwC16Wh",
-    "document": {
-      "@context": "https://www.w3.org/ns/did/v1",
-      "id": "did:panacea:mainnet:G3UzSnRRsyApppuHVuaff",
-      "publicKey": [
-        {
-          "id": "did:panacea:mainnet:G3UzSnRRsyApppuHVuaff#key1",
-          "type": "Secp256k1VerificationKey2018",
-          "publicKeyBase58": "dBuN4i7dqwCLzSX7GHBLsfUoXw5RmWQ3DwQ9Ee4bfh5Y"
+    "type": "did/MsgUpdateDID",
+    "value": {
+        "did": "did:panacea:mainnet:DnreD8QqXAQaEW9DwC16Wh",
+        "document": {
+            "@context": "https://www.w3.org/ns/did/v1",
+            "id": "did:panacea:mainnet:G3UzSnRRsyApppuHVuaff",
+            "publicKey": [
+                {
+                    "id": "did:panacea:mainnet:G3UzSnRRsyApppuHVuaff#key1",
+                    "type": "Secp256k1VerificationKey2018",
+                    "publicKeyBase58": "dBuN4i7dqwCLzSX7GHBLsfUoXw5RmWQ3DwQ9Ee4bfh5Y"
+                },
+                {
+                    "id": "did:panacea:mainnet:VaBMUdauUNCAZAmqHoR3a#key1",
+                    "type": "Secp256k1VerificationKey2018",
+                    "publicKeyBase58": "2BjcxuwijyE1om4991ANiFrwZJ3Ev5YYX9KiPKgaHmGsi"
+                }
+            ],
+            "authentication": [
+                "did:panacea:mainnet:G3UzSnRRsyApppuHVuaff#key1"
+            ]
         },
-        {
-          "id": "did:panacea:mainnet:VaBMUdauUNCAZAmqHoR3a#key1",
-          "type": "Secp256k1VerificationKey2018",
-          "publicKeyBase58": "2BjcxuwijyE1om4991ANiFrwZJ3Ev5YYX9KiPKgaHmGsi"
-        }
-      ],
-      "authentication": [
-        "did:panacea:mainnet:G3UzSnRRsyApppuHVuaff#key1"
-      ]
-    },
-    "signature": "xtsQH3D5naHe9IXmhCnohlChwHiD0dx9PI4aPkaJPGoEznYMHmg0aBerg85ai7T2WNxxlc39uFzAxKbI4sbJCA==",
-    "sig_key_id": "did:panacea:mainnet:G3UzSnRRsyApppuHVuaff#key1",
-    "from_address": "panacea1d58s72gu0mjkw0lkgyvr0eqzz3mv74awfsjslz"
-  }
+        "signature": "xtsQH3D5naHe9IXmhCnohlChwHiD0dx9PI4aPkaJPGoEznYMHmg0aBerg85ai7T2WNxxlc39uFzAxKbI4sbJCA==",
+        "sig_key_id": "did:panacea:mainnet:G3UzSnRRsyApppuHVuaff#key1",
+        "from_address": "panacea1d58s72gu0mjkw0lkgyvr0eqzz3mv74awfsjslz"
+    }
 }
 ```
 
@@ -230,12 +230,12 @@ Whenever submitting this transaction, the user must query the current `sequence`
 The source of the `signature` should look like (encoded with Amino):
 ```json
 {
-  "data": {
-    "@context": ...,
-    "id": "did:panacea:...",
-    ...
-  },
-  "sequence": "50"
+    "data": {
+        "@context": ...,
+        "id": "did:panacea:...",
+        ...
+    },
+    "sequence": "50"
 }
 ```
 
@@ -250,13 +250,13 @@ This strategy guarantees that malicious users cannot recreate the DID,
 because the DID deactivation may be appropriate when a person dies or a business is terminated.
 ```json
 {
-  "type": "did/MsgDeactivateDID",
-  "value": {
-    "did": "did:panacea:mainnet:DnreD8QqXAQaEW9DwC16Wh",
-    "signature": "xtsQH3D5naHe9IXmhCnohlChwHiD0dx9PI4aPkaJPGoEznYMHmg0aBerg85ai7T2WNxxlc39uFzAxKbI4sbJCA==",
-    "sig_key_id": "did:panacea:mainnet:G3UzSnRRsyApppuHVuaff#key1",
-    "from_address": "panacea1d58s72gu0mjkw0lkgyvr0eqzz3mv74awfsjslz"
-  }
+    "type": "did/MsgDeactivateDID",
+    "value": {
+        "did": "did:panacea:mainnet:DnreD8QqXAQaEW9DwC16Wh",
+        "signature": "xtsQH3D5naHe9IXmhCnohlChwHiD0dx9PI4aPkaJPGoEznYMHmg0aBerg85ai7T2WNxxlc39uFzAxKbI4sbJCA==",
+        "sig_key_id": "did:panacea:mainnet:G3UzSnRRsyApppuHVuaff#key1",
+        "from_address": "panacea1d58s72gu0mjkw0lkgyvr0eqzz3mv74awfsjslz"
+    }
 }
 ```
 
@@ -267,8 +267,8 @@ The `sig_key_id` must be one of the key IDs specified in the `authentication` of
 The source of the `signature` should look like (encoded with Amino):
 ```json
 {
-  "data": "did:panacea:...",
-  "sequence": "50"
+    "data": "did:panacea:...",
+    "sequence": "50"
 }
 ```
 
