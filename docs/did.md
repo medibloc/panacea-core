@@ -134,6 +134,18 @@ The `signature` must be generated from the `document` and the sequence `"0"`.
 It must be signed with a private key which corresponds to the public key referred by the `sig_key_id`.
 The `sig_key_id` must be one of the key IDs specified in the `authentication` of the `document`.
 
+The source of the `signature` should look like:
+```json
+{
+  "data": {
+    "@context": ...,
+    "id": "did:panacea:...",
+    ...
+  },
+  "sequence": "0"
+}
+```
+
 The transaction also must contain a `from_address` which is a Panacea account.
 Also, it must be signed with the private key of the Panacea account, so that Panacea can verify the transaction.
 
@@ -215,6 +227,18 @@ The `sig_key_id` must be one of the key IDs specified in the `authentication` of
 Whenever submitting this transaction, the user must query the current `sequence` by the Read DID operation.
 (The user can also increment the `sequence` manually, but the transaction can be rejected if there are the concurrent transactions with the same `sequence`.)
 
+The source of the `signature` should look like:
+```json
+{
+  "data": {
+    "@context": ...,
+    "id": "did:panacea:...",
+    ...
+  },
+  "sequence": "50"
+}
+```
+
 The transaction fails if the DID has been already deactivated.
 
 ### Deactivate
@@ -239,6 +263,14 @@ because the DID deactivation may be appropriate when a person dies or a business
 The `signature` must be generated from the `did` and the `sequence` returned from the Read DID operation.
 It must be signed with a private key which corresponds to the public key referred by the `sig_key_id`.
 The `sig_key_id` must be one of the key IDs specified in the `authentication` of the `document`.
+
+The source of the `signature` should look like:
+```json
+{
+  "data": did:panacea:...",
+  "sequence": "50"
+}
+```
 
 The transaction fails if the DID doesn't exist or if it has been already deactivated.
 
