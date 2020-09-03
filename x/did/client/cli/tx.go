@@ -13,11 +13,10 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/client/utils"
 	"github.com/cosmos/cosmos-sdk/codec"
-	"github.com/cosmos/cosmos-sdk/crypto/keys/hd"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtxb "github.com/cosmos/cosmos-sdk/x/auth/client/txbuilder"
 	"github.com/cosmos/go-bip39"
-	"github.com/medibloc/panacea-core/x/did/client/keystore"
+	didcrypto "github.com/medibloc/panacea-core/x/did/client/crypto"
 	"github.com/medibloc/panacea-core/x/did/types"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -27,10 +26,6 @@ import (
 
 const (
 	flagInteractive = "interactive"
-
-	mnemonicEntropySize = 256
-	defaultAccountForHD = 0
-	defaultIndexForHD   = 0
 )
 
 func GetCmdCreateDID(cdc *codec.Codec) *cobra.Command {
@@ -42,54 +37,56 @@ func GetCmdCreateDID(cdc *codec.Codec) *cobra.Command {
 			txBldr := authtxb.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
 			cliCtx := context.NewCLIContext().WithCodec(cdc).WithAccountDecoder(cdc)
 
-			privKey, err := genPrivKey(viper.GetBool(flagInteractive))
-			if err != nil {
-				return err
-			}
-
 			networkID, err := types.NewNetworkID(args[0])
 			if err != nil {
 				return err
 			}
 
-			pubKey := privKey.PubKey()
-			did := types.NewDID(networkID, pubKey, types.ES256K)
-			keyID := types.NewKeyID(did, "key1")
-			doc := types.NewDIDDocument(did, types.NewPubKey(keyID, types.ES256K, pubKey))
-
-			sig, err := types.Sign(doc, types.InitialSequence, privKey)
+			mnemonic, bip39Passphrase, err := readBIP39ParamsFrom(viper.GetBool(flagInteractive), client.BufferStdin())
+			if err != nil {
+				return err
+			}
+			privKey, err := didcrypto.GenSecp256k1PrivKey(mnemonic, bip39Passphrase)
 			if err != nil {
 				return err
 			}
 
-			passwd, err := client.GetCheckPassword(
-				"Enter a password to encrypt your key for DID to disk:",
-				"Repeat the password:",
-				client.BufferStdin(),
-			)
+			msg, err := newMsgCreateDID(cliCtx, networkID, privKey)
 			if err != nil {
 				return err
 			}
 
-			ks, err := keystore.NewKeyStore(keystoreBaseDir())
-			if err != nil {
-				return err
-			}
-			_, err = ks.Save(string(keyID), privKey[:], passwd)
-			if err != nil {
+			if err := savePrivKeyToKeyStore(msg.SigKeyID, privKey, client.BufferStdin()); err != nil {
 				return err
 			}
 
-			msg := types.NewMsgCreateDID(did, doc, keyID, sig, cliCtx.GetFromAddress())
-			if err := msg.ValidateBasic(); err != nil {
-				return err
-			}
 			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg}, false)
 		},
 	}
 
 	cmd.Flags().Bool(flagInteractive, false, "Interactively prompt user for BIP39 mnemonic and passphrase")
 	return cmd
+}
+
+// newMsgCreateDID creates a MsgCreateDID by generating a DID and a DID document from the networkID and privKey.
+// It generates the minimal DID document which contains only one public key information,
+// so that it can be extended by MsgUpdateDID later.
+func newMsgCreateDID(cliCtx context.CLIContext, networkID types.NetworkID, privKey secp256k1.PrivKeySecp256k1) (types.MsgCreateDID, error) {
+	pubKey := privKey.PubKey()
+	did := types.NewDID(networkID, pubKey, types.ES256K)
+	keyID := types.NewKeyID(did, "key1")
+	doc := types.NewDIDDocument(did, types.NewPubKey(keyID, types.ES256K, pubKey))
+
+	sig, err := types.Sign(doc, types.InitialSequence, privKey)
+	if err != nil {
+		return types.MsgCreateDID{}, err
+	}
+
+	msg := types.NewMsgCreateDID(did, doc, keyID, sig, cliCtx.GetFromAddress())
+	if err := msg.ValidateBasic(); err != nil {
+		return types.MsgCreateDID{}, err
+	}
+	return msg, nil
 }
 
 func GetCmdUpdateDID(cdc *codec.Codec) *cobra.Command {
@@ -114,8 +111,7 @@ func GetCmdUpdateDID(cdc *codec.Codec) *cobra.Command {
 			if err != nil {
 				return err
 			}
-
-			privKey, err := getPrivKeyFromKeyStore(keyID)
+			privKey, err := getPrivKeyFromKeyStore(keyID, client.BufferStdin())
 			if err != nil {
 				return err
 			}
@@ -145,16 +141,15 @@ func GetCmdDeactivateDID(cdc *codec.Codec) *cobra.Command {
 			txBldr := authtxb.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
 			cliCtx := context.NewCLIContext().WithCodec(cdc).WithAccountDecoder(cdc)
 
-			did := types.DID(args[0])
-			if !did.Valid() {
-				return types.ErrInvalidDID(string(did))
+			did, err := types.NewDIDFrom(args[0])
+			if err != nil {
+				return err
 			}
 			keyID, err := types.NewKeyIDFrom(args[1])
 			if err != nil {
 				return err
 			}
-
-			privKey, err := getPrivKeyFromKeyStore(keyID)
+			privKey, err := getPrivKeyFromKeyStore(keyID, client.BufferStdin())
 			if err != nil {
 				return err
 			}
@@ -175,43 +170,15 @@ func GetCmdDeactivateDID(cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
-func genPrivKey(interactive bool) (secp256k1.PrivKeySecp256k1, error) {
-	var err error
-	var mnemonic string
-	var bip39Passphrase string
-
-	if interactive {
-		mnemonic, bip39Passphrase, err = readBIP39ParamsFrom(client.BufferStdin())
-		if err != nil {
-			return secp256k1.PrivKeySecp256k1{}, err
-		}
+// readBIP39ParamsFrom reads a mnemonic and a bip39 passphrase from the reader in the interactive mode.
+// It returns empty strings in the non-interactive mode, so that they can be auto-generated by crypto.GenSecp256k1PrivKey.
+func readBIP39ParamsFrom(interactive bool, reader *bufio.Reader) (string, string, error) {
+	if !interactive {
+		return "", "", nil
 	}
 
-	if mnemonic == "" { // generate a random mnemonic
-		entropySeed, err := bip39.NewEntropy(mnemonicEntropySize)
-		if err != nil {
-			return secp256k1.PrivKeySecp256k1{}, err
-		}
-		mnemonic, err = bip39.NewMnemonic(entropySeed[:])
-		if err != nil {
-			return secp256k1.PrivKeySecp256k1{}, err
-		}
-		fmt.Fprintf(os.Stderr, "A random mnemonic was generated: %s\n", mnemonic)
-	}
-
-	seed, err := bip39.NewSeedWithErrorChecking(mnemonic, bip39Passphrase)
-	if err != nil {
-		return secp256k1.PrivKeySecp256k1{}, err
-	}
-
-	hdPath := hd.NewFundraiserParams(defaultAccountForHD, sdk.GetConfig().GetCoinType(), defaultIndexForHD).String()
-	masterPriv, chainCode := hd.ComputeMastersFromSeed(seed)
-	return hd.DerivePrivateKeyForPath(masterPriv, chainCode, hdPath)
-}
-
-func readBIP39ParamsFrom(buf *bufio.Reader) (string, string, error) {
 	// mnemonic can be an empty string
-	mnemonic, err := client.GetString("Enter your BIP39 mnemonic, or hit enter to generate one:", buf)
+	mnemonic, err := client.GetString("Enter your BIP39 mnemonic, or hit enter to generate one:", reader)
 	if err != nil {
 		return "", "", err
 	}
@@ -220,12 +187,12 @@ func readBIP39ParamsFrom(buf *bufio.Reader) (string, string, error) {
 	}
 
 	// passphrase can be an empty string
-	passphrase, err := client.GetString("Enter your BIP39 passphrase, or hit enter:", buf)
+	passphrase, err := client.GetString("Enter your BIP39 passphrase, or hit enter:", reader)
 	if err != nil {
 		return "", "", err
 	}
 	if passphrase != "" {
-		repeat, err := client.GetString("Repeat the passphrase:", buf)
+		repeat, err := client.GetString("Repeat the passphrase:", reader)
 		if err != nil {
 			return "", "", err
 		}
@@ -237,10 +204,8 @@ func readBIP39ParamsFrom(buf *bufio.Reader) (string, string, error) {
 	return mnemonic, passphrase, nil
 }
 
-func keystoreBaseDir() string {
-	return filepath.Join(viper.GetString(cli.HomeFlag), "did_keystore")
-}
-
+// readDIDDocFrom reads a DID document from a JSON file.
+// It returns an error if the JSON file is invalid or the DID document loaded is invalid.
 func readDIDDocFrom(path string) (types.DIDDocument, error) {
 	var doc types.DIDDocument
 
@@ -261,16 +226,36 @@ func readDIDDocFrom(path string) (types.DIDDocument, error) {
 	return doc, nil
 }
 
-func getPrivKeyFromKeyStore(keyID types.KeyID) (secp256k1.PrivKeySecp256k1, error) {
-	passwd, err := client.GetPassword(
-		"Enter a password to decrypt your key for DID on disk:",
-		client.BufferStdin(),
+func keystoreBaseDir() string {
+	return filepath.Join(viper.GetString(cli.HomeFlag), "did_keystore")
+}
+
+// savePrivKeyToKeyStore saves a privKey using a password which is read from the reader.
+func savePrivKeyToKeyStore(keyID types.KeyID, privKey secp256k1.PrivKeySecp256k1, reader *bufio.Reader) error {
+	passwd, err := client.GetCheckPassword(
+		"Enter a password to encrypt your key for DID to disk:",
+		"Repeat the password:",
+		reader,
 	)
+	if err != nil {
+		return err
+	}
+	ks, err := didcrypto.NewKeyStore(keystoreBaseDir())
+	if err != nil {
+		return err
+	}
+	_, err = ks.Save(string(keyID), privKey[:], passwd)
+	return err
+}
+
+// getPrivKeyFromKeyStore loads a privKey using a password which is read from the reader.
+func getPrivKeyFromKeyStore(keyID types.KeyID, reader *bufio.Reader) (secp256k1.PrivKeySecp256k1, error) {
+	passwd, err := client.GetPassword("Enter a password to decrypt your key for DID on disk:", reader)
 	if err != nil {
 		return secp256k1.PrivKeySecp256k1{}, err
 	}
 
-	ks, err := keystore.NewKeyStore(keystoreBaseDir())
+	ks, err := didcrypto.NewKeyStore(keystoreBaseDir())
 	if err != nil {
 		return secp256k1.PrivKeySecp256k1{}, err
 	}
@@ -283,8 +268,8 @@ func getPrivKeyFromKeyStore(keyID types.KeyID) (secp256k1.PrivKeySecp256k1, erro
 	return types.NewPrivKeyFromBytes(privKeyBytes)
 }
 
+// signUsingCurrentSeq generates a signature using the current sequence stored in the blockchain.
 func signUsingCurrentSeq(cliCtx context.CLIContext, did types.DID, privKey crypto.PrivKey, data types.Signable) ([]byte, error) {
-	// get a DIDDocumentWithSeq to use its Seq for signing
 	docWithSeq, err := queryDIDDocumentWithSeq(cliCtx, did)
 	if err != nil {
 		return nil, err

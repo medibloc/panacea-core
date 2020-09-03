@@ -19,9 +19,9 @@ func GetCmdQueryDID(cdc *codec.Codec) *cobra.Command {
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
-			id := types.DID(args[0])
-			if !id.Valid() {
-				return types.ErrInvalidDID(args[0])
+			id, err := types.NewDIDFrom(args[0])
+			if err != nil {
+				return err
 			}
 
 			docWithSeq, err := queryDIDDocumentWithSeq(cliCtx, id)
@@ -34,6 +34,8 @@ func GetCmdQueryDID(cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
+// queryDIDDocumentWithSeq gets a DIDDocumentWithSeq from the blockchain.
+// It returns an error if the DID doesn't exist or the DID has been deactivated.
 func queryDIDDocumentWithSeq(cliCtx context.CLIContext, id types.DID) (types.DIDDocumentWithSeq, error) {
 	bz, err := cliCtx.Codec.MarshalJSON(did.QueryDIDParams{DID: id})
 	if err != nil {
