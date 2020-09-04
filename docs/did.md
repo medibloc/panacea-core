@@ -204,7 +204,7 @@ This example is for adding a new public key to the DID document.
                     "publicKeyBase58": "dBuN4i7dqwCLzSX7GHBLsfUoXw5RmWQ3DwQ9Ee4bfh5Y"
                 },
                 {
-                    "id": "did:panacea:mainnet:VaBMUdauUNCAZAmqHoR3a#key1",
+                    "id": "did:panacea:mainnet:G3UzSnRRsyApppuHVuaff#key2",
                     "type": "Secp256k1VerificationKey2018",
                     "publicKeyBase58": "2BjcxuwijyE1om4991ANiFrwZJ3Ev5YYX9KiPKgaHmGsi"
                 }
