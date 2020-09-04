@@ -21,14 +21,14 @@ func TestNewDID(t *testing.T) {
 	require.Regexp(t, regex, did)
 }
 
-func TestNewDIDFrom(t *testing.T) {
+func TestParseDID(t *testing.T) {
 	str := "did:panacea:testnet:KS5zGZt66Me8MCctZBYrP"
-	did, err := NewDIDFrom(str)
+	did, err := ParseDID(str)
 	require.NoError(t, err)
 	require.EqualValues(t, str, did)
 
 	str = "did:panacea:t1estnet:KS5zGZt66Me8MCctZBYrP"
-	_, err = NewDIDFrom(str)
+	_, err = ParseDID(str)
 	require.EqualError(t, err, ErrInvalidDID(str).Error())
 }
 
@@ -87,15 +87,29 @@ func TestNewKeyID(t *testing.T) {
 	did := DID("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP")
 	expectedID := fmt.Sprintf("%s#key1", did)
 	id := NewKeyID(did, "key1")
-	require.True(t, id.Valid())
+	require.True(t, id.Valid(did))
 	require.EqualValues(t, expectedID, id)
 
-	id, err := NewKeyIDFrom(expectedID)
+	id, err := ParseKeyID(expectedID, did)
 	require.NoError(t, err)
 	require.EqualValues(t, expectedID, id)
+}
 
-	_, err = NewKeyIDFrom("invalid_id")
-	require.Error(t, err, ErrInvalidKeyID("invalid_id"))
+func TestKeyID_Valid(t *testing.T) {
+	// normal
+	require.True(t, KeyID("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP#key1").Valid("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP"))
+
+	// if suffix has whitespaces
+	require.False(t, KeyID("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP# key1").Valid("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP"))
+	require.False(t, KeyID("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP#key1 ").Valid("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP"))
+
+	// if suffix is empty
+	require.False(t, KeyID("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP#").Valid("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP"))
+	require.False(t, KeyID("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP").Valid("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP"))
+
+	// if prefix (DID) is invalid
+	require.False(t, KeyID("invalid#key1").Valid("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP"))
+	require.False(t, KeyID("did:panacea:mainnet:KS5zGZt66Me8MCctZBYrP#key1").Valid("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP"))
 }
 
 func TestKeyType_Valid(t *testing.T) {
@@ -107,7 +121,7 @@ func TestNewPubKey(t *testing.T) {
 	did := DID("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP")
 	pubKey := secp256k1.GenPrivKey().PubKey()
 	pub := NewPubKey(NewKeyID(did, "key1"), ES256K, pubKey)
-	require.True(t, pub.Valid())
+	require.True(t, pub.Valid(did))
 
 	expected := pubKey.(secp256k1.PubKeySecp256k1)
 	require.Equal(t, expected[:], base58.Decode(pub.KeyBase58))

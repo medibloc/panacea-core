@@ -19,7 +19,7 @@ func GetCmdQueryDID(cdc *codec.Codec) *cobra.Command {
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
-			id, err := types.NewDIDFrom(args[0])
+			id, err := types.ParseDID(args[0])
 			if err != nil {
 				return err
 			}
