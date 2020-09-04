@@ -21,14 +21,14 @@ func TestNewDID(t *testing.T) {
 	require.Regexp(t, regex, did)
 }
 
-func TestNewDIDFrom(t *testing.T) {
+func TestParseDID(t *testing.T) {
 	str := "did:panacea:testnet:KS5zGZt66Me8MCctZBYrP"
-	did, err := NewDIDFrom(str)
+	did, err := ParseDID(str)
 	require.NoError(t, err)
 	require.EqualValues(t, str, did)
 
 	str = "did:panacea:t1estnet:KS5zGZt66Me8MCctZBYrP"
-	_, err = NewDIDFrom(str)
+	_, err = ParseDID(str)
 	require.EqualError(t, err, ErrInvalidDID(str).Error())
 }
 
@@ -90,7 +90,7 @@ func TestNewKeyID(t *testing.T) {
 	require.True(t, id.Valid(did))
 	require.EqualValues(t, expectedID, id)
 
-	id, err := NewKeyIDFrom(expectedID, did)
+	id, err := ParseKeyID(expectedID, did)
 	require.NoError(t, err)
 	require.EqualValues(t, expectedID, id)
 }

@@ -23,7 +23,7 @@ func NewDID(networkID NetworkID, pubKey crypto.PubKey, keyType KeyType) DID {
 	return DID(fmt.Sprintf("did:%s:%s:%s", DIDMethod, networkID, idStr))
 }
 
-func NewDIDFrom(str string) (DID, error) {
+func ParseDID(str string) (DID, error) {
 	did := DID(str)
 	if !did.Valid() {
 		return "", ErrInvalidDID(str)
@@ -146,7 +146,7 @@ func NewKeyID(did DID, name string) KeyID {
 	return KeyID(fmt.Sprintf("%v#%s", did, name))
 }
 
-func NewKeyIDFrom(id string, did DID) (KeyID, error) {
+func ParseKeyID(id string, did DID) (KeyID, error) {
 	keyID := KeyID(id)
 	if !keyID.Valid(did) {
 		return "", ErrInvalidKeyID(id)

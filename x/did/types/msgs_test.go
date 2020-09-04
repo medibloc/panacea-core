@@ -94,7 +94,7 @@ func getFromAddress(t *testing.T) sdk.AccAddress {
 }
 
 func newDIDDocument() types.DIDDocument {
-	did, _ := types.NewDIDFrom("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP")
+	did, _ := types.ParseDID("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP")
 	keyID := types.NewKeyID(did, "key1")
 	pubKeyBase58, _ := types.NewPubKeyFromBase58("qoRmLNBEXoaKDE8dKffMq2DBNxacTEfvbKRuFrccYW1b")
 	pubKey := types.NewPubKey(keyID, types.ES256K, pubKeyBase58)
