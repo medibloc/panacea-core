@@ -102,7 +102,7 @@ func GetCmdUpdateDID(cdc *codec.Codec) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			keyID, err := types.NewKeyIDFrom(args[1])
+			keyID, err := types.NewKeyIDFrom(args[1], did)
 			if err != nil {
 				return err
 			}
@@ -145,7 +145,7 @@ func GetCmdDeactivateDID(cdc *codec.Codec) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			keyID, err := types.NewKeyIDFrom(args[1])
+			keyID, err := types.NewKeyIDFrom(args[1], did)
 			if err != nil {
 				return err
 			}

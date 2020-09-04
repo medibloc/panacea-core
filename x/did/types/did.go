@@ -96,13 +96,13 @@ func (doc DIDDocument) Valid() bool {
 	}
 
 	for _, pubKey := range doc.PubKeys {
-		if !pubKey.Valid() {
+		if !pubKey.Valid(doc.ID) {
 			return false
 		}
 	}
 
 	for _, auth := range doc.Authentications {
-		if !auth.Valid() {
+		if !auth.Valid(doc.ID) {
 			return false
 		}
 		if _, ok := doc.PubKeyByID(KeyID(auth)); !ok {
@@ -146,16 +146,16 @@ func NewKeyID(did DID, name string) KeyID {
 	return KeyID(fmt.Sprintf("%v#%s", did, name))
 }
 
-func NewKeyIDFrom(id string) (KeyID, error) {
+func NewKeyIDFrom(id string, did DID) (KeyID, error) {
 	keyID := KeyID(id)
-	if !keyID.Valid() {
+	if !keyID.Valid(did) {
 		return "", ErrInvalidKeyID(id)
 	}
 	return keyID, nil
 }
 
-func (id KeyID) Valid() bool {
-	pattern := fmt.Sprintf("^%s#.+$", didRegex()) //TODO: exclude whitespaces
+func (id KeyID) Valid(did DID) bool {
+	pattern := fmt.Sprintf("^%v#.+$", did) //TODO: exclude whitespaces
 	matched, _ := regexp.MatchString(pattern, string(id))
 	return matched
 }
@@ -209,8 +209,8 @@ func encodePubKeyES256K(key crypto.PubKey, truncateLen int) string {
 	return base58.Encode(k)
 }
 
-func (pk PubKey) Valid() bool {
-	if !pk.ID.Valid() || !pk.Type.Valid() {
+func (pk PubKey) Valid(did DID) bool {
+	if !pk.ID.Valid(did) || !pk.Type.Valid() {
 		return false
 	}
 
@@ -222,8 +222,8 @@ func (pk PubKey) Valid() bool {
 // TODO: to be extended
 type Authentication KeyID
 
-func (a Authentication) Valid() bool {
-	return KeyID(a).Valid()
+func (a Authentication) Valid(did DID) bool {
+	return KeyID(a).Valid(did)
 }
 
 // DIDDocumentWithSeq is for storing a Sequence along with a DIDDocument.

@@ -87,15 +87,18 @@ func TestNewKeyID(t *testing.T) {
 	did := DID("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP")
 	expectedID := fmt.Sprintf("%s#key1", did)
 	id := NewKeyID(did, "key1")
-	require.True(t, id.Valid())
+	require.True(t, id.Valid(did))
 	require.EqualValues(t, expectedID, id)
 
-	id, err := NewKeyIDFrom(expectedID)
+	id, err := NewKeyIDFrom(expectedID, did)
 	require.NoError(t, err)
 	require.EqualValues(t, expectedID, id)
+}
 
-	_, err = NewKeyIDFrom("invalid_id")
-	require.Error(t, err, ErrInvalidKeyID("invalid_id"))
+func TestKeyID_Valid(t *testing.T) {
+	require.True(t, KeyID("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP#key1").Valid("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP"))
+	require.False(t, KeyID("invalid#key1").Valid("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP"))
+	require.False(t, KeyID("did:panacea:mainnet:KS5zGZt66Me8MCctZBYrP#key1").Valid("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP"))
 }
 
 func TestKeyType_Valid(t *testing.T) {
@@ -107,7 +110,7 @@ func TestNewPubKey(t *testing.T) {
 	did := DID("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP")
 	pubKey := secp256k1.GenPrivKey().PubKey()
 	pub := NewPubKey(NewKeyID(did, "key1"), ES256K, pubKey)
-	require.True(t, pub.Valid())
+	require.True(t, pub.Valid(did))
 
 	expected := pubKey.(secp256k1.PubKeySecp256k1)
 	require.Equal(t, expected[:], base58.Decode(pub.KeyBase58))
