@@ -155,7 +155,7 @@ func NewKeyIDFrom(id string, did DID) (KeyID, error) {
 }
 
 func (id KeyID) Valid(did DID) bool {
-	pattern := fmt.Sprintf("^%v#.+$", did) //TODO: exclude whitespaces
+	pattern := fmt.Sprintf(`^%v#\S+$`, did)
 	matched, _ := regexp.MatchString(pattern, string(id))
 	return matched
 }
