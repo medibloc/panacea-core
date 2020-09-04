@@ -1,28 +1,40 @@
 # Panacea DID Method Specification
 
+
+## Abstract
+
+Panacea is a public blockchain built by MediBloc to reinvent the healthcare experience.
+Panacea also supports DID operations. DIDs are created and stored in the Panacea, and they are used with verifiable credentials.
+
+This specification describes how DIDs are managed on the Panacea.
+
+
 ## Table of Contents
 
-* [Panacea DID](#panacea-did)
-   * [Panacea DID Method Name](#panacea-did-method-name)
-   * [Panacea DID Method Specific Identifier](#panacea-did-method-specific-identifier)
-* [Panacea DID Document](#panacea-did-document)
+* [DID Method Name](#did-method-name)
+* [DID Method Specific Identifier](#did-method-specific-identifier)
+    * [Relationship between DIDs and Panacea accounts](#relationship-between-dids-and-panacea-accounts)
+* [DID Document Format (JSON-LD)](#did-document-format-json-ld)
 * [CRUD Operations](#crud-operations)
-   * [Create (Register)](#create-register)
-   * [Read](#read)
-   * [Update](#update)
-   * [Delete](#delete)
+    * [Create (Register)](#create-register)
+    * [Read](#read)
+    * [Update](#update)
+    * [Deactivate](#deactivate)
 * [Security Considerations](#security-considerations)
+    * [Replay Attack](#replay-attack)
 * [Privacy Considerations](#privacy-considerations)
 * [Reference Implementations](#reference-implementations)
 * [References](#references)
 
-## Panacea DID
 
-### Panacea DID Method Name
+## DID Method Name
 
-`panacea`
+The namestring is `panacea`.
 
-### Panacea DID Method Specific Identifier
+A DID must begin with the prefix: `did:panacea` in lowercase.
+
+
+## DID Method Specific Identifier
 
 ```
 panacea-did = "did:panacea:" network-id ":" idstring
@@ -35,210 +47,253 @@ base58 = "1" / "2" / "3" / "4" / "5" / "6" / "7" / "8" / "9" / "A" / "B" /
          "m" / "n" / "o" / "p" / "q" / "r" / "s" / "t" / "u" / "v" / "w" /
          "x" / "y" / "z"
 ```
-To generate `idstring`, Panacea SDK generates a random Secp256k1 key-pair, and
+To generate `idstring`, Panacea SDK generates a Secp256k1 key-pair, and
 encodes the first 16 bytes of its public key into base58.
-This gives an length of either 21 or 22 characters, and it means that DIDs are case-sensitive,
+This gives a length of either 21 or 22 characters, and it means that DIDs are case-sensitive,
 even though the prefix is always lower-case.
+
+The Panacea SDK provides a tool for generateing the Secp256k1 key-pair either randomly or from a mnemonic provided by the user.
 
 Example:
 ```
 did:panacea:mainnet:DnreD8QqXAQaEW9DwC16Wh
 ```
 
-**NOTE:**
-Because Panacea SDK generates a "random" Secp256k1 key-pair to make a DID,
-the DID is independent with any Panacea account address.
-However, a Panacea account address is needed to send a transaction to Panacea
-for registering the DID.
-The Panacea account address is considered as a DID owner who can update/revoke the DID.
+### Relationship between DIDs and Panacea accounts
 
-**TODO:**
-Panacea SDK will provide a feature to manage private keys of Secp256k1 key-pairs
-randomly generated for DIDs.
+DIDs are independent of any Panacea accounts.
+Panacea accounts are necessary only for sending transactions to Panacea
+to create/update/deactivate the DIDs.
 
-**TODO:**
-The DID owner mechanism for updating/revoking DIDs will be introduced soon.
-It will be done by JWT (reference: https://github.com/icon-project/icon-DID/blob/master/docs/ICON-DID-method.md#223-update-replace).
+It means that Panacea accounts are not used to verify the DID ownership.
+To prove the DID ownership, users must include a signature to the transaction.
+The signature must be generated with the private key which corresponds to one of the public keys registered in the DID document.
+The signature is different from the Panacea transaction signature generated with the private key of the Panacea account. 
+The details are described below.
 
 
+## DID Document Format (JSON-LD)
 
-
-## Panacea DID Document
-
-JSON-LD
-
-```
+```json
 {
     "@context": "https://www.w3.org/ns/did/v1",
-    "id": "did:panacea:mainnet:DnreD8QqXAQaEW9DwC16Wh",
-    "authentication": [
-        "key1"
-    ],
+    "id": "did:panacea:mainnet:G3UzSnRRsyApppuHVuaff",
     "publicKey": [
         {
-            "id": "did:panacea:mainnet:DnreD8QqXAQaEW9DwC16Wh#key1",
-            "type": "Ed25519VerificationKey2018",
-            "controller": "did:panacea:mainnet:DnreD8QqXAQaEW9DwC16Wh",
-            "publicKeyBase58": "H3C2AVvLMv6gmMNam3uVAjZpfkcJCwDwnZn6z3wXmqPV"
+            "id": "did:panacea:mainnet:G3UzSnRRsyApppuHVuaff#key1",
+            "type": "Secp256k1VerificationKey2018",
+            "publicKeyBase58": "dBuN4i7dqwCLzSX7GHBLsfUoXw5RmWQ3DwQ9Ee4bfh5Y"
         }
     ],
-    "service": [
-        {
-            "id": "did:panacea:mainnet:DnreD8QqXAQaEW9DwC16Wh#svc1",
-            "type": "VerifiableCredentialService",
-            "serviceEndpoint": "https://example.com/vc/"
-        }
+    "authentication": [
+        "did:panacea:mainnet:G3UzSnRRsyApppuHVuaff#key1"
     ]
 }
 ```
+
+The Key IDs in the `authentication` are references to one of public keys specified in the `publicKey`.
+The spec of the `authentication` would be extended in the future.
+
+The Panacea DID Document doesn't contain the `service` field currently. It would be extended soon.
+
 
 ## CRUD Operations
 
 ### Create (Register)
 
 To create a DID Document in Panacea, the following transaction should be submitted.
-```
+```json
 {
-    "did": <new DID that is being registered>,
-    "document": {
-        "publicKey": [{
-            "id": <a valid unique identifier>,
-            "type": "Ed25519VerificationKey2018",
-            "publicKeyBase58": <base58-encoded public key of a Ed25519 verification key-pair>,
-        }],
-        "authentication": [{
-            "publicKey": [<reference to a publicKey object>]
-        }],
-        "service": [{
-            "type": <VerifiableCredentialService, ...>,
-            "serviceEndpoint": <A URI for the endpoint>
-        }]
-    }
-}
-```
-If you use Panacea SDK, `did` and `document` are generated by SDK.
-//TODO: describe details
-
-Example:
-```
-{
+    "type": "did/MsgCreateDID",
+    "value": {
     "did": "did:panacea:mainnet:DnreD8QqXAQaEW9DwC16Wh",
-    "document": {
-        "publicKey": [{
-            "id": "did:panacea:mainnet:DnreD8QqXAQaEW9DwC16Wh#key1",
-            "type": "Secp256k1VerificationKey2018",
-            "publicKeyBase58": "H3C2AVvLMv6gmMNam3uVAjZpfkcJCwDwnZn6z3wXmqPV"
-        }],
-        "authentication": [{
-            "publicKey": ["did:panacea:mainnet:DnreD8QqXAQaEW9DwC16Wh#key1"]
-        }],
-        "service": [{
-            "type": "VerifiableCredentialService",
-            "serviceEndpoint": "https://example.com/vc/"
-        }]
+        "document": {
+            "@context": "https://www.w3.org/ns/did/v1",
+            "id": "did:panacea:mainnet:G3UzSnRRsyApppuHVuaff",
+            "publicKey": [
+                {
+                    "id": "did:panacea:mainnet:G3UzSnRRsyApppuHVuaff#key1",
+                    "type": "Secp256k1VerificationKey2018",
+                    "publicKeyBase58": "dBuN4i7dqwCLzSX7GHBLsfUoXw5RmWQ3DwQ9Ee4bfh5Y"
+                }
+            ],
+            "authentication": [
+                "did:panacea:mainnet:G3UzSnRRsyApppuHVuaff#key1"
+            ]
+        },
+        "signature": "FLOgUBcMEjKs/o1lgu4Y5Ump/2xee0D0tLsrY9+YVMUD/G/qbSHo3lOJ4Jv2zsDn1grcbIYSQsOvoBTbYXXg3g==",
+        "sig_key_id": "did:panacea:mainnet:G3UzSnRRsyApppuHVuaff#key1",
+        "from_address": "panacea1d58s72gu0mjkw0lkgyvr0eqzz3mv74awfsjslz"
     }
 }
 ```
+The transaction must have a `did` and a `document` which will be stored in the Panacea.
 
-Possible outcomes include:
-- TBD
+It also must have a `signature` and a `sig_key_id` for proving the ownership of the DID.
+The `signature` must be generated from the `document` and the sequence `"0"`.
+It must be signed with a private key which corresponds to the public key referred by the `sig_key_id`.
+The `sig_key_id` must be one of the key IDs specified in the `authentication` of the `document`.
+
+The source of the `signature` should look like (encoded with Amino):
+```json
+{
+    "data": {
+        "@context": ...,
+        "id": "did:panacea:...",
+        ...
+    },
+    "sequence": "0"
+}
+```
+
+The transaction also must contain a `from_address` which is a Panacea account.
+Also, it must be signed with the private key of the Panacea account, so that Panacea can verify the transaction.
+
+The transaction fails if the same DID exists or if it has been already deactivated.
 
 ### Read
 
-A Panacea DID Document can be looked up by the DID using the following transaction.
-```
+A Panacea DID Document can be looked up by the following query.
+```json
 {
-    "did": <DID to be queried>
+    "did": "did:panacea:mainnet:G3UzSnRRsyApppuHVuaff"
 }
 ```
 
-Example:
-```
+If the DID exists (not deactivated yet), the result is:
+```json
 {
-    "did": "did:panacea:mainnet:DnreD8QqXAQaEW9DwC16Wh"
+    "document": {
+        "@context": "https://www.w3.org/ns/did/v1",
+        "id": "did:panacea:mainnet:G3UzSnRRsyApppuHVuaff",
+        "publicKey": [
+            {
+                "id": "did:panacea:mainnet:G3UzSnRRsyApppuHVuaff#key1",
+                "type": "Secp256k1VerificationKey2018",
+                "publicKeyBase58": "dBuN4i7dqwCLzSX7GHBLsfUoXw5RmWQ3DwQ9Ee4bfh5Y"
+            }
+        ],
+        "authentication": [
+            "did:panacea:mainnet:G3UzSnRRsyApppuHVuaff#key1"
+        ]
+    },
+    "sequence": "0"
 }
 ```
+
+The `sequence` is returned along with the `document`.
+It must be included in the subsequent transaction (update/deactivate) for preventing transaction replay attacks.
 
 ### Update
 
 Only the DID owner can replace the DID Document using the following transaction.
-```
-{
-    "type": "update",
-    "did": <DID whose document needs to be updated>,
-    "document": {
-        "publicKey": [{
-            "id": <a valid unique identifier>,
-            "type": "Ed25519VerificationKey2018",
-            "publicKeyBase58": <base58-encoded public key of a Ed25519 verification key-pair>,
-        }, {
-            "id": <a valid unique identifier>,
-            "type": "Ed25519VerificationKey2018",
-            "publicKeyBase58": <base58-encoded public key of a Ed25519 verification key-pair>,
-        }],
-        "authentication": [{
-            "publicKey": [<references to publicKey objects>]
-        }],
-        "service": [{
-            "type": <VerifiableCredentialService, ...>,
-            "serviceEndpoint": <A URI for the endpoint>
-        }]
-    }
-}
-```
 
-Example:
-```
+This example is for adding a new public key to the DID document.
+```json
 {
-    "type": "update",
-    "did": "did:panacea:mainnet:DnreD8QqXAQaEW9DwC16Wh",
-    "document": {
-        "publicKey": [{
-            "id": "did:panacea:mainnet:DnreD8QqXAQaEW9DwC16Wh#key1",
-            "type": "Ed25519VerificationKey2018",
-            "publicKeyBase58": "H3C2AVvLMv6gmMNam3uVAjZpfkcJCwDwnZn6z3wXmqPV"
-        }, {
-            "id": "did:panacea:mainnet:DnreD8QqXAQaEW9DwC16Wh#key2",
-            "type": "Ed25519VerificationKey2018",
-            "publicKeyBase58": "VAjZpfkcJCwDwnZn6z3wXmqPVH3C2AVvLMv6gmMNam3u"
-        }],
-        "authentication": [{
+    "type": "did/MsgUpdateDID",
+    "value": {
+        "did": "did:panacea:mainnet:DnreD8QqXAQaEW9DwC16Wh",
+        "document": {
+            "@context": "https://www.w3.org/ns/did/v1",
+            "id": "did:panacea:mainnet:G3UzSnRRsyApppuHVuaff",
             "publicKey": [
-                "did:panacea:mainnet:DnreD8QqXAQaEW9DwC16Wh#key1",
-                "did:panacea:mainnet:DnreD8QqXAQaEW9DwC16Wh#key2"
+                {
+                    "id": "did:panacea:mainnet:G3UzSnRRsyApppuHVuaff#key1",
+                    "type": "Secp256k1VerificationKey2018",
+                    "publicKeyBase58": "dBuN4i7dqwCLzSX7GHBLsfUoXw5RmWQ3DwQ9Ee4bfh5Y"
+                },
+                {
+                    "id": "did:panacea:mainnet:G3UzSnRRsyApppuHVuaff#key2",
+                    "type": "Secp256k1VerificationKey2018",
+                    "publicKeyBase58": "2BjcxuwijyE1om4991ANiFrwZJ3Ev5YYX9KiPKgaHmGsi"
+                }
+            ],
+            "authentication": [
+                "did:panacea:mainnet:G3UzSnRRsyApppuHVuaff#key1"
             ]
-        }],
-        "service": [{
-            "type": "VerifiableCredentialService",
-            "serviceEndpoint": "https://example.com/vc/"
-        }]
+        },
+        "signature": "xtsQH3D5naHe9IXmhCnohlChwHiD0dx9PI4aPkaJPGoEznYMHmg0aBerg85ai7T2WNxxlc39uFzAxKbI4sbJCA==",
+        "sig_key_id": "did:panacea:mainnet:G3UzSnRRsyApppuHVuaff#key1",
+        "from_address": "panacea1d58s72gu0mjkw0lkgyvr0eqzz3mv74awfsjslz"
     }
 }
 ```
 
-### Delete
+Like creating DIDs, The `signature` must be generated from the `document` and the `sequence` returned from the Read DID operation.
+It must be signed with a private key which corresponds to the public key referred by the `sig_key_id`.
+The `sig_key_id` must be one of the key IDs specified in the `authentication` of the `document`.
 
-To delete the DID document, the DID owner should send the following transaction.
-```
+Whenever submitting this transaction, the user must query the current `sequence` by the Read DID operation.
+(The user can also increment the `sequence` manually, but the transaction can be rejected if there are the concurrent transactions with the same `sequence`.)
+
+The source of the `signature` should look like (encoded with Amino):
+```json
 {
-    "type": "delete",
-    "did": <DID whose document is being deleted>
+    "data": {
+        "@context": ...,
+        "id": "did:panacea:...",
+        ...
+    },
+    "sequence": "50"
 }
 ```
 
-Example:
-```
+The transaction fails if the DID has been already deactivated.
+
+### Deactivate
+
+To deactivate the DID document, the DID owner should send the following transaction.
+
+Panacea doesn't delete the DID document. The document is just deactivated.
+This strategy guarantees that malicious users cannot recreate the DID,
+because the DID deactivation may be appropriate when a person dies or a business is terminated.
+```json
 {
-    "type": "delete",
-    "did": "did:panacea:mainnet:DnreD8QqXAQaEW9DwC16Wh"
+    "type": "did/MsgDeactivateDID",
+    "value": {
+        "did": "did:panacea:mainnet:DnreD8QqXAQaEW9DwC16Wh",
+        "signature": "xtsQH3D5naHe9IXmhCnohlChwHiD0dx9PI4aPkaJPGoEznYMHmg0aBerg85ai7T2WNxxlc39uFzAxKbI4sbJCA==",
+        "sig_key_id": "did:panacea:mainnet:G3UzSnRRsyApppuHVuaff#key1",
+        "from_address": "panacea1d58s72gu0mjkw0lkgyvr0eqzz3mv74awfsjslz"
+    }
 }
 ```
+
+The `signature` must be generated from the `did` and the `sequence` returned from the Read DID operation.
+It must be signed with a private key which corresponds to the public key referred by the `sig_key_id`.
+The `sig_key_id` must be one of the key IDs specified in the `authentication` of the `document`.
+
+The source of the `signature` should look like (encoded with Amino):
+```json
+{
+    "data": "did:panacea:...",
+    "sequence": "50"
+}
+```
+
+The transaction fails if the DID doesn't exist or if it has been already deactivated.
 
 ## Security Considerations
+
+### Replay Attack
+
+To prove the DID ownership, Create/Update/Deactivate transactions must contain a `signature` and a `sig_key_id`.
+If malicous users can replay the transaction with the same `signature`, the DID document can be modified unexpectedly.
+
+To prevent replay attacks, a `sequence` must be included when generating the `signature`.
+The `sequence` can be obtained by the Read DID operation.
+
+The `sequence` is monotonically incremented by the Panacea when the transaction is committed.
+That is, malicious users cannot reuse the signature from the previous transaction committed.
+The user must generate a new signature from the new `sequence`.
 
 ## Privacy Considerations
 
 ## Reference Implementations
+
+- Core: https://github.com/medibloc/panacea-core
+- SDK: https://github.com/medibloc/panacea-js
 
 ## References
 
