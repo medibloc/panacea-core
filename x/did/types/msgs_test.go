@@ -35,7 +35,7 @@ func TestMsgCreateDID(t *testing.T) {
 	require.Equal(t, fromAddr, msg.GetSigners()[0])
 
 	require.Equal(t,
-		`{"type":"did/MsgCreateDID","value":{"did":"did:panacea:testnet:KS5zGZt66Me8MCctZBYrP","document":{"authentication":["did:panacea:testnet:KS5zGZt66Me8MCctZBYrP#key1"],"id":"did:panacea:testnet:KS5zGZt66Me8MCctZBYrP","publicKey":[{"id":"did:panacea:testnet:KS5zGZt66Me8MCctZBYrP#key1","publicKeyBase58":"qoRmLNBEXoaKDE8dKffMq2DBNxacTEfvbKRuFrccYW1b","type":"Secp256k1VerificationKey2018"}]},"from_address":"panacea154p6kyu9kqgvcmq63w3vpn893ssy6anpu8ykfq","sig_key_id":"did:panacea:testnet:KS5zGZt66Me8MCctZBYrP#key1","signature":"bXktc2ln"}}`,
+		`{"type":"did/MsgCreateDID","value":{"did":"did:panacea:testnet:KS5zGZt66Me8MCctZBYrP","document":{"@context":"https://www.w3.org/ns/did/v1","authentication":["did:panacea:testnet:KS5zGZt66Me8MCctZBYrP#key1"],"id":"did:panacea:testnet:KS5zGZt66Me8MCctZBYrP","publicKey":[{"id":"did:panacea:testnet:KS5zGZt66Me8MCctZBYrP#key1","publicKeyBase58":"qoRmLNBEXoaKDE8dKffMq2DBNxacTEfvbKRuFrccYW1b","type":"Secp256k1VerificationKey2018"}]},"from_address":"panacea154p6kyu9kqgvcmq63w3vpn893ssy6anpu8ykfq","sig_key_id":"did:panacea:testnet:KS5zGZt66Me8MCctZBYrP#key1","signature":"bXktc2ln"}}`,
 		string(msg.GetSignBytes()),
 	)
 }
@@ -59,7 +59,7 @@ func TestMsgUpdateDID(t *testing.T) {
 	require.Equal(t, fromAddr, msg.GetSigners()[0])
 
 	require.Equal(t,
-		`{"type":"did/MsgUpdateDID","value":{"did":"did:panacea:testnet:KS5zGZt66Me8MCctZBYrP","document":{"authentication":["did:panacea:testnet:KS5zGZt66Me8MCctZBYrP#key1"],"id":"did:panacea:testnet:KS5zGZt66Me8MCctZBYrP","publicKey":[{"id":"did:panacea:testnet:KS5zGZt66Me8MCctZBYrP#key1","publicKeyBase58":"qoRmLNBEXoaKDE8dKffMq2DBNxacTEfvbKRuFrccYW1b","type":"Secp256k1VerificationKey2018"}]},"from_address":"panacea154p6kyu9kqgvcmq63w3vpn893ssy6anpu8ykfq","sig_key_id":"did:panacea:testnet:KS5zGZt66Me8MCctZBYrP#key1","signature":"bXktc2ln"}}`,
+		`{"type":"did/MsgUpdateDID","value":{"did":"did:panacea:testnet:KS5zGZt66Me8MCctZBYrP","document":{"@context":"https://www.w3.org/ns/did/v1","authentication":["did:panacea:testnet:KS5zGZt66Me8MCctZBYrP#key1"],"id":"did:panacea:testnet:KS5zGZt66Me8MCctZBYrP","publicKey":[{"id":"did:panacea:testnet:KS5zGZt66Me8MCctZBYrP#key1","publicKeyBase58":"qoRmLNBEXoaKDE8dKffMq2DBNxacTEfvbKRuFrccYW1b","type":"Secp256k1VerificationKey2018"}]},"from_address":"panacea154p6kyu9kqgvcmq63w3vpn893ssy6anpu8ykfq","sig_key_id":"did:panacea:testnet:KS5zGZt66Me8MCctZBYrP#key1","signature":"bXktc2ln"}}`,
 		string(msg.GetSignBytes()),
 	)
 }

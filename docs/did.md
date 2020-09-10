@@ -188,7 +188,7 @@ It must be included in the subsequent transaction (update/deactivate) for preven
 
 Only the DID owner can replace the DID Document using the following transaction.
 
-This example is for adding a new public key to the DID document.
+This example is for adding a new public key to the `publicKey` and adding a dedicated public key to the `authentication`.
 ```json
 {
     "type": "did/MsgUpdateDID",
@@ -210,7 +210,12 @@ This example is for adding a new public key to the DID document.
                 }
             ],
             "authentication": [
-                "did:panacea:mainnet:G3UzSnRRsyApppuHVuaff#key1"
+                "did:panacea:mainnet:G3UzSnRRsyApppuHVuaff#key1",
+                {
+                    "id": "did:panacea:mainnet:G3UzSnRRsyApppuHVuaff#key3",
+                    "type": "Secp256k1VerificationKey2018",
+                    "publicKeyBase58": "yE1om4991ANiFrwZJ3Ev5YYX9KiPKgaHmGsi2Bjcxuwij"
+                }
             ]
         },
         "signature": "xtsQH3D5naHe9IXmhCnohlChwHiD0dx9PI4aPkaJPGoEznYMHmg0aBerg85ai7T2WNxxlc39uFzAxKbI4sbJCA==",
