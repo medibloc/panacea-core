@@ -172,21 +172,21 @@ func (ctxs Contexts) Valid() bool {
 
 func (ctxs Contexts) MarshalJSON() ([]byte, error) {
 	if len(ctxs) == 1 { // if only one, treat it as a single string
-		return didCodec.MarshalJSON(ctxs[0])
+		return json.Marshal(ctxs[0])
 	}
-	return didCodec.MarshalJSON([]Context(ctxs)) // if not, as a list
+	return json.Marshal([]Context(ctxs)) // if not, as a list
 }
 
 func (ctxs *Contexts) UnmarshalJSON(bz []byte) error {
 	var single Context
-	err := didCodec.UnmarshalJSON(bz, &single)
+	err := json.Unmarshal(bz, &single)
 	if err == nil {
 		*ctxs = Contexts{single}
 		return nil
 	}
 
 	var multiple []Context
-	if err := didCodec.UnmarshalJSON(bz, &multiple); err != nil {
+	if err := json.Unmarshal(bz, &multiple); err != nil {
 		return err
 	}
 	*ctxs = multiple
@@ -323,16 +323,16 @@ func (a Authentication) Valid(did DID) bool {
 func (a Authentication) MarshalJSON() ([]byte, error) {
 	// if dedicated
 	if a.DedicatedPubKey != nil {
-		return didCodec.MarshalJSON(a.DedicatedPubKey)
+		return json.Marshal(a.DedicatedPubKey)
 	}
 	// if not dedicated
-	return didCodec.MarshalJSON(a.KeyID)
+	return json.Marshal(a.KeyID)
 }
 
 func (a *Authentication) UnmarshalJSON(bz []byte) error {
 	// if not dedicated
 	var keyID KeyID
-	err := didCodec.UnmarshalJSON(bz, &keyID)
+	err := json.Unmarshal(bz, &keyID)
 	if err == nil {
 		*a = newAuthentication(keyID)
 		return nil
@@ -340,7 +340,7 @@ func (a *Authentication) UnmarshalJSON(bz []byte) error {
 
 	// if dedicated
 	var pubKey PubKey
-	if err := didCodec.UnmarshalJSON(bz, &pubKey); err != nil {
+	if err := json.Unmarshal(bz, &pubKey); err != nil {
 		return err
 	}
 	*a = newAuthenticationDedicated(pubKey)
