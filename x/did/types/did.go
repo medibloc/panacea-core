@@ -73,6 +73,7 @@ func networkIDRegex() string {
 }
 
 type DIDDocument struct {
+	Contexts        Contexts         `json:"@context"`
 	ID              DID              `json:"id"`
 	PubKeys         []PubKey         `json:"publicKey"`
 	Authentications []Authentication `json:"authentication"`
@@ -80,9 +81,10 @@ type DIDDocument struct {
 
 func NewDIDDocument(id DID, pubKey PubKey) DIDDocument {
 	return DIDDocument{
+		Contexts:        Contexts{ContextDIDV1},
 		ID:              id,
 		PubKeys:         []PubKey{pubKey},
-		Authentications: []Authentication{Authentication(pubKey.ID)},
+		Authentications: []Authentication{newAuthentication(pubKey.ID)},
 	}
 }
 
@@ -92,6 +94,10 @@ func (doc DIDDocument) Valid() bool {
 	}
 
 	if !doc.ID.Valid() || doc.PubKeys == nil || doc.Authentications == nil {
+		return false
+	}
+
+	if doc.Contexts == nil || !doc.Contexts.Valid() {
 		return false
 	}
 
@@ -105,8 +111,10 @@ func (doc DIDDocument) Valid() bool {
 		if !auth.Valid(doc.ID) {
 			return false
 		}
-		if _, ok := doc.PubKeyByID(KeyID(auth)); !ok {
-			return false
+		if !auth.hasDedicatedPubKey() {
+			if _, ok := doc.PubKeyByID(auth.KeyID); !ok {
+				return false
+			}
 		}
 	}
 
@@ -129,14 +137,76 @@ func (doc DIDDocument) GetSignBytes() []byte {
 
 // PubKeyByID finds a PubKey by ID.
 // If the corresponding PubKey doesn't exist, it returns a false.
-func (doc DIDDocument) PubKeyByID(id KeyID) (*PubKey, bool) {
-	for i := 0; i < len(doc.PubKeys); i++ {
-		pubKey := &doc.PubKeys[i]
-		if pubKey.ID == id {
-			return pubKey, true
+func (doc DIDDocument) PubKeyByID(id KeyID) (PubKey, bool) {
+	//TODO: Sadly, Amino codec doesn't accept maps. Find the way to make this efficient.
+	for _, auth := range doc.Authentications {
+		if auth.KeyID == id {
+			for _, pubKey := range doc.PubKeys {
+				if pubKey.ID == id {
+					return pubKey, true
+				}
+			}
+			return PubKey{}, false
 		}
 	}
-	return nil, false
+	return PubKey{}, false
+}
+
+type Contexts []Context
+
+func (ctxs Contexts) Valid() bool {
+	if ctxs == nil || len(ctxs) == 0 || ctxs[0] != ContextDIDV1 { // the 1st one must be ContextDIDV1
+		return false
+	}
+
+	set := make(map[Context]struct{}, len(ctxs))
+	for _, ctx := range ctxs {
+		_, dup := set[ctx] // check the duplication
+		if dup || !ctx.Valid() {
+			return false
+		}
+		set[ctx] = struct{}{}
+	}
+	return true
+}
+
+func (ctxs Contexts) MarshalJSON() ([]byte, error) {
+	if len(ctxs) == 1 { // if only one, treat it as a single string
+		return json.Marshal(ctxs[0])
+	}
+	return json.Marshal([]Context(ctxs)) // if not, as a list
+}
+
+func (ctxs *Contexts) UnmarshalJSON(bz []byte) error {
+	var single Context
+	err := json.Unmarshal(bz, &single)
+	if err == nil {
+		*ctxs = Contexts{single}
+		return nil
+	}
+
+	var multiple []Context
+	if err := json.Unmarshal(bz, &multiple); err != nil {
+		return err
+	}
+	*ctxs = multiple
+	return nil
+}
+
+type Context string
+
+const (
+	ContextDIDV1      Context = "https://www.w3.org/ns/did/v1"
+	ContextSecurityV1 Context = "https://w3id.org/security/v1"
+)
+
+func (ctx Context) Valid() bool {
+	switch ctx {
+	case ContextDIDV1, ContextSecurityV1:
+		return true
+	default:
+		return false
+	}
 }
 
 type KeyID string
@@ -219,11 +289,62 @@ func (pk PubKey) Valid(did DID) bool {
 	return matched
 }
 
-// TODO: to be extended
-type Authentication KeyID
+type Authentication struct {
+	KeyID KeyID
+	// DedicatedPubKey is not nil if it is only authorized for authentication
+	// https://www.w3.org/TR/did-core/#example-18-authentication-property-containing-three-verification-methods
+	DedicatedPubKey *PubKey
+}
+
+func newAuthentication(keyID KeyID) Authentication {
+	return Authentication{KeyID: keyID, DedicatedPubKey: nil}
+}
+
+func newAuthenticationDedicated(pubKey PubKey) Authentication {
+	return Authentication{KeyID: pubKey.ID, DedicatedPubKey: &pubKey}
+}
+
+func (a Authentication) hasDedicatedPubKey() bool {
+	return a.DedicatedPubKey != nil
+}
 
 func (a Authentication) Valid(did DID) bool {
-	return KeyID(a).Valid(did)
+	if !a.KeyID.Valid(did) {
+		return false
+	}
+	if a.DedicatedPubKey != nil {
+		if !a.DedicatedPubKey.Valid(did) || a.DedicatedPubKey.ID != a.KeyID {
+			return false
+		}
+	}
+	return true
+}
+
+func (a Authentication) MarshalJSON() ([]byte, error) {
+	// if dedicated
+	if a.DedicatedPubKey != nil {
+		return json.Marshal(a.DedicatedPubKey)
+	}
+	// if not dedicated
+	return json.Marshal(a.KeyID)
+}
+
+func (a *Authentication) UnmarshalJSON(bz []byte) error {
+	// if not dedicated
+	var keyID KeyID
+	err := json.Unmarshal(bz, &keyID)
+	if err == nil {
+		*a = newAuthentication(keyID)
+		return nil
+	}
+
+	// if dedicated
+	var pubKey PubKey
+	if err := json.Unmarshal(bz, &pubKey); err != nil {
+		return err
+	}
+	*a = newAuthenticationDedicated(pubKey)
+	return nil
 }
 
 // DIDDocumentWithSeq is for storing a Sequence along with a DIDDocument.

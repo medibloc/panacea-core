@@ -68,19 +68,64 @@ func TestNewDIDDocument(t *testing.T) {
 	require.Equal(t, 1, len(doc.PubKeys))
 	require.Equal(t, pubKey, doc.PubKeys[0])
 	require.Equal(t, 1, len(doc.Authentications))
-	require.EqualValues(t, keyID, doc.Authentications[0])
-
-	pubKeyFound, ok := doc.PubKeyByID(keyID)
-	require.True(t, ok)
-	require.Equal(t, pubKey, *pubKeyFound)
-
-	_, ok = doc.PubKeyByID("invalid_key_id")
-	require.False(t, ok)
+	require.EqualValues(t, keyID, doc.Authentications[0].KeyID)
 }
 
 func TestDIDDocument_Empty(t *testing.T) {
 	require.False(t, getValidDIDDocument().Empty())
 	require.True(t, DIDDocument{}.Empty())
+}
+
+func TestDIDDocument_PubKeyByID(t *testing.T) {
+	did := DID("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP")
+	keyID := NewKeyID(did, "key1")
+	pubKey := NewPubKey(keyID, ES256K, secp256k1.GenPrivKey().PubKey())
+	doc := NewDIDDocument(did, pubKey)
+
+	found, ok := doc.PubKeyByID(keyID)
+	require.True(t, ok)
+	require.Equal(t, pubKey, found)
+
+	_, ok = doc.PubKeyByID(NewKeyID(did, "key2"))
+	require.False(t, ok)
+
+	doc.Authentications = []Authentication{} // clear authentications
+	_, ok = doc.PubKeyByID(keyID)
+	require.False(t, ok)
+}
+
+func TestContexts_Valid(t *testing.T) {
+	require.False(t, Contexts{}.Valid())
+	require.True(t, Contexts{ContextDIDV1}.Valid())
+	require.True(t, Contexts{ContextDIDV1, ContextSecurityV1}.Valid())
+	require.False(t, Contexts{ContextSecurityV1, ContextDIDV1}.Valid())
+	require.False(t, Contexts{ContextDIDV1, "https://something.com"}.Valid())
+	require.False(t, Contexts{ContextDIDV1, ContextDIDV1}.Valid())
+
+	var ctxs Contexts = nil
+	require.False(t, ctxs.Valid())
+}
+
+func TestContexts_MarshalJSON(t *testing.T) {
+	bz, err := didCodec.MarshalJSON(Contexts{ContextDIDV1})
+	require.NoError(t, err)
+	require.Equal(t, fmt.Sprintf(`"%v"`, ContextDIDV1), string(bz))
+
+	bz, err = didCodec.MarshalJSON(Contexts{ContextDIDV1, ContextSecurityV1})
+	require.NoError(t, err)
+	require.Equal(t, fmt.Sprintf(`["%v","%v"]`, ContextDIDV1, ContextSecurityV1), string(bz))
+}
+
+func TestContexts_UnmarshalJSON(t *testing.T) {
+	var ctxs Contexts
+
+	bz := []byte(fmt.Sprintf(`["%v","%v"]`, ContextDIDV1, ContextSecurityV1))
+	require.NoError(t, didCodec.UnmarshalJSON(bz, &ctxs))
+	require.Equal(t, Contexts{ContextDIDV1, ContextSecurityV1}, ctxs)
+
+	bz = []byte(fmt.Sprintf(`"%v"`, ContextDIDV1))
+	require.NoError(t, didCodec.UnmarshalJSON(bz, &ctxs))
+	require.Equal(t, Contexts{ContextDIDV1}, ctxs)
 }
 
 func TestNewKeyID(t *testing.T) {
@@ -125,6 +170,58 @@ func TestNewPubKey(t *testing.T) {
 
 	expected := pubKey.(secp256k1.PubKeySecp256k1)
 	require.Equal(t, expected[:], base58.Decode(pub.KeyBase58))
+}
+
+func TestAuthentication_Valid(t *testing.T) {
+	did := DID("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP")
+	keyID := NewKeyID(did, "key1")
+	pubKey := NewPubKey(keyID, ES256K, secp256k1.GenPrivKey().PubKey())
+
+	auth := Authentication{KeyID: keyID, DedicatedPubKey: nil}
+	require.True(t, auth.Valid(did))
+	auth = Authentication{KeyID: keyID, DedicatedPubKey: &pubKey}
+	require.True(t, auth.Valid(did))
+
+	auth = Authentication{KeyID: "invalid", DedicatedPubKey: nil}
+	require.False(t, auth.Valid(did))
+	auth = Authentication{KeyID: keyID, DedicatedPubKey: &PubKey{ID: "invalid"}}
+	require.False(t, auth.Valid(did))
+	auth = Authentication{KeyID: NewKeyID(did, "key2"), DedicatedPubKey: &pubKey}
+	require.False(t, auth.Valid(did))
+}
+
+func TestAuthentication_MarshalJSON(t *testing.T) {
+	did := DID("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP")
+	keyID := NewKeyID(did, "key1")
+	pubKey := NewPubKey(keyID, ES256K, secp256k1.GenPrivKey().PubKey())
+
+	auth := newAuthentication(keyID)
+	bz, err := auth.MarshalJSON()
+	require.NoError(t, err)
+	require.Equal(t, fmt.Sprintf(`"%v"`, keyID), string(bz))
+
+	auth = newAuthenticationDedicated(pubKey)
+	bz, err = auth.MarshalJSON()
+	require.NoError(t, err)
+	regex := fmt.Sprintf(`^{"id":"%v","type":"%v","publicKeyBase58":".+"}$`, keyID, ES256K)
+	require.Regexp(t, regex, string(bz))
+}
+
+func TestAuthentication_UnmarshalJSON(t *testing.T) {
+	did := DID("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP")
+	keyID := NewKeyID(did, "key1")
+	pubKey := NewPubKey(keyID, ES256K, secp256k1.GenPrivKey().PubKey())
+
+	var auth Authentication
+	bz := []byte(fmt.Sprintf(`"%v"`, keyID))
+	require.NoError(t, auth.UnmarshalJSON(bz))
+	require.Equal(t, newAuthentication(keyID), auth)
+	require.True(t, auth.Valid(did))
+
+	bz = []byte(fmt.Sprintf(`{"id":"%v","type":"%v","publicKeyBase58":"%v"}`, keyID, ES256K, pubKey.KeyBase58))
+	require.NoError(t, auth.UnmarshalJSON(bz))
+	require.Equal(t, newAuthenticationDedicated(pubKey), auth)
+	require.True(t, auth.Valid(did))
 }
 
 func TestDIDDocumentWithSeq_Empty(t *testing.T) {
