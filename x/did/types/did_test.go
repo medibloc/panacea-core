@@ -59,16 +59,16 @@ func TestNewNetworkID(t *testing.T) {
 
 func TestNewDIDDocument(t *testing.T) {
 	did := DID("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP")
-	keyID := NewKeyID(did, "key1")
-	pubKey := NewPubKey(keyID, ES256K, secp256k1.GenPrivKey().PubKey())
+	veriMethodID := NewVeriMethodID(did, "key1")
+	veriMethod := NewVeriMethod(veriMethodID, ES256K, did, secp256k1.GenPrivKey().PubKey())
 
-	doc := NewDIDDocument(did, pubKey)
+	doc := NewDIDDocument(did, veriMethod)
 	require.True(t, doc.Valid())
 	require.Equal(t, did, doc.ID)
-	require.Equal(t, 1, len(doc.PubKeys))
-	require.Equal(t, pubKey, doc.PubKeys[0])
+	require.Equal(t, 1, len(doc.VeriMethods))
+	require.Equal(t, veriMethod, doc.VeriMethods[0])
 	require.Equal(t, 1, len(doc.Authentications))
-	require.EqualValues(t, keyID, doc.Authentications[0].KeyID)
+	require.EqualValues(t, veriMethodID, doc.Authentications[0].VeriMethodID)
 }
 
 func TestDIDDocument_Empty(t *testing.T) {
@@ -76,21 +76,21 @@ func TestDIDDocument_Empty(t *testing.T) {
 	require.True(t, DIDDocument{}.Empty())
 }
 
-func TestDIDDocument_PubKeyByID(t *testing.T) {
+func TestDIDDocument_VeriMethodByID(t *testing.T) {
 	did := DID("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP")
-	keyID := NewKeyID(did, "key1")
-	pubKey := NewPubKey(keyID, ES256K, secp256k1.GenPrivKey().PubKey())
-	doc := NewDIDDocument(did, pubKey)
+	veriMethodID := NewVeriMethodID(did, "key1")
+	veriMethod := NewVeriMethod(veriMethodID, ES256K, did, secp256k1.GenPrivKey().PubKey())
+	doc := NewDIDDocument(did, veriMethod)
 
-	found, ok := doc.PubKeyByID(keyID)
+	found, ok := doc.VeriMethodByID(veriMethodID)
 	require.True(t, ok)
-	require.Equal(t, pubKey, found)
+	require.Equal(t, veriMethod, found)
 
-	_, ok = doc.PubKeyByID(NewKeyID(did, "key2"))
+	_, ok = doc.VeriMethodByID(NewVeriMethodID(did, "key2"))
 	require.False(t, ok)
 
 	doc.Authentications = []Authentication{} // clear authentications
-	_, ok = doc.PubKeyByID(keyID)
+	_, ok = doc.VeriMethodByID(veriMethodID)
 	require.False(t, ok)
 }
 
@@ -128,33 +128,33 @@ func TestContexts_UnmarshalJSON(t *testing.T) {
 	require.Equal(t, Contexts{ContextDIDV1}, ctxs)
 }
 
-func TestNewKeyID(t *testing.T) {
+func TestNewVeriMethodID(t *testing.T) {
 	did := DID("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP")
 	expectedID := fmt.Sprintf("%s#key1", did)
-	id := NewKeyID(did, "key1")
+	id := NewVeriMethodID(did, "key1")
 	require.True(t, id.Valid(did))
 	require.EqualValues(t, expectedID, id)
 
-	id, err := ParseKeyID(expectedID, did)
+	id, err := ParseVeriMethodID(expectedID, did)
 	require.NoError(t, err)
 	require.EqualValues(t, expectedID, id)
 }
 
-func TestKeyID_Valid(t *testing.T) {
+func TestVeriMethodID_Valid(t *testing.T) {
 	// normal
-	require.True(t, KeyID("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP#key1").Valid("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP"))
+	require.True(t, VeriMethodID("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP#key1").Valid("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP"))
 
 	// if suffix has whitespaces
-	require.False(t, KeyID("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP# key1").Valid("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP"))
-	require.False(t, KeyID("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP#key1 ").Valid("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP"))
+	require.False(t, VeriMethodID("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP# key1").Valid("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP"))
+	require.False(t, VeriMethodID("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP#key1 ").Valid("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP"))
 
 	// if suffix is empty
-	require.False(t, KeyID("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP#").Valid("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP"))
-	require.False(t, KeyID("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP").Valid("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP"))
+	require.False(t, VeriMethodID("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP#").Valid("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP"))
+	require.False(t, VeriMethodID("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP").Valid("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP"))
 
 	// if prefix (DID) is invalid
-	require.False(t, KeyID("invalid#key1").Valid("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP"))
-	require.False(t, KeyID("did:panacea:mainnet:KS5zGZt66Me8MCctZBYrP#key1").Valid("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP"))
+	require.False(t, VeriMethodID("invalid#key1").Valid("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP"))
+	require.False(t, VeriMethodID("did:panacea:mainnet:KS5zGZt66Me8MCctZBYrP#key1").Valid("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP"))
 }
 
 func TestKeyType_Valid(t *testing.T) {
@@ -162,65 +162,65 @@ func TestKeyType_Valid(t *testing.T) {
 	require.False(t, KeyType("invalid").Valid())
 }
 
-func TestNewPubKey(t *testing.T) {
+func TestNewVeriMethod(t *testing.T) {
 	did := DID("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP")
 	pubKey := secp256k1.GenPrivKey().PubKey()
-	pub := NewPubKey(NewKeyID(did, "key1"), ES256K, pubKey)
+	pub := NewVeriMethod(NewVeriMethodID(did, "key1"), ES256K, did, pubKey)
 	require.True(t, pub.Valid(did))
 
 	expected := pubKey.(secp256k1.PubKeySecp256k1)
-	require.Equal(t, expected[:], base58.Decode(pub.KeyBase58))
+	require.Equal(t, expected[:], base58.Decode(pub.PubKeyBase58))
 }
 
 func TestAuthentication_Valid(t *testing.T) {
 	did := DID("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP")
-	keyID := NewKeyID(did, "key1")
-	pubKey := NewPubKey(keyID, ES256K, secp256k1.GenPrivKey().PubKey())
+	veriMethodID := NewVeriMethodID(did, "key1")
+	veriMethod := NewVeriMethod(veriMethodID, ES256K, did, secp256k1.GenPrivKey().PubKey())
 
-	auth := Authentication{KeyID: keyID, DedicatedPubKey: nil}
+	auth := Authentication{VeriMethodID: veriMethodID, DedicatedMethod: nil}
 	require.True(t, auth.Valid(did))
-	auth = Authentication{KeyID: keyID, DedicatedPubKey: &pubKey}
+	auth = Authentication{VeriMethodID: veriMethodID, DedicatedMethod: &veriMethod}
 	require.True(t, auth.Valid(did))
 
-	auth = Authentication{KeyID: "invalid", DedicatedPubKey: nil}
+	auth = Authentication{VeriMethodID: "invalid", DedicatedMethod: nil}
 	require.False(t, auth.Valid(did))
-	auth = Authentication{KeyID: keyID, DedicatedPubKey: &PubKey{ID: "invalid"}}
+	auth = Authentication{VeriMethodID: veriMethodID, DedicatedMethod: &VeriMethod{ID: "invalid"}}
 	require.False(t, auth.Valid(did))
-	auth = Authentication{KeyID: NewKeyID(did, "key2"), DedicatedPubKey: &pubKey}
+	auth = Authentication{VeriMethodID: NewVeriMethodID(did, "key2"), DedicatedMethod: &veriMethod}
 	require.False(t, auth.Valid(did))
 }
 
 func TestAuthentication_MarshalJSON(t *testing.T) {
 	did := DID("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP")
-	keyID := NewKeyID(did, "key1")
-	pubKey := NewPubKey(keyID, ES256K, secp256k1.GenPrivKey().PubKey())
+	veriMethodID := NewVeriMethodID(did, "key1")
+	veriMethod := NewVeriMethod(veriMethodID, ES256K, did, secp256k1.GenPrivKey().PubKey())
 
-	auth := newAuthentication(keyID)
+	auth := newAuthentication(veriMethodID)
 	bz, err := auth.MarshalJSON()
 	require.NoError(t, err)
-	require.Equal(t, fmt.Sprintf(`"%v"`, keyID), string(bz))
+	require.Equal(t, fmt.Sprintf(`"%v"`, veriMethodID), string(bz))
 
-	auth = newAuthenticationDedicated(pubKey)
+	auth = newAuthenticationDedicated(veriMethod)
 	bz, err = auth.MarshalJSON()
 	require.NoError(t, err)
-	regex := fmt.Sprintf(`^{"id":"%v","type":"%v","publicKeyBase58":".+"}$`, keyID, ES256K)
+	regex := fmt.Sprintf(`{"id":"%v","type":"%v","controller":"%v","publicKeyBase58":"%v"}`, veriMethodID, ES256K, did, veriMethod.PubKeyBase58)
 	require.Regexp(t, regex, string(bz))
 }
 
 func TestAuthentication_UnmarshalJSON(t *testing.T) {
 	did := DID("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP")
-	keyID := NewKeyID(did, "key1")
-	pubKey := NewPubKey(keyID, ES256K, secp256k1.GenPrivKey().PubKey())
+	veriMethodID := NewVeriMethodID(did, "key1")
+	veriMethod := NewVeriMethod(veriMethodID, ES256K, did, secp256k1.GenPrivKey().PubKey())
 
 	var auth Authentication
-	bz := []byte(fmt.Sprintf(`"%v"`, keyID))
+	bz := []byte(fmt.Sprintf(`"%v"`, veriMethodID))
 	require.NoError(t, auth.UnmarshalJSON(bz))
-	require.Equal(t, newAuthentication(keyID), auth)
+	require.Equal(t, newAuthentication(veriMethodID), auth)
 	require.True(t, auth.Valid(did))
 
-	bz = []byte(fmt.Sprintf(`{"id":"%v","type":"%v","publicKeyBase58":"%v"}`, keyID, ES256K, pubKey.KeyBase58))
+	bz = []byte(fmt.Sprintf(`{"id":"%v","type":"%v","controller":"%v","publicKeyBase58":"%v"}`, veriMethodID, ES256K, did, veriMethod.PubKeyBase58))
 	require.NoError(t, auth.UnmarshalJSON(bz))
-	require.Equal(t, newAuthenticationDedicated(pubKey), auth)
+	require.Equal(t, newAuthenticationDedicated(veriMethod), auth)
 	require.True(t, auth.Valid(did))
 }
 
@@ -247,7 +247,7 @@ func TestDIDDocumentWithSeq_Deactivate(t *testing.T) {
 
 func getValidDIDDocument() DIDDocument {
 	did := DID("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP")
-	keyID := NewKeyID(did, "key1")
-	pubKey := NewPubKey(keyID, ES256K, secp256k1.GenPrivKey().PubKey())
-	return NewDIDDocument(did, pubKey)
+	veriMethodID := NewVeriMethodID(did, "key1")
+	veriMethod := NewVeriMethod(veriMethodID, ES256K, did, secp256k1.GenPrivKey().PubKey())
+	return NewDIDDocument(did, veriMethod)
 }

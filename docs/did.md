@@ -78,10 +78,11 @@ The details are described below.
 {
     "@context": "https://www.w3.org/ns/did/v1",
     "id": "did:panacea:mainnet:G3UzSnRRsyApppuHVuaff",
-    "publicKey": [
+    "verificationMethod": [
         {
             "id": "did:panacea:mainnet:G3UzSnRRsyApppuHVuaff#key1",
             "type": "Secp256k1VerificationKey2018",
+            "controller": "did:panacea:mainnet:G3UzSnRRsyApppuHVuaff",
             "publicKeyBase58": "dBuN4i7dqwCLzSX7GHBLsfUoXw5RmWQ3DwQ9Ee4bfh5Y"
         }
     ],
@@ -91,7 +92,10 @@ The details are described below.
 }
 ```
 
-The Key IDs in the `authentication` are references to one of public keys specified in the `publicKey`.
+Currently, the `controller` in the `verificationMethod` must be equal to the [DID subject](https://www.w3.org/TR/2020/WD-did-core-20200907/#dfn-did-subjects).
+It would be extended later.
+
+The Key IDs in the `authentication` are references to one of public keys specified in the `verificationMethod`.
 The spec of the `authentication` would be extended in the future.
 
 The Panacea DID Document doesn't contain the `service` field currently. It would be extended soon.
@@ -106,14 +110,15 @@ To create a DID Document in Panacea, the following transaction should be submitt
 {
     "type": "did/MsgCreateDID",
     "value": {
-    "did": "did:panacea:mainnet:DnreD8QqXAQaEW9DwC16Wh",
+        "did": "did:panacea:mainnet:G3UzSnRRsyApppuHVuaff",
         "document": {
             "@context": "https://www.w3.org/ns/did/v1",
             "id": "did:panacea:mainnet:G3UzSnRRsyApppuHVuaff",
-            "publicKey": [
+            "verificationMethod": [
                 {
                     "id": "did:panacea:mainnet:G3UzSnRRsyApppuHVuaff#key1",
                     "type": "Secp256k1VerificationKey2018",
+                    "controller": "did:panacea:mainnet:G3UzSnRRsyApppuHVuaff",
                     "publicKeyBase58": "dBuN4i7dqwCLzSX7GHBLsfUoXw5RmWQ3DwQ9Ee4bfh5Y"
                 }
             ],
@@ -166,10 +171,11 @@ If the DID exists (not deactivated yet), the result is:
     "document": {
         "@context": "https://www.w3.org/ns/did/v1",
         "id": "did:panacea:mainnet:G3UzSnRRsyApppuHVuaff",
-        "publicKey": [
+        "verificationMethod": [
             {
                 "id": "did:panacea:mainnet:G3UzSnRRsyApppuHVuaff#key1",
                 "type": "Secp256k1VerificationKey2018",
+                "controller": "did:panacea:mainnet:G3UzSnRRsyApppuHVuaff",
                 "publicKeyBase58": "dBuN4i7dqwCLzSX7GHBLsfUoXw5RmWQ3DwQ9Ee4bfh5Y"
             }
         ],
@@ -188,24 +194,26 @@ It must be included in the subsequent transaction (update/deactivate) for preven
 
 Only the DID owner can replace the DID Document using the following transaction.
 
-This example is for adding a new public key to the `publicKey` and adding a dedicated public key to the `authentication`.
+This example is for adding a new public key to the `verificationMethod` and adding a dedicated public key to the `authentication`.
 ```json
 {
     "type": "did/MsgUpdateDID",
     "value": {
-        "did": "did:panacea:mainnet:DnreD8QqXAQaEW9DwC16Wh",
+        "did": "did:panacea:mainnet:G3UzSnRRsyApppuHVuaff",
         "document": {
             "@context": "https://www.w3.org/ns/did/v1",
             "id": "did:panacea:mainnet:G3UzSnRRsyApppuHVuaff",
-            "publicKey": [
+            "verificationMethod": [
                 {
                     "id": "did:panacea:mainnet:G3UzSnRRsyApppuHVuaff#key1",
                     "type": "Secp256k1VerificationKey2018",
+                    "controller": "did:panacea:mainnet:G3UzSnRRsyApppuHVuaff",
                     "publicKeyBase58": "dBuN4i7dqwCLzSX7GHBLsfUoXw5RmWQ3DwQ9Ee4bfh5Y"
                 },
                 {
                     "id": "did:panacea:mainnet:G3UzSnRRsyApppuHVuaff#key2",
                     "type": "Secp256k1VerificationKey2018",
+                    "controller": "did:panacea:mainnet:G3UzSnRRsyApppuHVuaff",
                     "publicKeyBase58": "2BjcxuwijyE1om4991ANiFrwZJ3Ev5YYX9KiPKgaHmGsi"
                 }
             ],
@@ -214,6 +222,7 @@ This example is for adding a new public key to the `publicKey` and adding a dedi
                 {
                     "id": "did:panacea:mainnet:G3UzSnRRsyApppuHVuaff#key3",
                     "type": "Secp256k1VerificationKey2018",
+                    "controller": "did:panacea:mainnet:G3UzSnRRsyApppuHVuaff",
                     "publicKeyBase58": "yE1om4991ANiFrwZJ3Ev5YYX9KiPKgaHmGsi2Bjcxuwij"
                 }
             ]
