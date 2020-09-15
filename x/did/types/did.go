@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"regexp"
+	"strings"
 
 	"github.com/btcsuite/btcutil/base58"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -224,9 +225,24 @@ func ParseVeriMethodID(id string, did DID) (VeriMethodID, error) {
 	return methodID, nil
 }
 
+const (
+	maxVeriMethodIDLen = 128
+)
+
 func (id VeriMethodID) Valid(did DID) bool {
-	pattern := fmt.Sprintf(`^%v#\S+$`, did)
-	matched, _ := regexp.MatchString(pattern, string(id))
+	prefix := fmt.Sprintf("%v#", did)
+	if !strings.HasPrefix(string(id), prefix) {
+		return false
+	}
+
+	// Limit the length because it can be used for keystore filenames.
+	// Max filename length on Linux is usually 256 bytes.
+	if len(string(id))-len(prefix) > maxVeriMethodIDLen {
+		return false
+	}
+
+	suffix := string(id)[len(prefix):]
+	matched, _ := regexp.MatchString(`^\S+$`, suffix) // no whitespace
 	return matched
 }
 
