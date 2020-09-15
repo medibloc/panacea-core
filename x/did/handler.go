@@ -35,7 +35,7 @@ func handleMsgCreateDID(ctx sdk.Context, keeper Keeper, msg MsgCreateDID) sdk.Re
 
 	seq := types.InitialSequence
 
-	_, err := verifyDIDOwnership(msg.Document, seq, msg.Document, msg.SigKeyID, msg.Signature)
+	_, err := verifyDIDOwnership(msg.Document, seq, msg.Document, msg.VeriMethodID, msg.Signature)
 	if err != nil {
 		return err.Result()
 	}
@@ -54,7 +54,7 @@ func handleMsgUpdateDID(ctx sdk.Context, keeper Keeper, msg MsgUpdateDID) sdk.Re
 		return types.ErrDIDDeactivated(msg.DID).Result()
 	}
 
-	newSeq, err := verifyDIDOwnership(msg.Document, docWithSeq.Seq, docWithSeq.Document, msg.SigKeyID, msg.Signature)
+	newSeq, err := verifyDIDOwnership(msg.Document, docWithSeq.Seq, docWithSeq.Document, msg.VeriMethodID, msg.Signature)
 	if err != nil {
 		return err.Result()
 	}
@@ -73,7 +73,7 @@ func handleMsgDeactivateDID(ctx sdk.Context, keeper Keeper, msg MsgDeactivateDID
 		return types.ErrDIDDeactivated(msg.DID).Result()
 	}
 
-	newSeq, err := verifyDIDOwnership(msg.DID, docWithSeq.Seq, docWithSeq.Document, msg.SigKeyID, msg.Signature)
+	newSeq, err := verifyDIDOwnership(msg.DID, docWithSeq.Seq, docWithSeq.Document, msg.VeriMethodID, msg.Signature)
 	if err != nil {
 		return err.Result()
 	}
@@ -84,14 +84,18 @@ func handleMsgDeactivateDID(ctx sdk.Context, keeper Keeper, msg MsgDeactivateDID
 }
 
 // verifyDIDOwnership verifies the DID ownership from a sig which is based on the data.
-// It fetches a public key from a doc using keyID. It also uses a seq to verifyDIDOwnership the sig.
+// It fetches a public key from a doc using veriMethodID. It also uses a seq to verifyDIDOwnership the sig.
 // If the verification is successful, it returns a new sequence. If not, it returns an error.
-func verifyDIDOwnership(data types.Signable, seq types.Sequence, doc types.DIDDocument, keyID types.KeyID, sig []byte) (types.Sequence, sdk.Error) {
-	pubKey, ok := doc.PubKeyByID(keyID)
+func verifyDIDOwnership(data types.Signable, seq types.Sequence, doc types.DIDDocument, veriMethodID types.VeriMethodID, sig []byte) (types.Sequence, sdk.Error) {
+	veriMethod, ok := doc.VeriMethodByID(veriMethodID)
 	if !ok {
-		return 0, types.ErrKeyIDNotFound(keyID)
+		return 0, types.ErrVeriMethodIDNotFound(veriMethodID)
 	}
-	pubKeySecp256k1, err := types.NewPubKeyFromBase58(pubKey.KeyBase58)
+	if veriMethod.Controller != doc.ID { // TODO: support other controllers
+		return 0, types.ErrInvalidKeyController(veriMethod.Controller)
+	}
+
+	pubKeySecp256k1, err := types.NewPubKeyFromBase58(veriMethod.PubKeyBase58)
 	if err != nil {
 		return 0, types.ErrInvalidSecp256k1PublicKey(err)
 	}

@@ -33,9 +33,9 @@ func TestNewMsgCreateDID(t *testing.T) {
 	msg, err := newMsgCreateDID(getCliContext(t), "testnet", privKey)
 	require.NoError(t, err)
 
-	// check if pubKey is correct
-	pub, _ := msg.Document.PubKeyByID(msg.SigKeyID)
-	pubKey, _ := types.NewPubKeyFromBase58(pub.KeyBase58)
+	// check if veriMethod is correct
+	veriMethod, _ := msg.Document.VeriMethodByID(msg.VeriMethodID)
+	pubKey, _ := types.NewPubKeyFromBase58(veriMethod.PubKeyBase58)
 	require.Equal(t, privKey.PubKey(), pubKey)
 
 	// check if the signature can be verifiable with the initial sequence
@@ -102,14 +102,14 @@ func TestReadBIP39ParamsFrom_InvalidMnemonic(t *testing.T) {
 
 // Check if the private key is stored and loaded correctly by the password specified.
 func TestSaveAndGetPrivKeyFromKeyStore(t *testing.T) {
-	keyID := types.KeyID("key1")
+	veriMethodID := types.VeriMethodID("key1")
 	privKey, _ := crypto.GenSecp256k1PrivKey("", "")
 
 	reader := bufio.NewReader(strings.NewReader("mypassword1\nmypassword1\n"))
-	require.NoError(t, savePrivKeyToKeyStore(keyID, privKey, reader))
+	require.NoError(t, savePrivKeyToKeyStore(veriMethodID, privKey, reader))
 
 	reader = bufio.NewReader(strings.NewReader("mypassword1\n"))
-	privKeyLoaded, err := getPrivKeyFromKeyStore(keyID, reader)
+	privKeyLoaded, err := getPrivKeyFromKeyStore(veriMethodID, reader)
 	require.NoError(t, err)
 	require.Equal(t, privKey, privKeyLoaded)
 }

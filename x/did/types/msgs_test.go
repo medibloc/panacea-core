@@ -21,10 +21,10 @@ func TestMsgCreateDID(t *testing.T) {
 	sig := []byte("my-sig")
 	fromAddr := getFromAddress(t)
 
-	msg := types.NewMsgCreateDID(doc.ID, doc, doc.PubKeys[0].ID, sig, fromAddr)
+	msg := types.NewMsgCreateDID(doc.ID, doc, doc.VeriMethods[0].ID, sig, fromAddr)
 	require.Equal(t, doc.ID, msg.DID)
 	require.Equal(t, doc, msg.Document)
-	require.Equal(t, doc.PubKeys[0].ID, msg.SigKeyID)
+	require.Equal(t, doc.VeriMethods[0].ID, msg.VeriMethodID)
 	require.Equal(t, sig, msg.Signature)
 	require.Equal(t, fromAddr, msg.FromAddress)
 
@@ -35,7 +35,7 @@ func TestMsgCreateDID(t *testing.T) {
 	require.Equal(t, fromAddr, msg.GetSigners()[0])
 
 	require.Equal(t,
-		`{"type":"did/MsgCreateDID","value":{"did":"did:panacea:testnet:KS5zGZt66Me8MCctZBYrP","document":{"@context":"https://www.w3.org/ns/did/v1","authentication":["did:panacea:testnet:KS5zGZt66Me8MCctZBYrP#key1"],"id":"did:panacea:testnet:KS5zGZt66Me8MCctZBYrP","publicKey":[{"id":"did:panacea:testnet:KS5zGZt66Me8MCctZBYrP#key1","publicKeyBase58":"qoRmLNBEXoaKDE8dKffMq2DBNxacTEfvbKRuFrccYW1b","type":"Secp256k1VerificationKey2018"}]},"from_address":"panacea154p6kyu9kqgvcmq63w3vpn893ssy6anpu8ykfq","sig_key_id":"did:panacea:testnet:KS5zGZt66Me8MCctZBYrP#key1","signature":"bXktc2ln"}}`,
+		`{"type":"did/MsgCreateDID","value":{"did":"did:panacea:testnet:KS5zGZt66Me8MCctZBYrP","document":{"@context":"https://www.w3.org/ns/did/v1","authentication":["did:panacea:testnet:KS5zGZt66Me8MCctZBYrP#key1"],"id":"did:panacea:testnet:KS5zGZt66Me8MCctZBYrP","verificationMethod":[{"controller":"did:panacea:testnet:KS5zGZt66Me8MCctZBYrP","id":"did:panacea:testnet:KS5zGZt66Me8MCctZBYrP#key1","publicKeyBase58":"qoRmLNBEXoaKDE8dKffMq2DBNxacTEfvbKRuFrccYW1b","type":"Secp256k1VerificationKey2018"}]},"from_address":"panacea154p6kyu9kqgvcmq63w3vpn893ssy6anpu8ykfq","signature":"bXktc2ln","verification_method_id":"did:panacea:testnet:KS5zGZt66Me8MCctZBYrP#key1"}}`,
 		string(msg.GetSignBytes()),
 	)
 }
@@ -45,10 +45,10 @@ func TestMsgUpdateDID(t *testing.T) {
 	sig := []byte("my-sig")
 	fromAddr := getFromAddress(t)
 
-	msg := types.NewMsgUpdateDID(doc.ID, doc, doc.PubKeys[0].ID, sig, fromAddr)
+	msg := types.NewMsgUpdateDID(doc.ID, doc, doc.VeriMethods[0].ID, sig, fromAddr)
 	require.Equal(t, doc.ID, msg.DID)
 	require.Equal(t, doc, msg.Document)
-	require.Equal(t, doc.PubKeys[0].ID, msg.SigKeyID)
+	require.Equal(t, doc.VeriMethods[0].ID, msg.VeriMethodID)
 	require.Equal(t, sig, msg.Signature)
 	require.Equal(t, fromAddr, msg.FromAddress)
 
@@ -59,7 +59,7 @@ func TestMsgUpdateDID(t *testing.T) {
 	require.Equal(t, fromAddr, msg.GetSigners()[0])
 
 	require.Equal(t,
-		`{"type":"did/MsgUpdateDID","value":{"did":"did:panacea:testnet:KS5zGZt66Me8MCctZBYrP","document":{"@context":"https://www.w3.org/ns/did/v1","authentication":["did:panacea:testnet:KS5zGZt66Me8MCctZBYrP#key1"],"id":"did:panacea:testnet:KS5zGZt66Me8MCctZBYrP","publicKey":[{"id":"did:panacea:testnet:KS5zGZt66Me8MCctZBYrP#key1","publicKeyBase58":"qoRmLNBEXoaKDE8dKffMq2DBNxacTEfvbKRuFrccYW1b","type":"Secp256k1VerificationKey2018"}]},"from_address":"panacea154p6kyu9kqgvcmq63w3vpn893ssy6anpu8ykfq","sig_key_id":"did:panacea:testnet:KS5zGZt66Me8MCctZBYrP#key1","signature":"bXktc2ln"}}`,
+		`{"type":"did/MsgUpdateDID","value":{"did":"did:panacea:testnet:KS5zGZt66Me8MCctZBYrP","document":{"@context":"https://www.w3.org/ns/did/v1","authentication":["did:panacea:testnet:KS5zGZt66Me8MCctZBYrP#key1"],"id":"did:panacea:testnet:KS5zGZt66Me8MCctZBYrP","verificationMethod":[{"controller":"did:panacea:testnet:KS5zGZt66Me8MCctZBYrP","id":"did:panacea:testnet:KS5zGZt66Me8MCctZBYrP#key1","publicKeyBase58":"qoRmLNBEXoaKDE8dKffMq2DBNxacTEfvbKRuFrccYW1b","type":"Secp256k1VerificationKey2018"}]},"from_address":"panacea154p6kyu9kqgvcmq63w3vpn893ssy6anpu8ykfq","signature":"bXktc2ln","verification_method_id":"did:panacea:testnet:KS5zGZt66Me8MCctZBYrP#key1"}}`,
 		string(msg.GetSignBytes()),
 	)
 }
@@ -69,9 +69,9 @@ func TestDeactivateDID(t *testing.T) {
 	sig := []byte("my-sig")
 	fromAddr := getFromAddress(t)
 
-	msg := types.NewMsgDeactivateDID(doc.ID, doc.PubKeys[0].ID, sig, fromAddr)
+	msg := types.NewMsgDeactivateDID(doc.ID, doc.VeriMethods[0].ID, sig, fromAddr)
 	require.Equal(t, doc.ID, msg.DID)
-	require.Equal(t, doc.PubKeys[0].ID, msg.SigKeyID)
+	require.Equal(t, doc.VeriMethods[0].ID, msg.VeriMethodID)
 	require.Equal(t, sig, msg.Signature)
 	require.Equal(t, fromAddr, msg.FromAddress)
 
@@ -82,7 +82,7 @@ func TestDeactivateDID(t *testing.T) {
 	require.Equal(t, fromAddr, msg.GetSigners()[0])
 
 	require.Equal(t,
-		`{"type":"did/MsgDeactivateDID","value":{"did":"did:panacea:testnet:KS5zGZt66Me8MCctZBYrP","from_address":"panacea154p6kyu9kqgvcmq63w3vpn893ssy6anpu8ykfq","sig_key_id":"did:panacea:testnet:KS5zGZt66Me8MCctZBYrP#key1","signature":"bXktc2ln"}}`,
+		`{"type":"did/MsgDeactivateDID","value":{"did":"did:panacea:testnet:KS5zGZt66Me8MCctZBYrP","from_address":"panacea154p6kyu9kqgvcmq63w3vpn893ssy6anpu8ykfq","signature":"bXktc2ln","verification_method_id":"did:panacea:testnet:KS5zGZt66Me8MCctZBYrP#key1"}}`,
 		string(msg.GetSignBytes()),
 	)
 }
@@ -95,8 +95,8 @@ func getFromAddress(t *testing.T) sdk.AccAddress {
 
 func newDIDDocument() types.DIDDocument {
 	did, _ := types.ParseDID("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP")
-	keyID := types.NewKeyID(did, "key1")
+	veriMethodID := types.NewVeriMethodID(did, "key1")
 	pubKeyBase58, _ := types.NewPubKeyFromBase58("qoRmLNBEXoaKDE8dKffMq2DBNxacTEfvbKRuFrccYW1b")
-	pubKey := types.NewPubKey(keyID, types.ES256K, pubKeyBase58)
-	return types.NewDIDDocument(did, pubKey)
+	veriMethod := types.NewVeriMethod(veriMethodID, types.ES256K, did, pubKeyBase58)
+	return types.NewDIDDocument(did, veriMethod)
 }

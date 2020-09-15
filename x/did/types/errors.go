@@ -12,13 +12,14 @@ const (
 	CodeInvalidDIDDocument        sdk.CodeType = 103
 	CodeDIDNotFound               sdk.CodeType = 104
 	CodeInvalidSignature          sdk.CodeType = 105
-	CodeInvalidKeyID              sdk.CodeType = 106
-	CodeKeyIDNotFound             sdk.CodeType = 107
+	CodeInvalidVeriMethodID       sdk.CodeType = 106
+	CodeVeriMethodIDNotFound      sdk.CodeType = 107
 	CodeSigVerificationFailed     sdk.CodeType = 108
 	CodeInvalidSecp256k1PublicKey sdk.CodeType = 109
 	CodeInvalidNetworkID          sdk.CodeType = 110
 	CodeInvalidDIDDocumentWithSeq sdk.CodeType = 111
 	CodeDIDDeactivated            sdk.CodeType = 112
+	CodeInvalidKeyController      sdk.CodeType = 113
 )
 
 func ErrDIDExists(did DID) sdk.Error {
@@ -41,12 +42,12 @@ func ErrInvalidSignature(sig []byte) sdk.Error {
 	return sdk.NewError(DefaultCodespace, CodeInvalidSignature, "Invalid signature %v", sig)
 }
 
-func ErrInvalidKeyID(id string) sdk.Error {
-	return sdk.NewError(DefaultCodespace, CodeInvalidKeyID, "Invalid KeyID: %s", id)
+func ErrInvalidVeriMethodID(id string) sdk.Error {
+	return sdk.NewError(DefaultCodespace, CodeInvalidVeriMethodID, "Invalid VeriMethodID: %s", id)
 }
 
-func ErrKeyIDNotFound(id KeyID) sdk.Error {
-	return sdk.NewError(DefaultCodespace, CodeKeyIDNotFound, "KeyID %v not found", id)
+func ErrVeriMethodIDNotFound(id VeriMethodID) sdk.Error {
+	return sdk.NewError(DefaultCodespace, CodeVeriMethodIDNotFound, "VeriMethodID %v not found", id)
 }
 
 func ErrSigVerificationFailed() sdk.Error {
@@ -67,4 +68,8 @@ func ErrInvalidDIDDocumentWithSeq(doc DIDDocumentWithSeq) sdk.Error {
 
 func ErrDIDDeactivated(did DID) sdk.Error {
 	return sdk.NewError(DefaultCodespace, CodeDIDDeactivated, "DID was already deactivated: %v", did)
+}
+
+func ErrInvalidKeyController(did DID) sdk.Error {
+	return sdk.NewError(DefaultCodespace, CodeInvalidKeyController, "Invalid key controller: %v", did)
 }

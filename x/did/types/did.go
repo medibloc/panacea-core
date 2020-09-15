@@ -75,16 +75,16 @@ func networkIDRegex() string {
 type DIDDocument struct {
 	Contexts        Contexts         `json:"@context"`
 	ID              DID              `json:"id"`
-	PubKeys         []PubKey         `json:"publicKey"`
+	VeriMethods     []VeriMethod     `json:"verificationMethod"`
 	Authentications []Authentication `json:"authentication"`
 }
 
-func NewDIDDocument(id DID, pubKey PubKey) DIDDocument {
+func NewDIDDocument(id DID, veriMethod VeriMethod) DIDDocument {
 	return DIDDocument{
 		Contexts:        Contexts{ContextDIDV1},
 		ID:              id,
-		PubKeys:         []PubKey{pubKey},
-		Authentications: []Authentication{newAuthentication(pubKey.ID)},
+		VeriMethods:     []VeriMethod{veriMethod},
+		Authentications: []Authentication{newAuthentication(veriMethod.ID)},
 	}
 }
 
@@ -93,7 +93,7 @@ func (doc DIDDocument) Valid() bool {
 		return true
 	}
 
-	if !doc.ID.Valid() || doc.PubKeys == nil || doc.Authentications == nil {
+	if !doc.ID.Valid() || doc.VeriMethods == nil || doc.Authentications == nil {
 		return false
 	}
 
@@ -101,8 +101,8 @@ func (doc DIDDocument) Valid() bool {
 		return false
 	}
 
-	for _, pubKey := range doc.PubKeys {
-		if !pubKey.Valid(doc.ID) {
+	for _, veriMethod := range doc.VeriMethods {
+		if !veriMethod.Valid(doc.ID) {
 			return false
 		}
 	}
@@ -111,8 +111,8 @@ func (doc DIDDocument) Valid() bool {
 		if !auth.Valid(doc.ID) {
 			return false
 		}
-		if !auth.hasDedicatedPubKey() {
-			if _, ok := doc.PubKeyByID(auth.KeyID); !ok {
+		if !auth.hasDedicatedMethod() {
+			if _, ok := doc.VeriMethodByID(auth.VeriMethodID); !ok {
 				return false
 			}
 		}
@@ -135,21 +135,21 @@ func (doc DIDDocument) GetSignBytes() []byte {
 	return sdk.MustSortJSON(didCodec.MustMarshalJSON(doc))
 }
 
-// PubKeyByID finds a PubKey by ID.
-// If the corresponding PubKey doesn't exist, it returns a false.
-func (doc DIDDocument) PubKeyByID(id KeyID) (PubKey, bool) {
+// VeriMethodByID finds a VeriMethod by ID.
+// If the corresponding VeriMethod doesn't exist, it returns a false.
+func (doc DIDDocument) VeriMethodByID(id VeriMethodID) (VeriMethod, bool) {
 	//TODO: Sadly, Amino codec doesn't accept maps. Find the way to make this efficient.
 	for _, auth := range doc.Authentications {
-		if auth.KeyID == id {
-			for _, pubKey := range doc.PubKeys {
-				if pubKey.ID == id {
-					return pubKey, true
+		if auth.VeriMethodID == id {
+			for _, veriMethod := range doc.VeriMethods {
+				if veriMethod.ID == id {
+					return veriMethod, true
 				}
 			}
-			return PubKey{}, false
+			return VeriMethod{}, false
 		}
 	}
-	return PubKey{}, false
+	return VeriMethod{}, false
 }
 
 type Contexts []Context
@@ -209,22 +209,22 @@ func (ctx Context) Valid() bool {
 	}
 }
 
-type KeyID string
+type VeriMethodID string
 
-func NewKeyID(did DID, name string) KeyID {
+func NewVeriMethodID(did DID, name string) VeriMethodID {
 	// https://www.w3.org/TR/did-core/#fragment
-	return KeyID(fmt.Sprintf("%v#%s", did, name))
+	return VeriMethodID(fmt.Sprintf("%v#%s", did, name))
 }
 
-func ParseKeyID(id string, did DID) (KeyID, error) {
-	keyID := KeyID(id)
-	if !keyID.Valid(did) {
-		return "", ErrInvalidKeyID(id)
+func ParseVeriMethodID(id string, did DID) (VeriMethodID, error) {
+	methodID := VeriMethodID(id)
+	if !methodID.Valid(did) {
+		return "", ErrInvalidVeriMethodID(id)
 	}
-	return keyID, nil
+	return methodID, nil
 }
 
-func (id KeyID) Valid(did DID) bool {
+func (id VeriMethodID) Valid(did DID) bool {
 	pattern := fmt.Sprintf(`^%v#\S+$`, did)
 	matched, _ := regexp.MatchString(pattern, string(id))
 	return matched
@@ -244,17 +244,20 @@ func (t KeyType) Valid() bool {
 	return false
 }
 
-type PubKey struct {
-	ID        KeyID   `json:"id"`
-	Type      KeyType `json:"type"`
-	KeyBase58 string  `json:"publicKeyBase58"`
+// TODO: support various types: https://www.w3.org/TR/did-core/#key-types-and-formats
+type VeriMethod struct {
+	ID           VeriMethodID `json:"id"`
+	Type         KeyType      `json:"type"`
+	Controller   DID          `json:"controller"`
+	PubKeyBase58 string       `json:"publicKeyBase58"`
 }
 
-func NewPubKey(id KeyID, keyType KeyType, key crypto.PubKey) PubKey {
-	return PubKey{
-		ID:        id,
-		Type:      keyType,
-		KeyBase58: newPubKeyBase58(key, keyType, 0),
+func NewVeriMethod(id VeriMethodID, keyType KeyType, controller DID, key crypto.PubKey) VeriMethod {
+	return VeriMethod{
+		ID:           id,
+		Type:         keyType,
+		Controller:   controller,
+		PubKeyBase58: newPubKeyBase58(key, keyType, 0),
 	}
 }
 
@@ -279,41 +282,46 @@ func encodePubKeyES256K(key crypto.PubKey, truncateLen int) string {
 	return base58.Encode(k)
 }
 
-func (pk PubKey) Valid(did DID) bool {
+func (pk VeriMethod) Valid(did DID) bool {
 	if !pk.ID.Valid(did) || !pk.Type.Valid() {
 		return false
 	}
 
+	// TODO: support the other DID as a controller
+	if pk.Controller != did {
+		return false
+	}
+
 	pattern := fmt.Sprintf("^[%s]+$", Base58Charset)
-	matched, _ := regexp.MatchString(pattern, pk.KeyBase58)
+	matched, _ := regexp.MatchString(pattern, pk.PubKeyBase58)
 	return matched
 }
 
 type Authentication struct {
-	KeyID KeyID
-	// DedicatedPubKey is not nil if it is only authorized for authentication
+	VeriMethodID VeriMethodID
+	// DedicatedMethod is not nil if it is only authorized for authentication
 	// https://www.w3.org/TR/did-core/#example-18-authentication-property-containing-three-verification-methods
-	DedicatedPubKey *PubKey
+	DedicatedMethod *VeriMethod
 }
 
-func newAuthentication(keyID KeyID) Authentication {
-	return Authentication{KeyID: keyID, DedicatedPubKey: nil}
+func newAuthentication(veriMethodID VeriMethodID) Authentication {
+	return Authentication{VeriMethodID: veriMethodID, DedicatedMethod: nil}
 }
 
-func newAuthenticationDedicated(pubKey PubKey) Authentication {
-	return Authentication{KeyID: pubKey.ID, DedicatedPubKey: &pubKey}
+func newAuthenticationDedicated(veriMethod VeriMethod) Authentication {
+	return Authentication{VeriMethodID: veriMethod.ID, DedicatedMethod: &veriMethod}
 }
 
-func (a Authentication) hasDedicatedPubKey() bool {
-	return a.DedicatedPubKey != nil
+func (a Authentication) hasDedicatedMethod() bool {
+	return a.DedicatedMethod != nil
 }
 
 func (a Authentication) Valid(did DID) bool {
-	if !a.KeyID.Valid(did) {
+	if !a.VeriMethodID.Valid(did) {
 		return false
 	}
-	if a.DedicatedPubKey != nil {
-		if !a.DedicatedPubKey.Valid(did) || a.DedicatedPubKey.ID != a.KeyID {
+	if a.DedicatedMethod != nil {
+		if !a.DedicatedMethod.Valid(did) || a.DedicatedMethod.ID != a.VeriMethodID {
 			return false
 		}
 	}
@@ -322,28 +330,28 @@ func (a Authentication) Valid(did DID) bool {
 
 func (a Authentication) MarshalJSON() ([]byte, error) {
 	// if dedicated
-	if a.DedicatedPubKey != nil {
-		return json.Marshal(a.DedicatedPubKey)
+	if a.DedicatedMethod != nil {
+		return json.Marshal(a.DedicatedMethod)
 	}
 	// if not dedicated
-	return json.Marshal(a.KeyID)
+	return json.Marshal(a.VeriMethodID)
 }
 
 func (a *Authentication) UnmarshalJSON(bz []byte) error {
 	// if not dedicated
-	var keyID KeyID
-	err := json.Unmarshal(bz, &keyID)
+	var veriMethodID VeriMethodID
+	err := json.Unmarshal(bz, &veriMethodID)
 	if err == nil {
-		*a = newAuthentication(keyID)
+		*a = newAuthentication(veriMethodID)
 		return nil
 	}
 
 	// if dedicated
-	var pubKey PubKey
-	if err := json.Unmarshal(bz, &pubKey); err != nil {
+	var veriMethod VeriMethod
+	if err := json.Unmarshal(bz, &veriMethod); err != nil {
 		return err
 	}
-	*a = newAuthenticationDedicated(pubKey)
+	*a = newAuthenticationDedicated(veriMethod)
 	return nil
 }
 
