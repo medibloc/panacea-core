@@ -2,6 +2,7 @@ package types
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -155,6 +156,14 @@ func TestVeriMethodID_Valid(t *testing.T) {
 	// if prefix (DID) is invalid
 	require.False(t, VeriMethodID("invalid#key1").Valid("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP"))
 	require.False(t, VeriMethodID("did:panacea:mainnet:KS5zGZt66Me8MCctZBYrP#key1").Valid("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP"))
+
+	// if suffix is too long
+	var builder strings.Builder
+	builder.WriteString("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP#")
+	for i := 0; i < maxVeriMethodIDLen+1; i++ {
+		builder.WriteByte('k')
+	}
+	require.False(t, VeriMethodID(builder.String()).Valid("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP"))
 }
 
 func TestKeyType_Valid(t *testing.T) {
