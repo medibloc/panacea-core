@@ -20,6 +20,7 @@ require (
 	github.com/stretchr/testify v1.4.0
 	github.com/tendermint/go-amino v0.15.0
 	github.com/tendermint/tendermint v0.32.12
+	github.com/tendermint/tm-db v0.2.0
 	golang.org/x/crypto v0.0.0-20200115085410-6d4e4cb37c7d
 	golang.org/x/net v0.0.0-20190923162816-aa69164e4478 // indirect
 	golang.org/x/sys v0.0.0-20190922100055-0a153f010e69 // indirect
@@ -29,4 +30,4 @@ require (
 	gopkg.in/yaml.v2 v2.2.7 // indirect
 )
 
-replace github.com/cosmos/cosmos-sdk => github.com/medibloc/cosmos-sdk v0.37.13-i
+replace github.com/cosmos/cosmos-sdk => github.com/medibloc/cosmos-sdk v0.37.13-internal
