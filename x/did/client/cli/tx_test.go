@@ -3,6 +3,8 @@ package cli
 import (
 	"bufio"
 	"fmt"
+	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/spf13/viper"
 	"os"
 	"strings"
 	"testing"
@@ -115,6 +117,7 @@ func TestSaveAndGetPrivKeyFromKeyStore(t *testing.T) {
 }
 
 func getCliContext(t *testing.T) context.CLIContext {
+	viper.Set(client.FlagTrustNode, true)
 	fromAddr, err := sdk.AccAddressFromBech32("panacea154p6kyu9kqgvcmq63w3vpn893ssy6anpu8ykfq")
 	require.NoError(t, err)
 	return context.NewCLIContext().WithFromAddress(fromAddr)
