@@ -1,14 +1,13 @@
-package did
+package types
 
 import (
 	"testing"
 
-	"github.com/medibloc/panacea-core/x/did/types"
 	"github.com/stretchr/testify/require"
 )
 
 func TestGenesisDIDDocumentKey(t *testing.T) {
-	key := GenesisDIDDocumentKey{DID: types.DID("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP")}
+	key := GenesisDIDDocumentKey{DID: DID("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP")}
 
 	var newKey GenesisDIDDocumentKey
 	require.NoError(t, newKey.Unmarshal(key.Marshal()))
@@ -16,7 +15,7 @@ func TestGenesisDIDDocumentKey(t *testing.T) {
 }
 
 func TestGenesisDIDDocumentKey_InvalidDID(t *testing.T) {
-	invalidKey := GenesisDIDDocumentKey{DID: types.DID("invalid_did")}.Marshal()
+	invalidKey := GenesisDIDDocumentKey{DID: DID("invalid_did")}.Marshal()
 
 	var key GenesisDIDDocumentKey
 	require.Error(t, key.Unmarshal(invalidKey))

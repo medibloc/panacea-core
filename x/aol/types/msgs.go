@@ -44,7 +44,7 @@ func (msg MsgCreateTopic) ValidateBasic() sdk.Error {
 }
 
 func (msg MsgCreateTopic) GetSignBytes() []byte {
-	bz := aolCodec.MustMarshalJSON(msg)
+	bz := ModuleCdc.MustMarshalJSON(msg)
 	return sdk.MustSortJSON(bz)
 }
 
@@ -85,7 +85,7 @@ func (msg MsgAddWriter) ValidateBasic() sdk.Error {
 }
 
 func (msg MsgAddWriter) GetSignBytes() []byte {
-	bz := aolCodec.MustMarshalJSON(msg)
+	bz := ModuleCdc.MustMarshalJSON(msg)
 	return sdk.MustSortJSON(bz)
 }
 
@@ -120,7 +120,7 @@ func (msg MsgDeleteWriter) ValidateBasic() sdk.Error {
 }
 
 func (msg MsgDeleteWriter) GetSignBytes() []byte {
-	bz := aolCodec.MustMarshalJSON(msg)
+	bz := ModuleCdc.MustMarshalJSON(msg)
 	return sdk.MustSortJSON(bz)
 }
 
@@ -162,7 +162,7 @@ func (msg MsgAddRecord) ValidateBasic() sdk.Error {
 }
 
 func (msg MsgAddRecord) GetSignBytes() []byte {
-	bz := aolCodec.MustMarshalJSON(msg)
+	bz := ModuleCdc.MustMarshalJSON(msg)
 	return sdk.MustSortJSON(bz)
 }
 

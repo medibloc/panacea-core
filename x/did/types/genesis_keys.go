@@ -1,11 +1,7 @@
-package did
-
-import (
-	"github.com/medibloc/panacea-core/x/did/types"
-)
+package types
 
 type GenesisDIDDocumentKey struct {
-	DID types.DID `json:"did"`
+	DID DID `json:"did"`
 }
 
 func (k GenesisDIDDocumentKey) Marshal() string {
@@ -13,9 +9,9 @@ func (k GenesisDIDDocumentKey) Marshal() string {
 }
 
 func (k *GenesisDIDDocumentKey) Unmarshal(key string) error {
-	did := types.DID(key)
+	did := DID(key)
 	if !did.Valid() {
-		return types.ErrInvalidDID(key)
+		return ErrInvalidDID(key)
 	}
 
 	k.DID = did

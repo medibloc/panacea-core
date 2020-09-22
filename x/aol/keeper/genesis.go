@@ -1,24 +1,13 @@
-package aol
+package keeper
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/medibloc/panacea-core/x/aol/types"
 )
 
-type GenesisState struct {
-	Owners  map[string]types.Owner  `json:"owners"`
-	Topics  map[string]types.Topic  `json:"topics"`
-	Writers map[string]types.Writer `json:"writers"`
-	Records map[string]types.Record `json:"records"`
-}
-
-func DefaultGenesisState() GenesisState {
-	return GenesisState{}
-}
-
-func InitGenesis(ctx sdk.Context, k Keeper, data GenesisState) {
+func InitGenesis(ctx sdk.Context, k Keeper, data types.GenesisState) {
 	for bz, value := range data.Owners {
-		var key GenesisOwnerKey
+		var key types.GenesisOwnerKey
 		err := key.Unmarshal(bz)
 		if err != nil {
 			panic(err)
@@ -27,7 +16,7 @@ func InitGenesis(ctx sdk.Context, k Keeper, data GenesisState) {
 	}
 
 	for bz, value := range data.Topics {
-		var key GenesisTopicKey
+		var key types.GenesisTopicKey
 		err := key.Unmarshal(bz)
 		if err != nil {
 			panic(err)
@@ -36,7 +25,7 @@ func InitGenesis(ctx sdk.Context, k Keeper, data GenesisState) {
 	}
 
 	for bz, value := range data.Writers {
-		var key GenesisWriterKey
+		var key types.GenesisWriterKey
 		err := key.Unmarshal(bz)
 		if err != nil {
 			panic(err)
@@ -45,7 +34,7 @@ func InitGenesis(ctx sdk.Context, k Keeper, data GenesisState) {
 	}
 
 	for bz, value := range data.Records {
-		var key GenesisRecordKey
+		var key types.GenesisRecordKey
 		err := key.Unmarshal(bz)
 		if err != nil {
 			panic(err)
@@ -54,39 +43,7 @@ func InitGenesis(ctx sdk.Context, k Keeper, data GenesisState) {
 	}
 }
 
-func ValidateGenesis(data GenesisState) error {
-	for bz := range data.Owners {
-		var key GenesisOwnerKey
-		err := key.Unmarshal(bz)
-		if err != nil {
-			return err
-		}
-	}
-	for bz := range data.Topics {
-		var key GenesisTopicKey
-		err := key.Unmarshal(bz)
-		if err != nil {
-			return err
-		}
-	}
-	for bz := range data.Writers {
-		var key GenesisWriterKey
-		err := key.Unmarshal(bz)
-		if err != nil {
-			return err
-		}
-	}
-	for bz := range data.Records {
-		var key GenesisRecordKey
-		err := key.Unmarshal(bz)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
+func ExportGenesis(ctx sdk.Context, k Keeper) types.GenesisState {
 	ownersMap := make(map[string]types.Owner)
 	topicsMap := make(map[string]types.Topic)
 	writersMap := make(map[string]types.Writer)
@@ -94,7 +51,7 @@ func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
 
 	ownerAddrs := k.ListOwner(ctx)
 	for _, ownerAddr := range ownerAddrs {
-		key := GenesisOwnerKey{
+		key := types.GenesisOwnerKey{
 			OwnerAddress: ownerAddr,
 		}.Marshal()
 		value := k.GetOwner(ctx, ownerAddr)
@@ -102,7 +59,7 @@ func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
 
 		topicNames := k.ListTopic(ctx, ownerAddr)
 		for _, topicName := range topicNames {
-			key := GenesisTopicKey{
+			key := types.GenesisTopicKey{
 				OwnerAddress: ownerAddr,
 				TopicName:    topicName,
 			}.Marshal()
@@ -112,7 +69,7 @@ func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
 
 			writerAddrs := k.ListWriter(ctx, ownerAddr, topicName)
 			for _, writerAddr := range writerAddrs {
-				key := GenesisWriterKey{
+				key := types.GenesisWriterKey{
 					OwnerAddress:  ownerAddr,
 					TopicName:     topicName,
 					WriterAddress: writerAddr,
@@ -123,7 +80,7 @@ func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
 
 			var offset uint64
 			for offset = 0; offset < totalRecords; offset++ {
-				key := GenesisRecordKey{
+				key := types.GenesisRecordKey{
 					OwnerAddress: ownerAddr,
 					TopicName:    topicName,
 					Offset:       offset,
@@ -134,7 +91,7 @@ func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
 		}
 	}
 
-	return GenesisState{
+	return types.GenesisState{
 		Owners:  ownersMap,
 		Topics:  topicsMap,
 		Writers: writersMap,

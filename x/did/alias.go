@@ -11,6 +11,7 @@ const (
 
 var (
 	RegisterCodec = types.RegisterCodec
+	ModuleCdc     = types.ModuleCdc
 )
 
 type (

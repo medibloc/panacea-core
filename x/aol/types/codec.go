@@ -4,10 +4,14 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 )
 
-var aolCodec = codec.New()
+// ModuleCdc generic sealed codec to be used throughout module
+var ModuleCdc *codec.Codec
 
 func init() {
-	RegisterCodec(aolCodec)
+	ModuleCdc := codec.New()
+	RegisterCodec(ModuleCdc)
+	codec.RegisterCrypto(ModuleCdc)
+	ModuleCdc.Seal()
 }
 
 // RegisterCodec registers concrete types on Amino codec

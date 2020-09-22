@@ -1,11 +1,12 @@
 package cli
 
 import (
+	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/context"
-	"github.com/cosmos/cosmos-sdk/client/utils"
+	"github.com/cosmos/cosmos-sdk/x/auth/client/utils"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	authtxb "github.com/cosmos/cosmos-sdk/x/auth/client/txbuilder"
+	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/medibloc/panacea-core/x/aol/types"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -17,14 +18,32 @@ const (
 	flagFeePayer    = "payer"
 )
 
+// GetTxCmd returns the transaction commands for this module
+func GetTxCmd(cdc *codec.Codec) *cobra.Command {
+	aolTxCmd := &cobra.Command{
+		Use:   types.ModuleName,
+		Short: "aol transaction subcommands",
+	}
+
+	aolTxCmd.AddCommand(client.PostCommands(
+		GetCmdAddRecord(cdc),
+		GetCmdAddWriter(cdc),
+		GetCmdCreateTopic(cdc),
+		GetCmdDeleteWriter(cdc),
+	)...)
+
+	return aolTxCmd
+}
+
+
 func GetCmdCreateTopic(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "create-topic [topic]",
 		Short: "Create a topic",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			txBldr := authtxb.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
-			cliCtx := context.NewCLIContext().WithCodec(cdc).WithAccountDecoder(cdc)
+			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
 			ownerAddr := cliCtx.GetFromAddress()
 			topic := args[0]
@@ -39,7 +58,7 @@ func GetCmdCreateTopic(cdc *codec.Codec) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg}, false)
+			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg})
 		},
 	}
 	cmd.Flags().String(flagDescription, "", "description of topic")
@@ -52,8 +71,8 @@ func GetCmdAddWriter(cdc *codec.Codec) *cobra.Command {
 		Short: "Add write permission for this topic",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			txBldr := authtxb.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
-			cliCtx := context.NewCLIContext().WithCodec(cdc).WithAccountDecoder(cdc)
+			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
 			ownerAddr := cliCtx.GetFromAddress()
 			topic := args[0]
@@ -75,7 +94,7 @@ func GetCmdAddWriter(cdc *codec.Codec) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg}, false)
+			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg})
 		},
 	}
 	cmd.Flags().String(flagMoniker, "", "name of writer")
@@ -89,8 +108,8 @@ func GetCmdDeleteWriter(cdc *codec.Codec) *cobra.Command {
 		Short: "Delete write permission for this topic",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			txBldr := authtxb.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
-			cliCtx := context.NewCLIContext().WithCodec(cdc).WithAccountDecoder(cdc)
+			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
 			ownerAddr := cliCtx.GetFromAddress()
 			topic := args[0]
@@ -108,7 +127,7 @@ func GetCmdDeleteWriter(cdc *codec.Codec) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg}, false)
+			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg})
 		},
 	}
 }
@@ -119,8 +138,8 @@ func GetCmdAddRecord(cdc *codec.Codec) *cobra.Command {
 		Short: "Add new record",
 		Args:  cobra.ExactArgs(4),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			txBldr := authtxb.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
-			cliCtx := context.NewCLIContext().WithCodec(cdc).WithAccountDecoder(cdc)
+			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
 			ownerAddr, err := sdk.AccAddressFromBech32(args[0])
 			if err != nil {
@@ -147,7 +166,7 @@ func GetCmdAddRecord(cdc *codec.Codec) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg}, false)
+			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg})
 		},
 	}
 	cmd.Flags().String(flagFeePayer, "", "optional address to pay for the fee")

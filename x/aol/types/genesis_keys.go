@@ -1,4 +1,4 @@
-package aol
+package types
 
 import (
 	"errors"

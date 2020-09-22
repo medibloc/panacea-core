@@ -1,4 +1,4 @@
-package did
+package keeper
 
 import (
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -7,15 +7,11 @@ import (
 	abci "github.com/tendermint/tendermint/abci/types"
 )
 
-const (
-	QueryDID = "did"
-)
-
 // NewQuerier is the module level router for state queries
 func NewQuerier(keeper Keeper) sdk.Querier {
 	return func(ctx sdk.Context, path []string, req abci.RequestQuery) ([]byte, sdk.Error) {
 		switch path[0] {
-		case QueryDID:
+		case types.QueryDID:
 			return queryDID(ctx, path[1:], req, keeper)
 		default:
 			return nil, sdk.ErrUnknownRequest("unknown did query endpoint")
@@ -23,12 +19,8 @@ func NewQuerier(keeper Keeper) sdk.Querier {
 	}
 }
 
-type QueryDIDParams struct {
-	DID types.DID
-}
-
 func queryDID(ctx sdk.Context, path []string, req abci.RequestQuery, k Keeper) ([]byte, sdk.Error) {
-	var params QueryDIDParams
+	var params types.QueryDIDParams
 	err := k.Codec().UnmarshalJSON(req.Data, &params)
 	if err != nil {
 		return nil, sdk.ErrUnknownRequest(sdk.AppendMsgToErr("incorrectly formated request data", err.Error()))

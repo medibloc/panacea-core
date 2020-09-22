@@ -1,4 +1,4 @@
-package did
+package keeper
 
 import (
 	"bytes"

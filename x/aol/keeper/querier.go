@@ -1,33 +1,25 @@
-package aol
+package keeper
 
 import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/medibloc/panacea-core/x/aol/types"
 	abci "github.com/tendermint/tendermint/abci/types"
-)
-
-// query endpoints supported by the aol querier
-const (
-	QueryListTopic  = "listTopic"
-	QueryTopic      = "topic"
-	QueryListWriter = "listWriter"
-	QueryWriter     = "writer"
-	QueryRecord     = "record"
 )
 
 // NewQuerier is the module level router for state queries
 func NewQuerier(keeper Keeper) sdk.Querier {
 	return func(ctx sdk.Context, path []string, req abci.RequestQuery) ([]byte, sdk.Error) {
 		switch path[0] {
-		case QueryListTopic:
+		case types.QueryListTopic:
 			return queryListTopic(ctx, path[1:], req, keeper)
-		case QueryTopic:
+		case types.QueryTopic:
 			return queryTopic(ctx, path[1:], req, keeper)
-		case QueryListWriter:
+		case types.QueryListWriter:
 			return queryListWriter(ctx, path[1:], req, keeper)
-		case QueryWriter:
+		case types.QueryWriter:
 			return queryWriter(ctx, path[1:], req, keeper)
-		case QueryRecord:
+		case types.QueryRecord:
 			return queryRecord(ctx, path[1:], req, keeper)
 		default:
 			return nil, sdk.ErrUnknownRequest("unknown aol query endpoint")
@@ -35,12 +27,8 @@ func NewQuerier(keeper Keeper) sdk.Querier {
 	}
 }
 
-type QueryListTopicParams struct {
-	Owner sdk.AccAddress
-}
-
 func queryListTopic(ctx sdk.Context, path []string, req abci.RequestQuery, k Keeper) ([]byte, sdk.Error) {
-	var params QueryListTopicParams
+	var params types.QueryListTopicParams
 	err := k.cdc.UnmarshalJSON(req.Data, &params)
 	if err != nil {
 		return nil, sdk.ErrUnknownRequest(sdk.AppendMsgToErr("incorrectly formatted request data", err.Error()))
@@ -53,13 +41,8 @@ func queryListTopic(ctx sdk.Context, path []string, req abci.RequestQuery, k Kee
 	return bz, nil
 }
 
-type QueryTopicParams struct {
-	Owner     sdk.AccAddress
-	TopicName string
-}
-
 func queryTopic(ctx sdk.Context, path []string, req abci.RequestQuery, k Keeper) ([]byte, sdk.Error) {
-	var params QueryTopicParams
+	var params types.QueryTopicParams
 	err := k.cdc.UnmarshalJSON(req.Data, &params)
 	if err != nil {
 		return nil, sdk.ErrUnknownRequest(sdk.AppendMsgToErr("incorrectly formatted request data", err.Error()))
@@ -72,13 +55,8 @@ func queryTopic(ctx sdk.Context, path []string, req abci.RequestQuery, k Keeper)
 	return bz, nil
 }
 
-type QueryListWriterParams struct {
-	Owner     sdk.AccAddress
-	TopicName string
-}
-
 func queryListWriter(ctx sdk.Context, path []string, req abci.RequestQuery, k Keeper) ([]byte, sdk.Error) {
-	var params QueryListWriterParams
+	var params types.QueryListWriterParams
 	err := k.cdc.UnmarshalJSON(req.Data, &params)
 	if err != nil {
 		return nil, sdk.ErrUnknownRequest(sdk.AppendMsgToErr("incorrectly formatted request data", err.Error()))
@@ -91,14 +69,8 @@ func queryListWriter(ctx sdk.Context, path []string, req abci.RequestQuery, k Ke
 	return bz, nil
 }
 
-type QueryWriterParams struct {
-	Owner     sdk.AccAddress
-	TopicName string
-	Writer    sdk.AccAddress
-}
-
 func queryWriter(ctx sdk.Context, path []string, req abci.RequestQuery, k Keeper) ([]byte, sdk.Error) {
-	var params QueryWriterParams
+	var params types.QueryWriterParams
 	err := k.cdc.UnmarshalJSON(req.Data, &params)
 	if err != nil {
 		return nil, sdk.ErrUnknownRequest(sdk.AppendMsgToErr("incorrectly formatted request data", err.Error()))
@@ -111,14 +83,8 @@ func queryWriter(ctx sdk.Context, path []string, req abci.RequestQuery, k Keeper
 	return bz, nil
 }
 
-type QueryRecordParams struct {
-	Owner     sdk.AccAddress
-	TopicName string
-	Offset    uint64
-}
-
 func queryRecord(ctx sdk.Context, path []string, req abci.RequestQuery, k Keeper) ([]byte, sdk.Error) {
-	var params QueryRecordParams
+	var params types.QueryRecordParams
 	err := k.cdc.UnmarshalJSON(req.Data, &params)
 	if err != nil {
 		return nil, sdk.ErrUnknownRequest(sdk.AppendMsgToErr("incorrectly formatted request data", err.Error()))
