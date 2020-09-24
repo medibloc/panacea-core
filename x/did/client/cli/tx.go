@@ -30,17 +30,12 @@ const (
 
 func GetCmdCreateDID(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "create-did [network-id]",
+		Use:   "create-did",
 		Short: "Create a DID",
-		Args:  cobra.ExactArgs(1),
+		Args:  cobra.ExactArgs(0),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			txBldr := authtxb.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
 			cliCtx := context.NewCLIContext().WithCodec(cdc).WithAccountDecoder(cdc)
-
-			networkID, err := types.NewNetworkID(args[0])
-			if err != nil {
-				return err
-			}
 
 			mnemonic, bip39Passphrase, err := readBIP39ParamsFrom(viper.GetBool(flagInteractive), client.BufferStdin())
 			if err != nil {
@@ -51,7 +46,7 @@ func GetCmdCreateDID(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			msg, err := newMsgCreateDID(cliCtx, networkID, privKey)
+			msg, err := newMsgCreateDID(cliCtx, privKey)
 			if err != nil {
 				return err
 			}
@@ -71,9 +66,9 @@ func GetCmdCreateDID(cdc *codec.Codec) *cobra.Command {
 // newMsgCreateDID creates a MsgCreateDID by generating a DID and a DID document from the networkID and privKey.
 // It generates the minimal DID document which contains only one public key information,
 // so that it can be extended by MsgUpdateDID later.
-func newMsgCreateDID(cliCtx context.CLIContext, networkID types.NetworkID, privKey secp256k1.PrivKeySecp256k1) (types.MsgCreateDID, error) {
+func newMsgCreateDID(cliCtx context.CLIContext, privKey secp256k1.PrivKeySecp256k1) (types.MsgCreateDID, error) {
 	pubKey := privKey.PubKey()
-	did := types.NewDID(networkID, pubKey, types.ES256K)
+	did := types.NewDID(pubKey, types.ES256K)
 	veriMethodID := types.NewVeriMethodID(did, "key1")
 	doc := types.NewDIDDocument(did, types.NewVeriMethod(veriMethodID, types.ES256K, did, pubKey))
 

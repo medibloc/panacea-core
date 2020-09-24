@@ -17,49 +17,36 @@ func TestNewDID(t *testing.T) {
 	privKey := secp256k1.GenPrivKey()
 	pubKey := privKey.PubKey()
 
-	did := NewDID(Mainnet, pubKey, ES256K)
-	regex := fmt.Sprintf("^did:panacea:mainnet:[%s]{21,22}$", Base58Charset)
+	did := NewDID(pubKey, ES256K)
+	regex := fmt.Sprintf("^did:panacea:[%s]{32,44}$", Base58Charset)
 	require.Regexp(t, regex, did)
 }
 
 func TestParseDID(t *testing.T) {
-	str := "did:panacea:testnet:KS5zGZt66Me8MCctZBYrP"
+	str := "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm"
 	did, err := ParseDID(str)
 	require.NoError(t, err)
 	require.EqualValues(t, str, did)
 
-	str = "did:panacea:t1estnet:KS5zGZt66Me8MCctZBYrP"
+	str = "did:panacea:7Prd74ry1Uct87nZqL3n"
 	_, err = ParseDID(str)
 	require.EqualError(t, err, ErrInvalidDID(str).Error())
 }
 
 func TestDID_Empty(t *testing.T) {
 	require.True(t, DID("").Empty())
-	require.False(t, DID("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP").Empty())
+	require.False(t, DID("did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm").Empty())
 }
 
 func TestDID_GetSignBytes(t *testing.T) {
-	did := DID("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP")
+	did := DID("did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm")
 	var did2 DID
 	require.NoError(t, codec.New().UnmarshalJSON(did.GetSignBytes(), &did2))
 	require.Equal(t, did, did2)
 }
 
-func TestNewNetworkID(t *testing.T) {
-	id, err := NewNetworkID("mainnet")
-	require.NoError(t, err)
-	require.Equal(t, Mainnet, id)
-
-	id, err = NewNetworkID("testnet")
-	require.NoError(t, err)
-	require.Equal(t, Testnet, id)
-
-	_, err = NewNetworkID("testn124et")
-	require.EqualError(t, err, ErrInvalidNetworkID("testn124et").Error())
-}
-
 func TestNewDIDDocument(t *testing.T) {
-	did := DID("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP")
+	did := DID("did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm")
 	veriMethodID := NewVeriMethodID(did, "key1")
 	veriMethod := NewVeriMethod(veriMethodID, ES256K, did, secp256k1.GenPrivKey().PubKey())
 
@@ -78,7 +65,7 @@ func TestDIDDocument_Empty(t *testing.T) {
 }
 
 func TestDIDDocument_VeriMethodByID(t *testing.T) {
-	did := DID("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP")
+	did := DID("did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm")
 	veriMethodID := NewVeriMethodID(did, "key1")
 	veriMethod := NewVeriMethod(veriMethodID, ES256K, did, secp256k1.GenPrivKey().PubKey())
 	doc := NewDIDDocument(did, veriMethod)
@@ -130,7 +117,7 @@ func TestContexts_UnmarshalJSON(t *testing.T) {
 }
 
 func TestNewVeriMethodID(t *testing.T) {
-	did := DID("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP")
+	did := DID("did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm")
 	expectedID := fmt.Sprintf("%s#key1", did)
 	id := NewVeriMethodID(did, "key1")
 	require.True(t, id.Valid(did))
@@ -143,27 +130,27 @@ func TestNewVeriMethodID(t *testing.T) {
 
 func TestVeriMethodID_Valid(t *testing.T) {
 	// normal
-	require.True(t, VeriMethodID("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP#key1").Valid("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP"))
+	require.True(t, VeriMethodID("did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm#key1").Valid("did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm"))
 
 	// if suffix has whitespaces
-	require.False(t, VeriMethodID("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP# key1").Valid("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP"))
-	require.False(t, VeriMethodID("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP#key1 ").Valid("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP"))
+	require.False(t, VeriMethodID("did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm# key1").Valid("did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm"))
+	require.False(t, VeriMethodID("did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm#key1 ").Valid("did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm"))
 
 	// if suffix is empty
-	require.False(t, VeriMethodID("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP#").Valid("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP"))
-	require.False(t, VeriMethodID("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP").Valid("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP"))
+	require.False(t, VeriMethodID("did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm#").Valid("did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm"))
+	require.False(t, VeriMethodID("did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm").Valid("did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm"))
 
 	// if prefix (DID) is invalid
-	require.False(t, VeriMethodID("invalid#key1").Valid("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP"))
-	require.False(t, VeriMethodID("did:panacea:mainnet:KS5zGZt66Me8MCctZBYrP#key1").Valid("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP"))
+	require.False(t, VeriMethodID("invalid#key1").Valid("did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm"))
+	require.False(t, VeriMethodID("did:panacea:87nZqL3ny7aR7C7Prd74ry1Uctg46JamVbJgk8azVgUm#key1").Valid("did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm"))
 
 	// if suffix is too long
 	var builder strings.Builder
-	builder.WriteString("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP#")
+	builder.WriteString("did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm#")
 	for i := 0; i < maxVeriMethodIDLen+1; i++ {
 		builder.WriteByte('k')
 	}
-	require.False(t, VeriMethodID(builder.String()).Valid("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP"))
+	require.False(t, VeriMethodID(builder.String()).Valid("did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm"))
 }
 
 func TestKeyType_Valid(t *testing.T) {
@@ -172,7 +159,7 @@ func TestKeyType_Valid(t *testing.T) {
 }
 
 func TestNewVeriMethod(t *testing.T) {
-	did := DID("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP")
+	did := DID("did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm")
 	pubKey := secp256k1.GenPrivKey().PubKey()
 	pub := NewVeriMethod(NewVeriMethodID(did, "key1"), ES256K, did, pubKey)
 	require.True(t, pub.Valid(did))
@@ -182,7 +169,7 @@ func TestNewVeriMethod(t *testing.T) {
 }
 
 func TestAuthentication_Valid(t *testing.T) {
-	did := DID("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP")
+	did := DID("did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm")
 	veriMethodID := NewVeriMethodID(did, "key1")
 	veriMethod := NewVeriMethod(veriMethodID, ES256K, did, secp256k1.GenPrivKey().PubKey())
 
@@ -200,7 +187,7 @@ func TestAuthentication_Valid(t *testing.T) {
 }
 
 func TestAuthentication_MarshalJSON(t *testing.T) {
-	did := DID("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP")
+	did := DID("did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm")
 	veriMethodID := NewVeriMethodID(did, "key1")
 	veriMethod := NewVeriMethod(veriMethodID, ES256K, did, secp256k1.GenPrivKey().PubKey())
 
@@ -217,7 +204,7 @@ func TestAuthentication_MarshalJSON(t *testing.T) {
 }
 
 func TestAuthentication_UnmarshalJSON(t *testing.T) {
-	did := DID("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP")
+	did := DID("did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm")
 	veriMethodID := NewVeriMethodID(did, "key1")
 	veriMethod := NewVeriMethod(veriMethodID, ES256K, did, secp256k1.GenPrivKey().PubKey())
 
@@ -255,7 +242,7 @@ func TestDIDDocumentWithSeq_Deactivate(t *testing.T) {
 }
 
 func getValidDIDDocument() DIDDocument {
-	did := DID("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP")
+	did := DID("did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm")
 	veriMethodID := NewVeriMethodID(did, "key1")
 	veriMethod := NewVeriMethod(veriMethodID, ES256K, did, secp256k1.GenPrivKey().PubKey())
 	return NewDIDDocument(did, veriMethod)

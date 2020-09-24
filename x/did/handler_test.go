@@ -225,7 +225,7 @@ func (k mockKeeper) ListDIDs(ctx sdk.Context) []types.DID {
 }
 
 func ctx() (types.DID, types.DIDDocumentWithSeq, crypto.PrivKey, types.VeriMethodID, Keeper) {
-	did := types.DID("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP")
+	did := types.DID("did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm")
 	doc, privKey := newDIDDocumentWithSeq(did)
 	return did, doc, privKey, doc.Document.VeriMethods[0].ID, newMockKeeper()
 }

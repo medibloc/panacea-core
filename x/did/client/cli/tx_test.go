@@ -3,11 +3,12 @@ package cli
 import (
 	"bufio"
 	"fmt"
-	"github.com/cosmos/cosmos-sdk/client"
-	"github.com/spf13/viper"
 	"os"
 	"strings"
 	"testing"
+
+	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/spf13/viper"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
@@ -32,7 +33,7 @@ func TestNewMsgCreateDID(t *testing.T) {
 	privKey, _ := crypto.GenSecp256k1PrivKey("", "")
 
 	// create a message
-	msg, err := newMsgCreateDID(getCliContext(t), "testnet", privKey)
+	msg, err := newMsgCreateDID(getCliContext(t), privKey)
 	require.NoError(t, err)
 
 	// check if veriMethod is correct
