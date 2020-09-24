@@ -1,6 +1,9 @@
 package aol
 
-import "github.com/medibloc/panacea-core/x/aol/types"
+import (
+	"github.com/medibloc/panacea-core/x/aol/keeper"
+	"github.com/medibloc/panacea-core/x/aol/types"
+)
 
 const (
 	ModuleName   = types.ModuleName
@@ -12,9 +15,12 @@ const (
 var (
 	RegisterCodec = types.RegisterCodec
 	ModuleCdc     = types.ModuleCdc
+	NewKeeper     = keeper.NewKeeper
 )
 
 type (
+	Keeper = keeper.Keeper
+
 	MsgCreateTopic  = types.MsgCreateTopic
 	MsgAddWriter    = types.MsgAddWriter
 	MsgDeleteWriter = types.MsgDeleteWriter

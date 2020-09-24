@@ -4,18 +4,6 @@ import (
 	"io"
 	"os"
 
-	keeper2 "github.com/medibloc/panacea-core/x/did/keeper"
-
-	"github.com/medibloc/panacea-core/x/aol/keeper"
-
-	"github.com/medibloc/panacea-core/x/aol"
-	"github.com/medibloc/panacea-core/x/did"
-
-	abci "github.com/tendermint/tendermint/abci/types"
-	cmn "github.com/tendermint/tendermint/libs/common"
-	"github.com/tendermint/tendermint/libs/log"
-	dbm "github.com/tendermint/tm-db"
-
 	bam "github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/simapp"
@@ -35,6 +23,14 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/slashing"
 	"github.com/cosmos/cosmos-sdk/x/staking"
 	"github.com/cosmos/cosmos-sdk/x/supply"
+
+	"github.com/medibloc/panacea-core/x/aol"
+	"github.com/medibloc/panacea-core/x/did"
+
+	abci "github.com/tendermint/tendermint/abci/types"
+	cmn "github.com/tendermint/tendermint/libs/common"
+	"github.com/tendermint/tendermint/libs/log"
+	dbm "github.com/tendermint/tm-db"
 )
 
 const appName = "PanaceaApp"
@@ -99,8 +95,8 @@ type PanaceaApp struct {
 	govKeeper      gov.Keeper
 	crisisKeeper   crisis.Keeper
 	paramsKeeper   params.Keeper
-	aolKeeper      keeper.Keeper
-	didKeeper      keeper2.Keeper
+	aolKeeper      aol.Keeper
+	didKeeper      did.Keeper
 
 	// the module manager
 	mm *module.Manager
@@ -212,11 +208,11 @@ func NewPanaceaApp(
 		app.supplyKeeper,
 		auth.FeeCollectorName,
 	)
-	app.aolKeeper = keeper.NewKeeper(
+	app.aolKeeper = aol.NewKeeper(
 		keys[aol.StoreKey],
 		app.cdc,
 	)
-	app.didKeeper = keeper2.NewKeeper(
+	app.didKeeper = did.NewKeeper(
 		keys[did.StoreKey],
 		app.cdc,
 	)
