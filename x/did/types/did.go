@@ -22,7 +22,10 @@ type DID string
 
 func NewDID(pubKey crypto.PubKey, keyType KeyType) DID {
 	hash := sha256.New()
-	hash.Write(getPubKeyBytes(pubKey, keyType))
+	_, err := hash.Write(getPubKeyBytes(pubKey, keyType))
+	if err != nil {
+		panic("failed to calculate SHA256 for DID")
+	}
 	idStr := base58.Encode(hash.Sum(nil))
 	return DID(fmt.Sprintf("did:%s:%s", DIDMethod, idStr))
 }
