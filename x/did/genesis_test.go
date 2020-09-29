@@ -18,9 +18,9 @@ func TestGenesis(t *testing.T) {
 	ctx := sdk.Context{}
 
 	// prepare a keeper with some data
-	did1 := types.DID("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP")
+	did1 := types.DID("did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm")
 	doc1, _ := newDIDDocumentWithSeq(did1)
-	did2 := types.DID("did:panacea:testnet:6Me8MCctZBYrPKS5zGZt6")
+	did2 := types.DID("did:panacea:46JamVbJgk8azVgUm7Prd74ry1Uct87nZqL3ny7aR7Cg")
 	doc2, _ := newDIDDocumentWithSeq(did2)
 	keeper := newMockKeeper()
 	keeper.SetDIDDocument(ctx, did1, doc1)

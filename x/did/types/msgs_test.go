@@ -35,7 +35,7 @@ func TestMsgCreateDID(t *testing.T) {
 	require.Equal(t, fromAddr, msg.GetSigners()[0])
 
 	require.Equal(t,
-		`{"type":"did/MsgCreateDID","value":{"did":"did:panacea:testnet:KS5zGZt66Me8MCctZBYrP","document":{"@context":"https://www.w3.org/ns/did/v1","authentication":["did:panacea:testnet:KS5zGZt66Me8MCctZBYrP#key1"],"id":"did:panacea:testnet:KS5zGZt66Me8MCctZBYrP","verificationMethod":[{"controller":"did:panacea:testnet:KS5zGZt66Me8MCctZBYrP","id":"did:panacea:testnet:KS5zGZt66Me8MCctZBYrP#key1","publicKeyBase58":"qoRmLNBEXoaKDE8dKffMq2DBNxacTEfvbKRuFrccYW1b","type":"Secp256k1VerificationKey2018"}]},"from_address":"panacea154p6kyu9kqgvcmq63w3vpn893ssy6anpu8ykfq","signature":"bXktc2ln","verification_method_id":"did:panacea:testnet:KS5zGZt66Me8MCctZBYrP#key1"}}`,
+		`{"type":"did/MsgCreateDID","value":{"did":"did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm","document":{"@context":"https://www.w3.org/ns/did/v1","authentication":["did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm#key1"],"id":"did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm","verificationMethod":[{"controller":"did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm","id":"did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm#key1","publicKeyBase58":"qoRmLNBEXoaKDE8dKffMq2DBNxacTEfvbKRuFrccYW1b","type":"Secp256k1VerificationKey2018"}]},"from_address":"panacea154p6kyu9kqgvcmq63w3vpn893ssy6anpu8ykfq","signature":"bXktc2ln","verification_method_id":"did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm#key1"}}`,
 		string(msg.GetSignBytes()),
 	)
 }
@@ -59,7 +59,7 @@ func TestMsgUpdateDID(t *testing.T) {
 	require.Equal(t, fromAddr, msg.GetSigners()[0])
 
 	require.Equal(t,
-		`{"type":"did/MsgUpdateDID","value":{"did":"did:panacea:testnet:KS5zGZt66Me8MCctZBYrP","document":{"@context":"https://www.w3.org/ns/did/v1","authentication":["did:panacea:testnet:KS5zGZt66Me8MCctZBYrP#key1"],"id":"did:panacea:testnet:KS5zGZt66Me8MCctZBYrP","verificationMethod":[{"controller":"did:panacea:testnet:KS5zGZt66Me8MCctZBYrP","id":"did:panacea:testnet:KS5zGZt66Me8MCctZBYrP#key1","publicKeyBase58":"qoRmLNBEXoaKDE8dKffMq2DBNxacTEfvbKRuFrccYW1b","type":"Secp256k1VerificationKey2018"}]},"from_address":"panacea154p6kyu9kqgvcmq63w3vpn893ssy6anpu8ykfq","signature":"bXktc2ln","verification_method_id":"did:panacea:testnet:KS5zGZt66Me8MCctZBYrP#key1"}}`,
+		`{"type":"did/MsgUpdateDID","value":{"did":"did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm","document":{"@context":"https://www.w3.org/ns/did/v1","authentication":["did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm#key1"],"id":"did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm","verificationMethod":[{"controller":"did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm","id":"did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm#key1","publicKeyBase58":"qoRmLNBEXoaKDE8dKffMq2DBNxacTEfvbKRuFrccYW1b","type":"Secp256k1VerificationKey2018"}]},"from_address":"panacea154p6kyu9kqgvcmq63w3vpn893ssy6anpu8ykfq","signature":"bXktc2ln","verification_method_id":"did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm#key1"}}`,
 		string(msg.GetSignBytes()),
 	)
 }
@@ -82,7 +82,7 @@ func TestDeactivateDID(t *testing.T) {
 	require.Equal(t, fromAddr, msg.GetSigners()[0])
 
 	require.Equal(t,
-		`{"type":"did/MsgDeactivateDID","value":{"did":"did:panacea:testnet:KS5zGZt66Me8MCctZBYrP","from_address":"panacea154p6kyu9kqgvcmq63w3vpn893ssy6anpu8ykfq","signature":"bXktc2ln","verification_method_id":"did:panacea:testnet:KS5zGZt66Me8MCctZBYrP#key1"}}`,
+		`{"type":"did/MsgDeactivateDID","value":{"did":"did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm","from_address":"panacea154p6kyu9kqgvcmq63w3vpn893ssy6anpu8ykfq","signature":"bXktc2ln","verification_method_id":"did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm#key1"}}`,
 		string(msg.GetSignBytes()),
 	)
 }
@@ -94,7 +94,7 @@ func getFromAddress(t *testing.T) sdk.AccAddress {
 }
 
 func newDIDDocument() types.DIDDocument {
-	did, _ := types.ParseDID("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP")
+	did, _ := types.ParseDID("did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm")
 	veriMethodID := types.NewVeriMethodID(did, "key1")
 	pubKeyBase58, _ := types.NewPubKeyFromBase58("qoRmLNBEXoaKDE8dKffMq2DBNxacTEfvbKRuFrccYW1b")
 	veriMethod := types.NewVeriMethod(veriMethodID, types.ES256K, did, pubKeyBase58)
