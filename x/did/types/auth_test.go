@@ -10,7 +10,7 @@ import (
 )
 
 func TestMustGetSignBytesWithSeq(t *testing.T) {
-	did := DID("did:panacea:testnet:UCqMYBSt8efvLQ59wNmMo")
+	did := DID("did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm")
 	signBytes := mustGetSignBytesWithSeq(did, Sequence(100))
 	require.NotNil(t, signBytes)
 
@@ -30,7 +30,7 @@ func TestSequence(t *testing.T) {
 }
 
 func TestSignVerify(t *testing.T) {
-	did := DID("did:panacea:testnet:UCqMYBSt8efvLQ59wNmMo")
+	did := DID("did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm")
 	privKey := secp256k1.GenPrivKey()
 	seq := Sequence(100)
 

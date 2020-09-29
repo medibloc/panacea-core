@@ -13,7 +13,7 @@ import (
 
 var (
 	baseDir = "my_keystore"
-	address = "did:panacea:mainnet:DnreD8QqXAQaEW9DwC16Wh#key1"
+	address = "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm#key1"
 	passwd  = "nein-danke"
 	priv    = secp256k1.GenPrivKey()
 )

@@ -8,7 +8,7 @@ import (
 )
 
 func TestGenesisDIDDocumentKey(t *testing.T) {
-	key := GenesisDIDDocumentKey{DID: types.DID("did:panacea:testnet:KS5zGZt66Me8MCctZBYrP")}
+	key := GenesisDIDDocumentKey{DID: types.DID("did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm")}
 
 	var newKey GenesisDIDDocumentKey
 	require.NoError(t, newKey.Unmarshal(key.Marshal()))

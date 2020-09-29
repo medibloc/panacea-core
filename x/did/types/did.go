@@ -1,6 +1,7 @@
 package types
 
 import (
+	"crypto/sha256"
 	"encoding/json"
 	"fmt"
 	"regexp"
@@ -19,9 +20,14 @@ const (
 
 type DID string
 
-func NewDID(networkID NetworkID, pubKey crypto.PubKey, keyType KeyType) DID {
-	idStr := newPubKeyBase58(pubKey, keyType, 16)
-	return DID(fmt.Sprintf("did:%s:%s:%s", DIDMethod, networkID, idStr))
+func NewDID(pubKey crypto.PubKey, keyType KeyType) DID {
+	hash := sha256.New()
+	_, err := hash.Write(getPubKeyBytes(pubKey, keyType))
+	if err != nil {
+		panic("failed to calculate SHA256 for DID")
+	}
+	idStr := base58.Encode(hash.Sum(nil))
+	return DID(fmt.Sprintf("did:%s:%s", DIDMethod, idStr))
 }
 
 func ParseDID(str string) (DID, error) {
@@ -40,7 +46,7 @@ func (did DID) Valid() bool {
 
 func didRegex() string {
 	// https://www.w3.org/TR/did-core/#did-syntax
-	return fmt.Sprintf("did:panacea:%s:[%s]{21,22}", networkIDRegex(), Base58Charset)
+	return fmt.Sprintf("did:%s:[%s]{32,44}", DIDMethod, Base58Charset)
 }
 
 func (did DID) Empty() bool {
@@ -50,27 +56,6 @@ func (did DID) Empty() bool {
 // GetSignBytes returns a byte array which is used to generate a signature for verifying DID ownership.
 func (did DID) GetSignBytes() []byte {
 	return sdk.MustSortJSON(didCodec.MustMarshalJSON(did))
-}
-
-type NetworkID string
-
-const (
-	Mainnet NetworkID = "mainnet"
-	Testnet NetworkID = "testnet"
-)
-
-func NewNetworkID(str string) (NetworkID, error) {
-	switch NetworkID(str) {
-	case Mainnet:
-		return Mainnet, nil
-	case Testnet:
-		return Testnet, nil
-	}
-	return "", ErrInvalidNetworkID(str)
-}
-
-func networkIDRegex() string {
-	return fmt.Sprintf("(%s|%s)", Mainnet, Testnet)
 }
 
 type DIDDocument struct {
@@ -273,29 +258,8 @@ func NewVeriMethod(id VeriMethodID, keyType KeyType, controller DID, key crypto.
 		ID:           id,
 		Type:         keyType,
 		Controller:   controller,
-		PubKeyBase58: newPubKeyBase58(key, keyType, 0),
+		PubKeyBase58: base58.Encode(getPubKeyBytes(key, keyType)),
 	}
-}
-
-func newPubKeyBase58(key crypto.PubKey, keyType KeyType, truncateLen int) string {
-	switch keyType {
-	case ES256K:
-		return encodePubKeyES256K(key, truncateLen)
-	}
-	panic(fmt.Sprintf("unsupported pubkey type: %v", keyType))
-}
-
-func encodePubKeyES256K(key crypto.PubKey, truncateLen int) string {
-	keyES256K := key.(secp256k1.PubKeySecp256k1)
-
-	var k []byte
-	if truncateLen > 0 {
-		k = keyES256K[:truncateLen]
-	} else {
-		k = keyES256K[:]
-	}
-
-	return base58.Encode(k)
 }
 
 func (pk VeriMethod) Valid(did DID) bool {
@@ -427,4 +391,13 @@ func NewPubKeyFromBase58(b58 string) (secp256k1.PubKeySecp256k1, error) {
 	}
 	copy(key[:], decoded)
 	return key, nil
+}
+
+func getPubKeyBytes(key crypto.PubKey, keyType KeyType) []byte {
+	switch keyType {
+	case ES256K:
+		bz := key.(secp256k1.PubKeySecp256k1)
+		return bz[:]
+	}
+	panic(fmt.Sprintf("unsupported pubkey type: %v", keyType))
 }
