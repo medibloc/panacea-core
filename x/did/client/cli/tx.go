@@ -11,10 +11,10 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/context"
-	"github.com/cosmos/cosmos-sdk/client/utils"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	authtxb "github.com/cosmos/cosmos-sdk/x/auth/client/txbuilder"
+	"github.com/cosmos/cosmos-sdk/x/auth"
+	"github.com/cosmos/cosmos-sdk/x/auth/client/utils"
 	"github.com/cosmos/go-bip39"
 	didcrypto "github.com/medibloc/panacea-core/x/did/client/crypto"
 	"github.com/medibloc/panacea-core/x/did/types"
@@ -28,16 +28,34 @@ const (
 	flagInteractive = "interactive"
 )
 
+// GetTxCmd returns the transaction commands for this module
+func GetTxCmd(cdc *codec.Codec) *cobra.Command {
+	didTxCmd := &cobra.Command{
+		Use:   types.ModuleName,
+		Short: "did transaction subcommands",
+	}
+
+	didTxCmd.AddCommand(client.PostCommands(
+		GetCmdCreateDID(cdc),
+		GetCmdUpdateDID(cdc),
+		GetCmdDeactivateDID(cdc),
+	)...)
+
+	return didTxCmd
+}
+
 func GetCmdCreateDID(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "create-did",
 		Short: "Create a DID",
 		Args:  cobra.ExactArgs(0),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			txBldr := authtxb.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
-			cliCtx := context.NewCLIContext().WithCodec(cdc).WithAccountDecoder(cdc)
+			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
-			mnemonic, bip39Passphrase, err := readBIP39ParamsFrom(viper.GetBool(flagInteractive), client.BufferStdin())
+			inBuf := bufio.NewReader(cmd.InOrStdin())
+
+			mnemonic, bip39Passphrase, err := readBIP39ParamsFrom(viper.GetBool(flagInteractive), inBuf)
 			if err != nil {
 				return err
 			}
@@ -51,11 +69,11 @@ func GetCmdCreateDID(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			if err := savePrivKeyToKeyStore(msg.VeriMethodID, privKey, client.BufferStdin()); err != nil {
+			if err := savePrivKeyToKeyStore(msg.VeriMethodID, privKey, inBuf); err != nil {
 				return err
 			}
 
-			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg}, false)
+			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg})
 		},
 	}
 
@@ -90,8 +108,10 @@ func GetCmdUpdateDID(cdc *codec.Codec) *cobra.Command {
 		Short: "Update a DID Document",
 		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			txBldr := authtxb.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
-			cliCtx := context.NewCLIContext().WithCodec(cdc).WithAccountDecoder(cdc)
+			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
+
+			inBuf := bufio.NewReader(cmd.InOrStdin())
 
 			did, err := types.ParseDID(args[0])
 			if err != nil {
@@ -106,7 +126,7 @@ func GetCmdUpdateDID(cdc *codec.Codec) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			privKey, err := getPrivKeyFromKeyStore(veriMethodID, client.BufferStdin())
+			privKey, err := getPrivKeyFromKeyStore(veriMethodID, inBuf)
 			if err != nil {
 				return err
 			}
@@ -121,7 +141,7 @@ func GetCmdUpdateDID(cdc *codec.Codec) *cobra.Command {
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
-			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg}, false)
+			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg})
 		},
 	}
 	return cmd
@@ -133,8 +153,10 @@ func GetCmdDeactivateDID(cdc *codec.Codec) *cobra.Command {
 		Short: "Deactivate a DID Document",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			txBldr := authtxb.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
-			cliCtx := context.NewCLIContext().WithCodec(cdc).WithAccountDecoder(cdc)
+			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
+
+			inBuf := bufio.NewReader(cmd.InOrStdin())
 
 			did, err := types.ParseDID(args[0])
 			if err != nil {
@@ -144,7 +166,7 @@ func GetCmdDeactivateDID(cdc *codec.Codec) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			privKey, err := getPrivKeyFromKeyStore(veriMethodID, client.BufferStdin())
+			privKey, err := getPrivKeyFromKeyStore(veriMethodID, inBuf)
 			if err != nil {
 				return err
 			}
@@ -159,7 +181,7 @@ func GetCmdDeactivateDID(cdc *codec.Codec) *cobra.Command {
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
-			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg}, false)
+			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg})
 		},
 	}
 	return cmd

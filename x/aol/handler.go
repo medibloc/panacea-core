@@ -3,12 +3,14 @@ package aol
 import (
 	"fmt"
 
+	"github.com/medibloc/panacea-core/x/aol/keeper"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/medibloc/panacea-core/x/aol/types"
 )
 
 // NewHandler returns a handler for "aol" type messages
-func NewHandler(keeper Keeper) sdk.Handler {
+func NewHandler(keeper keeper.Keeper) sdk.Handler {
 	return func(ctx sdk.Context, msg sdk.Msg) sdk.Result {
 		switch msg := msg.(type) {
 		case MsgCreateTopic:
@@ -26,7 +28,7 @@ func NewHandler(keeper Keeper) sdk.Handler {
 	}
 }
 
-func handleMsgCreateTopic(ctx sdk.Context, keeper Keeper, msg MsgCreateTopic) sdk.Result {
+func handleMsgCreateTopic(ctx sdk.Context, keeper keeper.Keeper, msg MsgCreateTopic) sdk.Result {
 	if keeper.HasTopic(ctx, msg.OwnerAddress, msg.TopicName) {
 		return types.ErrTopicExists(msg.TopicName).Result()
 	}
@@ -39,7 +41,7 @@ func handleMsgCreateTopic(ctx sdk.Context, keeper Keeper, msg MsgCreateTopic) sd
 	return sdk.Result{}
 }
 
-func handleMsgAddWriter(ctx sdk.Context, keeper Keeper, msg MsgAddWriter) sdk.Result {
+func handleMsgAddWriter(ctx sdk.Context, keeper keeper.Keeper, msg MsgAddWriter) sdk.Result {
 	if !keeper.HasTopic(ctx, msg.OwnerAddress, msg.TopicName) {
 		return types.ErrTopicNotFound(msg.TopicName).Result()
 	}
@@ -56,7 +58,7 @@ func handleMsgAddWriter(ctx sdk.Context, keeper Keeper, msg MsgAddWriter) sdk.Re
 	return sdk.Result{}
 }
 
-func handleMsgDeleteWriter(ctx sdk.Context, keeper Keeper, msg MsgDeleteWriter) sdk.Result {
+func handleMsgDeleteWriter(ctx sdk.Context, keeper keeper.Keeper, msg MsgDeleteWriter) sdk.Result {
 	if !keeper.HasWriter(ctx, msg.OwnerAddress, msg.TopicName, msg.WriterAddress) {
 		return types.ErrWriterNotFound(msg.WriterAddress).Result()
 	}
@@ -69,7 +71,7 @@ func handleMsgDeleteWriter(ctx sdk.Context, keeper Keeper, msg MsgDeleteWriter) 
 	return sdk.Result{}
 }
 
-func handleMsgAddRecord(ctx sdk.Context, keeper Keeper, msg MsgAddRecord) sdk.Result {
+func handleMsgAddRecord(ctx sdk.Context, keeper keeper.Keeper, msg MsgAddRecord) sdk.Result {
 	if !keeper.HasTopic(ctx, msg.OwnerAddress, msg.TopicName) {
 		return types.ErrTopicNotFound(msg.TopicName).Result()
 	}

@@ -3,6 +3,8 @@ package did
 import (
 	"testing"
 
+	"github.com/medibloc/panacea-core/x/did/keeper"
+
 	"github.com/tendermint/tendermint/crypto/secp256k1"
 
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -224,7 +226,7 @@ func (k mockKeeper) ListDIDs(ctx sdk.Context) []types.DID {
 	return dids
 }
 
-func ctx() (types.DID, types.DIDDocumentWithSeq, crypto.PrivKey, types.VeriMethodID, Keeper) {
+func ctx() (types.DID, types.DIDDocumentWithSeq, crypto.PrivKey, types.VeriMethodID, keeper.Keeper) {
 	did := types.DID("did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm")
 	doc, privKey := newDIDDocumentWithSeq(did)
 	return did, doc, privKey, doc.Document.VeriMethods[0].ID, newMockKeeper()

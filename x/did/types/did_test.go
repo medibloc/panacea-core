@@ -95,11 +95,11 @@ func TestContexts_Valid(t *testing.T) {
 }
 
 func TestContexts_MarshalJSON(t *testing.T) {
-	bz, err := didCodec.MarshalJSON(Contexts{ContextDIDV1})
+	bz, err := ModuleCdc.MarshalJSON(Contexts{ContextDIDV1})
 	require.NoError(t, err)
 	require.Equal(t, fmt.Sprintf(`"%v"`, ContextDIDV1), string(bz))
 
-	bz, err = didCodec.MarshalJSON(Contexts{ContextDIDV1, ContextSecurityV1})
+	bz, err = ModuleCdc.MarshalJSON(Contexts{ContextDIDV1, ContextSecurityV1})
 	require.NoError(t, err)
 	require.Equal(t, fmt.Sprintf(`["%v","%v"]`, ContextDIDV1, ContextSecurityV1), string(bz))
 }
@@ -108,11 +108,11 @@ func TestContexts_UnmarshalJSON(t *testing.T) {
 	var ctxs Contexts
 
 	bz := []byte(fmt.Sprintf(`["%v","%v"]`, ContextDIDV1, ContextSecurityV1))
-	require.NoError(t, didCodec.UnmarshalJSON(bz, &ctxs))
+	require.NoError(t, ModuleCdc.UnmarshalJSON(bz, &ctxs))
 	require.Equal(t, Contexts{ContextDIDV1, ContextSecurityV1}, ctxs)
 
 	bz = []byte(fmt.Sprintf(`"%v"`, ContextDIDV1))
-	require.NoError(t, didCodec.UnmarshalJSON(bz, &ctxs))
+	require.NoError(t, ModuleCdc.UnmarshalJSON(bz, &ctxs))
 	require.Equal(t, Contexts{ContextDIDV1}, ctxs)
 }
 

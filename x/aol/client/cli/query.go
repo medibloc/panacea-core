@@ -4,10 +4,11 @@ import (
 	"errors"
 	"strconv"
 
+	"github.com/cosmos/cosmos-sdk/client"
+
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/medibloc/panacea-core/x/aol"
 	"github.com/medibloc/panacea-core/x/aol/types"
 	"github.com/spf13/cobra"
 )
@@ -19,6 +20,24 @@ const (
 	RouteWriter     = "custom/aol/writer"
 	RouteRecord     = "custom/aol/record"
 )
+
+// GetQueryCmd returns the cli query commands for this module
+func GetQueryCmd(cdc *codec.Codec) *cobra.Command {
+	aolQueryCmd := &cobra.Command{
+		Use:   types.ModuleName,
+		Short: "Querying commands for the aol module",
+	}
+
+	aolQueryCmd.AddCommand(client.GetCommands(
+		GetCmdQueryListTopic(cdc),
+		GetCmdQueryListWriter(cdc),
+		GetCmdQueryRecord(cdc),
+		GetCmdQueryTopic(cdc),
+		GetCmdQueryWriter(cdc),
+	)...)
+
+	return aolQueryCmd
+}
 
 func GetCmdQueryListTopic(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
@@ -32,13 +51,13 @@ func GetCmdQueryListTopic(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			params := aol.QueryListTopicParams{Owner: ownerAddr}
+			params := types.QueryListTopicParams{Owner: ownerAddr}
 			bz, err := cdc.MarshalJSON(params)
 			if err != nil {
 				return err
 			}
 
-			res, err := cliCtx.QueryWithData(RouteListTopic, bz)
+			res, _, err := cliCtx.QueryWithData(RouteListTopic, bz)
 			if err != nil {
 				return err
 			}
@@ -63,7 +82,7 @@ func GetCmdQueryTopic(cdc *codec.Codec) *cobra.Command {
 			}
 			topicName := args[1]
 
-			params := aol.QueryTopicParams{
+			params := types.QueryTopicParams{
 				Owner:     ownerAddr,
 				TopicName: topicName,
 			}
@@ -72,7 +91,7 @@ func GetCmdQueryTopic(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			res, err := cliCtx.QueryWithData(RouteTopic, bz)
+			res, _, err := cliCtx.QueryWithData(RouteTopic, bz)
 			if err != nil {
 				return err
 			}
@@ -97,7 +116,7 @@ func GetCmdQueryListWriter(cdc *codec.Codec) *cobra.Command {
 			}
 			topicName := args[1]
 
-			params := aol.QueryListWriterParams{
+			params := types.QueryListWriterParams{
 				Owner:     ownerAddr,
 				TopicName: topicName,
 			}
@@ -106,7 +125,7 @@ func GetCmdQueryListWriter(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			res, err := cliCtx.QueryWithData(RouteListWriter, bz)
+			res, _, err := cliCtx.QueryWithData(RouteListWriter, bz)
 			if err != nil {
 				return err
 			}
@@ -135,7 +154,7 @@ func GetCmdQueryWriter(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			params := aol.QueryWriterParams{
+			params := types.QueryWriterParams{
 				Owner:     ownerAddr,
 				TopicName: topicName,
 				Writer:    writerAddr,
@@ -145,7 +164,7 @@ func GetCmdQueryWriter(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			res, err := cliCtx.QueryWithData(RouteWriter, bz)
+			res, _, err := cliCtx.QueryWithData(RouteWriter, bz)
 			if err != nil {
 				return err
 			}
@@ -174,7 +193,7 @@ func GetCmdQueryRecord(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			params := aol.QueryRecordParams{
+			params := types.QueryRecordParams{
 				Owner:     ownerAddr,
 				TopicName: topicName,
 				Offset:    offset,
@@ -184,7 +203,7 @@ func GetCmdQueryRecord(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			res, err := cliCtx.QueryWithData(RouteRecord, bz)
+			res, _, err := cliCtx.QueryWithData(RouteRecord, bz)
 			if err != nil {
 				return err
 			}
