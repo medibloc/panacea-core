@@ -1,97 +1,132 @@
 package init
 
 import (
-	"encoding/json"
 	"fmt"
-	"os"
-	"path/filepath"
-
-	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/server"
-
-	"github.com/medibloc/panacea-core/app"
-
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/module"
+	"github.com/cosmos/cosmos-sdk/x/crisis"
+	"github.com/cosmos/cosmos-sdk/x/distribution"
+	"github.com/cosmos/cosmos-sdk/x/genutil"
+	genutilcli "github.com/cosmos/cosmos-sdk/x/genutil/client/cli"
+	"github.com/cosmos/cosmos-sdk/x/gov"
+	"github.com/cosmos/cosmos-sdk/x/mint"
+	"github.com/cosmos/cosmos-sdk/x/slashing"
+	"github.com/cosmos/cosmos-sdk/x/staking"
+	"github.com/medibloc/panacea-core/types/assets"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-
-	cfg "github.com/tendermint/tendermint/config"
 	"github.com/tendermint/tendermint/libs/cli"
-	"github.com/tendermint/tendermint/libs/common"
+	"github.com/tendermint/tendermint/types"
+	"os"
+	"time"
 )
 
-const (
-	flagOverwrite    = "overwrite"
-	flagClientHome   = "home-client"
-	flagVestingStart = "vesting-start-time"
-	flagVestingEnd   = "vesting-end-time"
-	flagVestingAmt   = "vesting-amount"
-)
+// InitCmd wraps the genutil.InitCmd to inject specific parameters for Panacea.
+// It reads the default genesis.json, modifies and exports it.
+func InitCmd(ctx *server.Context, cdc *codec.Codec, mbm module.BasicManager, defaultNodeHome string) *cobra.Command {
+	initCmd := genutilcli.InitCmd(ctx, cdc, mbm, defaultNodeHome)
+	initCmd.PostRunE = func(cmd *cobra.Command, args []string) error {
+		config := ctx.Config
+		config.SetRoot(viper.GetString(cli.HomeFlag))
 
-type printInfo struct {
-	Moniker    string          `json:"moniker"`
-	ChainID    string          `json:"chain_id"`
-	NodeID     string          `json:"node_id"`
-	GenTxsDir  string          `json:"gentxs_dir"`
-	AppMessage json.RawMessage `json:"app_message"`
-}
+		genFile := config.GenesisFile()
+		genDoc := &types.GenesisDoc{}
 
-func displayInfo(cdc *codec.Codec, info printInfo) error {
-	out, err := codec.MarshalJSONIndent(cdc, info)
-	if err != nil {
-		return err
-	}
-
-	fmt.Fprintf(os.Stderr, "%s\n", string(out)) // nolint: errcheck
-	return nil
-}
-
-// InitCmd returns a command that initializes all files needed for Tendermint
-// and the respective application.
-func InitCmd(ctx *server.Context, cdc *codec.Codec) *cobra.Command { // nolint: golint
-	cmd := &cobra.Command{
-		Use:   "init [moniker]",
-		Short: "Initialize private validator, p2p, genesis, and application configuration files",
-		Long:  `Initialize validators's and node's configuration files.`,
-		Args:  cobra.ExactArgs(1),
-		RunE: func(_ *cobra.Command, args []string) error {
-			config := ctx.Config
-			config.SetRoot(viper.GetString(cli.HomeFlag))
-
-			chainID := viper.GetString(client.FlagChainID)
-			if chainID == "" {
-				chainID = fmt.Sprintf("test-chain-%v", common.RandStr(6))
+		if _, err := os.Stat(genFile); err != nil {
+			if !os.IsNotExist(err) {
+				return err
 			}
-
-			nodeID, _, err := InitializeNodeValidatorFiles(config)
+		} else {
+			genDoc, err = types.GenesisDocFromFile(genFile)
 			if err != nil {
-				return err
+				return fmt.Errorf("failed to read genesis file: %w", err)
 			}
+		}
 
-			config.Moniker = args[0]
+		appState, err := overrideGenesis(cdc, genDoc)
+		if err != nil {
+			return fmt.Errorf("failed to override genesis: %w", err)
+		}
 
-			var appState json.RawMessage
-			genFile := config.GenesisFile()
+		genDoc.AppState, err = cdc.MarshalJSON(appState)
+		if err != nil {
+			return fmt.Errorf("failed to marshal the app state JSON: %w", err)
+		}
 
-			if appState, err = initializeEmptyGenesis(cdc, genFile, chainID,
-				viper.GetBool(flagOverwrite)); err != nil {
-				return err
-			}
+		if err := genutil.ExportGenesisFile(genDoc, genFile); err != nil {
+			return fmt.Errorf("failed to export genesis file: %w", err)
+		}
 
-			if err = ExportGenesisFile(genFile, chainID, nil, appState); err != nil {
-				return err
-			}
 
-			toPrint := newPrintInfo(config.Moniker, chainID, nodeID, "", appState)
-
-			cfg.WriteConfigFile(filepath.Join(config.RootDir, "config", "config.toml"), config)
-			return displayInfo(cdc, toPrint)
-		},
+		return nil
 	}
 
-	cmd.Flags().String(cli.HomeFlag, app.DefaultNodeHome, "node's home directory")
-	cmd.Flags().BoolP(flagOverwrite, "o", false, "overwrite the genesis.json file")
-	cmd.Flags().String(client.FlagChainID, "", "genesis file chain-id, if left blank will be randomly created")
-
-	return cmd
+	return initCmd
 }
+
+// overrideGenesis overrides some parameters in the genesis doc to the panacea-specific values.
+func overrideGenesis(cdc *codec.Codec, genDoc *types.GenesisDoc) (genutil.AppMap, error) {
+	var appState genutil.AppMap
+	if err := cdc.UnmarshalJSON(genDoc.AppState, &appState); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal the app state JSON: %w", err)
+	}
+
+	var stakingGenState staking.GenesisState
+	if err := cdc.UnmarshalJSON(appState[staking.ModuleName], &stakingGenState); err != nil {
+		return nil, err
+	}
+	stakingGenState.Params.UnbondingTime = time.Second * 60 * 60 * 24 * 7 * 3 // three weeks
+	stakingGenState.Params.MaxValidators = 21
+	stakingGenState.Params.BondDenom = assets.MicroMedDenom
+	appState[staking.ModuleName] = cdc.MustMarshalJSON(stakingGenState)
+
+	var mintGenState mint.GenesisState
+	if err := cdc.UnmarshalJSON(appState[mint.ModuleName], &mintGenState); err != nil {
+		return nil, err
+	}
+	mintGenState.Minter = mint.InitialMinter(sdk.NewDecWithPrec(5, 2))
+	mintGenState.Params.MintDenom = assets.MicroMedDenom
+	mintGenState.Params.InflationRateChange = sdk.NewDecWithPrec(2, 2)
+	mintGenState.Params.InflationMin = sdk.NewDecWithPrec(4, 2)
+	mintGenState.Params.InflationMax = sdk.NewDecWithPrec(6, 2)
+	mintGenState.Params.BlocksPerYear = uint64(60 * 60 * 24 * 365.25)  // assuming 1 second block time
+	appState[mint.ModuleName] = cdc.MustMarshalJSON(mintGenState)
+
+	var distributionGenState distribution.GenesisState
+	if err := cdc.UnmarshalJSON(appState[distribution.ModuleName], &distributionGenState); err != nil {
+		return nil, err
+	}
+	distributionGenState.CommunityTax = sdk.ZeroDec()
+	appState[distribution.ModuleName] = cdc.MustMarshalJSON(distributionGenState)
+
+	var govGenState gov.GenesisState
+	if err := cdc.UnmarshalJSON(appState[gov.ModuleName], &govGenState); err != nil {
+		return nil, err
+	}
+	minDepositTokens := sdk.TokensFromConsensusPower(100000) // 100,000 MED
+	govGenState.DepositParams.MinDeposit = sdk.Coins{sdk.NewCoin(assets.MicroMedDenom, minDepositTokens)}
+	govGenState.DepositParams.MaxDepositPeriod = 60 * 60 * 24 * 14 * time.Second // 14 days
+	govGenState.VotingParams.VotingPeriod = 60 * 60 * 24 * 14 * time.Second // 14 days
+	appState[gov.ModuleName] = cdc.MustMarshalJSON(govGenState)
+
+	var crisisGenState crisis.GenesisState
+	if err := cdc.UnmarshalJSON(appState[crisis.ModuleName], &crisisGenState); err != nil {
+		return nil, err
+	}
+	crisisGenState.ConstantFee = sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(1000000000000)) // Spend 1,000,000 MED for invariants check
+	appState[crisis.ModuleName] = cdc.MustMarshalJSON(crisisGenState)
+
+	var slashingGenState slashing.GenesisState
+	if err := cdc.UnmarshalJSON(appState[slashing.ModuleName], &slashingGenState); err != nil {
+		return nil, err
+	}
+	slashingGenState.Params.MaxEvidenceAge = 60 * 60 * 24 * 7 * 3 * time.Second // 3 weeks as same as unbonding period
+	slashingGenState.Params.SignedBlocksWindow = 10000
+	slashingGenState.Params.MinSignedPerWindow = sdk.NewDecWithPrec(5, 2)
+	appState[slashing.ModuleName] = cdc.MustMarshalJSON(slashingGenState)
+
+	return appState, nil
+}
+

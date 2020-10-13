@@ -1,9 +1,9 @@
 package cli
 
 import (
+	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/codec"
-	"github.com/medibloc/panacea-core/x/did"
 	"github.com/medibloc/panacea-core/x/did/types"
 	"github.com/spf13/cobra"
 )
@@ -11,6 +11,20 @@ import (
 const (
 	RouteDID = "custom/did/did"
 )
+
+// GetQueryCmd returns the cli query commands for this module
+func GetQueryCmd(cdc *codec.Codec) *cobra.Command {
+	didQueryCmd := &cobra.Command{
+		Use:   types.ModuleName,
+		Short: "Querying commands for the did module",
+	}
+
+	didQueryCmd.AddCommand(client.GetCommands(
+		GetCmdQueryDID(cdc),
+	)...)
+
+	return didQueryCmd
+}
 
 func GetCmdQueryDID(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
@@ -37,12 +51,12 @@ func GetCmdQueryDID(cdc *codec.Codec) *cobra.Command {
 // queryDIDDocumentWithSeq gets a DIDDocumentWithSeq from the blockchain.
 // It returns an error if the DID doesn't exist or the DID has been deactivated.
 func queryDIDDocumentWithSeq(cliCtx context.CLIContext, id types.DID) (types.DIDDocumentWithSeq, error) {
-	bz, err := cliCtx.Codec.MarshalJSON(did.QueryDIDParams{DID: id})
+	bz, err := cliCtx.Codec.MarshalJSON(types.NewQueryDIDParams(id))
 	if err != nil {
 		return types.DIDDocumentWithSeq{}, err
 	}
 
-	res, err := cliCtx.QueryWithData(RouteDID, bz)
+	res, _, err := cliCtx.QueryWithData(RouteDID, bz)
 	if err != nil {
 		return types.DIDDocumentWithSeq{}, err
 	}

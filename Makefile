@@ -15,13 +15,12 @@ build_tags += ledger
 
 # process linker flags
 
-ldflags = -X github.com/medibloc/panacea-core/version.Version=$(VERSION) \
-	-X github.com/medibloc/panacea-core/version.Commit=$(COMMIT) \
-  -X "github.com/medibloc/panacea-core/version.BuildTags=$(build_tags)"
-
-ifneq ($(GOSUM),)
-ldflags += -X github.com/medibloc/panacea-core/version.GoSumHash=$(shell $(GOSUM) go.sum)
-endif
+ldflags = -X github.com/cosmos/cosmos-sdk/version.Name=panacea-core \
+          -X github.com/cosmos/cosmos-sdk/version.ServerName=panacead \
+          -X github.com/cosmos/cosmos-sdk/version.ClientName=panaceacli \
+          -X github.com/cosmos/cosmos-sdk/version.Version=$(VERSION) \
+          -X github.com/cosmos/cosmos-sdk/version.Commit=$(COMMIT) \
+          -X "github.com/cosmos/cosmos-sdk/version.BuildTags=$(build_tags)"
 
 ldflags += $(LDFLAGS)
 ldflags := $(strip $(ldflags))

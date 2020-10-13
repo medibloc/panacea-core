@@ -55,7 +55,7 @@ func (did DID) Empty() bool {
 
 // GetSignBytes returns a byte array which is used to generate a signature for verifying DID ownership.
 func (did DID) GetSignBytes() []byte {
-	return sdk.MustSortJSON(didCodec.MustMarshalJSON(did))
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(did))
 }
 
 type DIDDocument struct {
@@ -118,7 +118,7 @@ func (doc DIDDocument) String() string {
 
 // GetSignBytes returns a byte array which is used to generate a signature for verifying DID ownership.
 func (doc DIDDocument) GetSignBytes() []byte {
-	return sdk.MustSortJSON(didCodec.MustMarshalJSON(doc))
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(doc))
 }
 
 // VeriMethodByID finds a VeriMethod by ID.

@@ -19,5 +19,5 @@ func NewMsgAddRecordResponse(owner sdk.AccAddress, topic string, offset uint64) 
 }
 
 func (r ResAddRecord) MustMarshalJSON() []byte {
-	return aolCodec.MustMarshalJSON(r)
+	return ModuleCdc.MustMarshalJSON(r)
 }

@@ -3,12 +3,14 @@ package did
 import (
 	"fmt"
 
+	"github.com/medibloc/panacea-core/x/did/keeper"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/medibloc/panacea-core/x/did/types"
 )
 
 // NewHandler returns a handler for "did" type messages
-func NewHandler(keeper Keeper) sdk.Handler {
+func NewHandler(keeper keeper.Keeper) sdk.Handler {
 	return func(ctx sdk.Context, msg sdk.Msg) sdk.Result {
 		switch msg := msg.(type) {
 		case MsgCreateDID:
@@ -24,7 +26,7 @@ func NewHandler(keeper Keeper) sdk.Handler {
 	}
 }
 
-func handleMsgCreateDID(ctx sdk.Context, keeper Keeper, msg MsgCreateDID) sdk.Result {
+func handleMsgCreateDID(ctx sdk.Context, keeper keeper.Keeper, msg MsgCreateDID) sdk.Result {
 	cur := keeper.GetDIDDocument(ctx, msg.DID)
 	if !cur.Empty() {
 		if cur.Deactivated() {
@@ -45,7 +47,7 @@ func handleMsgCreateDID(ctx sdk.Context, keeper Keeper, msg MsgCreateDID) sdk.Re
 	return sdk.Result{}
 }
 
-func handleMsgUpdateDID(ctx sdk.Context, keeper Keeper, msg MsgUpdateDID) sdk.Result {
+func handleMsgUpdateDID(ctx sdk.Context, keeper keeper.Keeper, msg MsgUpdateDID) sdk.Result {
 	docWithSeq := keeper.GetDIDDocument(ctx, msg.DID)
 	if docWithSeq.Empty() {
 		return types.ErrDIDNotFound(msg.DID).Result()
@@ -64,7 +66,7 @@ func handleMsgUpdateDID(ctx sdk.Context, keeper Keeper, msg MsgUpdateDID) sdk.Re
 	return sdk.Result{}
 }
 
-func handleMsgDeactivateDID(ctx sdk.Context, keeper Keeper, msg MsgDeactivateDID) sdk.Result {
+func handleMsgDeactivateDID(ctx sdk.Context, keeper keeper.Keeper, msg MsgDeactivateDID) sdk.Result {
 	docWithSeq := keeper.GetDIDDocument(ctx, msg.DID)
 	if docWithSeq.Empty() {
 		return types.ErrDIDNotFound(msg.DID).Result()

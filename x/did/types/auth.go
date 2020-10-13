@@ -36,7 +36,7 @@ type dataWithSeq struct {
 // mustGetSignBytesWithSeq returns a byte slice which is the combination of data and seq.
 // The return value is deterministic, so that it can be used for signing.
 func mustGetSignBytesWithSeq(data Signable, seq Sequence) []byte {
-	return sdk.MustSortJSON(didCodec.MustMarshalJSON(dataWithSeq{
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(dataWithSeq{
 		Data: data.GetSignBytes(),
 		Seq:  seq,
 	}))
