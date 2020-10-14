@@ -28,4 +28,4 @@ require (
 	gopkg.in/yaml.v2 v2.2.7 // indirect
 )
 
-replace github.com/cosmos/cosmos-sdk => github.com/medibloc/cosmos-sdk v0.35.6-internal.0.20201005064440-b291387e4dc7
+replace github.com/cosmos/cosmos-sdk => github.com/medibloc/cosmos-sdk v0.35.7-internal
