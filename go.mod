@@ -26,4 +26,4 @@ require (
 	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
 )
 
-replace github.com/cosmos/cosmos-sdk => github.com/medibloc/cosmos-sdk v0.37.14-internal.0.20201013062843-a5f121b3001e
+replace github.com/cosmos/cosmos-sdk => github.com/medibloc/cosmos-sdk v0.37.15
