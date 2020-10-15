@@ -55,7 +55,7 @@ func (msg MsgCreateDID) ValidateBasic() sdk.Error {
 
 // GetSignBytes returns the canonical byte representation of the message. Used to generate a signature.
 func (msg MsgCreateDID) GetSignBytes() []byte {
-	return sdk.MustSortJSON(didCodec.MustMarshalJSON(msg))
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
 }
 
 // GetSigners return the addresses of signers that must sign.
@@ -108,7 +108,7 @@ func (msg MsgUpdateDID) ValidateBasic() sdk.Error {
 
 // GetSignBytes returns the canonical byte representation of the message. Used to generate a signature.
 func (msg MsgUpdateDID) GetSignBytes() []byte {
-	return sdk.MustSortJSON(didCodec.MustMarshalJSON(msg))
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
 }
 
 // GetSigners return the addresses of signers that must sign.
@@ -151,7 +151,7 @@ func (msg MsgDeactivateDID) ValidateBasic() sdk.Error {
 
 // GetSignBytes returns the canonical byte representation of the message. Used to generate a signature.
 func (msg MsgDeactivateDID) GetSignBytes() []byte {
-	return sdk.MustSortJSON(didCodec.MustMarshalJSON(msg))
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
 }
 
 // GetSigners return the addresses of signers that must sign.

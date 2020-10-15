@@ -5,11 +5,9 @@ import (
 	"strconv"
 
 	"github.com/cosmos/cosmos-sdk/client/context"
-	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/rest"
 	"github.com/gorilla/mux"
-	"github.com/medibloc/panacea-core/x/aol"
 	"github.com/medibloc/panacea-core/x/aol/types"
 )
 
@@ -22,36 +20,36 @@ const (
 )
 
 // RegisterRoutes - Central function to define routes that get registered by the main application
-func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Codec, queryRoute string) {
+func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router) {
 	// Topic API
 	r.HandleFunc(
 		"/api/v1/aol/{ownerAddr}/topics",
-		listTopicHandlerFn(cliCtx, cdc),
+		listTopicHandlerFn(cliCtx),
 	).Methods("GET")
 	r.HandleFunc(
 		"/api/v1/aol/{ownerAddr}/topics/{topic}",
-		getTopicHandlerFn(cliCtx, cdc),
+		getTopicHandlerFn(cliCtx),
 	).Methods("GET")
 
 	// ACL API
 	r.HandleFunc(
 		"/api/v1/aol/{ownerAddr}/topics/{topic}/acl",
-		listWriterHandlerFn(cliCtx, cdc),
+		listWriterHandlerFn(cliCtx),
 	).Methods("GET")
 	r.HandleFunc(
 		"/api/v1/aol/{ownerAddr}/topics/{topic}/acl/{writerAddr}",
-		getWriterHandlerFn(cliCtx, cdc),
+		getWriterHandlerFn(cliCtx),
 	).Methods("GET")
 
 	// Record API
 	r.HandleFunc(
 		"/api/v1/aol/{ownerAddr}/topics/{topic}/records/{offset}",
-		getRecordHandlerFn(cliCtx, cdc),
+		getRecordHandlerFn(cliCtx),
 	).Methods("GET")
 
 }
 
-func listTopicHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
+func listTopicHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		bech32owner := vars["ownerAddr"]
@@ -61,26 +59,28 @@ func listTopicHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.Handle
 			return
 		}
 
-		params := aol.QueryListTopicParams{
+		params := types.QueryListTopicParams{
 			Owner: ownerAddr,
 		}
 
-		bz, err := cdc.MarshalJSON(params)
+		bz, err := cliCtx.Codec.MarshalJSON(params)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
-		res, err := cliCtx.QueryWithData(RouteListTopic, bz)
+		res, height, err := cliCtx.QueryWithData(RouteListTopic, bz)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
 		}
-		rest.PostProcessResponse(w, cdc, res, cliCtx.Indent)
+		cliCtx = cliCtx.WithHeight(height)
+
+		rest.PostProcessResponse(w, cliCtx, res)
 	}
 }
 
-func getTopicHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
+func getTopicHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		bech32owner := vars["ownerAddr"]
@@ -91,27 +91,29 @@ func getTopicHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.Handler
 		}
 		topicName := vars["topic"]
 
-		params := aol.QueryTopicParams{
+		params := types.QueryTopicParams{
 			Owner:     ownerAddr,
 			TopicName: topicName,
 		}
 
-		bz, err := cdc.MarshalJSON(params)
+		bz, err := cliCtx.Codec.MarshalJSON(params)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
-		res, err := cliCtx.QueryWithData(RouteTopic, bz)
+		res, height, err := cliCtx.QueryWithData(RouteTopic, bz)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
 		}
-		rest.PostProcessResponse(w, cdc, res, cliCtx.Indent)
+		cliCtx = cliCtx.WithHeight(height)
+
+		rest.PostProcessResponse(w, cliCtx, res)
 	}
 }
 
-func listWriterHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
+func listWriterHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		bech32owner := vars["ownerAddr"]
@@ -122,27 +124,29 @@ func listWriterHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.Handl
 		}
 		topicName := vars["topic"]
 
-		params := aol.QueryListWriterParams{
+		params := types.QueryListWriterParams{
 			Owner:     ownerAddr,
 			TopicName: topicName,
 		}
 
-		bz, err := cdc.MarshalJSON(params)
+		bz, err := cliCtx.Codec.MarshalJSON(params)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
-		res, err := cliCtx.QueryWithData(RouteListWriter, bz)
+		res, height, err := cliCtx.QueryWithData(RouteListWriter, bz)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
 		}
-		rest.PostProcessResponse(w, cdc, res, cliCtx.Indent)
+		cliCtx = cliCtx.WithHeight(height)
+
+		rest.PostProcessResponse(w, cliCtx, res)
 	}
 }
 
-func getWriterHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
+func getWriterHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		bech32owner := vars["ownerAddr"]
@@ -159,28 +163,30 @@ func getWriterHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.Handle
 			return
 		}
 
-		params := aol.QueryWriterParams{
+		params := types.QueryWriterParams{
 			Owner:     ownerAddr,
 			TopicName: topicName,
 			Writer:    writerAddr,
 		}
 
-		bz, err := cdc.MarshalJSON(params)
+		bz, err := cliCtx.Codec.MarshalJSON(params)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
-		res, err := cliCtx.QueryWithData(RouteWriter, bz)
+		res, height, err := cliCtx.QueryWithData(RouteWriter, bz)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
 		}
-		rest.PostProcessResponse(w, cdc, res, cliCtx.Indent)
+		cliCtx = cliCtx.WithHeight(height)
+
+		rest.PostProcessResponse(w, cliCtx, res)
 	}
 }
 
-func getRecordHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.HandlerFunc {
+func getRecordHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		bech32owner := vars["ownerAddr"]
@@ -197,25 +203,27 @@ func getRecordHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.Handle
 			return
 		}
 
-		params := aol.QueryRecordParams{
+		params := types.QueryRecordParams{
 			Owner:     ownerAddr,
 			TopicName: topicName,
 			Offset:    offset,
 		}
 
-		bz, err := cdc.MarshalJSON(params)
+		bz, err := cliCtx.Codec.MarshalJSON(params)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
-		res, err := cliCtx.QueryWithData(RouteRecord, bz)
+		res, height, err := cliCtx.QueryWithData(RouteRecord, bz)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
 		}
+		cliCtx = cliCtx.WithHeight(height)
+
 		var recordData types.Record
-		err = cdc.UnmarshalJSON(res, &recordData)
+		err = cliCtx.Codec.UnmarshalJSON(res, &recordData)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
@@ -225,6 +233,6 @@ func getRecordHandlerFn(cliCtx context.CLIContext, cdc *codec.Codec) http.Handle
 			return
 		}
 
-		rest.PostProcessResponse(w, cdc, res, cliCtx.Indent)
+		rest.PostProcessResponse(w, cliCtx, res)
 	}
 }

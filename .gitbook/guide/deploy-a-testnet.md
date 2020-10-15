@@ -27,7 +27,7 @@ panaceacli keys add validator
 panacead add-genesis-account $(panaceacli keys show validator -a) 100000000000000umed
 
 # Generate the transaction that creates your validator
-panacead gentx --name validator
+panacead gentx --name validator --amount 1000000000000umed --commission-rate 0.1 --commission-max-rate 0.2 --commission-max-change-rate 0.01  --min-self-delegation 1000000
 
 # Add the generated bonding transaction to the genesis file
 panacead collect-gentxs
