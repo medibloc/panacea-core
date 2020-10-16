@@ -15,6 +15,8 @@ const (
 	CodeWriterExists        sdk.CodeType = 104
 	CodeWriterNotFound      sdk.CodeType = 104
 	CodeWriterNotAuthorized sdk.CodeType = 105
+	CodeInvalidTopic        sdk.CodeType = 106
+	CodeInvalidMoniker      sdk.CodeType = 107
 )
 
 func ErrMessageTooLarge(descriptor string, got, max int) sdk.Error {
@@ -40,4 +42,12 @@ func ErrWriterNotFound(writer sdk.AccAddress) sdk.Error {
 
 func ErrWriterNotAuthorized(writer sdk.AccAddress) sdk.Error {
 	return sdk.NewError(DefaultCodespace, CodeWriterNotAuthorized, "writer %v not authorized", writer)
+}
+
+func ErrInvalidTopic(topic string) sdk.Error {
+	return sdk.NewError(DefaultCodespace, CodeInvalidTopic, "invalid topic %v", topic)
+}
+
+func ErrInvalidMoniker(moniker string) sdk.Error {
+	return sdk.NewError(DefaultCodespace, CodeInvalidMoniker, "invalid moniker %v", moniker)
 }
