@@ -1,7 +1,7 @@
 package types
 
 type GenesisState struct {
-	Documents map[string]DIDDocumentWithSeq
+	Documents map[string]DIDDocumentWithSeq `json:"documents"`
 }
 
 func DefaultGenesisState() GenesisState {
