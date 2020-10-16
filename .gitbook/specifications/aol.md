@@ -17,6 +17,8 @@ type MsgCreateTopic struct {
 
 A `MsgCreateTopic` is constructed to facilitate the AOL topic. Message sender can set a topic and description. The writer can add record after receiving the appropriate privileges.
 
+Each field has limit. See the [Limits](#limits) section.
+
 #### Add Writer
 
 ```go
@@ -32,6 +34,8 @@ type MsgAddWriter struct {
 
 The owner of the exist topics can manage writer privileges. Writer who received privileges from the topic owner can add record to the topic. This means that the owner authenticate the writer. This `MsgAddWriter` performs a function similar to issuing a certificate.
 
+Each field has limit. See the [Limits](#limits) section.
+
 #### Delete Writer
 
 ```go
@@ -44,6 +48,8 @@ type MsgDeleteWriter struct {
 ```
 
 This `MsgDeleteWriter` removes writer from the topic. It is impossible to add record to the topic after being deprived of authority.
+
+Each field has limit. See the [Limits](#limits) section.
 
 #### Add Record
 
@@ -61,3 +67,14 @@ type MsgAddRecord struct {
 
 This `MsgAddRecord` add record or any data to the topic. If `FeePayerAddress` is provided, node charges fee to FeePayer.
 
+Each field has limit. See the [Limits](#limits) section.
+
+### Limits
+
+|Field|Min Length|Max Length|Charset|
+|-----|----------|----------|-------|
+|`TopicName`|1|70|`a-z`, `A-Z`, `0-9`, `.`, `_` and `-`|
+|`Moniker`|0|70|`a-z`, `A-Z`, `0-9`, `.`, `_` and `-`|
+|`Description`|0|5,000|Any|
+|`Key`|0|70|Any|
+|`Value`|0|5,000|Any|

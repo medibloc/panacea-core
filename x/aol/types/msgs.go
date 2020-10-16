@@ -1,6 +1,8 @@
 package types
 
 import (
+	"regexp"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -31,11 +33,11 @@ func (msg MsgCreateTopic) Route() string { return RouterKey }
 func (msg MsgCreateTopic) Type() string { return "create_topic" }
 
 func (msg MsgCreateTopic) ValidateBasic() sdk.Error {
-	if len(msg.TopicName) > MaxTopicLength {
-		return ErrMessageTooLarge("topic_name", len(msg.TopicName), MaxTopicLength)
+	if err := validateTopic(msg.TopicName); err != nil {
+		return err
 	}
-	if len(msg.Description) > MaxDescriptionLength {
-		return ErrMessageTooLarge("description", len(msg.Description), MaxDescriptionLength)
+	if err := validateDescription(msg.Description); err != nil {
+		return err
 	}
 	if msg.OwnerAddress.Empty() {
 		return sdk.ErrInvalidAddress(msg.OwnerAddress.String())
@@ -66,14 +68,14 @@ func (msg MsgAddWriter) Route() string { return RouterKey }
 func (msg MsgAddWriter) Type() string { return "add_writer" }
 
 func (msg MsgAddWriter) ValidateBasic() sdk.Error {
-	if len(msg.TopicName) > MaxTopicLength {
-		return ErrMessageTooLarge("topic_name", len(msg.TopicName), MaxTopicLength)
+	if err := validateTopic(msg.TopicName); err != nil {
+		return err
 	}
-	if len(msg.Moniker) > MaxMonikerLength {
-		return ErrMessageTooLarge("moniker", len(msg.Moniker), MaxMonikerLength)
+	if err := validateMoniker(msg.Moniker); err != nil {
+		return err
 	}
-	if len(msg.Description) > MaxDescriptionLength {
-		return ErrMessageTooLarge("description", len(msg.Description), MaxDescriptionLength)
+	if err := validateDescription(msg.Description); err != nil {
+		return err
 	}
 	if msg.WriterAddress.Empty() {
 		return sdk.ErrInvalidAddress(msg.WriterAddress.String())
@@ -105,9 +107,8 @@ func (msg MsgDeleteWriter) Route() string { return RouterKey }
 func (msg MsgDeleteWriter) Type() string { return "delete_writer" }
 
 func (msg MsgDeleteWriter) ValidateBasic() sdk.Error {
-	// TODO Empty Topic error
-	if len(msg.TopicName) > MaxTopicLength {
-		return ErrMessageTooLarge("topic_name", len(msg.TopicName), MaxTopicLength)
+	if err := validateTopic(msg.TopicName); err != nil {
+		return err
 	}
 	if msg.WriterAddress.Empty() {
 		// TODO Error Message
@@ -143,14 +144,14 @@ func (msg MsgAddRecord) Route() string { return RouterKey }
 func (msg MsgAddRecord) Type() string { return "add_record" }
 
 func (msg MsgAddRecord) ValidateBasic() sdk.Error {
-	if len(msg.TopicName) > MaxTopicLength {
-		return ErrMessageTooLarge("topic", len(msg.TopicName), MaxTopicLength)
+	if err := validateTopic(msg.TopicName); err != nil {
+		return err
 	}
-	if len(msg.Key) > MaxRecordKeyLength {
-		return ErrMessageTooLarge("key", len(msg.Key), MaxRecordKeyLength)
+	if err := validateRecordKey(msg.Key); err != nil {
+		return err
 	}
-	if len(msg.Value) > MaxRecordValueLength {
-		return ErrMessageTooLarge("value", len(msg.Value), MaxRecordValueLength)
+	if err := validateRecordValue(msg.Value); err != nil {
+		return err
 	}
 	if msg.WriterAddress.Empty() {
 		return sdk.ErrInvalidAddress(msg.WriterAddress.String())
@@ -171,4 +172,51 @@ func (msg MsgAddRecord) GetSigners() []sdk.AccAddress {
 		return []sdk.AccAddress{msg.WriterAddress}
 	}
 	return []sdk.AccAddress{msg.FeePayerAddress, msg.WriterAddress}
+}
+
+func validateTopic(topic string) sdk.Error {
+	if len(topic) > MaxTopicLength {
+		return ErrMessageTooLarge("topic", len(topic), MaxTopicLength)
+	}
+
+	// cannot be an empty string
+	if !regexp.MustCompile("^[A-Za-z0-9._-]+$").MatchString(topic) {
+		return ErrInvalidTopic(topic)
+	}
+
+	return nil
+}
+
+func validateMoniker(moniker string) sdk.Error {
+	if len(moniker) > MaxMonikerLength {
+		return ErrMessageTooLarge("moniker", len(moniker), MaxMonikerLength)
+	}
+
+	// can be an empty string
+	if !regexp.MustCompile("^[A-Za-z0-9._-]*$").MatchString(moniker) {
+		return ErrInvalidMoniker(moniker)
+	}
+
+	return nil
+}
+
+func validateDescription(description string) sdk.Error {
+	if len(description) > MaxDescriptionLength {
+		return ErrMessageTooLarge("description", len(description), MaxDescriptionLength)
+	}
+	return nil
+}
+
+func validateRecordKey(key []byte) sdk.Error {
+	if len(key) > MaxRecordKeyLength {
+		return ErrMessageTooLarge("key", len(key), MaxRecordKeyLength)
+	}
+	return nil
+}
+
+func validateRecordValue(value []byte) sdk.Error {
+	if len(value) > MaxRecordValueLength {
+		return ErrMessageTooLarge("value", len(value), MaxRecordValueLength)
+	}
+	return nil
 }
