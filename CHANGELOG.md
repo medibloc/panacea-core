@@ -4,17 +4,18 @@
 
 TBD
 
-## [v1.3.1] - 2020-10-xx
+## [v1.3.1](https://github.com/medibloc/panacea-core/releases/tag/v1.3.1) - 2020-10-19
 
 ### Features
 
-- [\#68](https://github.com/medibloc/panacea-core/pull/68) Enhance the AOL msg validation
+- [\#68](https://github.com/medibloc/panacea-core/pull/68) Enhance the `x/aol` message validation
 - [\#58](https://github.com/medibloc/panacea-core/pull/58) Upgrade `medibloc/cosmos-sdk` from [v0.35.6-internal](https://github.com/medibloc/cosmos-sdk/releases/tag/v0.35.6-internal) to [v0.37.15](https://github.com/medibloc/cosmos-sdk/releases/tag/v0.37.15).
 - [\#66](https://github.com/medibloc/panacea-core/pull/66) Integrate with Gitbook
 
 ### Bug fixes
 
 - [\#67](https://github.com/medibloc/panacea-core/pull/67) Use `documents` as the `x/did` genesis JSON key, instead of `Documents`.
+
 
 ## [v1.3.0-internal](https://github.com/medibloc/panacea-core/releases/tag/v1.3.0-internal) - 2020-09-29
 
