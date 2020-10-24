@@ -59,6 +59,11 @@ func listTopicHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
+		cliCtx, ok := rest.ParseQueryHeightOrReturnBadRequest(w, cliCtx, r)
+		if !ok {
+			return
+		}
+
 		params := types.QueryListTopicParams{
 			Owner: ownerAddr,
 		}
@@ -90,6 +95,11 @@ func getTopicHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 		topicName := vars["topic"]
+
+		cliCtx, ok := rest.ParseQueryHeightOrReturnBadRequest(w, cliCtx, r)
+		if !ok {
+			return
+		}
 
 		params := types.QueryTopicParams{
 			Owner:     ownerAddr,
@@ -123,6 +133,11 @@ func listWriterHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 		topicName := vars["topic"]
+
+		cliCtx, ok := rest.ParseQueryHeightOrReturnBadRequest(w, cliCtx, r)
+		if !ok {
+			return
+		}
 
 		params := types.QueryListWriterParams{
 			Owner:     ownerAddr,
@@ -163,6 +178,11 @@ func getWriterHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
+		cliCtx, ok := rest.ParseQueryHeightOrReturnBadRequest(w, cliCtx, r)
+		if !ok {
+			return
+		}
+
 		params := types.QueryWriterParams{
 			Owner:     ownerAddr,
 			TopicName: topicName,
@@ -200,6 +220,11 @@ func getRecordHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 		offset, err := strconv.ParseUint(strOffset, 10, 64)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+
+		cliCtx, ok := rest.ParseQueryHeightOrReturnBadRequest(w, cliCtx, r)
+		if !ok {
 			return
 		}
 

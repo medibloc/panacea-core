@@ -32,6 +32,11 @@ func getDIDHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
+		cliCtx, ok := rest.ParseQueryHeightOrReturnBadRequest(w, cliCtx, r)
+		if !ok {
+			return
+		}
+
 		params := types.NewQueryDIDParams(id)
 		bz, err := cliCtx.Codec.MarshalJSON(params)
 		if err != nil {
