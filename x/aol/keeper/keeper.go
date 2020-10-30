@@ -1,8 +1,6 @@
 package keeper
 
 import (
-	"bytes"
-
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/medibloc/panacea-core/x/aol/types"
@@ -49,11 +47,11 @@ func (k Keeper) ListOwner(ctx sdk.Context) []sdk.AccAddress {
 	store := ctx.KVStore(k.storeKey)
 	addrs := make([]sdk.AccAddress, 0)
 
-	ownerKey := OwnerKey(sdk.AccAddress{})
-	iter := sdk.KVStorePrefixIterator(store, ownerKey)
+	prefix := OwnerKey(sdk.AccAddress{})
+	iter := sdk.KVStorePrefixIterator(store, prefix)
 	defer iter.Close()
 	for ; iter.Valid(); iter.Next() {
-		addr := bytes.Split(iter.Key(), ownerKey)[1]
+		addr := getLastElement(iter.Key(), prefix)
 		addrs = append(addrs, addr)
 	}
 	return addrs
@@ -88,12 +86,12 @@ func (k Keeper) ListTopic(ctx sdk.Context, ownerAddr sdk.AccAddress) []string {
 	store := ctx.KVStore(k.storeKey)
 	topics := make([]string, 0)
 
-	topicKey := TopicKey(ownerAddr, "")
-	iter := sdk.KVStorePrefixIterator(store, topicKey)
+	prefix := TopicKey(ownerAddr, "")
+	iter := sdk.KVStorePrefixIterator(store, prefix)
 	defer iter.Close()
 	for ; iter.Valid(); iter.Next() {
-		topic := string(bytes.Split(iter.Key(), []byte(ownerAddr))[1])
-		topics = append(topics, topic[len(KeyDelimiter):])
+		topic := getLastElement(iter.Key(), prefix)
+		topics = append(topics, string(topic))
 	}
 	return topics
 }
@@ -134,13 +132,12 @@ func (k Keeper) ListWriter(ctx sdk.Context, ownerAddr sdk.AccAddress, topic stri
 	store := ctx.KVStore(k.storeKey)
 	writers := make([]sdk.AccAddress, 0)
 
-	writerKey := ACLWriterKey(ownerAddr, topic, sdk.AccAddress{})
-	iter := sdk.KVStorePrefixIterator(store, writerKey)
+	prefix := ACLWriterKey(ownerAddr, topic, sdk.AccAddress{})
+	iter := sdk.KVStorePrefixIterator(store, prefix)
 	defer iter.Close()
 	for ; iter.Valid(); iter.Next() {
 		writer := sdk.AccAddress{}
-		data := bytes.Split(iter.Key(), []byte(topic))[1]
-		data = data[len(KeyDelimiter):]
+		data := getLastElement(iter.Key(), prefix)
 		if err := writer.Unmarshal(data); err != nil {
 			return []sdk.AccAddress{}
 		}
