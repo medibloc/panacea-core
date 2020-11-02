@@ -1,8 +1,6 @@
 package keeper
 
 import (
-	"bytes"
-
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/medibloc/panacea-core/x/did/types"
@@ -62,12 +60,12 @@ func (k didKeeper) ListDIDs(ctx sdk.Context) []types.DID {
 	store := ctx.KVStore(k.storeKey)
 	dids := make([]types.DID, 0)
 
-	firstKey := DIDDocumentKey("")
-	iter := sdk.KVStorePrefixIterator(store, firstKey)
+	prefix := DIDDocumentKey("")
+	iter := sdk.KVStorePrefixIterator(store, prefix)
 	defer iter.Close()
 	for ; iter.Valid(); iter.Next() {
-		did := types.DID(bytes.Split(iter.Key(), firstKey)[1])
-		dids = append(dids, did)
+		did := getLastElement(iter.Key(), prefix)
+		dids = append(dids, types.DID(did))
 	}
 	return dids
 }

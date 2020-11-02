@@ -18,3 +18,7 @@ func DIDDocumentKey(did types.DID) []byte {
 		[]byte(did),
 	}, KeyDelimiter)
 }
+
+func getLastElement(key, prefix []byte) []byte {
+	return key[len(prefix):]
+}

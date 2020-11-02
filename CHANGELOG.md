@@ -2,7 +2,14 @@
 
 ## Unreleased
 
+### Features
+
 TBD
+
+### Bug fixes
+
+- [\#73](https://github.com/medibloc/panacea-core/pull/73) Make LCD use the latest height or the height specified in the URL query
+- [\#74](https://github.com/medibloc/panacea-core/pull/74) Fix parsing keeper keys of `x/aol` and `x/did`
 
 ## [v1.3.1](https://github.com/medibloc/panacea-core/releases/tag/v1.3.1) - 2020-10-19
 

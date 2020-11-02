@@ -47,3 +47,7 @@ func RecordKey(ownerAddr sdk.AccAddress, topic string, offset uint64) []byte {
 		sdk.Uint64ToBigEndian(offset),
 	}, KeyDelimiter)
 }
+
+func getLastElement(key, prefix []byte) []byte {
+	return key[len(prefix):]
+}
