@@ -51,6 +51,20 @@ func getDIDHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 		}
 		cliCtx = cliCtx.WithHeight(height)
 
+		var docWithSeq types.DIDDocumentWithSeq
+		if err := cliCtx.Codec.UnmarshalJSON(res, &docWithSeq); err != nil {
+			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+		if docWithSeq.Empty() {
+			rest.WriteErrorResponse(w, http.StatusNotFound, "DID not found")
+			return
+		}
+		if docWithSeq.Deactivated() {
+			rest.WriteErrorResponse(w, http.StatusNotFound, "DID already deactivated")
+			return
+		}
+
 		rest.PostProcessResponse(w, cliCtx, res)
 	}
 }
