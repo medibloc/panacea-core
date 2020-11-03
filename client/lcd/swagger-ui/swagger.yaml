@@ -1993,6 +1993,30 @@ paths:
           description: record not found
         500:
           description: Internal Server Error
+  /api/v1/did/{did}:
+    get:
+      summary: Query a DID document
+      description: Query a DID document
+      produces:
+        - application/json
+      tags:
+        - DID
+      parameters:
+        - type: string
+          description: DID
+          name: did
+          required: true
+          in: path
+          x-example: did:panacea:3YzwQVAXWqe6Tb7wApG98itdjjdEKKTqVdiKeHxAFD7Z
+      responses:
+        200:
+          description: "A DID document in the format: https://www.w3.org/TR/did-core"
+        400:
+          description: Invalid DID
+        404:
+          description: DID not found or deactivated
+        500:
+          description: Internal Server Error
 
 definitions:
   CheckTxResult:
