@@ -25,6 +25,6 @@ func ErrDenomNotAllowed(denom string) sdk.Error {
 	return sdk.NewError(DefaultCodespace, CodeDenomNotAllowed, "Denom(%v) is not allowed", denom)
 }
 
-func ErrInvalidIssuance(issuance Issuance) sdk.Error {
-	return sdk.NewError(DefaultCodespace, CodeInvalidIssuance, "Invalid issuance: %v", issuance)
+func ErrInvalidIssuance(err sdk.Error) sdk.Error {
+	return sdk.NewError(DefaultCodespace, CodeInvalidIssuance, "Invalid issuance: %v", err)
 }

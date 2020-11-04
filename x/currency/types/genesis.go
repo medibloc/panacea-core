@@ -15,8 +15,8 @@ func ValidateGenesis(data GenesisState) error {
 			return err
 		}
 
-		if !issuance.Valid() {
-			return ErrInvalidIssuance(issuance)
+		if err := issuance.Valid(); err != nil {
+			return ErrInvalidIssuance(err)
 		}
 	}
 	return nil

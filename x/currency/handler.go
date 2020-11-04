@@ -33,6 +33,6 @@ func handleMsgIssueCurrency(ctx sdk.Context, keeper keeper.Keeper, msg MsgIssueC
 		return types.ErrDenomExists(msg.Amount.Denom).Result()
 	}
 
-	keeper.SetIssuance(ctx, msg.Amount.Denom, msg)
+	keeper.SetIssuance(ctx, msg.Amount.Denom, msg.Issuance)
 	return sdk.Result{}
 }

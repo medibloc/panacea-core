@@ -44,11 +44,7 @@ func GetCmdIssueCurrency(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			msg := types.MsgIssueCurrency{
-				Amount:        amount,
-				IssuerAddress: issuerAddr,
-			}
-
+			msg := types.NewMsgIssueCurrency(amount, issuerAddr)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
