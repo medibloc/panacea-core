@@ -2017,6 +2017,28 @@ paths:
           description: DID not found or deactivated
         500:
           description: Internal Server Error
+  /api/v1/currency/issuance/{denom}:
+    get:
+      summary: Query a currency issuance
+      description: Query a currency issuance
+      produces:
+        - application/json
+      tags:
+        - Currency
+      parameters:
+        - type: string
+          description: Denomination of the currency issued
+          name: denom
+          required: true
+          in: path
+          x-example: DEM
+      responses:
+        200:
+          description: "A DID document in the format: https://www.w3.org/TR/did-core"
+        404:
+          description: Issuance not found
+        500:
+          description: Internal Server Error
 
 definitions:
   CheckTxResult:
@@ -2588,4 +2610,11 @@ definitions:
         type: integer
         example: 1398902555536968492
       writer_address:
+        $ref: "#/definitions/Address"
+  Issuance:
+    type: object
+    properties:
+      amount:
+        $ref: "#/definitions/Coin"
+      issuer_address:
         $ref: "#/definitions/Address"

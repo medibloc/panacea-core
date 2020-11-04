@@ -2,7 +2,9 @@
 
 ## Unreleased
 
-TBD
+### Features
+
+- [\#xx](https://github.com/medibloc/panacea-core/pull/xx) Add a new feature for issuing new currencies (by a new module `x/currency`)
 
 ## [v1.3.2](https://github.com/medibloc/panacea-core/releases/tag/v1.3.2) - 2020-11-04
 
