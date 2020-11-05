@@ -27,8 +27,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/staking"
 
 	"github.com/medibloc/panacea-core/x/aol"
-	"github.com/medibloc/panacea-core/x/currency"
 	"github.com/medibloc/panacea-core/x/did"
+	"github.com/medibloc/panacea-core/x/token"
 
 	abci "github.com/tendermint/tendermint/abci/types"
 	cmn "github.com/tendermint/tendermint/libs/common"
@@ -62,7 +62,7 @@ var (
 		supply.AppModuleBasic{},
 		aol.AppModuleBasic{},
 		did.AppModuleBasic{},
-		currency.AppModuleBasic{},
+		token.AppModuleBasic{},
 	)
 
 	// module account permissions
@@ -100,7 +100,7 @@ type PanaceaApp struct {
 	paramsKeeper   params.Keeper
 	aolKeeper      aol.Keeper
 	didKeeper      did.Keeper
-	currencyKeeper currency.Keeper
+	currencyKeeper token.Keeper
 
 	// the module manager
 	mm *module.Manager
@@ -124,7 +124,7 @@ func NewPanaceaApp(
 	keys := sdk.NewKVStoreKeys(
 		bam.MainStoreKey, auth.StoreKey, staking.StoreKey,
 		supply.StoreKey, mint.StoreKey, distr.StoreKey, slashing.StoreKey,
-		gov.StoreKey, params.StoreKey, aol.StoreKey, did.StoreKey, currency.StoreKey,
+		gov.StoreKey, params.StoreKey, aol.StoreKey, did.StoreKey, token.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(staking.TStoreKey, params.TStoreKey)
 
@@ -218,8 +218,8 @@ func NewPanaceaApp(
 		keys[did.StoreKey],
 		app.cdc,
 	)
-	app.currencyKeeper = currency.NewKeeper(
-		keys[currency.StoreKey],
+	app.currencyKeeper = token.NewKeeper(
+		keys[token.StoreKey],
 		app.cdc,
 		app.bankKeeper,
 	)
@@ -246,7 +246,7 @@ func NewPanaceaApp(
 		staking.NewAppModule(app.stakingKeeper, app.distrKeeper, app.accountKeeper, app.supplyKeeper),
 		aol.NewAppModule(app.aolKeeper),
 		did.NewAppModule(app.didKeeper),
-		currency.NewAppModule(app.currencyKeeper),
+		token.NewAppModule(app.currencyKeeper),
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -262,7 +262,7 @@ func NewPanaceaApp(
 		genaccounts.ModuleName, distr.ModuleName, staking.ModuleName,
 		auth.ModuleName, bank.ModuleName, slashing.ModuleName, gov.ModuleName,
 		mint.ModuleName, supply.ModuleName, crisis.ModuleName, genutil.ModuleName,
-		aol.ModuleName, did.ModuleName, currency.ModuleName,
+		aol.ModuleName, did.ModuleName, token.ModuleName,
 	)
 
 	app.mm.RegisterInvariants(&app.crisisKeeper)

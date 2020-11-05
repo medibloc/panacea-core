@@ -2017,26 +2017,46 @@ paths:
           description: DID not found or deactivated
         500:
           description: Internal Server Error
-  /api/v1/currency/issuance/{denom}:
+  /api/v1/token/tokens:
     get:
-      summary: Query a currency issuance
-      description: Query a currency issuance
+      summary: Query all tokens
+      description: Query all tokens
       produces:
         - application/json
       tags:
-        - Currency
-      parameters:
-        - type: string
-          description: Denomination of the currency issued
-          name: denom
-          required: true
-          in: path
-          x-example: DEM
+        - Token
       responses:
         200:
           description: "A DID document in the format: https://www.w3.org/TR/did-core"
+          schema:
+            type: array
+            items:
+              type: string
+              example: "KAI-0EA"
+        500:
+          description: Internal Server Error
+  /api/v1/token/tokens/{symbol}:
+    get:
+      summary: Query a token
+      description: Query a token
+      produces:
+        - application/json
+      tags:
+        - Token
+      parameters:
+        - type: string
+          description: A symbol of the token
+          name: symbol
+          required: true
+          in: path
+          x-example: KAI-0EA
+      responses:
+        200:
+          description: A token
+          schema:
+            $ref: "#/definitions/Token"
         404:
-          description: Issuance not found
+          description: Token not found
         500:
           description: Internal Server Error
 
@@ -2611,10 +2631,18 @@ definitions:
         example: 1398902555536968492
       writer_address:
         $ref: "#/definitions/Address"
-  Issuance:
+  Token:
     type: object
     properties:
-      amount:
+      name:
+        type: string
+        example: "my token"
+      symbol:
+        type: string
+        example: "KAI-0EA"
+      total_supply:
         $ref: "#/definitions/Coin"
-      issuer_address:
+      mintable:
+        type: boolean
+      owner_address:
         $ref: "#/definitions/Address"
