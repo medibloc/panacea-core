@@ -100,7 +100,7 @@ type PanaceaApp struct {
 	paramsKeeper   params.Keeper
 	aolKeeper      aol.Keeper
 	didKeeper      did.Keeper
-	currencyKeeper token.Keeper
+	tokenKeeper    token.Keeper
 
 	// the module manager
 	mm *module.Manager
@@ -218,7 +218,7 @@ func NewPanaceaApp(
 		keys[did.StoreKey],
 		app.cdc,
 	)
-	app.currencyKeeper = token.NewKeeper(
+	app.tokenKeeper = token.NewKeeper(
 		keys[token.StoreKey],
 		app.cdc,
 		app.bankKeeper,
@@ -246,7 +246,7 @@ func NewPanaceaApp(
 		staking.NewAppModule(app.stakingKeeper, app.distrKeeper, app.accountKeeper, app.supplyKeeper),
 		aol.NewAppModule(app.aolKeeper),
 		did.NewAppModule(app.didKeeper),
-		token.NewAppModule(app.currencyKeeper),
+		token.NewAppModule(app.tokenKeeper),
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
