@@ -4,13 +4,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/codec"
+	"github.com/medibloc/panacea-core/x/token/client/internal"
 	"github.com/medibloc/panacea-core/x/token/types"
 	"github.com/spf13/cobra"
-)
-
-const (
-	RouteToken      = "custom/token/token"
-	RouteListTokens = "custom/token/listTokens"
 )
 
 // GetQueryCmd returns the cli query commands for this module
@@ -42,7 +38,7 @@ func GetCmdQueryToken(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			res, _, err := cliCtx.QueryWithData(RouteToken, bz)
+			res, _, err := cliCtx.QueryWithData(internal.RouteToken, bz)
 			if err != nil {
 				return err
 			}
@@ -67,7 +63,7 @@ func GetCmdListTokens(cdc *codec.Codec) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
-			res, _, err := cliCtx.Query(RouteListTokens)
+			res, _, err := cliCtx.Query(internal.RouteListTokens)
 			if err != nil {
 				return err
 			}

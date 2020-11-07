@@ -3,16 +3,13 @@ package rest
 import (
 	"net/http"
 
+	"github.com/medibloc/panacea-core/x/token/client/internal"
+
 	"github.com/cosmos/cosmos-sdk/types/rest"
 	"github.com/medibloc/panacea-core/x/token/types"
 
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/gorilla/mux"
-)
-
-const (
-	RouteToken      = "custom/token/token"
-	RouteListTokens = "custom/token/listTokens"
 )
 
 // RegisterRoutes - Central function to define routes that get registered by the main application
@@ -45,7 +42,7 @@ func getTokenHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		res, height, err := cliCtx.QueryWithData(RouteToken, bz)
+		res, height, err := cliCtx.QueryWithData(internal.RouteToken, bz)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
@@ -73,7 +70,7 @@ func listTokensHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		res, height, err := cliCtx.Query(RouteListTokens)
+		res, height, err := cliCtx.Query(internal.RouteListTokens)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
