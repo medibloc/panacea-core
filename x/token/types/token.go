@@ -87,7 +87,7 @@ type ShortSymbol string
 
 func (s ShortSymbol) validate() sdk.Error {
 	str := string(s)
-	if strings.ToLower(str) == strings.ToLower(assets.MicroMedDenom[1:]) {
+	if strings.EqualFold(str, assets.MicroMedDenom[1:]) {
 		return ErrSymbolNotAllowed(str)
 	}
 	if !regexShortSymbol.MatchString(strings.ToUpper(str)) {
