@@ -3,7 +3,7 @@ package keeper
 import (
 	"testing"
 
-	"github.com/cosmos/cosmos-sdk/codec"
+	"github.com/medibloc/panacea-core/x/token/internal"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/medibloc/panacea-core/x/token/types"
@@ -15,7 +15,7 @@ func TestGenesis(t *testing.T) {
 	ctx := sdk.Context{}
 
 	// prepare a keeper with some data
-	keeper := newMockKeeper()
+	keeper := internal.NewMockKeeper()
 	token1 := types.Token{
 		Name:         "my token 1",
 		Symbol:       "KAI-0EA",
@@ -43,7 +43,7 @@ func TestGenesis(t *testing.T) {
 	require.NoError(t, types.ValidateGenesis(state))
 
 	// import it to a new keeper
-	newK := newMockKeeper()
+	newK := internal.NewMockKeeper()
 	InitGenesis(ctx, newK, state)
 	require.Equal(t, 2, len(newK.ListTokens(ctx)))
 	require.Equal(t, token1, newK.GetToken(ctx, token1.Symbol))
@@ -52,33 +52,4 @@ func TestGenesis(t *testing.T) {
 
 func newGenesisTokenKey(symbol types.Symbol) string {
 	return types.GenesisTokenKey{Symbol: symbol}.Marshal()
-}
-
-// mockKeeper implements the token.Keeper interface
-type mockKeeper struct {
-	tokens map[types.Symbol]types.Token
-}
-
-func newMockKeeper() *mockKeeper {
-	return &mockKeeper{tokens: make(map[types.Symbol]types.Token)}
-}
-
-func (k mockKeeper) Codec() *codec.Codec {
-	return codec.New()
-}
-
-func (k mockKeeper) SetToken(ctx sdk.Context, symbol types.Symbol, token types.Token) {
-	k.tokens[symbol] = token
-}
-
-func (k mockKeeper) GetToken(ctx sdk.Context, symbol types.Symbol) types.Token {
-	return k.tokens[symbol]
-}
-
-func (k mockKeeper) ListTokens(ctx sdk.Context) []types.Symbol {
-	symbols := make([]types.Symbol, 0)
-	for symbol := range k.tokens {
-		symbols = append(symbols, symbol)
-	}
-	return symbols
 }

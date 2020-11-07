@@ -19,4 +19,5 @@ func TestGenesisDIDDocumentKey_InvalidDID(t *testing.T) {
 
 	var key GenesisTokenKey
 	require.Error(t, key.Unmarshal(invalidKey))
+
 }
