@@ -632,6 +632,50 @@ You can query the record with this:
 panaceacli query aol get-record <owner_panacea> <topic> <offset>
 ```
 
+### DID
+
+#### Create(Issue) a DID
+
+```bash
+panaceacli tx did create-did --chain-id=<chain-id> --from=<address>
+```
+This doesn't require any parameter except `chain-id` and `from`.
+That is, it generates a Secp256k1 key-pair and derive a DID and a DID Document.
+The DID Document is stored in Panacea.
+
+To store the key-pair safely in your local, the command will prompt you to enter a passphrase.
+The encrypted key-pair file will be stored in your `~/.panaceacli/did_keystore` directory.
+
+#### Resolve a DID
+
+```bash
+panaceacli query did get-did <did> --chain-id=<chain-id>
+```
+This returns a DID Document in JSON corresponding to that DID.
+If the DID doesn't exist, or was already deactivated, an error will be returned.
+
+#### Update a DID
+
+```bash
+panaceaacli tx did update-did <did> <key-id> <did-doc-path> --chain-id=<chain-id> --from=<address>
+```
+A DID Document will be replaced to the new one written in a JSON file: `<did-doc-path>`.
+To prove that you are the DID owner, you must pass a `<key-id>` that is one of `verificationMethod`s in the DID Document.
+Also, that command will prompt you to enter a passphrase of that key if the key-pair is stored in your keystore: `~/.panaceacli/did_keystore`.
+The key-pair will be used to make a signature so that Panacea can verify that you are the DID owner.
+
+#### Deactivate a DID
+
+```bash
+panaceacli tx did deactivate-did <did> <key-id> --chain-id=<chain-id> --from=<address>
+```
+
+Like updating a DID, a `<key-id>` must be specified and the corresponding key-pair should be used to make a signature
+so that Panacea can verify that you are the DID owner.
+
+Deactivating a DID is not the same as deleting a DID. DIDs cannot be deleted permanently. They can just be deactivated.
+And DIDs cannot be reused to create another DID Documents forever.
+
 ### Token
 
 #### Issue a new token

@@ -20,5 +20,6 @@
 ## Specifications
 
 * [AOL](specifications/aol.md)
+* [DID](specifications/did.md)
 * [Token](specifications/token.md)
 
