@@ -1993,6 +1993,72 @@ paths:
           description: record not found
         500:
           description: Internal Server Error
+  /api/v1/did/{did}:
+    get:
+      summary: Query a DID document
+      description: Query a DID document
+      produces:
+        - application/json
+      tags:
+        - DID
+      parameters:
+        - type: string
+          description: DID
+          name: did
+          required: true
+          in: path
+          x-example: did:panacea:3YzwQVAXWqe6Tb7wApG98itdjjdEKKTqVdiKeHxAFD7Z
+      responses:
+        200:
+          description: "A DID document in the format: https://www.w3.org/TR/did-core"
+        400:
+          description: Invalid DID
+        404:
+          description: DID not found or deactivated
+        500:
+          description: Internal Server Error
+  /api/v1/token/tokens:
+    get:
+      summary: Query all tokens
+      description: Query all tokens
+      produces:
+        - application/json
+      tags:
+        - Token
+      responses:
+        200:
+          description: "A list of token symbols"
+          schema:
+            type: array
+            items:
+              type: string
+              example: "KAI-0EA"
+        500:
+          description: Internal Server Error
+  /api/v1/token/tokens/{symbol}:
+    get:
+      summary: Query a token
+      description: Query a token
+      produces:
+        - application/json
+      tags:
+        - Token
+      parameters:
+        - type: string
+          description: A symbol of the token
+          name: symbol
+          required: true
+          in: path
+          x-example: KAI-0EA
+      responses:
+        200:
+          description: A token
+          schema:
+            $ref: "#/definitions/Token"
+        404:
+          description: Token not found
+        500:
+          description: Internal Server Error
 
 definitions:
   CheckTxResult:
@@ -2564,4 +2630,19 @@ definitions:
         type: integer
         example: 1398902555536968492
       writer_address:
+        $ref: "#/definitions/Address"
+  Token:
+    type: object
+    properties:
+      name:
+        type: string
+        example: "my token"
+      symbol:
+        type: string
+        example: "KAI-0EA"
+      total_supply:
+        $ref: "#/definitions/Coin"
+      mintable:
+        type: boolean
+      owner_address:
         $ref: "#/definitions/Address"

@@ -4,12 +4,15 @@
 
 ### Features
 
-TBD
+- [\#80](https://github.com/medibloc/panacea-core/pull/80) Add the `x/token` module for issuing new tokens
+
+## [v1.3.2](https://github.com/medibloc/panacea-core/releases/tag/v1.3.2) - 2020-11-04
 
 ### Bug fixes
 
 - [\#73](https://github.com/medibloc/panacea-core/pull/73) Make LCD use the latest height or the height specified in the URL query
 - [\#74](https://github.com/medibloc/panacea-core/pull/74) Fix parsing keeper keys of `x/aol` and `x/did`
+- [\#76](https://github.com/medibloc/panacea-core/pull/76) Return 404 when DID is not found or deactivated
 
 ## [v1.3.1](https://github.com/medibloc/panacea-core/releases/tag/v1.3.1) - 2020-10-19
 

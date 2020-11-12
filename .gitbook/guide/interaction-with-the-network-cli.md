@@ -632,3 +632,74 @@ You can query the record with this:
 panaceacli query aol get-record <owner_panacea> <topic> <offset>
 ```
 
+### Token
+
+#### Issue a new token
+
+A new token can be issued by the following command. Anyone can issue a new token with fee paid.
+After issuing, the token would appear in the issuer's account.
+
+The symbol doesn't have to be unique. `-` followed by random 3 letters will be appended to the provided symbol to avoid uniqueness constraint.
+Those 3 letters are the first three letters of the Tx hash of the `issue` transaction.
+The generated symbol will be returned as a Tx response.
+
+For more details of each parameter, please see the [Token specification](../specifications/token.md).
+
+```bash
+# Note that the total supply must be in micro unit without a denomination.
+panaceacli tx token issue \
+    "my token" \
+    KAI \
+    1000000000 \
+    --mintable \
+    --from panacea126r28pr7sstg7yfmedv3qq4st4a4exlwccx2vc \
+    --chain-id testing
+```
+
+#### Query a token
+
+```bash
+# List all token symbols
+$ panaceacli query token list-tokens --chain-id testing
+
+- KAI-0C5
+- KAI-0EA
+
+# Query a token
+$ panaceacli query token get-token KAI-0EA
+
+name: my secret token
+symbol: KAI-0EA
+totalsupply:
+  denom: ukai0ea
+  amount: "1000000000"
+mintable: true
+owneraddress: panacea126r28pr7sstg7yfmedv3qq4st4a4exlwccx2vc
+```
+
+#### Query account balances and send tokens
+
+Of course, the new token is visible in the account balance.
+```bash
+$ panaceacli query account panacea126r28pr7sstg7yfmedv3qq4st4a4exlwccx2vc
+
+  address: panacea126r28pr7sstg7yfmedv3qq4st4a4exlwccx2vc
+  coins:
+  - denom: ukai0c5
+    amount: "1000000000"
+  - denom: ukai0ea
+    amount: "999999900"
+  - denom: ukai62e
+    amount: "1000000000"
+  - denom: umed
+    amount: "99000000000000"
+  pubkey: panaceapub1addwnpepqf2m7rxgazcem4e6x4hjnwexeagrqjfdlkvz65e0jpxv5sn76jurgpqmpd5
+  accountnumber: 0
+  sequence: 6
+```
+
+Also, the new token can be sent to other accounts.
+Note that the `amount` must be specified with the micro-denomination that contains the 3-letter suffix (without `-`).
+```bash
+panaceacli tx send <from-address> <to-address> 1000000ukai0ea
+```
