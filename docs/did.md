@@ -287,6 +287,8 @@ The transaction fails if the DID doesn't exist or if it has been already deactiv
 
 ## Security Considerations
 
+_This section is non-normative._
+
 ### Replay Attack
 
 To prove the DID ownership, Create/Update/Deactivate transactions must contain a `signature` and a `verification_method_id`.
@@ -300,6 +302,16 @@ That is, malicious users cannot reuse the signature from the previous transactio
 The user must generate a new signature from the new `sequence`.
 
 ## Privacy Considerations
+
+_This section is non-normative._
+
+### Keep Personally-Identifiable Information (PII) Private
+
+A DID Document should not include Personally Identifiable Information (PII), even if it is encrypted. All personal data should be kept behind service endpoints under the control of the DID subject. For example, if a DID Document contains a URL which contains any human-meaningful information, such as a username, some personal data can be unintentionally revealed without the DID subject's consent. For more details, please see the [Decentrailized Identifier Specification](https://www.w3.org/TR/did-core/#keep-personally-identifiable-information-pii-private).
+
+### DID Correlation Risks and Pseudonymous DIDs
+
+If DID Controllers want to mitigate the risk of correlation, they should use unique DIDs for every interaction and the corresponding DID Documents should contain a unique public key. For more details, please see the [Decentrailized Identifier Specification](https://www.w3.org/TR/did-core/#did-correlation-risks-and-pseudonymous-dids).
 
 ## Reference Implementations
 
