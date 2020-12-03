@@ -28,19 +28,13 @@ jobs:
     - name: Test
       run: make test
 
+    - name: Lint
+      uses: golangci/golangci-lint-action@v2
+      with:
+        version: v1.30
+
     - name: Publish coverage.html as an artifact
       uses: actions/upload-artifact@master
       with:
         name: coverage
         path: artifacts/coverage.html
-
-  lint:
-    # this action is recommended to be run as a separated job from other jobs (https://github.com/golangci/golangci-lint-action#how-to-use).
-    name: Lint
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: golangci-lint
-        uses: golangci/golangci-lint-action@v1
-        with:
-          version: v1.30
