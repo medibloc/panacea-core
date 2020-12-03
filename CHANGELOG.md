@@ -4,6 +4,12 @@
 
 TBD
 
+## [v1.3.3](https://github.com/medibloc/panacea-core/releases/tag/v1.3.3) - 2020-12-03
+
+### Bug fixes
+
+- [\#83](https://github.com/medibloc/panacea-core/pull/83) Use cosmos/cosmos-sdk v0.37.14 (instead of medibloc/cosmos-sdk v0.37.15-internal)
+
 
 ## [v1.3.2](https://github.com/medibloc/panacea-core/releases/tag/v1.3.2) - 2020-11-13
 
