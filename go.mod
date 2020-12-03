@@ -25,3 +25,5 @@ require (
 	golang.org/x/xerrors v0.0.0-20191011141410-1b5146add898 // indirect
 	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
 )
+
+replace github.com/cosmos/cosmos-sdk => github.com/medibloc/cosmos-sdk v0.37.14-internal
