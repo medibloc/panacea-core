@@ -50,6 +50,13 @@ TBD
     - This bug will be resolved after upgrading cosmos-sdk to [v0.37.11+](https://github.com/cosmos/cosmos-sdk/pull/6021).
 
 
+## [v1.2.7-internal](https://github.com/medibloc/panacea-core/releases/tag/v1.2.7-internal) - 2020-12-03
+
+### Bug fixes
+
+- [\#82](https://github.com/medibloc/panacea-core/pull/82) Fix parsing keeper keys of `x/aol`
+
+
 ## [v1.2.6-internal](https://github.com/medibloc/panacea-core/releases/tag/v1.2.6-internal) - 2020-10-14
 
 ### Features
