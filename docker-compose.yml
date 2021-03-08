@@ -1,0 +1,83 @@
+version: '3'
+
+networks:
+  localnet:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        -
+          subnet: 192.168.10.0/16
+
+services:
+  node1:
+    image: "panacea-core:latest"
+    command: panacead start
+#    ports:
+#      - "26656-26657:26656-26657"
+    volumes:
+      - ~/panacea_home/1/panacead:/root/.panacead
+      - ~/panacea_home/1/panaceacli:/root/.panaceacli
+    networks:
+      localnet:
+        ipv4_address: 192.168.10.2
+
+  node2:
+    image: "panacea-core:latest"
+    command: panacead start
+#    ports:
+#      - "26656-26657:26656-26657"
+    volumes:
+      - ~/panacea_home/2/panacead:/root/.panacead
+      - ~/panacea_home/2/panaceacli:/root/.panaceacli
+    networks:
+      localnet:
+        ipv4_address: 192.168.10.3
+
+  node3:
+    image: "panacea-core:latest"
+    command: panacead start
+#    ports:
+#      - "26656-26657:26656-26657"
+    volumes:
+      - ~/panacea_home/3/panacead:/root/.panacead
+      - ~/panacea_home/3/panaceacli:/root/.panaceacli
+    networks:
+      localnet:
+        ipv4_address: 192.168.10.4
+
+  node4:
+    image: "panacea-core:latest"
+    command: panacead start
+#    ports:
+#      - "26656-26657:26656-26657"
+    volumes:
+      - ~/panacea_home/4/panacead:/root/.panacead
+      - ~/panacea_home/4/panaceacli:/root/.panaceacli
+    networks:
+      localnet:
+        ipv4_address: 192.168.10.5
+
+  node5:
+    image: "panacea-core:latest"
+    command: panacead start
+#    ports:
+#      - "26656-26657:26656-26657"
+    volumes:
+      - ~/panacea_home/5/panacead:/root/.panacead
+      - ~/panacea_home/5/panaceacli:/root/.panaceacli
+    networks:
+      localnet:
+        ipv4_address: 192.168.10.6
+
+  node6:
+    image: "panacea-core:latest"
+    command: panacead start
+#    ports:
+#      - "26656-26657:26656-26657"
+    volumes:
+      - ~/panacea_home/6/panacead:/root/.panacead
+      - ~/panacea_home/6/panaceacli:/root/.panaceacli
+    networks:
+      localnet:
+        ipv4_address: 192.168.10.7

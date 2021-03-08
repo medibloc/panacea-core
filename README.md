@@ -33,6 +33,30 @@
 See the [docs](https://medibloc.gitbook.io/panacea-core/) here
 
 
+## Development
+
+### Build
+
+```bash
+make build
+make test
+
+# Install binaries to the $GOPATH/bin
+make install
+```
+
+### Run nodes in Docker
+
+```bash
+docker build -t panacea-core .
+
+./scripts/prepare_docker_compose.sh
+docker-compose up
+```
+
+
+
+
 ## License
 ```
 Copyright (C) 2019  MediBloc
