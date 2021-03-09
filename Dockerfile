@@ -23,7 +23,7 @@ RUN make clean && make build
 FROM alpine:edge
 
 # Install ca-certificates
-RUN apk add --update ca-certificates
+RUN apk add --update ca-certificates curl
 WORKDIR /root
 
 # Copy over binaries from the build-env

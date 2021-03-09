@@ -13,8 +13,6 @@ services:
   node1:
     image: "panacea-core:latest"
     command: panacead start
-#    ports:
-#      - "26656-26657:26656-26657"
     volumes:
       - ~/panacea_home/1/panacead:/root/.panacead
       - ~/panacea_home/1/panaceacli:/root/.panaceacli
@@ -25,8 +23,6 @@ services:
   node2:
     image: "panacea-core:latest"
     command: panacead start
-#    ports:
-#      - "26656-26657:26656-26657"
     volumes:
       - ~/panacea_home/2/panacead:/root/.panacead
       - ~/panacea_home/2/panaceacli:/root/.panaceacli
@@ -37,8 +33,6 @@ services:
   node3:
     image: "panacea-core:latest"
     command: panacead start
-#    ports:
-#      - "26656-26657:26656-26657"
     volumes:
       - ~/panacea_home/3/panacead:/root/.panacead
       - ~/panacea_home/3/panaceacli:/root/.panaceacli
@@ -49,8 +43,6 @@ services:
   node4:
     image: "panacea-core:latest"
     command: panacead start
-#    ports:
-#      - "26656-26657:26656-26657"
     volumes:
       - ~/panacea_home/4/panacead:/root/.panacead
       - ~/panacea_home/4/panaceacli:/root/.panaceacli
@@ -61,8 +53,6 @@ services:
   node5:
     image: "panacea-core:latest"
     command: panacead start
-#    ports:
-#      - "26656-26657:26656-26657"
     volumes:
       - ~/panacea_home/5/panacead:/root/.panacead
       - ~/panacea_home/5/panaceacli:/root/.panaceacli
@@ -73,8 +63,6 @@ services:
   node6:
     image: "panacea-core:latest"
     command: panacead start
-#    ports:
-#      - "26656-26657:26656-26657"
     volumes:
       - ~/panacea_home/6/panacead:/root/.panacead
       - ~/panacea_home/6/panaceacli:/root/.panaceacli

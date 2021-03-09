@@ -7,7 +7,6 @@ shopt -s expand_aliases
 NUM_NODES=6
 NUM_VALIDATORS=4
 CHAIN_ID=panacea-2
-DOCKER_NETWORK=panacea
 HOME_ROOT=$HOME/panacea_home
 
 rm -rf "${HOME_ROOT}"
@@ -15,16 +14,11 @@ for (( i=1; i<=$NUM_NODES; i++ )); do
   mkdir -p "${HOME_ROOT}/${i}/panacead" "${HOME_ROOT}/${i}/panaceacli"
 done
 
-# Create a docker network for Panacea containers.
-# They will communicate in this network using their container names as IPs.
-docker network rm ${DOCKER_NETWORK} || true
-docker network create ${DOCKER_NETWORK}
-
 # A helper function for generating a bash command to run a docker container
 function get_cmd() {
   mode_opt=$1
   node_id=$2
-  echo "docker run --rm ${mode_opt} --network ${DOCKER_NETWORK} --name node${node_id} \
+  echo "docker run --rm ${mode_opt} \
   -v ${HOME_ROOT}/${node_id}/panacead:/root/.panacead \
   -v ${HOME_ROOT}/${node_id}/panaceacli:/root/.panaceacli \
   panacea-core:latest"
@@ -62,10 +56,12 @@ for (( i=1; i<=$NUM_VALIDATORS; i++ )); do
 done
 
 for (( i=1; i<=$NUM_NODES; i++ )); do
-  cmd="$(get_cmd "-it" "${i}")"
-  sed -i '' "s/^persistent_peers[[:space:]]*=.*$/persistent_peers = \"${PERSISTENT_PEERS}\"/g" "${HOME_ROOT}/${i}/panacead/config/config.toml"
+  config_path="${HOME_ROOT}/${i}/panacead/config/config.toml"
+  sed -i '' "s|^persistent_peers[[:space:]]*=.*$|persistent_peers = \"${PERSISTENT_PEERS}\"|g" "${config_path}"
+  sed -i '' 's|^timeout_commit = .*$|timeout_commit = \"1s\"|g' "${config_path}"
+  sed -i '' 's|^size = .*$|size = 5000|g' "${config_path}"
+  sed -i '' 's|^pex = .*$|pex = true|g' "${config_path}"
+
+#  config_path="${HOME_ROOT}/${i}/panacead/config/panacead.toml"
+#  sed -i '' 's|^minimum-gas-prices = .*$|minimum-gas-prices = \"5.0umed\"|g' "${config_path}"
 done
-
-
-
-
