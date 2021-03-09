@@ -1,14 +1,22 @@
 #!/bin/bash
 
-set -euxo pipefail
+# A script for initializing multiple Panacea nodes, so that they can be started via Docker.
+# This script should work for both Linux and macOS.
+#
+# Prerequisites
+# - Docker
+# - jq
 
+set -euxo pipefail
 shopt -s expand_aliases
 
+# Configurations
 NUM_NODES=6
 NUM_VALIDATORS=4
 CHAIN_ID=panacea-2
 HOME_ROOT=$HOME/panacea_home
 
+# Recreate data directories
 rm -rf "${HOME_ROOT}"
 for (( i=1; i<=$NUM_NODES; i++ )); do
   mkdir -p "${HOME_ROOT}/${i}/panacead" "${HOME_ROOT}/${i}/panaceacli"
@@ -24,6 +32,7 @@ function get_cmd() {
   panacea-core:latest"
 }
 
+# Init the 1st node and create genesis accounts and transactions (to create validators)
 cmd="$(get_cmd "-it" "1")"
 $cmd panacead init node1 --chain-id=${CHAIN_ID}
 for (( i=1; i<=$NUM_VALIDATORS; i++ )); do
@@ -39,12 +48,18 @@ for (( i=1; i<=$NUM_VALIDATORS; i++ )); do
 done
 $cmd panacead collect-gentxs --gentx-dir /root/.panacead/config/gentx/
 
+# Modify some params in the genesis.json
+genesis_path="${HOME_ROOT}/1/panacead/config/genesis.json"
+jq '.app_state.staking.params.max_validators = 5' "${genesis_path}" > /tmp/genesis.json && mv /tmp/genesis.json "${genesis_path}"
+
+# Copy the genesis.json to other nodes' data directories
 for (( i=2; i<=$NUM_NODES; i++ )); do
   cmd="$(get_cmd "-it" "${i}")"
   $cmd panacead init "node${i}" --chain-id=${CHAIN_ID}
   cp "${HOME_ROOT}/1/panacead/config/genesis.json" "${HOME_ROOT}/${i}/panacead/config/genesis.json"
 done
 
+# Assemble a persistent_peers parameter
 PERSISTENT_PEERS=""
 for (( i=1; i<=$NUM_VALIDATORS; i++ )); do
   cmd="$(get_cmd "-it" "${i}")"
@@ -55,6 +70,7 @@ for (( i=1; i<=$NUM_VALIDATORS; i++ )); do
   PERSISTENT_PEERS+="${peer_id}@node${i}:26656"
 done
 
+# Modify config.toml of all nodes
 for (( i=1; i<=$NUM_NODES; i++ )); do
   config_path="${HOME_ROOT}/${i}/panacead/config/config.toml"
   sed -i '' "s|^persistent_peers[[:space:]]*=.*$|persistent_peers = \"${PERSISTENT_PEERS}\"|g" "${config_path}"
