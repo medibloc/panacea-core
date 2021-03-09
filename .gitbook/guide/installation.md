@@ -4,47 +4,36 @@ This guide will explain how to install the `panacead` and `panaceacli` entrypoin
 
 ## Install Go
 
-Install `go` by following the [official docs](https://golang.org/doc/install).
+[Go 1.12+](https://golang.org/doc/install) is required.
 
-::: tip **Go 1.12+ +** is required for Panacea Core. :::
+## Install the `panacead` and `panaceacli`
 
-> _NOTE_: Before installing `panacead` and `panaceacli` binaries, let's add the golang binaries to your `PATH` variable. Open your `.bash_profile` or `.zshrc` and append `$HOME/go/bin` to your PATH variable \(i.e. `export PATH=$HOME/bin:$HOME/go/bin`\).
-
-### Install the binaries
-
-Next, let's install the latest version of Panacea Core. Here we'll use the `master` branch, which contains the latest stable release. If necessary, make sure you `git checkout` the correct released version.
+Install the latest version of Panacea Core.
 
 ```bash
 git clone https://github.com/medibloc/panacea-core
-c​d panacea-core
-git checkout master
-make
+cd panacea-core
+git checkout v1.3.3
+make install
 ```
 
-> _NOTE_: If you have issues at this step, please check that you have the latest stable version of GO installed.
-
-That will install the `panacead` and `panaceacli` binaries. Verify that everything is OK:
-
+Verify that all binaries are installed successfully.
 ```bash
 $ panacead version --long
+name: panacea-core
+server_name: panacead
+client_name: panaceacli
+version: 1.3.3
+commit: 2dfceffc647db15499c715e8833c5e379c04e028
+build_tags: ' ledger'
+go: go version go1.15.5 darwin/amd64
+
 $ panaceacli version --long
+name: panacea-core
+server_name: panacead
+client_name: panaceacli
+version: 1.3.3
+commit: 2dfceffc647db15499c715e8833c5e379c04e028
+build_tags: ' ledger'
+go: go version go1.15.5 darwin/amd64
 ```
-
-`panaceacli` for instance should output something similar to:
-
-```text
-panacea_core: 0.0.2-25-ga25419b
-commit: a25419bd3ffa07dde59f352dd015d2dd859227ef
-go_sum_hash: ff10edafbe07b3e3aa879b1204cab0528ab002b0c4b37fa9dbf97e5117339e24
-build tags: ledger
-go version go1.12.4 darwin/amd64
-```
-
-### Build Tags
-
-Build tags indicate special features that have been enabled in the binary.
-
-| Build Tag | Description |
-| :--- | :--- |
-| ledger | Ledger devices are supported \(hardware wallets\) |
-

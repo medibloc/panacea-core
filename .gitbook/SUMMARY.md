@@ -15,7 +15,7 @@
 * [Deploy a testnet‌](guide/deploy-a-testnet.md)
 * [Interaction with the network: CLI‌](guide/interaction-with-the-network-cli.md)
 * [Light Client Daemon‌](guide/light-client-daemon.md)
-* [​Use the Ledger Nano‌](guide/use-the-ledger-nano.md)
+* [Ledger Nano Support](guide/ledger-nano-support.md)
 
 ## Specifications
 
