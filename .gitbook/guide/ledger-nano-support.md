@@ -13,7 +13,7 @@ Installing the `Panacea` app on your Ledger device is required before using the 
 1. Install [Ledger Live](https://www.ledger.com/ledger-live/) on your machine.
 2. Using Ledger Live, update your Ledger Nano device with the latest firmware.
 3. Navigate to the `Manager` menu on the Ledger Live.
-4. Connect you Ledger Nano device and allow Ledger Manager from it.
+4. Connect your Ledger Nano device and allow Ledger Manager from it.
 5. On the Ledger Live, search for `Panacea` and install it.
 
 
