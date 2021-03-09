@@ -33,36 +33,6 @@
 See the [docs](https://medibloc.gitbook.io/panacea-core/) here
 
 
-## Development
-
-### Build
-
-```bash
-make build
-make test
-
-# Install binaries to the $GOPATH/bin
-make install
-```
-
-### Run nodes via Docker
-
-Before running the following commands, install `jq`, Docker and Docker Compose.
-```bash
-docker build -t panacea-core .
-
-./scripts/prepare_docker_compose.sh
-docker-compose up
-```
-6 nodes are started. 4 of them are validators.
-You can find data directories from `$HOME/panancea_home/<node_id>/*` in your local which are mounted to each Docker container.
-
-You can get a shell to a container by the following command:
-```bash
-docker exec -it panacea-core_node1_1 /bin/sh
-```
-
-
 ## License
 ```
 Copyright (C) 2019  MediBloc
