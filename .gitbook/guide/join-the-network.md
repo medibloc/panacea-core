@@ -67,7 +67,9 @@ Check that everything is running smoothly:
 panaceacli status
 ```
 
-View the status of the network with the [Block Explorer](https://explorer.medibloc.org).
+View the status of the network with the Block Explorer
+- Mainnet: https://explorer.medibloc.org
+- Testnet: https://testnet-explorer.medibloc.org
 
 ## Export State
 
