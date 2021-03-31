@@ -25,6 +25,8 @@ After that, edit the `~/.panacead/config/app.toml` file in order to enable the a
 ```toml
 # Validators reject any tx from the mempool with less than the minimum fee per gas.
 minimum_fees = "0.5umed"
+
+# NOTE: For the Testnet, please set minimum_fees as "", so that no fee is required.
 ```
 
 Now, your full node has been initialized!
