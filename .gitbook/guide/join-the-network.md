@@ -11,7 +11,7 @@ panacead init <your_custom_moniker>
 ```
 
 {% hint style="warning" %}
-Note Monikers can contain only ASCII characters. Using Unicode characters will render your node unreachable.
+The `moniker` can contains only ASCII characters. Using Unicode characters will render your node unreachable.
 {% endhint %}
 
 Then, modify the `timeout_commit` in the `~/.panacead/config/config.toml` as below.
