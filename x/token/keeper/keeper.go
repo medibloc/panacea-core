@@ -55,7 +55,7 @@ func (k tokenKeeper) SetToken(ctx sdk.Context, symbol types.Symbol, token types.
 	newTotal := supply.GetTotal().Add(newCoins)
 	k.supplyKeeper.SetSupply(ctx, supply.SetTotal(newTotal))
 
-	// Deposit the total supply to the owner account
+	// Deposit the total supply of the new coin to the owner account
 	if _, err := k.bankKeeper.AddCoins(ctx, token.OwnerAddress, newCoins); err != nil {
 		panic(err)
 	}
