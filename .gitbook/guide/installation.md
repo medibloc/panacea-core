@@ -14,7 +14,7 @@ Install the latest version of Panacea Core.
 git clone https://github.com/medibloc/panacea-core
 cd panacea-core
 git checkout v1.3.3
-make install
+make install  # All binaries are installed in $GOPATH/bin
 ```
 
 Verify that all binaries are installed successfully.
