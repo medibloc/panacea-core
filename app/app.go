@@ -222,6 +222,7 @@ func NewPanaceaApp(
 		keys[token.StoreKey],
 		app.cdc,
 		app.bankKeeper,
+		app.supplyKeeper,
 	)
 
 	// register the staking hooks

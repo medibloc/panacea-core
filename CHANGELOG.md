@@ -2,7 +2,10 @@
 
 ## Unreleased
 
-TBD
+### Bug fixes
+
+- [\#95](https://github.com/medibloc/panacea-core/pull/95) x/token: Fix to update the total supply of all coins when issuing new tokens
+
 
 ## [v1.3.3](https://github.com/medibloc/panacea-core/releases/tag/v1.3.3) - 2020-12-03
 

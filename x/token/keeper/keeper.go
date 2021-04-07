@@ -24,15 +24,17 @@ type tokenKeeper struct {
 	cdc *codec.Codec
 
 	// External keepers
-	bankKeeper types.BankKeeper
+	bankKeeper   types.BankKeeper
+	supplyKeeper types.SupplyKeeper
 }
 
 // NewKeeper creates a new instance of the token Keeper
-func NewKeeper(storeKey sdk.StoreKey, cdc *codec.Codec, bankKeeper types.BankKeeper) Keeper {
+func NewKeeper(storeKey sdk.StoreKey, cdc *codec.Codec, bankKeeper types.BankKeeper, supplyKeeper types.SupplyKeeper) Keeper {
 	return tokenKeeper{
-		storeKey:   storeKey,
-		cdc:        cdc,
-		bankKeeper: bankKeeper,
+		storeKey:     storeKey,
+		cdc:          cdc,
+		bankKeeper:   bankKeeper,
+		supplyKeeper: supplyKeeper,
 	}
 }
 
@@ -46,8 +48,15 @@ func (k tokenKeeper) SetToken(ctx sdk.Context, symbol types.Symbol, token types.
 	bz := k.cdc.MustMarshalBinaryLengthPrefixed(token)
 	store.Set(key, bz)
 
-	// Deposit the total supply to the owner account
-	if _, err := k.bankKeeper.AddCoins(ctx, token.OwnerAddress, sdk.NewCoins(token.TotalSupply)); err != nil {
+	newCoins := sdk.NewCoins(token.TotalSupply)
+
+	// Update the total supply of all coins
+	supply := k.supplyKeeper.GetSupply(ctx)
+	newTotal := supply.GetTotal().Add(newCoins)
+	k.supplyKeeper.SetSupply(ctx, supply.SetTotal(newTotal))
+
+	// Deposit the total supply of the new coin to the owner account
+	if _, err := k.bankKeeper.AddCoins(ctx, token.OwnerAddress, newCoins); err != nil {
 		panic(err)
 	}
 }
