@@ -90,10 +90,9 @@ func newMsgCreateDID(cliCtx context.CLIContext, privKey secp256k1.PrivKeySecp256
 	pubKey := secp256k1util.PubKeyBytes(secp256k1util.DerivePubKey(privKey))
 	did := types.NewDID(pubKey)
 	veriMethodID := types.NewVeriMethodID(did, "key1")
-	doc := types.NewDIDDocument(
-		did,
-		types.NewVeriMethod(veriMethodID, types.ES256K_2019, did, pubKey),
-	)
+	veriMethods := []types.VeriMethod{types.NewVeriMethod(veriMethodID, types.ES256K_2019, did, pubKey)}
+	authentications := []types.Authentication{types.NewAuthentication(veriMethods[0].ID)}
+	doc := types.NewDIDDocument(did, veriMethods, authentications)
 
 	sig, err := types.Sign(doc, types.InitialSequence, privKey)
 	if err != nil {

@@ -50,15 +50,14 @@ func TestNewDIDDocument(t *testing.T) {
 	did := DID("did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm")
 	pubKey := secp256k1util.PubKeyBytes(secp256k1util.DerivePubKey(secp256k1.GenPrivKey()))
 	veriMethodID := NewVeriMethodID(did, "key1")
-	veriMethod := NewVeriMethod(veriMethodID, ES256K_2019, did, pubKey)
+	veriMethods := []VeriMethod{NewVeriMethod(veriMethodID, ES256K_2019, did, pubKey)}
+	authentications := []Authentication{NewAuthentication(veriMethods[0].ID)}
 
-	doc := NewDIDDocument(did, veriMethod)
+	doc := NewDIDDocument(did, veriMethods, authentications)
 	require.True(t, doc.Valid())
 	require.Equal(t, did, doc.ID)
-	require.Equal(t, 1, len(doc.VeriMethods))
-	require.Equal(t, veriMethod, doc.VeriMethods[0])
-	require.Equal(t, 1, len(doc.Authentications))
-	require.EqualValues(t, veriMethodID, doc.Authentications[0].VeriMethodID)
+	require.EqualValues(t, veriMethods, doc.VeriMethods)
+	require.EqualValues(t, authentications, doc.Authentications)
 }
 
 func TestDIDDocument_Empty(t *testing.T) {
@@ -70,12 +69,13 @@ func TestDIDDocument_VeriMethodByID(t *testing.T) {
 	did := DID("did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm")
 	pubKey := secp256k1util.PubKeyBytes(secp256k1util.DerivePubKey(secp256k1.GenPrivKey()))
 	veriMethodID := NewVeriMethodID(did, "key1")
-	veriMethod := NewVeriMethod(veriMethodID, ES256K_2019, did, pubKey)
-	doc := NewDIDDocument(did, veriMethod)
+	veriMethods := []VeriMethod{NewVeriMethod(veriMethodID, ES256K_2019, did, pubKey)}
+	authentications := []Authentication{NewAuthentication(veriMethods[0].ID)}
+	doc := NewDIDDocument(did, veriMethods, authentications)
 
 	found, ok := doc.VeriMethodByID(veriMethodID)
 	require.True(t, ok)
-	require.Equal(t, veriMethod, found)
+	require.Equal(t, veriMethods[0], found)
 
 	_, ok = doc.VeriMethodByID(NewVeriMethodID(did, "key2"))
 	require.False(t, ok)
@@ -195,12 +195,12 @@ func TestAuthentication_MarshalJSON(t *testing.T) {
 	veriMethodID := NewVeriMethodID(did, "key1")
 	veriMethod := NewVeriMethod(veriMethodID, ES256K_2019, did, pubKey)
 
-	auth := newAuthentication(veriMethodID)
+	auth := NewAuthentication(veriMethodID)
 	bz, err := auth.MarshalJSON()
 	require.NoError(t, err)
 	require.Equal(t, fmt.Sprintf(`"%v"`, veriMethodID), string(bz))
 
-	auth = newAuthenticationDedicated(veriMethod)
+	auth = NewAuthenticationDedicated(veriMethod)
 	bz, err = auth.MarshalJSON()
 	require.NoError(t, err)
 	regex := fmt.Sprintf(`{"id":"%v","type":"%v","controller":"%v","publicKeyBase58":"%v"}`, veriMethodID, ES256K_2019, did, veriMethod.PubKeyBase58)
@@ -216,12 +216,12 @@ func TestAuthentication_UnmarshalJSON(t *testing.T) {
 	var auth Authentication
 	bz := []byte(fmt.Sprintf(`"%v"`, veriMethodID))
 	require.NoError(t, auth.UnmarshalJSON(bz))
-	require.Equal(t, newAuthentication(veriMethodID), auth)
+	require.Equal(t, NewAuthentication(veriMethodID), auth)
 	require.True(t, auth.Valid(did))
 
 	bz = []byte(fmt.Sprintf(`{"id":"%v","type":"%v","controller":"%v","publicKeyBase58":"%v"}`, veriMethodID, ES256K_2019, did, veriMethod.PubKeyBase58))
 	require.NoError(t, auth.UnmarshalJSON(bz))
-	require.Equal(t, newAuthenticationDedicated(veriMethod), auth)
+	require.Equal(t, NewAuthenticationDedicated(veriMethod), auth)
 	require.True(t, auth.Valid(did))
 }
 
@@ -250,6 +250,7 @@ func getValidDIDDocument() DIDDocument {
 	did := DID("did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm")
 	pubKey := secp256k1util.PubKeyBytes(secp256k1util.DerivePubKey(secp256k1.GenPrivKey()))
 	veriMethodID := NewVeriMethodID(did, "key1")
-	veriMethod := NewVeriMethod(veriMethodID, ES256K_2019, did, pubKey)
-	return NewDIDDocument(did, veriMethod)
+	veriMethods := []VeriMethod{NewVeriMethod(veriMethodID, ES256K_2019, did, pubKey)}
+	authentications := []Authentication{NewAuthentication(veriMethods[0].ID)}
+	return NewDIDDocument(did, veriMethods, authentications)
 }

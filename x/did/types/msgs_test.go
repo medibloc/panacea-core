@@ -99,6 +99,11 @@ func newDIDDocument() types.DIDDocument {
 	did, _ := types.ParseDID("did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm")
 	veriMethodID := types.NewVeriMethodID(did, "key1")
 	pubKey, _ := secp256k1util.PubKeyFromBase58("qoRmLNBEXoaKDE8dKffMq2DBNxacTEfvbKRuFrccYW1b")
-	veriMethod := types.NewVeriMethod(veriMethodID, types.ES256K_2019, did, secp256k1util.PubKeyBytes(pubKey))
-	return types.NewDIDDocument(did, veriMethod)
+	veriMethods := []types.VeriMethod{
+		types.NewVeriMethod(veriMethodID, types.ES256K_2019, did, secp256k1util.PubKeyBytes(pubKey)),
+	}
+	authentications := []types.Authentication{
+		types.NewAuthentication(veriMethods[0].ID),
+	}
+	return types.NewDIDDocument(did, veriMethods, authentications)
 }

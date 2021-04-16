@@ -64,12 +64,12 @@ type DIDDocument struct {
 	Authentications []Authentication `json:"authentication"`
 }
 
-func NewDIDDocument(id DID, veriMethod VeriMethod) DIDDocument {
+func NewDIDDocument(id DID, veriMethods []VeriMethod, authentications []Authentication) DIDDocument {
 	return DIDDocument{
 		Contexts:        Contexts{ContextDIDV1},
 		ID:              id,
-		VeriMethods:     []VeriMethod{veriMethod},
-		Authentications: []Authentication{newAuthentication(veriMethod.ID)},
+		VeriMethods:     veriMethods,
+		Authentications: authentications,
 	}
 }
 
@@ -301,11 +301,11 @@ type Authentication struct {
 	DedicatedMethod *VeriMethod
 }
 
-func newAuthentication(veriMethodID VeriMethodID) Authentication {
+func NewAuthentication(veriMethodID VeriMethodID) Authentication {
 	return Authentication{VeriMethodID: veriMethodID, DedicatedMethod: nil}
 }
 
-func newAuthenticationDedicated(veriMethod VeriMethod) Authentication {
+func NewAuthenticationDedicated(veriMethod VeriMethod) Authentication {
 	return Authentication{VeriMethodID: veriMethod.ID, DedicatedMethod: &veriMethod}
 }
 
@@ -339,7 +339,7 @@ func (a *Authentication) UnmarshalJSON(bz []byte) error {
 	var veriMethodID VeriMethodID
 	err := json.Unmarshal(bz, &veriMethodID)
 	if err == nil {
-		*a = newAuthentication(veriMethodID)
+		*a = NewAuthentication(veriMethodID)
 		return nil
 	}
 
@@ -348,7 +348,7 @@ func (a *Authentication) UnmarshalJSON(bz []byte) error {
 	if err := json.Unmarshal(bz, &veriMethod); err != nil {
 		return err
 	}
-	*a = newAuthenticationDedicated(veriMethod)
+	*a = NewAuthenticationDedicated(veriMethod)
 	return nil
 }
 
