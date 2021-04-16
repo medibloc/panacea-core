@@ -3,6 +3,8 @@ package keeper
 import (
 	"testing"
 
+	"github.com/medibloc/panacea-core/x/did/internal/secp256k1util"
+
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/tendermint/tendermint/crypto"
 	"github.com/tendermint/tendermint/crypto/secp256k1"
@@ -80,8 +82,9 @@ func (k mockKeeper) ListDIDs(ctx sdk.Context) []types.DID {
 
 func newDIDDocumentWithSeq(did types.DID) (types.DIDDocumentWithSeq, crypto.PrivKey) {
 	privKey := secp256k1.GenPrivKey()
+	pubKey := secp256k1util.PubKeyBytes(secp256k1util.DerivePubKey(privKey))
 	veriMethodID := types.NewVeriMethodID(did, "key1")
-	pubKey := types.NewVeriMethod(veriMethodID, types.ES256K, did, privKey.PubKey())
-	doc := types.NewDIDDocumentWithSeq(types.NewDIDDocument(did, pubKey), types.InitialSequence)
+	veriMethod := types.NewVeriMethod(veriMethodID, types.ES256K_2019, did, pubKey)
+	doc := types.NewDIDDocumentWithSeq(types.NewDIDDocument(did, veriMethod), types.InitialSequence)
 	return doc, privKey
 }

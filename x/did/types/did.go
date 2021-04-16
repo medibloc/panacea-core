@@ -4,13 +4,12 @@ import (
 	"crypto/sha256"
 	"encoding/json"
 	"fmt"
+	"log"
 	"regexp"
 	"strings"
 
 	"github.com/btcsuite/btcutil/base58"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/tendermint/tendermint/crypto"
-	"github.com/tendermint/tendermint/crypto/secp256k1"
 )
 
 const (
@@ -20,9 +19,9 @@ const (
 
 type DID string
 
-func NewDID(pubKey crypto.PubKey, keyType KeyType) DID {
+func NewDID(pubKey []byte) DID {
 	hash := sha256.New()
-	_, err := hash.Write(getPubKeyBytes(pubKey, keyType))
+	_, err := hash.Write(pubKey)
 	if err != nil {
 		panic("failed to calculate SHA256 for DID")
 	}
@@ -181,18 +180,14 @@ func (ctxs *Contexts) UnmarshalJSON(bz []byte) error {
 
 type Context string
 
+// https://w3c.github.io/did-spec-registries/#context
 const (
-	ContextDIDV1      Context = "https://www.w3.org/ns/did/v1"
-	ContextSecurityV1 Context = "https://w3id.org/security/v1"
+	ContextDIDV1 Context = "https://www.w3.org/ns/did/v1"
 )
 
 func (ctx Context) Valid() bool {
-	switch ctx {
-	case ContextDIDV1, ContextSecurityV1:
-		return true
-	default:
-		return false
-	}
+	// TODO: The context can be any URI string. But, don't validate it strictly yet until W3C finalizes the spec.
+	return ctx != ""
 }
 
 type VeriMethodID string
@@ -233,42 +228,64 @@ func (id VeriMethodID) Valid(did DID) bool {
 
 type KeyType string
 
+// https://w3c.github.io/did-spec-registries/#verification-method-types
 const (
-	ES256K KeyType = "Secp256k1VerificationKey2018"
+	JSONWEBKEY_2020 KeyType = "JsonWebKey2020"
+	ES256K_2019     KeyType = "EcdsaSecp256k1VerificationKey2019"
+	ES256K_2018     KeyType = "Secp256k1VerificationKey2018" // deprecated
+	ED25519_2018    KeyType = "Ed25519VerificationKey2018"
+	BLS1281G1_2020  KeyType = "Bls12381G1Key2020"
+	BLS1281G2_2020  KeyType = "Bls12381G2Key2020"
+	GPG_2020        KeyType = "GpgVerificationKey2020"
+	RSA_2018        KeyType = "RsaVerificationKey2018"
+	X25519_2019     KeyType = "X25519KeyAgreementKey2019"
+	SS256K_2019     KeyType = "SchnorrSecp256k1VerificationKey2019"
+	ES256K_R_2020   KeyType = "EcdsaSecp256k1RecoveryMethod2020"
 )
 
 func (t KeyType) Valid() bool {
 	switch t {
-	case ES256K:
+	case JSONWEBKEY_2020,
+		ES256K_2019,
+		ES256K_2018,
+		ED25519_2018,
+		BLS1281G1_2020,
+		BLS1281G2_2020,
+		GPG_2020,
+		RSA_2018,
+		X25519_2019,
+		SS256K_2019,
+		ES256K_R_2020:
 		return true
 	}
-	return false
+
+	// TODO: Return false, after W3C finalizes the spec.
+	if t == "" {
+		return false
+	}
+	log.Printf("[warn] unknown key type: %s\n", t) // TODO: Use tendermint logger
+	return true
 }
 
-// TODO: support various types: https://www.w3.org/TR/did-core/#key-types-and-formats
 type VeriMethod struct {
-	ID           VeriMethodID `json:"id"`
-	Type         KeyType      `json:"type"`
-	Controller   DID          `json:"controller"`
-	PubKeyBase58 string       `json:"publicKeyBase58"`
+	ID         VeriMethodID `json:"id"`
+	Type       KeyType      `json:"type"`
+	Controller DID          `json:"controller"`
+	//TODO: support various pubkey representation (not fully-defined yet by W3C): https://w3c.github.io/did-spec-registries/#verification-method-types
+	PubKeyBase58 string `json:"publicKeyBase58"`
 }
 
-func NewVeriMethod(id VeriMethodID, keyType KeyType, controller DID, key crypto.PubKey) VeriMethod {
+func NewVeriMethod(id VeriMethodID, keyType KeyType, controller DID, pubKey []byte) VeriMethod {
 	return VeriMethod{
 		ID:           id,
 		Type:         keyType,
 		Controller:   controller,
-		PubKeyBase58: base58.Encode(getPubKeyBytes(key, keyType)),
+		PubKeyBase58: base58.Encode(pubKey),
 	}
 }
 
 func (pk VeriMethod) Valid(did DID) bool {
 	if !pk.ID.Valid(did) || !pk.Type.Valid() {
-		return false
-	}
-
-	// TODO: support the other DID as a controller
-	if pk.Controller != did {
 		return false
 	}
 
@@ -368,36 +385,4 @@ func (d DIDDocumentWithSeq) Deactivate(newSeq Sequence) DIDDocumentWithSeq {
 // Deactivated returns true if the DIDDocument has been activated.
 func (d DIDDocumentWithSeq) Deactivated() bool {
 	return d.Document.Empty() && d.Seq != InitialSequence
-}
-
-// NewPrivKeyFromBytes converts a byte slice into a Secp256k1 private key.
-// It returns an error when the length of the input is invalid.
-func NewPrivKeyFromBytes(bz []byte) (secp256k1.PrivKeySecp256k1, error) {
-	var key secp256k1.PrivKeySecp256k1
-	if len(bz) != len(key) {
-		return key, fmt.Errorf("invalid Secp256k1 private key. len:%d, expected:%d", len(bz), len(key))
-	}
-	copy(key[:], bz)
-	return key, nil
-}
-
-// NewPubKeyFromBase58 decodes a base58-encoded Secp256k1 public key.
-// It returns an error when the length of the input is invalid.
-func NewPubKeyFromBase58(b58 string) (secp256k1.PubKeySecp256k1, error) {
-	var key secp256k1.PubKeySecp256k1
-	decoded := base58.Decode(b58)
-	if len(decoded) != len(key) {
-		return key, fmt.Errorf("invalid Secp256k1 public key. len:%d, expected:%d", len(decoded), len(key))
-	}
-	copy(key[:], decoded)
-	return key, nil
-}
-
-func getPubKeyBytes(key crypto.PubKey, keyType KeyType) []byte {
-	switch keyType {
-	case ES256K:
-		bz := key.(secp256k1.PubKeySecp256k1)
-		return bz[:]
-	}
-	panic(fmt.Sprintf("unsupported pubkey type: %v", keyType))
 }

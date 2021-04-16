@@ -3,6 +3,8 @@ package did
 import (
 	"fmt"
 
+	"github.com/medibloc/panacea-core/x/did/internal/secp256k1util"
+
 	"github.com/medibloc/panacea-core/x/did/keeper"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -86,18 +88,16 @@ func handleMsgDeactivateDID(ctx sdk.Context, keeper keeper.Keeper, msg MsgDeacti
 }
 
 // verifyDIDOwnership verifies the DID ownership from a sig which is based on the data.
-// It fetches a public key from a doc using veriMethodID. It also uses a seq to verifyDIDOwnership the sig.
+// It fetches a public key from a doc using veriMethodID. It also uses a seq to verify the sig.
 // If the verification is successful, it returns a new sequence. If not, it returns an error.
 func verifyDIDOwnership(data types.Signable, seq types.Sequence, doc types.DIDDocument, veriMethodID types.VeriMethodID, sig []byte) (types.Sequence, sdk.Error) {
 	veriMethod, ok := doc.VeriMethodByID(veriMethodID)
 	if !ok {
 		return 0, types.ErrVeriMethodIDNotFound(veriMethodID)
 	}
-	if veriMethod.Controller != doc.ID { // TODO: support other controllers
-		return 0, types.ErrInvalidKeyController(veriMethod.Controller)
-	}
 
-	pubKeySecp256k1, err := types.NewPubKeyFromBase58(veriMethod.PubKeyBase58)
+	// TODO: Currently, only ES256K1 is supported. Support other sig types (according to veriMethod.Type).
+	pubKeySecp256k1, err := secp256k1util.PubKeyFromBase58(veriMethod.PubKeyBase58)
 	if err != nil {
 		return 0, types.ErrInvalidSecp256k1PublicKey(err)
 	}

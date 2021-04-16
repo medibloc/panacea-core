@@ -7,6 +7,8 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/medibloc/panacea-core/x/did/internal/secp256k1util"
+
 	"github.com/tendermint/tendermint/crypto"
 
 	"github.com/cosmos/cosmos-sdk/client"
@@ -85,10 +87,13 @@ func GetCmdCreateDID(cdc *codec.Codec) *cobra.Command {
 // It generates the minimal DID document which contains only one public key information,
 // so that it can be extended by MsgUpdateDID later.
 func newMsgCreateDID(cliCtx context.CLIContext, privKey secp256k1.PrivKeySecp256k1) (types.MsgCreateDID, error) {
-	pubKey := privKey.PubKey()
-	did := types.NewDID(pubKey, types.ES256K)
+	pubKey := secp256k1util.PubKeyBytes(secp256k1util.DerivePubKey(privKey))
+	did := types.NewDID(pubKey)
 	veriMethodID := types.NewVeriMethodID(did, "key1")
-	doc := types.NewDIDDocument(did, types.NewVeriMethod(veriMethodID, types.ES256K, did, pubKey))
+	doc := types.NewDIDDocument(
+		did,
+		types.NewVeriMethod(veriMethodID, types.ES256K_2019, did, pubKey),
+	)
 
 	sig, err := types.Sign(doc, types.InitialSequence, privKey)
 	if err != nil {
@@ -282,7 +287,7 @@ func getPrivKeyFromKeyStore(veriMethodID types.VeriMethodID, reader *bufio.Reade
 		return secp256k1.PrivKeySecp256k1{}, err
 	}
 
-	return types.NewPrivKeyFromBytes(privKeyBytes)
+	return secp256k1util.PrivKeyFromBytes(privKeyBytes)
 }
 
 // signUsingCurrentSeq generates a signature using the current sequence stored in the blockchain.
