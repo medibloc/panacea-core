@@ -84,8 +84,12 @@ func newDIDDocumentWithSeq(did types.DID) (types.DIDDocumentWithSeq, crypto.Priv
 	privKey := secp256k1.GenPrivKey()
 	pubKey := secp256k1util.PubKeyBytes(secp256k1util.DerivePubKey(privKey))
 	veriMethodID := types.NewVeriMethodID(did, "key1")
-	veriMethods := []types.VeriMethod{types.NewVeriMethod(veriMethodID, types.ES256K_2019, did, pubKey)}
-	authentications := []types.Authentication{types.NewAuthentication(veriMethods[0].ID)}
+	veriMethods := []types.VeriMethod{
+		types.NewVeriMethod(veriMethodID, types.ES256K_2019, did, pubKey),
+	}
+	authentications := []types.Authentication{
+		types.NewAuthentication(veriMethods[0].ID),
+	}
 	doc := types.NewDIDDocumentWithSeq(types.NewDIDDocument(did, veriMethods, authentications), types.InitialSequence)
 	return doc, privKey
 }
