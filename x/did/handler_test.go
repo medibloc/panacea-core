@@ -3,6 +3,8 @@ package did
 import (
 	"testing"
 
+	"github.com/medibloc/panacea-core/x/did/internal/secp256k1util"
+
 	"github.com/medibloc/panacea-core/x/did/keeper"
 
 	"github.com/tendermint/tendermint/crypto/secp256k1"
@@ -70,9 +72,9 @@ func TestHandleMsgUpdateDID(t *testing.T) {
 	newDoc := origDoc.Document
 	newDoc.VeriMethods = append(newDoc.VeriMethods, types.NewVeriMethod(
 		types.NewVeriMethodID(did, "key2"),
-		types.ES256K,
+		types.ES256K_2019,
 		did,
-		secp256k1.GenPrivKey().PubKey(),
+		secp256k1util.PubKeyBytes(secp256k1util.DerivePubKey(secp256k1.GenPrivKey())),
 	))
 
 	// call
@@ -234,9 +236,16 @@ func ctx() (types.DID, types.DIDDocumentWithSeq, crypto.PrivKey, types.VeriMetho
 
 func newDIDDocumentWithSeq(did types.DID) (types.DIDDocumentWithSeq, crypto.PrivKey) {
 	privKey := secp256k1.GenPrivKey()
+	pubKey := secp256k1util.PubKeyBytes(secp256k1util.DerivePubKey(privKey))
 	veriMethodID := types.NewVeriMethodID(did, "key1")
-	pubKey := types.NewVeriMethod(veriMethodID, types.ES256K, did, privKey.PubKey())
-	doc := types.NewDIDDocumentWithSeq(types.NewDIDDocument(did, pubKey), types.InitialSequence)
+	veriMethods := []types.VeriMethod{
+		types.NewVeriMethod(veriMethodID, types.ES256K_2019, did, pubKey),
+		types.NewVeriMethod(veriMethodID, types.BLS1281G2_2020, did, []byte("dummy BBS+ pub key")),
+	}
+	authentications := []types.Authentication{
+		types.NewAuthentication(veriMethods[0].ID),
+	}
+	doc := types.NewDIDDocumentWithSeq(types.NewDIDDocument(did, veriMethods, authentications), types.InitialSequence)
 	return doc, privKey
 }
 

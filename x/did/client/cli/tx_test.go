@@ -7,6 +7,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/medibloc/panacea-core/x/did/internal/secp256k1util"
+
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/spf13/viper"
 
@@ -38,7 +40,7 @@ func TestNewMsgCreateDID(t *testing.T) {
 
 	// check if veriMethod is correct
 	veriMethod, _ := msg.Document.VeriMethodByID(msg.VeriMethodID)
-	pubKey, _ := types.NewPubKeyFromBase58(veriMethod.PubKeyBase58)
+	pubKey, _ := secp256k1util.PubKeyFromBase58(veriMethod.PubKeyBase58)
 	require.Equal(t, privKey.PubKey(), pubKey)
 
 	// check if the signature can be verifiable with the initial sequence
