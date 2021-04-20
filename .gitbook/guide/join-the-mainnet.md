@@ -1,6 +1,65 @@
-# Join the network
+# Join the Mainnet
 
-## Setting Up a New Node
+This tutorial introduces deploying a new node on [AWS](https://aws.amazon.com/) and join the Panacea Mainnet.
+
+
+## Launch an AWS EC2 Instance
+
+### Choose an AMI
+
+Choose Ubuntu Server 20.04 LTS 64-bit (x86) with SSD Volume Type.
+![](../assets/fullnode/ec2-ami.png)
+
+### Choose the instance type
+
+Choose the `m5.large` instance type.
+![img.png](../assets/fullnode/ec2-instance-type.png)
+
+### Configure instance details
+
+Configuration | Value
+--------------|-------
+Network | Choose an existing VPC or default one if you don't have any
+Subnet | Choose an existing subnet or default one if you don't have any
+Auto-assign Public IP | Enable only if you access a full node from the outside of its VPC
+Other fields | Follow default settings
+
+### Add a storage
+
+Configuration | Value
+--------------|-------
+Size | 500 GiB
+Volume Type | `General Purpose SSD (gp3)`
+IOPS | 3000
+Throughput | 125 MB/s
+
+### Configure a Security Group
+
+Type | Protocol | Port range |  Description
+-----|----------|------------|-------------
+SSH | TCP | 22 |
+Custom TCP | TCP | 26656 | P2P with other nodes
+Custom TCP | TCP | 26657 | RPC
+Custom TCP | TCP | 1317 | HTTP
+
+The P2P `26656` port must be exposed to other Panacea nodes.
+If your node will be in the VPC guarded by [Sentry nodes](https://docs.tendermint.com/master/nodes/validators.html#local-configuration),
+expose `26656` to only Sentry nodes (recommended). If not, expose it to anywhere.
+
+The RPC `26657` and HTTP `1317` ports are for sending transactions/queries to your node.
+So, expose them to the network where you perform operational actions.
+
+
+### Connect to your EC2 instance and install prerequisites.
+
+```bash
+ssh ubuntu@<your-ec2-ip> -i <your-key>.pem
+```
+
+Install prerequisites by following the [Installation](installation.md) guide.
+
+
+## Setup a New Node
 
 These instructions are for setting up a brand new full node from scratch.
 
@@ -31,15 +90,13 @@ minimum_fees = "0.5umed"
 
 Now, your full node has been initialized!
 
-## Genesis & Seeds
-
-### Copy the Genesis File
+### Copy the Genesis file
 
 Fetch the `genesis.json` file of the latest chain from the following links, and place it to `~/.panacead/config/genesis.json`.
 - Mainnet: https://github.com/medibloc/panacea-launch
 - Testnet: https://github.com/medibloc/panacea-networks
 
-### Add Seed Nodes
+### Configure Seed Nodes
 
 Your node needs to know how to find peers.
 
@@ -54,6 +111,7 @@ persistent_peers = "8c41cc8a6fc59f05138ae6c16a9eec05d601ef71@13.209.177.91:26656
 ```
 
 For more information on seeds and peers, see the [Using Tendermint: Peers](https://docs.tendermint.com/master/tendermint-core/using-tendermint.html#peers).
+
 
 ## Run a Full Node
 
@@ -73,19 +131,12 @@ View the status of the network with the Block Explorer
 - Mainnet: https://explorer.medibloc.org
 - Testnet: https://testnet-explorer.medibloc.org
 
-## Export State
 
-Panacea can dump the entire application state to a JSON file, which could be useful for manual analysis and can also be used as the genesis file of a new network.
+## Join as a validator
 
-Export state with:
 
-```bash
-panacead export > [filename].json
-```
+{% hint style="info" %}
+This guide is only for node operators who want to act as a validator.
+{% endhint %}
 
-You can also export state from a particular height \(at the end of processing the block of that height\):
-
-```bash
-panacead export --height [height] > [filename].json
-```
 
