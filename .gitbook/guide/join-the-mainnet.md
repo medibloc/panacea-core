@@ -134,9 +134,11 @@ View the status of the network with the Block Explorer
 
 ## Join as a validator
 
+If you want to participate in validating blocks as a validator,
+you can register yourself into the validator set by submitting a transaction.
 
-{% hint style="info" %}
-This guide is only for node operators who want to act as a validator.
-{% endhint %}
+For more details, see the [CLI guide](interaction-with-the-network-cli.md#staking).
+
+
 
 

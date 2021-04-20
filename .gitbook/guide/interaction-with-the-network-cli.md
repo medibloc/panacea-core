@@ -244,9 +244,48 @@ panaceacli query slashing params
 
 ### Staking
 
-#### Set up a Validator
+#### Create your validator
 
-&lt;To be announced&gt;
+{% hint style="info" %}
+This guide assumes that you have already set up your full node.
+{% endhint %}
+
+Your `panaceavalconspub` address (public key) can be used to create a new validator by staking tokens.
+You can find your validator public key by:
+```bash
+panacead tendermint show-validator
+```
+
+Execute the following command to create your validator:
+
+{% hint style="warning" %}
+Don't use more `umed` than you have!
+{% endhint %}
+
+```bash
+panacead tx staking create-validator \
+  --amount=10000000umed \
+  --pubkey=$(panacead tenderment show-validator) \
+  --moniker="choose a moniker" \
+  --chain-id=<chain-id> \
+  --commission-rate="0.10" \
+  --commision-max-rate="0.20" \
+  --commision-max-change-rate="0.01" \
+  --min-self-delegation="1" \
+  --fees="1000000umed" \
+  --from=<key-name>
+```
+
+A `commission-max-change-rate` is used to measure % point change over the `commision-rate`.
+E.g. 1% to 2% is a 100% rate increase, but only 1% point.
+
+A `min-self-delegation` is a strictly positive integer that represents the minimum amount of self-delegated voting power
+your validator must always have. A `min-self-delegation` of `1` means your validator will never have a self-delegation lower than `1med` (`1000000umed`).
+
+You can confirm that you are in the validator set by the following command:
+```bash
+panaceacli query staking validators
+```
 
 #### Delegate to a Validator
 
