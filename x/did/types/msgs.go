@@ -12,21 +12,21 @@ var (
 
 // MsgCreateDID defines a CreateDID message.
 type MsgCreateDID struct {
-	DID          DID            `json:"did"`
-	Document     DIDDocument    `json:"document"`
-	VeriMethodID VeriMethodID   `json:"verification_method_id"`
-	Signature    []byte         `json:"signature"`
-	FromAddress  sdk.AccAddress `json:"from_address"`
+	DID                  DID                  `json:"did"`
+	Document             DIDDocument          `json:"document"`
+	VerificationMethodID VerificationMethodID `json:"verification_method_id"`
+	Signature            []byte               `json:"signature"`
+	FromAddress          sdk.AccAddress       `json:"from_address"`
 }
 
 // NewMsgCreateDID is a constructor of MsgCreateDID.
-func NewMsgCreateDID(did DID, doc DIDDocument, veriMethodID VeriMethodID, sig []byte, fromAddr sdk.AccAddress) MsgCreateDID {
+func NewMsgCreateDID(did DID, doc DIDDocument, verificationMethodID VerificationMethodID, sig []byte, fromAddr sdk.AccAddress) MsgCreateDID {
 	return MsgCreateDID{
-		DID:          did,
-		Document:     doc,
-		VeriMethodID: veriMethodID,
-		Signature:    sig,
-		FromAddress:  fromAddr,
+		DID:                  did,
+		Document:             doc,
+		VerificationMethodID: verificationMethodID,
+		Signature:            sig,
+		FromAddress:          fromAddr,
 	}
 }
 
@@ -65,21 +65,21 @@ func (msg MsgCreateDID) GetSigners() []sdk.AccAddress {
 
 // MsgUpdateDID defines a UpdateDID message.
 type MsgUpdateDID struct {
-	DID          DID            `json:"did"`
-	Document     DIDDocument    `json:"document"`
-	VeriMethodID VeriMethodID   `json:"verification_method_id"`
-	Signature    []byte         `json:"signature"`
-	FromAddress  sdk.AccAddress `json:"from_address"`
+	DID                  DID                  `json:"did"`
+	Document             DIDDocument          `json:"document"`
+	VerificationMethodID VerificationMethodID `json:"verification_method_id"`
+	Signature            []byte               `json:"signature"`
+	FromAddress          sdk.AccAddress       `json:"from_address"`
 }
 
 // NewMsgUpdateDID is a constructor of MsgUpdateDID.
-func NewMsgUpdateDID(did DID, doc DIDDocument, veriMethodID VeriMethodID, sig []byte, fromAddr sdk.AccAddress) MsgUpdateDID {
+func NewMsgUpdateDID(did DID, doc DIDDocument, verificationMethodID VerificationMethodID, sig []byte, fromAddr sdk.AccAddress) MsgUpdateDID {
 	return MsgUpdateDID{
-		DID:          did,
-		Document:     doc,
-		VeriMethodID: veriMethodID,
-		Signature:    sig,
-		FromAddress:  fromAddr,
+		DID:                  did,
+		Document:             doc,
+		VerificationMethodID: verificationMethodID,
+		Signature:            sig,
+		FromAddress:          fromAddr,
 	}
 }
 
@@ -118,15 +118,15 @@ func (msg MsgUpdateDID) GetSigners() []sdk.AccAddress {
 
 // MsgDeactivateDID defines a UpdateDID message.
 type MsgDeactivateDID struct {
-	DID          DID            `json:"did"`
-	VeriMethodID VeriMethodID   `json:"verification_method_id"`
-	Signature    []byte         `json:"signature"`
-	FromAddress  sdk.AccAddress `json:"from_address"`
+	DID                  DID                  `json:"did"`
+	VerificationMethodID VerificationMethodID `json:"verification_method_id"`
+	Signature            []byte               `json:"signature"`
+	FromAddress          sdk.AccAddress       `json:"from_address"`
 }
 
 // NewMsgDeactivateDID is a constructor of MsgDeactivateDID.
-func NewMsgDeactivateDID(did DID, veriMethodID VeriMethodID, sig []byte, fromAddr sdk.AccAddress) MsgDeactivateDID {
-	return MsgDeactivateDID{did, veriMethodID, sig, fromAddr}
+func NewMsgDeactivateDID(did DID, verificationMethodID VerificationMethodID, sig []byte, fromAddr sdk.AccAddress) MsgDeactivateDID {
+	return MsgDeactivateDID{did, verificationMethodID, sig, fromAddr}
 }
 
 // Route returns the name of the module.

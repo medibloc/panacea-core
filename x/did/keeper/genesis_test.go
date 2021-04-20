@@ -83,13 +83,16 @@ func (k mockKeeper) ListDIDs(ctx sdk.Context) []types.DID {
 func newDIDDocumentWithSeq(did types.DID) (types.DIDDocumentWithSeq, crypto.PrivKey) {
 	privKey := secp256k1.GenPrivKey()
 	pubKey := secp256k1util.PubKeyBytes(secp256k1util.DerivePubKey(privKey))
-	veriMethodID := types.NewVeriMethodID(did, "key1")
-	veriMethods := []types.VeriMethod{
-		types.NewVeriMethod(veriMethodID, types.ES256K_2019, did, pubKey),
+	verificationMethodID := types.NewVerificationMethodID(did, "key1")
+	verificationMethods := []types.VerificationMethod{
+		types.NewVerificationMethod(verificationMethodID, types.ES256K_2019, did, pubKey),
 	}
-	authentications := []types.Authentication{
-		types.NewAuthentication(veriMethods[0].ID),
+	authentications := []types.VerificationRelationship{
+		types.NewVerificationRelationship(verificationMethods[0].ID),
 	}
-	doc := types.NewDIDDocumentWithSeq(types.NewDIDDocument(did, veriMethods, authentications), types.InitialSequence)
+	doc := types.NewDIDDocumentWithSeq(
+		types.NewDIDDocument(did, types.WithVerificationMethods(verificationMethods), types.WithAuthentications(authentications)),
+		types.InitialSequence,
+	)
 	return doc, privKey
 }
