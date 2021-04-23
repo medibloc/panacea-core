@@ -11,7 +11,7 @@
 
 * [Getting started](guide/getting-started.md)
 * [Installation](guide/installation.md)
-* [Join the Mainnet‌](guide/join-the-mainnet.md)
+* [Join the Network](guide/join-the-network.md)
 * [Deploy a Testnet‌](guide/deploy-a-testnet.md)
 * [Interaction with the network: CLI‌](guide/interaction-with-the-network-cli.md)
 * [Light Client Daemon‌](guide/light-client-daemon.md)

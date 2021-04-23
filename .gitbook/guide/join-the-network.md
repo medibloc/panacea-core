@@ -1,4 +1,4 @@
-# Join the Mainnet
+# Join the Network
 
 This tutorial introduces deploying a new node on [AWS](https://aws.amazon.com/) and join the Panacea Mainnet.
 
