@@ -1,14 +1,12 @@
 # Interaction with the network: CLI‌
 
-## Panacea CLI
-
 For more information on the command usage, refer to its help screen: `panaceacli --help`.
 
 Here is a list of useful `panaceacli` commands, including usage examples.
 
-### Keys
+## Keys
 
-#### Key Types
+### Key Types
 
 There are three types of key representations that are used:
 
@@ -28,7 +26,7 @@ There are three types of key representations that are used:
   * Get this value with `panacead tendermint show-validator`
   * e.g. `panaceavalconspub1zcjduepqktkqqsl9rchj77v9vg0crc87grp9h2u5ggpdtvcq74kxlr29lgwsa3dr66`
 
-#### Generate Keys
+### Generate Keys
 
 You'll need an account private and public key pair \(a.k.a. `sk, pk` respectively\) to be able to receive funds, send txs, bond tx, etc.
 
@@ -72,7 +70,7 @@ Note that this is the Tendermint signing key, _not_ the operator key you will us
 
 ::: danger Warning We strongly recommend _NOT_ using the same passphrase for multiple keys. The MediBloc team will not be responsible for the loss of funds. :::
 
-### Fees & Gas
+## Fees & Gas
 
 Each transaction may either supply fees or gas prices, but not both. Most users will typically provide fees as this is the cost you will end up incurring for the transaction being included in the ledger.
 
@@ -92,9 +90,9 @@ or
 panaceacli tx send ... --gas-prices=500.0umed
 ```
 
-### Account
+## Account
 
-#### Query Account balance
+### Query Account balance
 
 After receiving tokens to your address, you can view your account's balance by typing:
 
@@ -104,7 +102,7 @@ panaceacli query account <account_panacea>
 
 ::: warning Note When you query an account balance with zero tokens, you will get this error: `account <account_panacea> does not exist.` This can also happen if you fund the account before your node has fully synced with the chain. These are both normal.:::
 
-### Send Tokens
+## Send Tokens
 
 The following command could be used to send coins from one account to another:
 
@@ -176,9 +174,9 @@ You can broadcast the signed transaction to a node by providing the JSON file to
 panaceacli tx broadcast --node=<node> signedSendTx.json
 ```
 
-### Query Transactions
+## Query Transactions
 
-#### Matching a set of tags
+### Matching a set of tags
 
 You can use the transaction search command to query for transactions that match a specific set of `tags`, which are added on every transaction.
 
@@ -208,7 +206,7 @@ The action tag always equals the message type returned by the `Type()` function 
 
 You can find a list of available `tags` on each module by looking at the /tags directory of each module. :::
 
-#### Matching a transaction's hash
+### Matching a transaction's hash
 
 You can also query a single transaction by its hash using the following command:
 
@@ -216,9 +214,9 @@ You can also query a single transaction by its hash using the following command:
 panaceacli query tx [hash]
 ```
 
-### Slashing
+## Slashing
 
-#### Unjailing
+### Unjailing
 
 To unjail your jailed validator
 
@@ -226,7 +224,7 @@ To unjail your jailed validator
 panaceacli tx slashing unjail --from <validator-operator-addr>
 ```
 
-#### Signing Info
+### Signing Info
 
 To retrieve a validator's signing info:
 
@@ -234,7 +232,7 @@ To retrieve a validator's signing info:
 panaceacli query slashing signing-info <validator-pubkey>
 ```
 
-#### Query Parameters
+### Query Parameters
 
 You can get the current slashing parameters via:
 
@@ -242,9 +240,9 @@ You can get the current slashing parameters via:
 panaceacli query slashing params
 ```
 
-### Staking
+## Staking
 
-#### Create your validator
+### Create your validator
 
 {% hint style="info" %}
 This guide assumes that you have already set up your full node by following [the guide](join-the-mainnet.md).
@@ -287,7 +285,7 @@ You can confirm that you are in the validator set by the following command:
 panaceacli query staking validators
 ```
 
-#### Delegate to a Validator
+### Delegate to a Validator
 
 You can delegate `umed` to a validator. These delegators can receive part of the validator's fee revenue.
 
@@ -305,7 +303,7 @@ If you want to get the information of a single validator you can check it with:
 panaceacli query staking validator <account_panaceaval>
 ```
 
-#### Bond Tokens
+### Bond Tokens
 
 Here's how you can bond tokens to a validator \(_i.e._ delegate\):
 
@@ -343,7 +341,7 @@ panaceacli query staking delegations <delegator_addr>
 
 You can also get previous delegation\(s\) status by adding the `--height` flag.
 
-#### Unbond Tokens
+### Unbond Tokens
 
 If for any reason the validator misbehaves, or you just want to unbond a certain amount of tokens, use this following command.
 
@@ -379,7 +377,7 @@ panaceacli query staking unbonding-delegations-from <account_panaceaval>
 
 To get previous unbonding-delegation\(s\) status on past blocks, try adding the `--height` flag.
 
-#### Redelegate Tokens
+### Redelegate Tokens
 
 A redelegation is a type delegation that allows you to bond illiquid tokens from one validator to another:
 
@@ -416,7 +414,7 @@ panaceacli query staking redelegations-from <account_panaceaval>
 
 To get previous redelegation\(s\) status on past blocks, try adding the `--height` flag.
 
-#### Query Parameters
+### Query Parameters
 
 Parameters define high level settings for staking. You can get the current values by using:
 
@@ -431,7 +429,7 @@ With the above command you will get the values for:
 * Maximum entries
 * Coin denomination for staking
 
-#### Query Pool
+### Query Pool
 
 A staking `Pool` defines the dynamic parameters of the current state. You can query them with the following command:
 
@@ -443,9 +441,9 @@ With the `pool` command you will get the values for:
 
 * Not-bonded and bonded tokens
 
-### Fee Distribution
+## Fee Distribution
 
-#### Query distribution parameters
+### Query distribution parameters
 
 To check the current distribution parameters, run:
 
@@ -453,7 +451,7 @@ To check the current distribution parameters, run:
 panaceacli query distr params
 ```
 
-#### Query validator commission
+### Query validator commission
 
 To check the current outstanding commission for a validator, run:
 
@@ -461,7 +459,7 @@ To check the current outstanding commission for a validator, run:
 panaceacli query distr commission <validator_address>
 ```
 
-#### Query validator slashes
+### Query validator slashes
 
 To check historical slashes for a validator, run:
 
@@ -469,7 +467,7 @@ To check historical slashes for a validator, run:
 panaceacli query distr slashes <validator_address> <start_height> <end_height>
 ```
 
-#### Query delegator rewards
+### Query delegator rewards
 
 To check current rewards for a delegation \(were they to be withdrawn\), run:
 
@@ -477,7 +475,7 @@ To check current rewards for a delegation \(were they to be withdrawn\), run:
 panaceacli query distr rewards <delegator_address> <validator_address>
 ```
 
-#### Query all delegator rewards
+### Query all delegator rewards
 
 To check all current rewards for a delegation \(were they to be withdrawn\), run:
 
@@ -485,7 +483,7 @@ To check all current rewards for a delegation \(were they to be withdrawn\), run
 panaceacli query distr rewards <delegator_address>
 ```
 
-### Multisig transactions
+## Multisig transactions
 
 Multisig transactions require signatures of multiple private keys. Thus, generating and signing a transaction from a multisig account involve cooperation among the parties involved. A multisig transaction can be initiated by any of the key holders, and at least one of them would need to import other parties' public keys into their Keybase and generate a multisig public key in order to finalize and broadcast the transaction.
 
@@ -568,7 +566,7 @@ panaceacli tx broadcast signedTx.json \
   --chain-id=<chain_id>
 ```
 
-### Shells completion scripts
+## Shells completion scripts
 
 Completion scripts for popular UNIX shell interpreters such as `Bash` and `Zsh` can be generated through the `completion` command, which is available for both `panacead` and `panaceacli`.
 
@@ -595,9 +593,9 @@ echo '. panaceacli_completion' >> ~/.bashrc
 
 Refer to the user's manual of your interpreter provided by your operating system for information on how to enable shell autocompletion. :::
 
-### AOL
+## AOL
 
-#### Create Topic
+### Create Topic
 
 You can create topic with this:
 
@@ -605,7 +603,7 @@ You can create topic with this:
 panaceacli tx aol create-topic <topic>
 ```
 
-#### List Topics
+### List Topics
 
 You can query the list of topics belong to specific account:
 
@@ -627,7 +625,7 @@ panaceacli tx aol add-writer <topic> <writer_panacea>
 
 ::: tip Note that the topic owner is not a writer as default. You need to add your self to the topic as a writer. :::
 
-#### List Writers
+### List Writers
 
 You can query the list of writers to the topic:
 
@@ -645,7 +643,7 @@ where `[name]` is the name of the key you specified when you initialized `panace
 
 While tokens are bonded, they are pooled with all the other bonded tokens in the network. Validators and delegators obtain a percentage of shares that equal their stake in this pool.
 
-#### Delete Writer
+### Delete Writer
 
 Owner can delete writer from the topic. After owner delete the writer, writer can not add record to the topic anymore.
 
@@ -655,7 +653,7 @@ panaceacli tx aol delete-writer <topic> <writer_panacea>
 
 ::: Note that only owner can delete writer from the topic :::
 
-#### Add Record
+### Add Record
 
 Writer can add record to the topic with this:
 
@@ -663,7 +661,7 @@ Writer can add record to the topic with this:
 panaceacli tx aol add-record <owner_panacea> <topic> <key> <value>
 ```
 
-#### Get Record
+### Get Record
 
 You can query the record with this:
 
@@ -671,9 +669,9 @@ You can query the record with this:
 panaceacli query aol get-record <owner_panacea> <topic> <offset>
 ```
 
-### DID
+## DID
 
-#### Create(Issue) a DID
+### Create(Issue) a DID
 
 ```bash
 panaceacli tx did create-did --chain-id=<chain-id> --from=<address>
@@ -685,7 +683,7 @@ The DID Document is stored in Panacea.
 To store the key-pair safely in your local, the command will prompt you to enter a passphrase.
 The encrypted key-pair file will be stored in your `~/.panaceacli/did_keystore` directory.
 
-#### Resolve a DID
+### Resolve a DID
 
 ```bash
 panaceacli query did get-did <did> --chain-id=<chain-id>
@@ -693,7 +691,7 @@ panaceacli query did get-did <did> --chain-id=<chain-id>
 This returns a DID Document in JSON corresponding to that DID.
 If the DID doesn't exist, or was already deactivated, an error will be returned.
 
-#### Update a DID
+### Update a DID
 
 ```bash
 panaceaacli tx did update-did <did> <key-id> <did-doc-path> --chain-id=<chain-id> --from=<address>
@@ -703,7 +701,7 @@ To prove that you are the DID owner, you must pass a `<key-id>` that is one of `
 Also, that command will prompt you to enter a passphrase of that key if the key-pair is stored in your keystore: `~/.panaceacli/did_keystore`.
 The key-pair will be used to make a signature so that Panacea can verify that you are the DID owner.
 
-#### Deactivate a DID
+### Deactivate a DID
 
 ```bash
 panaceacli tx did deactivate-did <did> <key-id> --chain-id=<chain-id> --from=<address>
@@ -715,9 +713,9 @@ so that Panacea can verify that you are the DID owner.
 Deactivating a DID is not the same as deleting a DID. DIDs cannot be deleted permanently. They can just be deactivated.
 And DIDs cannot be reused to create another DID Documents forever.
 
-### Token
+## Token
 
-#### Issue a new token
+### Issue a new token
 
 A new token can be issued by the following command. Anyone can issue a new token with fee paid.
 After issuing, the token would appear in the issuer's account.
@@ -739,7 +737,7 @@ panaceacli tx token issue \
     --chain-id testing
 ```
 
-#### Query a token
+### Query a token
 
 ```bash
 # List all token symbols
@@ -760,7 +758,7 @@ mintable: true
 owneraddress: panacea126r28pr7sstg7yfmedv3qq4st4a4exlwccx2vc
 ```
 
-#### Query account balances and send tokens
+### Query account balances and send tokens
 
 Of course, the new token is visible in the account balance.
 ```bash
