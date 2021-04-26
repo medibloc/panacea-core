@@ -71,7 +71,7 @@ func GetCmdCreateDID(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			if err := savePrivKeyToKeyStore(msg.VeriMethodID, privKey, inBuf); err != nil {
+			if err := savePrivKeyToKeyStore(msg.VerificationMethodID, privKey, inBuf); err != nil {
 				return err
 			}
 
@@ -89,21 +89,21 @@ func GetCmdCreateDID(cdc *codec.Codec) *cobra.Command {
 func newMsgCreateDID(cliCtx context.CLIContext, privKey secp256k1.PrivKeySecp256k1) (types.MsgCreateDID, error) {
 	pubKey := secp256k1util.PubKeyBytes(secp256k1util.DerivePubKey(privKey))
 	did := types.NewDID(pubKey)
-	veriMethodID := types.NewVeriMethodID(did, "key1")
-	veriMethods := []types.VeriMethod{
-		types.NewVeriMethod(veriMethodID, types.ES256K_2019, did, pubKey),
+	verificationMethodID := types.NewVerificationMethodID(did, "key1")
+	verificationMethods := []types.VerificationMethod{
+		types.NewVerificationMethod(verificationMethodID, types.ES256K_2019, did, pubKey),
 	}
-	authentications := []types.Authentication{
-		types.NewAuthentication(veriMethods[0].ID),
+	authentications := []types.VerificationRelationship{
+		types.NewVerificationRelationship(verificationMethods[0].ID),
 	}
-	doc := types.NewDIDDocument(did, veriMethods, authentications)
+	doc := types.NewDIDDocument(did, types.WithVerificationMethods(verificationMethods), types.WithAuthentications(authentications))
 
 	sig, err := types.Sign(doc, types.InitialSequence, privKey)
 	if err != nil {
 		return types.MsgCreateDID{}, err
 	}
 
-	msg := types.NewMsgCreateDID(did, doc, veriMethodID, sig, cliCtx.GetFromAddress())
+	msg := types.NewMsgCreateDID(did, doc, verificationMethodID, sig, cliCtx.GetFromAddress())
 	if err := msg.ValidateBasic(); err != nil {
 		return types.MsgCreateDID{}, err
 	}
@@ -125,7 +125,7 @@ func GetCmdUpdateDID(cdc *codec.Codec) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			veriMethodID, err := types.ParseVeriMethodID(args[1], did)
+			verificationMethodID, err := types.ParseVerificationMethodID(args[1], did)
 			if err != nil {
 				return err
 			}
@@ -134,7 +134,7 @@ func GetCmdUpdateDID(cdc *codec.Codec) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			privKey, err := getPrivKeyFromKeyStore(veriMethodID, inBuf)
+			privKey, err := getPrivKeyFromKeyStore(verificationMethodID, inBuf)
 			if err != nil {
 				return err
 			}
@@ -145,7 +145,7 @@ func GetCmdUpdateDID(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			msg := types.NewMsgUpdateDID(did, doc, veriMethodID, sig, cliCtx.GetFromAddress())
+			msg := types.NewMsgUpdateDID(did, doc, verificationMethodID, sig, cliCtx.GetFromAddress())
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
@@ -170,11 +170,11 @@ func GetCmdDeactivateDID(cdc *codec.Codec) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			veriMethodID, err := types.ParseVeriMethodID(args[1], did)
+			verificationMethodID, err := types.ParseVerificationMethodID(args[1], did)
 			if err != nil {
 				return err
 			}
-			privKey, err := getPrivKeyFromKeyStore(veriMethodID, inBuf)
+			privKey, err := getPrivKeyFromKeyStore(verificationMethodID, inBuf)
 			if err != nil {
 				return err
 			}
@@ -185,7 +185,7 @@ func GetCmdDeactivateDID(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			msg := types.NewMsgDeactivateDID(did, veriMethodID, sig, cliCtx.GetFromAddress())
+			msg := types.NewMsgDeactivateDID(did, verificationMethodID, sig, cliCtx.GetFromAddress())
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
@@ -256,7 +256,7 @@ func keystoreBaseDir() string {
 }
 
 // savePrivKeyToKeyStore saves a privKey using a password which is read from the reader.
-func savePrivKeyToKeyStore(veriMethodID types.VeriMethodID, privKey secp256k1.PrivKeySecp256k1, reader *bufio.Reader) error {
+func savePrivKeyToKeyStore(verificationMethodID types.VerificationMethodID, privKey secp256k1.PrivKeySecp256k1, reader *bufio.Reader) error {
 	passwd, err := client.GetCheckPassword(
 		"Enter a password to encrypt your key for DID to disk:",
 		"Repeat the password:",
@@ -269,12 +269,12 @@ func savePrivKeyToKeyStore(veriMethodID types.VeriMethodID, privKey secp256k1.Pr
 	if err != nil {
 		return err
 	}
-	_, err = ks.Save(string(veriMethodID), privKey[:], passwd)
+	_, err = ks.Save(string(verificationMethodID), privKey[:], passwd)
 	return err
 }
 
 // getPrivKeyFromKeyStore loads a privKey using a password which is read from the reader.
-func getPrivKeyFromKeyStore(veriMethodID types.VeriMethodID, reader *bufio.Reader) (secp256k1.PrivKeySecp256k1, error) {
+func getPrivKeyFromKeyStore(verificationMethodID types.VerificationMethodID, reader *bufio.Reader) (secp256k1.PrivKeySecp256k1, error) {
 	passwd, err := client.GetPassword("Enter a password to decrypt your key for DID on disk:", reader)
 	if err != nil {
 		return secp256k1.PrivKeySecp256k1{}, err
@@ -285,7 +285,7 @@ func getPrivKeyFromKeyStore(veriMethodID types.VeriMethodID, reader *bufio.Reade
 		return secp256k1.PrivKeySecp256k1{}, err
 	}
 
-	privKeyBytes, err := ks.LoadByAddress(string(veriMethodID), passwd)
+	privKeyBytes, err := ks.LoadByAddress(string(verificationMethodID), passwd)
 	if err != nil {
 		return secp256k1.PrivKeySecp256k1{}, err
 	}
