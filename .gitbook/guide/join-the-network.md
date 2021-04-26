@@ -15,7 +15,7 @@ Choose Ubuntu Server 20.04 LTS 64-bit (x86) with SSD Volume Type.
 
 Choose the `m5.large` instance type (minimum spec).
 
-![img.png](../assets/fullnode/ec2-instance-type.png)
+![](../assets/fullnode/ec2-instance-type.png)
 
 ### Configure instance details
 
