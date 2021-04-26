@@ -58,18 +58,79 @@ func (did DID) GetSignBytes() []byte {
 }
 
 type DIDDocument struct {
-	Contexts        Contexts         `json:"@context"`
-	ID              DID              `json:"id"`
-	VeriMethods     []VeriMethod     `json:"verificationMethod"`
-	Authentications []Authentication `json:"authentication"`
+	Contexts              Contexts                   `json:"@context"`
+	ID                    DID                        `json:"id"`
+	Controller            DID                        `json:"controller,omitempty"`
+	VerificationMethods   []VerificationMethod       `json:"verificationMethod,omitempty"`
+	Authentications       []VerificationRelationship `json:"authentication,omitempty"`
+	AssertionMethods      []VerificationRelationship `json:"assertionMethod,omitempty"`
+	KeyAgreements         []VerificationRelationship `json:"keyAgreement,omitempty"`
+	CapabilityInvocations []VerificationRelationship `json:"capabilityInvocation,omitempty"`
+	CapabilityDelegations []VerificationRelationship `json:"capabilityDelegation,omitempty"`
+	Services              []Service                  `json:"service,omitempty"`
 }
 
-func NewDIDDocument(id DID, veriMethods []VeriMethod, authentications []Authentication) DIDDocument {
-	return DIDDocument{
-		Contexts:        Contexts{ContextDIDV1},
-		ID:              id,
-		VeriMethods:     veriMethods,
-		Authentications: authentications,
+func NewDIDDocument(id DID, opts ...DIDDocumentOption) DIDDocument {
+	doc := DIDDocument{
+		Contexts: Contexts{ContextDIDV1},
+		ID:       id,
+	}
+
+	for _, opt := range opts {
+		opt(&doc)
+	}
+
+	return doc
+}
+
+// DIDDocumentOption is for optional properties of DID Document
+type DIDDocumentOption func(opts *DIDDocument)
+
+func WithController(controller DID) DIDDocumentOption {
+	return func(opts *DIDDocument) {
+		opts.Controller = controller
+	}
+}
+
+func WithVerificationMethods(verificationMethods []VerificationMethod) DIDDocumentOption {
+	return func(opts *DIDDocument) {
+		opts.VerificationMethods = verificationMethods
+	}
+}
+
+func WithAuthentications(authentications []VerificationRelationship) DIDDocumentOption {
+	return func(opts *DIDDocument) {
+		opts.Authentications = authentications
+	}
+}
+
+func WithAssertionMethods(assertionMethods []VerificationRelationship) DIDDocumentOption {
+	return func(opts *DIDDocument) {
+		opts.AssertionMethods = assertionMethods
+	}
+}
+
+func WithKeyAgreements(keyAgreements []VerificationRelationship) DIDDocumentOption {
+	return func(opts *DIDDocument) {
+		opts.KeyAgreements = keyAgreements
+	}
+}
+
+func WithCapabilityInvocations(capabilityInvocations []VerificationRelationship) DIDDocumentOption {
+	return func(opts *DIDDocument) {
+		opts.CapabilityInvocations = capabilityInvocations
+	}
+}
+
+func WithCapabilityDelegations(capabilityDelegations []VerificationRelationship) DIDDocumentOption {
+	return func(opts *DIDDocument) {
+		opts.CapabilityDelegations = capabilityDelegations
+	}
+}
+
+func WithServices(services []Service) DIDDocumentOption {
+	return func(opts *DIDDocument) {
+		opts.Services = services
 	}
 }
 
@@ -78,7 +139,11 @@ func (doc DIDDocument) Valid() bool {
 		return true
 	}
 
-	if !doc.ID.Valid() || doc.VeriMethods == nil || doc.Authentications == nil {
+	if !doc.ID.Valid() || doc.VerificationMethods == nil || doc.Authentications == nil {
+		return false
+	}
+
+	if !doc.Controller.Empty() && !doc.Controller.Valid() {
 		return false
 	}
 
@@ -86,23 +151,50 @@ func (doc DIDDocument) Valid() bool {
 		return false
 	}
 
-	for _, veriMethod := range doc.VeriMethods {
-		if !veriMethod.Valid(doc.ID) {
+	for _, verificationMethod := range doc.VerificationMethods {
+		if !verificationMethod.Valid(doc.ID) {
 			return false
 		}
 	}
 
-	for _, auth := range doc.Authentications {
-		if !auth.Valid(doc.ID) {
+	if !doc.validVerificationRelationships(doc.Authentications) {
+		return false
+	}
+	if !doc.validVerificationRelationships(doc.AssertionMethods) {
+		return false
+	}
+	if !doc.validVerificationRelationships(doc.KeyAgreements) {
+		return false
+	}
+	if !doc.validVerificationRelationships(doc.CapabilityInvocations) {
+		return false
+	}
+	if !doc.validVerificationRelationships(doc.CapabilityDelegations) {
+		return false
+	}
+
+	for _, service := range doc.Services {
+		if !service.Valid() {
 			return false
 		}
-		if !auth.hasDedicatedMethod() {
-			if _, ok := doc.VeriMethodByID(auth.VeriMethodID); !ok {
+	}
+
+	return true
+}
+
+func (doc DIDDocument) validVerificationRelationships(relationships []VerificationRelationship) bool {
+	for _, relationship := range relationships {
+		if !relationship.Valid(doc.ID) {
+			return false
+		}
+		if !relationship.hasDedicatedMethod() {
+			// if the relationship isn't a dedicated verification method,
+			// the referenced verification method must be presented in the 'verificationMethod' property.
+			if _, ok := doc.VerificationMethodByID(relationship.VerificationMethodID); !ok {
 				return false
 			}
 		}
 	}
-
 	return true
 }
 
@@ -120,21 +212,21 @@ func (doc DIDDocument) GetSignBytes() []byte {
 	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(doc))
 }
 
-// VeriMethodByID finds a VeriMethod by ID.
-// If the corresponding VeriMethod doesn't exist, it returns a false.
-func (doc DIDDocument) VeriMethodByID(id VeriMethodID) (VeriMethod, bool) {
+// VerificationMethodByID finds a VerificationMethod by ID.
+// If the corresponding VerificationMethod doesn't exist, it returns a false.
+func (doc DIDDocument) VerificationMethodByID(id VerificationMethodID) (VerificationMethod, bool) {
 	//TODO: Sadly, Amino codec doesn't accept maps. Find the way to make this efficient.
 	for _, auth := range doc.Authentications {
-		if auth.VeriMethodID == id {
-			for _, veriMethod := range doc.VeriMethods {
-				if veriMethod.ID == id {
-					return veriMethod, true
+		if auth.VerificationMethodID == id {
+			for _, verificationMethod := range doc.VerificationMethods {
+				if verificationMethod.ID == id {
+					return verificationMethod, true
 				}
 			}
-			return VeriMethod{}, false
+			return VerificationMethod{}, false
 		}
 	}
-	return VeriMethod{}, false
+	return VerificationMethod{}, false
 }
 
 type Contexts []Context
@@ -190,26 +282,26 @@ func (ctx Context) Valid() bool {
 	return ctx != ""
 }
 
-type VeriMethodID string
+type VerificationMethodID string
 
-func NewVeriMethodID(did DID, name string) VeriMethodID {
+func NewVerificationMethodID(did DID, name string) VerificationMethodID {
 	// https://www.w3.org/TR/did-core/#fragment
-	return VeriMethodID(fmt.Sprintf("%v#%s", did, name))
+	return VerificationMethodID(fmt.Sprintf("%v#%s", did, name))
 }
 
-func ParseVeriMethodID(id string, did DID) (VeriMethodID, error) {
-	methodID := VeriMethodID(id)
+func ParseVerificationMethodID(id string, did DID) (VerificationMethodID, error) {
+	methodID := VerificationMethodID(id)
 	if !methodID.Valid(did) {
-		return "", ErrInvalidVeriMethodID(id)
+		return "", ErrInvalidVerificationMethodID(id)
 	}
 	return methodID, nil
 }
 
 const (
-	maxVeriMethodIDLen = 128
+	maxVerificationMethodIDLen = 128
 )
 
-func (id VeriMethodID) Valid(did DID) bool {
+func (id VerificationMethodID) Valid(did DID) bool {
 	prefix := fmt.Sprintf("%v#", did)
 	if !strings.HasPrefix(string(id), prefix) {
 		return false
@@ -217,7 +309,7 @@ func (id VeriMethodID) Valid(did DID) bool {
 
 	// Limit the length because it can be used for keystore filenames.
 	// Max filename length on Linux is usually 256 bytes.
-	if len(string(id))-len(prefix) > maxVeriMethodIDLen {
+	if len(string(id))-len(prefix) > maxVerificationMethodIDLen {
 		return false
 	}
 
@@ -267,16 +359,16 @@ func (t KeyType) Valid() bool {
 	return true
 }
 
-type VeriMethod struct {
-	ID         VeriMethodID `json:"id"`
-	Type       KeyType      `json:"type"`
-	Controller DID          `json:"controller"`
+type VerificationMethod struct {
+	ID         VerificationMethodID `json:"id"`
+	Type       KeyType              `json:"type"`
+	Controller DID                  `json:"controller"`
 	//TODO: support various pubkey representation (not fully-defined yet by W3C): https://w3c.github.io/did-spec-registries/#verification-method-types
 	PubKeyBase58 string `json:"publicKeyBase58"`
 }
 
-func NewVeriMethod(id VeriMethodID, keyType KeyType, controller DID, pubKey []byte) VeriMethod {
-	return VeriMethod{
+func NewVerificationMethod(id VerificationMethodID, keyType KeyType, controller DID, pubKey []byte) VerificationMethod {
+	return VerificationMethod{
 		ID:           id,
 		Type:         keyType,
 		Controller:   controller,
@@ -284,7 +376,7 @@ func NewVeriMethod(id VeriMethodID, keyType KeyType, controller DID, pubKey []by
 	}
 }
 
-func (pk VeriMethod) Valid(did DID) bool {
+func (pk VerificationMethod) Valid(did DID) bool {
 	if !pk.ID.Valid(did) || !pk.Type.Valid() {
 		return false
 	}
@@ -294,62 +386,77 @@ func (pk VeriMethod) Valid(did DID) bool {
 	return matched
 }
 
-type Authentication struct {
-	VeriMethodID VeriMethodID
-	// DedicatedMethod is not nil if it is only authorized for authentication
-	// https://www.w3.org/TR/did-core/#example-18-authentication-property-containing-three-verification-methods
-	DedicatedMethod *VeriMethod
+type VerificationRelationship struct {
+	VerificationMethodID VerificationMethodID
+	// DedicatedVerificationMethod is not nil if it is only authorized for this verification relationship
+	// https://www.w3.org/TR/did-core/#authentication
+	DedicatedVerificationMethod *VerificationMethod
 }
 
-func NewAuthentication(veriMethodID VeriMethodID) Authentication {
-	return Authentication{VeriMethodID: veriMethodID, DedicatedMethod: nil}
+func NewVerificationRelationship(verificationMethodID VerificationMethodID) VerificationRelationship {
+	return VerificationRelationship{VerificationMethodID: verificationMethodID, DedicatedVerificationMethod: nil}
 }
 
-func NewAuthenticationDedicated(veriMethod VeriMethod) Authentication {
-	return Authentication{VeriMethodID: veriMethod.ID, DedicatedMethod: &veriMethod}
+func NewVerificationRelationshipDedicated(verificationMethod VerificationMethod) VerificationRelationship {
+	return VerificationRelationship{VerificationMethodID: verificationMethod.ID, DedicatedVerificationMethod: &verificationMethod}
 }
 
-func (a Authentication) hasDedicatedMethod() bool {
-	return a.DedicatedMethod != nil
+func (v VerificationRelationship) hasDedicatedMethod() bool {
+	return v.DedicatedVerificationMethod != nil
 }
 
-func (a Authentication) Valid(did DID) bool {
-	if !a.VeriMethodID.Valid(did) {
+func (v VerificationRelationship) Valid(did DID) bool {
+	if !v.VerificationMethodID.Valid(did) {
 		return false
 	}
-	if a.DedicatedMethod != nil {
-		if !a.DedicatedMethod.Valid(did) || a.DedicatedMethod.ID != a.VeriMethodID {
+	if v.DedicatedVerificationMethod != nil {
+		if !v.DedicatedVerificationMethod.Valid(did) || v.DedicatedVerificationMethod.ID != v.VerificationMethodID {
 			return false
 		}
 	}
 	return true
 }
 
-func (a Authentication) MarshalJSON() ([]byte, error) {
+func (v VerificationRelationship) MarshalJSON() ([]byte, error) {
 	// if dedicated
-	if a.DedicatedMethod != nil {
-		return json.Marshal(a.DedicatedMethod)
+	if v.DedicatedVerificationMethod != nil {
+		return json.Marshal(v.DedicatedVerificationMethod)
 	}
 	// if not dedicated
-	return json.Marshal(a.VeriMethodID)
+	return json.Marshal(v.VerificationMethodID)
 }
 
-func (a *Authentication) UnmarshalJSON(bz []byte) error {
+func (v *VerificationRelationship) UnmarshalJSON(bz []byte) error {
 	// if not dedicated
-	var veriMethodID VeriMethodID
-	err := json.Unmarshal(bz, &veriMethodID)
+	var verificationMethodID VerificationMethodID
+	err := json.Unmarshal(bz, &verificationMethodID)
 	if err == nil {
-		*a = NewAuthentication(veriMethodID)
+		*v = NewVerificationRelationship(verificationMethodID)
 		return nil
 	}
 
 	// if dedicated
-	var veriMethod VeriMethod
-	if err := json.Unmarshal(bz, &veriMethod); err != nil {
+	var verificationMethod VerificationMethod
+	if err := json.Unmarshal(bz, &verificationMethod); err != nil {
 		return err
 	}
-	*a = NewAuthenticationDedicated(veriMethod)
+	*v = NewVerificationRelationshipDedicated(verificationMethod)
 	return nil
+}
+
+type Service struct {
+	ID string `json:"id"`
+	//TODO: check strictly after the spec is finalized: https://w3c.github.io/did-spec-registries/#service-types
+	Type            string `json:"type"`
+	ServiceEndpoint string `json:"serviceEndpoint"`
+}
+
+func NewService(id string, type_ string, serviceEndpoint string) Service {
+	return Service{ID: id, Type: type_, ServiceEndpoint: serviceEndpoint}
+}
+
+func (s Service) Valid() bool {
+	return s.ID != "" && s.Type != "" && s.ServiceEndpoint != ""
 }
 
 // DIDDocumentWithSeq is for storing a Sequence along with a DIDDocument.

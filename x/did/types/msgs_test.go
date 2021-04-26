@@ -23,10 +23,10 @@ func TestMsgCreateDID(t *testing.T) {
 	sig := []byte("my-sig")
 	fromAddr := getFromAddress(t)
 
-	msg := types.NewMsgCreateDID(doc.ID, doc, doc.VeriMethods[0].ID, sig, fromAddr)
+	msg := types.NewMsgCreateDID(doc.ID, doc, doc.VerificationMethods[0].ID, sig, fromAddr)
 	require.Equal(t, doc.ID, msg.DID)
 	require.Equal(t, doc, msg.Document)
-	require.Equal(t, doc.VeriMethods[0].ID, msg.VeriMethodID)
+	require.Equal(t, doc.VerificationMethods[0].ID, msg.VerificationMethodID)
 	require.Equal(t, sig, msg.Signature)
 	require.Equal(t, fromAddr, msg.FromAddress)
 
@@ -37,7 +37,7 @@ func TestMsgCreateDID(t *testing.T) {
 	require.Equal(t, fromAddr, msg.GetSigners()[0])
 
 	require.Equal(t,
-		`{"type":"did/MsgCreateDID","value":{"did":"did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm","document":{"@context":"https://www.w3.org/ns/did/v1","authentication":["did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm#key1"],"id":"did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm","verificationMethod":[{"controller":"did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm","id":"did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm#key1","publicKeyBase58":"qoRmLNBEXoaKDE8dKffMq2DBNxacTEfvbKRuFrccYW1b","type":"EcdsaSecp256k1VerificationKey2019"}]},"from_address":"panacea154p6kyu9kqgvcmq63w3vpn893ssy6anpu8ykfq","signature":"bXktc2ln","verification_method_id":"did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm#key1"}}`,
+		`{"type":"did/MsgCreateDID","value":{"did":"did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm","document":{"@context":"https://www.w3.org/ns/did/v1","assertionMethod":[{"controller":"did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm","id":"did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm#key2","publicKeyBase58":"qoRmLNBEXoaKDE8dKffMq2DBNxacTEfvbKRuFrccYW1b","type":"EcdsaSecp256k1VerificationKey2019"}],"authentication":["did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm#key1"],"id":"did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm","service":[{"id":"service1","serviceEndpoint":"https://example.org","type":"LinkedDomains"}],"verificationMethod":[{"controller":"did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm","id":"did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm#key1","publicKeyBase58":"qoRmLNBEXoaKDE8dKffMq2DBNxacTEfvbKRuFrccYW1b","type":"EcdsaSecp256k1VerificationKey2019"}]},"from_address":"panacea154p6kyu9kqgvcmq63w3vpn893ssy6anpu8ykfq","signature":"bXktc2ln","verification_method_id":"did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm#key1"}}`,
 		string(msg.GetSignBytes()),
 	)
 }
@@ -47,10 +47,10 @@ func TestMsgUpdateDID(t *testing.T) {
 	sig := []byte("my-sig")
 	fromAddr := getFromAddress(t)
 
-	msg := types.NewMsgUpdateDID(doc.ID, doc, doc.VeriMethods[0].ID, sig, fromAddr)
+	msg := types.NewMsgUpdateDID(doc.ID, doc, doc.VerificationMethods[0].ID, sig, fromAddr)
 	require.Equal(t, doc.ID, msg.DID)
 	require.Equal(t, doc, msg.Document)
-	require.Equal(t, doc.VeriMethods[0].ID, msg.VeriMethodID)
+	require.Equal(t, doc.VerificationMethods[0].ID, msg.VerificationMethodID)
 	require.Equal(t, sig, msg.Signature)
 	require.Equal(t, fromAddr, msg.FromAddress)
 
@@ -61,7 +61,7 @@ func TestMsgUpdateDID(t *testing.T) {
 	require.Equal(t, fromAddr, msg.GetSigners()[0])
 
 	require.Equal(t,
-		`{"type":"did/MsgUpdateDID","value":{"did":"did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm","document":{"@context":"https://www.w3.org/ns/did/v1","authentication":["did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm#key1"],"id":"did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm","verificationMethod":[{"controller":"did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm","id":"did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm#key1","publicKeyBase58":"qoRmLNBEXoaKDE8dKffMq2DBNxacTEfvbKRuFrccYW1b","type":"EcdsaSecp256k1VerificationKey2019"}]},"from_address":"panacea154p6kyu9kqgvcmq63w3vpn893ssy6anpu8ykfq","signature":"bXktc2ln","verification_method_id":"did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm#key1"}}`,
+		`{"type":"did/MsgUpdateDID","value":{"did":"did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm","document":{"@context":"https://www.w3.org/ns/did/v1","assertionMethod":[{"controller":"did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm","id":"did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm#key2","publicKeyBase58":"qoRmLNBEXoaKDE8dKffMq2DBNxacTEfvbKRuFrccYW1b","type":"EcdsaSecp256k1VerificationKey2019"}],"authentication":["did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm#key1"],"id":"did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm","service":[{"id":"service1","serviceEndpoint":"https://example.org","type":"LinkedDomains"}],"verificationMethod":[{"controller":"did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm","id":"did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm#key1","publicKeyBase58":"qoRmLNBEXoaKDE8dKffMq2DBNxacTEfvbKRuFrccYW1b","type":"EcdsaSecp256k1VerificationKey2019"}]},"from_address":"panacea154p6kyu9kqgvcmq63w3vpn893ssy6anpu8ykfq","signature":"bXktc2ln","verification_method_id":"did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm#key1"}}`,
 		string(msg.GetSignBytes()),
 	)
 }
@@ -71,9 +71,9 @@ func TestDeactivateDID(t *testing.T) {
 	sig := []byte("my-sig")
 	fromAddr := getFromAddress(t)
 
-	msg := types.NewMsgDeactivateDID(doc.ID, doc.VeriMethods[0].ID, sig, fromAddr)
+	msg := types.NewMsgDeactivateDID(doc.ID, doc.VerificationMethods[0].ID, sig, fromAddr)
 	require.Equal(t, doc.ID, msg.DID)
-	require.Equal(t, doc.VeriMethods[0].ID, msg.VeriMethodID)
+	require.Equal(t, doc.VerificationMethods[0].ID, msg.VerificationMethodID)
 	require.Equal(t, sig, msg.Signature)
 	require.Equal(t, fromAddr, msg.FromAddress)
 
@@ -97,13 +97,31 @@ func getFromAddress(t *testing.T) sdk.AccAddress {
 
 func newDIDDocument() types.DIDDocument {
 	did, _ := types.ParseDID("did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm")
-	veriMethodID := types.NewVeriMethodID(did, "key1")
+	verificationMethodID := types.NewVerificationMethodID(did, "key1")
 	pubKey, _ := secp256k1util.PubKeyFromBase58("qoRmLNBEXoaKDE8dKffMq2DBNxacTEfvbKRuFrccYW1b")
-	veriMethods := []types.VeriMethod{
-		types.NewVeriMethod(veriMethodID, types.ES256K_2019, did, secp256k1util.PubKeyBytes(pubKey)),
+	verificationMethods := []types.VerificationMethod{
+		types.NewVerificationMethod(verificationMethodID, types.ES256K_2019, did, secp256k1util.PubKeyBytes(pubKey)),
 	}
-	authentications := []types.Authentication{
-		types.NewAuthentication(veriMethods[0].ID),
+	authentications := []types.VerificationRelationship{
+		types.NewVerificationRelationship(verificationMethods[0].ID),
 	}
-	return types.NewDIDDocument(did, veriMethods, authentications)
+	assertionMethods := []types.VerificationRelationship{
+		types.NewVerificationRelationshipDedicated(
+			types.NewVerificationMethod(
+				types.NewVerificationMethodID(did, "key2"),
+				types.ES256K_2019, did, secp256k1util.PubKeyBytes(pubKey),
+			),
+		),
+	}
+	services := []types.Service{
+		types.NewService("service1", "LinkedDomains", "https://example.org"),
+	}
+
+	return types.NewDIDDocument(
+		did,
+		types.WithVerificationMethods(verificationMethods),
+		types.WithAuthentications(authentications),
+		types.WithAssertionMethods(assertionMethods),
+		types.WithServices(services),
+	)
 }

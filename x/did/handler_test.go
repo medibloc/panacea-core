@@ -17,8 +17,8 @@ import (
 )
 
 func TestHandleMsgCreateDID(t *testing.T) {
-	did, doc, privKey, veriMethodID, keeper := ctx()
-	msg := newMsgCreateDID(t, doc.Document, veriMethodID, privKey)
+	did, doc, privKey, verificationMethodID, keeper := ctx()
+	msg := newMsgCreateDID(t, doc.Document, verificationMethodID, privKey)
 
 	res := handleMsgCreateDID(sdk.Context{}, keeper, msg)
 	require.True(t, res.IsOK())
@@ -27,8 +27,8 @@ func TestHandleMsgCreateDID(t *testing.T) {
 }
 
 func TestHandleMsgCreateDID_Exists(t *testing.T) {
-	did, doc, privKey, veriMethodID, keeper := ctx()
-	msg := newMsgCreateDID(t, doc.Document, veriMethodID, privKey)
+	did, doc, privKey, verificationMethodID, keeper := ctx()
+	msg := newMsgCreateDID(t, doc.Document, verificationMethodID, privKey)
 
 	// create
 	handleMsgCreateDID(sdk.Context{}, keeper, msg)
@@ -39,12 +39,12 @@ func TestHandleMsgCreateDID_Exists(t *testing.T) {
 }
 
 func TestHandleMsgCreateDID_Deactivated(t *testing.T) {
-	did, doc, privKey, veriMethodID, keeper := ctx()
-	msg := newMsgCreateDID(t, doc.Document, veriMethodID, privKey)
+	did, doc, privKey, verificationMethodID, keeper := ctx()
+	msg := newMsgCreateDID(t, doc.Document, verificationMethodID, privKey)
 
 	// create and deactivate
 	handleMsgCreateDID(sdk.Context{}, keeper, msg)
-	handleMsgDeactivateDID(sdk.Context{}, keeper, newMsgDeactivateDID(t, did, veriMethodID, privKey, types.InitialSequence))
+	handleMsgDeactivateDID(sdk.Context{}, keeper, newMsgDeactivateDID(t, did, verificationMethodID, privKey, types.InitialSequence))
 
 	// create once again
 	res := handleMsgCreateDID(sdk.Context{}, keeper, msg)
@@ -52,33 +52,33 @@ func TestHandleMsgCreateDID_Deactivated(t *testing.T) {
 }
 
 func TestHandleMsgCreateDID_SigVerificationFailed(t *testing.T) {
-	did, doc, privKey, veriMethodID, keeper := ctx()
+	did, doc, privKey, verificationMethodID, keeper := ctx()
 	sig, _ := types.Sign(doc.Document, types.InitialSequence, privKey)
 	sig[0] += 1 // pollute the signature
 
 	res := handleMsgCreateDID(sdk.Context{}, keeper, types.NewMsgCreateDID(
-		did, doc.Document, veriMethodID, sig, sdk.AccAddress{},
+		did, doc.Document, verificationMethodID, sig, sdk.AccAddress{},
 	))
 	require.Equal(t, types.ErrSigVerificationFailed().Result(), res)
 }
 
 func TestHandleMsgUpdateDID(t *testing.T) {
-	did, origDoc, privKey, veriMethodID, keeper := ctx()
+	did, origDoc, privKey, verificationMethodID, keeper := ctx()
 
 	// create
-	handleMsgCreateDID(sdk.Context{}, keeper, newMsgCreateDID(t, origDoc.Document, veriMethodID, privKey))
+	handleMsgCreateDID(sdk.Context{}, keeper, newMsgCreateDID(t, origDoc.Document, verificationMethodID, privKey))
 
 	// prepare a new doc
 	newDoc := origDoc.Document
-	newDoc.VeriMethods = append(newDoc.VeriMethods, types.NewVeriMethod(
-		types.NewVeriMethodID(did, "key2"),
+	newDoc.VerificationMethods = append(newDoc.VerificationMethods, types.NewVerificationMethod(
+		types.NewVerificationMethodID(did, "key2"),
 		types.ES256K_2019,
 		did,
 		secp256k1util.PubKeyBytes(secp256k1util.DerivePubKey(secp256k1.GenPrivKey())),
 	))
 
 	// call
-	msg := newMsgUpdateDID(t, newDoc, veriMethodID, privKey, origDoc.Seq)
+	msg := newMsgUpdateDID(t, newDoc, verificationMethodID, privKey, origDoc.Seq)
 	res := handleMsgUpdateDID(sdk.Context{}, keeper, msg)
 	require.True(t, res.IsOK())
 	require.Equal(t, 1, len(keeper.ListDIDs(sdk.Context{})))
@@ -93,32 +93,32 @@ func TestHandleMsgUpdateDID(t *testing.T) {
 }
 
 func TestHandleMsgUpdateDID_DIDNotFound(t *testing.T) {
-	did, origDoc, privKey, veriMethodID, keeper := ctx()
+	did, origDoc, privKey, verificationMethodID, keeper := ctx()
 
 	// update without creation
-	res := handleMsgUpdateDID(sdk.Context{}, keeper, newMsgUpdateDID(t, origDoc.Document, veriMethodID, privKey, origDoc.Seq))
+	res := handleMsgUpdateDID(sdk.Context{}, keeper, newMsgUpdateDID(t, origDoc.Document, verificationMethodID, privKey, origDoc.Seq))
 	require.Equal(t, types.ErrDIDNotFound(did).Result(), res)
 }
 
 func TestHandleMsgUpdateDID_DIDDeactivated(t *testing.T) {
-	did, origDoc, privKey, veriMethodID, keeper := ctx()
-	handleMsgCreateDID(sdk.Context{}, keeper, newMsgCreateDID(t, origDoc.Document, veriMethodID, privKey))
+	did, origDoc, privKey, verificationMethodID, keeper := ctx()
+	handleMsgCreateDID(sdk.Context{}, keeper, newMsgCreateDID(t, origDoc.Document, verificationMethodID, privKey))
 
 	// deactivate
-	deactivateMsg := newMsgDeactivateDID(t, did, veriMethodID, privKey, origDoc.Seq)
+	deactivateMsg := newMsgDeactivateDID(t, did, verificationMethodID, privKey, origDoc.Seq)
 	require.True(t, handleMsgDeactivateDID(sdk.Context{}, keeper, deactivateMsg).IsOK())
 
 	// update
-	res := handleMsgUpdateDID(sdk.Context{}, keeper, newMsgUpdateDID(t, origDoc.Document, veriMethodID, privKey, origDoc.Seq))
+	res := handleMsgUpdateDID(sdk.Context{}, keeper, newMsgUpdateDID(t, origDoc.Document, verificationMethodID, privKey, origDoc.Seq))
 	require.Equal(t, types.ErrDIDDeactivated(did).Result(), res)
 }
 
 func TestHandleMsgDeactivateDID(t *testing.T) {
-	did, doc, privKey, veriMethodID, keeper := ctx()
-	handleMsgCreateDID(sdk.Context{}, keeper, newMsgCreateDID(t, doc.Document, veriMethodID, privKey))
+	did, doc, privKey, verificationMethodID, keeper := ctx()
+	handleMsgCreateDID(sdk.Context{}, keeper, newMsgCreateDID(t, doc.Document, verificationMethodID, privKey))
 
 	// deactivate
-	msg := newMsgDeactivateDID(t, did, veriMethodID, privKey, types.InitialSequence)
+	msg := newMsgDeactivateDID(t, did, verificationMethodID, privKey, types.InitialSequence)
 	res := handleMsgDeactivateDID(sdk.Context{}, keeper, msg)
 	require.True(t, res.IsOK())
 
@@ -130,20 +130,20 @@ func TestHandleMsgDeactivateDID(t *testing.T) {
 }
 
 func TestHandleMsgDeactivateDID_DIDNotFound(t *testing.T) {
-	did, _, privKey, veriMethodID, keeper := ctx()
+	did, _, privKey, verificationMethodID, keeper := ctx()
 
 	// deactivate without creation
-	msg := newMsgDeactivateDID(t, did, veriMethodID, privKey, types.InitialSequence)
+	msg := newMsgDeactivateDID(t, did, verificationMethodID, privKey, types.InitialSequence)
 	res := handleMsgDeactivateDID(sdk.Context{}, keeper, msg)
 	require.Equal(t, types.ErrDIDNotFound(did).Result(), res)
 }
 
 func TestHandleMsgDeactivateDID_DIDDeactivated(t *testing.T) {
-	did, doc, privKey, veriMethodID, keeper := ctx()
-	handleMsgCreateDID(sdk.Context{}, keeper, newMsgCreateDID(t, doc.Document, veriMethodID, privKey))
+	did, doc, privKey, verificationMethodID, keeper := ctx()
+	handleMsgCreateDID(sdk.Context{}, keeper, newMsgCreateDID(t, doc.Document, verificationMethodID, privKey))
 
 	// deactivate
-	msg := newMsgDeactivateDID(t, did, veriMethodID, privKey, types.InitialSequence)
+	msg := newMsgDeactivateDID(t, did, verificationMethodID, privKey, types.InitialSequence)
 	handleMsgDeactivateDID(sdk.Context{}, keeper, msg)
 
 	// one more time
@@ -152,43 +152,43 @@ func TestHandleMsgDeactivateDID_DIDDeactivated(t *testing.T) {
 }
 
 func TestHandleMsgDeactivateDID_SigVerificationFailed(t *testing.T) {
-	did, doc, privKey, veriMethodID, keeper := ctx()
-	handleMsgCreateDID(sdk.Context{}, keeper, newMsgCreateDID(t, doc.Document, veriMethodID, privKey))
+	did, doc, privKey, verificationMethodID, keeper := ctx()
+	handleMsgCreateDID(sdk.Context{}, keeper, newMsgCreateDID(t, doc.Document, verificationMethodID, privKey))
 
 	sig, _ := types.Sign(did, doc.Seq, privKey)
 	sig[0] += 1 // pollute the signature
 
-	msg := types.NewMsgDeactivateDID(did, veriMethodID, sig, sdk.AccAddress{})
+	msg := types.NewMsgDeactivateDID(did, verificationMethodID, sig, sdk.AccAddress{})
 	res := handleMsgDeactivateDID(sdk.Context{}, keeper, msg)
 	require.Equal(t, types.ErrSigVerificationFailed().Result(), res)
 }
 
 func TestVerifyDIDOwnership(t *testing.T) {
-	_, doc, privKey, veriMethodID, _ := ctx()
+	_, doc, privKey, verificationMethodID, _ := ctx()
 	data := any("random string")
 	sig, _ := types.Sign(data, doc.Seq, privKey)
 
-	newSeq, err := verifyDIDOwnership(data, doc.Seq, doc.Document, veriMethodID, sig)
+	newSeq, err := verifyDIDOwnership(data, doc.Seq, doc.Document, verificationMethodID, sig)
 	require.NoError(t, err)
 	require.Equal(t, doc.Seq+1, newSeq)
 }
 
-func TestVerifyDIDOwnership_VeriMethodIDNotFound(t *testing.T) {
-	_, doc, privKey, veriMethodID, _ := ctx()
+func TestVerifyDIDOwnership_VerificationMethodIDNotFound(t *testing.T) {
+	_, doc, privKey, verificationMethodID, _ := ctx()
 	data := any("random string")
 	sig, _ := types.Sign(data, doc.Seq, privKey)
 
-	dummyVeriMethodID := veriMethodID + "dummy"
-	_, err := verifyDIDOwnership(data, doc.Seq, doc.Document, dummyVeriMethodID, sig)
-	require.EqualError(t, err, types.ErrVeriMethodIDNotFound(dummyVeriMethodID).Error())
+	dummyVerificationMethodID := verificationMethodID + "dummy"
+	_, err := verifyDIDOwnership(data, doc.Seq, doc.Document, dummyVerificationMethodID, sig)
+	require.EqualError(t, err, types.ErrVerificationMethodIDNotFound(dummyVerificationMethodID).Error())
 }
 
 func TestVerifyDIDOwnership_SigVerificationFailed(t *testing.T) {
-	_, doc, privKey, veriMethodID, _ := ctx()
+	_, doc, privKey, verificationMethodID, _ := ctx()
 	data := any("random string")
 	sig, _ := types.Sign(data, doc.Seq+11234, privKey)
 
-	_, err := verifyDIDOwnership(data, doc.Seq, doc.Document, veriMethodID, sig)
+	_, err := verifyDIDOwnership(data, doc.Seq, doc.Document, verificationMethodID, sig)
 	require.EqualError(t, err, types.ErrSigVerificationFailed().Error())
 }
 
@@ -228,41 +228,44 @@ func (k mockKeeper) ListDIDs(ctx sdk.Context) []types.DID {
 	return dids
 }
 
-func ctx() (types.DID, types.DIDDocumentWithSeq, crypto.PrivKey, types.VeriMethodID, keeper.Keeper) {
+func ctx() (types.DID, types.DIDDocumentWithSeq, crypto.PrivKey, types.VerificationMethodID, keeper.Keeper) {
 	did := types.DID("did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm")
 	doc, privKey := newDIDDocumentWithSeq(did)
-	return did, doc, privKey, doc.Document.VeriMethods[0].ID, newMockKeeper()
+	return did, doc, privKey, doc.Document.VerificationMethods[0].ID, newMockKeeper()
 }
 
 func newDIDDocumentWithSeq(did types.DID) (types.DIDDocumentWithSeq, crypto.PrivKey) {
 	privKey := secp256k1.GenPrivKey()
 	pubKey := secp256k1util.PubKeyBytes(secp256k1util.DerivePubKey(privKey))
-	veriMethodID := types.NewVeriMethodID(did, "key1")
-	veriMethods := []types.VeriMethod{
-		types.NewVeriMethod(veriMethodID, types.ES256K_2019, did, pubKey),
-		types.NewVeriMethod(veriMethodID, types.BLS1281G2_2020, did, []byte("dummy BBS+ pub key")),
+	verificationMethodID := types.NewVerificationMethodID(did, "key1")
+	verificationMethods := []types.VerificationMethod{
+		types.NewVerificationMethod(verificationMethodID, types.ES256K_2019, did, pubKey),
+		types.NewVerificationMethod(verificationMethodID, types.BLS1281G2_2020, did, []byte("dummy BBS+ pub key")),
 	}
-	authentications := []types.Authentication{
-		types.NewAuthentication(veriMethods[0].ID),
+	authentications := []types.VerificationRelationship{
+		types.NewVerificationRelationship(verificationMethods[0].ID),
 	}
-	doc := types.NewDIDDocumentWithSeq(types.NewDIDDocument(did, veriMethods, authentications), types.InitialSequence)
+	doc := types.NewDIDDocumentWithSeq(
+		types.NewDIDDocument(did, types.WithVerificationMethods(verificationMethods), types.WithAuthentications(authentications)),
+		types.InitialSequence,
+	)
 	return doc, privKey
 }
 
-func newMsgCreateDID(t *testing.T, doc types.DIDDocument, veriMethodID types.VeriMethodID, privKey crypto.PrivKey) MsgCreateDID {
+func newMsgCreateDID(t *testing.T, doc types.DIDDocument, verificationMethodID types.VerificationMethodID, privKey crypto.PrivKey) MsgCreateDID {
 	sig, err := types.Sign(doc, types.InitialSequence, privKey)
 	require.NoError(t, err)
-	return types.NewMsgCreateDID(doc.ID, doc, veriMethodID, sig, sdk.AccAddress{})
+	return types.NewMsgCreateDID(doc.ID, doc, verificationMethodID, sig, sdk.AccAddress{})
 }
 
-func newMsgUpdateDID(t *testing.T, newDoc types.DIDDocument, veriMethodID types.VeriMethodID, privKey crypto.PrivKey, seq types.Sequence) MsgUpdateDID {
+func newMsgUpdateDID(t *testing.T, newDoc types.DIDDocument, verificationMethodID types.VerificationMethodID, privKey crypto.PrivKey, seq types.Sequence) MsgUpdateDID {
 	sig, err := types.Sign(newDoc, seq, privKey)
 	require.NoError(t, err)
-	return types.NewMsgUpdateDID(newDoc.ID, newDoc, veriMethodID, sig, sdk.AccAddress{})
+	return types.NewMsgUpdateDID(newDoc.ID, newDoc, verificationMethodID, sig, sdk.AccAddress{})
 }
 
-func newMsgDeactivateDID(t *testing.T, did types.DID, veriMethodID types.VeriMethodID, privKey crypto.PrivKey, seq types.Sequence) MsgDeactivateDID {
+func newMsgDeactivateDID(t *testing.T, did types.DID, verificationMethodID types.VerificationMethodID, privKey crypto.PrivKey, seq types.Sequence) MsgDeactivateDID {
 	sig, err := types.Sign(did, seq, privKey)
 	require.NoError(t, err)
-	return types.NewMsgDeactivateDID(did, veriMethodID, sig, sdk.AccAddress{})
+	return types.NewMsgDeactivateDID(did, verificationMethodID, sig, sdk.AccAddress{})
 }

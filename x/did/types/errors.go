@@ -7,20 +7,20 @@ import (
 const DefaultCodespace sdk.CodespaceType = ModuleName
 
 const (
-	CodeDIDExists                       sdk.CodeType = 101
-	CodeInvalidDID                      sdk.CodeType = 102
-	CodeInvalidDIDDocument              sdk.CodeType = 103
-	CodeDIDNotFound                     sdk.CodeType = 104
-	CodeInvalidSignature                sdk.CodeType = 105
-	CodeInvalidVeriMethodID             sdk.CodeType = 106
-	CodeVeriMethodIDNotFound            sdk.CodeType = 107
-	CodeSigVerificationFailed           sdk.CodeType = 108
-	CodeInvalidSecp256k1PublicKey       sdk.CodeType = 109
-	CodeInvalidNetworkID                sdk.CodeType = 110
-	CodeInvalidDIDDocumentWithSeq       sdk.CodeType = 111
-	CodeDIDDeactivated                  sdk.CodeType = 112
-	CodeInvalidKeyController            sdk.CodeType = 113
-	CodeVeriMethodKeyTypeNotImplemented sdk.CodeType = 114
+	CodeDIDExists                               sdk.CodeType = 101
+	CodeInvalidDID                              sdk.CodeType = 102
+	CodeInvalidDIDDocument                      sdk.CodeType = 103
+	CodeDIDNotFound                             sdk.CodeType = 104
+	CodeInvalidSignature                        sdk.CodeType = 105
+	CodeInvalidVerificationMethodID             sdk.CodeType = 106
+	CodeVerificationMethodIDNotFound            sdk.CodeType = 107
+	CodeSigVerificationFailed                   sdk.CodeType = 108
+	CodeInvalidSecp256k1PublicKey               sdk.CodeType = 109
+	CodeInvalidNetworkID                        sdk.CodeType = 110
+	CodeInvalidDIDDocumentWithSeq               sdk.CodeType = 111
+	CodeDIDDeactivated                          sdk.CodeType = 112
+	CodeInvalidKeyController                    sdk.CodeType = 113
+	CodeVerificationMethodKeyTypeNotImplemented sdk.CodeType = 114
 )
 
 func ErrDIDExists(did DID) sdk.Error {
@@ -43,12 +43,12 @@ func ErrInvalidSignature(sig []byte) sdk.Error {
 	return sdk.NewError(DefaultCodespace, CodeInvalidSignature, "Invalid signature %v", sig)
 }
 
-func ErrInvalidVeriMethodID(id string) sdk.Error {
-	return sdk.NewError(DefaultCodespace, CodeInvalidVeriMethodID, "Invalid VeriMethodID: %s", id)
+func ErrInvalidVerificationMethodID(id string) sdk.Error {
+	return sdk.NewError(DefaultCodespace, CodeInvalidVerificationMethodID, "Invalid VerificationMethodID: %s", id)
 }
 
-func ErrVeriMethodIDNotFound(id VeriMethodID) sdk.Error {
-	return sdk.NewError(DefaultCodespace, CodeVeriMethodIDNotFound, "VeriMethodID %v not found", id)
+func ErrVerificationMethodIDNotFound(id VerificationMethodID) sdk.Error {
+	return sdk.NewError(DefaultCodespace, CodeVerificationMethodIDNotFound, "VerificationMethodID %v not found", id)
 }
 
 func ErrSigVerificationFailed() sdk.Error {
@@ -75,6 +75,6 @@ func ErrInvalidKeyController(did DID) sdk.Error {
 	return sdk.NewError(DefaultCodespace, CodeInvalidKeyController, "Invalid key controller: %v", did)
 }
 
-func ErrVeriMethodKeyTypeNotImplemented(keyType KeyType) sdk.Error {
-	return sdk.NewError(DefaultCodespace, CodeVeriMethodKeyTypeNotImplemented, "Verification not implemented with key type: %v", keyType)
+func ErrVerificationMethodKeyTypeNotImplemented(keyType KeyType) sdk.Error {
+	return sdk.NewError(DefaultCodespace, CodeVerificationMethodKeyTypeNotImplemented, "Verification not implemented with key type: %v", keyType)
 }

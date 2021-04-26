@@ -39,7 +39,7 @@ func handleMsgCreateDID(ctx sdk.Context, keeper keeper.Keeper, msg MsgCreateDID)
 
 	seq := types.InitialSequence
 
-	_, err := verifyDIDOwnership(msg.Document, seq, msg.Document, msg.VeriMethodID, msg.Signature)
+	_, err := verifyDIDOwnership(msg.Document, seq, msg.Document, msg.VerificationMethodID, msg.Signature)
 	if err != nil {
 		return err.Result()
 	}
@@ -58,7 +58,7 @@ func handleMsgUpdateDID(ctx sdk.Context, keeper keeper.Keeper, msg MsgUpdateDID)
 		return types.ErrDIDDeactivated(msg.DID).Result()
 	}
 
-	newSeq, err := verifyDIDOwnership(msg.Document, docWithSeq.Seq, docWithSeq.Document, msg.VeriMethodID, msg.Signature)
+	newSeq, err := verifyDIDOwnership(msg.Document, docWithSeq.Seq, docWithSeq.Document, msg.VerificationMethodID, msg.Signature)
 	if err != nil {
 		return err.Result()
 	}
@@ -77,7 +77,7 @@ func handleMsgDeactivateDID(ctx sdk.Context, keeper keeper.Keeper, msg MsgDeacti
 		return types.ErrDIDDeactivated(msg.DID).Result()
 	}
 
-	newSeq, err := verifyDIDOwnership(msg.DID, docWithSeq.Seq, docWithSeq.Document, msg.VeriMethodID, msg.Signature)
+	newSeq, err := verifyDIDOwnership(msg.DID, docWithSeq.Seq, docWithSeq.Document, msg.VerificationMethodID, msg.Signature)
 	if err != nil {
 		return err.Result()
 	}
@@ -90,19 +90,19 @@ func handleMsgDeactivateDID(ctx sdk.Context, keeper keeper.Keeper, msg MsgDeacti
 // verifyDIDOwnership verifies the DID ownership from a sig which is covers a DID Document + a sequence number.
 // A public key is taken from one of verificationMethods in the DID Document.
 // If the verification is successful, it returns a new sequence. If not, it returns an error.
-func verifyDIDOwnership(data types.Signable, seq types.Sequence, doc types.DIDDocument, veriMethodID types.VeriMethodID, sig []byte) (types.Sequence, sdk.Error) {
-	veriMethod, ok := doc.VeriMethodByID(veriMethodID)
+func verifyDIDOwnership(data types.Signable, seq types.Sequence, doc types.DIDDocument, verificationMethodID types.VerificationMethodID, sig []byte) (types.Sequence, sdk.Error) {
+	verificationMethod, ok := doc.VerificationMethodByID(verificationMethodID)
 	if !ok {
-		return 0, types.ErrVeriMethodIDNotFound(veriMethodID)
+		return 0, types.ErrVerificationMethodIDNotFound(verificationMethodID)
 	}
 
 	// TODO: Currently, only ES256K1 is supported to verify DID ownership.
 	//       It makes sense for now, since a DID is derived from a Secp256k1 public key.
-	//       But, need to support other key types (according to veriMethod.Type).
-	if veriMethod.Type != types.ES256K_2019 && veriMethod.Type != types.ES256K_2018 {
-		return 0, types.ErrVeriMethodKeyTypeNotImplemented(veriMethod.Type)
+	//       But, need to support other key types (according to verificationMethod.Type).
+	if verificationMethod.Type != types.ES256K_2019 && verificationMethod.Type != types.ES256K_2018 {
+		return 0, types.ErrVerificationMethodKeyTypeNotImplemented(verificationMethod.Type)
 	}
-	pubKeySecp256k1, err := secp256k1util.PubKeyFromBase58(veriMethod.PubKeyBase58)
+	pubKeySecp256k1, err := secp256k1util.PubKeyFromBase58(verificationMethod.PubKeyBase58)
 	if err != nil {
 		return 0, types.ErrInvalidSecp256k1PublicKey(err)
 	}
