@@ -215,17 +215,28 @@ func (doc DIDDocument) GetSignBytes() []byte {
 // VerificationMethodByID finds a VerificationMethod by ID.
 // If the corresponding VerificationMethod doesn't exist, it returns a false.
 func (doc DIDDocument) VerificationMethodByID(id VerificationMethodID) (VerificationMethod, bool) {
-	//TODO: Sadly, Amino codec doesn't accept maps. Find the way to make this efficient.
-	for _, auth := range doc.Authentications {
-		if auth.VerificationMethodID == id {
-			for _, verificationMethod := range doc.VerificationMethods {
-				if verificationMethod.ID == id {
-					return verificationMethod, true
-				}
-			}
-			return VerificationMethod{}, false
+	for _, verificationMethod := range doc.VerificationMethods {
+		if verificationMethod.ID == id {
+			return verificationMethod, true
 		}
 	}
+	return VerificationMethod{}, false
+}
+
+// VerificationMethodFrom finds a VerificationMethod from the slice of VerificationRelationship by its ID.
+// There are two types of VerificationRelationship. If it has a dedicated VerificationMethod, it is returned as it is.
+// If the relationship has only a ID of VerificationMethod, this function tries to find a corresponding VerificationMethod in the DIDDocument.
+func (doc DIDDocument) VerificationMethodFrom(relationships []VerificationRelationship, id VerificationMethodID) (VerificationMethod, bool) {
+	for _, relationship := range relationships {
+		if relationship.VerificationMethodID == id {
+			if relationship.hasDedicatedMethod() {
+				return *relationship.DedicatedVerificationMethod, true
+			} else {
+				return doc.VerificationMethodByID(id)
+			}
+		}
+	}
+
 	return VerificationMethod{}, false
 }
 
