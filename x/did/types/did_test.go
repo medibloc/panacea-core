@@ -98,8 +98,7 @@ func TestDIDDocument_VerificationMethodByID(t *testing.T) {
 	pubKey := secp256k1util.PubKeyBytes(secp256k1util.DerivePubKey(secp256k1.GenPrivKey()))
 	verificationMethodID := NewVerificationMethodID(did, "key1")
 	verificationMethods := []VerificationMethod{NewVerificationMethod(verificationMethodID, ES256K_2019, did, pubKey)}
-	authentications := []VerificationRelationship{NewVerificationRelationship(verificationMethods[0].ID)}
-	doc := NewDIDDocument(did, WithVerificationMethods(verificationMethods), WithAuthentications(authentications))
+	doc := NewDIDDocument(did, WithVerificationMethods(verificationMethods))
 
 	found, ok := doc.VerificationMethodByID(verificationMethodID)
 	require.True(t, ok)
@@ -107,9 +106,25 @@ func TestDIDDocument_VerificationMethodByID(t *testing.T) {
 
 	_, ok = doc.VerificationMethodByID(NewVerificationMethodID(did, "key2"))
 	require.False(t, ok)
+}
+
+func TestDIDDocument_VerificationMethodFrom(t *testing.T) {
+	did := DID("did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm")
+	pubKey := secp256k1util.PubKeyBytes(secp256k1util.DerivePubKey(secp256k1.GenPrivKey()))
+	verificationMethodID := NewVerificationMethodID(did, "key1")
+	verificationMethods := []VerificationMethod{NewVerificationMethod(verificationMethodID, ES256K_2019, did, pubKey)}
+	authentications := []VerificationRelationship{NewVerificationRelationship(verificationMethods[0].ID)}
+	doc := NewDIDDocument(did, WithVerificationMethods(verificationMethods), WithAuthentications(authentications))
+
+	found, ok := doc.VerificationMethodFrom(doc.Authentications, verificationMethodID)
+	require.True(t, ok)
+	require.Equal(t, verificationMethods[0], found)
+
+	_, ok = doc.VerificationMethodFrom(doc.Authentications, NewVerificationMethodID(did, "key2"))
+	require.False(t, ok)
 
 	doc.Authentications = []VerificationRelationship{} // clear authentications
-	_, ok = doc.VerificationMethodByID(verificationMethodID)
+	_, ok = doc.VerificationMethodFrom(doc.Authentications, verificationMethodID)
 	require.False(t, ok)
 }
 

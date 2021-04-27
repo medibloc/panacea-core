@@ -91,7 +91,7 @@ func handleMsgDeactivateDID(ctx sdk.Context, keeper keeper.Keeper, msg MsgDeacti
 // A public key is taken from one of verificationMethods in the DID Document.
 // If the verification is successful, it returns a new sequence. If not, it returns an error.
 func verifyDIDOwnership(data types.Signable, seq types.Sequence, doc types.DIDDocument, verificationMethodID types.VerificationMethodID, sig []byte) (types.Sequence, sdk.Error) {
-	verificationMethod, ok := doc.VerificationMethodByID(verificationMethodID)
+	verificationMethod, ok := doc.VerificationMethodFrom(doc.Authentications, verificationMethodID)
 	if !ok {
 		return 0, types.ErrVerificationMethodIDNotFound(verificationMethodID)
 	}
