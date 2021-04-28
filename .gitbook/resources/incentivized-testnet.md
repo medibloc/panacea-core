@@ -4,10 +4,19 @@ MediBloc will open a Incentivized Testnet program for a month.
 This program is for validators to be onboarded to the process how to set up nodes and participate in block provisions.
 
 
+## Timeline
+
+*To be determined soon*
+
+- 10th May ~ 11th June: Operate the Testnet
+- Mid-June: Upgrade the Mainnet + Validator Joining
+
+
 ## Environment
 
 A Testnet is currently being operated with 3 validator nodes by MediBloc.
 It will be upgraded with the following parameters for the Incentivized Testnet.
+This setting can be changed.
 
 |Parameter|Value|
 |---------|-----|
