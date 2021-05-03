@@ -40,8 +40,9 @@ The staking parameters will be set as below (can be changed).
 - Each validator receives the incentive on the Mainnet in proportion to the rewards they earned on the Testnet.
   - If a validator earned the rewards `R = F - 100000` MED on the Testnet, the validator will receive the incentive on the Mainnet as the following formula:
     ```
-    incentive = total_pie * (R_k / (R_1 + R_2 + ... + R_n))
+    incentive_k = total_pie * (R_k / (R_1 + R_2 + ... + R_n))
     ```
+    - `incentive_k`: The incentive that the validator `k` will receive on the Mainnet
     - `R_k`: The rewards that the validator `k` earned on the Testnet
 	- `n`: The number of validators whose `R` is `> 0`
   - The `total_pie` is `1,000,000` MED (can be changed).
