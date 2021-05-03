@@ -42,11 +42,12 @@ The staking parameters will be set as below (can be changed).
     ```
     incentive = total_pie * (R_k / (R_1 + R_2 + ... + R_n))
     ```
-	- for `n` validators whose `R_k` is `> 0`
+    - `R_k`: The rewards that the validator `k` earned on the Testnet
+	- `n`: The number of validators whose `R` is `> 0`
   - The `total_pie` is `1,000,000` MED (can be changed).
 - If all validators operate their node without any downtime and malicious behaviors, all of them will get the same amount of incentives.
 - If a validator misses some block provisions or behave maliciously (such as double signing), they cannot earn full amount of block rewards minted during the Testnet period. Or, they can be slashed. Thus, their incentives on the Mainnet will be decreased. For details, please see the [Validator FAQ](https://hub.cosmos.network/main/validators/validator-faq.html#what-are-the-slashing-conditions).
-- Validators whose `R_k` is `<= 0` will not get any incentive on the Mainnet.
+- Validators whose `R` is `<= 0` will not get any incentive on the Mainnet.
 
 
 ## Guide for Validators
