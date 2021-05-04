@@ -23,3 +23,6 @@
 * [DID](specifications/did.md)
 * [Token](specifications/token.md)
 
+## Resources
+
+* [Incentivized Testnet](resources/incentivized-testnet.md)
