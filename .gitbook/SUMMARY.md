@@ -2,10 +2,6 @@
 
 * [Introduction](README.md)
 
-## Features
-
-* [What is Panacea?‌](features/what-is-panacea.md)
-* [AOL](features/aol.md)
 
 ## Guide
 

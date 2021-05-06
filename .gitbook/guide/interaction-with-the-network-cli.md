@@ -261,7 +261,7 @@ Don't use more `umed` than you have!
 {% endhint %}
 
 ```bash
-panacead tx staking create-validator \
+panaceacli tx staking create-validator \
   --amount=10000000umed \
   --pubkey=$(panacead tenderment show-validator) \
   --moniker="choose a moniker" \
