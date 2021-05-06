@@ -226,7 +226,7 @@ We have to solve this simple equation to find the reward `R` for each validator:
 
 ```
 9*R + R + R*5% = 1005
-R = 1005x/10.05 = 100
+R = 1005/10.05 = 100
 ```
 
 - For the proposer validator:
