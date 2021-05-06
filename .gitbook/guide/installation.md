@@ -4,7 +4,7 @@ This guide will explain how to install the `panacead` and `panaceacli` entrypoin
 
 ## Install Go
 
-[Go 1.14+](https://golang.org/doc/install) is required.
+[Go 1.15+](https://golang.org/doc/install) is required.
 
 ## Install the `panacead` and `panaceacli`
 
