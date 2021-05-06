@@ -26,3 +26,4 @@
 ## Resources
 
 * [Incentivized Testnet](resources/incentivized-testnet.md)
+* [Validator FAQ](resources/validator-faq.md)
