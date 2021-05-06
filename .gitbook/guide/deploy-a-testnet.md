@@ -60,23 +60,3 @@ Start the second node.
 ```bash
 panacead start
 ```
-
-
-## Using a single machine (using Docker)
-
-Multiple nodes can be run in a single machine using Docker.
-```bash
-# NOTE: Make sure that you already installed jq, docker and docker-compose
-
-docker build -t panacea-core .
-
-./scripts/prepare_docker_compose.sh
-docker-compose up
-```
-6 nodes are started. 4 of them are validators.
-You can find data directories from `$HOME/panancea_home/<node_id>/*` in your local which are mounted to each Docker container.
-
-You can get a shell to a container by the following command:
-```bash
-docker exec -it panacea-core_node1_1 /bin/sh
-```
