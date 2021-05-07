@@ -270,7 +270,6 @@ panaceacli tx staking create-validator \
   --commission-max-change-rate="0.01" \
   --min-self-delegation="1" \
   --amount=10000000umed \
-  --pubkey=$(panacead tenderment show-validator) \
   --fees="1000000umed" \
   --from=<key-name>
 ```
