@@ -86,7 +86,7 @@ timeout_commit = "1s"
 After that, edit the `~/.panacead/config/app.toml` file in order to enable the anti-spam mechanism and reject incoming transactions with less than a minimum fee:
 ```toml
 # Validators reject any tx from the mempool with less than the minimum fee per gas.
-minimum_fees = "0.5umed"
+minimum_fees = "5.0umed"
 
 # NOTE: For the Testnet, please set minimum_fees as "", so that no fee is required.
 ```
