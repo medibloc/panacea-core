@@ -8,29 +8,28 @@ import (
 )
 
 func (k Keeper) BurnCoins(ctx sdk.Context, acc string) sdk.Error {
-	bunAccount, err := getAccount(ctx, k, acc)
+	burnAccount, err := getAccount(ctx, k, acc)
 	if err != nil {
 		return sdk.ErrInvalidAddress(err.Error())
 	}
 
-	if bunAccount == nil {
+	if burnAccount == nil {
 		return nil
 	}
 
-	amt := bunAccount.GetCoins()
+	amt := burnAccount.GetCoins()
 	if amt.Empty() {
 		return nil
 	}
 
-	ctx.Logger().Info("find burn coin.", fmt.Sprintf("address: %s, coins: %s", bunAccount.GetAddress(), bunAccount.GetCoins()))
+	ctx.Logger().Info("find burn coin.", fmt.Sprintf("address: %s, coins: %s", burnAccount.GetAddress(), burnAccount.GetCoins()))
 
-	_, err = k.bankKeeper.SubtractCoins(ctx, bunAccount.GetAddress(), amt)
-
+	_, err = k.bankKeeper.SubtractCoins(ctx, burnAccount.GetAddress(), amt)
 	if err != nil {
 		return sdk.ErrInvalidCoins(err.Error())
 	}
 
-	ctx.Logger().Info("Success burn coin to bunAccount.", fmt.Sprintf("address: %s, coins: %s", acc, amt))
+	ctx.Logger().Info("Success burn coin to burnAccount.", fmt.Sprintf("address: %s, coins: %s", acc, amt))
 
 	burnCoinsToSupply(ctx, k, amt)
 
@@ -39,7 +38,6 @@ func (k Keeper) BurnCoins(ctx sdk.Context, acc string) sdk.Error {
 
 func getAccount(ctx sdk.Context, k Keeper, acc string) (accountExported.Account, error) {
 	burnAcc, err := sdk.AccAddressFromBech32(acc)
-
 	if err != nil {
 		return nil, err
 	}

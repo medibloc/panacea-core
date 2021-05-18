@@ -109,7 +109,6 @@ func (AppModule) BeginBlock(_ sdk.Context, _ abci.RequestBeginBlock) {}
 
 func (am AppModule) EndBlock(ctx sdk.Context, block abci.RequestEndBlock) []abci.ValidatorUpdate {
 	err := am.keeper.BurnCoins(ctx, types.BurnAddress)
-
 	if err != nil {
 		panic("Failed burn. msg : " + err.Error())
 	}
