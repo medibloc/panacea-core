@@ -18,7 +18,6 @@ func (k Keeper) BurnCoins(ctx sdk.Context, acc string) sdk.Error {
 	}
 
 	amt := bunAccount.GetCoins()
-
 	if amt.Empty() {
 		return nil
 	}
