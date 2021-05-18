@@ -32,11 +32,10 @@ var (
 	_ module.AppModule      = AppModule{}
 )
 
-func NewAppModule(keeper keeper.Keeper, supplyKeeper supply.Keeper) AppModule {
+func NewAppModule(keeper keeper.Keeper) AppModule {
 	return AppModule{
 		AppModuleBasic: AppModuleBasic{},
 		keeper:         keeper,
-		supplyKeeper:   supplyKeeper,
 	}
 }
 
@@ -110,7 +109,7 @@ func (AppModule) BeginBlock(_ sdk.Context, _ abci.RequestBeginBlock) {}
 func (am AppModule) EndBlock(ctx sdk.Context, block abci.RequestEndBlock) []abci.ValidatorUpdate {
 	err := am.keeper.BurnCoins(ctx, types.BurnAddress)
 	if err != nil {
-		panic("Failed burn. msg : " + err.Error())
+		ctx.Logger().Error("Failed burn.", fmt.Sprintf("msg : %s", err.Error()))
 	}
 
 	return []abci.ValidatorUpdate{}

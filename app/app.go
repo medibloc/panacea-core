@@ -257,7 +257,7 @@ func NewPanaceaApp(
 		aol.NewAppModule(app.aolKeeper),
 		did.NewAppModule(app.didKeeper),
 		token.NewAppModule(app.tokenKeeper),
-		burn.NewAppModule(app.burnKeeper, app.supplyKeeper),
+		burn.NewAppModule(app.burnKeeper),
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that

@@ -123,7 +123,7 @@ func createTestInput(t *testing.T) TestInput {
 	return TestInput{ctx, cdc, accountKeeper, bankKeeper, supplyKeeper, burnKeeper}
 }
 
-func TestGetAccount(t *testing.T) {
+func TestBurnCoins(t *testing.T) {
 	input := createTestInput(t)
 
 	beforeBurnCoin1 := input.AccountKeeper.GetAccount(input.Ctx, addrs[0]).GetCoins()
@@ -151,5 +151,36 @@ func TestGetAccount(t *testing.T) {
 	require.Equal(t, initCoins, afterBurnCoin3)
 	// required 400 umed
 	require.Equal(t, afterBurnTotal, initCoins.Add(initCoins))
+
+}
+
+func TestGetAccount_NotExistAddress(t *testing.T) {
+	input := createTestInput(t)
+
+	beforeBurnCoin1 := input.AccountKeeper.GetAccount(input.Ctx, addrs[0]).GetCoins()
+	beforeBurnCoin2 := input.AccountKeeper.GetAccount(input.Ctx, addrs[1]).GetCoins()
+	beforeBurnCoin3 := input.AccountKeeper.GetAccount(input.Ctx, addrs[2]).GetCoins()
+	beforeBurnTotal := input.SupplyKeeper.GetSupply(input.Ctx).GetTotal()
+
+	require.Equal(t, initCoins, beforeBurnCoin1)
+	require.Equal(t, initCoins, beforeBurnCoin2)
+	require.Equal(t, initCoins, beforeBurnCoin3)
+	// required 600 umed
+	require.Equal(t, beforeBurnTotal, initCoins.Add(initCoins).Add(initCoins))
+
+	err := input.Keeper.BurnCoins(input.Ctx, "invalid address")
+
+	require.Error(t, err)
+
+	afterBurnCoin1 := input.AccountKeeper.GetAccount(input.Ctx, addrs[0]).GetCoins()
+	afterBurnCoin2 := input.AccountKeeper.GetAccount(input.Ctx, addrs[1]).GetCoins()
+	afterBurnCoin3 := input.AccountKeeper.GetAccount(input.Ctx, addrs[2]).GetCoins()
+	afterBurnTotal := input.SupplyKeeper.GetSupply(input.Ctx).GetTotal()
+
+	require.Equal(t, initCoins, afterBurnCoin1)
+	require.Equal(t, initCoins, afterBurnCoin2)
+	require.Equal(t, initCoins, afterBurnCoin3)
+	// required 400 umed
+	require.Equal(t, afterBurnTotal, initCoins.Add(initCoins).Add(initCoins))
 
 }

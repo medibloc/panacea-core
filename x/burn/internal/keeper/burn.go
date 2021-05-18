@@ -7,10 +7,10 @@ import (
 	accountExported "github.com/cosmos/cosmos-sdk/x/auth/exported"
 )
 
-func (k Keeper) BurnCoins(ctx sdk.Context, acc string) sdk.Error {
+func (k Keeper) BurnCoins(ctx sdk.Context, acc string) error {
 	burnAccount, err := getAccount(ctx, k, acc)
 	if err != nil {
-		return sdk.ErrInvalidAddress(err.Error())
+		return err
 	}
 
 	if burnAccount == nil {
@@ -26,12 +26,12 @@ func (k Keeper) BurnCoins(ctx sdk.Context, acc string) sdk.Error {
 
 	_, err = k.bankKeeper.SubtractCoins(ctx, burnAccount.GetAddress(), amt)
 	if err != nil {
-		return sdk.ErrInvalidCoins(err.Error())
+		return err
 	}
 
 	ctx.Logger().Info("Success burn coin to burnAccount.", fmt.Sprintf("address: %s, coins: %s", acc, amt))
 
-	burnCoinsToSupply(ctx, k, amt)
+	burnCoinsFromSupply(ctx, k, amt)
 
 	return nil
 }
@@ -45,7 +45,7 @@ func getAccount(ctx sdk.Context, k Keeper, acc string) (accountExported.Account,
 	return k.accountKeeper.GetAccount(ctx, burnAcc), nil
 }
 
-func burnCoinsToSupply(ctx sdk.Context, k Keeper, amt sdk.Coins) {
+func burnCoinsFromSupply(ctx sdk.Context, k Keeper, amt sdk.Coins) {
 	supply := k.supplyKeeper.GetSupply(ctx)
 	supply = supply.Deflate(amt)
 	k.supplyKeeper.SetSupply(ctx, supply)
