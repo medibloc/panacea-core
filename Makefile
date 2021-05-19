@@ -44,8 +44,6 @@ lint:
 
 build: go.sum
 	go build -mod=readonly $(BUILD_FLAGS) -o build/panacead ./cmd/panacead
-	go build -mod=readonly $(BUILD_FLAGS) -o build/panaceacli ./cmd/panaceacli
-	go build -mod=readonly $(BUILD_FLAGS) -o build/panaceakeyutil ./cmd/panaceakeyutil
 
 test:
 	mkdir -p $(ARTIFACT_DIR)
@@ -57,8 +55,6 @@ update_panacea_lite_docs:
 
 install: go.sum update_panacea_lite_docs
 	go install -mod=readonly $(BUILD_FLAGS) ./cmd/panacead
-	go install -mod=readonly $(BUILD_FLAGS) ./cmd/panaceacli
-	go install -mod=readonly $(BUILD_FLAGS) ./cmd/panaceakeyutil
 
 ########################################
 ### Tools & dependencies
