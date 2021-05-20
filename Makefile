@@ -2,6 +2,7 @@ VERSION := $(shell echo $(shell git describe --tags) | sed 's/^v//')
 COMMIT := $(shell git log -1 --format='%H')
 GOBIN ?= $(GOPATH)/bin
 GOSUM := $(shell which gosum)
+DOCKER := $(shell which docker)
 
 export GO111MODULE = on
 
@@ -38,6 +39,16 @@ lint:
 	find . -name '*.go' -type f -not -path "./vendor*" -not -path "*.git*" | xargs gofmt -d -s
 	go mod verify
 
+########################################
+### Protobuf
+
+proto-gen: proto-update-deps
+	@echo "Generating Protobuf files"
+	$(DOCKER) run --rm -v $(CURDIR):/workspace --workdir /workspace tendermintdev/sdk-proto-gen sh ./scripts/protocgen.sh
+
+proto-update-deps:
+	GO111MODULE=off go get github.com/stormcat24/protodep
+	protodep up
 
 ########################################
 ### Build/Install
