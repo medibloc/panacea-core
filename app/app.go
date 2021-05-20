@@ -27,6 +27,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/staking"
 
 	"github.com/medibloc/panacea-core/x/aol"
+	"github.com/medibloc/panacea-core/x/burn"
 	"github.com/medibloc/panacea-core/x/did"
 	"github.com/medibloc/panacea-core/x/token"
 
@@ -63,6 +64,7 @@ var (
 		aol.AppModuleBasic{},
 		did.AppModuleBasic{},
 		token.AppModuleBasic{},
+		burn.AppModuleBasic{},
 	)
 
 	// module account permissions
@@ -101,6 +103,7 @@ type PanaceaApp struct {
 	aolKeeper      aol.Keeper
 	didKeeper      did.Keeper
 	tokenKeeper    token.Keeper
+	burnKeeper     burn.Keeper
 
 	// the module manager
 	mm *module.Manager
@@ -225,6 +228,12 @@ func NewPanaceaApp(
 		app.supplyKeeper,
 	)
 
+	app.burnKeeper = burn.NewKeeper(
+		app.accountKeeper,
+		app.bankKeeper,
+		app.supplyKeeper,
+	)
+
 	// register the staking hooks
 	// NOTE: stakingKeeper above is passed by reference, so that it will contain these hooks
 	app.stakingKeeper = *stakingKeeper.SetHooks(
@@ -248,6 +257,7 @@ func NewPanaceaApp(
 		aol.NewAppModule(app.aolKeeper),
 		did.NewAppModule(app.didKeeper),
 		token.NewAppModule(app.tokenKeeper),
+		burn.NewAppModule(app.burnKeeper),
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -255,7 +265,7 @@ func NewPanaceaApp(
 	// CanWithdrawInvariant invariant.
 	app.mm.SetOrderBeginBlockers(mint.ModuleName, distr.ModuleName, slashing.ModuleName)
 
-	app.mm.SetOrderEndBlockers(crisis.ModuleName, gov.ModuleName, staking.ModuleName)
+	app.mm.SetOrderEndBlockers(crisis.ModuleName, gov.ModuleName, staking.ModuleName, burn.ModuleName)
 
 	// NOTE: The genutils module must occur after staking so that pools are
 	// properly initialized with tokens from genesis accounts.
@@ -263,7 +273,7 @@ func NewPanaceaApp(
 		genaccounts.ModuleName, distr.ModuleName, staking.ModuleName,
 		auth.ModuleName, bank.ModuleName, slashing.ModuleName, gov.ModuleName,
 		mint.ModuleName, supply.ModuleName, crisis.ModuleName, genutil.ModuleName,
-		aol.ModuleName, did.ModuleName, token.ModuleName,
+		aol.ModuleName, did.ModuleName, token.ModuleName, burn.ModuleName,
 	)
 
 	app.mm.RegisterInvariants(&app.crisisKeeper)
