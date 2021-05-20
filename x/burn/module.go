@@ -6,8 +6,6 @@ import (
 
 	"github.com/medibloc/panacea-core/x/burn/internal/keeper"
 
-	"github.com/cosmos/cosmos-sdk/x/supply"
-
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -23,8 +21,7 @@ type AppModuleBasic struct{}
 
 type AppModule struct {
 	AppModuleBasic
-	keeper       keeper.Keeper
-	supplyKeeper supply.Keeper
+	keeper keeper.Keeper
 }
 
 var (
