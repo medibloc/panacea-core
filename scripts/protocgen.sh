@@ -4,6 +4,8 @@
 
 set -eo pipefail
 
+# regen-network/cosmos-proto must be used to handle Go interface types as google.protobuf.Any.
+# https://github.com/regen-network/cosmos-proto
 protoc_gen_gocosmos() {
   if ! grep "github.com/gogo/protobuf => github.com/regen-network/protobuf" go.mod &>/dev/null ; then
     echo -e "\tPlease run this command from somewhere inside the cosmos-sdk folder."
