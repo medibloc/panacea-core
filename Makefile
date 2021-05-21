@@ -48,7 +48,7 @@ proto-gen: proto-update-deps
 
 proto-update-deps:
 	GO111MODULE=off go get github.com/stormcat24/protodep
-	protodep up
+	protodep up --use-https
 
 ########################################
 ### Build/Install
