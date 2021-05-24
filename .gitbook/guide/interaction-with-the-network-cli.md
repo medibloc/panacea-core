@@ -268,7 +268,7 @@ panaceacli tx staking create-validator \
   --commission-rate="0.10" \
   --commission-max-rate="0.20" \
   --commission-max-change-rate="0.01" \
-  --min-self-delegation="1000000" \
+  --min-self-delegation="1" \
   --amount=10000000umed \
   --fees="1000000umed" \
   --from=<key-name>
