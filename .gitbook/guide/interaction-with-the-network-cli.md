@@ -268,7 +268,7 @@ panaceacli tx staking create-validator \
   --commission-rate="0.10" \
   --commission-max-rate="0.20" \
   --commission-max-change-rate="0.01" \
-  --min-self-delegation="1" \
+  --min-self-delegation="1000000" \
   --amount=10000000umed \
   --fees="1000000umed" \
   --from=<key-name>
@@ -284,10 +284,12 @@ panaceacli tx staking create-validator \
 - `commission-max-change-rate`: A maximum daily increase of the validator commission. This cannot be changed after the
   `create-validator` transaction is processed. This is used to measure % point change over the `commision-rate`.
   E.g. 1% to 2% is a 100% rate increase, but only 1% point.
-- `min-self-delegation`: A strictly positive integer that represents the minimum amount of self-delegated voting power
-  your validator must always have. A `min-self-delegation` of `1` means your validator will never have a self-delegation
-  lower than `1med` (`1000000umed`).
+- `min-self-delegation`: A strictly positive integer in `umed` that represents the minimum amount of self-delegated voting power
+  your validator must always have. If the validator's self-delegated stake falls below this limit, their entire staking pool will unbond.
 - `amount`: An amount of your self-delegation
+
+**Note:** A minimum amount of MEDs that must be delegated to be an active validator is `1med` (`1000000umed`).
+In other words, validators cannot be in the active set, if their total stake (= self-bonded stake + delegators stake) is under `1med`.
 
 You can confirm that you are in the validator set by the following command:
 ```bash
@@ -322,7 +324,7 @@ panaceacli tx staking edit-validator
   --fees="1000000umed"
 ```
 
-**Note**: The commission-rate value must adhere to the following invariants:
+**Note**: The `--commission-rate` value must adhere to the following invariants:
 
 - Must be between 0 and the validator's `commission-max-rate`
 - Must not exceed the validator's `commission-max-change-rate` which is maximum % point change rate **per day**.
