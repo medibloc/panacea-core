@@ -306,17 +306,10 @@ if the field has never been set or remain the same if it has been set in the pas
 
 The `--from` option specifies which validator you are editing.
 
-The `--identity` can be used as to verify identity with systems like Keybase or UPort.
-When using with Keybase, `--identity` should be populated with a 16-digit string that is generated with a [keybase.io](https://keybase.io/) account.
-It's a cryptographically secure method of verifying your identity across multiple online networks.
-The Keybase API allows us to retrieve your Keybase avatar.
-This is how you can add a logo to your validator profile.
-
 ```bash
 panaceacli tx staking edit-validator
   --moniker="choose a new moniker" \
   --website="https://example.com" \
-  --identity=6A0D65E29A4CBC8E \
   --details="This is a detail description" \
   --chain-id=<chain_id> \
   --commission-rate="0.15" \
