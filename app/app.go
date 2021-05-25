@@ -85,7 +85,11 @@ import (
 	panaceatypes "github.com/medibloc/panacea-core/x/panacea/types"
 	tmjson "github.com/tendermint/tendermint/libs/json"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
+
 	// this line is used by starport scaffolding # stargate/app/moduleImport
+	"github.com/medibloc/panacea-core/x/burn"
+	burnkeeper "github.com/medibloc/panacea-core/x/burn/keeper"
+	burntypes "github.com/medibloc/panacea-core/x/burn/types"
 )
 
 const Name = "panacea"
@@ -133,6 +137,7 @@ var (
 		vesting.AppModuleBasic{},
 		panacea.AppModuleBasic{},
 		// this line is used by starport scaffolding # stargate/app/moduleBasic
+		burn.AppModuleBasic{},
 	)
 
 	// module account permissions
@@ -193,6 +198,7 @@ type App struct {
 	IBCKeeper        *ibckeeper.Keeper // IBC Keeper must be a pointer in the app, so we can SetRouter on it correctly
 	EvidenceKeeper   evidencekeeper.Keeper
 	TransferKeeper   ibctransferkeeper.Keeper
+	BurnKeeper       burnkeeper.Keeper
 
 	// make scoped keepers public for test purposes
 	ScopedIBCKeeper      capabilitykeeper.ScopedKeeper
@@ -200,6 +206,7 @@ type App struct {
 
 	panaceaKeeper panaceakeeper.Keeper
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
+	burnKeeper burnkeeper.Keeper
 
 	// the module manager
 	mm *module.Manager
@@ -210,7 +217,7 @@ type App struct {
 func New(
 	logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bool, skipUpgradeHeights map[int64]bool,
 	homePath string, invCheckPeriod uint, encodingConfig appparams.EncodingConfig,
-	// this line is used by starport scaffolding # stargate/app/newArgument
+// this line is used by starport scaffolding # stargate/app/newArgument
 	appOpts servertypes.AppOptions, baseAppOptions ...func(*baseapp.BaseApp),
 ) *App {
 
@@ -230,6 +237,7 @@ func New(
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
 		panaceatypes.StoreKey,
 		// this line is used by starport scaffolding # stargate/app/storeKey
+		burntypes.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
@@ -324,6 +332,9 @@ func New(
 	)
 
 	// this line is used by starport scaffolding # stargate/app/keeperDefinition
+	app.burnKeeper = *burnkeeper.NewKeeper(
+		app.BankKeeper,
+	)
 
 	app.GovKeeper = govkeeper.NewKeeper(
 		appCodec, keys[govtypes.StoreKey], app.GetSubspace(govtypes.ModuleName), app.AccountKeeper, app.BankKeeper,
@@ -367,6 +378,7 @@ func New(
 		transferModule,
 		panacea.NewAppModule(appCodec, app.panaceaKeeper),
 		// this line is used by starport scaffolding # stargate/app/appModule
+		burn.NewAppModule(appCodec, app.burnKeeper),
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -378,7 +390,7 @@ func New(
 		evidencetypes.ModuleName, stakingtypes.ModuleName, ibchost.ModuleName,
 	)
 
-	app.mm.SetOrderEndBlockers(crisistypes.ModuleName, govtypes.ModuleName, stakingtypes.ModuleName)
+	app.mm.SetOrderEndBlockers(crisistypes.ModuleName, govtypes.ModuleName, stakingtypes.ModuleName, burntypes.ModuleName)
 
 	// NOTE: The genutils module must occur after staking so that pools are
 	// properly initialized with tokens from genesis accounts.
@@ -401,6 +413,7 @@ func New(
 		ibctransfertypes.ModuleName,
 		panaceatypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/initGenesis
+		burntypes.ModuleName,
 	)
 
 	app.mm.RegisterInvariants(&app.CrisisKeeper)
@@ -583,6 +596,7 @@ func initParamsKeeper(appCodec codec.BinaryMarshaler, legacyAmino *codec.LegacyA
 	paramsKeeper.Subspace(ibctransfertypes.ModuleName)
 	paramsKeeper.Subspace(ibchost.ModuleName)
 	// this line is used by starport scaffolding # stargate/app/paramSubspace
+	paramsKeeper.Subspace(burntypes.ModuleName)
 
 	return paramsKeeper
 }
