@@ -14,12 +14,22 @@ const (
 // RegisterRoutes registers token-related REST handlers to a router
 func RegisterRoutes(clientCtx client.Context, r *mux.Router) {
 	// this line is used by starport scaffolding # 2
+	registerQueryRoutes(clientCtx, r)
+	registerTxHandlers(clientCtx, r)
+
 }
 
 func registerQueryRoutes(clientCtx client.Context, r *mux.Router) {
 	// this line is used by starport scaffolding # 3
+	r.HandleFunc("/token/tokens/{id}", getTokenHandler(clientCtx)).Methods("GET")
+	r.HandleFunc("/token/tokens", listTokenHandler(clientCtx)).Methods("GET")
+
 }
 
 func registerTxHandlers(clientCtx client.Context, r *mux.Router) {
 	// this line is used by starport scaffolding # 4
+	r.HandleFunc("/token/tokens", createTokenHandler(clientCtx)).Methods("POST")
+	r.HandleFunc("/token/tokens/{id}", updateTokenHandler(clientCtx)).Methods("POST")
+	r.HandleFunc("/token/tokens/{id}", deleteTokenHandler(clientCtx)).Methods("POST")
+
 }

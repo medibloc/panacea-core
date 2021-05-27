@@ -1,0 +1,16 @@
+syntax = "proto3";
+package medibloc.panaceacore.token;
+
+option go_package = "github.com/medibloc/panacea-core/x/token/types";
+
+import "gogoproto/gogo.proto";
+
+message Token {
+  string creator = 1;
+  uint64 id = 2;
+  string name = 3; 
+  string symbol = 4; 
+  int32 totalSupply = 5; 
+  bool mintable = 6; 
+  string ownerAddress = 7; 
+}
