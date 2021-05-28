@@ -85,6 +85,7 @@ import (
 	panaceatypes "github.com/medibloc/panacea-core/x/panacea/types"
 	tmjson "github.com/tendermint/tendermint/libs/json"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
+
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 	"github.com/medibloc/panacea-core/x/token"
 	tokenkeeper "github.com/medibloc/panacea-core/x/token/keeper"
@@ -336,6 +337,7 @@ func New(
 		appCodec,
 		keys[tokentypes.StoreKey],
 		keys[tokentypes.MemStoreKey],
+		app.BankKeeper,
 	)
 	tokenModule := token.NewAppModule(appCodec, app.tokenKeeper)
 

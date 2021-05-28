@@ -48,12 +48,12 @@ func (k Keeper) Token(c context.Context, req *types.QueryGetTokenRequest) (*type
 	var token types.Token
 	ctx := sdk.UnwrapSDKContext(c)
 
-	if !k.HasToken(ctx, req.Id) {
+	if !k.HasToken(ctx, req.Symbol) {
 		return nil, sdkerrors.ErrKeyNotFound
 	}
 
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.TokenKey))
-	k.cdc.MustUnmarshalBinaryBare(store.Get(GetTokenIDBytes(req.Id)), &token)
+	k.cdc.MustUnmarshalBinaryBare(store.Get(GetSymbolBytes(req.Symbol)), &token)
 
 	return &types.QueryGetTokenResponse{Token: &token}, nil
 }

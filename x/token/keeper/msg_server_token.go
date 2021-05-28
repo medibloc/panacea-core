@@ -4,68 +4,34 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/tendermint/tendermint/crypto/tmhash"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/medibloc/panacea-core/x/token/types"
 )
 
-func (k msgServer) CreateToken(goCtx context.Context, msg *types.MsgCreateToken) (*types.MsgCreateTokenResponse, error) {
+func (k msgServer) IssueToken(goCtx context.Context, msg *types.MsgIssueToken) (*types.MsgIssueTokenResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	id := k.AppendToken(
-		ctx,
-		msg.Creator,
-		msg.Name,
-		msg.Symbol,
-		msg.TotalSupply,
-		msg.Mintable,
-		msg.OwnerAddress,
-	)
+	txHash := fmt.Sprintf("%X", tmhash.Sum(ctx.TxBytes()))
+	token := NewTokenFromMsg(msg, txHash)
 
-	return &types.MsgCreateTokenResponse{
-		Id: id,
-	}, nil
-}
-
-func (k msgServer) UpdateToken(goCtx context.Context, msg *types.MsgUpdateToken) (*types.MsgUpdateTokenResponse, error) {
-	ctx := sdk.UnwrapSDKContext(goCtx)
-
-	var token = types.Token{
-		Creator:      msg.Creator,
-		Id:           msg.Id,
-		Name:         msg.Name,
-		Symbol:       msg.Symbol,
-		TotalSupply:  msg.TotalSupply,
-		Mintable:     msg.Mintable,
-		OwnerAddress: msg.OwnerAddress,
-	}
-
-	// Checks that the element exists
-	if !k.HasToken(ctx, msg.Id) {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrKeyNotFound, fmt.Sprintf("key %d doesn't exist", msg.Id))
-	}
-
-	// Checks if the the msg sender is the same as the current owner
-	if msg.Creator != k.GetTokenOwner(ctx, msg.Id) {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, "incorrect owner")
+	if k.HasToken(ctx, token.Symbol) {
+		return nil, sdkerrors.Wrap(types.ErrTokenExists, fmt.Sprintf("symbol: %s", token.Symbol))
 	}
 
 	k.SetToken(ctx, token)
-
-	return &types.MsgUpdateTokenResponse{}, nil
+	return &types.MsgIssueTokenResponse{}, nil
 }
 
-func (k msgServer) DeleteToken(goCtx context.Context, msg *types.MsgDeleteToken) (*types.MsgDeleteTokenResponse, error) {
-	ctx := sdk.UnwrapSDKContext(goCtx)
-
-	if !k.HasToken(ctx, msg.Id) {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrKeyNotFound, fmt.Sprintf("key %d doesn't exist", msg.Id))
+func NewTokenFromMsg(msg *types.MsgIssueToken, txHash string) types.Token {
+	symbol := types.NewSymbol(msg.ShortSymbol, txHash)
+	return types.Token{
+		Name:         msg.Name,
+		Symbol:       symbol,
+		TotalSupply:  sdk.NewCoin(types.GetMicroDenom(symbol), msg.TotalSupplyMicro.Int),
+		Mintable:     msg.Mintable,
+		OwnerAddress: msg.OwnerAddress,
 	}
-	if msg.Creator != k.GetTokenOwner(ctx, msg.Id) {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, "incorrect owner")
-	}
-
-	k.RemoveToken(ctx, msg.Id)
-
-	return &types.MsgDeleteTokenResponse{}, nil
 }

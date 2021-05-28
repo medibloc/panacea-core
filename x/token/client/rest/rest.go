@@ -21,15 +21,13 @@ func RegisterRoutes(clientCtx client.Context, r *mux.Router) {
 
 func registerQueryRoutes(clientCtx client.Context, r *mux.Router) {
 	// this line is used by starport scaffolding # 3
-	r.HandleFunc("/token/tokens/{id}", getTokenHandler(clientCtx)).Methods("GET")
+	r.HandleFunc("/token/tokens/{symbol}", getTokenHandler(clientCtx)).Methods("GET")
 	r.HandleFunc("/token/tokens", listTokenHandler(clientCtx)).Methods("GET")
 
 }
 
 func registerTxHandlers(clientCtx client.Context, r *mux.Router) {
 	// this line is used by starport scaffolding # 4
-	r.HandleFunc("/token/tokens", createTokenHandler(clientCtx)).Methods("POST")
-	r.HandleFunc("/token/tokens/{id}", updateTokenHandler(clientCtx)).Methods("POST")
-	r.HandleFunc("/token/tokens/{id}", deleteTokenHandler(clientCtx)).Methods("POST")
+	r.HandleFunc("/token/tokens", issueTokenHandler(clientCtx)).Methods("POST")
 
 }

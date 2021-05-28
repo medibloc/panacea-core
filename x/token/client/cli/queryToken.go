@@ -2,7 +2,6 @@ package cli
 
 import (
 	"context"
-	"strconv"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -42,23 +41,18 @@ func CmdListToken() *cobra.Command {
 	return cmd
 }
 
-func CmdShowToken() *cobra.Command {
+func CmdGetToken() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "show-token [id]",
-		Short: "shows a token",
+		Use:   "get-token [symbol]",
+		Short: "get a token",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 
 			queryClient := types.NewQueryClient(clientCtx)
 
-			id, err := strconv.ParseUint(args[0], 10, 64)
-			if err != nil {
-				return err
-			}
-
 			params := &types.QueryGetTokenRequest{
-				Id: id,
+				Symbol: args[0],
 			}
 
 			res, err := queryClient.Token(context.Background(), params)

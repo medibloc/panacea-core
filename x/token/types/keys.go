@@ -26,6 +26,5 @@ func KeyPrefix(p string) []byte {
 }
 
 const (
-	TokenKey      = "Token-value-"
-	TokenCountKey = "Token-count-"
+	TokenKey = "Token-value-"
 )

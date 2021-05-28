@@ -24,13 +24,18 @@ func (gs GenesisState) Validate() error {
 
 	// this line is used by starport scaffolding # genesis/types/validate
 	// Check for duplicated ID in token
-	tokenIdMap := make(map[uint64]bool)
+	tokenSymbolMap := make(map[string]bool)
 
-	for _, elem := range gs.TokenList {
-		if _, ok := tokenIdMap[elem.Id]; ok {
-			return fmt.Errorf("duplicated id for token")
+	for _, token := range gs.TokenList {
+		if _, ok := tokenSymbolMap[token.Symbol]; ok {
+			return fmt.Errorf("duplicated symbol for token: %v", token)
 		}
-		tokenIdMap[elem.Id] = true
+
+		if err := validateToken(token); err != nil {
+			return fmt.Errorf("invalid token: %v", token)
+		}
+
+		tokenSymbolMap[token.Symbol] = true
 	}
 
 	return nil

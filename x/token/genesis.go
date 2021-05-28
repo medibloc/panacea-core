@@ -15,9 +15,6 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 		k.SetToken(ctx, *elem)
 	}
 
-	// Set token count
-	k.SetTokenCount(ctx, uint64(len(genState.TokenList)))
-
 	// this line is used by starport scaffolding # ibc/genesis/init
 }
 

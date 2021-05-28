@@ -31,9 +31,7 @@ func GetTxCmd() *cobra.Command {
 
 	// this line is used by starport scaffolding # 1
 
-	cmd.AddCommand(CmdCreateToken())
-	cmd.AddCommand(CmdUpdateToken())
-	cmd.AddCommand(CmdDeleteToken())
+	cmd.AddCommand(CmdIssueToken())
 
 	return cmd
 }
