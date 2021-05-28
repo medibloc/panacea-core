@@ -64,7 +64,7 @@ test:
 update_panacea_lite_docs:
 	@statik -src=client/lcd/swagger-ui -dest=client/lcd -f
 
-install: go.sum update_panacea_lite_docs
+install: go.sum
 	go install -mod=readonly $(BUILD_FLAGS) ./cmd/panacead
 
 ########################################
