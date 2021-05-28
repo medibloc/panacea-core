@@ -1,47 +1,27 @@
 syntax = "proto3";
 package medibloc.panaceacore.token;
 
+import "gogoproto/gogo.proto";
+import "cosmos/base/v1beta1/coin.proto";
+
 // this line is used by starport scaffolding # proto/tx/import
 
 option go_package = "github.com/medibloc/panacea-core/x/token/types";
 
 // Msg defines the Msg service.
 service Msg {
-    // this line is used by starport scaffolding # proto/tx/rpc
-  rpc CreateToken(MsgCreateToken) returns (MsgCreateTokenResponse);
-  rpc UpdateToken(MsgUpdateToken) returns (MsgUpdateTokenResponse);
-  rpc DeleteToken(MsgDeleteToken) returns (MsgDeleteTokenResponse);
+  // this line is used by starport scaffolding # proto/tx/rpc
+  rpc IssueToken(MsgIssueToken) returns (MsgIssueTokenResponse);
 }
 
 // this line is used by starport scaffolding # proto/tx/message
-message MsgCreateToken {
-  string creator = 1;
-  string name = 2;
-  string symbol = 3;
-  int32 totalSupply = 4;
-  bool mintable = 5;
-  string ownerAddress = 6;
+message MsgIssueToken {
+  string name = 1;
+  string shortSymbol = 2;
+  cosmos.base.v1beta1.IntProto totalSupplyMicro = 3 [(gogoproto.nullable) = false] ;
+  bool mintable = 4;
+  string ownerAddress = 5;
 }
 
-message MsgCreateTokenResponse {
-  uint64 id = 1;
+message MsgIssueTokenResponse {
 }
-
-message MsgUpdateToken {
-  string creator = 1;
-  uint64 id = 2;
-  string name = 3;
-  string symbol = 4;
-  int32 totalSupply = 5;
-  bool mintable = 6;
-  string ownerAddress = 7;
-}
-
-message MsgUpdateTokenResponse { }
-
-message MsgDeleteToken {
-  string creator = 1;
-  uint64 id = 2;
-}
-
-message MsgDeleteTokenResponse { }

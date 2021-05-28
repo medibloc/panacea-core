@@ -12,7 +12,7 @@ option go_package = "github.com/medibloc/panacea-core/x/token/types";
 service Query {
     // this line is used by starport scaffolding # 2
 	rpc Token(QueryGetTokenRequest) returns (QueryGetTokenResponse) {
-		option (google.api.http).get = "/medibloc/panaceacore/token/token/{id}";
+		option (google.api.http).get = "/medibloc/panaceacore/token/token/{symbol}";
 	}
 	rpc TokenAll(QueryAllTokenRequest) returns (QueryAllTokenResponse) {
 		option (google.api.http).get = "/medibloc/panaceacore/token/token";
@@ -22,7 +22,7 @@ service Query {
 
 // this line is used by starport scaffolding # 3
 message QueryGetTokenRequest {
-	uint64 id = 1;
+	string symbol = 1;
 }
 
 message QueryGetTokenResponse {
