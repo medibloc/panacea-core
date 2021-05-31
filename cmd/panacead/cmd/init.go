@@ -76,6 +76,11 @@ func InitCmd(mbm module.BasicManager, defaultNodeHome string) *cobra.Command {
 	return initCmd
 }
 
+const (
+	blockTimeSec = 1
+	unbondingPeriod = 60 * 60 * 24 * 7 * 3 * time.Second // three weeks
+)
+
 // overrideGenesis overrides some parameters in the genesis doc to the panacea-specific values.
 func overrideGenesis(cdc codec.JSONMarshaler, genDoc *types.GenesisDoc) (json.RawMessage, error) {
 	appState := make(map[string]json.RawMessage)
@@ -87,7 +92,7 @@ func overrideGenesis(cdc codec.JSONMarshaler, genDoc *types.GenesisDoc) (json.Ra
 	if err := cdc.UnmarshalJSON(appState[stakingtypes.ModuleName], &stakingGenState); err != nil {
 		return nil, err
 	}
-	stakingGenState.Params.UnbondingTime = time.Second * 60 * 60 * 24 * 7 * 3 // three weeks
+	stakingGenState.Params.UnbondingTime = unbondingPeriod
 	stakingGenState.Params.MaxValidators = 50
 	stakingGenState.Params.BondDenom = assets.MicroMedDenom
 	appState[stakingtypes.ModuleName] = cdc.MustMarshalJSON(&stakingGenState)
@@ -101,7 +106,7 @@ func overrideGenesis(cdc codec.JSONMarshaler, genDoc *types.GenesisDoc) (json.Ra
 	mintGenState.Params.InflationRateChange = sdk.NewDecWithPrec(3, 2) // 3%
 	mintGenState.Params.InflationMin = sdk.NewDecWithPrec(7, 2)        // 7%
 	mintGenState.Params.InflationMax = sdk.NewDecWithPrec(10, 2)       // 10%
-	mintGenState.Params.BlocksPerYear = uint64(60 * 60 * 24 * 365.25)  // assuming 1 second block time
+	mintGenState.Params.BlocksPerYear = uint64(60 * 60 * 24 * 365.25)  * uint64(blockTimeSec)
 	appState[minttypes.ModuleName] = cdc.MustMarshalJSON(&mintGenState)
 
 	var distrGenState distrtypes.GenesisState
@@ -137,6 +142,10 @@ func overrideGenesis(cdc codec.JSONMarshaler, genDoc *types.GenesisDoc) (json.Ra
 	slashingGenState.Params.SlashFractionDoubleSign = sdk.NewDecWithPrec(5, 2) // 5%
 	slashingGenState.Params.SlashFractionDowntime = sdk.NewDecWithPrec(1, 4)   // 0.01%
 	appState[slashingtypes.ModuleName] = cdc.MustMarshalJSON(&slashingGenState)
+
+	// Override Tendermint consensus params: https://docs.tendermint.com/master/tendermint-core/using-tendermint.html#fields
+	genDoc.ConsensusParams.Evidence.MaxAgeDuration = unbondingPeriod  // should correspond with unbondingPeriod for handling Nothing-At-Stake attacks
+	genDoc.ConsensusParams.Evidence.MaxAgeNumBlocks = int64(unbondingPeriod.Seconds()) / blockTimeSec
 
 	return tmjson.Marshal(appState)
 }
