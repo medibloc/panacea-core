@@ -25,7 +25,7 @@ const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 // GenesisState defines the token module's genesis state.
 type GenesisState struct {
 	// this line is used by starport scaffolding # genesis/proto/state
-	TokenList []*Token `protobuf:"bytes,1,rep,name=tokenList,proto3" json:"tokenList,omitempty"`
+	Tokens map[string]*Token `protobuf:"bytes,1,rep,name=tokens,proto3" json:"tokens,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 }
 
 func (m *GenesisState) Reset()         { *m = GenesisState{} }
@@ -61,33 +61,37 @@ func (m *GenesisState) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_GenesisState proto.InternalMessageInfo
 
-func (m *GenesisState) GetTokenList() []*Token {
+func (m *GenesisState) GetTokens() map[string]*Token {
 	if m != nil {
-		return m.TokenList
+		return m.Tokens
 	}
 	return nil
 }
 
 func init() {
 	proto.RegisterType((*GenesisState)(nil), "medibloc.panaceacore.token.GenesisState")
+	proto.RegisterMapType((map[string]*Token)(nil), "medibloc.panaceacore.token.GenesisState.TokensEntry")
 }
 
 func init() { proto.RegisterFile("token/genesis.proto", fileDescriptor_7d637ba3268cd6c3) }
 
 var fileDescriptor_7d637ba3268cd6c3 = []byte{
-	// 181 bytes of a gzipped FileDescriptorProto
+	// 238 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0x12, 0x2e, 0xc9, 0xcf, 0x4e,
 	0xcd, 0xd3, 0x4f, 0x4f, 0xcd, 0x4b, 0x2d, 0xce, 0x2c, 0xd6, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17,
 	0x92, 0xca, 0x4d, 0x4d, 0xc9, 0x4c, 0xca, 0xc9, 0x4f, 0xd6, 0x2b, 0x48, 0xcc, 0x4b, 0x4c, 0x4e,
 	0x4d, 0x4c, 0xce, 0x2f, 0x4a, 0xd5, 0x03, 0xab, 0x94, 0x12, 0x84, 0x68, 0x00, 0x93, 0x10, 0xe5,
-	0x4a, 0xfe, 0x5c, 0x3c, 0xee, 0x10, 0xfd, 0xc1, 0x25, 0x89, 0x25, 0xa9, 0x42, 0xf6, 0x5c, 0x9c,
-	0x60, 0x69, 0x9f, 0xcc, 0xe2, 0x12, 0x09, 0x46, 0x05, 0x66, 0x0d, 0x6e, 0x23, 0x45, 0x3d, 0xdc,
-	0x46, 0xea, 0x85, 0x80, 0xc8, 0x20, 0x84, 0x1e, 0x27, 0x8f, 0x13, 0x8f, 0xe4, 0x18, 0x2f, 0x3c,
-	0x92, 0x63, 0x7c, 0xf0, 0x48, 0x8e, 0x71, 0xc2, 0x63, 0x39, 0x86, 0x0b, 0x8f, 0xe5, 0x18, 0x6e,
-	0x3c, 0x96, 0x63, 0x88, 0xd2, 0x4b, 0xcf, 0x2c, 0xc9, 0x28, 0x4d, 0xd2, 0x4b, 0xce, 0xcf, 0xd5,
-	0x87, 0x99, 0xa8, 0x0f, 0x35, 0x51, 0x17, 0x64, 0xa4, 0x7e, 0x85, 0x3e, 0xd4, 0x81, 0x95, 0x05,
-	0xa9, 0xc5, 0x49, 0x6c, 0x60, 0x17, 0x1a, 0x03, 0x02, 0x00, 0x00, 0xff, 0xff, 0x6f, 0x12, 0xfa,
-	0x27, 0xe7, 0x00, 0x00, 0x00,
+	0x4a, 0xbb, 0x18, 0xb9, 0x78, 0xdc, 0x21, 0x06, 0x04, 0x97, 0x24, 0x96, 0xa4, 0x0a, 0xf9, 0x70,
+	0xb1, 0x81, 0xe5, 0x8b, 0x25, 0x18, 0x15, 0x98, 0x35, 0xb8, 0x8d, 0x4c, 0xf4, 0x70, 0x1b, 0xa8,
+	0x87, 0xac, 0x53, 0x2f, 0x04, 0xac, 0xcd, 0x35, 0xaf, 0xa4, 0xa8, 0x32, 0x08, 0x6a, 0x86, 0x54,
+	0x0c, 0x17, 0x37, 0x92, 0xb0, 0x90, 0x00, 0x17, 0x73, 0x76, 0x6a, 0xa5, 0x04, 0xa3, 0x02, 0xa3,
+	0x06, 0x67, 0x10, 0x88, 0x29, 0x64, 0xce, 0xc5, 0x5a, 0x96, 0x98, 0x53, 0x9a, 0x2a, 0xc1, 0xa4,
+	0xc0, 0xa8, 0xc1, 0x6d, 0xa4, 0x88, 0xcf, 0x36, 0xb0, 0x49, 0x41, 0x10, 0xf5, 0x56, 0x4c, 0x16,
+	0x8c, 0x4e, 0x1e, 0x27, 0x1e, 0xc9, 0x31, 0x5e, 0x78, 0x24, 0xc7, 0xf8, 0xe0, 0x91, 0x1c, 0xe3,
+	0x84, 0xc7, 0x72, 0x0c, 0x17, 0x1e, 0xcb, 0x31, 0xdc, 0x78, 0x2c, 0xc7, 0x10, 0xa5, 0x97, 0x9e,
+	0x59, 0x92, 0x51, 0x9a, 0xa4, 0x97, 0x9c, 0x9f, 0xab, 0x0f, 0x33, 0x51, 0x1f, 0x6a, 0xa2, 0x2e,
+	0xc8, 0x48, 0xfd, 0x0a, 0x7d, 0x68, 0x60, 0x54, 0x16, 0xa4, 0x16, 0x27, 0xb1, 0x81, 0x43, 0xc3,
+	0x18, 0x10, 0x00, 0x00, 0xff, 0xff, 0x24, 0x63, 0x98, 0x56, 0x53, 0x01, 0x00, 0x00,
 }
 
 func (m *GenesisState) Marshal() (dAtA []byte, err error) {
@@ -110,16 +114,28 @@ func (m *GenesisState) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if len(m.TokenList) > 0 {
-		for iNdEx := len(m.TokenList) - 1; iNdEx >= 0; iNdEx-- {
-			{
-				size, err := m.TokenList[iNdEx].MarshalToSizedBuffer(dAtA[:i])
-				if err != nil {
-					return 0, err
+	if len(m.Tokens) > 0 {
+		for k := range m.Tokens {
+			v := m.Tokens[k]
+			baseI := i
+			if v != nil {
+				{
+					size, err := v.MarshalToSizedBuffer(dAtA[:i])
+					if err != nil {
+						return 0, err
+					}
+					i -= size
+					i = encodeVarintGenesis(dAtA, i, uint64(size))
 				}
-				i -= size
-				i = encodeVarintGenesis(dAtA, i, uint64(size))
+				i--
+				dAtA[i] = 0x12
 			}
+			i -= len(k)
+			copy(dAtA[i:], k)
+			i = encodeVarintGenesis(dAtA, i, uint64(len(k)))
+			i--
+			dAtA[i] = 0xa
+			i = encodeVarintGenesis(dAtA, i, uint64(baseI-i))
 			i--
 			dAtA[i] = 0xa
 		}
@@ -144,10 +160,17 @@ func (m *GenesisState) Size() (n int) {
 	}
 	var l int
 	_ = l
-	if len(m.TokenList) > 0 {
-		for _, e := range m.TokenList {
-			l = e.Size()
-			n += 1 + l + sovGenesis(uint64(l))
+	if len(m.Tokens) > 0 {
+		for k, v := range m.Tokens {
+			_ = k
+			_ = v
+			l = 0
+			if v != nil {
+				l = v.Size()
+				l += 1 + sovGenesis(uint64(l))
+			}
+			mapEntrySize := 1 + len(k) + sovGenesis(uint64(len(k))) + l
+			n += mapEntrySize + 1 + sovGenesis(uint64(mapEntrySize))
 		}
 	}
 	return n
@@ -190,7 +213,7 @@ func (m *GenesisState) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field TokenList", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Tokens", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -217,10 +240,105 @@ func (m *GenesisState) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.TokenList = append(m.TokenList, &Token{})
-			if err := m.TokenList[len(m.TokenList)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
+			if m.Tokens == nil {
+				m.Tokens = make(map[string]*Token)
 			}
+			var mapkey string
+			var mapvalue *Token
+			for iNdEx < postIndex {
+				entryPreIndex := iNdEx
+				var wire uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return ErrIntOverflowGenesis
+					}
+					if iNdEx >= l {
+						return io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					wire |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				fieldNum := int32(wire >> 3)
+				if fieldNum == 1 {
+					var stringLenmapkey uint64
+					for shift := uint(0); ; shift += 7 {
+						if shift >= 64 {
+							return ErrIntOverflowGenesis
+						}
+						if iNdEx >= l {
+							return io.ErrUnexpectedEOF
+						}
+						b := dAtA[iNdEx]
+						iNdEx++
+						stringLenmapkey |= uint64(b&0x7F) << shift
+						if b < 0x80 {
+							break
+						}
+					}
+					intStringLenmapkey := int(stringLenmapkey)
+					if intStringLenmapkey < 0 {
+						return ErrInvalidLengthGenesis
+					}
+					postStringIndexmapkey := iNdEx + intStringLenmapkey
+					if postStringIndexmapkey < 0 {
+						return ErrInvalidLengthGenesis
+					}
+					if postStringIndexmapkey > l {
+						return io.ErrUnexpectedEOF
+					}
+					mapkey = string(dAtA[iNdEx:postStringIndexmapkey])
+					iNdEx = postStringIndexmapkey
+				} else if fieldNum == 2 {
+					var mapmsglen int
+					for shift := uint(0); ; shift += 7 {
+						if shift >= 64 {
+							return ErrIntOverflowGenesis
+						}
+						if iNdEx >= l {
+							return io.ErrUnexpectedEOF
+						}
+						b := dAtA[iNdEx]
+						iNdEx++
+						mapmsglen |= int(b&0x7F) << shift
+						if b < 0x80 {
+							break
+						}
+					}
+					if mapmsglen < 0 {
+						return ErrInvalidLengthGenesis
+					}
+					postmsgIndex := iNdEx + mapmsglen
+					if postmsgIndex < 0 {
+						return ErrInvalidLengthGenesis
+					}
+					if postmsgIndex > l {
+						return io.ErrUnexpectedEOF
+					}
+					mapvalue = &Token{}
+					if err := mapvalue.Unmarshal(dAtA[iNdEx:postmsgIndex]); err != nil {
+						return err
+					}
+					iNdEx = postmsgIndex
+				} else {
+					iNdEx = entryPreIndex
+					skippy, err := skipGenesis(dAtA[iNdEx:])
+					if err != nil {
+						return err
+					}
+					if (skippy < 0) || (iNdEx+skippy) < 0 {
+						return ErrInvalidLengthGenesis
+					}
+					if (iNdEx + skippy) > postIndex {
+						return io.ErrUnexpectedEOF
+					}
+					iNdEx += skippy
+				}
+			}
+			m.Tokens[mapkey] = mapvalue
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex

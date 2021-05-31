@@ -13,7 +13,7 @@ func DefaultGenesis() *GenesisState {
 	return &GenesisState{
 		// this line is used by starport scaffolding # ibc/genesistype/default
 		// this line is used by starport scaffolding # genesis/types/default
-		TokenList: []*Token{},
+		Tokens: map[string]*Token{},
 	}
 }
 
@@ -26,7 +26,7 @@ func (gs GenesisState) Validate() error {
 	// Check for duplicated ID in token
 	tokenSymbolMap := make(map[string]bool)
 
-	for _, token := range gs.TokenList {
+	for _, token := range gs.Tokens {
 		if _, ok := tokenSymbolMap[token.Symbol]; ok {
 			return fmt.Errorf("duplicated symbol for token: %v", token)
 		}

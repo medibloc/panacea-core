@@ -11,8 +11,8 @@ import (
 func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) {
 	// this line is used by starport scaffolding # genesis/module/init
 	// Set all the token
-	for _, elem := range genState.TokenList {
-		k.SetToken(ctx, *elem)
+	for _, token := range genState.Tokens {
+		k.SetToken(ctx, *token)
 	}
 
 	// this line is used by starport scaffolding # ibc/genesis/init
@@ -25,9 +25,8 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	// this line is used by starport scaffolding # genesis/module/export
 	// Get all token
 	tokenList := k.GetAllToken(ctx)
-	for _, elem := range tokenList {
-		elem := elem
-		genesis.TokenList = append(genesis.TokenList, &elem)
+	for _, token := range tokenList {
+		genesis.Tokens[token.Symbol] = &token
 	}
 
 	// this line is used by starport scaffolding # ibc/genesis/export
