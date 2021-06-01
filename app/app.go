@@ -87,6 +87,10 @@ import (
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 
 	// this line is used by starport scaffolding # stargate/app/moduleImport
+	"github.com/medibloc/panacea-core/x/did"
+	didkeeper "github.com/medibloc/panacea-core/x/did/keeper"
+	didtypes "github.com/medibloc/panacea-core/x/did/types"
+	// this line is used by starport scaffolding # stargate/app/moduleImport
 	"github.com/medibloc/panacea-core/x/burn"
 	burnkeeper "github.com/medibloc/panacea-core/x/burn/keeper"
 	burntypes "github.com/medibloc/panacea-core/x/burn/types"
@@ -137,6 +141,7 @@ var (
 		vesting.AppModuleBasic{},
 		panacea.AppModuleBasic{},
 		// this line is used by starport scaffolding # stargate/app/moduleBasic
+		did.AppModuleBasic{},
 		burn.AppModuleBasic{},
 	)
 
@@ -206,6 +211,7 @@ type App struct {
 
 	panaceaKeeper panaceakeeper.Keeper
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
+	didKeeper  didkeeper.Keeper
 	burnKeeper burnkeeper.Keeper
 
 	// the module manager
@@ -237,6 +243,7 @@ func New(
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
 		panaceatypes.StoreKey,
 		// this line is used by starport scaffolding # stargate/app/storeKey
+		didtypes.StoreKey,
 		burntypes.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
@@ -332,6 +339,11 @@ func New(
 	)
 
 	// this line is used by starport scaffolding # stargate/app/keeperDefinition
+	app.didKeeper = *didkeeper.NewKeeper(
+		appCodec,
+		keys[didtypes.StoreKey],
+		keys[didtypes.MemStoreKey],
+	)
 	app.burnKeeper = *burnkeeper.NewKeeper(
 		app.BankKeeper,
 	)
@@ -378,6 +390,7 @@ func New(
 		transferModule,
 		panacea.NewAppModule(appCodec, app.panaceaKeeper),
 		// this line is used by starport scaffolding # stargate/app/appModule
+		did.NewAppModule(appCodec, app.didKeeper),
 		burn.NewAppModule(appCodec, app.burnKeeper),
 	)
 
@@ -413,6 +426,7 @@ func New(
 		ibctransfertypes.ModuleName,
 		panaceatypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/initGenesis
+		didtypes.ModuleName,
 		burntypes.ModuleName,
 	)
 
@@ -596,6 +610,7 @@ func initParamsKeeper(appCodec codec.BinaryMarshaler, legacyAmino *codec.LegacyA
 	paramsKeeper.Subspace(ibctransfertypes.ModuleName)
 	paramsKeeper.Subspace(ibchost.ModuleName)
 	// this line is used by starport scaffolding # stargate/app/paramSubspace
+	paramsKeeper.Subspace(didtypes.ModuleName)
 	paramsKeeper.Subspace(burntypes.ModuleName)
 
 	return paramsKeeper
