@@ -13,4 +13,5 @@ var (
 	ErrInvalidSymbol      = sdkerrors.Register(ModuleName, 3, "invalid symbol")
 	ErrInvalidTotalSupply = sdkerrors.Register(ModuleName, 4, "invalid total supply")
 	ErrTokenExists        = sdkerrors.Register(ModuleName, 5, "token already exists")
+	ErrInvalidDenom       = sdkerrors.Register(ModuleName, 6, "invalid denom")
 )
