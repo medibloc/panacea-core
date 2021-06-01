@@ -5,7 +5,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/medibloc/panacea-core/x/did/internal/secp256k1util"
 	"github.com/medibloc/panacea-core/x/did/types"
-	"log"
 )
 
 func (m msgServer) CreateDID(goCtx context.Context, msg *types.MsgCreateDID) (*types.MsgCreateDIDResponse, error) {
@@ -23,7 +22,6 @@ func (m msgServer) CreateDID(goCtx context.Context, msg *types.MsgCreateDID) (*t
 	seq := types.InitialSequence
 	_, err := verifyDIDOwnership(msg.Document, seq, msg.Document, msg.VerificationMethodID, msg.Signature)
 	if err != nil {
-		log.Println(err)
 		return nil, err
 	}
 
