@@ -1,0 +1,25 @@
+syntax = "proto3";
+package medibloc.panaceacore.did;
+
+import "google/api/annotations.proto";
+import "cosmos/base/query/v1beta1/pagination.proto";
+// this line is used by starport scaffolding # 1
+import "did/did.proto";
+
+option go_package = "github.com/medibloc/panacea-core/x/did/types";
+
+// Query defines the gRPC querier service.
+service Query {
+	rpc DIDDocumentWithSeq(QueryGetDIDRequest) returns (QueryGetDIDResponse) {
+		option (google.api.http).get = "/medibloc/panaceacore/did/{DID}";
+	}
+}
+
+// this line is used by starport scaffolding # 3
+message QueryGetDIDRequest {
+	string DID = 1;
+}
+
+message QueryGetDIDResponse {
+	DIDDocumentWithSeq DIDDocumentWithSeq = 1;
+}
