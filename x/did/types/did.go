@@ -235,7 +235,7 @@ func (doc DIDDocument) VerificationMethodFrom(relationships []*VerificationRelat
 }
 
 func ValidContexts(ctxs []string) bool {
-	if ctxs == nil || len(ctxs) == 0 || ctxs[0] != ContextDIDV1 { // the 1st one must be ContextDIDV1
+	if len(ctxs) == 0 || ctxs[0] != ContextDIDV1 { // the 1st one must be ContextDIDV1
 		return false
 	}
 
@@ -248,29 +248,6 @@ func ValidContexts(ctxs []string) bool {
 		set[ctx] = struct{}{}
 	}
 	return true
-}
-
-func MarshalJSONContexts(ctxs []string) ([]byte, error) {
-	if len(ctxs) == 1 { // if only one, treat it as a single string
-		return json.Marshal(ctxs[0])
-	}
-	return json.Marshal(ctxs) // if not, as a list
-}
-
-func UnmarshalJSONContexts(bz []byte, ctxs *[]string) error {
-	var single string
-	err := json.Unmarshal(bz, &single)
-	if err == nil {
-		ctxs = &[]string{}
-		return nil
-	}
-
-	var multiple []string
-	if err := json.Unmarshal(bz, &multiple); err != nil {
-		return err
-	}
-	*ctxs = multiple
-	return nil
 }
 
 const (
