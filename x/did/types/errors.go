@@ -24,10 +24,6 @@ var (
 	ErrVerificationMethodKeyTypeNotImplemented = sdkerrors.Register(ModuleName, 14, "Verification not implemented with key type")
 )
 
-/*func Error(error *sdkerrors.Error, args ...interface{}) error {
-	return sdkerrors.New(error.Codespace(), error.ABCICode(), fmt.Sprintf(error.Error(), args))
-}*/
-
 func ErrorWrapf(error *sdkerrors.Error, format string, args ...interface{}) error {
-	return sdkerrors.Wrapf(error, format, args)
+	return sdkerrors.Wrapf(error, format, args...)
 }
