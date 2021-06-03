@@ -80,9 +80,6 @@ import (
 	upgradekeeper "github.com/cosmos/cosmos-sdk/x/upgrade/keeper"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 	appparams "github.com/medibloc/panacea-core/app/params"
-	"github.com/medibloc/panacea-core/x/panacea"
-	panaceakeeper "github.com/medibloc/panacea-core/x/panacea/keeper"
-	panaceatypes "github.com/medibloc/panacea-core/x/panacea/types"
 	tmjson "github.com/tendermint/tendermint/libs/json"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 
@@ -135,7 +132,6 @@ var (
 		evidence.AppModuleBasic{},
 		transfer.AppModuleBasic{},
 		vesting.AppModuleBasic{},
-		panacea.AppModuleBasic{},
 		// this line is used by starport scaffolding # stargate/app/moduleBasic
 		burn.AppModuleBasic{},
 	)
@@ -203,7 +199,6 @@ type App struct {
 	ScopedIBCKeeper      capabilitykeeper.ScopedKeeper
 	ScopedTransferKeeper capabilitykeeper.ScopedKeeper
 
-	panaceaKeeper panaceakeeper.Keeper
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 	burnKeeper burnkeeper.Keeper
 
@@ -216,7 +211,7 @@ type App struct {
 func New(
 	logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bool, skipUpgradeHeights map[int64]bool,
 	homePath string, invCheckPeriod uint, encodingConfig appparams.EncodingConfig,
-// this line is used by starport scaffolding # stargate/app/newArgument
+	// this line is used by starport scaffolding # stargate/app/newArgument
 	appOpts servertypes.AppOptions, baseAppOptions ...func(*baseapp.BaseApp),
 ) *App {
 
@@ -234,7 +229,6 @@ func New(
 		minttypes.StoreKey, distrtypes.StoreKey, slashingtypes.StoreKey,
 		govtypes.StoreKey, paramstypes.StoreKey, ibchost.StoreKey, upgradetypes.StoreKey,
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
-		panaceatypes.StoreKey,
 		// this line is used by starport scaffolding # stargate/app/storeKey
 		burntypes.StoreKey,
 	)
@@ -326,10 +320,6 @@ func New(
 	// If evidence needs to be handled for the app, set routes in router here and seal
 	app.EvidenceKeeper = *evidenceKeeper
 
-	app.panaceaKeeper = *panaceakeeper.NewKeeper(
-		appCodec, keys[panaceatypes.StoreKey], keys[panaceatypes.MemStoreKey],
-	)
-
 	// this line is used by starport scaffolding # stargate/app/keeperDefinition
 	app.burnKeeper = *burnkeeper.NewKeeper(
 		app.BankKeeper,
@@ -375,7 +365,6 @@ func New(
 		ibc.NewAppModule(app.IBCKeeper),
 		params.NewAppModule(app.ParamsKeeper),
 		transferModule,
-		panacea.NewAppModule(appCodec, app.panaceaKeeper),
 		// this line is used by starport scaffolding # stargate/app/appModule
 		burn.NewAppModule(appCodec, app.burnKeeper),
 	)
@@ -410,7 +399,6 @@ func New(
 		genutiltypes.ModuleName,
 		evidencetypes.ModuleName,
 		ibctransfertypes.ModuleName,
-		panaceatypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/initGenesis
 		burntypes.ModuleName,
 	)
