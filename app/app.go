@@ -2,11 +2,14 @@ package app
 
 import (
 	"io"
+	"net/http"
 	"os"
 	"path/filepath"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec/types"
+	"github.com/gorilla/mux"
+	"github.com/rakyll/statik/fs"
 	"github.com/spf13/cast"
 
 	abci "github.com/tendermint/tendermint/abci/types"
@@ -85,6 +88,8 @@ import (
 	panaceatypes "github.com/medibloc/panacea-core/x/panacea/types"
 	tmjson "github.com/tendermint/tendermint/libs/json"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
+
+	_ "github.com/medibloc/panacea-core/client/docs/statik"
 
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 	"github.com/medibloc/panacea-core/x/burn"
@@ -559,6 +564,11 @@ func (app *App) RegisterAPIRoutes(apiSvr *api.Server, apiConfig config.APIConfig
 	// Register legacy and grpc-gateway routes for all modules.
 	ModuleBasics.RegisterRESTRoutes(clientCtx, apiSvr.Router)
 	ModuleBasics.RegisterGRPCGatewayRoutes(clientCtx, apiSvr.GRPCGatewayRouter)
+
+	// register swagger API from root so that other applications can override easily
+	if apiConfig.Swagger {
+		RegisterSwaggerAPI(apiSvr.Router)
+	}
 }
 
 // RegisterTxService implements the Application.RegisterTxService method.
@@ -569,6 +579,17 @@ func (app *App) RegisterTxService(clientCtx client.Context) {
 // RegisterTendermintService implements the Application.RegisterTendermintService method.
 func (app *App) RegisterTendermintService(clientCtx client.Context) {
 	tmservice.RegisterTendermintService(app.BaseApp.GRPCQueryRouter(), clientCtx, app.interfaceRegistry)
+}
+
+// RegisterSwaggerAPI registers swagger route with API Server
+func RegisterSwaggerAPI(rtr *mux.Router) {
+	statikFS, err := fs.New()
+	if err != nil {
+		panic(err)
+	}
+
+	staticServer := http.FileServer(statikFS)
+	rtr.PathPrefix("/swagger/").Handler(http.StripPrefix("/swagger/", staticServer))
 }
 
 // GetMaccPerms returns a copy of the module account permissions
