@@ -2,11 +2,19 @@ syntax = "proto3";
 package medibloc.panaceacore.aol;
 
 // this line is used by starport scaffolding # genesis/proto/import
+import "aol/owner.proto";
+import "aol/record.proto";
+import "aol/writer.proto";
+import "aol/topic.proto";
 
 option go_package = "github.com/medibloc/panacea-core/x/aol/types";
 
 // GenesisState defines the aol module's genesis state.
 message GenesisState {
     // this line is used by starport scaffolding # genesis/proto/state
+		repeated Owner ownerList = 4; // this line is used by starport scaffolding # genesis/proto/stateField
+		repeated Record recordList = 3; // this line is used by starport scaffolding # genesis/proto/stateField
+		repeated Writer writerList = 2; // this line is used by starport scaffolding # genesis/proto/stateField
+		repeated Topic topicList = 1; // this line is used by starport scaffolding # genesis/proto/stateField
     // this line is used by starport scaffolding # ibc/genesis/proto
 }

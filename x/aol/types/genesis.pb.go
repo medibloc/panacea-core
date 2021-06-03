@@ -24,6 +24,11 @@ const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 // GenesisState defines the aol module's genesis state.
 type GenesisState struct {
+	// this line is used by starport scaffolding # genesis/proto/state
+	OwnerList  []*Owner  `protobuf:"bytes,4,rep,name=ownerList,proto3" json:"ownerList,omitempty"`
+	RecordList []*Record `protobuf:"bytes,3,rep,name=recordList,proto3" json:"recordList,omitempty"`
+	WriterList []*Writer `protobuf:"bytes,2,rep,name=writerList,proto3" json:"writerList,omitempty"`
+	TopicList  []*Topic  `protobuf:"bytes,1,rep,name=topicList,proto3" json:"topicList,omitempty"`
 }
 
 func (m *GenesisState) Reset()         { *m = GenesisState{} }
@@ -59,6 +64,34 @@ func (m *GenesisState) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_GenesisState proto.InternalMessageInfo
 
+func (m *GenesisState) GetOwnerList() []*Owner {
+	if m != nil {
+		return m.OwnerList
+	}
+	return nil
+}
+
+func (m *GenesisState) GetRecordList() []*Record {
+	if m != nil {
+		return m.RecordList
+	}
+	return nil
+}
+
+func (m *GenesisState) GetWriterList() []*Writer {
+	if m != nil {
+		return m.WriterList
+	}
+	return nil
+}
+
+func (m *GenesisState) GetTopicList() []*Topic {
+	if m != nil {
+		return m.TopicList
+	}
+	return nil
+}
+
 func init() {
 	proto.RegisterType((*GenesisState)(nil), "medibloc.panaceacore.aol.GenesisState")
 }
@@ -66,17 +99,24 @@ func init() {
 func init() { proto.RegisterFile("aol/genesis.proto", fileDescriptor_0eb1318be878d2e5) }
 
 var fileDescriptor_0eb1318be878d2e5 = []byte{
-	// 145 bytes of a gzipped FileDescriptorProto
+	// 265 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0x12, 0x4c, 0xcc, 0xcf, 0xd1,
 	0x4f, 0x4f, 0xcd, 0x4b, 0x2d, 0xce, 0x2c, 0xd6, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17, 0x92, 0xc8,
 	0x4d, 0x4d, 0xc9, 0x4c, 0xca, 0xc9, 0x4f, 0xd6, 0x2b, 0x48, 0xcc, 0x4b, 0x4c, 0x4e, 0x4d, 0x4c,
-	0xce, 0x2f, 0x4a, 0xd5, 0x4b, 0xcc, 0xcf, 0x51, 0xe2, 0xe3, 0xe2, 0x71, 0x87, 0x28, 0x0d, 0x2e,
-	0x49, 0x2c, 0x49, 0x75, 0x72, 0x3b, 0xf1, 0x48, 0x8e, 0xf1, 0xc2, 0x23, 0x39, 0xc6, 0x07, 0x8f,
-	0xe4, 0x18, 0x27, 0x3c, 0x96, 0x63, 0xb8, 0xf0, 0x58, 0x8e, 0xe1, 0xc6, 0x63, 0x39, 0x86, 0x28,
-	0x9d, 0xf4, 0xcc, 0x92, 0x8c, 0xd2, 0x24, 0xbd, 0xe4, 0xfc, 0x5c, 0x7d, 0x98, 0x71, 0xfa, 0x50,
-	0xe3, 0x74, 0x41, 0xe6, 0xe9, 0x57, 0xe8, 0x83, 0x6c, 0x2e, 0xa9, 0x2c, 0x48, 0x2d, 0x4e, 0x62,
-	0x03, 0x5b, 0x6c, 0x0c, 0x08, 0x00, 0x00, 0xff, 0xff, 0x84, 0x79, 0xf5, 0x7f, 0x8d, 0x00, 0x00,
-	0x00,
+	0xce, 0x2f, 0x4a, 0xd5, 0x4b, 0xcc, 0xcf, 0x91, 0xe2, 0x07, 0x29, 0xce, 0x2f, 0xcf, 0x4b, 0x2d,
+	0x82, 0x28, 0x95, 0x12, 0x00, 0x09, 0x14, 0xa5, 0x26, 0xe7, 0x17, 0xa5, 0x20, 0x8b, 0x94, 0x17,
+	0x65, 0x96, 0xc0, 0xd5, 0x80, 0x35, 0x95, 0xe4, 0x17, 0x64, 0x26, 0x43, 0x04, 0x94, 0x26, 0x30,
+	0x71, 0xf1, 0xb8, 0x43, 0x6c, 0x0c, 0x2e, 0x49, 0x2c, 0x49, 0x15, 0xb2, 0xe5, 0xe2, 0x04, 0x1b,
+	0xea, 0x93, 0x59, 0x5c, 0x22, 0xc1, 0xa2, 0xc0, 0xac, 0xc1, 0x6d, 0x24, 0xaf, 0x87, 0xcb, 0x11,
+	0x7a, 0xfe, 0x20, 0xa5, 0x41, 0x08, 0x1d, 0x42, 0x0e, 0x5c, 0x5c, 0x10, 0x27, 0x80, 0xf5, 0x33,
+	0x83, 0xf5, 0x2b, 0xe0, 0xd6, 0x1f, 0x04, 0x56, 0x1b, 0x84, 0xa4, 0x07, 0x64, 0x02, 0xc4, 0xc9,
+	0x60, 0x13, 0x98, 0x08, 0x99, 0x10, 0x0e, 0x56, 0x1b, 0x84, 0xa4, 0x07, 0xe4, 0x05, 0xb0, 0x17,
+	0xc1, 0x06, 0x30, 0x12, 0xf2, 0x42, 0x08, 0x48, 0x69, 0x10, 0x42, 0x87, 0x93, 0xdb, 0x89, 0x47,
+	0x72, 0x8c, 0x17, 0x1e, 0xc9, 0x31, 0x3e, 0x78, 0x24, 0xc7, 0x38, 0xe1, 0xb1, 0x1c, 0xc3, 0x85,
+	0xc7, 0x72, 0x0c, 0x37, 0x1e, 0xcb, 0x31, 0x44, 0xe9, 0xa4, 0x67, 0x96, 0x64, 0x94, 0x26, 0xe9,
+	0x25, 0xe7, 0xe7, 0xea, 0xc3, 0xcc, 0xd3, 0x87, 0x9a, 0xa7, 0x0b, 0x32, 0x50, 0xbf, 0x42, 0x1f,
+	0x1c, 0xc0, 0x95, 0x05, 0xa9, 0xc5, 0x49, 0x6c, 0xe0, 0x10, 0x36, 0x06, 0x04, 0x00, 0x00, 0xff,
+	0xff, 0x88, 0xa8, 0x21, 0xb3, 0xd6, 0x01, 0x00, 0x00,
 }
 
 func (m *GenesisState) Marshal() (dAtA []byte, err error) {
@@ -99,6 +139,62 @@ func (m *GenesisState) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
+	if len(m.OwnerList) > 0 {
+		for iNdEx := len(m.OwnerList) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.OwnerList[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintGenesis(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x22
+		}
+	}
+	if len(m.RecordList) > 0 {
+		for iNdEx := len(m.RecordList) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.RecordList[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintGenesis(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x1a
+		}
+	}
+	if len(m.WriterList) > 0 {
+		for iNdEx := len(m.WriterList) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.WriterList[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintGenesis(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x12
+		}
+	}
+	if len(m.TopicList) > 0 {
+		for iNdEx := len(m.TopicList) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.TopicList[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintGenesis(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0xa
+		}
+	}
 	return len(dAtA) - i, nil
 }
 
@@ -119,6 +215,30 @@ func (m *GenesisState) Size() (n int) {
 	}
 	var l int
 	_ = l
+	if len(m.TopicList) > 0 {
+		for _, e := range m.TopicList {
+			l = e.Size()
+			n += 1 + l + sovGenesis(uint64(l))
+		}
+	}
+	if len(m.WriterList) > 0 {
+		for _, e := range m.WriterList {
+			l = e.Size()
+			n += 1 + l + sovGenesis(uint64(l))
+		}
+	}
+	if len(m.RecordList) > 0 {
+		for _, e := range m.RecordList {
+			l = e.Size()
+			n += 1 + l + sovGenesis(uint64(l))
+		}
+	}
+	if len(m.OwnerList) > 0 {
+		for _, e := range m.OwnerList {
+			l = e.Size()
+			n += 1 + l + sovGenesis(uint64(l))
+		}
+	}
 	return n
 }
 
@@ -157,6 +277,142 @@ func (m *GenesisState) Unmarshal(dAtA []byte) error {
 			return fmt.Errorf("proto: GenesisState: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field TopicList", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGenesis
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthGenesis
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthGenesis
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.TopicList = append(m.TopicList, &Topic{})
+			if err := m.TopicList[len(m.TopicList)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field WriterList", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGenesis
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthGenesis
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthGenesis
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.WriterList = append(m.WriterList, &Writer{})
+			if err := m.WriterList[len(m.WriterList)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field RecordList", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGenesis
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthGenesis
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthGenesis
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.RecordList = append(m.RecordList, &Record{})
+			if err := m.RecordList[len(m.RecordList)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field OwnerList", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGenesis
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthGenesis
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthGenesis
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.OwnerList = append(m.OwnerList, &Owner{})
+			if err := m.OwnerList[len(m.OwnerList)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipGenesis(dAtA[iNdEx:])

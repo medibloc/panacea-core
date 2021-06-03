@@ -1,0 +1,14 @@
+syntax = "proto3";
+package medibloc.panaceacore.aol;
+
+option go_package = "github.com/medibloc/panacea-core/x/aol/types";
+
+import "gogoproto/gogo.proto";
+
+message Writer {
+  string creator = 1;
+  uint64 id = 2;
+  string moniker = 3; 
+  string description = 4; 
+  int32 nanoTimestamp = 5; 
+}
