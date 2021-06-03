@@ -8,35 +8,36 @@ import "did/did.proto";
 
 service Msg {
   rpc CreateDID(MsgCreateDID) returns (MsgCreateDIDResponse);
+
   rpc UpdateDID(MsgUpdateDID) returns (MsgUpdateDIDResponse);
   rpc DeactivateDID(MsgDeactivateDID) returns (MsgDeactivateDIDResponse);
 }
 
 message MsgCreateDID {
-  string DID = 1;
+  string DID = 1 [json_name = "did", (gogoproto.jsontag) = "did"];
   DIDDocument document = 2;
-  string verificationMethodID = 3 [json_name = "verification_method_id"];
+  string verificationMethodID = 3 [json_name = "verification_method_id", (gogoproto.jsontag) = "verification_method_id"];
   bytes signature = 4;
-  string fromAddress = 5 [json_name = "from_address"];
+  string fromAddress = 5 [json_name = "from_address", (gogoproto.jsontag) = "from_address"];
 }
 
 message MsgCreateDIDResponse {}
 
 message MsgUpdateDID {
-  string DID = 1;
+  string DID = 1 [json_name = "did", (gogoproto.jsontag) = "did"];
   DIDDocument document = 2;
-  string verificationMethodID = 3 [json_name = "verification_method_id"];
+  string verificationMethodID = 3 [json_name = "verification_method_id", (gogoproto.jsontag) = "verification_method_id"];
   bytes signature = 4;
-  string fromAddress = 5 [json_name = "from_address"];
+  string fromAddress = 5 [json_name = "from_address", (gogoproto.jsontag) = "from_address"];
 }
 
 message MsgUpdateDIDResponse {}
 
 message MsgDeactivateDID {
-  string DID = 1;
-  string verificationMethodID = 2 [json_name = "verification_method_id"];
+  string DID = 1 [json_name = "did", (gogoproto.jsontag) = "did"];
+  string verificationMethodID = 2 [json_name = "verification_method_id", (gogoproto.jsontag) = "verification_method_id"];
   bytes signature = 3;
-  string fromAddress = 4 [json_name = "from_address"];
+  string fromAddress = 4 [json_name = "from_address", (gogoproto.jsontag) = "from_address"];
 }
 
 message MsgDeactivateDIDResponse {}

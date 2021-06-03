@@ -11,7 +11,7 @@ option go_package = "github.com/medibloc/panacea-core/x/did/types";
 // Query defines the gRPC querier service.
 service Query {
 	rpc DIDDocumentWithSeq(QueryGetDIDRequest) returns (QueryGetDIDResponse) {
-		option (google.api.http).get = "/medibloc/panaceacore/did/{DID}";
+		option (google.api.http).get = "/api/v1/did/{DID}";
 	}
 }
 
