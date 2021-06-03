@@ -10,8 +10,8 @@ func (k GenesisDIDDocumentKey) Marshal() string {
 
 func (k *GenesisDIDDocumentKey) Unmarshal(key string) error {
 	did := key
-	if !ValidDID(did) {
-		return Error(ErrInvalidDID, key)
+	if !ValidateDID(did) {
+		return ErrorWrapf(ErrInvalidDID, "DID: %s", key)
 	}
 
 	k.DID = did

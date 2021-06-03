@@ -9,12 +9,8 @@ import (
 // InitGenesis initializes the capability module's state from a provided genesis
 // state.
 func InitGenesis(ctx sdk.Context, k keeper.Keeper, data types.GenesisState) {
-	for bz, doc := range data.Documents {
-		var key types.GenesisDIDDocumentKey
-		if err := key.Unmarshal(bz); err != nil {
-			panic(err)
-		}
-		k.SetDIDDocument(ctx, key.DID, *doc)
+	for did, doc := range data.Documents {
+		k.SetDIDDocument(ctx, did, *doc)
 	}
 }
 

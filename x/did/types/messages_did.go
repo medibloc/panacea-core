@@ -38,14 +38,14 @@ func (msg *MsgCreateDID) GetSignBytes() []byte {
 }
 
 func (msg *MsgCreateDID) ValidateBasic() error {
-	if !ValidDID(msg.DID) {
-		return Error(ErrInvalidDID, msg.DID)
+	if !ValidateDID(msg.DID) {
+		return ErrorWrapf(ErrInvalidDID, "did: %v", msg.DID)
 	}
 	if !msg.Document.Valid() {
-		return Error(ErrInvalidDIDDocument, msg.Document)
+		return ErrorWrapf(ErrInvalidDIDDocument, "DIDDocument: %v", msg.Document)
 	}
 	if msg.Signature == nil || len(msg.Signature) == 0 {
-		return Error(ErrInvalidSignature, msg.Signature)
+		return ErrorWrapf(ErrInvalidSignature, "Signature: %v", msg.Signature)
 	}
 
 	addr, err := sdk.AccAddressFromBech32(msg.FromAddress)
@@ -53,7 +53,7 @@ func (msg *MsgCreateDID) ValidateBasic() error {
 		return err
 	}
 	if addr.Empty() {
-		return Error(sdkerrors.ErrInvalidAddress, addr.String())
+		return ErrorWrapf(sdkerrors.ErrInvalidAddress, "Address: %s", addr.String())
 	}
 	return nil
 }
@@ -79,21 +79,21 @@ func (msg MsgUpdateDID) Type() string { return "update_did" }
 
 // ValidateBasic runs stateless checks on the message.
 func (msg MsgUpdateDID) ValidateBasic() error {
-	if !ValidDID(msg.DID) {
-		return Error(ErrInvalidDID, msg.DID)
+	if !ValidateDID(msg.DID) {
+		return ErrorWrapf(ErrInvalidDID, "DID: %v", msg.DID)
 	}
 	if !msg.Document.Valid() {
-		return Error(ErrInvalidDIDDocument, msg.Document)
+		return ErrorWrapf(ErrInvalidDIDDocument, "DIDDocument: %v", msg.Document)
 	}
 	if msg.Signature == nil || len(msg.Signature) == 0 {
-		return Error(ErrInvalidSignature, msg.Signature)
+		return ErrorWrapf(ErrInvalidSignature, "Signature: %v", msg.Signature)
 	}
 	addr, err := sdk.AccAddressFromBech32(msg.FromAddress)
 	if err != nil {
 		return err
 	}
 	if addr.Empty() {
-		return Error(sdkerrors.ErrInvalidAddress, addr.String())
+		return ErrorWrapf(sdkerrors.ErrInvalidAddress, "Address: %v", addr.String())
 	}
 	return nil
 }
@@ -127,11 +127,11 @@ func (msg MsgDeactivateDID) Type() string { return "deactivate_did" }
 
 // VaValidateBasic runs stateless checks on the message.
 func (msg MsgDeactivateDID) ValidateBasic() error {
-	if !ValidDID(msg.DID) {
-		return Error(ErrInvalidDID, msg.DID)
+	if !ValidateDID(msg.DID) {
+		return ErrorWrapf(ErrInvalidDID, "DID: %v", msg.DID)
 	}
 	if msg.Signature == nil || len(msg.Signature) == 0 {
-		return Error(ErrInvalidSignature, msg.Signature)
+		return ErrorWrapf(ErrInvalidSignature, "Signature: %v", msg.Signature)
 	}
 
 	addr, err := sdk.AccAddressFromBech32(msg.FromAddress)
@@ -139,7 +139,7 @@ func (msg MsgDeactivateDID) ValidateBasic() error {
 		return err
 	}
 	if addr.Empty() {
-		return Error(sdkerrors.ErrInvalidAddress, addr.String())
+		return ErrorWrapf(sdkerrors.ErrInvalidAddress, "Address: %s", addr.String())
 	}
 	return nil
 }

@@ -19,10 +19,10 @@ func (k Keeper) DIDDocumentWithSeq(c context.Context, req *types.QueryGetDIDRequ
 	did := req.DID
 	docWithSeq := k.GetDIDDocument(ctx, did)
 	if docWithSeq.Empty() {
-		return &types.QueryGetDIDResponse{}, types.Error(types.ErrDIDNotFound, did)
+		return &types.QueryGetDIDResponse{}, types.ErrorWrapf(types.ErrDIDNotFound, "DID: %s", did)
 	}
 	if docWithSeq.Deactivated() {
-		return &types.QueryGetDIDResponse{}, types.Error(types.ErrDIDDeactivated, did)
+		return &types.QueryGetDIDResponse{}, types.ErrorWrapf(types.ErrDIDDeactivated, "DID: %s", did)
 	}
 
 	return &types.QueryGetDIDResponse{DIDDocumentWithSeq: &docWithSeq}, nil

@@ -288,7 +288,7 @@ func readDIDDocFrom(path string) (types.DIDDocument, error) {
 		return doc, fmt.Errorf("fail to decode DIDDocument JSON: %w", err)
 	}
 	if !doc.Valid() {
-		return doc, types.Error(types.ErrInvalidDIDDocument, doc)
+		return doc, types.ErrorWrapf(types.ErrInvalidDIDDocument, "DIDDocument: %v", doc)
 	}
 
 	return doc, nil
