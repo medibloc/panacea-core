@@ -2,9 +2,12 @@
 
 set -eo pipefail
 
+# Directories that contain proto files
+PROTO_DIRS="./proto ./third_party/proto"
+
 mkdir -p ./tmp-swagger-gen
 
-proto_dirs=$(find ./proto ./third_party/proto -path -prune -o -name '*.proto' -print0 | xargs -0 -n1 dirname | sort | uniq)
+proto_dirs=$(find ${PROTO_DIRS} -path -prune -o -name '*.proto' -print0 | xargs -0 -n1 dirname | sort | uniq)
 for dir in $proto_dirs; do
 
   # generate swagger files (filter query files)
