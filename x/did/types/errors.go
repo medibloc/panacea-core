@@ -23,7 +23,3 @@ var (
 	CodeInvalidKeyController                   = sdkerrors.Register(ModuleName, 13, "Invalid key controller")
 	ErrVerificationMethodKeyTypeNotImplemented = sdkerrors.Register(ModuleName, 14, "Verification not implemented with key type")
 )
-
-func ErrorWrapf(error *sdkerrors.Error, format string, args ...interface{}) error {
-	return sdkerrors.Wrapf(error, format, args...)
-}

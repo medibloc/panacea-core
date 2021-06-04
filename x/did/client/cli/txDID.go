@@ -11,6 +11,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/input"
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/go-bip39"
 	"github.com/medibloc/panacea-core/x/did/internal/secp256k1util"
 	"github.com/spf13/cobra"
@@ -288,7 +289,7 @@ func readDIDDocFrom(path string) (types.DIDDocument, error) {
 		return doc, fmt.Errorf("fail to decode DIDDocument JSON: %w", err)
 	}
 	if !doc.Valid() {
-		return doc, types.ErrorWrapf(types.ErrInvalidDIDDocument, "DIDDocument: %v", doc)
+		return doc, sdkerrors.Wrapf(types.ErrInvalidDIDDocument, "DIDDocument: %v", doc)
 	}
 
 	return doc, nil

@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"context"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/medibloc/panacea-core/x/did/types"
@@ -19,10 +20,10 @@ func (k Keeper) DIDDocumentWithSeq(c context.Context, req *types.QueryGetDIDRequ
 	did := req.DID
 	docWithSeq := k.GetDIDDocument(ctx, did)
 	if docWithSeq.Empty() {
-		return &types.QueryGetDIDResponse{}, types.ErrorWrapf(types.ErrDIDNotFound, "DID: %s", did)
+		return &types.QueryGetDIDResponse{}, sdkerrors.Wrapf(types.ErrDIDNotFound, "DID: %s", did)
 	}
 	if docWithSeq.Deactivated() {
-		return &types.QueryGetDIDResponse{}, types.ErrorWrapf(types.ErrDIDDeactivated, "DID: %s", did)
+		return &types.QueryGetDIDResponse{}, sdkerrors.Wrapf(types.ErrDIDDeactivated, "DID: %s", did)
 	}
 
 	return &types.QueryGetDIDResponse{DIDDocumentWithSeq: &docWithSeq}, nil
