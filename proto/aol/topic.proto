@@ -6,9 +6,7 @@ option go_package = "github.com/medibloc/panacea-core/x/aol/types";
 import "gogoproto/gogo.proto";
 
 message Topic {
-  string creator = 1;
-  uint64 id = 2;
-  string description = 3; 
-  int32 totalRecords = 4; 
-  int32 totalWriter = 5; 
+  string description = 1;
+  uint64 totalRecords = 2;
+  uint64 totalWriters = 3;
 }

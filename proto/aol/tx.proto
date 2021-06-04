@@ -7,128 +7,49 @@ option go_package = "github.com/medibloc/panacea-core/x/aol/types";
 
 // Msg defines the Msg service.
 service Msg {
-    // this line is used by starport scaffolding # proto/tx/rpc
-  rpc CreateOwner(MsgCreateOwner) returns (MsgCreateOwnerResponse);
-  rpc UpdateOwner(MsgUpdateOwner) returns (MsgUpdateOwnerResponse);
-  rpc DeleteOwner(MsgDeleteOwner) returns (MsgDeleteOwnerResponse);
-  rpc CreateRecord(MsgCreateRecord) returns (MsgCreateRecordResponse);
-  rpc UpdateRecord(MsgUpdateRecord) returns (MsgUpdateRecordResponse);
-  rpc DeleteRecord(MsgDeleteRecord) returns (MsgDeleteRecordResponse);
-  rpc CreateWriter(MsgCreateWriter) returns (MsgCreateWriterResponse);
-  rpc UpdateWriter(MsgUpdateWriter) returns (MsgUpdateWriterResponse);
-  rpc DeleteWriter(MsgDeleteWriter) returns (MsgDeleteWriterResponse);
   rpc CreateTopic(MsgCreateTopic) returns (MsgCreateTopicResponse);
-  rpc UpdateTopic(MsgUpdateTopic) returns (MsgUpdateTopicResponse);
-  rpc DeleteTopic(MsgDeleteTopic) returns (MsgDeleteTopicResponse);
+  rpc AddWriter(MsgAddWriter) returns (MsgAddWriterResponse);
+  rpc DeleteWriter(MsgDeleteWriter) returns (MsgDeleteWriterResponse);
+  rpc AddRecord(MsgAddRecord) returns (MsgAddRecordResponse);
 }
 
-// this line is used by starport scaffolding # proto/tx/message
-message MsgCreateOwner {
-  string creator = 1;
-  int32 totalTopics = 2;
+message MsgCreateTopic {
+  string topicName = 1;
+  string description = 2;
+  string ownerAddress = 3;
 }
 
-message MsgCreateOwnerResponse {
-  uint64 id = 1;
-}
+message MsgCreateTopicResponse { }
 
-message MsgUpdateOwner {
-  string creator = 1;
-  uint64 id = 2;
-  int32 totalTopics = 3;
-}
-
-message MsgUpdateOwnerResponse { }
-
-message MsgDeleteOwner {
-  string creator = 1;
-  uint64 id = 2;
-}
-
-message MsgDeleteOwnerResponse { }
-
-message MsgCreateRecord {
-  string creator = 1;
-  string key = 2;
-  string value = 3;
-  int32 nanoTimestamp = 4;
-  string writerAddress = 5;
-}
-
-message MsgCreateRecordResponse {
-  uint64 id = 1;
-}
-
-message MsgUpdateRecord {
-  string creator = 1;
-  uint64 id = 2;
-  string key = 3;
-  string value = 4;
-  int32 nanoTimestamp = 5;
-  string writerAddress = 6;
-}
-
-message MsgUpdateRecordResponse { }
-
-message MsgDeleteRecord {
-  string creator = 1;
-  uint64 id = 2;
-}
-
-message MsgDeleteRecordResponse { }
-
-message MsgCreateWriter {
-  string creator = 1;
+message MsgAddWriter {
+  string topicName = 1;
   string moniker = 2;
   string description = 3;
-  int32 nanoTimestamp = 4;
+  string writerAddress = 4;
+  string ownerAddress = 5;
 }
 
-message MsgCreateWriterResponse {
-  uint64 id = 1;
-}
-
-message MsgUpdateWriter {
-  string creator = 1;
-  uint64 id = 2;
-  string moniker = 3;
-  string description = 4;
-  int32 nanoTimestamp = 5;
-}
-
-message MsgUpdateWriterResponse { }
+message MsgAddWriterResponse { }
 
 message MsgDeleteWriter {
-  string creator = 1;
-  uint64 id = 2;
+  string topicName = 1;
+  string writerAddress = 2;
+  string ownerAddress = 3;
 }
 
 message MsgDeleteWriterResponse { }
 
-message MsgCreateTopic {
-  string creator = 1;
-  string description = 2;
-  int32 totalRecords = 3;
-  int32 totalWriter = 4;
+message MsgAddRecord {
+  string topicName = 1;
+  bytes key = 2;
+  bytes value = 3;
+  string writerAddress = 4;
+  string ownerAddress = 5;
+  string feePayerAddress = 6;
 }
 
-message MsgCreateTopicResponse {
-  uint64 id = 1;
+message MsgAddRecordResponse {
+  string ownerAddress = 1;
+  string topicName = 2;
+  uint64 offset = 3;
 }
-
-message MsgUpdateTopic {
-  string creator = 1;
-  uint64 id = 2;
-  string description = 3;
-  int32 totalRecords = 4;
-  int32 totalWriter = 5;
-}
-
-message MsgUpdateTopicResponse { }
-
-message MsgDeleteTopic {
-  string creator = 1;
-  uint64 id = 2;
-}
-
-message MsgDeleteTopicResponse { }

@@ -6,10 +6,8 @@ option go_package = "github.com/medibloc/panacea-core/x/aol/types";
 import "gogoproto/gogo.proto";
 
 message Record {
-  string creator = 1;
-  uint64 id = 2;
-  string key = 3; 
-  string value = 4; 
-  int32 nanoTimestamp = 5; 
-  string writerAddress = 6; 
+  bytes key = 1; 
+  bytes value = 2; 
+  int64 nanoTimestamp = 3; 
+  string writerAddress = 4; 
 }

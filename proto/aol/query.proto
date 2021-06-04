@@ -13,99 +13,74 @@ option go_package = "github.com/medibloc/panacea-core/x/aol/types";
 
 // Query defines the gRPC querier service.
 service Query {
-    // this line is used by starport scaffolding # 2
-	rpc Owner(QueryGetOwnerRequest) returns (QueryGetOwnerResponse) {
-		option (google.api.http).get = "/medibloc/panaceacore/aol/owner/{id}";
-	}
-	rpc OwnerAll(QueryAllOwnerRequest) returns (QueryAllOwnerResponse) {
-		option (google.api.http).get = "/medibloc/panaceacore/aol/owner";
+	rpc Topic(QueryGetTopicRequest) returns (QueryGetTopicResponse) {
+		option (google.api.http).get = "/panacea/aol/topic/{ownerAddress}/{topicName}";
 	}
 
-	rpc Record(QueryGetRecordRequest) returns (QueryGetRecordResponse) {
-		option (google.api.http).get = "/medibloc/panaceacore/aol/record/{id}";
-	}
-	rpc RecordAll(QueryAllRecordRequest) returns (QueryAllRecordResponse) {
-		option (google.api.http).get = "/medibloc/panaceacore/aol/record";
+	rpc Topics(QueryListTopicsRequest) returns (QueryListTopicsResponse) {
+		option (google.api.http).get = "/panacea/aol/topic/{ownerAddress}";
 	}
 
 	rpc Writer(QueryGetWriterRequest) returns (QueryGetWriterResponse) {
-		option (google.api.http).get = "/medibloc/panaceacore/aol/writer/{id}";
-	}
-	rpc WriterAll(QueryAllWriterRequest) returns (QueryAllWriterResponse) {
-		option (google.api.http).get = "/medibloc/panaceacore/aol/writer";
+		option (google.api.http).get = "/panacea/aol/writer/{ownerAddress}/{topicName}/{writerAddress}";
 	}
 
-	rpc Topic(QueryGetTopicRequest) returns (QueryGetTopicResponse) {
-		option (google.api.http).get = "/medibloc/panaceacore/aol/topic/{id}";
-	}
-	rpc TopicAll(QueryAllTopicRequest) returns (QueryAllTopicResponse) {
-		option (google.api.http).get = "/medibloc/panaceacore/aol/topic";
+	rpc Writers(QueryListWritersRequest) returns (QueryListWritersResponse) {
+		option (google.api.http).get = "/panacea/aol/writer/{ownerAddress}/{topicName}";
 	}
 
+	rpc Record(QueryGetRecordRequest) returns (QueryGetRecordResponse) {
+		option (google.api.http).get = "/panacea/aol/record/{ownerAddress}/{topicName}/{offset}";
+	}
 }
 
 // this line is used by starport scaffolding # 3
-message QueryGetOwnerRequest {
-	uint64 id = 1;
-}
-
-message QueryGetOwnerResponse {
-	Owner Owner = 1;
-}
-
-message QueryAllOwnerRequest {
-	cosmos.base.query.v1beta1.PageRequest pagination = 1;
-}
-
-message QueryAllOwnerResponse {
-	repeated Owner Owner = 1;
-	cosmos.base.query.v1beta1.PageResponse pagination = 2;
-}
-message QueryGetRecordRequest {
-	uint64 id = 1;
-}
-
-message QueryGetRecordResponse {
-	Record Record = 1;
-}
-
-message QueryAllRecordRequest {
-	cosmos.base.query.v1beta1.PageRequest pagination = 1;
-}
-
-message QueryAllRecordResponse {
-	repeated Record Record = 1;
-	cosmos.base.query.v1beta1.PageResponse pagination = 2;
-}
-message QueryGetWriterRequest {
-	uint64 id = 1;
-}
-
-message QueryGetWriterResponse {
-	Writer Writer = 1;
-}
-
-message QueryAllWriterRequest {
-	cosmos.base.query.v1beta1.PageRequest pagination = 1;
-}
-
-message QueryAllWriterResponse {
-	repeated Writer Writer = 1;
-	cosmos.base.query.v1beta1.PageResponse pagination = 2;
-}
 message QueryGetTopicRequest {
-	uint64 id = 1;
+	string ownerAddress = 1;
+	string topicName = 2;
 }
 
 message QueryGetTopicResponse {
 	Topic Topic = 1;
 }
 
-message QueryAllTopicRequest {
-	cosmos.base.query.v1beta1.PageRequest pagination = 1;
+message QueryListTopicsRequest {
+	string ownerAddress = 1;
+	cosmos.base.query.v1beta1.PageRequest pagination = 2;
 }
 
-message QueryAllTopicResponse {
-	repeated Topic Topic = 1;
+message QueryListTopicsResponse {
+	repeated string topicNames = 1;
 	cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+message QueryGetWriterRequest {
+	string ownerAddress = 1;
+	string topicName = 2;
+	string writerAddress = 3;
+}
+
+message QueryGetWriterResponse {
+	Writer Writer = 1;
+}
+
+message QueryListWritersRequest {
+	string ownerAddress = 1;
+	string topicName = 2;
+	cosmos.base.query.v1beta1.PageRequest pagination = 3;
+}
+
+message QueryListWritersResponse {
+	repeated string writerAddresses = 1;
+	cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+message QueryGetRecordRequest {
+	string ownerAddress = 1;
+	string topicName = 2;
+	uint64 offset = 3;
+}
+
+message QueryGetRecordResponse {
+	Record Record = 1;
 }
