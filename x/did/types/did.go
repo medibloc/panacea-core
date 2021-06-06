@@ -21,13 +21,13 @@ const (
 
 type JSONStringOrStrings []string
 
-func (strings JSONStringOrStrings) EmptyDID() bool {
+func EmptyDIDs(strings []string) bool {
 	if strings == nil || len(strings) == 0 {
 		return true
 	}
 
 	for _, did := range strings {
-		if len(did) > 0 {
+		if !EmptyDID(did) {
 			return false
 		}
 	}
@@ -35,15 +35,13 @@ func (strings JSONStringOrStrings) EmptyDID() bool {
 	return true
 }
 
-func (strings JSONStringOrStrings) ValidDID() bool {
-	if strings.EmptyDID() {
+func ValidateDIDs(strings []string) bool {
+	if EmptyDIDs(strings) {
 		return false
 	}
 
-	pattern := fmt.Sprintf("^%s$", didRegex())
 	for _, did := range strings {
-		matched, _ := regexp.MatchString(pattern, did)
-		if !matched {
+		if !ValidateDID(did) {
 			return false
 		}
 	}
@@ -221,11 +219,11 @@ func (doc DIDDocument) Valid() bool {
 		return false
 	}
 
-	if !doc.Controller.ValidDID() {
+	if !ValidateDIDs(*doc.Controller) {
 		return false
 	}
 
-	if !doc.Contexts.ValidDID() {
+	if !ValidateDIDs(*doc.Contexts) {
 		return false
 	}
 
