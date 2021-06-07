@@ -1,0 +1,18 @@
+ {
+  "@context": [
+    "https://www.w3.org/ns/did/v1",
+    "https://medibloc.org/ko"
+  ],
+  "id": "did:panacea:27FnaDeQZApXhsRZZDARhWYs2nKFaw3p7evGd9zUSrBZ",
+  "verificationMethod": [
+    {
+      "controller": "did:panacea:27FnaDeQZApXhsRZZDARhWYs2nKFaw3p7evGd9zUSrBZ",
+      "id": "did:panacea:27FnaDeQZApXhsRZZDARhWYs2nKFaw3p7evGd9zUSrBZ#key1",
+      "publicKeyBase58": "hfiFwEqzHPx3RbQBmkgg4UEMtejfbL27CspYNKiVuURN",
+      "type": "Secp256k1VerificationKey2018"
+    }
+  ],
+   "authentication": [
+     "did:panacea:27FnaDeQZApXhsRZZDARhWYs2nKFaw3p7evGd9zUSrBZ#key1"
+   ]
+}
