@@ -1,0 +1,15 @@
+syntax = "proto3";
+package medibloc.panaceacore.token;
+
+option go_package = "github.com/medibloc/panacea-core/x/token/types";
+
+import "gogoproto/gogo.proto";
+import "cosmos/base/v1beta1/coin.proto";
+
+message Token {
+  string name = 1;
+  string symbol = 2;
+  cosmos.base.v1beta1.Coin totalSupply = 3 [(gogoproto.nullable) = false];
+  bool mintable = 4;
+  string ownerAddress = 5;
+}
