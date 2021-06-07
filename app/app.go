@@ -2,11 +2,14 @@ package app
 
 import (
 	"io"
+	"net/http"
 	"os"
 	"path/filepath"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec/types"
+	"github.com/gorilla/mux"
+	"github.com/rakyll/statik/fs"
 	"github.com/spf13/cast"
 
 	abci "github.com/tendermint/tendermint/abci/types"
@@ -85,11 +88,15 @@ import (
 	panaceatypes "github.com/medibloc/panacea-core/x/panacea/types"
 	tmjson "github.com/tendermint/tendermint/libs/json"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
+  
+  _ "github.com/medibloc/panacea-core/client/docs/statik"
 
-	// this line is used by starport scaffolding # stargate/app/moduleImport
 	"github.com/medibloc/panacea-core/x/token"
 	tokenkeeper "github.com/medibloc/panacea-core/x/token/keeper"
 	tokentypes "github.com/medibloc/panacea-core/x/token/types"
+	"github.com/medibloc/panacea-core/x/burn"
+	burnkeeper "github.com/medibloc/panacea-core/x/burn/keeper"
+	burntypes "github.com/medibloc/panacea-core/x/burn/types"
 )
 
 const Name = "panacea"
@@ -136,8 +143,8 @@ var (
 		transfer.AppModuleBasic{},
 		vesting.AppModuleBasic{},
 		panacea.AppModuleBasic{},
-		// this line is used by starport scaffolding # stargate/app/moduleBasic
 		token.AppModuleBasic{},
+		burn.AppModuleBasic{},
 	)
 
 	// module account permissions
@@ -205,6 +212,7 @@ type App struct {
 
 	panaceaKeeper panaceakeeper.Keeper
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
+	burnKeeper burnkeeper.Keeper
 
 	tokenKeeper tokenkeeper.Keeper
 
@@ -217,7 +225,7 @@ type App struct {
 func New(
 	logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bool, skipUpgradeHeights map[int64]bool,
 	homePath string, invCheckPeriod uint, encodingConfig appparams.EncodingConfig,
-	// this line is used by starport scaffolding # stargate/app/newArgument
+// this line is used by starport scaffolding # stargate/app/newArgument
 	appOpts servertypes.AppOptions, baseAppOptions ...func(*baseapp.BaseApp),
 ) *App {
 
@@ -236,8 +244,8 @@ func New(
 		govtypes.StoreKey, paramstypes.StoreKey, ibchost.StoreKey, upgradetypes.StoreKey,
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
 		panaceatypes.StoreKey,
-		// this line is used by starport scaffolding # stargate/app/storeKey
 		tokentypes.StoreKey,
+		burntypes.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
@@ -332,6 +340,9 @@ func New(
 	)
 
 	// this line is used by starport scaffolding # stargate/app/keeperDefinition
+	app.burnKeeper = *burnkeeper.NewKeeper(
+		app.BankKeeper,
+	)
 
 	app.tokenKeeper = *tokenkeeper.NewKeeper(
 		appCodec,
@@ -382,8 +393,8 @@ func New(
 		params.NewAppModule(app.ParamsKeeper),
 		transferModule,
 		panacea.NewAppModule(appCodec, app.panaceaKeeper),
-		// this line is used by starport scaffolding # stargate/app/appModule
 		tokenModule,
+		burn.NewAppModule(appCodec, app.burnKeeper),
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -395,7 +406,7 @@ func New(
 		evidencetypes.ModuleName, stakingtypes.ModuleName, ibchost.ModuleName,
 	)
 
-	app.mm.SetOrderEndBlockers(crisistypes.ModuleName, govtypes.ModuleName, stakingtypes.ModuleName)
+	app.mm.SetOrderEndBlockers(crisistypes.ModuleName, govtypes.ModuleName, stakingtypes.ModuleName, burntypes.ModuleName)
 
 	// NOTE: The genutils module must occur after staking so that pools are
 	// properly initialized with tokens from genesis accounts.
@@ -417,8 +428,8 @@ func New(
 		evidencetypes.ModuleName,
 		ibctransfertypes.ModuleName,
 		panaceatypes.ModuleName,
-		// this line is used by starport scaffolding # stargate/app/initGenesis
 		tokentypes.ModuleName,
+		burntypes.ModuleName,
 	)
 
 	app.mm.RegisterInvariants(&app.CrisisKeeper)
@@ -565,6 +576,11 @@ func (app *App) RegisterAPIRoutes(apiSvr *api.Server, apiConfig config.APIConfig
 	// Register legacy and grpc-gateway routes for all modules.
 	ModuleBasics.RegisterRESTRoutes(clientCtx, apiSvr.Router)
 	ModuleBasics.RegisterGRPCGatewayRoutes(clientCtx, apiSvr.GRPCGatewayRouter)
+
+	// register swagger API from root so that other applications can override easily
+	if apiConfig.Swagger {
+		RegisterSwaggerAPI(apiSvr.Router)
+	}
 }
 
 // RegisterTxService implements the Application.RegisterTxService method.
@@ -575,6 +591,17 @@ func (app *App) RegisterTxService(clientCtx client.Context) {
 // RegisterTendermintService implements the Application.RegisterTendermintService method.
 func (app *App) RegisterTendermintService(clientCtx client.Context) {
 	tmservice.RegisterTendermintService(app.BaseApp.GRPCQueryRouter(), clientCtx, app.interfaceRegistry)
+}
+
+// RegisterSwaggerAPI registers swagger route with API Server
+func RegisterSwaggerAPI(rtr *mux.Router) {
+	statikFS, err := fs.New()
+	if err != nil {
+		panic(err)
+	}
+
+	staticServer := http.FileServer(statikFS)
+	rtr.PathPrefix("/swagger/").Handler(http.StripPrefix("/swagger/", staticServer))
 }
 
 // GetMaccPerms returns a copy of the module account permissions
@@ -600,8 +627,8 @@ func initParamsKeeper(appCodec codec.BinaryMarshaler, legacyAmino *codec.LegacyA
 	paramsKeeper.Subspace(crisistypes.ModuleName)
 	paramsKeeper.Subspace(ibctransfertypes.ModuleName)
 	paramsKeeper.Subspace(ibchost.ModuleName)
-	// this line is used by starport scaffolding # stargate/app/paramSubspace
 	paramsKeeper.Subspace(tokentypes.ModuleName)
+	paramsKeeper.Subspace(burntypes.ModuleName)
 
 	return paramsKeeper
 }
