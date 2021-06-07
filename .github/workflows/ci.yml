@@ -22,11 +22,8 @@ jobs:
     - name: Check out code into the Go module directory
       uses: actions/checkout@v2
 
-    - name: Run protoc
-      run: make proto-gen
-
-    - name: Build
-      run: make build
+    - name: Build (+ generating proto and docs)
+      run: make build-all
 
     - name: Test
       run: make test
