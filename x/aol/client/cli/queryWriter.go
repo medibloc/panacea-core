@@ -2,7 +2,6 @@ package cli
 
 import (
 	"context"
-	"strconv"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -10,25 +9,23 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func CmdListWriter() *cobra.Command {
+func CmdGetWriter() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "list-writer",
-		Short: "list all writer",
+		Use:   "get-writer [ownerAddress] [topicName] [writerAddress]",
+		Short: "get a writer",
+		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 
-			pageReq, err := client.ReadPageRequest(cmd.Flags())
-			if err != nil {
-				return err
-			}
-
 			queryClient := types.NewQueryClient(clientCtx)
 
-			params := &types.QueryAllWriterRequest{
-				Pagination: pageReq,
+			params := &types.QueryGetWriterRequest{
+				OwnerAddress:  args[0],
+				TopicName:     args[1],
+				WriterAddress: args[2],
 			}
 
-			res, err := queryClient.WriterAll(context.Background(), params)
+			res, err := queryClient.Writer(context.Background(), params)
 			if err != nil {
 				return err
 			}
@@ -42,26 +39,28 @@ func CmdListWriter() *cobra.Command {
 	return cmd
 }
 
-func CmdShowWriter() *cobra.Command {
+func CmdListWriters() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "show-writer [id]",
-		Short: "shows a writer",
-		Args:  cobra.ExactArgs(1),
+		Use:   "list-writer [ownerAddress] [topicName]",
+		Short: "list all writers of <ownerAddress, topicName>",
+		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 
-			queryClient := types.NewQueryClient(clientCtx)
-
-			id, err := strconv.ParseUint(args[0], 10, 64)
+			pageReq, err := client.ReadPageRequest(cmd.Flags())
 			if err != nil {
 				return err
 			}
 
-			params := &types.QueryGetWriterRequest{
-				Id: id,
+			queryClient := types.NewQueryClient(clientCtx)
+
+			params := &types.QueryListWritersRequest{
+				OwnerAddress: args[0],
+				TopicName:    args[1],
+				Pagination:   pageReq,
 			}
 
-			res, err := queryClient.Writer(context.Background(), params)
+			res, err := queryClient.Writers(context.Background(), params)
 			if err != nil {
 				return err
 			}

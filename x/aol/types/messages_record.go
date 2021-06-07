@@ -5,122 +5,69 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-var _ sdk.Msg = &MsgCreateRecord{}
+var _ sdk.Msg = &MsgAddRecord{}
 
-func NewMsgCreateRecord(creator string, key string, value string, nanoTimestamp int32, writerAddress string) *MsgCreateRecord {
-	return &MsgCreateRecord{
-		Creator:       creator,
-		Key:           key,
-		Value:         value,
-		NanoTimestamp: nanoTimestamp,
-		WriterAddress: writerAddress,
+func NewMsgAddRecord(topicName string, key, value []byte, writerAddress, ownerAddress, feePayerAddress string) *MsgAddRecord {
+	return &MsgAddRecord{
+		TopicName:       topicName,
+		Key:             key,
+		Value:           value,
+		WriterAddress:   writerAddress,
+		OwnerAddress:    ownerAddress,
+		FeePayerAddress: feePayerAddress,
 	}
 }
 
-func (msg *MsgCreateRecord) Route() string {
+func (msg *MsgAddRecord) Route() string {
 	return RouterKey
 }
 
-func (msg *MsgCreateRecord) Type() string {
-	return "CreateRecord"
+func (msg *MsgAddRecord) Type() string {
+	return "AddRecord"
 }
 
-func (msg *MsgCreateRecord) GetSigners() []sdk.AccAddress {
-	creator, err := sdk.AccAddressFromBech32(msg.Creator)
+func (msg *MsgAddRecord) GetSigners() []sdk.AccAddress {
+	writerAddress, err := sdk.AccAddressFromBech32(msg.WriterAddress)
 	if err != nil {
 		panic(err)
 	}
-	return []sdk.AccAddress{creator}
+
+	if msg.FeePayerAddress != "" {
+		feePayerAddress, err := sdk.AccAddressFromBech32(msg.FeePayerAddress)
+		if err != nil {
+			panic(err)
+		}
+		return []sdk.AccAddress{feePayerAddress, writerAddress}
+	} else {
+		return []sdk.AccAddress{writerAddress}
+	}
 }
 
-func (msg *MsgCreateRecord) GetSignBytes() []byte {
+func (msg *MsgAddRecord) GetSignBytes() []byte {
 	bz := ModuleCdc.MustMarshalJSON(msg)
 	return sdk.MustSortJSON(bz)
 }
 
-func (msg *MsgCreateRecord) ValidateBasic() error {
-	_, err := sdk.AccAddressFromBech32(msg.Creator)
-	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
+func (msg *MsgAddRecord) ValidateBasic() error {
+	if err := validateTopicName(msg.TopicName); err != nil {
+		return err
 	}
-	return nil
-}
-
-var _ sdk.Msg = &MsgUpdateRecord{}
-
-func NewMsgUpdateRecord(creator string, id uint64, key string, value string, nanoTimestamp int32, writerAddress string) *MsgUpdateRecord {
-	return &MsgUpdateRecord{
-		Id:            id,
-		Creator:       creator,
-		Key:           key,
-		Value:         value,
-		NanoTimestamp: nanoTimestamp,
-		WriterAddress: writerAddress,
+	if err := validateRecordKey(msg.Key); err != nil {
+		return err
 	}
-}
-
-func (msg *MsgUpdateRecord) Route() string {
-	return RouterKey
-}
-
-func (msg *MsgUpdateRecord) Type() string {
-	return "UpdateRecord"
-}
-
-func (msg *MsgUpdateRecord) GetSigners() []sdk.AccAddress {
-	creator, err := sdk.AccAddressFromBech32(msg.Creator)
-	if err != nil {
-		panic(err)
+	if err := validateRecordValue(msg.Value); err != nil {
+		return err
 	}
-	return []sdk.AccAddress{creator}
-}
-
-func (msg *MsgUpdateRecord) GetSignBytes() []byte {
-	bz := ModuleCdc.MustMarshalJSON(msg)
-	return sdk.MustSortJSON(bz)
-}
-
-func (msg *MsgUpdateRecord) ValidateBasic() error {
-	_, err := sdk.AccAddressFromBech32(msg.Creator)
-	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
+	if _, err := sdk.AccAddressFromBech32(msg.WriterAddress); err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid writer address (%s)", err)
 	}
-	return nil
-}
-
-var _ sdk.Msg = &MsgCreateRecord{}
-
-func NewMsgDeleteRecord(creator string, id uint64) *MsgDeleteRecord {
-	return &MsgDeleteRecord{
-		Id:      id,
-		Creator: creator,
+	if _, err := sdk.AccAddressFromBech32(msg.OwnerAddress); err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid owner address (%s)", err)
 	}
-}
-func (msg *MsgDeleteRecord) Route() string {
-	return RouterKey
-}
-
-func (msg *MsgDeleteRecord) Type() string {
-	return "DeleteRecord"
-}
-
-func (msg *MsgDeleteRecord) GetSigners() []sdk.AccAddress {
-	creator, err := sdk.AccAddressFromBech32(msg.Creator)
-	if err != nil {
-		panic(err)
-	}
-	return []sdk.AccAddress{creator}
-}
-
-func (msg *MsgDeleteRecord) GetSignBytes() []byte {
-	bz := ModuleCdc.MustMarshalJSON(msg)
-	return sdk.MustSortJSON(bz)
-}
-
-func (msg *MsgDeleteRecord) ValidateBasic() error {
-	_, err := sdk.AccAddressFromBech32(msg.Creator)
-	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
+	if msg.FeePayerAddress != "" {
+		if _, err := sdk.AccAddressFromBech32(msg.FeePayerAddress); err != nil {
+			return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid feePayer address (%s)", err)
+		}
 	}
 	return nil
 }

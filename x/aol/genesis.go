@@ -2,6 +2,7 @@ package aol
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/medibloc/panacea-core/types/compkey"
 	"github.com/medibloc/panacea-core/x/aol/keeper"
 	"github.com/medibloc/panacea-core/x/aol/types"
 )
@@ -9,76 +10,54 @@ import (
 // InitGenesis initializes the capability module's state from a provided genesis
 // state.
 func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) {
-	// this line is used by starport scaffolding # genesis/module/init
-	// Set all the owner
-	for _, elem := range genState.OwnerList {
-		k.SetOwner(ctx, *elem)
+	for keyStr, owner := range genState.Owners {
+		var key types.OwnerCompositeKey
+		compkey.MustDecodeFromString(keyStr, types.GenesisKeySeparator, &key)
+		k.SetOwner(ctx, key, *owner)
 	}
 
-	// Set owner count
-	k.SetOwnerCount(ctx, uint64(len(genState.OwnerList)))
-
-	// Set all the record
-	for _, elem := range genState.RecordList {
-		k.SetRecord(ctx, *elem)
+	for keyStr, topic := range genState.Topics {
+		var key types.TopicCompositeKey
+		compkey.MustDecodeFromString(keyStr, types.GenesisKeySeparator, &key)
+		k.SetTopic(ctx, key, *topic)
 	}
 
-	// Set record count
-	k.SetRecordCount(ctx, uint64(len(genState.RecordList)))
-
-	// Set all the writer
-	for _, elem := range genState.WriterList {
-		k.SetWriter(ctx, *elem)
+	for keyStr, writer := range genState.Writers {
+		var key types.WriterCompositeKey
+		compkey.MustDecodeFromString(keyStr, types.GenesisKeySeparator, &key)
+		k.SetWriter(ctx, key, *writer)
 	}
 
-	// Set writer count
-	k.SetWriterCount(ctx, uint64(len(genState.WriterList)))
-
-	// Set all the topic
-	for _, elem := range genState.TopicList {
-		k.SetTopic(ctx, *elem)
+	for keyStr, record := range genState.Records {
+		var key types.RecordCompositeKey
+		compkey.MustDecodeFromString(keyStr, types.GenesisKeySeparator, &key)
+		k.SetRecord(ctx, key, *record)
 	}
-
-	// Set topic count
-	k.SetTopicCount(ctx, uint64(len(genState.TopicList)))
-
-	// this line is used by starport scaffolding # ibc/genesis/init
 }
 
 // ExportGenesis returns the capability module's exported genesis.
 func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	genesis := types.DefaultGenesis()
 
-	// this line is used by starport scaffolding # genesis/module/export
-	// Get all owner
-	ownerList := k.GetAllOwner(ctx)
-	for _, elem := range ownerList {
-		elem := elem
-		genesis.OwnerList = append(genesis.OwnerList, &elem)
+	ownerKeys, owners := k.GetAllOwners(ctx)
+	for i, key := range ownerKeys {
+		genesis.Owners[compkey.EncodeToString(&key, types.GenesisKeySeparator)] = &owners[i]
 	}
 
-	// Get all record
-	recordList := k.GetAllRecord(ctx)
-	for _, elem := range recordList {
-		elem := elem
-		genesis.RecordList = append(genesis.RecordList, &elem)
+	topicKeys, topics := k.GetAllTopics(ctx)
+	for i, key := range topicKeys {
+		genesis.Topics[compkey.EncodeToString(&key, types.GenesisKeySeparator)] = &topics[i]
 	}
 
-	// Get all writer
-	writerList := k.GetAllWriter(ctx)
-	for _, elem := range writerList {
-		elem := elem
-		genesis.WriterList = append(genesis.WriterList, &elem)
+	writerKeys, writers := k.GetAllWriters(ctx)
+	for i, key := range writerKeys {
+		genesis.Writers[compkey.EncodeToString(&key, types.GenesisKeySeparator)] = &writers[i]
 	}
 
-	// Get all topic
-	topicList := k.GetAllTopic(ctx)
-	for _, elem := range topicList {
-		elem := elem
-		genesis.TopicList = append(genesis.TopicList, &elem)
+	recordKeys, records := k.GetAllRecords(ctx)
+	for i, key := range recordKeys {
+		genesis.Records[compkey.EncodeToString(&key, types.GenesisKeySeparator)] = &records[i]
 	}
-
-	// this line is used by starport scaffolding # ibc/genesis/export
 
 	return genesis
 }

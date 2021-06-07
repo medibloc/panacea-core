@@ -3,33 +3,67 @@ package keeper
 import (
 	"context"
 
+	"github.com/medibloc/panacea-core/types/compkey"
+
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/types/query"
 	"github.com/medibloc/panacea-core/x/aol/types"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
 
-func (k Keeper) WriterAll(c context.Context, req *types.QueryAllWriterRequest) (*types.QueryAllWriterResponse, error) {
+func (k Keeper) Writer(c context.Context, req *types.QueryGetWriterRequest) (*types.QueryGetWriterResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
 
-	var writers []*types.Writer
 	ctx := sdk.UnwrapSDKContext(c)
 
-	store := ctx.KVStore(k.storeKey)
-	writerStore := prefix.NewStore(store, types.KeyPrefix(types.WriterKey))
+	ownerAddr, err := sdk.AccAddressFromBech32(req.OwnerAddress)
+	if err != nil {
+		return nil, status.Error(codes.InvalidArgument, "invalid owner address")
+	}
+	writerAddr, err := sdk.AccAddressFromBech32(req.WriterAddress)
+	if err != nil {
+		return nil, status.Error(codes.InvalidArgument, "invalid writer address")
+	}
 
-	pageRes, err := query.Paginate(writerStore, req.Pagination, func(key []byte, value []byte) error {
-		var writer types.Writer
-		if err := k.cdc.UnmarshalBinaryBare(value, &writer); err != nil {
+	writerKey := types.WriterCompositeKey{OwnerAddress: ownerAddr, TopicName: req.TopicName, WriterAddress: writerAddr}
+	if !k.HasWriter(ctx, writerKey) {
+		return nil, status.Error(codes.NotFound, "writer not found")
+	}
+
+	writer := k.GetWriter(ctx, writerKey)
+	return &types.QueryGetWriterResponse{Writer: &writer}, nil
+}
+
+func (k Keeper) Writers(c context.Context, req *types.QueryListWritersRequest) (*types.QueryListWritersResponse, error) {
+	if req == nil {
+		return nil, status.Error(codes.InvalidArgument, "invalid request")
+	}
+
+	var writerAddresses []string
+	ctx := sdk.UnwrapSDKContext(c)
+
+	ownerAddr, err := sdk.AccAddressFromBech32(req.OwnerAddress)
+	if err != nil {
+		return nil, status.Error(codes.InvalidArgument, "invalid owner address")
+	}
+	compKeyPrefix, err := compkey.PartialEncode(&types.WriterCompositeKey{OwnerAddress: ownerAddr, TopicName: req.TopicName, WriterAddress: nil}, 2)
+	if err != nil {
+		return nil, status.Error(codes.Internal, "failed to writer key")
+	}
+
+	store := ctx.KVStore(k.storeKey)
+	writerStore := prefix.NewStore(store, append(types.KeyPrefix(types.WriterKey), compKeyPrefix...))
+
+	pageRes, err := query.Paginate(writerStore, req.Pagination, func(compKeyLast []byte, value []byte) error {
+		var compKey types.WriterCompositeKey
+		if err := compkey.Decode(append(compKeyPrefix, compKeyLast...), &compKey); err != nil {
 			return err
 		}
-
-		writers = append(writers, &writer)
+		writerAddresses = append(writerAddresses, compKey.WriterAddress.String())
 		return nil
 	})
 
@@ -37,23 +71,5 @@ func (k Keeper) WriterAll(c context.Context, req *types.QueryAllWriterRequest) (
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	return &types.QueryAllWriterResponse{Writer: writers, Pagination: pageRes}, nil
-}
-
-func (k Keeper) Writer(c context.Context, req *types.QueryGetWriterRequest) (*types.QueryGetWriterResponse, error) {
-	if req == nil {
-		return nil, status.Error(codes.InvalidArgument, "invalid request")
-	}
-
-	var writer types.Writer
-	ctx := sdk.UnwrapSDKContext(c)
-
-	if !k.HasWriter(ctx, req.Id) {
-		return nil, sdkerrors.ErrKeyNotFound
-	}
-
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.WriterKey))
-	k.cdc.MustUnmarshalBinaryBare(store.Get(GetWriterIDBytes(req.Id)), &writer)
-
-	return &types.QueryGetWriterResponse{Writer: &writer}, nil
+	return &types.QueryListWritersResponse{WriterAddresses: writerAddresses, Pagination: pageRes}, nil
 }

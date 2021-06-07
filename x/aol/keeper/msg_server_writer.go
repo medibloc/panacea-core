@@ -2,66 +2,68 @@ package keeper
 
 import (
 	"context"
-	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/medibloc/panacea-core/x/aol/types"
 )
 
-func (k msgServer) CreateWriter(goCtx context.Context, msg *types.MsgCreateWriter) (*types.MsgCreateWriterResponse, error) {
+func (k msgServer) AddWriter(goCtx context.Context, msg *types.MsgAddWriter) (*types.MsgAddWriterResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	id := k.AppendWriter(
-		ctx,
-		msg.Creator,
-		msg.Moniker,
-		msg.Description,
-		msg.NanoTimestamp,
-	)
+	ownerAddr, err := sdk.AccAddressFromBech32(msg.OwnerAddress)
+	if err != nil {
+		return nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid owner address: %v", err)
+	}
+	writerAddr, err := sdk.AccAddressFromBech32(msg.WriterAddress)
+	if err != nil {
+		return nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid writer address: %v", err)
+	}
 
-	return &types.MsgCreateWriterResponse{
-		Id: id,
-	}, nil
-}
+	topicKey := types.TopicCompositeKey{OwnerAddress: ownerAddr, TopicName: msg.TopicName}
+	if !k.HasTopic(ctx, topicKey) {
+		return nil, sdkerrors.Wrapf(types.ErrTopicNotFound, "topic <%s, %s>", msg.OwnerAddress, msg.TopicName)
+	}
+	writerKey := types.WriterCompositeKey{OwnerAddress: ownerAddr, TopicName: msg.TopicName, WriterAddress: writerAddr}
+	if k.HasWriter(ctx, writerKey) {
+		return nil, sdkerrors.Wrapf(types.ErrWriterExists, "writer <%s, %s, %s>", msg.OwnerAddress, msg.TopicName, msg.WriterAddress)
+	}
 
-func (k msgServer) UpdateWriter(goCtx context.Context, msg *types.MsgUpdateWriter) (*types.MsgUpdateWriterResponse, error) {
-	ctx := sdk.UnwrapSDKContext(goCtx)
+	topic := k.GetTopic(ctx, topicKey).IncreaseTotalWriters()
+	k.SetTopic(ctx, topicKey, topic)
 
-	var writer = types.Writer{
-		Creator:       msg.Creator,
-		Id:            msg.Id,
+	writer := types.Writer{
 		Moniker:       msg.Moniker,
 		Description:   msg.Description,
-		NanoTimestamp: msg.NanoTimestamp,
+		NanoTimestamp: ctx.BlockTime().UnixNano(),
 	}
+	k.SetWriter(ctx, writerKey, writer)
 
-	// Checks that the element exists
-	if !k.HasWriter(ctx, msg.Id) {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrKeyNotFound, fmt.Sprintf("key %d doesn't exist", msg.Id))
-	}
-
-	// Checks if the the msg sender is the same as the current owner
-	if msg.Creator != k.GetWriterOwner(ctx, msg.Id) {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, "incorrect owner")
-	}
-
-	k.SetWriter(ctx, writer)
-
-	return &types.MsgUpdateWriterResponse{}, nil
+	return &types.MsgAddWriterResponse{}, nil
 }
 
 func (k msgServer) DeleteWriter(goCtx context.Context, msg *types.MsgDeleteWriter) (*types.MsgDeleteWriterResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	if !k.HasWriter(ctx, msg.Id) {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrKeyNotFound, fmt.Sprintf("key %d doesn't exist", msg.Id))
+	ownerAddr, err := sdk.AccAddressFromBech32(msg.OwnerAddress)
+	if err != nil {
+		return nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid owner address: %v", err)
 	}
-	if msg.Creator != k.GetWriterOwner(ctx, msg.Id) {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, "incorrect owner")
+	writerAddr, err := sdk.AccAddressFromBech32(msg.WriterAddress)
+	if err != nil {
+		return nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid writer address: %v", err)
 	}
 
-	k.RemoveWriter(ctx, msg.Id)
+	topicKey := types.TopicCompositeKey{OwnerAddress: ownerAddr, TopicName: msg.TopicName}
+	writerKey := types.WriterCompositeKey{OwnerAddress: ownerAddr, TopicName: msg.TopicName, WriterAddress: writerAddr}
+	if !k.HasWriter(ctx, writerKey) {
+		return nil, sdkerrors.Wrapf(types.ErrWriterNotFound, "writer <%s, %s, %s>", msg.OwnerAddress, msg.TopicName, msg.WriterAddress)
+	}
+
+	topic := k.GetTopic(ctx, topicKey).DecreaseTotalWriters()
+	k.SetTopic(ctx, topicKey, topic)
+
+	k.RemoveWriter(ctx, writerKey)
 
 	return &types.MsgDeleteWriterResponse{}, nil
 }

@@ -10,55 +10,25 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func CmdListRecord() *cobra.Command {
+func CmdGetRecord() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "list-record",
-		Short: "list all record",
-		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx := client.GetClientContextFromCmd(cmd)
-
-			pageReq, err := client.ReadPageRequest(cmd.Flags())
-			if err != nil {
-				return err
-			}
-
-			queryClient := types.NewQueryClient(clientCtx)
-
-			params := &types.QueryAllRecordRequest{
-				Pagination: pageReq,
-			}
-
-			res, err := queryClient.RecordAll(context.Background(), params)
-			if err != nil {
-				return err
-			}
-
-			return clientCtx.PrintProto(res)
-		},
-	}
-
-	flags.AddQueryFlagsToCmd(cmd)
-
-	return cmd
-}
-
-func CmdShowRecord() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "show-record [id]",
-		Short: "shows a record",
-		Args:  cobra.ExactArgs(1),
+		Use:   "get-record [ownerAddress] [topicName] [offset]",
+		Short: "get a record",
+		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 
 			queryClient := types.NewQueryClient(clientCtx)
 
-			id, err := strconv.ParseUint(args[0], 10, 64)
+			offset, err := strconv.ParseUint(args[2], 10, 64)
 			if err != nil {
 				return err
 			}
 
 			params := &types.QueryGetRecordRequest{
-				Id: id,
+				OwnerAddress: args[0],
+				TopicName:    args[1],
+				Offset:       offset,
 			}
 
 			res, err := queryClient.Record(context.Background(), params)

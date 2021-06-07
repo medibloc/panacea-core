@@ -2,7 +2,6 @@ package cli
 
 import (
 	"context"
-	"strconv"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -10,25 +9,22 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func CmdListTopic() *cobra.Command {
+func CmdGetTopic() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "list-topic",
-		Short: "list all topic",
+		Use:   "get-topic [ownerAddress] [topicName]",
+		Short: "get a topic",
+		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 
-			pageReq, err := client.ReadPageRequest(cmd.Flags())
-			if err != nil {
-				return err
-			}
-
 			queryClient := types.NewQueryClient(clientCtx)
 
-			params := &types.QueryAllTopicRequest{
-				Pagination: pageReq,
+			params := &types.QueryGetTopicRequest{
+				OwnerAddress: args[0],
+				TopicName:    args[1],
 			}
 
-			res, err := queryClient.TopicAll(context.Background(), params)
+			res, err := queryClient.Topic(context.Background(), params)
 			if err != nil {
 				return err
 			}
@@ -42,26 +38,27 @@ func CmdListTopic() *cobra.Command {
 	return cmd
 }
 
-func CmdShowTopic() *cobra.Command {
+func CmdListTopics() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "show-topic [id]",
-		Short: "shows a topic",
+		Use:   "list-topic [ownerAddress]",
+		Short: "list all topics of the owner",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 
-			queryClient := types.NewQueryClient(clientCtx)
-
-			id, err := strconv.ParseUint(args[0], 10, 64)
+			pageReq, err := client.ReadPageRequest(cmd.Flags())
 			if err != nil {
 				return err
 			}
 
-			params := &types.QueryGetTopicRequest{
-				Id: id,
+			queryClient := types.NewQueryClient(clientCtx)
+
+			params := &types.QueryListTopicsRequest{
+				OwnerAddress: args[0],
+				Pagination:   pageReq,
 			}
 
-			res, err := queryClient.Topic(context.Background(), params)
+			res, err := queryClient.Topics(context.Background(), params)
 			if err != nil {
 				return err
 			}

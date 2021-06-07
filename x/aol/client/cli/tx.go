@@ -16,6 +16,7 @@ var (
 )
 
 const (
+	//nolint
 	flagPacketTimeoutTimestamp = "packet-timeout-timestamp"
 )
 
@@ -29,23 +30,10 @@ func GetTxCmd() *cobra.Command {
 		RunE:                       client.ValidateCmd,
 	}
 
-	// this line is used by starport scaffolding # 1
-
-	cmd.AddCommand(CmdCreateOwner())
-	cmd.AddCommand(CmdUpdateOwner())
-	cmd.AddCommand(CmdDeleteOwner())
-
-	cmd.AddCommand(CmdCreateRecord())
-	cmd.AddCommand(CmdUpdateRecord())
-	cmd.AddCommand(CmdDeleteRecord())
-
-	cmd.AddCommand(CmdCreateWriter())
-	cmd.AddCommand(CmdUpdateWriter())
-	cmd.AddCommand(CmdDeleteWriter())
-
 	cmd.AddCommand(CmdCreateTopic())
-	cmd.AddCommand(CmdUpdateTopic())
-	cmd.AddCommand(CmdDeleteTopic())
+	cmd.AddCommand(CmdAddWriter())
+	cmd.AddCommand(CmdDeleteWriter())
+	cmd.AddCommand(CmdAddRecord())
 
 	return cmd
 }

@@ -9,45 +9,19 @@ import (
 
 func RegisterCodec(cdc *codec.LegacyAmino) {
 	// this line is used by starport scaffolding # 2
-	cdc.RegisterConcrete(&MsgCreateOwner{}, "aol/CreateOwner", nil)
-	cdc.RegisterConcrete(&MsgUpdateOwner{}, "aol/UpdateOwner", nil)
-	cdc.RegisterConcrete(&MsgDeleteOwner{}, "aol/DeleteOwner", nil)
-
-	cdc.RegisterConcrete(&MsgCreateRecord{}, "aol/CreateRecord", nil)
-	cdc.RegisterConcrete(&MsgUpdateRecord{}, "aol/UpdateRecord", nil)
-	cdc.RegisterConcrete(&MsgDeleteRecord{}, "aol/DeleteRecord", nil)
-
-	cdc.RegisterConcrete(&MsgCreateWriter{}, "aol/CreateWriter", nil)
-	cdc.RegisterConcrete(&MsgUpdateWriter{}, "aol/UpdateWriter", nil)
-	cdc.RegisterConcrete(&MsgDeleteWriter{}, "aol/DeleteWriter", nil)
-
 	cdc.RegisterConcrete(&MsgCreateTopic{}, "aol/CreateTopic", nil)
-	cdc.RegisterConcrete(&MsgUpdateTopic{}, "aol/UpdateTopic", nil)
-	cdc.RegisterConcrete(&MsgDeleteTopic{}, "aol/DeleteTopic", nil)
-
+	cdc.RegisterConcrete(&MsgAddWriter{}, "aol/AddWriter", nil)
+	cdc.RegisterConcrete(&MsgDeleteWriter{}, "aol/DeleteWriter", nil)
+	cdc.RegisterConcrete(&MsgAddRecord{}, "aol/AddRecord", nil)
 }
 
 func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 	// this line is used by starport scaffolding # 3
 	registry.RegisterImplementations((*sdk.Msg)(nil),
-		&MsgCreateOwner{},
-		&MsgUpdateOwner{},
-		&MsgDeleteOwner{},
-	)
-	registry.RegisterImplementations((*sdk.Msg)(nil),
-		&MsgCreateRecord{},
-		&MsgUpdateRecord{},
-		&MsgDeleteRecord{},
-	)
-	registry.RegisterImplementations((*sdk.Msg)(nil),
-		&MsgCreateWriter{},
-		&MsgUpdateWriter{},
-		&MsgDeleteWriter{},
-	)
-	registry.RegisterImplementations((*sdk.Msg)(nil),
 		&MsgCreateTopic{},
-		&MsgUpdateTopic{},
-		&MsgDeleteTopic{},
+		&MsgAddWriter{},
+		&MsgDeleteWriter{},
+		&MsgAddRecord{},
 	)
 
 	msgservice.RegisterMsgServiceDesc(registry, &_Msg_serviceDesc)

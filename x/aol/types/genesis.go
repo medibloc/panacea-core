@@ -1,67 +1,59 @@
 package types
 
-import (
-	"fmt"
-	// this line is used by starport scaffolding # ibc/genesistype/import
-)
+import "github.com/medibloc/panacea-core/types/compkey"
+
+// this line is used by starport scaffolding # ibc/genesistype/import
 
 // DefaultIndex is the default capability global index
 const DefaultIndex uint64 = 1
 
+const GenesisKeySeparator = "/"
+
 // DefaultGenesis returns the default Capability genesis state
 func DefaultGenesis() *GenesisState {
 	return &GenesisState{
-		// this line is used by starport scaffolding # ibc/genesistype/default
-		// this line is used by starport scaffolding # genesis/types/default
-		OwnerList:  []*Owner{},
-		RecordList: []*Record{},
-		WriterList: []*Writer{},
-		TopicList:  []*Topic{},
+		Owners:  map[string]*Owner{},
+		Topics:  map[string]*Topic{},
+		Writers: map[string]*Writer{},
+		Records: map[string]*Record{},
 	}
 }
 
 // Validate performs basic genesis state validation returning an error upon any
 // failure.
 func (gs GenesisState) Validate() error {
-	// this line is used by starport scaffolding # ibc/genesistype/validate
-
-	// this line is used by starport scaffolding # genesis/types/validate
-	// Check for duplicated ID in owner
-	ownerIdMap := make(map[uint64]bool)
-
-	for _, elem := range gs.OwnerList {
-		if _, ok := ownerIdMap[elem.Id]; ok {
-			return fmt.Errorf("duplicated id for owner")
+	for keyStr := range gs.Owners {
+		var key OwnerCompositeKey
+		if err := compkey.DecodeFromString(keyStr, GenesisKeySeparator, &key); err != nil {
+			return err
 		}
-		ownerIdMap[elem.Id] = true
 	}
-	// Check for duplicated ID in record
-	recordIdMap := make(map[uint64]bool)
-
-	for _, elem := range gs.RecordList {
-		if _, ok := recordIdMap[elem.Id]; ok {
-			return fmt.Errorf("duplicated id for record")
+	for keyStr, topic := range gs.Topics {
+		var key TopicCompositeKey
+		if err := compkey.DecodeFromString(keyStr, GenesisKeySeparator, &key); err != nil {
+			return err
 		}
-		recordIdMap[elem.Id] = true
-	}
-	// Check for duplicated ID in writer
-	writerIdMap := make(map[uint64]bool)
-
-	for _, elem := range gs.WriterList {
-		if _, ok := writerIdMap[elem.Id]; ok {
-			return fmt.Errorf("duplicated id for writer")
+		if err := topic.Validate(); err != nil {
+			return err
 		}
-		writerIdMap[elem.Id] = true
 	}
-	// Check for duplicated ID in topic
-	topicIdMap := make(map[uint64]bool)
-
-	for _, elem := range gs.TopicList {
-		if _, ok := topicIdMap[elem.Id]; ok {
-			return fmt.Errorf("duplicated id for topic")
+	for keyStr, writer := range gs.Writers {
+		var key WriterCompositeKey
+		if err := compkey.DecodeFromString(keyStr, GenesisKeySeparator, &key); err != nil {
+			return err
 		}
-		topicIdMap[elem.Id] = true
+		if err := writer.Validate(); err != nil {
+			return err
+		}
 	}
-
+	for keyStr, record := range gs.Records {
+		var key RecordCompositeKey
+		if err := compkey.DecodeFromString(keyStr, GenesisKeySeparator, &key); err != nil {
+			return err
+		}
+		if err := record.Validate(); err != nil {
+			return err
+		}
+	}
 	return nil
 }

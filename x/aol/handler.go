@@ -17,53 +17,21 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 		ctx = ctx.WithEventManager(sdk.NewEventManager())
 
 		switch msg := msg.(type) {
-		// this line is used by starport scaffolding # 1
-		case *types.MsgCreateOwner:
-			res, err := msgServer.CreateOwner(sdk.WrapSDKContext(ctx), msg)
+
+		case *types.MsgCreateTopic:
+			res, err := msgServer.CreateTopic(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)
 
-		case *types.MsgUpdateOwner:
-			res, err := msgServer.UpdateOwner(sdk.WrapSDKContext(ctx), msg)
-			return sdk.WrapServiceResult(ctx, res, err)
-
-		case *types.MsgDeleteOwner:
-			res, err := msgServer.DeleteOwner(sdk.WrapSDKContext(ctx), msg)
-			return sdk.WrapServiceResult(ctx, res, err)
-
-		case *types.MsgCreateRecord:
-			res, err := msgServer.CreateRecord(sdk.WrapSDKContext(ctx), msg)
-			return sdk.WrapServiceResult(ctx, res, err)
-
-		case *types.MsgUpdateRecord:
-			res, err := msgServer.UpdateRecord(sdk.WrapSDKContext(ctx), msg)
-			return sdk.WrapServiceResult(ctx, res, err)
-
-		case *types.MsgDeleteRecord:
-			res, err := msgServer.DeleteRecord(sdk.WrapSDKContext(ctx), msg)
-			return sdk.WrapServiceResult(ctx, res, err)
-
-		case *types.MsgCreateWriter:
-			res, err := msgServer.CreateWriter(sdk.WrapSDKContext(ctx), msg)
-			return sdk.WrapServiceResult(ctx, res, err)
-
-		case *types.MsgUpdateWriter:
-			res, err := msgServer.UpdateWriter(sdk.WrapSDKContext(ctx), msg)
+		case *types.MsgAddWriter:
+			res, err := msgServer.AddWriter(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)
 
 		case *types.MsgDeleteWriter:
 			res, err := msgServer.DeleteWriter(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)
 
-		case *types.MsgCreateTopic:
-			res, err := msgServer.CreateTopic(sdk.WrapSDKContext(ctx), msg)
-			return sdk.WrapServiceResult(ctx, res, err)
-
-		case *types.MsgUpdateTopic:
-			res, err := msgServer.UpdateTopic(sdk.WrapSDKContext(ctx), msg)
-			return sdk.WrapServiceResult(ctx, res, err)
-
-		case *types.MsgDeleteTopic:
-			res, err := msgServer.DeleteTopic(sdk.WrapSDKContext(ctx), msg)
+		case *types.MsgAddRecord:
+			res, err := msgServer.AddRecord(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)
 
 		default:
