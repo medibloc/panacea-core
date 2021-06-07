@@ -1,0 +1,39 @@
+syntax = "proto3";
+package medibloc.panaceacore.token;
+
+import "google/api/annotations.proto";
+import "cosmos/base/query/v1beta1/pagination.proto";
+// this line is used by starport scaffolding # 1
+import "token/token.proto";
+
+option go_package = "github.com/medibloc/panacea-core/x/token/types";
+
+// Query defines the gRPC querier service.
+service Query {
+    // this line is used by starport scaffolding # 2
+	rpc Token(QueryGetTokenRequest) returns (QueryGetTokenResponse) {
+		option (google.api.http).get = "/medibloc/panaceacore/token/token/{symbol}";
+	}
+	rpc TokenAll(QueryAllTokenRequest) returns (QueryAllTokenResponse) {
+		option (google.api.http).get = "/medibloc/panaceacore/token/token";
+	}
+
+}
+
+// this line is used by starport scaffolding # 3
+message QueryGetTokenRequest {
+	string symbol = 1;
+}
+
+message QueryGetTokenResponse {
+	Token Token = 1;
+}
+
+message QueryAllTokenRequest {
+	cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+message QueryAllTokenResponse {
+	repeated Token Token = 1;
+	cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
