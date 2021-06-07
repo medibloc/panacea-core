@@ -77,7 +77,7 @@ func InitCmd(mbm module.BasicManager, defaultNodeHome string) *cobra.Command {
 }
 
 const (
-	blockTimeSec = 1
+	blockTimeSec    = 1
 	unbondingPeriod = 60 * 60 * 24 * 7 * 3 * time.Second // three weeks
 )
 
@@ -106,7 +106,7 @@ func overrideGenesis(cdc codec.JSONMarshaler, genDoc *types.GenesisDoc) (json.Ra
 	mintGenState.Params.InflationRateChange = sdk.NewDecWithPrec(3, 2) // 3%
 	mintGenState.Params.InflationMin = sdk.NewDecWithPrec(7, 2)        // 7%
 	mintGenState.Params.InflationMax = sdk.NewDecWithPrec(10, 2)       // 10%
-	mintGenState.Params.BlocksPerYear = uint64(60 * 60 * 24 * 365.25)  * uint64(blockTimeSec)
+	mintGenState.Params.BlocksPerYear = uint64(60*60*24*365.25) * uint64(blockTimeSec)
 	appState[minttypes.ModuleName] = cdc.MustMarshalJSON(&mintGenState)
 
 	var distrGenState distrtypes.GenesisState
@@ -144,7 +144,7 @@ func overrideGenesis(cdc codec.JSONMarshaler, genDoc *types.GenesisDoc) (json.Ra
 	appState[slashingtypes.ModuleName] = cdc.MustMarshalJSON(&slashingGenState)
 
 	// Override Tendermint consensus params: https://docs.tendermint.com/master/tendermint-core/using-tendermint.html#fields
-	genDoc.ConsensusParams.Evidence.MaxAgeDuration = unbondingPeriod  // should correspond with unbondingPeriod for handling Nothing-At-Stake attacks
+	genDoc.ConsensusParams.Evidence.MaxAgeDuration = unbondingPeriod // should correspond with unbondingPeriod for handling Nothing-At-Stake attacks
 	genDoc.ConsensusParams.Evidence.MaxAgeNumBlocks = int64(unbondingPeriod.Seconds()) / blockTimeSec
 
 	return tmjson.Marshal(appState)
