@@ -77,6 +77,9 @@ func validateToken(t *Token) error {
 	if err := validateTotalSupplyAmount(t.TotalSupply.Amount); err != nil {
 		return err
 	}
+	if GetMicroDenom(t.Symbol) != t.TotalSupply.Denom {
+		return ErrInvalidDenom
+	}
 	if _, err := sdk.AccAddressFromBech32(t.OwnerAddress); err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid owner address (%s)", err)
 	}
