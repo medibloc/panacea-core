@@ -138,6 +138,26 @@ func ValidateDID(did string) bool {
 	return matched
 }
 
+func ValidateContexts(contexts []string) bool {
+	if contexts == nil || len(contexts) == 0 || contexts[0] != ContextDIDV1 { // the 1st one must be ContextDIDV1
+		return false
+	}
+
+	set := make(map[string]struct{}, len(contexts))
+	for _, context := range contexts {
+		_, dup := set[context] // check the duplication
+		if dup || !ValidateContext(context) {
+			return false
+		}
+		set[context] = struct{}{}
+	}
+	return true
+}
+
+func ValidateContext(context string) bool {
+	return context != ""
+}
+
 func didRegex() string {
 	// https://www.w3.org/TR/did-core/#did-syntax
 	return fmt.Sprintf("did:%s:[%s]{32,44}", DIDMethod, Base58Charset)
@@ -219,11 +239,11 @@ func (doc DIDDocument) Valid() bool {
 		return false
 	}
 
-	if !ValidateDIDs(*doc.Controller) {
+	if doc.Controller != nil && !EmptyDIDs(*doc.Controller) && !ValidateDIDs(*doc.Controller) {
 		return false
 	}
 
-	if !ValidateDIDs(*doc.Contexts) {
+	if doc.Contexts != nil && !ValidateContexts(*doc.Contexts) {
 		return false
 	}
 
