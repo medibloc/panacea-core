@@ -85,15 +85,15 @@ import (
 	appparams "github.com/medibloc/panacea-core/app/params"
 	tmjson "github.com/tendermint/tendermint/libs/json"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
-  
-  _ "github.com/medibloc/panacea-core/client/docs/statik"
 
-	"github.com/medibloc/panacea-core/x/token"
-	tokenkeeper "github.com/medibloc/panacea-core/x/token/keeper"
-	tokentypes "github.com/medibloc/panacea-core/x/token/types"
+	_ "github.com/medibloc/panacea-core/client/docs/statik"
+
 	"github.com/medibloc/panacea-core/x/burn"
 	burnkeeper "github.com/medibloc/panacea-core/x/burn/keeper"
 	burntypes "github.com/medibloc/panacea-core/x/burn/types"
+	"github.com/medibloc/panacea-core/x/token"
+	tokenkeeper "github.com/medibloc/panacea-core/x/token/keeper"
+	tokentypes "github.com/medibloc/panacea-core/x/token/types"
 )
 
 const Name = "panacea"
@@ -382,7 +382,6 @@ func New(
 		ibc.NewAppModule(app.IBCKeeper),
 		params.NewAppModule(app.ParamsKeeper),
 		transferModule,
-		panacea.NewAppModule(appCodec, app.panaceaKeeper),
 		tokenModule,
 		burn.NewAppModule(appCodec, app.burnKeeper),
 	)
