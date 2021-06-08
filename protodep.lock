@@ -8,8 +8,8 @@ proto_outdir = "./third_party/proto"
   protocol = ""
 
 [[dependencies]]
-  target = "github.com/cosmos/cosmos-sdk/proto/cosmos/base"
+  target = "github.com/cosmos/cosmos-sdk/proto"
   revision = "c4864e9f85011b3e971885ea995a0021c01a885d"
   branch = ""
-  path = "cosmos/base"
+  path = ""
   protocol = ""

@@ -2,11 +2,14 @@ package app
 
 import (
 	"io"
+	"net/http"
 	"os"
 	"path/filepath"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec/types"
+	"github.com/gorilla/mux"
+	"github.com/rakyll/statik/fs"
 	"github.com/spf13/cast"
 
 	abci "github.com/tendermint/tendermint/abci/types"
@@ -80,20 +83,21 @@ import (
 	upgradekeeper "github.com/cosmos/cosmos-sdk/x/upgrade/keeper"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 	appparams "github.com/medibloc/panacea-core/app/params"
-	"github.com/medibloc/panacea-core/x/panacea"
-	panaceakeeper "github.com/medibloc/panacea-core/x/panacea/keeper"
-	panaceatypes "github.com/medibloc/panacea-core/x/panacea/types"
 	tmjson "github.com/tendermint/tendermint/libs/json"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 
+	_ "github.com/medibloc/panacea-core/client/docs/statik"
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 	"github.com/medibloc/panacea-core/x/did"
 	didkeeper "github.com/medibloc/panacea-core/x/did/keeper"
 	didtypes "github.com/medibloc/panacea-core/x/did/types"
-	// this line is used by starport scaffolding # stargate/app/moduleImport
+
 	"github.com/medibloc/panacea-core/x/burn"
 	burnkeeper "github.com/medibloc/panacea-core/x/burn/keeper"
 	burntypes "github.com/medibloc/panacea-core/x/burn/types"
+	"github.com/medibloc/panacea-core/x/token"
+	tokenkeeper "github.com/medibloc/panacea-core/x/token/keeper"
+	tokentypes "github.com/medibloc/panacea-core/x/token/types"
 )
 
 const Name = "panacea"
@@ -139,9 +143,9 @@ var (
 		evidence.AppModuleBasic{},
 		transfer.AppModuleBasic{},
 		vesting.AppModuleBasic{},
-		panacea.AppModuleBasic{},
 		// this line is used by starport scaffolding # stargate/app/moduleBasic
 		did.AppModuleBasic{},
+		token.AppModuleBasic{},
 		burn.AppModuleBasic{},
 	)
 
@@ -209,10 +213,11 @@ type App struct {
 	ScopedIBCKeeper      capabilitykeeper.ScopedKeeper
 	ScopedTransferKeeper capabilitykeeper.ScopedKeeper
 
-	panaceaKeeper panaceakeeper.Keeper
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 	didKeeper  didkeeper.Keeper
 	burnKeeper burnkeeper.Keeper
+
+	tokenKeeper tokenkeeper.Keeper
 
 	// the module manager
 	mm *module.Manager
@@ -223,7 +228,7 @@ type App struct {
 func New(
 	logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bool, skipUpgradeHeights map[int64]bool,
 	homePath string, invCheckPeriod uint, encodingConfig appparams.EncodingConfig,
-// this line is used by starport scaffolding # stargate/app/newArgument
+	// this line is used by starport scaffolding # stargate/app/newArgument
 	appOpts servertypes.AppOptions, baseAppOptions ...func(*baseapp.BaseApp),
 ) *App {
 
@@ -241,9 +246,9 @@ func New(
 		minttypes.StoreKey, distrtypes.StoreKey, slashingtypes.StoreKey,
 		govtypes.StoreKey, paramstypes.StoreKey, ibchost.StoreKey, upgradetypes.StoreKey,
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
-		panaceatypes.StoreKey,
 		// this line is used by starport scaffolding # stargate/app/storeKey
 		didtypes.StoreKey,
+		tokentypes.StoreKey,
 		burntypes.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
@@ -334,10 +339,6 @@ func New(
 	// If evidence needs to be handled for the app, set routes in router here and seal
 	app.EvidenceKeeper = *evidenceKeeper
 
-	app.panaceaKeeper = *panaceakeeper.NewKeeper(
-		appCodec, keys[panaceatypes.StoreKey], keys[panaceatypes.MemStoreKey],
-	)
-
 	// this line is used by starport scaffolding # stargate/app/keeperDefinition
 	app.didKeeper = *didkeeper.NewKeeper(
 		appCodec,
@@ -347,6 +348,14 @@ func New(
 	app.burnKeeper = *burnkeeper.NewKeeper(
 		app.BankKeeper,
 	)
+
+	app.tokenKeeper = *tokenkeeper.NewKeeper(
+		appCodec,
+		keys[tokentypes.StoreKey],
+		keys[tokentypes.MemStoreKey],
+		app.BankKeeper,
+	)
+	tokenModule := token.NewAppModule(appCodec, app.tokenKeeper)
 
 	app.GovKeeper = govkeeper.NewKeeper(
 		appCodec, keys[govtypes.StoreKey], app.GetSubspace(govtypes.ModuleName), app.AccountKeeper, app.BankKeeper,
@@ -388,9 +397,9 @@ func New(
 		ibc.NewAppModule(app.IBCKeeper),
 		params.NewAppModule(app.ParamsKeeper),
 		transferModule,
-		panacea.NewAppModule(appCodec, app.panaceaKeeper),
 		// this line is used by starport scaffolding # stargate/app/appModule
 		did.NewAppModule(appCodec, app.didKeeper),
+		tokenModule,
 		burn.NewAppModule(appCodec, app.burnKeeper),
 	)
 
@@ -424,9 +433,9 @@ func New(
 		genutiltypes.ModuleName,
 		evidencetypes.ModuleName,
 		ibctransfertypes.ModuleName,
-		panaceatypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/initGenesis
 		didtypes.ModuleName,
+		tokentypes.ModuleName,
 		burntypes.ModuleName,
 	)
 
@@ -574,6 +583,11 @@ func (app *App) RegisterAPIRoutes(apiSvr *api.Server, apiConfig config.APIConfig
 	// Register legacy and grpc-gateway routes for all modules.
 	ModuleBasics.RegisterRESTRoutes(clientCtx, apiSvr.Router)
 	ModuleBasics.RegisterGRPCGatewayRoutes(clientCtx, apiSvr.GRPCGatewayRouter)
+
+	// register swagger API from root so that other applications can override easily
+	if apiConfig.Swagger {
+		RegisterSwaggerAPI(apiSvr.Router)
+	}
 }
 
 // RegisterTxService implements the Application.RegisterTxService method.
@@ -584,6 +598,17 @@ func (app *App) RegisterTxService(clientCtx client.Context) {
 // RegisterTendermintService implements the Application.RegisterTendermintService method.
 func (app *App) RegisterTendermintService(clientCtx client.Context) {
 	tmservice.RegisterTendermintService(app.BaseApp.GRPCQueryRouter(), clientCtx, app.interfaceRegistry)
+}
+
+// RegisterSwaggerAPI registers swagger route with API Server
+func RegisterSwaggerAPI(rtr *mux.Router) {
+	statikFS, err := fs.New()
+	if err != nil {
+		panic(err)
+	}
+
+	staticServer := http.FileServer(statikFS)
+	rtr.PathPrefix("/swagger/").Handler(http.StripPrefix("/swagger/", staticServer))
 }
 
 // GetMaccPerms returns a copy of the module account permissions
@@ -611,6 +636,7 @@ func initParamsKeeper(appCodec codec.BinaryMarshaler, legacyAmino *codec.LegacyA
 	paramsKeeper.Subspace(ibchost.ModuleName)
 	// this line is used by starport scaffolding # stargate/app/paramSubspace
 	paramsKeeper.Subspace(didtypes.ModuleName)
+	paramsKeeper.Subspace(tokentypes.ModuleName)
 	paramsKeeper.Subspace(burntypes.ModuleName)
 
 	return paramsKeeper

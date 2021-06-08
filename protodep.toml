@@ -5,6 +5,7 @@ proto_outdir = "./third_party/proto"
     revision = "v0.42.4"
 
 [[dependencies]]
-    target = "github.com/cosmos/cosmos-sdk/proto/cosmos/base"
-    path = "cosmos/base"
+	# Although we don't need all Cosmos proto files to compile proto files in our `x/` directory,
+	# we should fetch all Cosmos proto files in order to generate a full Swagger doc from them.
+    target = "github.com/cosmos/cosmos-sdk/proto"
     revision = "v0.42.4"
