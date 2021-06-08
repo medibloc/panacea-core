@@ -1,51 +1,40 @@
 package types_test
 
 import (
+	"github.com/stretchr/testify/require"
 	"testing"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/stretchr/testify/suite"
-
-	"github.com/medibloc/panacea-core/types/testsuite"
 	"github.com/medibloc/panacea-core/x/did/internal/secp256k1util"
 	"github.com/medibloc/panacea-core/x/did/types"
 )
 
-type messageTestSuite struct {
-	testsuite.TestSuite
-}
-
-func TestMessageTestSuite(t *testing.T) {
-	sdk.GetConfig().SetBech32PrefixForAccount("panacea", "panaceapub")
-	suite.Run(t, new(messageTestSuite))
-}
-
-func (suite messageTestSuite) TestMsgCreateDID() {
+func TestMsgCreateDID(t *testing.T) {
 	doc := newDIDDocument()
 	sig := []byte("my-sig")
-	fromAddr := getFromAddress(suite)
+	fromAddr := getFromAddress(t)
 
 	msg := types.NewMsgCreateDID(doc.ID, doc, doc.VerificationMethods[0].ID, sig, fromAddr.String())
-	suite.Require().Equal(doc.ID, msg.DID)
-	suite.Require().Equal(doc, *msg.Document)
-	suite.Require().Equal(doc.VerificationMethods[0].ID, msg.VerificationMethodID)
-	suite.Require().Equal(sig, msg.Signature)
-	suite.Require().Equal(fromAddr.String(), msg.FromAddress)
+	require.Equal(t, doc.ID, msg.DID)
+	require.Equal(t, doc, *msg.Document)
+	require.Equal(t, doc.VerificationMethods[0].ID, msg.VerificationMethodID)
+	require.Equal(t, sig, msg.Signature)
+	require.Equal(t, fromAddr.String(), msg.FromAddress)
 
-	suite.Require().Equal(types.RouterKey, msg.Route())
-	suite.Require().Equal("create_did", msg.Type())
-	suite.Require().Nil(msg.ValidateBasic())
-	suite.Require().Equal(1, len(msg.GetSigners()))
-	suite.Require().Equal(fromAddr, msg.GetSigners()[0])
+	require.Equal(t, types.RouterKey, msg.Route())
+	require.Equal(t, "create_did", msg.Type())
+	require.Nil(t, msg.ValidateBasic())
+	require.Equal(t, 1, len(msg.GetSigners()))
+	require.Equal(t, fromAddr, msg.GetSigners()[0])
 
-	suite.Require().Equal(`{"did":"did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm","document":{"@context":"https://www.w3.org/ns/did/v1","assertionMethod":[{"controller":"did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm","id":"did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm#key2","publicKeyBase58":"qoRmLNBEXoaKDE8dKffMq2DBNxacTEfvbKRuFrccYW1b","type":"EcdsaSecp256k1VerificationKey2019"}],"authentication":["did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm#key1"],"id":"did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm","service":[{"id":"service1","serviceEndpoint":"https://example.org","type":"LinkedDomains"}],"verificationMethod":[{"controller":"did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm","id":"did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm#key1","publicKeyBase58":"qoRmLNBEXoaKDE8dKffMq2DBNxacTEfvbKRuFrccYW1b","type":"EcdsaSecp256k1VerificationKey2019"}]},"from_address":"panacea154p6kyu9kqgvcmq63w3vpn893ssy6anpu8ykfq","signature":"bXktc2ln","verification_method_id":"did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm#key1"}`,
+	require.Equal(t, `{"did":"did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm","document":{"@context":"https://www.w3.org/ns/did/v1","assertionMethod":[{"controller":"did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm","id":"did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm#key2","publicKeyBase58":"qoRmLNBEXoaKDE8dKffMq2DBNxacTEfvbKRuFrccYW1b","type":"EcdsaSecp256k1VerificationKey2019"}],"authentication":["did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm#key1"],"id":"did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm","service":[{"id":"service1","serviceEndpoint":"https://example.org","type":"LinkedDomains"}],"verificationMethod":[{"controller":"did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm","id":"did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm#key1","publicKeyBase58":"qoRmLNBEXoaKDE8dKffMq2DBNxacTEfvbKRuFrccYW1b","type":"EcdsaSecp256k1VerificationKey2019"}]},"from_address":"panacea154p6kyu9kqgvcmq63w3vpn893ssy6anpu8ykfq","signature":"bXktc2ln","verification_method_id":"did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm#key1"}`,
 		string(msg.GetSignBytes()),
 	)
 }
 
-func getFromAddress(suite messageTestSuite) sdk.AccAddress {
+func getFromAddress(t *testing.T) sdk.AccAddress {
 	fromAddr, err := sdk.AccAddressFromBech32("panacea154p6kyu9kqgvcmq63w3vpn893ssy6anpu8ykfq")
-	suite.Require().NoError(err)
+	require.NoError(t, err)
 	return fromAddr
 }
 

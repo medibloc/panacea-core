@@ -21,7 +21,7 @@ func (m msgServer) CreateDID(goCtx context.Context, msg *types.MsgCreateDID) (*t
 	}
 
 	seq := types.InitialSequence
-	_, err := verifyDIDOwnership(msg.Document, seq, msg.Document, msg.VerificationMethodID, msg.Signature)
+	_, err := VerifyDIDOwnership(msg.Document, seq, msg.Document, msg.VerificationMethodID, msg.Signature)
 	if err != nil {
 		return nil, err
 	}
@@ -43,7 +43,7 @@ func (m msgServer) UpdateDID(goCtx context.Context, msg *types.MsgUpdateDID) (*t
 		return nil, sdkerrors.Wrapf(types.ErrDIDDeactivated, "DID: %s", msg.DID)
 	}
 
-	newSeq, err := verifyDIDOwnership(msg.Document, docWithSeq.Seq, docWithSeq.Document, msg.VerificationMethodID, msg.Signature)
+	newSeq, err := VerifyDIDOwnership(msg.Document, docWithSeq.Seq, docWithSeq.Document, msg.VerificationMethodID, msg.Signature)
 	if err != nil {
 		return nil, err
 	}
@@ -66,7 +66,7 @@ func (m msgServer) DeactivateDID(goCtx context.Context, msg *types.MsgDeactivate
 	}
 
 	signableDID := types.SignableDID(msg.DID)
-	newSeq, err := verifyDIDOwnership(signableDID, docWithSeq.Seq, docWithSeq.Document, msg.VerificationMethodID, msg.Signature)
+	newSeq, err := VerifyDIDOwnership(signableDID, docWithSeq.Seq, docWithSeq.Document, msg.VerificationMethodID, msg.Signature)
 	if err != nil {
 		return nil, err
 	}
@@ -76,7 +76,7 @@ func (m msgServer) DeactivateDID(goCtx context.Context, msg *types.MsgDeactivate
 
 }
 
-func verifyDIDOwnership(data types.Signable, seq uint64, doc *types.DIDDocument, verificationMethodID string, sig []byte) (uint64, error) {
+func VerifyDIDOwnership(data types.Signable, seq uint64, doc *types.DIDDocument, verificationMethodID string, sig []byte) (uint64, error) {
 	verificationMethod, ok := doc.VerificationMethodFrom(doc.Authentications, verificationMethodID)
 	if !ok {
 		return 0, sdkerrors.Wrapf(types.ErrVerificationMethodIDNotFound, "VerificationMethodId: %s", verificationMethodID)

@@ -1,57 +1,49 @@
 package types
 
 import (
+	"github.com/stretchr/testify/require"
 	"testing"
 
-	"github.com/stretchr/testify/suite"
 	"github.com/tendermint/tendermint/crypto/secp256k1"
 )
 
-type authTestSuite struct {
-	suite.Suite
-}
-
-func TestAuthTestSuite(t *testing.T) {
-	suite.Run(t, new(authTestSuite))
-}
-
-func (suite *authTestSuite) TestMustGetSignBytesWithSeq() {
+func TestMustGetSignBytesWithSeq(t *testing.T) {
 	did := "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm"
 	signableDID := SignableDID(did)
 	signBytes := mustGetSignBytesWithSeq(signableDID, 100)
-	suite.Require().NotNil(signBytes)
+	require.NotNil(t, signBytes)
 
 	var obj dataWithSeq
-	suite.Require().NoError(ModuleCdc.Amino.UnmarshalJSON(signBytes, &obj))
-	suite.Require().Equal(ModuleCdc.Amino.MustMarshalJSON(signableDID), []byte(obj.Data))
-	suite.Require().Equal(uint64(100), obj.Seq)
+	require.NoError(t, ModuleCdc.Amino.UnmarshalJSON(signBytes, &obj))
+	require.Equal(t, ModuleCdc.Amino.MustMarshalJSON(signableDID), []byte(obj.Data))
+	require.Equal(t, uint64(100), obj.Seq)
 }
 
-func (suite *authTestSuite) TestSequence() {
+func TestSequence(t *testing.T) {
 	seq := InitialSequence
-	suite.Require().Equal(uint64(0), seq)
+	require.Equal(t, uint64(0), seq)
 
 	nextSeq := nextSequence(seq)
-	suite.Require().Equal(uint64(0), seq)
-	suite.Require().Equal(uint64(1), nextSeq)
+	require.Equal(t, uint64(0), seq)
+	require.Equal(t, uint64(1), nextSeq)
 }
 
-func (suite *authTestSuite) TestSignVerify() {
+func TestSignVerify(t *testing.T) {
 	did := "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm"
 	signableDID := SignableDID(did)
 	privKey := secp256k1.GenPrivKey()
 	seq := uint64(100)
 
 	sig, err := Sign(signableDID, seq, privKey)
-	suite.Require().NoError(err)
-	suite.Require().NotNil(sig)
+	require.NoError(t, err)
+	require.NotNil(t, sig)
 
 	newSeq, ok := Verify(sig, signableDID, seq, privKey.PubKey())
-	suite.Require().True(ok)
-	suite.Require().Equal(seq+1, newSeq)
+	require.True(t, ok)
+	require.Equal(t, seq+1, newSeq)
 }
 
-func (suite *authTestSuite) TestSignVerify_doInvalid() {
+func TestSignVerify_doInvalid(t *testing.T) {
 	did := "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm"
 	signableDID := SignableDID(did)
 	privKey := secp256k1.GenPrivKey()
@@ -59,10 +51,10 @@ func (suite *authTestSuite) TestSignVerify_doInvalid() {
 	seq := uint64(100)
 
 	sig, err := Sign(signableDID, seq, privKey)
-	suite.Require().NoError(err)
-	suite.Require().NotNil(sig)
+	require.NoError(t, err)
+	require.NotNil(t, sig)
 
 	newSeq, ok := Verify(sig, signableDID, seq, anotherPrivKey.PubKey())
-	suite.Require().Equal(false, ok)
-	suite.Require().Equal(uint64(0), newSeq)
+	require.Equal(t, false, ok)
+	require.Equal(t, uint64(0), newSeq)
 }
