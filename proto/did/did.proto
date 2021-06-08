@@ -1,0 +1,46 @@
+syntax = "proto3";
+package medibloc.panaceacore.did;
+
+option go_package = "github.com/medibloc/panacea-core/x/did/types";
+
+import "gogoproto/gogo.proto";
+
+message Strings {
+  repeated string values = 1;
+}
+
+message DIDDocument {
+  Strings contexts = 1 [json_name = "@context", (gogoproto.jsontag) = "@context", (gogoproto.customtype) = "JSONStringOrStrings"];
+  string ID = 2 [json_name = "id", (gogoproto.jsontag) = "id"];
+  Strings controller = 3 [(gogoproto.customtype) = "JSONStringOrStrings"];
+  repeated VerificationMethod verificationMethods = 4 [json_name = "verificationMethod", (gogoproto.jsontag) = "verificationMethod,omitempty"];
+  repeated VerificationRelationship authentications = 5 [json_name = "authentication", (gogoproto.jsontag) = "authentication,omitempty"];
+  repeated VerificationRelationship assertionMethods = 6 [json_name = "assertionMethod", (gogoproto.jsontag) = "assertionMethod,omitempty"];
+  repeated VerificationRelationship keyAgreements = 7 [json_name = "keyAgreement", (gogoproto.jsontag) = "keyAgreement,omitempty"];
+  repeated VerificationRelationship capabilityInvocations = 8 [json_name = "capabilityInvocation", (gogoproto.jsontag) = "capabilityInvocation,omitempty"];
+  repeated VerificationRelationship capabilityDelegations = 9 [json_name = "capabilityDelegation", (gogoproto.jsontag) = "capabilityDelegation,omitempty"];
+  repeated Service services = 10 [json_name = "service", (gogoproto.jsontag) = "service,omitempty"];
+}
+
+message VerificationMethod {
+  string ID = 1 [json_name = "id", (gogoproto.jsontag) = "id"];
+  string type = 2;
+  string controller = 3;
+  string pubKeyBase58 = 4 [json_name = "publicKeyBase58", (gogoproto.jsontag) = "publicKeyBase58"];
+}
+
+message VerificationRelationship {
+  string verificationMethodID = 1;
+  VerificationMethod dedicatedVerificationMethod = 2;
+}
+
+message Service {
+  string ID = 1 [json_name = "id", (gogoproto.jsontag) = "id"];
+  string type = 2;
+  string serviceEndpoint = 3;
+}
+
+message DIDDocumentWithSeq {
+  DIDDocument document = 1;
+  uint64 seq = 2 [json_name = "sequence", (gogoproto.jsontag) = "sequence"];
+}

@@ -87,6 +87,10 @@ import (
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 
 	_ "github.com/medibloc/panacea-core/client/docs/statik"
+	// this line is used by starport scaffolding # stargate/app/moduleImport
+	"github.com/medibloc/panacea-core/x/did"
+	didkeeper "github.com/medibloc/panacea-core/x/did/keeper"
+	didtypes "github.com/medibloc/panacea-core/x/did/types"
 
 	"github.com/medibloc/panacea-core/x/burn"
 	burnkeeper "github.com/medibloc/panacea-core/x/burn/keeper"
@@ -139,6 +143,8 @@ var (
 		evidence.AppModuleBasic{},
 		transfer.AppModuleBasic{},
 		vesting.AppModuleBasic{},
+		// this line is used by starport scaffolding # stargate/app/moduleBasic
+		did.AppModuleBasic{},
 		token.AppModuleBasic{},
 		burn.AppModuleBasic{},
 	)
@@ -201,12 +207,14 @@ type App struct {
 	IBCKeeper        *ibckeeper.Keeper // IBC Keeper must be a pointer in the app, so we can SetRouter on it correctly
 	EvidenceKeeper   evidencekeeper.Keeper
 	TransferKeeper   ibctransferkeeper.Keeper
+	BurnKeeper       burnkeeper.Keeper
 
 	// make scoped keepers public for test purposes
 	ScopedIBCKeeper      capabilitykeeper.ScopedKeeper
 	ScopedTransferKeeper capabilitykeeper.ScopedKeeper
 
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
+	didKeeper  didkeeper.Keeper
 	burnKeeper burnkeeper.Keeper
 
 	tokenKeeper tokenkeeper.Keeper
@@ -238,6 +246,8 @@ func New(
 		minttypes.StoreKey, distrtypes.StoreKey, slashingtypes.StoreKey,
 		govtypes.StoreKey, paramstypes.StoreKey, ibchost.StoreKey, upgradetypes.StoreKey,
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
+		// this line is used by starport scaffolding # stargate/app/storeKey
+		didtypes.StoreKey,
 		tokentypes.StoreKey,
 		burntypes.StoreKey,
 	)
@@ -330,6 +340,11 @@ func New(
 	app.EvidenceKeeper = *evidenceKeeper
 
 	// this line is used by starport scaffolding # stargate/app/keeperDefinition
+	app.didKeeper = *didkeeper.NewKeeper(
+		appCodec,
+		keys[didtypes.StoreKey],
+		keys[didtypes.MemStoreKey],
+	)
 	app.burnKeeper = *burnkeeper.NewKeeper(
 		app.BankKeeper,
 	)
@@ -382,6 +397,8 @@ func New(
 		ibc.NewAppModule(app.IBCKeeper),
 		params.NewAppModule(app.ParamsKeeper),
 		transferModule,
+		// this line is used by starport scaffolding # stargate/app/appModule
+		did.NewAppModule(appCodec, app.didKeeper),
 		tokenModule,
 		burn.NewAppModule(appCodec, app.burnKeeper),
 	)
@@ -416,6 +433,8 @@ func New(
 		genutiltypes.ModuleName,
 		evidencetypes.ModuleName,
 		ibctransfertypes.ModuleName,
+		// this line is used by starport scaffolding # stargate/app/initGenesis
+		didtypes.ModuleName,
 		tokentypes.ModuleName,
 		burntypes.ModuleName,
 	)
@@ -615,6 +634,8 @@ func initParamsKeeper(appCodec codec.BinaryMarshaler, legacyAmino *codec.LegacyA
 	paramsKeeper.Subspace(crisistypes.ModuleName)
 	paramsKeeper.Subspace(ibctransfertypes.ModuleName)
 	paramsKeeper.Subspace(ibchost.ModuleName)
+	// this line is used by starport scaffolding # stargate/app/paramSubspace
+	paramsKeeper.Subspace(didtypes.ModuleName)
 	paramsKeeper.Subspace(tokentypes.ModuleName)
 	paramsKeeper.Subspace(burntypes.ModuleName)
 

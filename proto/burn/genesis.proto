@@ -1,0 +1,8 @@
+syntax = "proto3";
+package medibloc.panaceacore.burn;
+
+option go_package = "github.com/medibloc/panacea-core/x/burn/types";
+
+// GenesisState defines the burn module's genesis state.
+message GenesisState {
+}
