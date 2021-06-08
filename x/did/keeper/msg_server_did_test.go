@@ -1,17 +1,24 @@
 package keeper_test
 
 import (
+	"testing"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/medibloc/panacea-core/types/testsuite"
 	"github.com/medibloc/panacea-core/x/did/internal/secp256k1util"
 	didkeeper "github.com/medibloc/panacea-core/x/did/keeper"
 	"github.com/medibloc/panacea-core/x/did/types"
+	"github.com/stretchr/testify/suite"
 	"github.com/tendermint/tendermint/crypto"
 	"github.com/tendermint/tendermint/crypto/secp256k1"
 )
 
 type msgServerTestSuite struct {
 	testsuite.TestSuite
+}
+
+func TestMsgServerTestSuite(t *testing.T) {
+	suite.Run(t, new(msgServerTestSuite))
 }
 
 func (suite msgServerTestSuite) TestHandleMsgCreateDID() {
