@@ -28,6 +28,7 @@ import (
 
 const (
 	flagInteractive = "interactive"
+	baseDir         = "did_keystore"
 )
 
 func CmdCreateDID() *cobra.Command {
@@ -204,7 +205,7 @@ func readBIP39ParamsFrom(interactive bool, reader *bufio.Reader) (string, string
 }
 
 func keystoreBaseDir() string {
-	return filepath.Join(viper.GetString(cli.HomeFlag), "did_keystore")
+	return filepath.Join(viper.GetString(cli.HomeFlag), baseDir)
 }
 
 // savePrivKeyToKeyStore saves a privKey using a password which is read from the reader.

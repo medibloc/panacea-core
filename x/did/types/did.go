@@ -22,7 +22,7 @@ const (
 type JSONStringOrStrings []string
 
 func EmptyDIDs(strings []string) bool {
-	if strings == nil || len(strings) == 0 {
+	if len(strings) == 0 {
 		return true
 	}
 
@@ -86,7 +86,7 @@ func (strings JSONStringOrStrings) MarshalJSON() ([]byte, error) {
 	if len(strings) == 1 { // if only one, treat it as a single string
 		return json.Marshal(strings[0])
 	}
-	return json.Marshal(strings) // if not, as a list
+	return json.Marshal([]string(strings)) // if not, as a list
 }
 
 func (strings *JSONStringOrStrings) UnmarshalJSON(data []byte) error {
@@ -139,7 +139,7 @@ func ValidateDID(did string) bool {
 }
 
 func ValidateContexts(contexts []string) bool {
-	if contexts == nil || len(contexts) == 0 || contexts[0] != ContextDIDV1 { // the 1st one must be ContextDIDV1
+	if len(contexts) == 0 || contexts[0] != ContextDIDV1 { // the 1st one must be ContextDIDV1
 		return false
 	}
 
@@ -349,7 +349,7 @@ func ParseVerificationMethodID(id string, did string) (string, error) {
 }
 
 const (
-	maxVerificationMethodIDLen = 128
+	MaxVerificationMethodIDLen = 128
 )
 
 func ValidateVerificationMethodID(verificationMethodID string, did string) bool {
@@ -360,7 +360,7 @@ func ValidateVerificationMethodID(verificationMethodID string, did string) bool 
 
 	// Limit the length because it can be used for keystore filenames.
 	// Max filename length on Linux is usually 256 bytes.
-	if len(verificationMethodID)-len(prefix) > maxVerificationMethodIDLen {
+	if len(verificationMethodID)-len(prefix) > MaxVerificationMethodIDLen {
 		return false
 	}
 
