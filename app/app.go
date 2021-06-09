@@ -87,14 +87,16 @@ import (
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 
 	_ "github.com/medibloc/panacea-core/client/docs/statik"
-	// this line is used by starport scaffolding # stargate/app/moduleImport
-	"github.com/medibloc/panacea-core/x/did"
-	didkeeper "github.com/medibloc/panacea-core/x/did/keeper"
-	didtypes "github.com/medibloc/panacea-core/x/did/types"
 
+	"github.com/medibloc/panacea-core/x/aol"
+	aolkeeper "github.com/medibloc/panacea-core/x/aol/keeper"
+	aoltypes "github.com/medibloc/panacea-core/x/aol/types"
 	"github.com/medibloc/panacea-core/x/burn"
 	burnkeeper "github.com/medibloc/panacea-core/x/burn/keeper"
 	burntypes "github.com/medibloc/panacea-core/x/burn/types"
+	"github.com/medibloc/panacea-core/x/did"
+	didkeeper "github.com/medibloc/panacea-core/x/did/keeper"
+	didtypes "github.com/medibloc/panacea-core/x/did/types"
 	"github.com/medibloc/panacea-core/x/token"
 	tokenkeeper "github.com/medibloc/panacea-core/x/token/keeper"
 	tokentypes "github.com/medibloc/panacea-core/x/token/types"
@@ -143,7 +145,7 @@ var (
 		evidence.AppModuleBasic{},
 		transfer.AppModuleBasic{},
 		vesting.AppModuleBasic{},
-		// this line is used by starport scaffolding # stargate/app/moduleBasic
+		aol.AppModuleBasic{},
 		did.AppModuleBasic{},
 		token.AppModuleBasic{},
 		burn.AppModuleBasic{},
@@ -207,16 +209,14 @@ type App struct {
 	IBCKeeper        *ibckeeper.Keeper // IBC Keeper must be a pointer in the app, so we can SetRouter on it correctly
 	EvidenceKeeper   evidencekeeper.Keeper
 	TransferKeeper   ibctransferkeeper.Keeper
-	BurnKeeper       burnkeeper.Keeper
 
 	// make scoped keepers public for test purposes
 	ScopedIBCKeeper      capabilitykeeper.ScopedKeeper
 	ScopedTransferKeeper capabilitykeeper.ScopedKeeper
 
-	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
-	didKeeper  didkeeper.Keeper
-	burnKeeper burnkeeper.Keeper
-
+	aolKeeper   aolkeeper.Keeper
+	didKeeper   didkeeper.Keeper
+	burnKeeper  burnkeeper.Keeper
 	tokenKeeper tokenkeeper.Keeper
 
 	// the module manager
@@ -228,7 +228,6 @@ type App struct {
 func New(
 	logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bool, skipUpgradeHeights map[int64]bool,
 	homePath string, invCheckPeriod uint, encodingConfig appparams.EncodingConfig,
-	// this line is used by starport scaffolding # stargate/app/newArgument
 	appOpts servertypes.AppOptions, baseAppOptions ...func(*baseapp.BaseApp),
 ) *App {
 
@@ -246,7 +245,7 @@ func New(
 		minttypes.StoreKey, distrtypes.StoreKey, slashingtypes.StoreKey,
 		govtypes.StoreKey, paramstypes.StoreKey, ibchost.StoreKey, upgradetypes.StoreKey,
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
-		// this line is used by starport scaffolding # stargate/app/storeKey
+		aoltypes.StoreKey,
 		didtypes.StoreKey,
 		tokentypes.StoreKey,
 		burntypes.StoreKey,
@@ -339,12 +338,18 @@ func New(
 	// If evidence needs to be handled for the app, set routes in router here and seal
 	app.EvidenceKeeper = *evidenceKeeper
 
-	// this line is used by starport scaffolding # stargate/app/keeperDefinition
+	app.aolKeeper = *aolkeeper.NewKeeper(
+		appCodec,
+		keys[aoltypes.StoreKey],
+		keys[aoltypes.MemStoreKey],
+	)
+
 	app.didKeeper = *didkeeper.NewKeeper(
 		appCodec,
 		keys[didtypes.StoreKey],
 		keys[didtypes.MemStoreKey],
 	)
+
 	app.burnKeeper = *burnkeeper.NewKeeper(
 		app.BankKeeper,
 	)
@@ -355,7 +360,6 @@ func New(
 		keys[tokentypes.MemStoreKey],
 		app.BankKeeper,
 	)
-	tokenModule := token.NewAppModule(appCodec, app.tokenKeeper)
 
 	app.GovKeeper = govkeeper.NewKeeper(
 		appCodec, keys[govtypes.StoreKey], app.GetSubspace(govtypes.ModuleName), app.AccountKeeper, app.BankKeeper,
@@ -397,9 +401,9 @@ func New(
 		ibc.NewAppModule(app.IBCKeeper),
 		params.NewAppModule(app.ParamsKeeper),
 		transferModule,
-		// this line is used by starport scaffolding # stargate/app/appModule
+		aol.NewAppModule(appCodec, app.aolKeeper),
 		did.NewAppModule(appCodec, app.didKeeper),
-		tokenModule,
+		token.NewAppModule(appCodec, app.tokenKeeper),
 		burn.NewAppModule(appCodec, app.burnKeeper),
 	)
 
@@ -433,7 +437,7 @@ func New(
 		genutiltypes.ModuleName,
 		evidencetypes.ModuleName,
 		ibctransfertypes.ModuleName,
-		// this line is used by starport scaffolding # stargate/app/initGenesis
+		aoltypes.ModuleName,
 		didtypes.ModuleName,
 		tokentypes.ModuleName,
 		burntypes.ModuleName,
@@ -634,7 +638,7 @@ func initParamsKeeper(appCodec codec.BinaryMarshaler, legacyAmino *codec.LegacyA
 	paramsKeeper.Subspace(crisistypes.ModuleName)
 	paramsKeeper.Subspace(ibctransfertypes.ModuleName)
 	paramsKeeper.Subspace(ibchost.ModuleName)
-	// this line is used by starport scaffolding # stargate/app/paramSubspace
+	paramsKeeper.Subspace(aoltypes.ModuleName)
 	paramsKeeper.Subspace(didtypes.ModuleName)
 	paramsKeeper.Subspace(tokentypes.ModuleName)
 	paramsKeeper.Subspace(burntypes.ModuleName)
