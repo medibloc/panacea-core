@@ -124,12 +124,7 @@ func EncodeToString(key CompositeKey, separator string) string {
 // DecodeFromString decodes a string into a CompositeKey.
 // Use a separator that was used when encoding.
 func DecodeFromString(encoded string, separator string, out CompositeKey) error {
-	elems := strings.Split(encoded, separator)
-	values := make([]string, 0, len(elems))
-	for _, elem := range elems {
-		values = append(values, elem)
-	}
-
+	values := strings.Split(encoded, separator)
 	return out.FromStrings(values)
 }
 

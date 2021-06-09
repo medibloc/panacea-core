@@ -38,8 +38,6 @@ const (
 	TopicKey  = "Topic-value-"
 	WriterKey = "Writer-value-"
 	RecordKey = "Record-value-"
-
-	compositeKeySeparator = "/"
 )
 
 var (
