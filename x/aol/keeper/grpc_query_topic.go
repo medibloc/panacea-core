@@ -48,7 +48,7 @@ func (k Keeper) Topics(c context.Context, req *types.QueryListTopicsRequest) (*t
 	}
 	compKeyPrefix, err := compkey.PartialEncode(&types.TopicCompositeKey{OwnerAddress: ownerAddr, TopicName: ""}, 1)
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "fail to encode topic key")
+		return nil, status.Errorf(codes.Internal, "fail to encode topic key: %v", err.Error())
 	}
 
 	store := ctx.KVStore(k.storeKey)
