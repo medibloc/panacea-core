@@ -720,15 +720,15 @@ func RegisterQueryHandlerClient(ctx context.Context, mux *runtime.ServeMux, clie
 }
 
 var (
-	pattern_Query_Topic_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4}, []string{"panacea", "aol", "topic", "ownerAddress", "topicName"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_Topic_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6}, []string{"panacea", "aol", "v2", "owners", "ownerAddress", "topics", "topicName"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_Topics_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"panacea", "aol", "topic", "ownerAddress"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_Topics_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5}, []string{"panacea", "aol", "v2", "owners", "ownerAddress", "topics"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_Writer_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5}, []string{"panacea", "aol", "writer", "ownerAddress", "topicName", "writerAddress"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_Writer_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6, 2, 7, 1, 0, 4, 1, 5, 8}, []string{"panacea", "aol", "v2", "owners", "ownerAddress", "topics", "topicName", "writers", "writerAddress"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_Writers_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4}, []string{"panacea", "aol", "writer", "ownerAddress", "topicName"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_Writers_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6, 2, 7}, []string{"panacea", "aol", "v2", "owners", "ownerAddress", "topics", "topicName", "writers"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_Record_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5}, []string{"panacea", "aol", "record", "ownerAddress", "topicName", "offset"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_Record_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6, 2, 7, 1, 0, 4, 1, 5, 8}, []string{"panacea", "aol", "v2", "owners", "ownerAddress", "topics", "topicName", "records", "offset"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (

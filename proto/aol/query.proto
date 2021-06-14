@@ -14,23 +14,23 @@ option go_package = "github.com/medibloc/panacea-core/x/aol/types";
 // Query defines the gRPC querier service.
 service Query {
 	rpc Topic(QueryGetTopicRequest) returns (QueryGetTopicResponse) {
-		option (google.api.http).get = "/panacea/aol/topic/{ownerAddress}/{topicName}";
+		option (google.api.http).get = "/panacea/aol/v2/owners/{ownerAddress}/topics/{topicName}";
 	}
 
 	rpc Topics(QueryListTopicsRequest) returns (QueryListTopicsResponse) {
-		option (google.api.http).get = "/panacea/aol/topic/{ownerAddress}";
+		option (google.api.http).get = "/panacea/aol/v2/owners/{ownerAddress}/topics";
 	}
 
 	rpc Writer(QueryGetWriterRequest) returns (QueryGetWriterResponse) {
-		option (google.api.http).get = "/panacea/aol/writer/{ownerAddress}/{topicName}/{writerAddress}";
+		option (google.api.http).get = "/panacea/aol/v2/owners/{ownerAddress}/topics/{topicName}/writers/{writerAddress}";
 	}
 
 	rpc Writers(QueryListWritersRequest) returns (QueryListWritersResponse) {
-		option (google.api.http).get = "/panacea/aol/writer/{ownerAddress}/{topicName}";
+		option (google.api.http).get = "/panacea/aol/v2/owners/{ownerAddress}/topics/{topicName}/writers";
 	}
 
 	rpc Record(QueryGetRecordRequest) returns (QueryGetRecordResponse) {
-		option (google.api.http).get = "/panacea/aol/record/{ownerAddress}/{topicName}/{offset}";
+		option (google.api.http).get = "/panacea/aol/v2/owners/{ownerAddress}/topics/{topicName}/records/{offset}";
 	}
 }
 
