@@ -1,5 +1,5 @@
 syntax = "proto3";
-package medibloc.panaceacore.aol;
+package panacea.aol.v2;
 
 // this line is used by starport scaffolding # proto/tx/import
 

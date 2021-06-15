@@ -1,10 +1,10 @@
 syntax = "proto3";
-package medibloc.panaceacore.did;
+package panacea.did.v2;
 
 import "google/api/annotations.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";
 // this line is used by starport scaffolding # 1
-import "did/did.proto";
+import "did/v2/did.proto";
 
 option go_package = "github.com/medibloc/panacea-core/x/did/types";
 

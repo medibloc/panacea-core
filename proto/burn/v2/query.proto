@@ -1,5 +1,5 @@
 syntax = "proto3";
-package medibloc.panaceacore.burn;
+package panacea.burn.v2;
 
 import "google/api/annotations.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";

@@ -1,11 +1,11 @@
 syntax = "proto3";
-package medibloc.panaceacore.aol;
+package panacea.aol.v2;
 
 // this line is used by starport scaffolding # genesis/proto/import
-import "aol/owner.proto";
-import "aol/record.proto";
-import "aol/writer.proto";
-import "aol/topic.proto";
+import "aol/v2/owner.proto";
+import "aol/v2/record.proto";
+import "aol/v2/writer.proto";
+import "aol/v2/topic.proto";
 
 option go_package = "github.com/medibloc/panacea-core/x/aol/types";
 
