@@ -1,10 +1,10 @@
 syntax = "proto3";
-package medibloc.panaceacore.token;
+package panacea.token.v2;
 
 import "google/api/annotations.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";
 // this line is used by starport scaffolding # 1
-import "token/token.proto";
+import "token/v2/token.proto";
 
 option go_package = "github.com/medibloc/panacea-core/x/token/types";
 

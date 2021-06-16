@@ -1,9 +1,9 @@
 syntax = "proto3";
-package medibloc.panaceacore.did;
+package panacea.did.v2;
 
 option go_package = "github.com/medibloc/panacea-core/x/did/types";
 
-import "did/did.proto";
+import "did/v2/did.proto";
 
 // GenesisState defines the did module's genesis state.
 message GenesisState {

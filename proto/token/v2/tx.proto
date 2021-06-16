@@ -1,5 +1,5 @@
 syntax = "proto3";
-package medibloc.panaceacore.token;
+package panacea.token.v2;
 
 import "gogoproto/gogo.proto";
 import "cosmos/base/v1beta1/coin.proto";
