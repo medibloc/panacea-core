@@ -27,7 +27,7 @@ func CmdAddWriter() *cobra.Command {
 			description := viper.GetString(flagDescription)
 			ownerAddress := clientCtx.GetFromAddress().String()
 
-			msg := types.NewMsgAddWriter(topicName, writerAddress, moniker, description, ownerAddress)
+			msg := types.NewMsgAddWriter(topicName, moniker, description, writerAddress, ownerAddress)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
