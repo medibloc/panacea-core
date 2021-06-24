@@ -65,8 +65,11 @@ func (m msgServer) DeactivateDID(goCtx context.Context, msg *types.MsgDeactivate
 		return nil, sdkerrors.Wrapf(types.ErrDIDDeactivated, "DID: %s", msg.DID)
 	}
 
-	signableDID := types.SignableDID(msg.DID)
-	newSeq, err := VerifyDIDOwnership(signableDID, docWithSeq.Seq, docWithSeq.Document, msg.VerificationMethodID, msg.Signature)
+	doc := types.DIDDocument{
+		ID: msg.DID,
+	}
+
+	newSeq, err := VerifyDIDOwnership(&doc, docWithSeq.Seq, docWithSeq.Document, msg.VerificationMethodID, msg.Signature)
 	if err != nil {
 		return nil, err
 	}
@@ -76,7 +79,7 @@ func (m msgServer) DeactivateDID(goCtx context.Context, msg *types.MsgDeactivate
 
 }
 
-func VerifyDIDOwnership(data types.Signable, seq uint64, doc *types.DIDDocument, verificationMethodID string, sig []byte) (uint64, error) {
+func VerifyDIDOwnership(signData *types.DIDDocument, seq uint64, doc *types.DIDDocument, verificationMethodID string, sig []byte) (uint64, error) {
 	verificationMethod, ok := doc.VerificationMethodFrom(doc.Authentications, verificationMethodID)
 	if !ok {
 		return 0, sdkerrors.Wrapf(types.ErrVerificationMethodIDNotFound, "VerificationMethodId: %s", verificationMethodID)
@@ -92,7 +95,7 @@ func VerifyDIDOwnership(data types.Signable, seq uint64, doc *types.DIDDocument,
 	if err != nil {
 		return 0, sdkerrors.Wrapf(types.ErrInvalidSecp256k1PublicKey, "PublicKey: %v", verificationMethod.PubKeyBase58)
 	}
-	newSeq, ok := types.Verify(sig, data, seq, pubKeySecp256k1)
+	newSeq, ok := types.Verify(sig, signData, seq, pubKeySecp256k1)
 	if !ok {
 		return 0, types.ErrSigVerificationFailed
 	}

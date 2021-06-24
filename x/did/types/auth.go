@@ -1,45 +1,43 @@
 package types
 
 import (
-	"encoding/json"
-
+	"fmt"
+	sdkcodec "github.com/cosmos/cosmos-sdk/codec"
 	"github.com/tendermint/tendermint/crypto"
-
-	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-// Signable is an interface for data which can be converted to a sign-able byte slice (deterministic).
-type Signable interface {
-	// Get the canonical byte representation of the data.
-	GetSignBytes() []byte
+func Sign(signableData sdkcodec.ProtoMarshaler, seq uint64, privKey crypto.PrivKey) ([]byte, error) {
+	return privKey.Sign(mustGetSignBytesWithSeq(signableData, seq))
 }
 
-func Sign(data Signable, seq uint64, privKey crypto.PrivKey) ([]byte, error) {
-	return privKey.Sign(mustGetSignBytesWithSeq(data, seq))
-}
+func Verify(signature []byte, signableData sdkcodec.ProtoMarshaler, seq uint64, pubKey crypto.PubKey) (uint64, bool) {
+	signBytes := mustGetSignBytesWithSeq(signableData, seq)
 
-func Verify(sig []byte, data Signable, seq uint64, pubKey crypto.PubKey) (uint64, bool) {
-	signBytes := mustGetSignBytesWithSeq(data, seq)
-	if !pubKey.VerifySignature(signBytes, sig) {
+	if !pubKey.VerifySignature(signBytes, signature) {
 		return 0, false
 	}
 	return nextSequence(seq), true
 }
 
-// dataWithSeq is a combination of Seq and any kind of Data.
-// The signing is done on this struct.
-type dataWithSeq struct {
-	Data json.RawMessage `json:"data"`
-	Seq  uint64          `json:"sequence"`
-}
-
 // mustGetSignBytesWithSeq returns a byte slice which is the combination of data and seq.
 // The return value is deterministic, so that it can be used for signing.
-func mustGetSignBytesWithSeq(data Signable, seq uint64) []byte {
-	return sdk.MustSortJSON(ModuleCdc.Amino.MustMarshalJSON(dataWithSeq{
-		Data: data.GetSignBytes(),
+func mustGetSignBytesWithSeq(signableData sdkcodec.ProtoMarshaler, seq uint64) []byte {
+	dAtA, err := signableData.Marshal()
+	if err != nil {
+		panic(fmt.Sprintf("marshal failed: %s, signableData: %s", err.Error(), signableData))
+	}
+	dataWithSeq := DataWithSeq{
+		Data: dAtA,
 		Seq:  seq,
-	}))
+	}
+
+	dAtA, err = dataWithSeq.Marshal()
+
+	if err != nil {
+		panic(fmt.Sprintf("marshal failed: %s, dataWithSeq: %v", err.Error(), dataWithSeq))
+	}
+
+	return dAtA
 }
 
 // Sequence is a preventative measure to distinguish replayed transactions (replay attack).
