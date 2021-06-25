@@ -7,15 +7,8 @@ import (
 	"github.com/tendermint/tendermint/crypto/secp256k1"
 	"testing"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/medibloc/panacea-core/x/did/types"
 )
-
-type any string
-
-func (a any) GetSignBytes() []byte {
-	return sdk.MustSortJSON(types.ModuleCdc.Amino.MustMarshalJSON(a))
-}
 
 func TestVerifyDIDOwnership(t *testing.T) {
 	did := "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm"
