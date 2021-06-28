@@ -13,8 +13,13 @@ import (
 	capabilitytypes "github.com/cosmos/cosmos-sdk/x/capability/types"
 	paramskeeper "github.com/cosmos/cosmos-sdk/x/params/keeper"
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
+	aolkeeper "github.com/medibloc/panacea-core/x/aol/keeper"
+	aoltypes "github.com/medibloc/panacea-core/x/aol/types"
 	burnkeeper "github.com/medibloc/panacea-core/x/burn/keeper"
+	tokenkeeper "github.com/medibloc/panacea-core/x/token/keeper"
+	tokentypes "github.com/medibloc/panacea-core/x/token/types"
 	"github.com/stretchr/testify/suite"
+	"github.com/tendermint/tendermint/crypto/secp256k1"
 	"github.com/tendermint/tendermint/libs/log"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 	"github.com/tendermint/tendermint/types/time"
@@ -31,19 +36,23 @@ type TestSuite struct {
 	Ctx sdk.Context
 
 	AccountKeeper authkeeper.AccountKeeper
+	AolKeeper     aolkeeper.Keeper
+	AolMsgServer  aoltypes.MsgServer
 	BankKeeper    bankkeeper.Keeper
 	BurnKeeper    burnkeeper.Keeper
 	DIDMsgServer  didtypes.MsgServer
 	DIDKeeper     didkeeper.Keeper
+	TokenKeeper   tokenkeeper.Keeper
 }
 
 func (suite *TestSuite) SetupTest() {
 	keyParams := sdk.NewKVStoreKeys(
+		aoltypes.StoreKey,
 		authtypes.StoreKey,
 		banktypes.StoreKey,
 		paramstypes.StoreKey,
-		didtypes.StoreKey)
-	/*didKeyParam := sdk.NewKVStoreKey(didtypes.StoreKey)*/
+		didtypes.StoreKey,
+		tokentypes.StoreKey)
 	tKeyParams := sdk.NewTransientStoreKey(paramstypes.TStoreKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
 
@@ -83,15 +92,21 @@ func (suite *TestSuite) SetupTest() {
 		paramsKeeper.Subspace(authtypes.ModuleName),
 		authtypes.ProtoBaseAccount,
 		maccPerms,
-		)
+	)
 	suite.AccountKeeper.SetParams(ctx, authtypes.DefaultParams())
+	suite.AolKeeper = *aolkeeper.NewKeeper(
+		cdc.Marshaler,
+		keyParams[aoltypes.StoreKey],
+		memKeys[aoltypes.MemStoreKey],
+	)
+	suite.AolMsgServer = aolkeeper.NewMsgServerImpl(suite.AolKeeper)
 	suite.BankKeeper = bankkeeper.NewBaseKeeper(
 		cdc.Marshaler,
 		keyParams[banktypes.StoreKey],
 		suite.AccountKeeper,
 		paramsKeeper.Subspace(banktypes.ModuleName),
 		modAccAddrs,
-		)
+	)
 	suite.BankKeeper.SetParams(ctx, banktypes.DefaultParams())
 	suite.BurnKeeper = *burnkeeper.NewKeeper(suite.BankKeeper)
 	suite.DIDKeeper = *didkeeper.NewKeeper(
@@ -100,6 +115,12 @@ func (suite *TestSuite) SetupTest() {
 		memKeys[didtypes.MemStoreKey],
 	)
 	suite.DIDMsgServer = didkeeper.NewMsgServerImpl(suite.DIDKeeper)
+	suite.TokenKeeper = *tokenkeeper.NewKeeper(
+		cdc.Marshaler,
+		keyParams[tokentypes.StoreKey],
+		memKeys[tokentypes.MemStoreKey],
+		suite.BankKeeper,
+	)
 }
 
 func (suite *TestSuite) BeforeTest(suiteName, testName string) {
@@ -125,4 +146,8 @@ func newTestCodec() params.EncodingConfig {
 		Amino:             cdc,
 	}
 
+}
+
+func (suite *TestSuite) GetAccAddress() sdk.AccAddress {
+	return sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address())
 }
