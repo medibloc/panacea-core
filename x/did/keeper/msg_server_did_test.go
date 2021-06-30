@@ -251,16 +251,16 @@ func (suite msgServerTestSuite) TestHandleMsgDeactivateDID_SigVerificationFailed
 	goContext := sdk.WrapSDKContext(suite.Ctx)
 
 	did, docWithSeq, privKey, verificationMethodID := suite.makeTestData()
+	doc := *docWithSeq.Document
 
-	createMsg := newMsgCreateDID(suite, *docWithSeq.Document, verificationMethodID, privKey)
+	createMsg := newMsgCreateDID(suite, doc, verificationMethodID, privKey)
 	createRes, err := didMsgServer.CreateDID(goContext, &createMsg)
 	suite.Require().NoError(err)
 	suite.Require().NotNil(createRes)
 	suite.Require().Equal(1, len(didKeeper.ListDIDs(suite.Ctx)))
 	suite.Require().Equal(docWithSeq, didKeeper.GetDIDDocument(suite.Ctx, did))
 
-	signableDID := types.SignableDID(did)
-	sig, _ := types.Sign(signableDID, docWithSeq.Seq, privKey)
+	sig, _ := types.Sign(&doc, docWithSeq.Seq, privKey)
 	sig[0] += 1 // pollute the signature
 
 	deactivateMsg := types.NewMsgDeactivateDID(did, verificationMethodID, sig, sdk.AccAddress{}.String())
@@ -269,32 +269,26 @@ func (suite msgServerTestSuite) TestHandleMsgDeactivateDID_SigVerificationFailed
 	suite.Require().ErrorIs(types.ErrSigVerificationFailed, err)
 }
 
-type any string
-
-func (a any) GetSignBytes() []byte {
-	return sdk.MustSortJSON(types.ModuleCdc.Amino.MustMarshalJSON(a))
-}
-
 func (suite msgServerTestSuite) TestVerifyDIDOwnership() {
 	did := "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm"
-	doc, privKey := suite.newDIDDocumentWithSeq(did)
+	docWithSeq, privKey := suite.newDIDDocumentWithSeq(did)
+	doc := docWithSeq.Document
 
-	data := any("random string")
-	sig, _ := types.Sign(data, doc.Seq, privKey)
+	sig, _ := types.Sign(doc, docWithSeq.Seq, privKey)
 
-	newSeq, err := didkeeper.VerifyDIDOwnership(data, doc.Seq, doc.Document, doc.Document.VerificationMethods[0].ID, sig)
+	newSeq, err := didkeeper.VerifyDIDOwnership(doc, docWithSeq.Seq, docWithSeq.Document, docWithSeq.Document.VerificationMethods[0].ID, sig)
 	suite.Require().NoError(err)
-	suite.Require().Equal(doc.Seq+1, newSeq)
+	suite.Require().Equal(docWithSeq.Seq+1, newSeq)
 }
 
 func (suite msgServerTestSuite) TestVerifyDIDOwnership_SigVerificationFailed() {
 	did := "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm"
-	doc, privKey := suite.newDIDDocumentWithSeq(did)
+	docWithSeq, privKey := suite.newDIDDocumentWithSeq(did)
+	doc := docWithSeq.Document
 
-	data := any("random string")
-	sig, _ := types.Sign(data, doc.Seq+11234, privKey)
+	sig, _ := types.Sign(doc, docWithSeq.Seq+11234, privKey)
 
-	_, err := didkeeper.VerifyDIDOwnership(data, doc.Seq, doc.Document, doc.Document.VerificationMethods[0].ID, sig)
+	_, err := didkeeper.VerifyDIDOwnership(doc, docWithSeq.Seq, docWithSeq.Document, docWithSeq.Document.VerificationMethods[0].ID, sig)
 	suite.Require().ErrorIs(types.ErrSigVerificationFailed, err)
 }
 
@@ -327,19 +321,23 @@ func (suite msgServerTestSuite) newDIDDocumentWithSeq(did string) (types.DIDDocu
 }
 
 func newMsgCreateDID(suite msgServerTestSuite, doc types.DIDDocument, verificationMethodID string, privKey crypto.PrivKey) types.MsgCreateDID {
-	sig, err := types.Sign(doc, types.InitialSequence, privKey)
+	sig, err := types.Sign(&doc, types.InitialSequence, privKey)
 	suite.Require().NoError(err)
 	return types.NewMsgCreateDID(doc.ID, doc, verificationMethodID, sig, sdk.AccAddress{}.String())
 }
 
 func newMsgUpdateDID(suite msgServerTestSuite, newDoc types.DIDDocument, verificationMethodID string, privKey crypto.PrivKey, seq uint64) types.MsgUpdateDID {
-	sig, err := types.Sign(newDoc, seq, privKey)
+	sig, err := types.Sign(&newDoc, seq, privKey)
 	suite.Require().NoError(err)
 	return types.NewMsgUpdateDID(newDoc.ID, newDoc, verificationMethodID, sig, sdk.AccAddress{}.String())
 }
 
 func newMsgDeactivateDID(suite msgServerTestSuite, did string, verificationMethodID string, privKey crypto.PrivKey, seq uint64) types.MsgDeactivateDID {
-	sig, err := types.Sign(types.SignableDID(did), seq, privKey)
+	doc := types.DIDDocument{
+		ID: did,
+	}
+
+	sig, err := types.Sign(&doc, seq, privKey)
 	suite.Require().NoError(err)
 	return types.NewMsgDeactivateDID(did, verificationMethodID, sig, sdk.AccAddress{}.String())
 }

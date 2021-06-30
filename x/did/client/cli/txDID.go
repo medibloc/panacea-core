@@ -10,6 +10,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/input"
 	"github.com/cosmos/cosmos-sdk/client/tx"
+	sdkcodec "github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/go-bip39"
@@ -102,7 +103,7 @@ func CmdUpdateDID() *cobra.Command {
 				return err
 			}
 			// For proving that I know the private key. It signs on the DIDDocument.
-			sig, err := signUsingCurrentSeq(clientCtx, did, privKey, doc)
+			sig, err := signUsingCurrentSeq(clientCtx, did, privKey, &doc)
 			if err != nil {
 				return err
 			}
@@ -150,9 +151,11 @@ func CmdDeactivateDID() *cobra.Command {
 				return err
 			}
 
-			// For proving that I know the private key. It signs on the DID, not DIDDocument.
-			signableDID := types.SignableDID(did)
-			sig, err := signUsingCurrentSeq(clientCtx, did, privKey, signableDID)
+			// For proving that I know the private key. It signs on the DIDDocument.
+			doc := types.DIDDocument{
+				ID: did,
+			}
+			sig, err := signUsingCurrentSeq(clientCtx, did, privKey, &doc)
 			if err != nil {
 				return err
 			}
@@ -262,7 +265,7 @@ func newMsgCreateDID(fromAddress sdk.AccAddress, privKey secp256k1.PrivKey) (typ
 	}
 	doc := types.NewDIDDocument(did, types.WithVerificationMethods(verificationMethods), types.WithAuthentications(authentications))
 
-	sig, err := types.Sign(doc, types.InitialSequence, privKey)
+	sig, err := types.Sign(&doc, types.InitialSequence, privKey)
 	if err != nil {
 		return types.MsgCreateDID{}, err
 	}
@@ -317,7 +320,7 @@ func getPrivKeyFromKeyStore(verificationMethodID string, reader *bufio.Reader) (
 }
 
 // signUsingCurrentSeq generates a signature using the current sequence stored in the blockchain.
-func signUsingCurrentSeq(clientCtx client.Context, did string, privKey crypto.PrivKey, data types.Signable) ([]byte, error) {
+func signUsingCurrentSeq(clientCtx client.Context, did string, privKey crypto.PrivKey, data sdkcodec.ProtoMarshaler) ([]byte, error) {
 	queryClient := types.NewQueryClient(clientCtx)
 
 	params := &types.QueryGetDIDRequest{

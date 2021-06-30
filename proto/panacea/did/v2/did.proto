@@ -44,3 +44,8 @@ message DIDDocumentWithSeq {
   DIDDocument document = 1;
   uint64 seq = 2 [json_name = "sequence", (gogoproto.jsontag) = "sequence"];
 }
+
+message DataWithSeq {
+  bytes data = 1;
+  uint64 seq = 2;
+}

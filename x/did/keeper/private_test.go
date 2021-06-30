@@ -7,36 +7,29 @@ import (
 	"github.com/tendermint/tendermint/crypto/secp256k1"
 	"testing"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/medibloc/panacea-core/x/did/types"
 )
 
-type any string
-
-func (a any) GetSignBytes() []byte {
-	return sdk.MustSortJSON(types.ModuleCdc.Amino.MustMarshalJSON(a))
-}
-
 func TestVerifyDIDOwnership(t *testing.T) {
 	did := "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm"
-	doc, privKey := newDIDDocumentWithSeq(did)
+	docWithSeq, privKey := newDIDDocumentWithSeq(did)
+	doc := docWithSeq.Document
 
-	data := any("random string")
-	sig, _ := types.Sign(data, doc.Seq, privKey)
+	sig, _ := types.Sign(doc, docWithSeq.Seq, privKey)
 
-	newSeq, err := VerifyDIDOwnership(data, doc.Seq, doc.Document, doc.Document.VerificationMethods[0].ID, sig)
+	newSeq, err := VerifyDIDOwnership(doc, docWithSeq.Seq, docWithSeq.Document, docWithSeq.Document.VerificationMethods[0].ID, sig)
 	require.NoError(t, err)
-	require.Equal(t, doc.Seq+1, newSeq)
+	require.Equal(t, docWithSeq.Seq+1, newSeq)
 }
 
 func TestVerifyDIDOwnership_SigVerificationFailed(t *testing.T) {
 	did := "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm"
-	doc, privKey := newDIDDocumentWithSeq(did)
+	docWithSeq, privKey := newDIDDocumentWithSeq(did)
+	doc := docWithSeq.Document
 
-	data := any("random string")
-	sig, _ := types.Sign(data, doc.Seq+11234, privKey)
+	sig, _ := types.Sign(doc, docWithSeq.Seq+11234, privKey)
 
-	_, err := VerifyDIDOwnership(data, doc.Seq, doc.Document, doc.Document.VerificationMethods[0].ID, sig)
+	_, err := VerifyDIDOwnership(doc, docWithSeq.Seq, docWithSeq.Document, docWithSeq.Document.VerificationMethods[0].ID, sig)
 	require.ErrorIs(t, types.ErrSigVerificationFailed, err)
 }
 
