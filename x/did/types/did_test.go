@@ -49,15 +49,6 @@ func TestDID_Empty(t *testing.T) {
 	require.False(t, types.EmptyDID("did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm"))
 }
 
-func TestDID_GetSignBytes(t *testing.T) {
-	did := "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm"
-	signableDID := types.SignableDID(did)
-	var signableDID2 types.SignableDID
-	err := types.ModuleCdc.Amino.UnmarshalJSON(signableDID.GetSignBytes(), &signableDID2)
-	require.NoError(t, err)
-	require.Equal(t, signableDID, signableDID2)
-}
-
 func TestNewDIDDocument(t *testing.T) {
 	did := "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm"
 	pubKey := secp256k1util.PubKeyBytes(secp256k1util.DerivePubKey(secp256k1.GenPrivKey()))

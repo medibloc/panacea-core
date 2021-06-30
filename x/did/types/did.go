@@ -107,13 +107,6 @@ func (strings *JSONStringOrStrings) UnmarshalJSON(data []byte) error {
 
 var _ sdk.CustomProtobufType = &JSONStringOrStrings{}
 
-type SignableDID string
-
-// GetSignBytes returns a byte array which is used to generate a signature for verifying DID ownership.
-func (did SignableDID) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleCdc.Amino.MustMarshalJSON(did))
-}
-
 func NewDID(pubKey []byte) string {
 	hash := sha256.New()
 	_, err := hash.Write(pubKey)
