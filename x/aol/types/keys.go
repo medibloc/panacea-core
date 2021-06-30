@@ -29,15 +29,11 @@ const (
 
 // this line is used by starport scaffolding # ibc/keys/port
 
-func KeyPrefix(p string) []byte {
-	return []byte(p)
-}
-
-const (
-	OwnerKey  = "Owner-value-"
-	TopicKey  = "Topic-value-"
-	WriterKey = "Writer-value-"
-	RecordKey = "Record-value-"
+var (
+	OwnerKeyPrefix  = []byte{0x00}
+	TopicKeyPrefix  = []byte{0x01}
+	WriterKeyPrefix = []byte{0x02}
+	RecordKeyPrefix = []byte{0x03}
 )
 
 var (

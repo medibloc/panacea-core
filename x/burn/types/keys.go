@@ -19,7 +19,3 @@ const (
 	// BurnAddress defines default burn address
 	BurnAddress = "panacea100000000000000000000000000000000nqmafp"
 )
-
-func KeyPrefix(p string) []byte {
-	return []byte(p)
-}

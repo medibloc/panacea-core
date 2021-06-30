@@ -56,7 +56,7 @@ func (k Keeper) Writers(c context.Context, req *types.QueryListWritersRequest) (
 	}
 
 	store := ctx.KVStore(k.storeKey)
-	writerStore := prefix.NewStore(store, append(types.KeyPrefix(types.WriterKey), compKeyPrefix...))
+	writerStore := prefix.NewStore(store, append(types.WriterKeyPrefix, compKeyPrefix...))
 
 	pageRes, err := query.Paginate(writerStore, req.Pagination, func(compKeyLast []byte, value []byte) error {
 		var compKey types.WriterCompositeKey

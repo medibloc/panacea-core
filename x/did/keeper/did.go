@@ -7,14 +7,14 @@ import (
 )
 
 func (k Keeper) SetDIDDocument(ctx sdk.Context, did string, doc types.DIDDocumentWithSeq) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.DIDKey))
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.DIDKeyPrefix)
 	key := DIDDocumentKey(did)
 	bz := k.cdc.MustMarshalBinaryLengthPrefixed(&doc)
 	store.Set(key, bz)
 }
 
 func (k Keeper) GetDIDDocument(ctx sdk.Context, did string) types.DIDDocumentWithSeq {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.DIDKey))
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.DIDKeyPrefix)
 	key := DIDDocumentKey(did)
 	bz := store.Get(key)
 	if bz == nil {
@@ -27,7 +27,7 @@ func (k Keeper) GetDIDDocument(ctx sdk.Context, did string) types.DIDDocumentWit
 }
 
 func (k Keeper) ListDIDs(ctx sdk.Context) []string {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.DIDKey))
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.DIDKeyPrefix)
 	dids := make([]string, 0)
 
 	prefix := DIDDocumentKey("")
