@@ -8,14 +8,14 @@ import (
 
 func (k Keeper) SetDIDDocument(ctx sdk.Context, did string, doc types.DIDDocumentWithSeq) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.DIDKeyPrefix)
-	key := DIDDocumentKey(did)
+	key := []byte(did)
 	bz := k.cdc.MustMarshalBinaryLengthPrefixed(&doc)
 	store.Set(key, bz)
 }
 
 func (k Keeper) GetDIDDocument(ctx sdk.Context, did string) types.DIDDocumentWithSeq {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.DIDKeyPrefix)
-	key := DIDDocumentKey(did)
+	key := []byte(did)
 	bz := store.Get(key)
 	if bz == nil {
 		return types.DIDDocumentWithSeq{}
@@ -30,12 +30,11 @@ func (k Keeper) ListDIDs(ctx sdk.Context) []string {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.DIDKeyPrefix)
 	dids := make([]string, 0)
 
-	prefix := DIDDocumentKey("")
-	iter := sdk.KVStorePrefixIterator(store, prefix)
+	iter := sdk.KVStorePrefixIterator(store, []byte{})
 	defer iter.Close()
 	for ; iter.Valid(); iter.Next() {
-		did := getLastElement(iter.Key(), prefix)
-		dids = append(dids, string(did))
+		did := string(iter.Key())
+		dids = append(dids, did)
 	}
 	return dids
 }
