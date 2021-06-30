@@ -158,8 +158,7 @@ func (suite aolMsgServerTestSuite) TestMsgServer() {
 	}
 	getTopicResponse, err = aolKeeper.Topic(goCtx, &getTopicRequest)
 	suite.Require().NoError(err)
-	// bug to description clear.
-	//suite.Require().Equal(msgCreateTopic.Description, getTopicResponse.Topic.Description)
+	suite.Require().Equal(msgCreateTopic.Description, getTopicResponse.Topic.Description)
 	suite.Require().Equal(uint64(2), getTopicResponse.Topic.TotalRecords)
 	suite.Require().Equal(uint64(2), getTopicResponse.Topic.TotalWriters)
 
@@ -180,8 +179,7 @@ func (suite aolMsgServerTestSuite) TestMsgServer() {
 	}
 	getTopicResponse, err = aolKeeper.Topic(goCtx, &getTopicRequest)
 	suite.Require().NoError(err)
-	// bug to description clear.
-	//suite.Require().Equal(msgCreateTopic.Description, getTopicResponse.Topic.Description)
+	suite.Require().Equal(msgCreateTopic.Description, getTopicResponse.Topic.Description)
 	suite.Require().Equal(uint64(2), getTopicResponse.Topic.TotalRecords)
 	suite.Require().Equal(uint64(1), getTopicResponse.Topic.TotalWriters)
 }

@@ -117,7 +117,10 @@ func (suite tokenTestSuite) TestTokenMultiSymbol() {
 
 func (suite tokenTestSuite) TestInvalidFromAddress() {
 	defer func() {
-		recover()
+		if r := recover(); r != nil {
+			err, _ := r.(error)
+			suite.Require().Equal("decoding bech32 failed: invalid character in string: ' '", err.Error())
+		}
 	}()
 
 	ctx := suite.Ctx
@@ -141,7 +144,10 @@ func (suite tokenTestSuite) TestInvalidFromAddress() {
 
 func (suite tokenTestSuite) TestInvalidNewCoin() {
 	defer func() {
-		recover()
+		if r := recover(); r != nil {
+			err, _ := r.(error)
+			suite.Require().Equal("invalid denom: ", err.Error())
+		}
 	}()
 
 	ctx := suite.Ctx
