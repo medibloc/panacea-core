@@ -1,42 +1,38 @@
 package types
 
 import (
-	"encoding/base64"
-	"fmt"
-	"time"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-type Record struct {
-	Key           []byte         `json:"key"`
-	Value         []byte         `json:"value"`
-	NanoTimestamp int64          `json:"nano_timestamp"`
-	WriterAddress sdk.AccAddress `json:"writer_address"`
-}
+const (
+	maxRecordKeyLength   = 70
+	maxRecordValueLength = 5000
+)
 
-func NewRecord(key []byte, value []byte, nanoTimestamp int64, writer sdk.AccAddress) Record {
-	return Record{
-		Key:           key,
-		Value:         value,
-		NanoTimestamp: nanoTimestamp,
-		WriterAddress: writer,
+func (r Record) Validate() error {
+	if err := validateRecordKey(r.Key); err != nil {
+		return err
 	}
+	if err := validateRecordValue(r.Key); err != nil {
+		return err
+	}
+	if _, err := sdk.AccAddressFromBech32(r.WriterAddress); err != nil {
+		return err
+	}
+	return nil
 }
 
-func (r Record) String() string {
-	return fmt.Sprintf(`Record:
-	Key: %s
-	Value: %s
-	Accepted Time: %s
-	WriterAddress: %s`,
-		base64.StdEncoding.EncodeToString(r.Key),
-		base64.StdEncoding.EncodeToString(r.Value),
-		sdk.FormatTimeBytes(time.Unix(0, r.NanoTimestamp)),
-		r.WriterAddress,
-	)
+func validateRecordKey(key []byte) error {
+	if len(key) > maxRecordKeyLength {
+		return sdkerrors.Wrapf(ErrMessageTooLarge, "key (%d > %d)", len(key), maxRecordKeyLength)
+	}
+	return nil
 }
 
-func (r Record) IsEmpty() bool {
-	return r.WriterAddress.Empty()
+func validateRecordValue(value []byte) error {
+	if len(value) > maxRecordValueLength {
+		return sdkerrors.Wrapf(ErrMessageTooLarge, "value (%d > %d)", len(value), maxRecordValueLength)
+	}
+	return nil
 }

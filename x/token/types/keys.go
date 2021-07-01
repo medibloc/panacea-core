@@ -1,15 +1,25 @@
 package types
 
 const (
-	// module name
+	// ModuleName defines the module name
 	ModuleName = "token"
 
-	// StoreKey to be used when creating the KVStore
+	// StoreKey defines the primary module store key
 	StoreKey = ModuleName
 
-	// RouterKey to be used in router
+	// RouterKey is the message route for slashing
 	RouterKey = ModuleName
 
-	// QuerierRoute is the query router key
+	// QuerierRoute defines the module's query routing key
 	QuerierRoute = ModuleName
+
+	// MemStoreKey defines the in-memory store key
+	MemStoreKey = "mem_capability"
+
+	// this line is used by starport scaffolding # ibc/keys/name
+)
+
+// this line is used by starport scaffolding # ibc/keys/port
+var (
+	TokenKeyPrefix = []byte{0x00}
 )

@@ -1,0 +1,15 @@
+proto_outdir = "./third_party/proto"
+
+[[dependencies]]
+  target = "github.com/cosmos/cosmos-sdk/third_party/proto"
+  revision = "a7e19ad4588bcceeeeab522f5807b9ff22e91a8c"
+  branch = ""
+  path = ""
+  protocol = ""
+
+[[dependencies]]
+  target = "github.com/cosmos/cosmos-sdk/proto"
+  revision = "a7e19ad4588bcceeeeab522f5807b9ff22e91a8c"
+  branch = ""
+  path = ""
+  protocol = ""

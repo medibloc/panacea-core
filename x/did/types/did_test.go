@@ -1,60 +1,66 @@
-package types
+package types_test
 
 import (
 	"fmt"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/stretchr/testify/require"
+	"os"
 	"strings"
 	"testing"
 
-	"github.com/medibloc/panacea-core/x/did/internal/secp256k1util"
-
-	"github.com/cosmos/cosmos-sdk/codec"
-
 	"github.com/btcsuite/btcutil/base58"
-
-	"github.com/stretchr/testify/require"
 	"github.com/tendermint/tendermint/crypto/secp256k1"
+
+	"github.com/medibloc/panacea-core/x/did/internal/secp256k1util"
+	"github.com/medibloc/panacea-core/x/did/types"
 )
+
+
+func TestMain(m *testing.M) {
+	config := sdk.GetConfig()
+	config.SetBech32PrefixForAccount("panacea", "panaceapub")
+	config.Seal()
+
+	os.Exit(m.Run())
+}
 
 func TestNewDID(t *testing.T) {
 	pubKey := secp256k1util.PubKeyBytes(secp256k1util.DerivePubKey(secp256k1.GenPrivKey()))
 
-	did := NewDID(pubKey)
-	regex := fmt.Sprintf("^did:panacea:[%s]{32,44}$", Base58Charset)
+	did := types.NewDID(pubKey)
+	regex := fmt.Sprintf("^did:panacea:[%s]{32,44}$", types.Base58Charset)
 	require.Regexp(t, regex, did)
 }
 
 func TestParseDID(t *testing.T) {
 	str := "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm"
-	did, err := ParseDID(str)
+	did, err := types.ParseDID(str)
 	require.NoError(t, err)
 	require.EqualValues(t, str, did)
 
 	str = "did:panacea:7Prd74ry1Uct87nZqL3n"
-	_, err = ParseDID(str)
-	require.EqualError(t, err, ErrInvalidDID(str).Error())
+	_, err = types.ParseDID(str)
+
+	require.ErrorIs(t, types.ErrInvalidDID, err)
 }
 
 func TestDID_Empty(t *testing.T) {
-	require.True(t, DID("").Empty())
-	require.False(t, DID("did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm").Empty())
-}
-
-func TestDID_GetSignBytes(t *testing.T) {
-	did := DID("did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm")
-	var did2 DID
-	require.NoError(t, codec.New().UnmarshalJSON(did.GetSignBytes(), &did2))
-	require.Equal(t, did, did2)
+	require.True(t, types.EmptyDID(""))
+	require.False(t, types.EmptyDID("did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm"))
 }
 
 func TestNewDIDDocument(t *testing.T) {
-	did := DID("did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm")
+	did := "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm"
 	pubKey := secp256k1util.PubKeyBytes(secp256k1util.DerivePubKey(secp256k1.GenPrivKey()))
-	verificationMethodID := NewVerificationMethodID(did, "key1")
-	verificationMethods := []VerificationMethod{NewVerificationMethod(verificationMethodID, ES256K_2019, did, pubKey)}
-	authentications := []VerificationRelationship{NewVerificationRelationship(verificationMethods[0].ID)}
-	services := []Service{NewService("service1", "LinkedDomains", "https://service.org")}
+	verificationMethodID := types.NewVerificationMethodID(did, "key1")
+	verificationMethod := types.NewVerificationMethod(verificationMethodID, types.ES256K_2019, did, pubKey)
+	verificationMethods := []*types.VerificationMethod{&verificationMethod}
+	verificationRelationship := types.NewVerificationRelationship(verificationMethods[0].ID)
+	authentications := []*types.VerificationRelationship{&verificationRelationship}
+	service := types.NewService("service1", "LinkedDomains", "https://service.org")
+	services := []*types.Service{&service}
 
-	doc := NewDIDDocument(did, WithVerificationMethods(verificationMethods), WithAuthentications(authentications), WithServices(services))
+	doc := types.NewDIDDocument(did, types.WithVerificationMethods(verificationMethods), types.WithAuthentications(authentications), types.WithServices(services))
 	require.True(t, doc.Valid())
 	require.Equal(t, did, doc.ID)
 	require.Empty(t, doc.Controller)
@@ -69,238 +75,250 @@ func TestNewDIDDocument(t *testing.T) {
 
 func TestDIDDocument_Empty(t *testing.T) {
 	require.False(t, getValidDIDDocument().Empty())
-	require.True(t, DIDDocument{}.Empty())
+	require.True(t, types.DIDDocument{}.Empty())
 }
 
 func TestDIDDocument_Invalid(t *testing.T) {
-	did := DID("did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm")
-	invalidVerificationRelationships := []VerificationRelationship{
-		NewVerificationRelationship(NewVerificationMethodID("invalid did", "key1")),
+	did := "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm"
+	invalidVerificationRelationship := types.NewVerificationRelationship(types.NewVerificationMethodID("invalid did", "key1"))
+	invalidVerificationRelationships := []*types.VerificationRelationship{
+		&invalidVerificationRelationship,
 	}
-	invalidServices := []Service{
-		NewService("", "", ""),
+	service := types.NewService("", "", "")
+	invalidServices := []*types.Service{
+		&service,
 	}
 
-	require.False(t, NewDIDDocument("invalid did").Valid())
-	require.False(t, NewDIDDocument(did, WithController("invalid did")).Valid())
-	require.False(t, NewDIDDocument(did, WithAuthentications(invalidVerificationRelationships)).Valid())
-	require.False(t, NewDIDDocument(did, WithAssertionMethods(invalidVerificationRelationships)).Valid())
-	require.False(t, NewDIDDocument(did, WithKeyAgreements(invalidVerificationRelationships)).Valid())
-	require.False(t, NewDIDDocument(did, WithCapabilityInvocations(invalidVerificationRelationships)).Valid())
-	require.False(t, NewDIDDocument(did, WithCapabilityDelegations(invalidVerificationRelationships)).Valid())
-	require.False(t, NewDIDDocument(did, WithCapabilityDelegations(invalidVerificationRelationships)).Valid())
-	require.False(t, NewDIDDocument(did, WithCapabilityDelegations(invalidVerificationRelationships)).Valid())
-	require.False(t, NewDIDDocument(did, WithServices(invalidServices)).Valid())
+	require.False(t, types.NewDIDDocument("invalid did").Valid())
+	require.False(t, types.NewDIDDocument(did, types.WithController("invalid did")).Valid())
+	require.False(t, types.NewDIDDocument(did, types.WithAuthentications(invalidVerificationRelationships)).Valid())
+	require.False(t, types.NewDIDDocument(did, types.WithAssertionMethods(invalidVerificationRelationships)).Valid())
+	require.False(t, types.NewDIDDocument(did, types.WithKeyAgreements(invalidVerificationRelationships)).Valid())
+	require.False(t, types.NewDIDDocument(did, types.WithCapabilityInvocations(invalidVerificationRelationships)).Valid())
+	require.False(t, types.NewDIDDocument(did, types.WithCapabilityDelegations(invalidVerificationRelationships)).Valid())
+	require.False(t, types.NewDIDDocument(did, types.WithCapabilityDelegations(invalidVerificationRelationships)).Valid())
+	require.False(t, types.NewDIDDocument(did, types.WithCapabilityDelegations(invalidVerificationRelationships)).Valid())
+	require.False(t, types.NewDIDDocument(did, types.WithServices(invalidServices)).Valid())
+
 }
 
 func TestDIDDocument_VerificationMethodByID(t *testing.T) {
-	did := DID("did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm")
+	did := "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm"
 	pubKey := secp256k1util.PubKeyBytes(secp256k1util.DerivePubKey(secp256k1.GenPrivKey()))
-	verificationMethodID := NewVerificationMethodID(did, "key1")
-	verificationMethods := []VerificationMethod{NewVerificationMethod(verificationMethodID, ES256K_2019, did, pubKey)}
-	doc := NewDIDDocument(did, WithVerificationMethods(verificationMethods))
+	verificationMethodID := types.NewVerificationMethodID(did, "key1")
+	verificationMethod := types.NewVerificationMethod(verificationMethodID, types.ES256K_2019, did, pubKey)
+	verificationMethods := []*types.VerificationMethod{&verificationMethod}
+	doc := types.NewDIDDocument(did, types.WithVerificationMethods(verificationMethods))
 
 	found, ok := doc.VerificationMethodByID(verificationMethodID)
 	require.True(t, ok)
-	require.Equal(t, verificationMethods[0], found)
+	require.Equal(t, *verificationMethods[0], found)
 
-	_, ok = doc.VerificationMethodByID(NewVerificationMethodID(did, "key2"))
+	_, ok = doc.VerificationMethodByID(types.NewVerificationMethodID(did, "key2"))
 	require.False(t, ok)
 }
 
 func TestDIDDocument_VerificationMethodFrom(t *testing.T) {
-	did := DID("did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm")
+	did := "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm"
 	pubKey := secp256k1util.PubKeyBytes(secp256k1util.DerivePubKey(secp256k1.GenPrivKey()))
-	verificationMethodID := NewVerificationMethodID(did, "key1")
-	verificationMethods := []VerificationMethod{NewVerificationMethod(verificationMethodID, ES256K_2019, did, pubKey)}
-	authentications := []VerificationRelationship{NewVerificationRelationship(verificationMethods[0].ID)}
-	doc := NewDIDDocument(did, WithVerificationMethods(verificationMethods), WithAuthentications(authentications))
+	verificationMethodID := types.NewVerificationMethodID(did, "key1")
+	verificationMethod := types.NewVerificationMethod(verificationMethodID, types.ES256K_2019, did, pubKey)
+	verificationMethods := []*types.VerificationMethod{&verificationMethod}
+	verificationRelationship := types.NewVerificationRelationship(verificationMethods[0].ID)
+	authentications := []*types.VerificationRelationship{&verificationRelationship}
+	doc := types.NewDIDDocument(did, types.WithVerificationMethods(verificationMethods), types.WithAuthentications(authentications))
 
 	found, ok := doc.VerificationMethodFrom(doc.Authentications, verificationMethodID)
 	require.True(t, ok)
-	require.Equal(t, verificationMethods[0], found)
+	require.Equal(t, *verificationMethods[0], found)
 
-	_, ok = doc.VerificationMethodFrom(doc.Authentications, NewVerificationMethodID(did, "key2"))
+	_, ok = doc.VerificationMethodFrom(doc.Authentications, types.NewVerificationMethodID(did, "key2"))
 	require.False(t, ok)
 
-	doc.Authentications = []VerificationRelationship{} // clear authentications
+	doc.Authentications = []*types.VerificationRelationship{} // clear authentications
 	_, ok = doc.VerificationMethodFrom(doc.Authentications, verificationMethodID)
 	require.False(t, ok)
 }
 
 func TestContexts_Valid(t *testing.T) {
-	require.False(t, Contexts{}.Valid())
-	require.True(t, Contexts{ContextDIDV1}.Valid())
-	require.True(t, Contexts{ContextDIDV1, "https://example.com"}.Valid())
-	require.False(t, Contexts{"https://example.com", ContextDIDV1}.Valid())
-	require.False(t, Contexts{ContextDIDV1, ContextDIDV1}.Valid())
+	require.False(t, types.ValidateContexts(types.JSONStringOrStrings{}))
+	require.True(t, types.ValidateContexts(types.JSONStringOrStrings{types.ContextDIDV1}))
+	require.True(t, types.ValidateContexts(types.JSONStringOrStrings{types.ContextDIDV1, "https://example.com"}))
+	require.False(t, types.ValidateContexts(types.JSONStringOrStrings{"https://example.com", types.ContextDIDV1}))
+	require.False(t, types.ValidateContexts(types.JSONStringOrStrings{types.ContextDIDV1, types.ContextDIDV1}))
 
-	var ctxs Contexts = nil
-	require.False(t, ctxs.Valid())
+	var ctxs types.JSONStringOrStrings = nil
+	require.False(t, types.ValidateContexts(ctxs))
 }
 
 func TestContexts_MarshalJSON(t *testing.T) {
-	bz, err := ModuleCdc.MarshalJSON(Contexts{ContextDIDV1})
+	bz, err := types.ModuleCdc.Amino.MarshalJSON(types.JSONStringOrStrings{types.ContextDIDV1})
 	require.NoError(t, err)
-	require.Equal(t, fmt.Sprintf(`"%v"`, ContextDIDV1), string(bz))
+	require.Equal(t, fmt.Sprintf(`"%v"`, types.ContextDIDV1), string(bz))
 
-	bz, err = ModuleCdc.MarshalJSON(Contexts{ContextDIDV1, "https://example.com"})
+	bz, err = types.ModuleCdc.Amino.MarshalJSON(types.JSONStringOrStrings{types.ContextDIDV1, "https://example.com"})
 	require.NoError(t, err)
-	require.Equal(t, fmt.Sprintf(`["%v","%v"]`, ContextDIDV1, "https://example.com"), string(bz))
+	require.Equal(t, fmt.Sprintf(`["%v","%v"]`, types.ContextDIDV1, "https://example.com"), string(bz))
 }
 
 func TestContexts_UnmarshalJSON(t *testing.T) {
-	var ctxs Contexts
+	var ctxs types.JSONStringOrStrings
 
-	bz := []byte(fmt.Sprintf(`["%v","%v"]`, ContextDIDV1, "https://example.com"))
-	require.NoError(t, ModuleCdc.UnmarshalJSON(bz, &ctxs))
-	require.Equal(t, Contexts{ContextDIDV1, "https://example.com"}, ctxs)
+	bz := []byte(fmt.Sprintf(`["%v","%v"]`, types.ContextDIDV1, "https://example.com"))
+	require.NoError(t, types.ModuleCdc.Amino.UnmarshalJSON(bz, &ctxs))
+	require.Equal(t, types.JSONStringOrStrings{types.ContextDIDV1, "https://example.com"}, ctxs)
 
-	bz = []byte(fmt.Sprintf(`"%v"`, ContextDIDV1))
-	require.NoError(t, ModuleCdc.UnmarshalJSON(bz, &ctxs))
-	require.Equal(t, Contexts{ContextDIDV1}, ctxs)
+	bz = []byte(fmt.Sprintf(`"%v"`, types.ContextDIDV1))
+	require.NoError(t, types.ModuleCdc.Amino.UnmarshalJSON(bz, &ctxs))
+	require.Equal(t, types.JSONStringOrStrings{types.ContextDIDV1}, ctxs)
 }
 
 func TestNewVerificationMethodID(t *testing.T) {
-	did := DID("did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm")
+	did := "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm"
 	expectedID := fmt.Sprintf("%s#key1", did)
-	id := NewVerificationMethodID(did, "key1")
-	require.True(t, id.Valid(did))
+	id := types.NewVerificationMethodID(did, "key1")
+	require.True(t, types.ValidateVerificationMethodID(id, did))
 	require.EqualValues(t, expectedID, id)
 
-	id, err := ParseVerificationMethodID(expectedID, did)
+	id, err := types.ParseVerificationMethodID(expectedID, did)
 	require.NoError(t, err)
 	require.EqualValues(t, expectedID, id)
 }
 
 func TestVerificationMethodID_Valid(t *testing.T) {
+	validate := types.ValidateVerificationMethodID
+
 	// normal
-	require.True(t, VerificationMethodID("did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm#key1").Valid("did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm"))
+	require.True(t, validate("did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm#key1", "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm"))
 
 	// if suffix has whitespaces
-	require.False(t, VerificationMethodID("did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm# key1").Valid("did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm"))
-	require.False(t, VerificationMethodID("did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm#key1 ").Valid("did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm"))
+	require.False(t, validate("did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm# key1", "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm"))
+	require.False(t, validate("did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm#key1 ", "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm"))
 
 	// if suffix is empty
-	require.False(t, VerificationMethodID("did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm#").Valid("did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm"))
-	require.False(t, VerificationMethodID("did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm").Valid("did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm"))
+	require.False(t, validate("did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm#", "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm"))
+	require.False(t, validate("did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm", "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm"))
 
 	// if prefix (DID) is invalid
-	require.False(t, VerificationMethodID("invalid#key1").Valid("did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm"))
-	require.False(t, VerificationMethodID("did:panacea:87nZqL3ny7aR7C7Prd74ry1Uctg46JamVbJgk8azVgUm#key1").Valid("did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm"))
+	require.False(t, validate("invalid#key1", "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm"))
+	require.False(t, validate("did:panacea:87nZqL3ny7aR7C7Prd74ry1Uctg46JamVbJgk8azVgUm#key1", "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm"))
 
 	// if suffix is too long
 	var builder strings.Builder
 	builder.WriteString("did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm#")
-	for i := 0; i < maxVerificationMethodIDLen+1; i++ {
+	for i := 0; i < types.MaxVerificationMethodIDLen+1; i++ {
 		builder.WriteByte('k')
 	}
-	require.False(t, VerificationMethodID(builder.String()).Valid("did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm"))
+	require.False(t, validate(builder.String(), "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm"))
 }
 
 func TestKeyType_Valid(t *testing.T) {
-	require.True(t, ES256K_2019.Valid())
-	require.True(t, KeyType("NewKeyType2021").Valid())
-	require.False(t, KeyType("").Valid())
+	require.True(t, types.ValidateKeyType(types.ES256K_2019))
+	require.True(t, types.ValidateKeyType("NewKeyType2021"))
+	require.False(t, types.ValidateKeyType(""))
 }
 
 func TestNewVerificationMethod(t *testing.T) {
-	did := DID("did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm")
+	did := "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm"
 	pubKey := secp256k1util.PubKeyBytes(secp256k1util.DerivePubKey(secp256k1.GenPrivKey()))
-	pub := NewVerificationMethod(NewVerificationMethodID(did, "key1"), ES256K_2019, did, pubKey)
+	pub := types.NewVerificationMethod(types.NewVerificationMethodID(did, "key1"), types.ES256K_2019, did, pubKey)
 	require.True(t, pub.Valid(did))
 
 	require.Equal(t, pubKey[:], base58.Decode(pub.PubKeyBase58))
 }
 
 func TestVerificationRelationship_Valid(t *testing.T) {
-	did := DID("did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm")
+	did := "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm"
 	pubKey := secp256k1util.PubKeyBytes(secp256k1util.DerivePubKey(secp256k1.GenPrivKey()))
-	verificationMethodID := NewVerificationMethodID(did, "key1")
-	verificationMethod := NewVerificationMethod(verificationMethodID, ES256K_2019, did, pubKey)
+	verificationMethodID := types.NewVerificationMethodID(did, "key1")
+	verificationMethod := types.NewVerificationMethod(verificationMethodID, types.ES256K_2019, did, pubKey)
 
-	auth := VerificationRelationship{VerificationMethodID: verificationMethodID, DedicatedVerificationMethod: nil}
+	auth := types.VerificationRelationship{VerificationMethodID: verificationMethodID, DedicatedVerificationMethod: nil}
 	require.True(t, auth.Valid(did))
-	auth = VerificationRelationship{VerificationMethodID: verificationMethodID, DedicatedVerificationMethod: &verificationMethod}
+	auth = types.VerificationRelationship{VerificationMethodID: verificationMethodID, DedicatedVerificationMethod: &verificationMethod}
 	require.True(t, auth.Valid(did))
 
-	auth = VerificationRelationship{VerificationMethodID: "invalid", DedicatedVerificationMethod: nil}
+	auth = types.VerificationRelationship{VerificationMethodID: "invalid", DedicatedVerificationMethod: nil}
 	require.False(t, auth.Valid(did))
-	auth = VerificationRelationship{VerificationMethodID: verificationMethodID, DedicatedVerificationMethod: &VerificationMethod{ID: "invalid"}}
+	auth = types.VerificationRelationship{VerificationMethodID: verificationMethodID, DedicatedVerificationMethod: &types.VerificationMethod{ID: "invalid"}}
 	require.False(t, auth.Valid(did))
-	auth = VerificationRelationship{VerificationMethodID: NewVerificationMethodID(did, "key2"), DedicatedVerificationMethod: &verificationMethod}
+	auth = types.VerificationRelationship{VerificationMethodID: types.NewVerificationMethodID(did, "key2"), DedicatedVerificationMethod: &verificationMethod}
 	require.False(t, auth.Valid(did))
 }
 
 func TestVerificationRelationship_MarshalJSON(t *testing.T) {
-	did := DID("did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm")
+	did := "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm"
 	pubKey := secp256k1util.PubKeyBytes(secp256k1util.DerivePubKey(secp256k1.GenPrivKey()))
-	verificationMethodID := NewVerificationMethodID(did, "key1")
-	verificationMethod := NewVerificationMethod(verificationMethodID, ES256K_2019, did, pubKey)
+	verificationMethodID := types.NewVerificationMethodID(did, "key1")
+	verificationMethod := types.NewVerificationMethod(verificationMethodID, types.ES256K_2019, did, pubKey)
 
-	auth := NewVerificationRelationship(verificationMethodID)
+	auth := types.NewVerificationRelationship(verificationMethodID)
 	bz, err := auth.MarshalJSON()
 	require.NoError(t, err)
 	require.Equal(t, fmt.Sprintf(`"%v"`, verificationMethodID), string(bz))
 
-	auth = NewVerificationRelationshipDedicated(verificationMethod)
+	auth = types.NewVerificationRelationshipDedicated(verificationMethod)
 	bz, err = auth.MarshalJSON()
 	require.NoError(t, err)
-	regex := fmt.Sprintf(`{"id":"%v","type":"%v","controller":"%v","publicKeyBase58":"%v"}`, verificationMethodID, ES256K_2019, did, verificationMethod.PubKeyBase58)
+	regex := fmt.Sprintf(`{"id":"%v","type":"%v","controller":"%v","publicKeyBase58":"%v"}`, verificationMethodID, types.ES256K_2019, did, verificationMethod.PubKeyBase58)
 	require.Regexp(t, regex, string(bz))
 }
 
 func TestVerificationRelationship_UnmarshalJSON(t *testing.T) {
-	did := DID("did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm")
+	did := "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm"
 	pubKey := secp256k1util.PubKeyBytes(secp256k1util.DerivePubKey(secp256k1.GenPrivKey()))
-	verificationMethodID := NewVerificationMethodID(did, "key1")
-	verificationMethod := NewVerificationMethod(verificationMethodID, ES256K_2019, did, pubKey)
+	verificationMethodID := types.NewVerificationMethodID(did, "key1")
+	verificationMethod := types.NewVerificationMethod(verificationMethodID, types.ES256K_2019, did, pubKey)
 
-	var auth VerificationRelationship
+	var auth types.VerificationRelationship
 	bz := []byte(fmt.Sprintf(`"%v"`, verificationMethodID))
 	require.NoError(t, auth.UnmarshalJSON(bz))
-	require.Equal(t, NewVerificationRelationship(verificationMethodID), auth)
+	require.Equal(t, types.NewVerificationRelationship(verificationMethodID), auth)
 	require.True(t, auth.Valid(did))
 
-	bz = []byte(fmt.Sprintf(`{"id":"%v","type":"%v","controller":"%v","publicKeyBase58":"%v"}`, verificationMethodID, ES256K_2019, did, verificationMethod.PubKeyBase58))
+	bz = []byte(fmt.Sprintf(`{"id":"%v","type":"%v","controller":"%v","publicKeyBase58":"%v"}`, verificationMethodID, types.ES256K_2019, did, verificationMethod.PubKeyBase58))
 	require.NoError(t, auth.UnmarshalJSON(bz))
-	require.Equal(t, NewVerificationRelationshipDedicated(verificationMethod), auth)
+	require.Equal(t, types.NewVerificationRelationshipDedicated(verificationMethod), auth)
 	require.True(t, auth.Valid(did))
 }
 
 func TestService_Valid(t *testing.T) {
-	require.True(t, NewService("service1", "LinkedDomains", "https://domain.com").Valid())
-	require.False(t, NewService("", "LinkedDomains", "https://domain.com").Valid())
-	require.False(t, NewService("service1", "", "https://domain.com").Valid())
-	require.False(t, NewService("service1", "LinkedDomains", "").Valid())
+	require.True(t, types.NewService("service1", "LinkedDomains", "https://domain.com").Valid())
+	require.False(t, types.NewService("", "LinkedDomains", "https://domain.com").Valid())
+	require.False(t, types.NewService("service1", "", "https://domain.com").Valid())
+	require.False(t, types.NewService("service1", "LinkedDomains", "").Valid())
 }
 
 func TestDIDDocumentWithSeq_Empty(t *testing.T) {
-	require.False(t, NewDIDDocumentWithSeq(getValidDIDDocument(), InitialSequence).Empty())
-	require.True(t, DIDDocumentWithSeq{}.Empty())
+	document := getValidDIDDocument()
+	require.False(t, types.NewDIDDocumentWithSeq(&document, types.InitialSequence).Empty())
+	require.True(t, types.DIDDocumentWithSeq{}.Empty())
 }
 
 func TestDIDDocumentWithSeq_Valid(t *testing.T) {
 	doc := getValidDIDDocument()
-	require.True(t, NewDIDDocumentWithSeq(doc, InitialSequence).Valid())
-	require.False(t, DIDDocumentWithSeq{
-		Document: DIDDocument{ID: "invalid_did"},
+	require.True(t, types.NewDIDDocumentWithSeq(&doc, types.InitialSequence).Valid())
+	require.False(t, types.DIDDocumentWithSeq{
+		Document: &types.DIDDocument{ID: "invalid_did"},
 	}.Valid())
 }
 
 func TestDIDDocumentWithSeq_Deactivate(t *testing.T) {
-	docWithSeq := NewDIDDocumentWithSeq(getValidDIDDocument(), InitialSequence)
-	deactivated := docWithSeq.Deactivate(InitialSequence + 1)
+	document := getValidDIDDocument()
+	docWithSeq := types.NewDIDDocumentWithSeq(&document, types.InitialSequence)
+	deactivated := docWithSeq.Deactivate(types.InitialSequence + 1)
 	require.True(t, deactivated.Deactivated())
 	require.False(t, deactivated.Empty())
 	require.True(t, deactivated.Valid())
 }
 
-func getValidDIDDocument() DIDDocument {
-	did := DID("did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm")
+func getValidDIDDocument() types.DIDDocument {
+	did := "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm"
 	pubKey := secp256k1util.PubKeyBytes(secp256k1util.DerivePubKey(secp256k1.GenPrivKey()))
-	verificationMethodID := NewVerificationMethodID(did, "key1")
-	verificationMethods := []VerificationMethod{NewVerificationMethod(verificationMethodID, ES256K_2019, did, pubKey)}
-	authentications := []VerificationRelationship{NewVerificationRelationship(verificationMethods[0].ID)}
-	return NewDIDDocument(did, WithVerificationMethods(verificationMethods), WithAuthentications(authentications))
+	verificationMethodID := types.NewVerificationMethodID(did, "key1")
+	verificationMethod := types.NewVerificationMethod(verificationMethodID, types.ES256K_2019, did, pubKey)
+	verificationMethods := []*types.VerificationMethod{&verificationMethod}
+	verificationRelationship := types.NewVerificationRelationship(verificationMethods[0].ID)
+	authentications := []*types.VerificationRelationship{&verificationRelationship}
+	return types.NewDIDDocument(did, types.WithVerificationMethods(verificationMethods), types.WithAuthentications(authentications))
 }

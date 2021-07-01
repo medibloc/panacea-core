@@ -2,23 +2,32 @@ package types
 
 import (
 	"github.com/cosmos/cosmos-sdk/codec"
+	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/msgservice"
 )
 
-// RegisterCodec registers concrete types on Amino codec
-func RegisterCodec(cdc *codec.Codec) {
-	cdc.RegisterConcrete(MsgCreateTopic{}, "aol/MsgCreateTopic", nil)
-	cdc.RegisterConcrete(MsgAddWriter{}, "aol/MsgAddWriter", nil)
-	cdc.RegisterConcrete(MsgDeleteWriter{}, "aol/MsgDeleteWriter", nil)
-	cdc.RegisterConcrete(MsgAddRecord{}, "aol/MsgAddRecord", nil)
-	cdc.RegisterConcrete(ResAddRecord{}, "aol/ResAddRecord", nil)
+func RegisterCodec(cdc *codec.LegacyAmino) {
+	// this line is used by starport scaffolding # 2
+	cdc.RegisterConcrete(&MsgCreateTopic{}, "aol/CreateTopic", nil)
+	cdc.RegisterConcrete(&MsgAddWriter{}, "aol/AddWriter", nil)
+	cdc.RegisterConcrete(&MsgDeleteWriter{}, "aol/DeleteWriter", nil)
+	cdc.RegisterConcrete(&MsgAddRecord{}, "aol/AddRecord", nil)
 }
 
-// ModuleCdc generic sealed codec to be used throughout module
-var ModuleCdc *codec.Codec
+func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
+	// this line is used by starport scaffolding # 3
+	registry.RegisterImplementations((*sdk.Msg)(nil),
+		&MsgCreateTopic{},
+		&MsgAddWriter{},
+		&MsgDeleteWriter{},
+		&MsgAddRecord{},
+	)
 
-func init() {
-	ModuleCdc = codec.New()
-	RegisterCodec(ModuleCdc)
-	codec.RegisterCrypto(ModuleCdc)
-	ModuleCdc.Seal()
+	msgservice.RegisterMsgServiceDesc(registry, &_Msg_serviceDesc)
 }
+
+var (
+	amino     = codec.NewLegacyAmino()
+	ModuleCdc = codec.NewAminoCodec(amino)
+)

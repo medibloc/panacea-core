@@ -1,71 +1,31 @@
 package keeper
 
 import (
+	"fmt"
+
+	"github.com/tendermint/tendermint/libs/log"
+
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/medibloc/panacea-core/x/did/types"
 )
 
-// Keeper maintains the link to data storage
-// and exposes getter/setter methods for
-// the various parts of the state machine
-type Keeper interface {
-	Codec() *codec.Codec
-	SetDIDDocument(ctx sdk.Context, did types.DID, doc types.DIDDocumentWithSeq)
-	GetDIDDocument(ctx sdk.Context, did types.DID) types.DIDDocumentWithSeq
-	ListDIDs(ctx sdk.Context) []types.DID
-}
+type (
+	Keeper struct {
+		cdc      codec.Marshaler
+		storeKey sdk.StoreKey
+		memKey   sdk.StoreKey
+	}
+)
 
-// didKeeper implements the Keeper interface
-type didKeeper struct {
-	// Unexposed key to access store from sdk.Context
-	storeKey sdk.StoreKey
-
-	cdc *codec.Codec
-}
-
-// NewKeeper creates a new instance of the did Keeper
-func NewKeeper(storeKey sdk.StoreKey, cdc *codec.Codec) Keeper {
-	return didKeeper{
-		storeKey: storeKey,
+func NewKeeper(cdc codec.Marshaler, storeKey, memKey sdk.StoreKey) *Keeper {
+	return &Keeper{
 		cdc:      cdc,
+		storeKey: storeKey,
+		memKey:   memKey,
 	}
 }
 
-func (k didKeeper) Codec() *codec.Codec {
-	return k.cdc
-}
-
-func (k didKeeper) SetDIDDocument(ctx sdk.Context, did types.DID, doc types.DIDDocumentWithSeq) {
-	store := ctx.KVStore(k.storeKey)
-	key := DIDDocumentKey(did)
-	bz := k.cdc.MustMarshalBinaryLengthPrefixed(doc)
-	store.Set(key, bz)
-}
-
-func (k didKeeper) GetDIDDocument(ctx sdk.Context, did types.DID) types.DIDDocumentWithSeq {
-	store := ctx.KVStore(k.storeKey)
-	key := DIDDocumentKey(did)
-	bz := store.Get(key)
-	if bz == nil {
-		return types.DIDDocumentWithSeq{}
-	}
-
-	var doc types.DIDDocumentWithSeq
-	k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &doc)
-	return doc
-}
-
-func (k didKeeper) ListDIDs(ctx sdk.Context) []types.DID {
-	store := ctx.KVStore(k.storeKey)
-	dids := make([]types.DID, 0)
-
-	prefix := DIDDocumentKey("")
-	iter := sdk.KVStorePrefixIterator(store, prefix)
-	defer iter.Close()
-	for ; iter.Valid(); iter.Next() {
-		did := getLastElement(iter.Key(), prefix)
-		dids = append(dids, types.DID(did))
-	}
-	return dids
+func (k Keeper) Logger(ctx sdk.Context) log.Logger {
+	return ctx.Logger().With("module", fmt.Sprintf("x/%s", types.ModuleName))
 }

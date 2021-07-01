@@ -1,42 +1,57 @@
 package types
 
-type GenesisState struct {
-	Owners  map[string]Owner  `json:"owners"`
-	Topics  map[string]Topic  `json:"topics"`
-	Writers map[string]Writer `json:"writers"`
-	Records map[string]Record `json:"records"`
+import "github.com/medibloc/panacea-core/types/compkey"
+
+// this line is used by starport scaffolding # ibc/genesistype/import
+
+// DefaultIndex is the default capability global index
+const DefaultIndex uint64 = 1
+
+const GenesisKeySeparator = "/"
+
+// DefaultGenesis returns the default Capability genesis state
+func DefaultGenesis() *GenesisState {
+	return &GenesisState{
+		Owners:  map[string]*Owner{},
+		Topics:  map[string]*Topic{},
+		Writers: map[string]*Writer{},
+		Records: map[string]*Record{},
+	}
 }
 
-func DefaultGenesisState() GenesisState {
-	return GenesisState{}
-}
-
-func ValidateGenesis(data GenesisState) error {
-	for bz := range data.Owners {
-		var key GenesisOwnerKey
-		err := key.Unmarshal(bz)
-		if err != nil {
+// Validate performs basic genesis state validation returning an error upon any
+// failure.
+func (gs GenesisState) Validate() error {
+	for keyStr := range gs.Owners {
+		var key OwnerCompositeKey
+		if err := compkey.DecodeFromString(keyStr, GenesisKeySeparator, &key); err != nil {
 			return err
 		}
 	}
-	for bz := range data.Topics {
-		var key GenesisTopicKey
-		err := key.Unmarshal(bz)
-		if err != nil {
+	for keyStr, topic := range gs.Topics {
+		var key TopicCompositeKey
+		if err := compkey.DecodeFromString(keyStr, GenesisKeySeparator, &key); err != nil {
+			return err
+		}
+		if err := topic.Validate(); err != nil {
 			return err
 		}
 	}
-	for bz := range data.Writers {
-		var key GenesisWriterKey
-		err := key.Unmarshal(bz)
-		if err != nil {
+	for keyStr, writer := range gs.Writers {
+		var key WriterCompositeKey
+		if err := compkey.DecodeFromString(keyStr, GenesisKeySeparator, &key); err != nil {
+			return err
+		}
+		if err := writer.Validate(); err != nil {
 			return err
 		}
 	}
-	for bz := range data.Records {
-		var key GenesisRecordKey
-		err := key.Unmarshal(bz)
-		if err != nil {
+	for keyStr, record := range gs.Records {
+		var key RecordCompositeKey
+		if err := compkey.DecodeFromString(keyStr, GenesisKeySeparator, &key); err != nil {
+			return err
+		}
+		if err := record.Validate(); err != nil {
 			return err
 		}
 	}

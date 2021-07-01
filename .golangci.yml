@@ -1,0 +1,5 @@
+issues:
+  exclude-rules:
+    - text: "SA1019: codec.LegacyAmino is deprecated"
+      linters:
+        - staticcheck

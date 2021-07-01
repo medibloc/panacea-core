@@ -1,74 +1,34 @@
 package cli
 
 import (
-	"github.com/cosmos/cosmos-sdk/client"
-	"github.com/cosmos/cosmos-sdk/client/context"
-	"github.com/cosmos/cosmos-sdk/codec"
-	"github.com/medibloc/panacea-core/x/did/types"
-	"github.com/spf13/cobra"
-)
+	"fmt"
+	// "strings"
 
-const (
-	RouteDID = "custom/did/did"
+	"github.com/spf13/cobra"
+
+	"github.com/cosmos/cosmos-sdk/client"
+	// "github.com/cosmos/cosmos-sdk/client/flags"
+	// sdk "github.com/cosmos/cosmos-sdk/types"
+
+	"github.com/medibloc/panacea-core/x/did/types"
 )
 
 // GetQueryCmd returns the cli query commands for this module
-func GetQueryCmd(cdc *codec.Codec) *cobra.Command {
-	didQueryCmd := &cobra.Command{
-		Use:   types.ModuleName,
-		Short: "Querying commands for the did module",
-	}
-
-	didQueryCmd.AddCommand(client.GetCommands(
-		GetCmdQueryDID(cdc),
-	)...)
-
-	return didQueryCmd
-}
-
-func GetCmdQueryDID(cdc *codec.Codec) *cobra.Command {
+func GetQueryCmd(queryRoute string) *cobra.Command {
+	// Group did queries under a subcommand
 	cmd := &cobra.Command{
-		Use:   "get-did [did]",
-		Short: "Get a DID",
-		Args:  cobra.ExactArgs(1),
-		RunE: func(cmd *cobra.Command, args []string) error {
-			cliCtx := context.NewCLIContext().WithCodec(cdc)
-			id, err := types.ParseDID(args[0])
-			if err != nil {
-				return err
-			}
-
-			docWithSeq, err := queryDIDDocumentWithSeq(cliCtx, id)
-			if err != nil {
-				return err
-			}
-			return cliCtx.PrintOutput(docWithSeq.Document)
-		},
+		Use:                        types.ModuleName,
+		Short:                      fmt.Sprintf("Querying commands for the %s module", types.ModuleName),
+		DisableFlagParsing:         true,
+		SuggestionsMinimumDistance: 2,
+		RunE:                       client.ValidateCmd,
 	}
-	return cmd
+
+	// this line is used by starport scaffolding # 1
+
+	cmd.AddCommand(CmdGetDID())
+
+
+	return cmd 
 }
 
-// queryDIDDocumentWithSeq gets a DIDDocumentWithSeq from the blockchain.
-// It returns an error if the DID doesn't exist or the DID has been deactivated.
-func queryDIDDocumentWithSeq(cliCtx context.CLIContext, id types.DID) (types.DIDDocumentWithSeq, error) {
-	bz, err := cliCtx.Codec.MarshalJSON(types.NewQueryDIDParams(id))
-	if err != nil {
-		return types.DIDDocumentWithSeq{}, err
-	}
-
-	res, _, err := cliCtx.QueryWithData(RouteDID, bz)
-	if err != nil {
-		return types.DIDDocumentWithSeq{}, err
-	}
-
-	var doc types.DIDDocumentWithSeq
-	cliCtx.Codec.MustUnmarshalJSON(res, &doc)
-	if doc.Empty() {
-		return types.DIDDocumentWithSeq{}, types.ErrDIDNotFound(id)
-	}
-	if doc.Deactivated() {
-		return types.DIDDocumentWithSeq{}, types.ErrDIDDeactivated(id)
-	}
-
-	return doc, nil
-}

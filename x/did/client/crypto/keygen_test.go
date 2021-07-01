@@ -1,22 +1,30 @@
 package crypto_test
 
 import (
+	"github.com/stretchr/testify/suite"
 	"testing"
 
+	"github.com/medibloc/panacea-core/types/testsuite"
 	"github.com/medibloc/panacea-core/x/did/client/crypto"
-	"github.com/stretchr/testify/require"
-
 	"github.com/tendermint/tendermint/crypto/secp256k1"
 )
 
-func TestGenSecp256k1PrivKey(t *testing.T) {
-	privKey, err := crypto.GenSecp256k1PrivKey("", "")
-	require.NoError(t, err)
-	require.NotEqual(t, secp256k1.PrivKeySecp256k1{}, privKey)
+type keygenTestSuite struct {
+	testsuite.TestSuite
 }
 
-func TestGenSecp256k1PrivKey_InvalidMnemonic(t *testing.T) {
+func TestKeygenTestSuite(t *testing.T) {
+	suite.Run(t, new(keygenTestSuite))
+}
+
+func (suite keygenTestSuite) TestGenSecp256k1PrivKey() {
+	privKey, err := crypto.GenSecp256k1PrivKey("", "")
+	suite.Require().NoError(err)
+	suite.Require().NotEqual(secp256k1.PrivKey{}, privKey)
+}
+
+func (suite keygenTestSuite) TestGenSecp256k1PrivKey_InvalidMnemonic() {
 	privKey, err := crypto.GenSecp256k1PrivKey("dummy", "")
-	require.Error(t, err, "invalid mnemonic: dummy")
-	require.Equal(t, secp256k1.PrivKeySecp256k1{}, privKey)
+	suite.Require().Error(err, "invalid mnemonic: dummy")
+	suite.Require().Equal(secp256k1.PrivKey{}, privKey)
 }

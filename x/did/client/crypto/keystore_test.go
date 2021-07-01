@@ -5,10 +5,11 @@ import (
 	"os"
 	"testing"
 
-	"github.com/medibloc/panacea-core/x/did/client/crypto"
-
-	"github.com/stretchr/testify/require"
+	"github.com/stretchr/testify/suite"
 	"github.com/tendermint/tendermint/crypto/secp256k1"
+
+	"github.com/medibloc/panacea-core/types/testsuite"
+	"github.com/medibloc/panacea-core/x/did/client/crypto"
 )
 
 var (
@@ -18,70 +19,78 @@ var (
 	priv    = secp256k1.GenPrivKey()
 )
 
+type keyStoreTestSuite struct {
+	testsuite.TestSuite
+}
+
+func TestKeyStoreTestSuite(t *testing.T) {
+	suite.Run(t, new(keyStoreTestSuite))
+}
+
+func (suite keyStoreTestSuite) AfterTest(_, _ string) {
+	err := os.RemoveAll(baseDir)
+	suite.Require().NoError(err)
+}
+
 // Check if the keystore can decrypt a JSON provided by Web3 Secret Storage Definition
 // https://github.com/ethereum/wiki/wiki/Web3-Secret-Storage-Definition#test-vectors
-func TestKeyStore_DecryptWeb3(t *testing.T) {
-	ks := newKeyStore(t)
+func (suite keyStoreTestSuite) TestKeyStore_DecryptWeb3() {
+	ks := newKeyStore(suite)
 	secret, err := ks.Load("testdata/web3.json", "testpassword")
-	require.NoError(t, err)
-	require.Equal(t, "7a28b5ba57c53603b0b07b56bba752f7784bf506fa95edc395f5cf6c7514fe9d", hex.EncodeToString(secret))
+	suite.Require().NoError(err)
+	suite.Require().Equal("7a28b5ba57c53603b0b07b56bba752f7784bf506fa95edc395f5cf6c7514fe9d", hex.EncodeToString(secret))
 }
 
-func TestKeyStore_SaveAndLoad(t *testing.T) {
-	ks := newKeyStore(t)
+func (suite keyStoreTestSuite) TestKeyStore_SaveAndLoad() {
+	ks := newKeyStore(suite)
 
 	path, err := ks.Save(address, priv[:], passwd)
-	require.NoError(t, err)
-	require.NotEmpty(t, path)
+	suite.Require().NoError(err)
+	suite.Require().NotEmpty(path)
 
 	loadedPriv, err := ks.Load(path, passwd)
-	require.NoError(t, err)
-	require.Equal(t, priv[:], loadedPriv)
+	suite.Require().NoError(err)
+	suite.Require().Equal(priv[:], secp256k1.PrivKey(loadedPriv))
 }
 
-func TestKeyStore_Load_WithInvalidPath(t *testing.T) {
-	ks := newKeyStore(t)
+func (suite keyStoreTestSuite) TestKeyStore_Load_WithInvalidPath() {
+	ks := newKeyStore(suite)
 	path, _ := ks.Save(address, priv[:], passwd)
 	_, err := ks.Load(path+path, passwd)
-	require.Error(t, err)
+	suite.Require().Error(err)
 }
 
-func TestKeyStore_Load_WithInvalidPassword(t *testing.T) {
-	ks := newKeyStore(t)
+func (suite keyStoreTestSuite) TestKeyStore_Load_WithInvalidPassword() {
+	ks := newKeyStore(suite)
 	path, _ := ks.Save(address, priv[:], passwd)
 	_, err := ks.Load(path, passwd+passwd)
-	require.Error(t, err)
+	suite.Require().Error(err)
 }
 
-func TestKeyStore_LoadByAddress_RecentFile(t *testing.T) {
-	ks := newKeyStore(t)
+func (suite keyStoreTestSuite) TestKeyStore_LoadByAddress_RecentFile() {
+	ks := newKeyStore(suite)
 	_, err := ks.Save(address, priv[:], passwd)
-	require.NoError(t, err)
+	suite.Require().NoError(err)
 
 	newPriv := secp256k1.GenPrivKey()
 	_, err = ks.Save(address, newPriv[:], passwd)
-	require.NoError(t, err)
+	suite.Require().NoError(err)
 
 	privBytes, err := ks.LoadByAddress(address, passwd)
-	require.NoError(t, err)
-	require.Equal(t, newPriv[:], privBytes)
+	suite.Require().NoError(err)
+	suite.Require().Equal(newPriv[:], secp256k1.PrivKey(privBytes))
 }
 
-func TestKeyStore_LoadByAddress_NotExist(t *testing.T) {
-	ks := newKeyStore(t)
+func (suite keyStoreTestSuite) TestKeyStore_LoadByAddress_NotExist() {
+	ks := newKeyStore(suite)
 	privBytes, err := ks.LoadByAddress(address, passwd)
-	require.Error(t, err)
-	require.Nil(t, privBytes)
+	suite.Require().Error(err)
+	suite.Require().Nil(privBytes)
 }
 
-func newKeyStore(t *testing.T) *crypto.KeyStore {
+func newKeyStore(suite keyStoreTestSuite) *crypto.KeyStore {
 	ks, err := crypto.NewKeyStore(baseDir)
-	require.NoError(t, err)
-	require.NotNil(t, ks)
-
-	t.Cleanup(func() {
-		os.RemoveAll(baseDir)
-	})
-
+	suite.Require().NoError(err)
+	suite.Require().NotNil(ks)
 	return ks
 }

@@ -1,18 +1,18 @@
 package types
 
 import (
-	"fmt"
-	"strings"
+	"regexp"
+
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-type Topic struct {
-	Description  string `json:"description"`
-	TotalRecords uint64 `json:"total_records"`
-	TotalWriters uint64 `json:"total_writers"`
-}
+const (
+	maxTopicLength       = 70
+	maxDescriptionLength = 5000
+)
 
-func NewTopic(description string) Topic {
-	return Topic{Description: description}
+func (t Topic) Validate() error {
+	return validateDescription(t.Description)
 }
 
 func (t Topic) NextRecordOffset() uint64 {
@@ -23,6 +23,7 @@ func (t Topic) IncreaseTotalRecords() Topic {
 	return Topic{
 		TotalRecords: t.TotalRecords + 1,
 		TotalWriters: t.TotalWriters,
+		Description: t.Description,
 	}
 }
 
@@ -30,6 +31,7 @@ func (t Topic) IncreaseTotalWriters() Topic {
 	return Topic{
 		TotalRecords: t.TotalRecords,
 		TotalWriters: t.TotalWriters + 1,
+		Description: t.Description,
 	}
 }
 
@@ -37,25 +39,26 @@ func (t Topic) DecreaseTotalWriters() Topic {
 	return Topic{
 		TotalRecords: t.TotalRecords,
 		TotalWriters: t.TotalWriters - 1,
+		Description: t.Description,
 	}
 }
 
-func (t Topic) String() string {
-	return fmt.Sprintf(`Topic:
-	Description: %s
-	TotalRecords: %d
-	TotalWriters: %d`,
-		t.Description,
-		t.TotalRecords,
-		t.TotalWriters,
-	)
+func validateTopicName(topicName string) error {
+	if len(topicName) > maxTopicLength {
+		return sdkerrors.Wrapf(ErrMessageTooLarge, "topicName (%d > %d)", len(topicName), maxTopicLength)
+	}
+
+	// cannot be an empty string
+	if !regexp.MustCompile("^[A-Za-z0-9._-]+$").MatchString(topicName) {
+		return sdkerrors.Wrapf(ErrInvalidTopic, "topic %s", topicName)
+	}
+
+	return nil
 }
 
-type Topics []string
-
-func (t Topics) String() (out string) {
-	for _, topic := range t {
-		out += topic + "\n"
+func validateDescription(description string) error {
+	if len(description) > maxDescriptionLength {
+		return sdkerrors.Wrapf(ErrMessageTooLarge, "description (%d > %d)", len(description), maxDescriptionLength)
 	}
-	return strings.TrimSpace(out)
+	return nil
 }

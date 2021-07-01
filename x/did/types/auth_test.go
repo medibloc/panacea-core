@@ -1,44 +1,69 @@
 package types
 
 import (
-	"testing"
-
-	"github.com/tendermint/tendermint/crypto/secp256k1"
-
-	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/stretchr/testify/require"
+	"github.com/tendermint/tendermint/crypto/secp256k1"
+	"testing"
 )
 
 func TestMustGetSignBytesWithSeq(t *testing.T) {
-	did := DID("did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm")
-	signBytes := mustGetSignBytesWithSeq(did, Sequence(100))
+	did := "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm"
+	doc := DIDDocument{
+		ID: did,
+	}
+
+	signBytes := mustGetSignBytesWithSeq(&doc, 100)
 	require.NotNil(t, signBytes)
 
-	var obj dataWithSeq
-	require.NoError(t, codec.New().UnmarshalJSON(signBytes, &obj))
-	require.Equal(t, did.GetSignBytes(), []byte(obj.Data))
-	require.Equal(t, Sequence(100), obj.Seq)
+	dataWithSeq := DataWithSeq{}
+	require.NoError(t, dataWithSeq.Unmarshal(signBytes))
+
+	unmarshalDoc := DIDDocument{}
+	require.NoError(t, unmarshalDoc.Unmarshal(dataWithSeq.GetData()))
+	require.Equal(t, doc.ID, unmarshalDoc.ID)
+	require.Equal(t, uint64(100), dataWithSeq.Seq)
 }
 
 func TestSequence(t *testing.T) {
 	seq := InitialSequence
-	require.Equal(t, Sequence(0), seq)
+	require.Equal(t, uint64(0), seq)
 
-	nextSeq := seq.next()
-	require.Equal(t, Sequence(0), seq)
-	require.Equal(t, Sequence(1), nextSeq)
+	nextSeq := nextSequence(seq)
+	require.Equal(t, uint64(0), seq)
+	require.Equal(t, uint64(1), nextSeq)
 }
 
 func TestSignVerify(t *testing.T) {
-	did := DID("did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm")
+	did := "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm"
+	doc := DIDDocument{
+		ID: did,
+	}
 	privKey := secp256k1.GenPrivKey()
-	seq := Sequence(100)
+	seq := uint64(100)
 
-	sig, err := Sign(did, seq, privKey)
+	sig, err := Sign(&doc, seq, privKey)
 	require.NoError(t, err)
 	require.NotNil(t, sig)
 
-	newSeq, ok := Verify(sig, did, seq, privKey.PubKey())
+	newSeq, ok := Verify(sig, &doc, seq, privKey.PubKey())
 	require.True(t, ok)
 	require.Equal(t, seq+1, newSeq)
+}
+
+func TestSignVerify_doInvalid(t *testing.T) {
+	did := "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm"
+	doc := DIDDocument{
+		ID: did,
+	}
+	privKey := secp256k1.GenPrivKey()
+	anotherPrivKey := secp256k1.GenPrivKey()
+	seq := uint64(100)
+
+	sig, err := Sign(&doc, seq, privKey)
+	require.NoError(t, err)
+	require.NotNil(t, sig)
+
+	newSeq, ok := Verify(sig, &doc, seq, anotherPrivKey.PubKey())
+	require.Equal(t, false, ok)
+	require.Equal(t, uint64(0), newSeq)
 }

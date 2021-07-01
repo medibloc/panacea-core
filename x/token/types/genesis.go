@@ -1,23 +1,42 @@
 package types
 
-type GenesisState struct {
-	Tokens map[string]Token `json:"tokens"`
-}
+import (
+	"fmt"
+	// this line is used by starport scaffolding # ibc/genesistype/import
+)
 
-func DefaultGenesisState() GenesisState {
-	return GenesisState{}
-}
+// DefaultIndex is the default capability global index
+const DefaultIndex uint64 = 1
 
-func ValidateGenesis(data GenesisState) error {
-	for bz, token := range data.Tokens {
-		var key GenesisTokenKey
-		if err := key.Unmarshal(bz); err != nil {
-			return err
-		}
-
-		if err := token.validate(); err != nil {
-			return err
-		}
+// DefaultGenesis returns the default Capability genesis state
+func DefaultGenesis() *GenesisState {
+	return &GenesisState{
+		// this line is used by starport scaffolding # ibc/genesistype/default
+		// this line is used by starport scaffolding # genesis/types/default
+		Tokens: map[string]*Token{},
 	}
+}
+
+// Validate performs basic genesis state validation returning an error upon any
+// failure.
+func (gs GenesisState) Validate() error {
+	// this line is used by starport scaffolding # ibc/genesistype/validate
+
+	// this line is used by starport scaffolding # genesis/types/validate
+	// Check for duplicated ID in token
+	tokenSymbolMap := make(map[string]bool)
+
+	for _, token := range gs.Tokens {
+		if _, ok := tokenSymbolMap[token.Symbol]; ok {
+			return fmt.Errorf("duplicated symbol for token: %v", token)
+		}
+
+		if err := validateToken(token); err != nil {
+			return fmt.Errorf("invalid token: %v", token)
+		}
+
+		tokenSymbolMap[token.Symbol] = true
+	}
+
 	return nil
 }
