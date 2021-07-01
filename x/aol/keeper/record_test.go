@@ -93,7 +93,9 @@ func (suite recordTestSuite) TestMultiRecord() {
 
 	resultKeys, resultRecords := aolKeeper.GetAllRecords(ctx)
 	suite.Require().Equal(2, len(resultKeys))
-	suite.Require().Equal([]aoltypes.RecordCompositeKey{key, key2}, resultKeys)
+	suite.Require().Contains(resultKeys, key)
+	suite.Require().Contains(resultKeys, key2)
 	suite.Require().Equal(2, len(resultRecords))
-	suite.Require().Equal([]aoltypes.Record{record, record2}, resultRecords)
+	suite.Require().Contains(resultRecords, record)
+	suite.Require().Contains(resultRecords, record2)
 }

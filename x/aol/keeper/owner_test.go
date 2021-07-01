@@ -1,13 +1,14 @@
 package keeper_test
 
 import (
+	"testing"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/medibloc/panacea-core/types/testsuite"
 	aoltypes "github.com/medibloc/panacea-core/x/aol/types"
 	"github.com/stretchr/testify/suite"
 	"github.com/tendermint/tendermint/crypto"
 	"github.com/tendermint/tendermint/crypto/secp256k1"
-	"testing"
 )
 
 var (
@@ -89,7 +90,9 @@ func (suite ownerTestSuite) TestMultiOwner() {
 	// verify GetAllOwner
 	resultKeys, resultOwners := aolKeeper.GetAllOwners(ctx)
 	suite.Require().Equal(2, len(resultKeys))
-	suite.Require().Equal([]aoltypes.OwnerCompositeKey{key, key2}, resultKeys)
+	suite.Require().Contains(resultKeys, key)
+	suite.Require().Contains(resultKeys, key2)
 	suite.Require().Equal(2, len(resultOwners))
-	suite.Require().Equal([]aoltypes.Owner{owner, owner2}, resultOwners)
+	suite.Require().Contains(resultOwners, owner)
+	suite.Require().Contains(resultOwners, owner2)
 }
