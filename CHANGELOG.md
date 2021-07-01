@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+TBD
+
+
+## [v2.0.0-alpha.1](https://github.com/medibloc/panacea-core/releases/tag/v2.0.0-alpha.1) - 2021-07-01
+
+### Features
+
+- [\#116](https://github.com/medibloc/panacea-core/pull/116) feat: Support the new Cosmos SDK v0.42 Stargate
+- [\#141](https://github.com/medibloc/panacea-core/pull/141) feat: Add `x/wasm` module
+- [\#115](https://github.com/medibloc/panacea-core/pull/115) feat: Add `x/burn` module
+
 ### Bug fixes
 
 - [\#95](https://github.com/medibloc/panacea-core/pull/95) x/token: Fix to update the total supply of all coins when issuing new tokens
