@@ -57,7 +57,7 @@ func (suite ownerTestSuite) TestOneOwner() {
 	suite.Require().Equal([]aoltypes.Owner{owner}, resultOwners)
 }
 
-func (suite ownerTestSuite) TestMultiOneOwner() {
+func (suite ownerTestSuite) TestMultiOwner() {
 	ctx := suite.Ctx
 	aolKeeper := suite.AolKeeper
 
