@@ -9,14 +9,14 @@ import (
 
 // SetTopic set a specific topic in the store
 func (k Keeper) SetTopic(ctx sdk.Context, key types.TopicCompositeKey, topic types.Topic) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.TopicKey))
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.TopicKeyPrefix)
 	b := k.cdc.MustMarshalBinaryBare(&topic)
 	store.Set(compkey.MustEncode(&key), b)
 }
 
 // GetTopic returns a topic from its id
 func (k Keeper) GetTopic(ctx sdk.Context, key types.TopicCompositeKey) types.Topic {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.TopicKey))
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.TopicKeyPrefix)
 	var topic types.Topic
 	k.cdc.MustUnmarshalBinaryBare(store.Get(compkey.MustEncode(&key)), &topic)
 	return topic
@@ -24,13 +24,13 @@ func (k Keeper) GetTopic(ctx sdk.Context, key types.TopicCompositeKey) types.Top
 
 // HasTopic checks if the topic exists in the store
 func (k Keeper) HasTopic(ctx sdk.Context, key types.TopicCompositeKey) bool {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.TopicKey))
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.TopicKeyPrefix)
 	return store.Has(compkey.MustEncode(&key))
 }
 
 // GetAllTopics returns all topics
 func (k Keeper) GetAllTopics(ctx sdk.Context) ([]types.TopicCompositeKey, []types.Topic) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.TopicKey))
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.TopicKeyPrefix)
 	iterator := sdk.KVStorePrefixIterator(store, []byte{})
 	defer iterator.Close()
 

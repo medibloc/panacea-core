@@ -8,7 +8,7 @@ import (
 
 // SetToken set a specific token in the store
 func (k Keeper) SetToken(ctx sdk.Context, token types.Token) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.TokenKey))
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.TokenKeyPrefix)
 	b := k.cdc.MustMarshalBinaryBare(&token)
 	store.Set(GetSymbolBytes(token.Symbol), b)
 
@@ -30,7 +30,7 @@ func (k Keeper) SetToken(ctx sdk.Context, token types.Token) {
 
 // GetToken returns a token from its id
 func (k Keeper) GetToken(ctx sdk.Context, symbol string) types.Token {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.TokenKey))
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.TokenKeyPrefix)
 	var token types.Token
 	k.cdc.MustUnmarshalBinaryBare(store.Get(GetSymbolBytes(symbol)), &token)
 	return token
@@ -38,13 +38,13 @@ func (k Keeper) GetToken(ctx sdk.Context, symbol string) types.Token {
 
 // HasToken checks if the token exists in the store
 func (k Keeper) HasToken(ctx sdk.Context, symbol string) bool {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.TokenKey))
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.TokenKeyPrefix)
 	return store.Has(GetSymbolBytes(symbol))
 }
 
 // GetAllToken returns all token
 func (k Keeper) GetAllToken(ctx sdk.Context) (list []types.Token) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.TokenKey))
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.TokenKeyPrefix)
 	iterator := sdk.KVStorePrefixIterator(store, []byte{})
 
 	defer iterator.Close()

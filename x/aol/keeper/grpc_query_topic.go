@@ -52,7 +52,7 @@ func (k Keeper) Topics(c context.Context, req *types.QueryListTopicsRequest) (*t
 	}
 
 	store := ctx.KVStore(k.storeKey)
-	topicStore := prefix.NewStore(store, append(types.KeyPrefix(types.TopicKey), compKeyPrefix...))
+	topicStore := prefix.NewStore(store, append(types.TopicKeyPrefix, compKeyPrefix...))
 
 	pageRes, err := query.Paginate(topicStore, req.Pagination, func(compKeyLast []byte, value []byte) error {
 		var compKey types.TopicCompositeKey

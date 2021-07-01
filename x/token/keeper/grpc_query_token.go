@@ -21,7 +21,7 @@ func (k Keeper) TokenAll(c context.Context, req *types.QueryAllTokenRequest) (*t
 	ctx := sdk.UnwrapSDKContext(c)
 
 	store := ctx.KVStore(k.storeKey)
-	tokenStore := prefix.NewStore(store, types.KeyPrefix(types.TokenKey))
+	tokenStore := prefix.NewStore(store, types.TokenKeyPrefix)
 
 	pageRes, err := query.Paginate(tokenStore, req.Pagination, func(key []byte, value []byte) error {
 		var token types.Token
@@ -52,7 +52,7 @@ func (k Keeper) Token(c context.Context, req *types.QueryGetTokenRequest) (*type
 		return nil, sdkerrors.ErrKeyNotFound
 	}
 
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.TokenKey))
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.TokenKeyPrefix)
 	k.cdc.MustUnmarshalBinaryBare(store.Get(GetSymbolBytes(req.Symbol)), &token)
 
 	return &types.QueryGetTokenResponse{Token: &token}, nil

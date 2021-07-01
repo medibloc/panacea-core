@@ -9,14 +9,14 @@ import (
 
 // SetRecord set a specific record in the store
 func (k Keeper) SetRecord(ctx sdk.Context, key types.RecordCompositeKey, record types.Record) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.RecordKey))
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.RecordKeyPrefix)
 	b := k.cdc.MustMarshalBinaryBare(&record)
 	store.Set(compkey.MustEncode(&key), b)
 }
 
 // GetRecord returns a record from its id
 func (k Keeper) GetRecord(ctx sdk.Context, key types.RecordCompositeKey) types.Record {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.RecordKey))
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.RecordKeyPrefix)
 	var record types.Record
 	k.cdc.MustUnmarshalBinaryBare(store.Get(compkey.MustEncode(&key)), &record)
 	return record
@@ -24,13 +24,13 @@ func (k Keeper) GetRecord(ctx sdk.Context, key types.RecordCompositeKey) types.R
 
 // HasRecord checks if the record exists in the store
 func (k Keeper) HasRecord(ctx sdk.Context, key types.RecordCompositeKey) bool {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.RecordKey))
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.RecordKeyPrefix)
 	return store.Has(compkey.MustEncode(&key))
 }
 
 // GetAllRecords returns all records
 func (k Keeper) GetAllRecords(ctx sdk.Context) ([]types.RecordCompositeKey, []types.Record) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.RecordKey))
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.RecordKeyPrefix)
 	iterator := sdk.KVStorePrefixIterator(store, []byte{})
 	defer iterator.Close()
 

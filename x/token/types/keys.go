@@ -20,11 +20,6 @@ const (
 )
 
 // this line is used by starport scaffolding # ibc/keys/port
-
-func KeyPrefix(p string) []byte {
-	return []byte(p)
-}
-
-const (
-	TokenKey = "Token-value-"
+var (
+	TokenKeyPrefix = []byte{0x00}
 )
