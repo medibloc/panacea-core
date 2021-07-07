@@ -52,13 +52,13 @@ proto-swagger-gen: proto-update-deps
 	@echo "Generating swagger.yaml from *.proto files"
 	$(DOCKER) run --rm -v $(CURDIR):/workspace --workdir /workspace tendermintdev/sdk-proto-gen:v0.2 sh ./scripts/protoc-swagger-gen.sh
 
+proto-lint: proto-update-deps
+	$(DOCKER) run --rm -v $(CURDIR):/workspace --workdir /workspace bufbuild/buf lint --error-format=json
+
 proto-update-deps:
 	@echo "Fetching Protobuf dependencies"
 	GO111MODULE=off go get github.com/stormcat24/protodep
 	protodep up --use-https
-
-proto-lint:
-	$(DOCKER) run --rm -v $(CURDIR):/workspace --workdir /workspace bufbuild/buf lint --error-format=json
 
 ########################################
 ### Build/Install
