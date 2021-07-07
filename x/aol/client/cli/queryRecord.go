@@ -25,7 +25,7 @@ func CmdGetRecord() *cobra.Command {
 				return err
 			}
 
-			params := &types.QueryGetRecordRequest{
+			params := &types.QueryRecordRequest{
 				OwnerAddress: args[0],
 				TopicName:    args[1],
 				Offset:       offset,

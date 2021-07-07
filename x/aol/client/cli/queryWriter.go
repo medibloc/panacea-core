@@ -19,7 +19,7 @@ func CmdGetWriter() *cobra.Command {
 
 			queryClient := types.NewQueryClient(clientCtx)
 
-			params := &types.QueryGetWriterRequest{
+			params := &types.QueryWriterRequest{
 				OwnerAddress:  args[0],
 				TopicName:     args[1],
 				WriterAddress: args[2],
@@ -54,7 +54,7 @@ func CmdListWriters() *cobra.Command {
 
 			queryClient := types.NewQueryClient(clientCtx)
 
-			params := &types.QueryListWritersRequest{
+			params := &types.QueryWritersRequest{
 				OwnerAddress: args[0],
 				TopicName:    args[1],
 				Pagination:   pageReq,

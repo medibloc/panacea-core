@@ -13,7 +13,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (k Keeper) Topic(c context.Context, req *types.QueryGetTopicRequest) (*types.QueryGetTopicResponse, error) {
+func (k Keeper) Topic(c context.Context, req *types.QueryTopicRequest) (*types.QueryTopicResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
@@ -31,10 +31,10 @@ func (k Keeper) Topic(c context.Context, req *types.QueryGetTopicRequest) (*type
 	}
 
 	topic := k.GetTopic(ctx, topicKey)
-	return &types.QueryGetTopicResponse{Topic: &topic}, nil
+	return &types.QueryTopicResponse{Topic: &topic}, nil
 }
 
-func (k Keeper) Topics(c context.Context, req *types.QueryListTopicsRequest) (*types.QueryListTopicsResponse, error) {
+func (k Keeper) Topics(c context.Context, req *types.QueryTopicsRequest) (*types.QueryTopicsResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
@@ -67,5 +67,5 @@ func (k Keeper) Topics(c context.Context, req *types.QueryListTopicsRequest) (*t
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	return &types.QueryListTopicsResponse{TopicNames: topicNames, Pagination: pageRes}, nil
+	return &types.QueryTopicsResponse{TopicNames: topicNames, Pagination: pageRes}, nil
 }

@@ -54,9 +54,9 @@ func makeTestDIDDocumentWithSeq(did string) (types.DIDDocumentWithSeq, crypto.Pr
 		&es256VerificationMethod,
 		&blsVerificationMethod,
 	}
-	verificationRelationship := types.NewVerificationRelationship(verificationMethods[0].ID)
-	authentications := []*types.VerificationRelationship{
-		&verificationRelationship,
+	verificationRelationship := types.NewVerificationRelationship(verificationMethods[0].Id)
+	authentications := []types.VerificationRelationship{
+		verificationRelationship,
 	}
 	doc := types.NewDIDDocument(did, types.WithVerificationMethods(verificationMethods), types.WithAuthentications(authentications))
 	docWithSeq := types.NewDIDDocumentWithSeq(

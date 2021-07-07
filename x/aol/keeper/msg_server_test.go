@@ -1,11 +1,12 @@
 package keeper_test
 
 import (
+	"testing"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/medibloc/panacea-core/types/testsuite"
 	aoltypes "github.com/medibloc/panacea-core/x/aol/types"
 	"github.com/stretchr/testify/suite"
-	"testing"
 )
 
 type aolMsgServerTestSuite struct {
@@ -31,8 +32,8 @@ func (suite aolMsgServerTestSuite) TestMsgServer() {
 
 	// create topic
 	msgCreateTopic := aoltypes.MsgCreateTopic{
-		TopicName: topicName,
-		Description: "topic description",
+		TopicName:    topicName,
+		Description:  "topic description",
 		OwnerAddress: ownerAddress.String(),
 	}
 	createTopicResponse, err := aolMsgServer.CreateTopic(goCtx, &msgCreateTopic)
@@ -40,9 +41,9 @@ func (suite aolMsgServerTestSuite) TestMsgServer() {
 	suite.Require().NotNil(createTopicResponse)
 
 	// get topic
-	getTopicRequest := aoltypes.QueryGetTopicRequest{
+	getTopicRequest := aoltypes.QueryTopicRequest{
 		OwnerAddress: ownerAddress.String(),
-		TopicName: topicName,
+		TopicName:    topicName,
 	}
 	getTopicResponse, err := aolKeeper.Topic(goCtx, &getTopicRequest)
 	suite.Require().NoError(err)
@@ -80,9 +81,9 @@ func (suite aolMsgServerTestSuite) TestMsgServer() {
 	suite.Require().NotNil(addWriterResponse)
 
 	// get writer
-	getWriterRequest := aoltypes.QueryGetWriterRequest{
-		OwnerAddress: ownerAddress.String(),
-		TopicName: topicName,
+	getWriterRequest := aoltypes.QueryWriterRequest{
+		OwnerAddress:  ownerAddress.String(),
+		TopicName:     topicName,
 		WriterAddress: writerAddress2.String(),
 	}
 	getWriterResponse, err := aolKeeper.Writer(goCtx, &getWriterRequest)
@@ -91,9 +92,9 @@ func (suite aolMsgServerTestSuite) TestMsgServer() {
 	suite.Require().Equal(msgAddWriter.Moniker, getWriterResponse.Writer.Moniker)
 
 	// get writer2
-	getWriterRequest = aoltypes.QueryGetWriterRequest{
-		OwnerAddress: ownerAddress.String(),
-		TopicName: topicName,
+	getWriterRequest = aoltypes.QueryWriterRequest{
+		OwnerAddress:  ownerAddress.String(),
+		TopicName:     topicName,
 		WriterAddress: writerAddress2.String(),
 	}
 	getWriterResponse, err = aolKeeper.Writer(goCtx, &getWriterRequest)
@@ -103,11 +104,11 @@ func (suite aolMsgServerTestSuite) TestMsgServer() {
 
 	// add record
 	msgAddRecord := aoltypes.MsgAddRecord{
-		TopicName: topicName,
-		Key: []byte("key1"),
-		Value: []byte("value1"),
-		WriterAddress: writerAddress.String(),
-		OwnerAddress: ownerAddress.String(),
+		TopicName:       topicName,
+		Key:             []byte("key1"),
+		Value:           []byte("value1"),
+		WriterAddress:   writerAddress.String(),
+		OwnerAddress:    ownerAddress.String(),
 		FeePayerAddress: writerAddress.String(),
 	}
 	addRecordResponse, err := aolMsgServer.AddRecord(goCtx, &msgAddRecord)
@@ -115,10 +116,10 @@ func (suite aolMsgServerTestSuite) TestMsgServer() {
 	suite.Require().NotNil(addRecordResponse)
 
 	// get record
-	getRecordRequest := aoltypes.QueryGetRecordRequest{
+	getRecordRequest := aoltypes.QueryRecordRequest{
 		OwnerAddress: ownerAddress.String(),
-		TopicName: topicName,
-		Offset: 0,
+		TopicName:    topicName,
+		Offset:       0,
 	}
 	getRecordResponse, err := aolKeeper.Record(goCtx, &getRecordRequest)
 	suite.Require().NoError(err)
@@ -128,11 +129,11 @@ func (suite aolMsgServerTestSuite) TestMsgServer() {
 
 	// add record2
 	msgAddRecord2 := aoltypes.MsgAddRecord{
-		TopicName: topicName,
-		Key: []byte("key2"),
-		Value: []byte("value2"),
-		WriterAddress: writerAddress.String(),
-		OwnerAddress: ownerAddress.String(),
+		TopicName:       topicName,
+		Key:             []byte("key2"),
+		Value:           []byte("value2"),
+		WriterAddress:   writerAddress.String(),
+		OwnerAddress:    ownerAddress.String(),
 		FeePayerAddress: writerAddress.String(),
 	}
 	addRecordResponse, err = aolMsgServer.AddRecord(goCtx, &msgAddRecord2)
@@ -140,10 +141,10 @@ func (suite aolMsgServerTestSuite) TestMsgServer() {
 	suite.Require().NotNil(addRecordResponse)
 
 	// get record
-	getRecordRequest = aoltypes.QueryGetRecordRequest{
+	getRecordRequest = aoltypes.QueryRecordRequest{
 		OwnerAddress: ownerAddress.String(),
-		TopicName: topicName,
-		Offset: 1,
+		TopicName:    topicName,
+		Offset:       1,
 	}
 	getRecordResponse, err = aolKeeper.Record(goCtx, &getRecordRequest)
 	suite.Require().NoError(err)
@@ -152,9 +153,9 @@ func (suite aolMsgServerTestSuite) TestMsgServer() {
 	suite.Require().Equal(msgAddRecord2.WriterAddress, getRecordResponse.Record.WriterAddress)
 
 	// get topic
-	getTopicRequest = aoltypes.QueryGetTopicRequest{
+	getTopicRequest = aoltypes.QueryTopicRequest{
 		OwnerAddress: ownerAddress.String(),
-		TopicName: topicName,
+		TopicName:    topicName,
 	}
 	getTopicResponse, err = aolKeeper.Topic(goCtx, &getTopicRequest)
 	suite.Require().NoError(err)
@@ -164,18 +165,18 @@ func (suite aolMsgServerTestSuite) TestMsgServer() {
 
 	// delete writer
 	msgDeleteWriter := aoltypes.MsgDeleteWriter{
-		TopicName: topicName,
+		TopicName:     topicName,
 		WriterAddress: writerAddress2.String(),
-		OwnerAddress: ownerAddress.String(),
+		OwnerAddress:  ownerAddress.String(),
 	}
-	msgDeleteWriterResponse , err := aolMsgServer.DeleteWriter(goCtx, &msgDeleteWriter)
+	msgDeleteWriterResponse, err := aolMsgServer.DeleteWriter(goCtx, &msgDeleteWriter)
 	suite.Require().NoError(err)
 	suite.Require().NotNil(msgDeleteWriterResponse)
 
 	// get topic
-	getTopicRequest = aoltypes.QueryGetTopicRequest{
+	getTopicRequest = aoltypes.QueryTopicRequest{
 		OwnerAddress: ownerAddress.String(),
-		TopicName: topicName,
+		TopicName:    topicName,
 	}
 	getTopicResponse, err = aolKeeper.Topic(goCtx, &getTopicRequest)
 	suite.Require().NoError(err)
