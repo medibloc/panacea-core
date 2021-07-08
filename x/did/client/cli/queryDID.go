@@ -2,6 +2,7 @@ package cli
 
 import (
 	"context"
+	"encoding/base64"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -25,7 +26,7 @@ func CmdGetDID() *cobra.Command {
 			queryClient := types.NewQueryClient(clientCtx)
 
 			params := &types.QueryDIDRequest{
-				Did: id,
+				DidBase64: base64.StdEncoding.EncodeToString([]byte(id)),
 			}
 
 			res, err := queryClient.DID(context.Background(), params)

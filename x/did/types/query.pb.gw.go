@@ -42,15 +42,15 @@ func request_Query_DID_0(ctx context.Context, marshaler runtime.Marshaler, clien
 		_   = err
 	)
 
-	val, ok = pathParams["did"]
+	val, ok = pathParams["did_base64"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "did")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "did_base64")
 	}
 
-	protoReq.Did, err = runtime.String(val)
+	protoReq.DidBase64, err = runtime.String(val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "did", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "did_base64", err)
 	}
 
 	msg, err := client.DID(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -69,15 +69,15 @@ func local_request_Query_DID_0(ctx context.Context, marshaler runtime.Marshaler,
 		_   = err
 	)
 
-	val, ok = pathParams["did"]
+	val, ok = pathParams["did_base64"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "did")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "did_base64")
 	}
 
-	protoReq.Did, err = runtime.String(val)
+	protoReq.DidBase64, err = runtime.String(val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "did", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "did_base64", err)
 	}
 
 	msg, err := server.DID(ctx, &protoReq)
@@ -176,7 +176,7 @@ func RegisterQueryHandlerClient(ctx context.Context, mux *runtime.ServeMux, clie
 }
 
 var (
-	pattern_Query_DID_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 1}, []string{"panacea", "did", "v2", "dids"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_DID_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"panacea", "did", "v2", "dids", "did_base64"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (

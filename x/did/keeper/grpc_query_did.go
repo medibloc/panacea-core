@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"context"
+	"encoding/base64"
 
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
@@ -18,7 +19,12 @@ func (k Keeper) DID(c context.Context, req *types.QueryDIDRequest) (*types.Query
 
 	ctx := sdk.UnwrapSDKContext(c)
 
-	did := req.Did
+	didBz, err := base64.StdEncoding.DecodeString(req.DidBase64)
+	if err != nil {
+		return &types.QueryDIDResponse{}, sdkerrors.Wrapf(types.ErrInvalidDID, "DidBase64: %s", req.DidBase64)
+	}
+
+	did := string(didBz)
 	docWithSeq := k.GetDIDDocument(ctx, did)
 	if docWithSeq.Empty() {
 		return &types.QueryDIDResponse{}, sdkerrors.Wrapf(types.ErrDIDNotFound, "DID: %s", did)
