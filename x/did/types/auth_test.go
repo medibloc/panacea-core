@@ -22,7 +22,7 @@ func TestMustGetSignBytesWithSeq(t *testing.T) {
 	unmarshalDoc := DIDDocument{}
 	require.NoError(t, unmarshalDoc.Unmarshal(dataWithSeq.GetData()))
 	require.Equal(t, doc.Id, unmarshalDoc.Id)
-	require.Equal(t, uint64(100), dataWithSeq.Seq)
+	require.Equal(t, uint64(100), dataWithSeq.Sequence)
 }
 
 func TestSequence(t *testing.T) {

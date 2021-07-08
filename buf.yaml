@@ -27,8 +27,6 @@ lint:
     - cosmos_proto
     - google
     - confio
-    # TODO: `did` is excluded to odey the W3C spec which uses camel-case, but I guess we can use snake-case.
-    - panacea/did
 breaking:
   use:
     - FILE

@@ -26,7 +26,7 @@ func (suite queryDIDTestSuite) TestDIDDocumentWithSeq() {
 	didKeeper.SetDIDDocument(suite.Ctx, did, docWithSeq)
 
 	req := types.QueryDIDRequest{Did: did}
-	res, err := didKeeper.DIDDocumentWithSeq(sdk.WrapSDKContext(suite.Ctx), &req)
+	res, err := didKeeper.DID(sdk.WrapSDKContext(suite.Ctx), &req)
 	suite.Require().NoError(err)
 	suite.Require().NotNil(res)
 	suite.Require().Equal(docWithSeq, *res.DidDocumentWithSeq)

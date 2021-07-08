@@ -2,6 +2,7 @@ package types
 
 import (
 	"fmt"
+
 	sdkcodec "github.com/cosmos/cosmos-sdk/codec"
 	"github.com/tendermint/tendermint/crypto"
 )
@@ -27,8 +28,8 @@ func mustGetSignBytesWithSeq(signableData sdkcodec.ProtoMarshaler, seq uint64) [
 		panic(fmt.Sprintf("marshal failed: %s, signableData: %s", err.Error(), signableData))
 	}
 	dataWithSeq := DataWithSeq{
-		Data: dAtA,
-		Seq:  seq,
+		Data:     dAtA,
+		Sequence: seq,
 	}
 
 	dAtA, err = dataWithSeq.Marshal()

@@ -328,10 +328,10 @@ func signUsingCurrentSeq(clientCtx client.Context, did string, privKey crypto.Pr
 		Did: did,
 	}
 
-	res, err := queryClient.DIDDocumentWithSeq(context.Background(), params)
+	res, err := queryClient.DID(context.Background(), params)
 	if err != nil {
 		return []byte{}, err
 	}
 
-	return types.Sign(data, res.DidDocumentWithSeq.Seq, privKey)
+	return types.Sign(data, res.DidDocumentWithSeq.Sequence, privKey)
 }

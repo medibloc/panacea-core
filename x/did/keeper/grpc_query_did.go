@@ -11,7 +11,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (k Keeper) DIDDocumentWithSeq(c context.Context, req *types.QueryDIDRequest) (*types.QueryDIDResponse, error) {
+func (k Keeper) DID(c context.Context, req *types.QueryDIDRequest) (*types.QueryDIDResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
