@@ -3,6 +3,7 @@ package cli
 import (
 	"bufio"
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -325,7 +326,7 @@ func signUsingCurrentSeq(clientCtx client.Context, did string, privKey crypto.Pr
 	queryClient := types.NewQueryClient(clientCtx)
 
 	params := &types.QueryDIDRequest{
-		Did: did,
+		DidBase64: base64.StdEncoding.EncodeToString([]byte(did)),
 	}
 
 	res, err := queryClient.DID(context.Background(), params)
