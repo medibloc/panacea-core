@@ -6,6 +6,7 @@ import "cosmos/base/query/v1beta1/pagination.proto";
 // this line is used by starport scaffolding # 1
 import "panacea/did/v2/did.proto";
 
+option java_multiple_files = true;
 option go_package = "github.com/medibloc/panacea-core/x/did/types";
 
 // Query defines the gRPC querier service.

@@ -1,6 +1,7 @@
 syntax = "proto3";
 package panacea.token.v2;
 
+option java_multiple_files = true;
 option go_package = "github.com/medibloc/panacea-core/x/token/types";
 
 import "gogoproto/gogo.proto";

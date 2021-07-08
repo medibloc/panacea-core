@@ -6,6 +6,7 @@ import "panacea/aol/v2/record.proto";
 import "panacea/aol/v2/writer.proto";
 import "panacea/aol/v2/topic.proto";
 
+option java_multiple_files = true;
 option go_package = "github.com/medibloc/panacea-core/x/aol/types";
 
 // GenesisState defines the aol module's genesis state.
