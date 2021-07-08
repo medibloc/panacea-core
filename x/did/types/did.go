@@ -1,12 +1,15 @@
 package types
 
 import (
+	"bytes"
 	"crypto/sha256"
 	"encoding/json"
 	"fmt"
 	"log"
 	"regexp"
 	"strings"
+
+	"github.com/gogo/protobuf/jsonpb"
 
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
@@ -465,8 +468,9 @@ func (v *VerificationRelationship) UnmarshalJSON(bz []byte) error {
 	}
 
 	// if dedicated
+	// Use jsonpb to handle camelCase as well as snake_case
 	var verificationMethod VerificationMethod
-	if err := json.Unmarshal(bz, &verificationMethod); err != nil {
+	if err := jsonpb.Unmarshal(bytes.NewReader(bz), &verificationMethod); err != nil {
 		return err
 	}
 	*v = NewVerificationRelationshipDedicated(verificationMethod)

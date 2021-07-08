@@ -258,7 +258,7 @@ func TestVerificationRelationship_MarshalJSON(t *testing.T) {
 	auth = types.NewVerificationRelationshipDedicated(verificationMethod)
 	bz, err = auth.MarshalJSON()
 	require.NoError(t, err)
-	regex := fmt.Sprintf(`{"id":"%v","type":"%v","controller":"%v","publicKeyBase58":"%v"}`, verificationMethodID, types.ES256K_2019, did, verificationMethod.PublicKeyBase58)
+	regex := fmt.Sprintf(`{"id":"%v","type":"%v","controller":"%v","public_key_base58":"%v"}`, verificationMethodID, types.ES256K_2019, did, verificationMethod.PublicKeyBase58)
 	require.Regexp(t, regex, string(bz))
 }
 
