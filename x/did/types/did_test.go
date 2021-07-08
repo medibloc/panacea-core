@@ -233,16 +233,14 @@ func TestVerificationRelationship_Valid(t *testing.T) {
 	verificationMethodID := types.NewVerificationMethodID(did, "key1")
 	verificationMethod := types.NewVerificationMethod(verificationMethodID, types.ES256K_2019, did, pubKey)
 
-	auth := types.VerificationRelationship{VerificationMethodID: verificationMethodID, DedicatedVerificationMethod: nil}
+	auth := types.NewVerificationRelationship(verificationMethodID)
 	require.True(t, auth.Valid(did))
-	auth = types.VerificationRelationship{VerificationMethodID: verificationMethodID, DedicatedVerificationMethod: &verificationMethod}
+	auth = types.NewVerificationRelationshipDedicated(verificationMethod)
 	require.True(t, auth.Valid(did))
 
-	auth = types.VerificationRelationship{VerificationMethodID: "invalid", DedicatedVerificationMethod: nil}
+	auth = types.NewVerificationRelationship("invalid")
 	require.False(t, auth.Valid(did))
-	auth = types.VerificationRelationship{VerificationMethodID: verificationMethodID, DedicatedVerificationMethod: &types.VerificationMethod{Id: "invalid"}}
-	require.False(t, auth.Valid(did))
-	auth = types.VerificationRelationship{VerificationMethodID: types.NewVerificationMethodID(did, "key2"), DedicatedVerificationMethod: &verificationMethod}
+	auth = types.NewVerificationRelationshipDedicated(types.VerificationMethod{Id: "invalid"})
 	require.False(t, auth.Valid(did))
 }
 

@@ -280,7 +280,7 @@ func (doc DIDDocument) validVerificationRelationships(relationships []Verificati
 		if !relationship.hasDedicatedMethod() {
 			// if the relationship isn't a dedicated verification method,
 			// the referenced verification method must be presented in the 'verificationMethod' property.
-			if _, ok := doc.VerificationMethodByID(relationship.VerificationMethodID); !ok {
+			if _, ok := doc.VerificationMethodByID(relationship.GetVerificationMethodId()); !ok {
 				return false
 			}
 		}
@@ -313,11 +313,15 @@ func (doc DIDDocument) VerificationMethodByID(id string) (VerificationMethod, bo
 // If the relationship has only a ID of VerificationMethod, this function tries to find a corresponding VerificationMethod in the DIDDocument.
 func (doc DIDDocument) VerificationMethodFrom(relationships []VerificationRelationship, id string) (VerificationMethod, bool) {
 	for _, relationship := range relationships {
-		if relationship.VerificationMethodID == id {
-			if relationship.hasDedicatedMethod() {
-				return *relationship.DedicatedVerificationMethod, true
-			} else {
-				return doc.VerificationMethodByID(id)
+		if relationship.hasDedicatedMethod() {
+			veriMethod := relationship.GetVerificationMethod()
+			if veriMethod.Id == id {
+				return *veriMethod, true
+			}
+		} else {
+			veriMethodID := relationship.GetVerificationMethodId()
+			if veriMethodID == id {
+				return doc.VerificationMethodByID(veriMethodID)
 			}
 		}
 	}
@@ -420,36 +424,35 @@ func (pk VerificationMethod) Valid(did string) bool {
 }
 
 func NewVerificationRelationship(verificationMethodID string) VerificationRelationship {
-	return VerificationRelationship{VerificationMethodID: verificationMethodID, DedicatedVerificationMethod: nil}
+	return VerificationRelationship{
+		Content: &VerificationRelationship_VerificationMethodId{VerificationMethodId: verificationMethodID},
+	}
 }
 
 func NewVerificationRelationshipDedicated(verificationMethod VerificationMethod) VerificationRelationship {
-	return VerificationRelationship{VerificationMethodID: verificationMethod.Id, DedicatedVerificationMethod: &verificationMethod}
+	return VerificationRelationship{
+		Content: &VerificationRelationship_VerificationMethod{VerificationMethod: &verificationMethod},
+	}
 }
 
 func (v VerificationRelationship) hasDedicatedMethod() bool {
-	return v.DedicatedVerificationMethod != nil
+	return v.GetVerificationMethod() != nil
 }
 
 func (v VerificationRelationship) Valid(did string) bool {
-	if !ValidateVerificationMethodID(v.VerificationMethodID, did) {
-		return false
+	if v.hasDedicatedMethod() {
+		return v.GetVerificationMethod().Valid(did)
+	} else {
+		return ValidateVerificationMethodID(v.GetVerificationMethodId(), did)
 	}
-	if v.DedicatedVerificationMethod != nil {
-		if !v.DedicatedVerificationMethod.Valid(did) || v.DedicatedVerificationMethod.Id != v.VerificationMethodID {
-			return false
-		}
-	}
-	return true
 }
 
 func (v VerificationRelationship) MarshalJSON() ([]byte, error) {
-	// if dedicated
-	if v.DedicatedVerificationMethod != nil {
-		return json.Marshal(v.DedicatedVerificationMethod)
+	if v.hasDedicatedMethod() {
+		return json.Marshal(v.GetVerificationMethod())
+	} else {
+		return json.Marshal(v.GetVerificationMethodId())
 	}
-	// if not dedicated
-	return json.Marshal(v.VerificationMethodID)
 }
 
 func (v *VerificationRelationship) UnmarshalJSON(bz []byte) error {

@@ -36,8 +36,10 @@ message VerificationMethod {
 
 // VerificationRelationship defines a W3C verification relationship
 message VerificationRelationship {
-  string verificationMethodID = 1;
-  VerificationMethod dedicatedVerificationMethod = 2;
+  oneof content {
+    string verification_method_id = 1;
+    VerificationMethod verification_method = 2;
+  }
 }
 
 // Service defines a service in the W3C DID Document.
