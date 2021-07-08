@@ -7,38 +7,49 @@ option go_package = "github.com/medibloc/panacea-core/x/did/types";
 import "gogoproto/gogo.proto";
 import "panacea/did/v2/did.proto";
 
+// Msg defines the Msg service.
 service Msg {
+  // CreateDID defines a method for creating a DID.
   rpc CreateDID(MsgCreateDID) returns (MsgCreateDIDResponse);
 
+  // UpdateDID defines a method for updating a DID.
   rpc UpdateDID(MsgUpdateDID) returns (MsgUpdateDIDResponse);
+
+  // DeactivateDID defines a method for deactivating a DID.
   rpc DeactivateDID(MsgDeactivateDID) returns (MsgDeactivateDIDResponse);
 }
 
+// MsgCreateDID defines the Msg/CreateDID request type.
 message MsgCreateDID {
-  string DID = 1 [json_name = "did", (gogoproto.jsontag) = "did"];
+  string did = 1;
   DIDDocument document = 2;
-  string verificationMethodID = 3 [json_name = "verification_method_id", (gogoproto.jsontag) = "verification_method_id"];
+  string verification_method_id = 3;
   bytes signature = 4;
-  string fromAddress = 5 [json_name = "from_address", (gogoproto.jsontag) = "from_address"];
+  string from_address = 5;
 }
 
+// MsgCreateDIDResponse defines the Msg/CreateDID response type.
 message MsgCreateDIDResponse {}
 
+// MsgUpdateDID defines the Msg/UpdateDID request type.
 message MsgUpdateDID {
-  string DID = 1 [json_name = "did", (gogoproto.jsontag) = "did"];
+  string did = 1;
   DIDDocument document = 2;
-  string verificationMethodID = 3 [json_name = "verification_method_id", (gogoproto.jsontag) = "verification_method_id"];
+  string verification_method_id = 3;
   bytes signature = 4;
-  string fromAddress = 5 [json_name = "from_address", (gogoproto.jsontag) = "from_address"];
+  string from_address = 5;
 }
 
+// MsgUpdateDIDResponse defines the Msg/UpdateDID response type.
 message MsgUpdateDIDResponse {}
 
+// MsgDeactivateDID defines the Msg/DeactivateDID request type.
 message MsgDeactivateDID {
-  string DID = 1 [json_name = "did", (gogoproto.jsontag) = "did"];
-  string verificationMethodID = 2 [json_name = "verification_method_id", (gogoproto.jsontag) = "verification_method_id"];
+  string did = 1;
+  string verification_method_id = 2;
   bytes signature = 3;
-  string fromAddress = 4 [json_name = "from_address", (gogoproto.jsontag) = "from_address"];
+  string from_address = 4;
 }
 
+// MsgDeactivateDIDResponse defines the Msg/DeactivateDID response type.
 message MsgDeactivateDIDResponse {}

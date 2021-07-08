@@ -6,6 +6,9 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"os"
+	"path/filepath"
+
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/input"
@@ -20,8 +23,6 @@ import (
 	"github.com/tendermint/tendermint/crypto"
 	"github.com/tendermint/tendermint/crypto/secp256k1"
 	"github.com/tendermint/tendermint/libs/cli"
-	"os"
-	"path/filepath"
 
 	didcrypto "github.com/medibloc/panacea-core/x/did/client/crypto"
 	"github.com/medibloc/panacea-core/x/did/types"
@@ -60,7 +61,7 @@ func CmdCreateDID() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			if err := savePrivKeyToKeyStore(msg.VerificationMethodID, privKey, inBuf); err != nil {
+			if err := savePrivKeyToKeyStore(msg.VerificationMethodId, privKey, inBuf); err != nil {
 				return err
 			}
 
@@ -153,7 +154,7 @@ func CmdDeactivateDID() *cobra.Command {
 
 			// For proving that I know the private key. It signs on the DIDDocument.
 			doc := types.DIDDocument{
-				ID: did,
+				Id: did,
 			}
 			sig, err := signUsingCurrentSeq(clientCtx, did, privKey, &doc)
 			if err != nil {
@@ -259,9 +260,9 @@ func newMsgCreateDID(fromAddress sdk.AccAddress, privKey secp256k1.PrivKey) (typ
 	verificationMethods := []*types.VerificationMethod{
 		&verificationMethod,
 	}
-	relationship := types.NewVerificationRelationship(verificationMethods[0].ID)
-	authentications := []*types.VerificationRelationship{
-		&relationship,
+	relationship := types.NewVerificationRelationship(verificationMethods[0].Id)
+	authentications := []types.VerificationRelationship{
+		relationship,
 	}
 	doc := types.NewDIDDocument(did, types.WithVerificationMethods(verificationMethods), types.WithAuthentications(authentications))
 
@@ -323,8 +324,8 @@ func getPrivKeyFromKeyStore(verificationMethodID string, reader *bufio.Reader) (
 func signUsingCurrentSeq(clientCtx client.Context, did string, privKey crypto.PrivKey, data sdkcodec.ProtoMarshaler) ([]byte, error) {
 	queryClient := types.NewQueryClient(clientCtx)
 
-	params := &types.QueryGetDIDRequest{
-		DID: did,
+	params := &types.QueryDIDRequest{
+		Did: did,
 	}
 
 	res, err := queryClient.DIDDocumentWithSeq(context.Background(), params)
@@ -332,5 +333,5 @@ func signUsingCurrentSeq(clientCtx client.Context, did string, privKey crypto.Pr
 		return []byte{}, err
 	}
 
-	return types.Sign(data, res.DIDDocumentWithSeq.Seq, privKey)
+	return types.Sign(data, res.DidDocumentWithSeq.Seq, privKey)
 }

@@ -30,7 +30,7 @@ BUILD_FLAGS := -tags "$(build_tags)" -ldflags '$(ldflags)'
 ARTIFACT_DIR := artifacts
 
 all: build-all install
-build-all: proto-gen update-swagger-docs build
+build-all: proto-lint proto-gen update-swagger-docs build
 
 ########################################
 ### Analyzing
@@ -46,11 +46,14 @@ lint:
 
 proto-gen: proto-update-deps
 	@echo "Generating *.pb.go files from *.proto files"
-	$(DOCKER) run --rm -v $(CURDIR):/workspace --workdir /workspace tendermintdev/sdk-proto-gen sh ./scripts/protocgen.sh
+	$(DOCKER) run --rm -v $(CURDIR):/workspace --workdir /workspace tendermintdev/sdk-proto-gen:v0.2 sh ./scripts/protocgen.sh
 
 proto-swagger-gen: proto-update-deps
 	@echo "Generating swagger.yaml from *.proto files"
-	$(DOCKER) run --rm -v $(CURDIR):/workspace --workdir /workspace tendermintdev/sdk-proto-gen sh ./scripts/protoc-swagger-gen.sh
+	$(DOCKER) run --rm -v $(CURDIR):/workspace --workdir /workspace tendermintdev/sdk-proto-gen:v0.2 sh ./scripts/protoc-swagger-gen.sh
+
+proto-lint: proto-update-deps
+	$(DOCKER) run --rm -v $(CURDIR):/workspace --workdir /workspace bufbuild/buf lint --error-format=json
 
 proto-update-deps:
 	@echo "Fetching Protobuf dependencies"

@@ -11,16 +11,18 @@ option go_package = "github.com/medibloc/panacea-core/x/did/types";
 
 // Query defines the gRPC querier service.
 service Query {
-	rpc DIDDocumentWithSeq(QueryGetDIDRequest) returns (QueryGetDIDResponse) {
-		option (google.api.http).get = "/panacea/did/v2/dids/{DID}";
+	// DIDDocumentWithSeq returns a DID Document with a sequence number.
+	rpc DIDDocumentWithSeq(QueryDIDRequest) returns (QueryDIDResponse) {
+		option (google.api.http).get = "/panacea/did/v2/dids/{did}";
 	}
 }
 
-// this line is used by starport scaffolding # 3
-message QueryGetDIDRequest {
-	string DID = 1;
+// QueryDIDRequest is the request type for the Query/DIDDocumentWithSeq RPC method.
+message QueryDIDRequest {
+	string did = 1;
 }
 
-message QueryGetDIDResponse {
-	DIDDocumentWithSeq DIDDocumentWithSeq = 1;
+// QueryDIDResponse is the response type for the Query/DIDDocumentWithSeq RPC method.
+message QueryDIDResponse {
+	DIDDocumentWithSeq did_document_with_seq = 1;
 }

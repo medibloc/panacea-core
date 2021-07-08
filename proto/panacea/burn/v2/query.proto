@@ -3,14 +3,10 @@ package panacea.burn.v2;
 
 import "google/api/annotations.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";
-// this line is used by starport scaffolding # 1
 
 option java_multiple_files = true;
 option go_package = "github.com/medibloc/panacea-core/x/burn/types";
 
 // Query defines the gRPC querier service.
 service Query {
-    // this line is used by starport scaffolding # 2
 }
-
-// this line is used by starport scaffolding # 3

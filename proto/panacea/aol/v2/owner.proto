@@ -6,6 +6,7 @@ option go_package = "github.com/medibloc/panacea-core/x/aol/types";
 
 import "gogoproto/gogo.proto";
 
+// Owner defines a owner type.
 message Owner {
-  uint64 totalTopics = 1;
+  uint64 total_topics = 1;
 }

@@ -3,10 +3,11 @@ package cli
 import (
 	"bufio"
 	"fmt"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"os"
 	"strings"
 	"testing"
+
+	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/stretchr/testify/suite"
 
@@ -39,7 +40,7 @@ func (suite txTestSuite) TestNewMsgCreateDID() {
 	suite.Require().NoError(err)
 
 	// check if verificationMethod is correct
-	verificationMethod, _ := msg.Document.VerificationMethodByID(msg.VerificationMethodID)
+	verificationMethod, _ := msg.Document.VerificationMethodByID(msg.VerificationMethodId)
 	pubKey, _ := secp256k1util.PubKeyFromBase58(verificationMethod.PubKeyBase58)
 	suite.Require().Equal(privKey.PubKey(), pubKey)
 
@@ -121,10 +122,10 @@ func (suite txTestSuite) TestReadDIDDocOneContext() {
 	contexts := *doc.Contexts
 	suite.Require().Equal(1, len(contexts))
 	suite.Require().Equal(types.ContextDIDV1, contexts[0])
-	suite.Require().Equal("did:panacea:27FnaDeQZApXhsRZZDARhWYs2nKFaw3p7evGd9zUSrBZ", doc.ID)
+	suite.Require().Equal("did:panacea:27FnaDeQZApXhsRZZDARhWYs2nKFaw3p7evGd9zUSrBZ", doc.Id)
 	suite.Require().Equal(1, len(doc.VerificationMethods))
 	suite.Require().Equal("did:panacea:27FnaDeQZApXhsRZZDARhWYs2nKFaw3p7evGd9zUSrBZ", doc.VerificationMethods[0].Controller)
-	suite.Require().Equal("did:panacea:27FnaDeQZApXhsRZZDARhWYs2nKFaw3p7evGd9zUSrBZ#key1", doc.VerificationMethods[0].ID)
+	suite.Require().Equal("did:panacea:27FnaDeQZApXhsRZZDARhWYs2nKFaw3p7evGd9zUSrBZ#key1", doc.VerificationMethods[0].Id)
 	suite.Require().Equal("hfiFwEqzHPx3RbQBmkgg4UEMtejfbL27CspYNKiVuURN", doc.VerificationMethods[0].PubKeyBase58)
 	suite.Require().Equal("Secp256k1VerificationKey2018", doc.VerificationMethods[0].Type)
 	suite.Require().Equal(1, len(doc.Authentications))
@@ -140,10 +141,10 @@ func (suite txTestSuite) TestReadDIDDocTwoContexts() {
 	suite.Require().Equal(2, len(contexts))
 	suite.Require().Equal(types.ContextDIDV1, contexts[0])
 	suite.Require().Equal("https://medibloc.org/ko", contexts[1])
-	suite.Require().Equal("did:panacea:27FnaDeQZApXhsRZZDARhWYs2nKFaw3p7evGd9zUSrBZ", doc.ID)
+	suite.Require().Equal("did:panacea:27FnaDeQZApXhsRZZDARhWYs2nKFaw3p7evGd9zUSrBZ", doc.Id)
 	suite.Require().Equal(1, len(doc.VerificationMethods))
 	suite.Require().Equal("did:panacea:27FnaDeQZApXhsRZZDARhWYs2nKFaw3p7evGd9zUSrBZ", doc.VerificationMethods[0].Controller)
-	suite.Require().Equal("did:panacea:27FnaDeQZApXhsRZZDARhWYs2nKFaw3p7evGd9zUSrBZ#key1", doc.VerificationMethods[0].ID)
+	suite.Require().Equal("did:panacea:27FnaDeQZApXhsRZZDARhWYs2nKFaw3p7evGd9zUSrBZ#key1", doc.VerificationMethods[0].Id)
 	suite.Require().Equal("hfiFwEqzHPx3RbQBmkgg4UEMtejfbL27CspYNKiVuURN", doc.VerificationMethods[0].PubKeyBase58)
 	suite.Require().Equal("Secp256k1VerificationKey2018", doc.VerificationMethods[0].Type)
 	suite.Require().Equal(1, len(doc.Authentications))
@@ -159,19 +160,19 @@ func (suite txTestSuite) TestReadDIDDocMultiRelationship() {
 	suite.Require().Equal(2, len(contexts))
 	suite.Require().Equal(types.ContextDIDV1, contexts[0])
 	suite.Require().Equal("https://medibloc.org/ko", contexts[1])
-	suite.Require().Equal("did:panacea:27FnaDeQZApXhsRZZDARhWYs2nKFaw3p7evGd9zUSrBZ", doc.ID)
+	suite.Require().Equal("did:panacea:27FnaDeQZApXhsRZZDARhWYs2nKFaw3p7evGd9zUSrBZ", doc.Id)
 	suite.Require().Equal(2, len(doc.VerificationMethods))
 	suite.Require().Equal("did:panacea:27FnaDeQZApXhsRZZDARhWYs2nKFaw3p7evGd9zUSrBZ", doc.VerificationMethods[0].Controller)
 	suite.Require().Equal("hfiFwEqzHPx3RbQBmkgg4UEMtejfbL27CspYNKiVuURN", doc.VerificationMethods[0].PubKeyBase58)
 	suite.Require().Equal("Secp256k1VerificationKey2018", doc.VerificationMethods[0].Type)
 	suite.Require().Equal(2, len(doc.Authentications))
-	suite.Require().Equal("did:panacea:27FnaDeQZApXhsRZZDARhWYs2nKFaw3p7evGd9zUSrBZ#key1", doc.VerificationMethods[0].ID)
+	suite.Require().Equal("did:panacea:27FnaDeQZApXhsRZZDARhWYs2nKFaw3p7evGd9zUSrBZ#key1", doc.VerificationMethods[0].Id)
 	suite.Require().Equal("did:panacea:27FnaDeQZApXhsRZZDARhWYs2nKFaw3p7evGd9zUSrBZ#key1", doc.Authentications[0].VerificationMethodID)
 	suite.Require().Nil(doc.Authentications[0].DedicatedVerificationMethod)
 	suite.Require().Equal("did:panacea:27FnaDeQZApXhsRZZDARhWYs2nKFaw3p7evGd9zUSrBZ", doc.Authentications[1].DedicatedVerificationMethod.Controller)
 	suite.Require().Equal("Secp256k1VerificationKey2018", doc.Authentications[1].DedicatedVerificationMethod.Type)
 	suite.Require().Equal("did:panacea:27FnaDeQZApXhsRZZDARhWYs2nKFaw3p7evGd9zUSrBZ#key2", doc.Authentications[1].VerificationMethodID)
-	suite.Require().Equal("did:panacea:27FnaDeQZApXhsRZZDARhWYs2nKFaw3p7evGd9zUSrBZ#key2", doc.Authentications[1].DedicatedVerificationMethod.ID)
+	suite.Require().Equal("did:panacea:27FnaDeQZApXhsRZZDARhWYs2nKFaw3p7evGd9zUSrBZ#key2", doc.Authentications[1].DedicatedVerificationMethod.Id)
 	suite.Require().Equal("zH3C2AVvLMv6gmMNam3uVAjZpfkcJCwDwnZn6z3wXmqPV", doc.Authentications[1].DedicatedVerificationMethod.PubKeyBase58)
 
 	suite.Require().Equal(3, len(doc.AssertionMethods))
@@ -180,11 +181,11 @@ func (suite txTestSuite) TestReadDIDDocMultiRelationship() {
 	suite.Require().Equal("did:panacea:27FnaDeQZApXhsRZZDARhWYs2nKFaw3p7evGd9zUSrBZ", doc.AssertionMethods[1].DedicatedVerificationMethod.Controller)
 	suite.Require().Equal("Secp256k1VerificationKey2018", doc.AssertionMethods[1].DedicatedVerificationMethod.Type)
 	suite.Require().Equal("did:panacea:27FnaDeQZApXhsRZZDARhWYs2nKFaw3p7evGd9zUSrBZ#key2", doc.AssertionMethods[1].VerificationMethodID)
-	suite.Require().Equal("did:panacea:27FnaDeQZApXhsRZZDARhWYs2nKFaw3p7evGd9zUSrBZ#key2", doc.AssertionMethods[1].DedicatedVerificationMethod.ID)
+	suite.Require().Equal("did:panacea:27FnaDeQZApXhsRZZDARhWYs2nKFaw3p7evGd9zUSrBZ#key2", doc.AssertionMethods[1].DedicatedVerificationMethod.Id)
 	suite.Require().Equal("aH3C2AVvLMv6gmMNam3uVAjZpfkcJCwDwnZn6z3wXmqPs", doc.AssertionMethods[1].DedicatedVerificationMethod.PubKeyBase58)
 	suite.Require().Equal("did:panacea:27FnaDeQZApXhsRZZDARhWYs2nKFaw3p7evGd9zUSrBZ", doc.AssertionMethods[2].DedicatedVerificationMethod.Controller)
 	suite.Require().Equal("Secp256k1VerificationKey2018", doc.AssertionMethods[2].DedicatedVerificationMethod.Type)
-	suite.Require().Equal("did:panacea:27FnaDeQZApXhsRZZDARhWYs2nKFaw3p7evGd9zUSrBZ#key3", doc.AssertionMethods[2].DedicatedVerificationMethod.ID)
+	suite.Require().Equal("did:panacea:27FnaDeQZApXhsRZZDARhWYs2nKFaw3p7evGd9zUSrBZ#key3", doc.AssertionMethods[2].DedicatedVerificationMethod.Id)
 	suite.Require().Equal("bH3C2AVvLMv6gmMNam3uVAjZpfkcJCwDwnZn6z3wXmqPo", doc.AssertionMethods[2].DedicatedVerificationMethod.PubKeyBase58)
 
 	suite.Require().Equal(3, len(doc.KeyAgreements))
@@ -193,7 +194,7 @@ func (suite txTestSuite) TestReadDIDDocMultiRelationship() {
 	suite.Require().Equal("did:panacea:27FnaDeQZApXhsRZZDARhWYs2nKFaw3p7evGd9zUSrBZ", doc.KeyAgreements[1].DedicatedVerificationMethod.Controller)
 	suite.Require().Equal("Secp256k1VerificationKey2018", doc.KeyAgreements[1].DedicatedVerificationMethod.Type)
 	suite.Require().Equal("did:panacea:27FnaDeQZApXhsRZZDARhWYs2nKFaw3p7evGd9zUSrBZ#key2", doc.KeyAgreements[1].VerificationMethodID)
-	suite.Require().Equal("did:panacea:27FnaDeQZApXhsRZZDARhWYs2nKFaw3p7evGd9zUSrBZ#key2", doc.KeyAgreements[1].DedicatedVerificationMethod.ID)
+	suite.Require().Equal("did:panacea:27FnaDeQZApXhsRZZDARhWYs2nKFaw3p7evGd9zUSrBZ#key2", doc.KeyAgreements[1].DedicatedVerificationMethod.Id)
 	suite.Require().Equal("oH3C2AVvLMv6gmMNam3uVAjZpfkcJCwDwnZn6z3wXmqPP", doc.KeyAgreements[1].DedicatedVerificationMethod.PubKeyBase58)
 	suite.Require().Equal("did:panacea:27FnaDeQZApXhsRZZDARhWYs2nKFaw3p7evGd9zUSrBZ#key3", doc.KeyAgreements[2].VerificationMethodID)
 	suite.Require().Nil(doc.KeyAgreements[2].DedicatedVerificationMethod)
@@ -204,7 +205,7 @@ func (suite txTestSuite) TestReadDIDDocMultiRelationship() {
 	suite.Require().Equal("did:panacea:27FnaDeQZApXhsRZZDARhWYs2nKFaw3p7evGd9zUSrBZ", doc.CapabilityInvocations[1].DedicatedVerificationMethod.Controller)
 	suite.Require().Equal("Secp256k1VerificationKey2018", doc.CapabilityInvocations[1].DedicatedVerificationMethod.Type)
 	suite.Require().Equal("did:panacea:27FnaDeQZApXhsRZZDARhWYs2nKFaw3p7evGd9zUSrBZ#key2", doc.CapabilityInvocations[1].VerificationMethodID)
-	suite.Require().Equal("did:panacea:27FnaDeQZApXhsRZZDARhWYs2nKFaw3p7evGd9zUSrBZ#key2", doc.CapabilityInvocations[1].DedicatedVerificationMethod.ID)
+	suite.Require().Equal("did:panacea:27FnaDeQZApXhsRZZDARhWYs2nKFaw3p7evGd9zUSrBZ#key2", doc.CapabilityInvocations[1].DedicatedVerificationMethod.Id)
 	suite.Require().Equal("PH3C2AVvLMv6gmMNam3uVAjZpfkcJCwDwnZn6z3wXmqPp", doc.CapabilityInvocations[1].DedicatedVerificationMethod.PubKeyBase58)
 
 	suite.Require().Equal(2, len(doc.CapabilityDelegations))
@@ -213,6 +214,6 @@ func (suite txTestSuite) TestReadDIDDocMultiRelationship() {
 	suite.Require().Equal("did:panacea:27FnaDeQZApXhsRZZDARhWYs2nKFaw3p7evGd9zUSrBZ", doc.CapabilityDelegations[1].DedicatedVerificationMethod.Controller)
 	suite.Require().Equal("Secp256k1VerificationKey2018", doc.CapabilityDelegations[1].DedicatedVerificationMethod.Type)
 	suite.Require().Equal("did:panacea:27FnaDeQZApXhsRZZDARhWYs2nKFaw3p7evGd9zUSrBZ#key2", doc.CapabilityDelegations[1].VerificationMethodID)
-	suite.Require().Equal("did:panacea:27FnaDeQZApXhsRZZDARhWYs2nKFaw3p7evGd9zUSrBZ#key2", doc.CapabilityDelegations[1].DedicatedVerificationMethod.ID)
+	suite.Require().Equal("did:panacea:27FnaDeQZApXhsRZZDARhWYs2nKFaw3p7evGd9zUSrBZ#key2", doc.CapabilityDelegations[1].DedicatedVerificationMethod.Id)
 	suite.Require().Equal("qH3C2AVvLMv6gmMNam3uVAjZpfkcJCwDwnZn6z3wXmqPQ", doc.CapabilityDelegations[1].DedicatedVerificationMethod.PubKeyBase58)
 }

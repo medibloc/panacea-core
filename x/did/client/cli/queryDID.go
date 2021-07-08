@@ -2,6 +2,7 @@ package cli
 
 import (
 	"context"
+
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/medibloc/panacea-core/x/did/types"
@@ -23,8 +24,8 @@ func CmdGetDID() *cobra.Command {
 
 			queryClient := types.NewQueryClient(clientCtx)
 
-			params := &types.QueryGetDIDRequest{
-				DID: id,
+			params := &types.QueryDIDRequest{
+				Did: id,
 			}
 
 			res, err := queryClient.DIDDocumentWithSeq(context.Background(), params)

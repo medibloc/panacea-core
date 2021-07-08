@@ -28,12 +28,13 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
+// MsgCreateDID defines the Msg/CreateDID request type.
 type MsgCreateDID struct {
-	DID                  string       `protobuf:"bytes,1,opt,name=DID,json=did,proto3" json:"did"`
+	Did                  string       `protobuf:"bytes,1,opt,name=did,proto3" json:"did,omitempty"`
 	Document             *DIDDocument `protobuf:"bytes,2,opt,name=document,proto3" json:"document,omitempty"`
-	VerificationMethodID string       `protobuf:"bytes,3,opt,name=verificationMethodID,json=verification_method_id,proto3" json:"verification_method_id"`
+	VerificationMethodId string       `protobuf:"bytes,3,opt,name=verification_method_id,json=verificationMethodId,proto3" json:"verification_method_id,omitempty"`
 	Signature            []byte       `protobuf:"bytes,4,opt,name=signature,proto3" json:"signature,omitempty"`
-	FromAddress          string       `protobuf:"bytes,5,opt,name=fromAddress,json=from_address,proto3" json:"from_address"`
+	FromAddress          string       `protobuf:"bytes,5,opt,name=from_address,json=fromAddress,proto3" json:"from_address,omitempty"`
 }
 
 func (m *MsgCreateDID) Reset()         { *m = MsgCreateDID{} }
@@ -69,9 +70,9 @@ func (m *MsgCreateDID) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgCreateDID proto.InternalMessageInfo
 
-func (m *MsgCreateDID) GetDID() string {
+func (m *MsgCreateDID) GetDid() string {
 	if m != nil {
-		return m.DID
+		return m.Did
 	}
 	return ""
 }
@@ -83,9 +84,9 @@ func (m *MsgCreateDID) GetDocument() *DIDDocument {
 	return nil
 }
 
-func (m *MsgCreateDID) GetVerificationMethodID() string {
+func (m *MsgCreateDID) GetVerificationMethodId() string {
 	if m != nil {
-		return m.VerificationMethodID
+		return m.VerificationMethodId
 	}
 	return ""
 }
@@ -104,6 +105,7 @@ func (m *MsgCreateDID) GetFromAddress() string {
 	return ""
 }
 
+// MsgCreateDIDResponse defines the Msg/CreateDID response type.
 type MsgCreateDIDResponse struct {
 }
 
@@ -140,12 +142,13 @@ func (m *MsgCreateDIDResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgCreateDIDResponse proto.InternalMessageInfo
 
+// MsgUpdateDID defines the Msg/UpdateDID request type.
 type MsgUpdateDID struct {
-	DID                  string       `protobuf:"bytes,1,opt,name=DID,json=did,proto3" json:"did"`
+	Did                  string       `protobuf:"bytes,1,opt,name=did,proto3" json:"did,omitempty"`
 	Document             *DIDDocument `protobuf:"bytes,2,opt,name=document,proto3" json:"document,omitempty"`
-	VerificationMethodID string       `protobuf:"bytes,3,opt,name=verificationMethodID,json=verification_method_id,proto3" json:"verification_method_id"`
+	VerificationMethodId string       `protobuf:"bytes,3,opt,name=verification_method_id,json=verificationMethodId,proto3" json:"verification_method_id,omitempty"`
 	Signature            []byte       `protobuf:"bytes,4,opt,name=signature,proto3" json:"signature,omitempty"`
-	FromAddress          string       `protobuf:"bytes,5,opt,name=fromAddress,json=from_address,proto3" json:"from_address"`
+	FromAddress          string       `protobuf:"bytes,5,opt,name=from_address,json=fromAddress,proto3" json:"from_address,omitempty"`
 }
 
 func (m *MsgUpdateDID) Reset()         { *m = MsgUpdateDID{} }
@@ -181,9 +184,9 @@ func (m *MsgUpdateDID) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgUpdateDID proto.InternalMessageInfo
 
-func (m *MsgUpdateDID) GetDID() string {
+func (m *MsgUpdateDID) GetDid() string {
 	if m != nil {
-		return m.DID
+		return m.Did
 	}
 	return ""
 }
@@ -195,9 +198,9 @@ func (m *MsgUpdateDID) GetDocument() *DIDDocument {
 	return nil
 }
 
-func (m *MsgUpdateDID) GetVerificationMethodID() string {
+func (m *MsgUpdateDID) GetVerificationMethodId() string {
 	if m != nil {
-		return m.VerificationMethodID
+		return m.VerificationMethodId
 	}
 	return ""
 }
@@ -216,6 +219,7 @@ func (m *MsgUpdateDID) GetFromAddress() string {
 	return ""
 }
 
+// MsgUpdateDIDResponse defines the Msg/UpdateDID response type.
 type MsgUpdateDIDResponse struct {
 }
 
@@ -252,11 +256,12 @@ func (m *MsgUpdateDIDResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgUpdateDIDResponse proto.InternalMessageInfo
 
+// MsgDeactivateDID defines the Msg/DeactivateDID request type.
 type MsgDeactivateDID struct {
-	DID                  string `protobuf:"bytes,1,opt,name=DID,json=did,proto3" json:"did"`
-	VerificationMethodID string `protobuf:"bytes,2,opt,name=verificationMethodID,json=verification_method_id,proto3" json:"verification_method_id"`
+	Did                  string `protobuf:"bytes,1,opt,name=did,proto3" json:"did,omitempty"`
+	VerificationMethodId string `protobuf:"bytes,2,opt,name=verification_method_id,json=verificationMethodId,proto3" json:"verification_method_id,omitempty"`
 	Signature            []byte `protobuf:"bytes,3,opt,name=signature,proto3" json:"signature,omitempty"`
-	FromAddress          string `protobuf:"bytes,4,opt,name=fromAddress,json=from_address,proto3" json:"from_address"`
+	FromAddress          string `protobuf:"bytes,4,opt,name=from_address,json=fromAddress,proto3" json:"from_address,omitempty"`
 }
 
 func (m *MsgDeactivateDID) Reset()         { *m = MsgDeactivateDID{} }
@@ -292,16 +297,16 @@ func (m *MsgDeactivateDID) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgDeactivateDID proto.InternalMessageInfo
 
-func (m *MsgDeactivateDID) GetDID() string {
+func (m *MsgDeactivateDID) GetDid() string {
 	if m != nil {
-		return m.DID
+		return m.Did
 	}
 	return ""
 }
 
-func (m *MsgDeactivateDID) GetVerificationMethodID() string {
+func (m *MsgDeactivateDID) GetVerificationMethodId() string {
 	if m != nil {
-		return m.VerificationMethodID
+		return m.VerificationMethodId
 	}
 	return ""
 }
@@ -320,6 +325,7 @@ func (m *MsgDeactivateDID) GetFromAddress() string {
 	return ""
 }
 
+// MsgDeactivateDIDResponse defines the Msg/DeactivateDID response type.
 type MsgDeactivateDIDResponse struct {
 }
 
@@ -368,35 +374,34 @@ func init() {
 func init() { proto.RegisterFile("panacea/did/v2/tx.proto", fileDescriptor_c90e89c02ae9a760) }
 
 var fileDescriptor_c90e89c02ae9a760 = []byte{
-	// 448 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xec, 0x54, 0xbf, 0x6f, 0xd3, 0x40,
-	0x18, 0xcd, 0xc5, 0xe5, 0x47, 0xae, 0x01, 0x55, 0x27, 0xab, 0x18, 0x53, 0x39, 0x56, 0xc5, 0xe0,
-	0x01, 0x6c, 0xc9, 0x1d, 0x98, 0x29, 0x27, 0x24, 0x0f, 0x16, 0xc8, 0x12, 0x0b, 0x0c, 0xd1, 0xc5,
-	0x77, 0x75, 0x4f, 0xc2, 0x3e, 0xcb, 0x77, 0xb1, 0xca, 0x8e, 0xc4, 0xca, 0x9f, 0xc5, 0x58, 0x31,
-	0x31, 0x45, 0x28, 0xd9, 0xf2, 0x57, 0x20, 0xbb, 0x71, 0x62, 0x87, 0x94, 0x30, 0x30, 0xb2, 0x58,
-	0xf6, 0xf7, 0xde, 0xbd, 0x4f, 0xef, 0x7d, 0xe7, 0x0f, 0x3e, 0xca, 0x49, 0x46, 0x62, 0x46, 0x3c,
-	0xca, 0xa9, 0x57, 0xfa, 0x9e, 0xba, 0x72, 0xf3, 0x42, 0x28, 0x81, 0x1e, 0xae, 0x00, 0x97, 0x72,
-	0xea, 0x96, 0xbe, 0xa9, 0x27, 0x22, 0x11, 0x35, 0xe4, 0x55, 0x6f, 0x37, 0x2c, 0xd3, 0xd8, 0x3a,
-	0x5e, 0x91, 0x6b, 0xe4, 0xf4, 0x4b, 0x1f, 0x0e, 0x43, 0x99, 0xbc, 0x2a, 0x18, 0x51, 0x0c, 0x07,
-	0x18, 0x3d, 0x86, 0x1a, 0x0e, 0xb0, 0x01, 0x6c, 0xe0, 0x0c, 0xce, 0xef, 0x2d, 0x67, 0x23, 0x8d,
-	0x72, 0x1a, 0x55, 0x0f, 0xf4, 0x02, 0xde, 0xa7, 0x22, 0x9e, 0xa6, 0x2c, 0x53, 0x46, 0xdf, 0x06,
-	0xce, 0xa1, 0xff, 0xc4, 0xed, 0xb6, 0x77, 0x71, 0x80, 0xf1, 0x8a, 0x12, 0xad, 0xc9, 0xe8, 0x2d,
-	0xd4, 0x4b, 0x56, 0xf0, 0x0b, 0x1e, 0x13, 0xc5, 0x45, 0x16, 0x32, 0x75, 0x29, 0x68, 0x80, 0x0d,
-	0xad, 0x6e, 0x62, 0x2e, 0x67, 0xa3, 0xe3, 0x36, 0x3e, 0x4e, 0x6b, 0xc2, 0x98, 0xd3, 0xe8, 0x96,
-	0x3a, 0x3a, 0x81, 0x03, 0xc9, 0x93, 0x8c, 0xa8, 0x69, 0xc1, 0x8c, 0x03, 0x1b, 0x38, 0xc3, 0x68,
-	0x53, 0x40, 0x67, 0xf0, 0xf0, 0xa2, 0x10, 0xe9, 0x4b, 0x4a, 0x0b, 0x26, 0xa5, 0x71, 0xa7, 0x6e,
-	0x73, 0xb4, 0x9c, 0x8d, 0x86, 0x55, 0x79, 0x4c, 0x6e, 0xea, 0x51, 0xe7, 0xeb, 0xf4, 0x18, 0xea,
-	0xed, 0x20, 0x22, 0x26, 0x73, 0x91, 0x49, 0xd6, 0x24, 0xf4, 0x2e, 0xa7, 0xff, 0x13, 0xd2, 0xdb,
-	0x41, 0xac, 0x13, 0xfa, 0x0e, 0xe0, 0x51, 0x28, 0x13, 0xcc, 0x48, 0xac, 0x78, 0xb9, 0x3f, 0xa5,
-	0xdb, 0xcc, 0xf6, 0xff, 0x8d, 0x59, 0x6d, 0x8f, 0xd9, 0x83, 0xbf, 0x32, 0x6b, 0x42, 0x63, 0xdb,
-	0x53, 0x63, 0xd8, 0xff, 0xdc, 0x87, 0x5a, 0x28, 0x13, 0xf4, 0x06, 0x0e, 0x36, 0x3f, 0xce, 0xc9,
-	0xf6, 0xa4, 0xdb, 0xb7, 0xc9, 0x7c, 0xfa, 0x27, 0xb4, 0x11, 0xae, 0x04, 0x37, 0xf7, 0x6c, 0x97,
-	0xe0, 0x1a, 0xdd, 0x29, 0xf8, 0xdb, 0x68, 0xd0, 0x07, 0xf8, 0xa0, 0x3b, 0x16, 0x7b, 0xc7, 0xb1,
-	0x0e, 0xc3, 0x74, 0xf6, 0x31, 0x1a, 0xf1, 0xf3, 0xd7, 0xdf, 0xe6, 0x16, 0xb8, 0x9e, 0x5b, 0xe0,
-	0xe7, 0xdc, 0x02, 0x5f, 0x17, 0x56, 0xef, 0x7a, 0x61, 0xf5, 0x7e, 0x2c, 0xac, 0xde, 0xfb, 0x67,
-	0x09, 0x57, 0x97, 0xd3, 0x89, 0x1b, 0x8b, 0xd4, 0x4b, 0x19, 0xe5, 0x93, 0x8f, 0x22, 0xf6, 0x56,
-	0xb2, 0xcf, 0x63, 0x51, 0x30, 0xef, 0xaa, 0x5e, 0x45, 0xea, 0x53, 0xce, 0xe4, 0xe4, 0x6e, 0xbd,
-	0x8a, 0xce, 0x7e, 0x05, 0x00, 0x00, 0xff, 0xff, 0xeb, 0x34, 0x45, 0x17, 0xe5, 0x04, 0x00, 0x00,
+	// 420 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xdc, 0x53, 0x3d, 0x8f, 0xd3, 0x40,
+	0x10, 0xcd, 0xc6, 0x01, 0x91, 0x4d, 0x40, 0xd1, 0x2a, 0x0a, 0x96, 0x89, 0x2c, 0x13, 0x51, 0xb8,
+	0x00, 0x5b, 0x32, 0x48, 0xd4, 0x80, 0x0b, 0x52, 0x58, 0x20, 0x4b, 0x34, 0x50, 0x44, 0x1b, 0xef,
+	0xc6, 0x59, 0x09, 0x7b, 0x2d, 0xef, 0xc6, 0x0a, 0x3d, 0x3f, 0xe0, 0xfa, 0xfb, 0x43, 0x57, 0xa6,
+	0xbc, 0xf2, 0x94, 0xfc, 0x91, 0x93, 0x9d, 0xd8, 0xf9, 0xbe, 0x5c, 0x7d, 0xdd, 0x6a, 0xde, 0x9b,
+	0xe7, 0xf7, 0x66, 0x3c, 0xf0, 0x75, 0x82, 0x63, 0x1c, 0x50, 0x6c, 0x13, 0x46, 0xec, 0xcc, 0xb1,
+	0xe5, 0xdc, 0x4a, 0x52, 0x2e, 0x39, 0x7a, 0xb5, 0x01, 0x2c, 0xc2, 0x88, 0x95, 0x39, 0x5a, 0x37,
+	0xe4, 0x21, 0x2f, 0x20, 0x3b, 0x7f, 0xad, 0x59, 0x9a, 0x7a, 0xd0, 0x9e, 0x93, 0x0b, 0x64, 0xb0,
+	0x00, 0xb0, 0xed, 0x89, 0xf0, 0x5b, 0x4a, 0xb1, 0xa4, 0xee, 0xd0, 0x45, 0x1d, 0xa8, 0x10, 0x46,
+	0x54, 0x60, 0x00, 0xb3, 0xe9, 0xe7, 0x4f, 0xf4, 0x19, 0xbe, 0x20, 0x3c, 0x98, 0x45, 0x34, 0x96,
+	0x6a, 0xdd, 0x00, 0x66, 0xcb, 0x79, 0x63, 0xed, 0x7f, 0xd5, 0x72, 0x87, 0xae, 0xbb, 0xa1, 0xf8,
+	0x15, 0x19, 0x7d, 0x82, 0xbd, 0x8c, 0xa6, 0x6c, 0xc2, 0x02, 0x2c, 0x19, 0x8f, 0x47, 0x11, 0x95,
+	0x53, 0x4e, 0x46, 0x8c, 0xa8, 0x4a, 0xa1, 0xde, 0xdd, 0x45, 0xbd, 0x02, 0x1c, 0x12, 0xd4, 0x87,
+	0x4d, 0xc1, 0xc2, 0x18, 0xcb, 0x59, 0x4a, 0xd5, 0x86, 0x01, 0xcc, 0xb6, 0xbf, 0x2d, 0xa0, 0xb7,
+	0xb0, 0x3d, 0x49, 0x79, 0x34, 0xc2, 0x84, 0xa4, 0x54, 0x08, 0xf5, 0x59, 0xa1, 0xd4, 0xca, 0x6b,
+	0x5f, 0xd6, 0xa5, 0x41, 0x0f, 0x76, 0x77, 0x13, 0xf9, 0x54, 0x24, 0x3c, 0x16, 0xb4, 0x8c, 0xfa,
+	0x2b, 0x21, 0x4f, 0x2c, 0x6a, 0x95, 0xa8, 0x8a, 0x7a, 0x0d, 0x60, 0xc7, 0x13, 0xa1, 0x4b, 0x71,
+	0x20, 0x59, 0x76, 0x36, 0xee, 0x79, 0xd7, 0xf5, 0xc7, 0xba, 0x56, 0x2e, 0xb9, 0x6e, 0x1c, 0xbb,
+	0xd6, 0xa0, 0x7a, 0x68, 0xae, 0x74, 0xee, 0xfc, 0xaf, 0x43, 0xc5, 0x13, 0x21, 0xfa, 0x01, 0x9b,
+	0xdb, 0x7f, 0xb2, 0x7f, 0xb8, 0x84, 0xdd, 0xfd, 0x6a, 0xef, 0x1e, 0x42, 0x4b, 0xe1, 0x5c, 0x70,
+	0xbb, 0xf9, 0x53, 0x82, 0x15, 0x7a, 0x52, 0xf0, 0x68, 0xc6, 0xe8, 0x0f, 0x7c, 0xb9, 0x3f, 0x5f,
+	0xe3, 0x44, 0xdb, 0x1e, 0x43, 0x33, 0x2f, 0x31, 0x4a, 0xf1, 0xaf, 0xdf, 0x6f, 0x96, 0x3a, 0x58,
+	0x2c, 0x75, 0x70, 0xb7, 0xd4, 0xc1, 0xd5, 0x4a, 0xaf, 0x2d, 0x56, 0x7a, 0xed, 0x76, 0xa5, 0xd7,
+	0x7e, 0x82, 0xdf, 0xef, 0x43, 0x26, 0xa7, 0xb3, 0xb1, 0x15, 0xf0, 0xc8, 0x8e, 0x28, 0x61, 0xe3,
+	0xbf, 0x3c, 0xb0, 0x37, 0xc2, 0x1f, 0x02, 0x9e, 0x52, 0x7b, 0x5e, 0xdc, 0xb9, 0xfc, 0x97, 0x50,
+	0x31, 0x7e, 0x5e, 0xdc, 0xf9, 0xc7, 0xfb, 0x00, 0x00, 0x00, 0xff, 0xff, 0x48, 0x26, 0x49, 0x8f,
+	0x42, 0x04, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -411,8 +416,11 @@ const _ = grpc.SupportPackageIsVersion4
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type MsgClient interface {
+	// CreateDID defines a method for creating a DID.
 	CreateDID(ctx context.Context, in *MsgCreateDID, opts ...grpc.CallOption) (*MsgCreateDIDResponse, error)
+	// UpdateDID defines a method for updating a DID.
 	UpdateDID(ctx context.Context, in *MsgUpdateDID, opts ...grpc.CallOption) (*MsgUpdateDIDResponse, error)
+	// DeactivateDID defines a method for deactivating a DID.
 	DeactivateDID(ctx context.Context, in *MsgDeactivateDID, opts ...grpc.CallOption) (*MsgDeactivateDIDResponse, error)
 }
 
@@ -453,8 +461,11 @@ func (c *msgClient) DeactivateDID(ctx context.Context, in *MsgDeactivateDID, opt
 
 // MsgServer is the server API for Msg service.
 type MsgServer interface {
+	// CreateDID defines a method for creating a DID.
 	CreateDID(context.Context, *MsgCreateDID) (*MsgCreateDIDResponse, error)
+	// UpdateDID defines a method for updating a DID.
 	UpdateDID(context.Context, *MsgUpdateDID) (*MsgUpdateDIDResponse, error)
+	// DeactivateDID defines a method for deactivating a DID.
 	DeactivateDID(context.Context, *MsgDeactivateDID) (*MsgDeactivateDIDResponse, error)
 }
 
@@ -585,10 +596,10 @@ func (m *MsgCreateDID) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x22
 	}
-	if len(m.VerificationMethodID) > 0 {
-		i -= len(m.VerificationMethodID)
-		copy(dAtA[i:], m.VerificationMethodID)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.VerificationMethodID)))
+	if len(m.VerificationMethodId) > 0 {
+		i -= len(m.VerificationMethodId)
+		copy(dAtA[i:], m.VerificationMethodId)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.VerificationMethodId)))
 		i--
 		dAtA[i] = 0x1a
 	}
@@ -604,10 +615,10 @@ func (m *MsgCreateDID) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x12
 	}
-	if len(m.DID) > 0 {
-		i -= len(m.DID)
-		copy(dAtA[i:], m.DID)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.DID)))
+	if len(m.Did) > 0 {
+		i -= len(m.Did)
+		copy(dAtA[i:], m.Did)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Did)))
 		i--
 		dAtA[i] = 0xa
 	}
@@ -671,10 +682,10 @@ func (m *MsgUpdateDID) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x22
 	}
-	if len(m.VerificationMethodID) > 0 {
-		i -= len(m.VerificationMethodID)
-		copy(dAtA[i:], m.VerificationMethodID)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.VerificationMethodID)))
+	if len(m.VerificationMethodId) > 0 {
+		i -= len(m.VerificationMethodId)
+		copy(dAtA[i:], m.VerificationMethodId)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.VerificationMethodId)))
 		i--
 		dAtA[i] = 0x1a
 	}
@@ -690,10 +701,10 @@ func (m *MsgUpdateDID) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x12
 	}
-	if len(m.DID) > 0 {
-		i -= len(m.DID)
-		copy(dAtA[i:], m.DID)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.DID)))
+	if len(m.Did) > 0 {
+		i -= len(m.Did)
+		copy(dAtA[i:], m.Did)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Did)))
 		i--
 		dAtA[i] = 0xa
 	}
@@ -757,17 +768,17 @@ func (m *MsgDeactivateDID) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x1a
 	}
-	if len(m.VerificationMethodID) > 0 {
-		i -= len(m.VerificationMethodID)
-		copy(dAtA[i:], m.VerificationMethodID)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.VerificationMethodID)))
+	if len(m.VerificationMethodId) > 0 {
+		i -= len(m.VerificationMethodId)
+		copy(dAtA[i:], m.VerificationMethodId)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.VerificationMethodId)))
 		i--
 		dAtA[i] = 0x12
 	}
-	if len(m.DID) > 0 {
-		i -= len(m.DID)
-		copy(dAtA[i:], m.DID)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.DID)))
+	if len(m.Did) > 0 {
+		i -= len(m.Did)
+		copy(dAtA[i:], m.Did)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Did)))
 		i--
 		dAtA[i] = 0xa
 	}
@@ -814,7 +825,7 @@ func (m *MsgCreateDID) Size() (n int) {
 	}
 	var l int
 	_ = l
-	l = len(m.DID)
+	l = len(m.Did)
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
@@ -822,7 +833,7 @@ func (m *MsgCreateDID) Size() (n int) {
 		l = m.Document.Size()
 		n += 1 + l + sovTx(uint64(l))
 	}
-	l = len(m.VerificationMethodID)
+	l = len(m.VerificationMethodId)
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
@@ -852,7 +863,7 @@ func (m *MsgUpdateDID) Size() (n int) {
 	}
 	var l int
 	_ = l
-	l = len(m.DID)
+	l = len(m.Did)
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
@@ -860,7 +871,7 @@ func (m *MsgUpdateDID) Size() (n int) {
 		l = m.Document.Size()
 		n += 1 + l + sovTx(uint64(l))
 	}
-	l = len(m.VerificationMethodID)
+	l = len(m.VerificationMethodId)
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
@@ -890,11 +901,11 @@ func (m *MsgDeactivateDID) Size() (n int) {
 	}
 	var l int
 	_ = l
-	l = len(m.DID)
+	l = len(m.Did)
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
-	l = len(m.VerificationMethodID)
+	l = len(m.VerificationMethodId)
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
@@ -955,7 +966,7 @@ func (m *MsgCreateDID) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field DID", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Did", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -983,7 +994,7 @@ func (m *MsgCreateDID) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.DID = string(dAtA[iNdEx:postIndex])
+			m.Did = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
@@ -1023,7 +1034,7 @@ func (m *MsgCreateDID) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field VerificationMethodID", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field VerificationMethodId", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -1051,7 +1062,7 @@ func (m *MsgCreateDID) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.VerificationMethodID = string(dAtA[iNdEx:postIndex])
+			m.VerificationMethodId = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 4:
 			if wireType != 2 {
@@ -1221,7 +1232,7 @@ func (m *MsgUpdateDID) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field DID", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Did", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -1249,7 +1260,7 @@ func (m *MsgUpdateDID) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.DID = string(dAtA[iNdEx:postIndex])
+			m.Did = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
@@ -1289,7 +1300,7 @@ func (m *MsgUpdateDID) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field VerificationMethodID", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field VerificationMethodId", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -1317,7 +1328,7 @@ func (m *MsgUpdateDID) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.VerificationMethodID = string(dAtA[iNdEx:postIndex])
+			m.VerificationMethodId = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 4:
 			if wireType != 2 {
@@ -1487,7 +1498,7 @@ func (m *MsgDeactivateDID) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field DID", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Did", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -1515,11 +1526,11 @@ func (m *MsgDeactivateDID) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.DID = string(dAtA[iNdEx:postIndex])
+			m.Did = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field VerificationMethodID", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field VerificationMethodId", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -1547,7 +1558,7 @@ func (m *MsgDeactivateDID) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.VerificationMethodID = string(dAtA[iNdEx:postIndex])
+			m.VerificationMethodId = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {

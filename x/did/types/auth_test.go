@@ -1,15 +1,16 @@
 package types
 
 import (
+	"testing"
+
 	"github.com/stretchr/testify/require"
 	"github.com/tendermint/tendermint/crypto/secp256k1"
-	"testing"
 )
 
 func TestMustGetSignBytesWithSeq(t *testing.T) {
 	did := "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm"
 	doc := DIDDocument{
-		ID: did,
+		Id: did,
 	}
 
 	signBytes := mustGetSignBytesWithSeq(&doc, 100)
@@ -20,7 +21,7 @@ func TestMustGetSignBytesWithSeq(t *testing.T) {
 
 	unmarshalDoc := DIDDocument{}
 	require.NoError(t, unmarshalDoc.Unmarshal(dataWithSeq.GetData()))
-	require.Equal(t, doc.ID, unmarshalDoc.ID)
+	require.Equal(t, doc.Id, unmarshalDoc.Id)
 	require.Equal(t, uint64(100), dataWithSeq.Seq)
 }
 
@@ -36,7 +37,7 @@ func TestSequence(t *testing.T) {
 func TestSignVerify(t *testing.T) {
 	did := "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm"
 	doc := DIDDocument{
-		ID: did,
+		Id: did,
 	}
 	privKey := secp256k1.GenPrivKey()
 	seq := uint64(100)
@@ -53,7 +54,7 @@ func TestSignVerify(t *testing.T) {
 func TestSignVerify_doInvalid(t *testing.T) {
 	did := "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm"
 	doc := DIDDocument{
-		ID: did,
+		Id: did,
 	}
 	privKey := secp256k1.GenPrivKey()
 	anotherPrivKey := secp256k1.GenPrivKey()

@@ -1,0 +1,42 @@
+# For 'buf': https://docs.buf.build/configuration/#bufyaml-defaults
+# Reference: https://github.com/cosmos/cosmos-sdk/blob/v0.42.6/buf.yaml
+version: v1beta1
+
+build:
+  roots:
+    - proto
+    - third_party/proto
+  excludes:
+    - third_party/proto/google/protobuf
+lint:
+  use:
+    - DEFAULT
+    - COMMENTS
+    - FILE_LOWER_SNAKE_CASE
+  except:
+    - UNARY_RPC
+    - COMMENT_FIELD
+    - SERVICE_SUFFIX
+    - PACKAGE_VERSION_SUFFIX
+    - RPC_REQUEST_STANDARD_NAME
+  ignore:
+    - tendermint
+    - gogoproto
+    - cosmos
+    - ibc
+    - cosmos_proto
+    - google
+    - confio
+    # TODO: `did` is excluded to odey the W3C spec which uses camel-case, but I guess we can use snake-case.
+    - panacea/did
+breaking:
+  use:
+    - FILE
+  ignore:
+    - tendermint
+    - gogoproto
+    - cosmos
+    - ibc
+    - cosmos_proto
+    - google
+    - confio

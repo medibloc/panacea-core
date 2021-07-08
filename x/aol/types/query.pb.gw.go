@@ -32,7 +32,7 @@ var _ = utilities.NewDoubleArray
 var _ = descriptor.ForMessage
 
 func request_Query_Topic_0(ctx context.Context, marshaler runtime.Marshaler, client QueryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq QueryGetTopicRequest
+	var protoReq QueryTopicRequest
 	var metadata runtime.ServerMetadata
 
 	var (
@@ -42,26 +42,26 @@ func request_Query_Topic_0(ctx context.Context, marshaler runtime.Marshaler, cli
 		_   = err
 	)
 
-	val, ok = pathParams["ownerAddress"]
+	val, ok = pathParams["owner_address"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "ownerAddress")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "owner_address")
 	}
 
 	protoReq.OwnerAddress, err = runtime.String(val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "ownerAddress", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "owner_address", err)
 	}
 
-	val, ok = pathParams["topicName"]
+	val, ok = pathParams["topic_name"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "topicName")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "topic_name")
 	}
 
 	protoReq.TopicName, err = runtime.String(val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "topicName", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "topic_name", err)
 	}
 
 	msg, err := client.Topic(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -70,7 +70,7 @@ func request_Query_Topic_0(ctx context.Context, marshaler runtime.Marshaler, cli
 }
 
 func local_request_Query_Topic_0(ctx context.Context, marshaler runtime.Marshaler, server QueryServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq QueryGetTopicRequest
+	var protoReq QueryTopicRequest
 	var metadata runtime.ServerMetadata
 
 	var (
@@ -80,26 +80,26 @@ func local_request_Query_Topic_0(ctx context.Context, marshaler runtime.Marshale
 		_   = err
 	)
 
-	val, ok = pathParams["ownerAddress"]
+	val, ok = pathParams["owner_address"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "ownerAddress")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "owner_address")
 	}
 
 	protoReq.OwnerAddress, err = runtime.String(val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "ownerAddress", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "owner_address", err)
 	}
 
-	val, ok = pathParams["topicName"]
+	val, ok = pathParams["topic_name"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "topicName")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "topic_name")
 	}
 
 	protoReq.TopicName, err = runtime.String(val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "topicName", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "topic_name", err)
 	}
 
 	msg, err := server.Topic(ctx, &protoReq)
@@ -108,11 +108,11 @@ func local_request_Query_Topic_0(ctx context.Context, marshaler runtime.Marshale
 }
 
 var (
-	filter_Query_Topics_0 = &utilities.DoubleArray{Encoding: map[string]int{"ownerAddress": 0}, Base: []int{1, 1, 0}, Check: []int{0, 1, 2}}
+	filter_Query_Topics_0 = &utilities.DoubleArray{Encoding: map[string]int{"owner_address": 0}, Base: []int{1, 1, 0}, Check: []int{0, 1, 2}}
 )
 
 func request_Query_Topics_0(ctx context.Context, marshaler runtime.Marshaler, client QueryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq QueryListTopicsRequest
+	var protoReq QueryTopicsRequest
 	var metadata runtime.ServerMetadata
 
 	var (
@@ -122,15 +122,15 @@ func request_Query_Topics_0(ctx context.Context, marshaler runtime.Marshaler, cl
 		_   = err
 	)
 
-	val, ok = pathParams["ownerAddress"]
+	val, ok = pathParams["owner_address"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "ownerAddress")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "owner_address")
 	}
 
 	protoReq.OwnerAddress, err = runtime.String(val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "ownerAddress", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "owner_address", err)
 	}
 
 	if err := req.ParseForm(); err != nil {
@@ -146,7 +146,7 @@ func request_Query_Topics_0(ctx context.Context, marshaler runtime.Marshaler, cl
 }
 
 func local_request_Query_Topics_0(ctx context.Context, marshaler runtime.Marshaler, server QueryServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq QueryListTopicsRequest
+	var protoReq QueryTopicsRequest
 	var metadata runtime.ServerMetadata
 
 	var (
@@ -156,15 +156,15 @@ func local_request_Query_Topics_0(ctx context.Context, marshaler runtime.Marshal
 		_   = err
 	)
 
-	val, ok = pathParams["ownerAddress"]
+	val, ok = pathParams["owner_address"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "ownerAddress")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "owner_address")
 	}
 
 	protoReq.OwnerAddress, err = runtime.String(val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "ownerAddress", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "owner_address", err)
 	}
 
 	if err := req.ParseForm(); err != nil {
@@ -180,7 +180,7 @@ func local_request_Query_Topics_0(ctx context.Context, marshaler runtime.Marshal
 }
 
 func request_Query_Writer_0(ctx context.Context, marshaler runtime.Marshaler, client QueryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq QueryGetWriterRequest
+	var protoReq QueryWriterRequest
 	var metadata runtime.ServerMetadata
 
 	var (
@@ -190,37 +190,37 @@ func request_Query_Writer_0(ctx context.Context, marshaler runtime.Marshaler, cl
 		_   = err
 	)
 
-	val, ok = pathParams["ownerAddress"]
+	val, ok = pathParams["owner_address"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "ownerAddress")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "owner_address")
 	}
 
 	protoReq.OwnerAddress, err = runtime.String(val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "ownerAddress", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "owner_address", err)
 	}
 
-	val, ok = pathParams["topicName"]
+	val, ok = pathParams["topic_name"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "topicName")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "topic_name")
 	}
 
 	protoReq.TopicName, err = runtime.String(val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "topicName", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "topic_name", err)
 	}
 
-	val, ok = pathParams["writerAddress"]
+	val, ok = pathParams["writer_address"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "writerAddress")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "writer_address")
 	}
 
 	protoReq.WriterAddress, err = runtime.String(val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "writerAddress", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "writer_address", err)
 	}
 
 	msg, err := client.Writer(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -229,7 +229,7 @@ func request_Query_Writer_0(ctx context.Context, marshaler runtime.Marshaler, cl
 }
 
 func local_request_Query_Writer_0(ctx context.Context, marshaler runtime.Marshaler, server QueryServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq QueryGetWriterRequest
+	var protoReq QueryWriterRequest
 	var metadata runtime.ServerMetadata
 
 	var (
@@ -239,37 +239,37 @@ func local_request_Query_Writer_0(ctx context.Context, marshaler runtime.Marshal
 		_   = err
 	)
 
-	val, ok = pathParams["ownerAddress"]
+	val, ok = pathParams["owner_address"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "ownerAddress")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "owner_address")
 	}
 
 	protoReq.OwnerAddress, err = runtime.String(val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "ownerAddress", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "owner_address", err)
 	}
 
-	val, ok = pathParams["topicName"]
+	val, ok = pathParams["topic_name"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "topicName")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "topic_name")
 	}
 
 	protoReq.TopicName, err = runtime.String(val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "topicName", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "topic_name", err)
 	}
 
-	val, ok = pathParams["writerAddress"]
+	val, ok = pathParams["writer_address"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "writerAddress")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "writer_address")
 	}
 
 	protoReq.WriterAddress, err = runtime.String(val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "writerAddress", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "writer_address", err)
 	}
 
 	msg, err := server.Writer(ctx, &protoReq)
@@ -278,11 +278,11 @@ func local_request_Query_Writer_0(ctx context.Context, marshaler runtime.Marshal
 }
 
 var (
-	filter_Query_Writers_0 = &utilities.DoubleArray{Encoding: map[string]int{"ownerAddress": 0, "topicName": 1}, Base: []int{1, 1, 2, 0, 0}, Check: []int{0, 1, 1, 2, 3}}
+	filter_Query_Writers_0 = &utilities.DoubleArray{Encoding: map[string]int{"owner_address": 0, "topic_name": 1}, Base: []int{1, 1, 2, 0, 0}, Check: []int{0, 1, 1, 2, 3}}
 )
 
 func request_Query_Writers_0(ctx context.Context, marshaler runtime.Marshaler, client QueryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq QueryListWritersRequest
+	var protoReq QueryWritersRequest
 	var metadata runtime.ServerMetadata
 
 	var (
@@ -292,26 +292,26 @@ func request_Query_Writers_0(ctx context.Context, marshaler runtime.Marshaler, c
 		_   = err
 	)
 
-	val, ok = pathParams["ownerAddress"]
+	val, ok = pathParams["owner_address"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "ownerAddress")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "owner_address")
 	}
 
 	protoReq.OwnerAddress, err = runtime.String(val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "ownerAddress", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "owner_address", err)
 	}
 
-	val, ok = pathParams["topicName"]
+	val, ok = pathParams["topic_name"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "topicName")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "topic_name")
 	}
 
 	protoReq.TopicName, err = runtime.String(val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "topicName", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "topic_name", err)
 	}
 
 	if err := req.ParseForm(); err != nil {
@@ -327,7 +327,7 @@ func request_Query_Writers_0(ctx context.Context, marshaler runtime.Marshaler, c
 }
 
 func local_request_Query_Writers_0(ctx context.Context, marshaler runtime.Marshaler, server QueryServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq QueryListWritersRequest
+	var protoReq QueryWritersRequest
 	var metadata runtime.ServerMetadata
 
 	var (
@@ -337,26 +337,26 @@ func local_request_Query_Writers_0(ctx context.Context, marshaler runtime.Marsha
 		_   = err
 	)
 
-	val, ok = pathParams["ownerAddress"]
+	val, ok = pathParams["owner_address"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "ownerAddress")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "owner_address")
 	}
 
 	protoReq.OwnerAddress, err = runtime.String(val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "ownerAddress", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "owner_address", err)
 	}
 
-	val, ok = pathParams["topicName"]
+	val, ok = pathParams["topic_name"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "topicName")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "topic_name")
 	}
 
 	protoReq.TopicName, err = runtime.String(val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "topicName", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "topic_name", err)
 	}
 
 	if err := req.ParseForm(); err != nil {
@@ -372,7 +372,7 @@ func local_request_Query_Writers_0(ctx context.Context, marshaler runtime.Marsha
 }
 
 func request_Query_Record_0(ctx context.Context, marshaler runtime.Marshaler, client QueryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq QueryGetRecordRequest
+	var protoReq QueryRecordRequest
 	var metadata runtime.ServerMetadata
 
 	var (
@@ -382,26 +382,26 @@ func request_Query_Record_0(ctx context.Context, marshaler runtime.Marshaler, cl
 		_   = err
 	)
 
-	val, ok = pathParams["ownerAddress"]
+	val, ok = pathParams["owner_address"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "ownerAddress")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "owner_address")
 	}
 
 	protoReq.OwnerAddress, err = runtime.String(val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "ownerAddress", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "owner_address", err)
 	}
 
-	val, ok = pathParams["topicName"]
+	val, ok = pathParams["topic_name"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "topicName")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "topic_name")
 	}
 
 	protoReq.TopicName, err = runtime.String(val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "topicName", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "topic_name", err)
 	}
 
 	val, ok = pathParams["offset"]
@@ -421,7 +421,7 @@ func request_Query_Record_0(ctx context.Context, marshaler runtime.Marshaler, cl
 }
 
 func local_request_Query_Record_0(ctx context.Context, marshaler runtime.Marshaler, server QueryServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq QueryGetRecordRequest
+	var protoReq QueryRecordRequest
 	var metadata runtime.ServerMetadata
 
 	var (
@@ -431,26 +431,26 @@ func local_request_Query_Record_0(ctx context.Context, marshaler runtime.Marshal
 		_   = err
 	)
 
-	val, ok = pathParams["ownerAddress"]
+	val, ok = pathParams["owner_address"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "ownerAddress")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "owner_address")
 	}
 
 	protoReq.OwnerAddress, err = runtime.String(val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "ownerAddress", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "owner_address", err)
 	}
 
-	val, ok = pathParams["topicName"]
+	val, ok = pathParams["topic_name"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "topicName")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "topic_name")
 	}
 
 	protoReq.TopicName, err = runtime.String(val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "topicName", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "topic_name", err)
 	}
 
 	val, ok = pathParams["offset"]
@@ -720,15 +720,15 @@ func RegisterQueryHandlerClient(ctx context.Context, mux *runtime.ServeMux, clie
 }
 
 var (
-	pattern_Query_Topic_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6}, []string{"panacea", "aol", "v2", "owners", "ownerAddress", "topics", "topicName"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_Topic_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6}, []string{"panacea", "aol", "v2", "owners", "owner_address", "topics", "topic_name"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_Topics_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5}, []string{"panacea", "aol", "v2", "owners", "ownerAddress", "topics"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_Topics_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5}, []string{"panacea", "aol", "v2", "owners", "owner_address", "topics"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_Writer_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6, 2, 7, 1, 0, 4, 1, 5, 8}, []string{"panacea", "aol", "v2", "owners", "ownerAddress", "topics", "topicName", "writers", "writerAddress"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_Writer_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6, 2, 7, 1, 0, 4, 1, 5, 8}, []string{"panacea", "aol", "v2", "owners", "owner_address", "topics", "topic_name", "writers", "writer_address"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_Writers_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6, 2, 7}, []string{"panacea", "aol", "v2", "owners", "ownerAddress", "topics", "topicName", "writers"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_Writers_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6, 2, 7}, []string{"panacea", "aol", "v2", "owners", "owner_address", "topics", "topic_name", "writers"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_Record_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6, 2, 7, 1, 0, 4, 1, 5, 8}, []string{"panacea", "aol", "v2", "owners", "ownerAddress", "topics", "topicName", "records", "offset"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_Record_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6, 2, 7, 1, 0, 4, 1, 5, 8}, []string{"panacea", "aol", "v2", "owners", "owner_address", "topics", "topic_name", "records", "offset"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (
