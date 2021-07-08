@@ -32,7 +32,7 @@ func (suite genesisTestSuite) TestGenesis() {
 
 	didKeeper.SetDIDDocument(suite.Ctx, did1, doc1)
 	didKeeper.SetDIDDocument(suite.Ctx, did2, doc2)
-	doc2Deactivated := doc2.Deactivate(doc2.Seq + 1)
+	doc2Deactivated := doc2.Deactivate(doc2.Sequence + 1)
 	didKeeper.SetDIDDocument(suite.Ctx, did2, doc2Deactivated)
 
 	// export a genesis

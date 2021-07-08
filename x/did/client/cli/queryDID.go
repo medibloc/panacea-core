@@ -28,7 +28,7 @@ func CmdGetDID() *cobra.Command {
 				Did: id,
 			}
 
-			res, err := queryClient.DIDDocumentWithSeq(context.Background(), params)
+			res, err := queryClient.DID(context.Background(), params)
 
 			if err != nil {
 				return err

@@ -224,7 +224,7 @@ func TestNewVerificationMethod(t *testing.T) {
 	pub := types.NewVerificationMethod(types.NewVerificationMethodID(did, "key1"), types.ES256K_2019, did, pubKey)
 	require.True(t, pub.Valid(did))
 
-	require.Equal(t, pubKey[:], base58.Decode(pub.PubKeyBase58))
+	require.Equal(t, pubKey[:], base58.Decode(pub.PublicKeyBase58))
 }
 
 func TestVerificationRelationship_Valid(t *testing.T) {
@@ -258,7 +258,7 @@ func TestVerificationRelationship_MarshalJSON(t *testing.T) {
 	auth = types.NewVerificationRelationshipDedicated(verificationMethod)
 	bz, err = auth.MarshalJSON()
 	require.NoError(t, err)
-	regex := fmt.Sprintf(`{"id":"%v","type":"%v","controller":"%v","publicKeyBase58":"%v"}`, verificationMethodID, types.ES256K_2019, did, verificationMethod.PubKeyBase58)
+	regex := fmt.Sprintf(`{"id":"%v","type":"%v","controller":"%v","publicKeyBase58":"%v"}`, verificationMethodID, types.ES256K_2019, did, verificationMethod.PublicKeyBase58)
 	require.Regexp(t, regex, string(bz))
 }
 
@@ -274,7 +274,7 @@ func TestVerificationRelationship_UnmarshalJSON(t *testing.T) {
 	require.Equal(t, types.NewVerificationRelationship(verificationMethodID), auth)
 	require.True(t, auth.Valid(did))
 
-	bz = []byte(fmt.Sprintf(`{"id":"%v","type":"%v","controller":"%v","publicKeyBase58":"%v"}`, verificationMethodID, types.ES256K_2019, did, verificationMethod.PubKeyBase58))
+	bz = []byte(fmt.Sprintf(`{"id":"%v","type":"%v","controller":"%v","publicKeyBase58":"%v"}`, verificationMethodID, types.ES256K_2019, did, verificationMethod.PublicKeyBase58))
 	require.NoError(t, auth.UnmarshalJSON(bz))
 	require.Equal(t, types.NewVerificationRelationshipDedicated(verificationMethod), auth)
 	require.True(t, auth.Valid(did))

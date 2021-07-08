@@ -406,10 +406,10 @@ func ValidateKeyType(keyType string) bool {
 
 func NewVerificationMethod(id string, keyType string, controller string, pubKey []byte) VerificationMethod {
 	return VerificationMethod{
-		Id:           id,
-		Type:         keyType,
-		Controller:   controller,
-		PubKeyBase58: base58.Encode(pubKey),
+		Id:              id,
+		Type:            keyType,
+		Controller:      controller,
+		PublicKeyBase58: base58.Encode(pubKey),
 	}
 }
 
@@ -419,7 +419,7 @@ func (pk VerificationMethod) Valid(did string) bool {
 	}
 
 	pattern := fmt.Sprintf("^[%s]+$", Base58Charset)
-	matched, _ := regexp.MatchString(pattern, pk.PubKeyBase58)
+	matched, _ := regexp.MatchString(pattern, pk.PublicKeyBase58)
 	return matched
 }
 
@@ -484,14 +484,14 @@ func (s Service) Valid() bool {
 func NewDIDDocumentWithSeq(doc *DIDDocument, seq uint64) DIDDocumentWithSeq {
 	return DIDDocumentWithSeq{
 		Document: doc,
-		Seq:      seq,
+		Sequence: seq,
 	}
 }
 
 // Empty returns true if all members in DIDDocumentWithSeq are empty.
 // The empty struct means that the entity doesn't exist.
 func (d DIDDocumentWithSeq) Empty() bool {
-	return d.Document == nil || d.Document.Empty() && d.Seq == InitialSequence
+	return d.Document == nil || d.Document.Empty() && d.Sequence == InitialSequence
 }
 
 func (d DIDDocumentWithSeq) Valid() bool {
@@ -506,5 +506,5 @@ func (d DIDDocumentWithSeq) Deactivate(newSeq uint64) DIDDocumentWithSeq {
 
 // Deactivated returns true if the DIDDocument has been activated.
 func (d DIDDocumentWithSeq) Deactivated() bool {
-	return d.Document.Empty() && d.Seq != InitialSequence
+	return d.Document.Empty() && d.Sequence != InitialSequence
 }

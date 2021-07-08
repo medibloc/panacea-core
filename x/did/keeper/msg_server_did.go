@@ -44,7 +44,7 @@ func (m msgServer) UpdateDID(goCtx context.Context, msg *types.MsgUpdateDID) (*t
 		return nil, sdkerrors.Wrapf(types.ErrDIDDeactivated, "DID: %s", msg.Did)
 	}
 
-	newSeq, err := VerifyDIDOwnership(msg.Document, docWithSeq.Seq, docWithSeq.Document, msg.VerificationMethodId, msg.Signature)
+	newSeq, err := VerifyDIDOwnership(msg.Document, docWithSeq.Sequence, docWithSeq.Document, msg.VerificationMethodId, msg.Signature)
 	if err != nil {
 		return nil, err
 	}
@@ -70,7 +70,7 @@ func (m msgServer) DeactivateDID(goCtx context.Context, msg *types.MsgDeactivate
 		Id: msg.Did,
 	}
 
-	newSeq, err := VerifyDIDOwnership(&doc, docWithSeq.Seq, docWithSeq.Document, msg.VerificationMethodId, msg.Signature)
+	newSeq, err := VerifyDIDOwnership(&doc, docWithSeq.Sequence, docWithSeq.Document, msg.VerificationMethodId, msg.Signature)
 	if err != nil {
 		return nil, err
 	}
@@ -92,9 +92,9 @@ func VerifyDIDOwnership(signData *types.DIDDocument, seq uint64, doc *types.DIDD
 	if verificationMethod.Type != types.ES256K_2019 && verificationMethod.Type != types.ES256K_2018 {
 		return 0, sdkerrors.Wrapf(types.ErrVerificationMethodKeyTypeNotImplemented, "VerificationMethod: %v", verificationMethod.Type)
 	}
-	pubKeySecp256k1, err := secp256k1util.PubKeyFromBase58(verificationMethod.PubKeyBase58)
+	pubKeySecp256k1, err := secp256k1util.PubKeyFromBase58(verificationMethod.PublicKeyBase58)
 	if err != nil {
-		return 0, sdkerrors.Wrapf(types.ErrInvalidSecp256k1PublicKey, "PublicKey: %v", verificationMethod.PubKeyBase58)
+		return 0, sdkerrors.Wrapf(types.ErrInvalidSecp256k1PublicKey, "PublicKey: %v", verificationMethod.PublicKeyBase58)
 	}
 	newSeq, ok := types.Verify(sig, signData, seq, pubKeySecp256k1)
 	if !ok {

@@ -16,13 +16,13 @@ message DIDDocument {
   Strings contexts = 1 [json_name = "@context", (gogoproto.jsontag) = "@context", (gogoproto.customtype) = "JSONStringOrStrings"];
   string id = 2;
   Strings controller = 3 [(gogoproto.customtype) = "JSONStringOrStrings"];
-  repeated VerificationMethod verificationMethods = 4 [json_name = "verificationMethod", (gogoproto.jsontag) = "verificationMethod,omitempty"];
+  repeated VerificationMethod verification_methods = 4 [json_name = "verificationMethod", (gogoproto.jsontag) = "verificationMethod,omitempty"];
   // TODO: the repeated gogoproto.customtype has an issue: https://github.com/gogo/protobuf/issues/478
   repeated VerificationRelationship authentications = 5 [json_name = "authentication", (gogoproto.jsontag) = "authentication,omitempty", (gogoproto.customtype) = "VerificationRelationship"];
-  repeated VerificationRelationship assertionMethods = 6 [json_name = "assertionMethod", (gogoproto.jsontag) = "assertionMethod,omitempty", (gogoproto.customtype) = "VerificationRelationship"];
-  repeated VerificationRelationship keyAgreements = 7 [json_name = "keyAgreement", (gogoproto.jsontag) = "keyAgreement,omitempty", (gogoproto.customtype) = "VerificationRelationship"];
-  repeated VerificationRelationship capabilityInvocations = 8 [json_name = "capabilityInvocation", (gogoproto.jsontag) = "capabilityInvocation,omitempty", (gogoproto.customtype) = "VerificationRelationship"];
-  repeated VerificationRelationship capabilityDelegations = 9 [json_name = "capabilityDelegation", (gogoproto.jsontag) = "capabilityDelegation,omitempty", (gogoproto.customtype) = "VerificationRelationship"];
+  repeated VerificationRelationship assertion_methods = 6 [json_name = "assertionMethod", (gogoproto.jsontag) = "assertionMethod,omitempty", (gogoproto.customtype) = "VerificationRelationship"];
+  repeated VerificationRelationship key_agreements = 7 [json_name = "keyAgreement", (gogoproto.jsontag) = "keyAgreement,omitempty", (gogoproto.customtype) = "VerificationRelationship"];
+  repeated VerificationRelationship capability_invocations = 8 [json_name = "capabilityInvocation", (gogoproto.jsontag) = "capabilityInvocation,omitempty", (gogoproto.customtype) = "VerificationRelationship"];
+  repeated VerificationRelationship capability_delegations = 9 [json_name = "capabilityDelegation", (gogoproto.jsontag) = "capabilityDelegation,omitempty", (gogoproto.customtype) = "VerificationRelationship"];
   repeated Service services = 10 [json_name = "service", (gogoproto.jsontag) = "service,omitempty"];
 }
 
@@ -31,11 +31,12 @@ message VerificationMethod {
   string id = 1;
   string type = 2;
   string controller = 3;
-  string pubKeyBase58 = 4 [json_name = "publicKeyBase58", (gogoproto.jsontag) = "publicKeyBase58"];
+  string public_key_base58 = 4 [json_name = "publicKeyBase58", (gogoproto.jsontag) = "publicKeyBase58"];
 }
 
 // VerificationRelationship defines a W3C verification relationship
 message VerificationRelationship {
+  // VerificationRelationship can be one of a single ID or a VerificationMethod.
   oneof content {
     string verification_method_id = 1;
     VerificationMethod verification_method = 2;
@@ -46,17 +47,17 @@ message VerificationRelationship {
 message Service {
   string id = 1;
   string type = 2;
-  string serviceEndpoint = 3;
+  string service_endpoint = 3 [json_name = "serviceEndpoint", (gogoproto.jsontag) = "serviceEndpoint,omitempty"];
 }
 
 // DIDDocumentWithSeq defines a message for DID Document with a sequence number for preventing replay attacks.
 message DIDDocumentWithSeq {
   DIDDocument document = 1;
-  uint64 seq = 2 [json_name = "sequence", (gogoproto.jsontag) = "sequence"];
+  uint64 sequence = 2;
 }
 
 // DataWithSeq defines a message for data with a sequence number for preventing replay attacks.
 message DataWithSeq {
   bytes data = 1;
-  uint64 seq = 2;
+  uint64 sequence = 2;
 }
