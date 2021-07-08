@@ -21,16 +21,16 @@ func (k Keeper) DID(c context.Context, req *types.QueryDIDRequest) (*types.Query
 
 	didBz, err := base64.StdEncoding.DecodeString(req.DidBase64)
 	if err != nil {
-		return &types.QueryDIDResponse{}, sdkerrors.Wrapf(types.ErrInvalidDID, "DidBase64: %s", req.DidBase64)
+		return nil, sdkerrors.Wrapf(types.ErrInvalidDID, "DidBase64: %s", req.DidBase64)
 	}
 
 	did := string(didBz)
 	docWithSeq := k.GetDIDDocument(ctx, did)
 	if docWithSeq.Empty() {
-		return &types.QueryDIDResponse{}, sdkerrors.Wrapf(types.ErrDIDNotFound, "DID: %s", did)
+		return nil, sdkerrors.Wrapf(types.ErrDIDNotFound, "DID: %s", did)
 	}
 	if docWithSeq.Deactivated() {
-		return &types.QueryDIDResponse{}, sdkerrors.Wrapf(types.ErrDIDDeactivated, "DID: %s", did)
+		return nil, sdkerrors.Wrapf(types.ErrDIDDeactivated, "DID: %s", did)
 	}
 
 	return &types.QueryDIDResponse{DidDocumentWithSeq: &docWithSeq}, nil
