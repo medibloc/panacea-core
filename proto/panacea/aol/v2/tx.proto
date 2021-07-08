@@ -3,6 +3,7 @@ package panacea.aol.v2;
 
 // this line is used by starport scaffolding # proto/tx/import
 
+option java_multiple_files = true;
 option go_package = "github.com/medibloc/panacea-core/x/aol/types";
 
 // Msg defines the Msg service.
