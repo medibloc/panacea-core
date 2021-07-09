@@ -23,6 +23,7 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
+// Strings defines a JSON-LD string array format which is marshalled to a single string if the array length is 1.
 type Strings struct {
 	Values []string `protobuf:"bytes,1,rep,name=values,proto3" json:"values,omitempty"`
 }
@@ -67,17 +68,22 @@ func (m *Strings) GetValues() []string {
 	return nil
 }
 
+// DIDDocument defines a W3C DID Document
+//
+// NOTE: All 'json_name' and 'gogoproto.customtype' tags are for panacea-core to unmarshal the v1.3 genesis which is in the W3C JSON-LD format.
+//       On the other hand, the panacea-core and cosmos-sdk don't use those tags to marshal result to JSON (via grpc-gateway).
 type DIDDocument struct {
-	Contexts              *JSONStringOrStrings        `protobuf:"bytes,1,opt,name=contexts,json=@context,proto3,customtype=JSONStringOrStrings" json:"@context"`
-	ID                    string                      `protobuf:"bytes,2,opt,name=ID,json=id,proto3" json:"id"`
-	Controller            *JSONStringOrStrings        `protobuf:"bytes,3,opt,name=controller,proto3,customtype=JSONStringOrStrings" json:"controller,omitempty"`
-	VerificationMethods   []*VerificationMethod       `protobuf:"bytes,4,rep,name=verificationMethods,json=verificationMethod,proto3" json:"verificationMethod,omitempty"`
-	Authentications       []*VerificationRelationship `protobuf:"bytes,5,rep,name=authentications,json=authentication,proto3" json:"authentication,omitempty"`
-	AssertionMethods      []*VerificationRelationship `protobuf:"bytes,6,rep,name=assertionMethods,json=assertionMethod,proto3" json:"assertionMethod,omitempty"`
-	KeyAgreements         []*VerificationRelationship `protobuf:"bytes,7,rep,name=keyAgreements,json=keyAgreement,proto3" json:"keyAgreement,omitempty"`
-	CapabilityInvocations []*VerificationRelationship `protobuf:"bytes,8,rep,name=capabilityInvocations,json=capabilityInvocation,proto3" json:"capabilityInvocation,omitempty"`
-	CapabilityDelegations []*VerificationRelationship `protobuf:"bytes,9,rep,name=capabilityDelegations,json=capabilityDelegation,proto3" json:"capabilityDelegation,omitempty"`
-	Services              []*Service                  `protobuf:"bytes,10,rep,name=services,json=service,proto3" json:"service,omitempty"`
+	Contexts            *JSONStringOrStrings  `protobuf:"bytes,1,opt,name=contexts,json=@context,proto3,customtype=JSONStringOrStrings" json:"contexts,omitempty"`
+	Id                  string                `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`
+	Controller          *JSONStringOrStrings  `protobuf:"bytes,3,opt,name=controller,proto3,customtype=JSONStringOrStrings" json:"controller,omitempty"`
+	VerificationMethods []*VerificationMethod `protobuf:"bytes,4,rep,name=verification_methods,json=verificationMethod,proto3" json:"verification_methods,omitempty"`
+	// TODO: the repeated gogoproto.customtype has an issue: https://github.com/gogo/protobuf/issues/478
+	Authentications       []VerificationRelationship `protobuf:"bytes,5,rep,name=authentications,json=authentication,proto3,customtype=VerificationRelationship" json:"authentications,omitempty"`
+	AssertionMethods      []VerificationRelationship `protobuf:"bytes,6,rep,name=assertion_methods,json=assertionMethod,proto3,customtype=VerificationRelationship" json:"assertion_methods,omitempty"`
+	KeyAgreements         []VerificationRelationship `protobuf:"bytes,7,rep,name=key_agreements,json=keyAgreement,proto3,customtype=VerificationRelationship" json:"key_agreements,omitempty"`
+	CapabilityInvocations []VerificationRelationship `protobuf:"bytes,8,rep,name=capability_invocations,json=capabilityInvocation,proto3,customtype=VerificationRelationship" json:"capability_invocations,omitempty"`
+	CapabilityDelegations []VerificationRelationship `protobuf:"bytes,9,rep,name=capability_delegations,json=capabilityDelegation,proto3,customtype=VerificationRelationship" json:"capability_delegations,omitempty"`
+	Services              []*Service                 `protobuf:"bytes,10,rep,name=services,json=service,proto3" json:"services,omitempty"`
 }
 
 func (m *DIDDocument) Reset()         { *m = DIDDocument{} }
@@ -113,9 +119,9 @@ func (m *DIDDocument) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_DIDDocument proto.InternalMessageInfo
 
-func (m *DIDDocument) GetID() string {
+func (m *DIDDocument) GetId() string {
 	if m != nil {
-		return m.ID
+		return m.Id
 	}
 	return ""
 }
@@ -127,41 +133,6 @@ func (m *DIDDocument) GetVerificationMethods() []*VerificationMethod {
 	return nil
 }
 
-func (m *DIDDocument) GetAuthentications() []*VerificationRelationship {
-	if m != nil {
-		return m.Authentications
-	}
-	return nil
-}
-
-func (m *DIDDocument) GetAssertionMethods() []*VerificationRelationship {
-	if m != nil {
-		return m.AssertionMethods
-	}
-	return nil
-}
-
-func (m *DIDDocument) GetKeyAgreements() []*VerificationRelationship {
-	if m != nil {
-		return m.KeyAgreements
-	}
-	return nil
-}
-
-func (m *DIDDocument) GetCapabilityInvocations() []*VerificationRelationship {
-	if m != nil {
-		return m.CapabilityInvocations
-	}
-	return nil
-}
-
-func (m *DIDDocument) GetCapabilityDelegations() []*VerificationRelationship {
-	if m != nil {
-		return m.CapabilityDelegations
-	}
-	return nil
-}
-
 func (m *DIDDocument) GetServices() []*Service {
 	if m != nil {
 		return m.Services
@@ -169,11 +140,12 @@ func (m *DIDDocument) GetServices() []*Service {
 	return nil
 }
 
+// VerificationMethod defines a W3C verification method
 type VerificationMethod struct {
-	ID           string `protobuf:"bytes,1,opt,name=ID,json=id,proto3" json:"id"`
-	Type         string `protobuf:"bytes,2,opt,name=type,proto3" json:"type,omitempty"`
-	Controller   string `protobuf:"bytes,3,opt,name=controller,proto3" json:"controller,omitempty"`
-	PubKeyBase58 string `protobuf:"bytes,4,opt,name=pubKeyBase58,json=publicKeyBase58,proto3" json:"publicKeyBase58"`
+	Id              string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Type            string `protobuf:"bytes,2,opt,name=type,proto3" json:"type,omitempty"`
+	Controller      string `protobuf:"bytes,3,opt,name=controller,proto3" json:"controller,omitempty"`
+	PublicKeyBase58 string `protobuf:"bytes,4,opt,name=public_key_base58,json=publicKeyBase58,proto3" json:"public_key_base58,omitempty"`
 }
 
 func (m *VerificationMethod) Reset()         { *m = VerificationMethod{} }
@@ -209,9 +181,9 @@ func (m *VerificationMethod) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_VerificationMethod proto.InternalMessageInfo
 
-func (m *VerificationMethod) GetID() string {
+func (m *VerificationMethod) GetId() string {
 	if m != nil {
-		return m.ID
+		return m.Id
 	}
 	return ""
 }
@@ -230,16 +202,21 @@ func (m *VerificationMethod) GetController() string {
 	return ""
 }
 
-func (m *VerificationMethod) GetPubKeyBase58() string {
+func (m *VerificationMethod) GetPublicKeyBase58() string {
 	if m != nil {
-		return m.PubKeyBase58
+		return m.PublicKeyBase58
 	}
 	return ""
 }
 
+// VerificationRelationship defines a W3C verification relationship
 type VerificationRelationship struct {
-	VerificationMethodID        string              `protobuf:"bytes,1,opt,name=verificationMethodID,proto3" json:"verificationMethodID,omitempty"`
-	DedicatedVerificationMethod *VerificationMethod `protobuf:"bytes,2,opt,name=dedicatedVerificationMethod,proto3" json:"dedicatedVerificationMethod,omitempty"`
+	// VerificationRelationship can be one of a single ID or a VerificationMethod.
+	//
+	// Types that are valid to be assigned to Content:
+	//	*VerificationRelationship_VerificationMethodId
+	//	*VerificationRelationship_VerificationMethod
+	Content isVerificationRelationship_Content `protobuf_oneof:"content"`
 }
 
 func (m *VerificationRelationship) Reset()         { *m = VerificationRelationship{} }
@@ -275,24 +252,56 @@ func (m *VerificationRelationship) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_VerificationRelationship proto.InternalMessageInfo
 
-func (m *VerificationRelationship) GetVerificationMethodID() string {
-	if m != nil {
-		return m.VerificationMethodID
-	}
-	return ""
+type isVerificationRelationship_Content interface {
+	isVerificationRelationship_Content()
+	MarshalTo([]byte) (int, error)
+	Size() int
 }
 
-func (m *VerificationRelationship) GetDedicatedVerificationMethod() *VerificationMethod {
+type VerificationRelationship_VerificationMethodId struct {
+	VerificationMethodId string `protobuf:"bytes,1,opt,name=verification_method_id,json=verificationMethodId,proto3,oneof" json:"verification_method_id,omitempty"`
+}
+type VerificationRelationship_VerificationMethod struct {
+	VerificationMethod *VerificationMethod `protobuf:"bytes,2,opt,name=verification_method,json=verificationMethod,proto3,oneof" json:"verification_method,omitempty"`
+}
+
+func (*VerificationRelationship_VerificationMethodId) isVerificationRelationship_Content() {}
+func (*VerificationRelationship_VerificationMethod) isVerificationRelationship_Content()   {}
+
+func (m *VerificationRelationship) GetContent() isVerificationRelationship_Content {
 	if m != nil {
-		return m.DedicatedVerificationMethod
+		return m.Content
 	}
 	return nil
 }
 
+func (m *VerificationRelationship) GetVerificationMethodId() string {
+	if x, ok := m.GetContent().(*VerificationRelationship_VerificationMethodId); ok {
+		return x.VerificationMethodId
+	}
+	return ""
+}
+
+func (m *VerificationRelationship) GetVerificationMethod() *VerificationMethod {
+	if x, ok := m.GetContent().(*VerificationRelationship_VerificationMethod); ok {
+		return x.VerificationMethod
+	}
+	return nil
+}
+
+// XXX_OneofWrappers is for the internal use of the proto package.
+func (*VerificationRelationship) XXX_OneofWrappers() []interface{} {
+	return []interface{}{
+		(*VerificationRelationship_VerificationMethodId)(nil),
+		(*VerificationRelationship_VerificationMethod)(nil),
+	}
+}
+
+// Service defines a service in the W3C DID Document.
 type Service struct {
-	ID              string `protobuf:"bytes,1,opt,name=ID,json=id,proto3" json:"id"`
+	Id              string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	Type            string `protobuf:"bytes,2,opt,name=type,proto3" json:"type,omitempty"`
-	ServiceEndpoint string `protobuf:"bytes,3,opt,name=serviceEndpoint,proto3" json:"serviceEndpoint,omitempty"`
+	ServiceEndpoint string `protobuf:"bytes,3,opt,name=service_endpoint,json=serviceEndpoint,proto3" json:"service_endpoint,omitempty"`
 }
 
 func (m *Service) Reset()         { *m = Service{} }
@@ -328,9 +337,9 @@ func (m *Service) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_Service proto.InternalMessageInfo
 
-func (m *Service) GetID() string {
+func (m *Service) GetId() string {
 	if m != nil {
-		return m.ID
+		return m.Id
 	}
 	return ""
 }
@@ -349,9 +358,10 @@ func (m *Service) GetServiceEndpoint() string {
 	return ""
 }
 
+// DIDDocumentWithSeq defines a message for DID Document with a sequence number for preventing replay attacks.
 type DIDDocumentWithSeq struct {
 	Document *DIDDocument `protobuf:"bytes,1,opt,name=document,proto3" json:"document,omitempty"`
-	Seq      uint64       `protobuf:"varint,2,opt,name=seq,json=sequence,proto3" json:"sequence"`
+	Sequence uint64       `protobuf:"varint,2,opt,name=sequence,proto3" json:"sequence,omitempty"`
 }
 
 func (m *DIDDocumentWithSeq) Reset()         { *m = DIDDocumentWithSeq{} }
@@ -394,16 +404,17 @@ func (m *DIDDocumentWithSeq) GetDocument() *DIDDocument {
 	return nil
 }
 
-func (m *DIDDocumentWithSeq) GetSeq() uint64 {
+func (m *DIDDocumentWithSeq) GetSequence() uint64 {
 	if m != nil {
-		return m.Seq
+		return m.Sequence
 	}
 	return 0
 }
 
+// DataWithSeq defines a message for data with a sequence number for preventing replay attacks.
 type DataWithSeq struct {
-	Data []byte `protobuf:"bytes,1,opt,name=data,proto3" json:"data,omitempty"`
-	Seq  uint64 `protobuf:"varint,2,opt,name=seq,proto3" json:"seq,omitempty"`
+	Data     []byte `protobuf:"bytes,1,opt,name=data,proto3" json:"data,omitempty"`
+	Sequence uint64 `protobuf:"varint,2,opt,name=sequence,proto3" json:"sequence,omitempty"`
 }
 
 func (m *DataWithSeq) Reset()         { *m = DataWithSeq{} }
@@ -446,9 +457,9 @@ func (m *DataWithSeq) GetData() []byte {
 	return nil
 }
 
-func (m *DataWithSeq) GetSeq() uint64 {
+func (m *DataWithSeq) GetSequence() uint64 {
 	if m != nil {
-		return m.Seq
+		return m.Sequence
 	}
 	return 0
 }
@@ -466,52 +477,48 @@ func init() {
 func init() { proto.RegisterFile("panacea/did/v2/did.proto", fileDescriptor_6fb0abc66ec091ab) }
 
 var fileDescriptor_6fb0abc66ec091ab = []byte{
-	// 708 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xa4, 0x55, 0xcd, 0x6e, 0xd3, 0x4c,
-	0x14, 0xad, 0x93, 0x7c, 0xf9, 0x99, 0xe4, 0x6b, 0xca, 0xf4, 0xcf, 0xb4, 0xc5, 0x0e, 0xee, 0x26,
-	0x8b, 0x92, 0x48, 0xa9, 0x10, 0x88, 0x15, 0x58, 0x01, 0x29, 0x20, 0x28, 0x72, 0x25, 0x40, 0x6c,
-	0x90, 0x63, 0x5f, 0x92, 0x11, 0x8e, 0xc7, 0xb5, 0xc7, 0x51, 0xb3, 0xe4, 0x0d, 0x78, 0x00, 0x1e,
-	0x83, 0x87, 0x60, 0xd9, 0x25, 0x62, 0x61, 0xa1, 0x76, 0x67, 0x5e, 0x02, 0xd9, 0x99, 0xa6, 0x8e,
-	0x9d, 0x56, 0x44, 0xac, 0x72, 0x73, 0xce, 0xf5, 0x39, 0x77, 0xae, 0x7d, 0xef, 0x20, 0xd1, 0xd1,
-	0x6d, 0xdd, 0x00, 0xbd, 0x6d, 0x12, 0xb3, 0x3d, 0xee, 0x44, 0x3f, 0x2d, 0xc7, 0xa5, 0x8c, 0xe2,
-	0x55, 0xce, 0xb4, 0x22, 0x68, 0xdc, 0xd9, 0xd9, 0x18, 0xd0, 0x01, 0x8d, 0xa9, 0x76, 0x14, 0x4d,
-	0xb3, 0x94, 0xbb, 0xa8, 0x74, 0xcc, 0x5c, 0x62, 0x0f, 0x3c, 0xbc, 0x85, 0x8a, 0x63, 0xdd, 0xf2,
-	0xc1, 0x13, 0x85, 0x46, 0xbe, 0x59, 0xd1, 0xf8, 0x3f, 0xe5, 0x77, 0x09, 0x55, 0xbb, 0xbd, 0x6e,
-	0x97, 0x1a, 0xfe, 0x08, 0x6c, 0x86, 0xdf, 0xa1, 0xb2, 0x41, 0x6d, 0x06, 0xa7, 0x2c, 0xca, 0x14,
-	0x9a, 0xd5, 0xce, 0x76, 0x6b, 0xde, 0xab, 0xc5, 0x25, 0xd5, 0xfd, 0x9f, 0x81, 0xbc, 0xfe, 0xfc,
-	0xf8, 0xe8, 0xd5, 0x14, 0x38, 0x72, 0x39, 0x11, 0x06, 0x72, 0xf9, 0x31, 0x17, 0xd1, 0x66, 0x11,
-	0xde, 0x42, 0xb9, 0x5e, 0x57, 0xcc, 0x35, 0x84, 0x66, 0x45, 0x2d, 0x86, 0x81, 0x9c, 0x23, 0xa6,
-	0x96, 0x23, 0x26, 0x7e, 0x8d, 0x50, 0x94, 0xe2, 0x52, 0xcb, 0x02, 0x57, 0xcc, 0xdf, 0xec, 0xb9,
-	0x7d, 0x8d, 0xa7, 0x96, 0xd0, 0xc0, 0x3e, 0x5a, 0x1f, 0x83, 0x4b, 0x3e, 0x12, 0x43, 0x67, 0x84,
-	0xda, 0x2f, 0x81, 0x0d, 0xa9, 0xe9, 0x89, 0x85, 0x46, 0xbe, 0x59, 0xed, 0x28, 0x69, 0xe9, 0x37,
-	0x99, 0x54, 0xb5, 0x11, 0x06, 0xf2, 0x5e, 0x56, 0xe2, 0x80, 0x8e, 0x08, 0x83, 0x91, 0xc3, 0x26,
-	0x1a, 0xce, 0xb2, 0x98, 0xa2, 0xba, 0xee, 0xb3, 0x21, 0xd8, 0x8c, 0xe3, 0x9e, 0xf8, 0x5f, 0x6c,
-	0xd9, 0xbc, 0xc9, 0x52, 0x03, 0x6b, 0x9a, 0x3c, 0x24, 0x8e, 0xba, 0x17, 0x06, 0xb2, 0x38, 0x2f,
-	0x92, 0x30, 0x5d, 0x9d, 0x67, 0xb0, 0x8b, 0xd6, 0x74, 0xcf, 0x03, 0x37, 0x79, 0xc8, 0xe2, 0x92,
-	0x8e, 0x77, 0xc2, 0x40, 0xbe, 0x9d, 0x52, 0x49, 0x58, 0xd6, 0x53, 0x14, 0x26, 0xe8, 0xff, 0x4f,
-	0x30, 0x79, 0x32, 0x70, 0x01, 0xa2, 0xef, 0xc5, 0x13, 0x4b, 0x4b, 0x1a, 0xee, 0x84, 0x81, 0xbc,
-	0x95, 0x94, 0x48, 0xb8, 0xd5, 0x92, 0x38, 0xfe, 0x2c, 0xa0, 0x4d, 0x43, 0x77, 0xf4, 0x3e, 0xb1,
-	0x08, 0x9b, 0xf4, 0xec, 0x31, 0xbd, 0x6c, 0x6b, 0x79, 0x49, 0x4f, 0x25, 0x0c, 0x64, 0x69, 0x91,
-	0x54, 0xc2, 0x7b, 0x63, 0x11, 0x9f, 0xaa, 0xa1, 0x0b, 0x16, 0x0c, 0x78, 0x0d, 0x95, 0x7f, 0xab,
-	0xe1, 0x4a, 0x6a, 0x71, 0x0d, 0x57, 0x3c, 0xee, 0xa1, 0xb2, 0x07, 0xee, 0x98, 0x18, 0xe0, 0x89,
-	0x28, 0x76, 0xcd, 0x8e, 0xc7, 0x94, 0x57, 0x37, 0xc3, 0x40, 0xbe, 0xc5, 0x93, 0x13, 0xba, 0x25,
-	0x0e, 0x29, 0x5f, 0x05, 0x84, 0xb3, 0xdf, 0x3b, 0x1f, 0x4d, 0x21, 0x33, 0x9a, 0x18, 0x15, 0xd8,
-	0xc4, 0x81, 0xe9, 0xd0, 0x6a, 0x71, 0x8c, 0xa5, 0xcc, 0xb8, 0x56, 0xe6, 0x86, 0xef, 0x11, 0xaa,
-	0x39, 0x7e, 0xff, 0x05, 0x4c, 0x54, 0xdd, 0x83, 0xfb, 0x0f, 0xc5, 0x42, 0xac, 0xba, 0x1e, 0x06,
-	0x72, 0xdd, 0xf1, 0xfb, 0x16, 0x31, 0x66, 0x94, 0x96, 0x06, 0x94, 0x6f, 0x02, 0x12, 0xaf, 0x6b,
-	0x20, 0xee, 0xa0, 0x8d, 0xec, 0xd0, 0x5d, 0x96, 0xad, 0x2d, 0xe4, 0xb0, 0x89, 0x76, 0x4d, 0x30,
-	0x23, 0x14, 0xcc, 0xec, 0xb9, 0xe3, 0x73, 0xfd, 0xd5, 0x46, 0xd0, 0x6e, 0x92, 0x51, 0x3e, 0xa0,
-	0x12, 0x7f, 0x01, 0x4b, 0x75, 0xb2, 0x89, 0xea, 0xfc, 0xbd, 0x3c, 0xb5, 0x4d, 0x87, 0x12, 0x9b,
-	0xf1, 0x76, 0xa6, 0x61, 0xc5, 0x45, 0x38, 0xb1, 0xa3, 0xdf, 0x12, 0x36, 0x3c, 0x86, 0x13, 0xfc,
-	0x00, 0x95, 0x4d, 0x0e, 0xf1, 0x55, 0xbd, 0x9b, 0x3e, 0x49, 0xe2, 0x29, 0x6d, 0x96, 0x8c, 0xf7,
-	0x51, 0xde, 0x83, 0x93, 0xb8, 0x96, 0x82, 0x5a, 0x8b, 0xd6, 0xb5, 0x07, 0x27, 0x3e, 0xd8, 0x06,
-	0x68, 0xb3, 0x48, 0x39, 0x44, 0xd5, 0xae, 0xce, 0xf4, 0x4b, 0x33, 0x8c, 0x0a, 0xa6, 0xce, 0xf4,
-	0xd8, 0xa8, 0xa6, 0xc5, 0x31, 0x5e, 0x4b, 0xe8, 0x68, 0x51, 0xa8, 0x3e, 0xfb, 0x7e, 0x2e, 0x09,
-	0x67, 0xe7, 0x92, 0xf0, 0xeb, 0x5c, 0x12, 0xbe, 0x5c, 0x48, 0x2b, 0x67, 0x17, 0xd2, 0xca, 0x8f,
-	0x0b, 0x69, 0xe5, 0xfd, 0xc1, 0x80, 0xb0, 0xa1, 0xdf, 0x6f, 0x19, 0x74, 0xd4, 0x1e, 0x81, 0x49,
-	0xfa, 0x16, 0x35, 0xda, 0xbc, 0xda, 0x7b, 0x06, 0x75, 0xa1, 0x7d, 0x1a, 0xdf, 0x72, 0x51, 0x67,
-	0xbc, 0x7e, 0x31, 0xbe, 0xbf, 0x0e, 0xff, 0x04, 0x00, 0x00, 0xff, 0xff, 0x88, 0x4c, 0x05, 0x8b,
-	0x01, 0x07, 0x00, 0x00,
+	// 653 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xb4, 0x55, 0xcb, 0x6e, 0xd3, 0x40,
+	0x14, 0x8d, 0xdb, 0xd0, 0x24, 0x37, 0x55, 0x42, 0xa7, 0x51, 0x6b, 0x15, 0xe4, 0x16, 0xaf, 0x02,
+	0x82, 0x44, 0x0a, 0xe2, 0xb1, 0x41, 0x82, 0x28, 0x48, 0x2d, 0xaf, 0x56, 0x2e, 0x2f, 0xb1, 0x89,
+	0x26, 0xf6, 0x25, 0x19, 0xd5, 0xf1, 0xb8, 0xf6, 0xc4, 0x6a, 0x24, 0x96, 0x7c, 0x00, 0x2b, 0xbe,
+	0x84, 0x8f, 0x60, 0xd9, 0x25, 0xea, 0xa2, 0x42, 0xed, 0x8f, 0x20, 0x8f, 0x27, 0x26, 0x69, 0xda,
+	0xaa, 0x42, 0x61, 0xe5, 0xf1, 0xbd, 0x67, 0xce, 0x99, 0x7b, 0x67, 0xce, 0x0c, 0xe8, 0x3e, 0xf5,
+	0xa8, 0x8d, 0xb4, 0xee, 0x30, 0xa7, 0x1e, 0x35, 0xe2, 0x4f, 0xcd, 0x0f, 0xb8, 0xe0, 0xa4, 0xa4,
+	0x32, 0xb5, 0x38, 0x14, 0x35, 0xd6, 0x2a, 0x5d, 0xde, 0xe5, 0x32, 0x55, 0x8f, 0x47, 0x09, 0xca,
+	0xbc, 0x05, 0xb9, 0x5d, 0x11, 0x30, 0xaf, 0x1b, 0x92, 0x15, 0x58, 0x88, 0xa8, 0x3b, 0xc0, 0x50,
+	0xd7, 0x36, 0xe6, 0xab, 0x05, 0x4b, 0xfd, 0x99, 0xdf, 0x73, 0x50, 0x6c, 0x6d, 0xb5, 0x5a, 0xdc,
+	0x1e, 0xf4, 0xd1, 0x13, 0xe4, 0x15, 0xe4, 0x6d, 0xee, 0x09, 0x3c, 0x10, 0x31, 0x52, 0xab, 0x16,
+	0x1b, 0xab, 0xb5, 0x49, 0xad, 0x9a, 0xa2, 0x6c, 0xae, 0x1e, 0x1d, 0xaf, 0x2f, 0xbf, 0xd8, 0xdd,
+	0x7e, 0x93, 0x04, 0xb6, 0x03, 0x95, 0xb0, 0xf2, 0x4f, 0x15, 0x05, 0x29, 0xc1, 0x1c, 0x73, 0xf4,
+	0xb9, 0x0d, 0xad, 0x5a, 0xb0, 0xe6, 0x98, 0x43, 0x76, 0x00, 0xe2, 0x54, 0xc0, 0x5d, 0x17, 0x03,
+	0x7d, 0xfe, 0x1f, 0xf9, 0xc7, 0x38, 0xc8, 0x5b, 0xa8, 0x44, 0x18, 0xb0, 0xcf, 0xcc, 0xa6, 0x82,
+	0x71, 0xaf, 0xdd, 0x47, 0xd1, 0xe3, 0x4e, 0xa8, 0x67, 0x37, 0xe6, 0xab, 0xc5, 0x86, 0x79, 0x96,
+	0xfb, 0xfd, 0x18, 0xf6, 0xb5, 0x84, 0x5a, 0x24, 0x9a, 0x8a, 0x11, 0x0e, 0x65, 0x3a, 0x10, 0x3d,
+	0xf4, 0x84, 0x8a, 0x87, 0xfa, 0x35, 0x49, 0x58, 0xbd, 0x8c, 0xd0, 0x42, 0x37, 0x01, 0xf7, 0x98,
+	0xdf, 0xbc, 0x79, 0x74, 0xbc, 0xae, 0x5f, 0x94, 0xb5, 0x4a, 0x93, 0xf4, 0x24, 0x80, 0x25, 0x1a,
+	0x86, 0x18, 0x4c, 0xd4, 0xb0, 0x30, 0x53, 0xc9, 0x72, 0x2a, 0xa0, 0x8a, 0x74, 0xa1, 0xb4, 0x87,
+	0xc3, 0x36, 0xed, 0x06, 0x88, 0xf1, 0xde, 0x87, 0x7a, 0x6e, 0xa6, 0x82, 0x8b, 0x7b, 0x38, 0x7c,
+	0x36, 0x22, 0x27, 0x5f, 0x60, 0xc5, 0xa6, 0x3e, 0xed, 0x30, 0x97, 0x89, 0x61, 0x9b, 0x79, 0x11,
+	0x1f, 0x75, 0x36, 0x3f, 0x53, 0xd5, 0xca, 0x5f, 0x95, 0xad, 0x54, 0xe4, 0x8c, 0xba, 0x83, 0x2e,
+	0x76, 0x95, 0x7a, 0xe1, 0x7f, 0xa9, 0xb7, 0x52, 0x11, 0xd2, 0x80, 0x7c, 0x88, 0x41, 0xc4, 0x6c,
+	0x0c, 0x75, 0x90, 0x7a, 0xd3, 0x87, 0x3e, 0xc9, 0x5b, 0x39, 0x05, 0x34, 0xbf, 0x6a, 0x40, 0xa6,
+	0x4f, 0xab, 0x72, 0x94, 0x96, 0x3a, 0x8a, 0x40, 0x56, 0x0c, 0x7d, 0x54, 0x1e, 0x93, 0x63, 0x62,
+	0x4c, 0xb9, 0xac, 0x30, 0xe1, 0x99, 0x3b, 0xb0, 0xe4, 0x0f, 0x3a, 0x2e, 0xb3, 0xdb, 0xf1, 0xfe,
+	0x77, 0x68, 0x88, 0x0f, 0x1e, 0xeb, 0x59, 0x09, 0x2b, 0x27, 0x89, 0x97, 0x38, 0x6c, 0xca, 0xb0,
+	0xf9, 0x43, 0x83, 0x0b, 0xab, 0x25, 0x0f, 0x61, 0xe5, 0x1c, 0xf3, 0xb5, 0x47, 0x0b, 0xdc, 0xcc,
+	0x58, 0x95, 0x69, 0x73, 0x6d, 0x39, 0xe4, 0x1d, 0x2c, 0x9f, 0x33, 0x4f, 0xd6, 0x70, 0x25, 0xcf,
+	0x6e, 0x66, 0xce, 0x73, 0x6d, 0xb3, 0x00, 0x39, 0x79, 0xf1, 0x78, 0xc2, 0xfc, 0x08, 0x39, 0xd5,
+	0xd1, 0x2b, 0x75, 0xec, 0x36, 0x5c, 0x57, 0x7d, 0x6f, 0xa3, 0xe7, 0xf8, 0x9c, 0x79, 0x42, 0xf5,
+	0xad, 0xac, 0xe2, 0xcf, 0x55, 0xd8, 0x64, 0x40, 0xc6, 0xee, 0xcb, 0x0f, 0x4c, 0xf4, 0x76, 0x71,
+	0x9f, 0x3c, 0x82, 0xbc, 0xa3, 0x42, 0xea, 0xda, 0xbc, 0x71, 0xb6, 0x8c, 0xb1, 0x59, 0x56, 0x0a,
+	0x26, 0x6b, 0xf1, 0xd1, 0xd8, 0x1f, 0xa0, 0x67, 0x27, 0x2b, 0xca, 0x5a, 0xe9, 0xbf, 0xf9, 0x04,
+	0x8a, 0x2d, 0x2a, 0xe8, 0x48, 0x83, 0x40, 0xd6, 0xa1, 0x82, 0x4a, 0xfe, 0x45, 0x4b, 0x8e, 0x2f,
+	0x9b, 0xde, 0xdc, 0xfc, 0x79, 0x62, 0x68, 0x87, 0x27, 0x86, 0xf6, 0xfb, 0xc4, 0xd0, 0xbe, 0x9d,
+	0x1a, 0x99, 0xc3, 0x53, 0x23, 0xf3, 0xeb, 0xd4, 0xc8, 0xec, 0x68, 0x9f, 0xee, 0x76, 0x99, 0xe8,
+	0x0d, 0x3a, 0x35, 0x9b, 0xf7, 0xeb, 0x7d, 0x74, 0x58, 0xc7, 0xe5, 0x76, 0x5d, 0x2d, 0xf8, 0x9e,
+	0xcd, 0x03, 0xac, 0x1f, 0xc8, 0x47, 0x27, 0xee, 0x4e, 0xd8, 0x59, 0x90, 0xcf, 0xc9, 0xfd, 0x3f,
+	0x01, 0x00, 0x00, 0xff, 0xff, 0x24, 0x63, 0x2a, 0x23, 0x90, 0x06, 0x00, 0x00,
 }
 
 func (m *Strings) Marshal() (dAtA []byte, err error) {
@@ -583,11 +590,11 @@ func (m *DIDDocument) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	if len(m.CapabilityDelegations) > 0 {
 		for iNdEx := len(m.CapabilityDelegations) - 1; iNdEx >= 0; iNdEx-- {
 			{
-				size, err := m.CapabilityDelegations[iNdEx].MarshalToSizedBuffer(dAtA[:i])
-				if err != nil {
+				size := m.CapabilityDelegations[iNdEx].Size()
+				i -= size
+				if _, err := m.CapabilityDelegations[iNdEx].MarshalTo(dAtA[i:]); err != nil {
 					return 0, err
 				}
-				i -= size
 				i = encodeVarintDid(dAtA, i, uint64(size))
 			}
 			i--
@@ -597,11 +604,11 @@ func (m *DIDDocument) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	if len(m.CapabilityInvocations) > 0 {
 		for iNdEx := len(m.CapabilityInvocations) - 1; iNdEx >= 0; iNdEx-- {
 			{
-				size, err := m.CapabilityInvocations[iNdEx].MarshalToSizedBuffer(dAtA[:i])
-				if err != nil {
+				size := m.CapabilityInvocations[iNdEx].Size()
+				i -= size
+				if _, err := m.CapabilityInvocations[iNdEx].MarshalTo(dAtA[i:]); err != nil {
 					return 0, err
 				}
-				i -= size
 				i = encodeVarintDid(dAtA, i, uint64(size))
 			}
 			i--
@@ -611,11 +618,11 @@ func (m *DIDDocument) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	if len(m.KeyAgreements) > 0 {
 		for iNdEx := len(m.KeyAgreements) - 1; iNdEx >= 0; iNdEx-- {
 			{
-				size, err := m.KeyAgreements[iNdEx].MarshalToSizedBuffer(dAtA[:i])
-				if err != nil {
+				size := m.KeyAgreements[iNdEx].Size()
+				i -= size
+				if _, err := m.KeyAgreements[iNdEx].MarshalTo(dAtA[i:]); err != nil {
 					return 0, err
 				}
-				i -= size
 				i = encodeVarintDid(dAtA, i, uint64(size))
 			}
 			i--
@@ -625,11 +632,11 @@ func (m *DIDDocument) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	if len(m.AssertionMethods) > 0 {
 		for iNdEx := len(m.AssertionMethods) - 1; iNdEx >= 0; iNdEx-- {
 			{
-				size, err := m.AssertionMethods[iNdEx].MarshalToSizedBuffer(dAtA[:i])
-				if err != nil {
+				size := m.AssertionMethods[iNdEx].Size()
+				i -= size
+				if _, err := m.AssertionMethods[iNdEx].MarshalTo(dAtA[i:]); err != nil {
 					return 0, err
 				}
-				i -= size
 				i = encodeVarintDid(dAtA, i, uint64(size))
 			}
 			i--
@@ -639,11 +646,11 @@ func (m *DIDDocument) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	if len(m.Authentications) > 0 {
 		for iNdEx := len(m.Authentications) - 1; iNdEx >= 0; iNdEx-- {
 			{
-				size, err := m.Authentications[iNdEx].MarshalToSizedBuffer(dAtA[:i])
-				if err != nil {
+				size := m.Authentications[iNdEx].Size()
+				i -= size
+				if _, err := m.Authentications[iNdEx].MarshalTo(dAtA[i:]); err != nil {
 					return 0, err
 				}
-				i -= size
 				i = encodeVarintDid(dAtA, i, uint64(size))
 			}
 			i--
@@ -676,10 +683,10 @@ func (m *DIDDocument) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x1a
 	}
-	if len(m.ID) > 0 {
-		i -= len(m.ID)
-		copy(dAtA[i:], m.ID)
-		i = encodeVarintDid(dAtA, i, uint64(len(m.ID)))
+	if len(m.Id) > 0 {
+		i -= len(m.Id)
+		copy(dAtA[i:], m.Id)
+		i = encodeVarintDid(dAtA, i, uint64(len(m.Id)))
 		i--
 		dAtA[i] = 0x12
 	}
@@ -718,10 +725,10 @@ func (m *VerificationMethod) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if len(m.PubKeyBase58) > 0 {
-		i -= len(m.PubKeyBase58)
-		copy(dAtA[i:], m.PubKeyBase58)
-		i = encodeVarintDid(dAtA, i, uint64(len(m.PubKeyBase58)))
+	if len(m.PublicKeyBase58) > 0 {
+		i -= len(m.PublicKeyBase58)
+		copy(dAtA[i:], m.PublicKeyBase58)
+		i = encodeVarintDid(dAtA, i, uint64(len(m.PublicKeyBase58)))
 		i--
 		dAtA[i] = 0x22
 	}
@@ -739,10 +746,10 @@ func (m *VerificationMethod) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x12
 	}
-	if len(m.ID) > 0 {
-		i -= len(m.ID)
-		copy(dAtA[i:], m.ID)
-		i = encodeVarintDid(dAtA, i, uint64(len(m.ID)))
+	if len(m.Id) > 0 {
+		i -= len(m.Id)
+		copy(dAtA[i:], m.Id)
+		i = encodeVarintDid(dAtA, i, uint64(len(m.Id)))
 		i--
 		dAtA[i] = 0xa
 	}
@@ -769,9 +776,42 @@ func (m *VerificationRelationship) MarshalToSizedBuffer(dAtA []byte) (int, error
 	_ = i
 	var l int
 	_ = l
-	if m.DedicatedVerificationMethod != nil {
+	if m.Content != nil {
 		{
-			size, err := m.DedicatedVerificationMethod.MarshalToSizedBuffer(dAtA[:i])
+			size := m.Content.Size()
+			i -= size
+			if _, err := m.Content.MarshalTo(dAtA[i:]); err != nil {
+				return 0, err
+			}
+		}
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *VerificationRelationship_VerificationMethodId) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *VerificationRelationship_VerificationMethodId) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	i -= len(m.VerificationMethodId)
+	copy(dAtA[i:], m.VerificationMethodId)
+	i = encodeVarintDid(dAtA, i, uint64(len(m.VerificationMethodId)))
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
+}
+func (m *VerificationRelationship_VerificationMethod) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *VerificationRelationship_VerificationMethod) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	if m.VerificationMethod != nil {
+		{
+			size, err := m.VerificationMethod.MarshalToSizedBuffer(dAtA[:i])
 			if err != nil {
 				return 0, err
 			}
@@ -781,16 +821,8 @@ func (m *VerificationRelationship) MarshalToSizedBuffer(dAtA []byte) (int, error
 		i--
 		dAtA[i] = 0x12
 	}
-	if len(m.VerificationMethodID) > 0 {
-		i -= len(m.VerificationMethodID)
-		copy(dAtA[i:], m.VerificationMethodID)
-		i = encodeVarintDid(dAtA, i, uint64(len(m.VerificationMethodID)))
-		i--
-		dAtA[i] = 0xa
-	}
 	return len(dAtA) - i, nil
 }
-
 func (m *Service) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -825,10 +857,10 @@ func (m *Service) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x12
 	}
-	if len(m.ID) > 0 {
-		i -= len(m.ID)
-		copy(dAtA[i:], m.ID)
-		i = encodeVarintDid(dAtA, i, uint64(len(m.ID)))
+	if len(m.Id) > 0 {
+		i -= len(m.Id)
+		copy(dAtA[i:], m.Id)
+		i = encodeVarintDid(dAtA, i, uint64(len(m.Id)))
 		i--
 		dAtA[i] = 0xa
 	}
@@ -855,8 +887,8 @@ func (m *DIDDocumentWithSeq) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if m.Seq != 0 {
-		i = encodeVarintDid(dAtA, i, uint64(m.Seq))
+	if m.Sequence != 0 {
+		i = encodeVarintDid(dAtA, i, uint64(m.Sequence))
 		i--
 		dAtA[i] = 0x10
 	}
@@ -895,8 +927,8 @@ func (m *DataWithSeq) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if m.Seq != 0 {
-		i = encodeVarintDid(dAtA, i, uint64(m.Seq))
+	if m.Sequence != 0 {
+		i = encodeVarintDid(dAtA, i, uint64(m.Sequence))
 		i--
 		dAtA[i] = 0x10
 	}
@@ -946,7 +978,7 @@ func (m *DIDDocument) Size() (n int) {
 		l = m.Contexts.Size()
 		n += 1 + l + sovDid(uint64(l))
 	}
-	l = len(m.ID)
+	l = len(m.Id)
 	if l > 0 {
 		n += 1 + l + sovDid(uint64(l))
 	}
@@ -1005,7 +1037,7 @@ func (m *VerificationMethod) Size() (n int) {
 	}
 	var l int
 	_ = l
-	l = len(m.ID)
+	l = len(m.Id)
 	if l > 0 {
 		n += 1 + l + sovDid(uint64(l))
 	}
@@ -1017,7 +1049,7 @@ func (m *VerificationMethod) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovDid(uint64(l))
 	}
-	l = len(m.PubKeyBase58)
+	l = len(m.PublicKeyBase58)
 	if l > 0 {
 		n += 1 + l + sovDid(uint64(l))
 	}
@@ -1030,24 +1062,41 @@ func (m *VerificationRelationship) Size() (n int) {
 	}
 	var l int
 	_ = l
-	l = len(m.VerificationMethodID)
-	if l > 0 {
-		n += 1 + l + sovDid(uint64(l))
-	}
-	if m.DedicatedVerificationMethod != nil {
-		l = m.DedicatedVerificationMethod.Size()
-		n += 1 + l + sovDid(uint64(l))
+	if m.Content != nil {
+		n += m.Content.Size()
 	}
 	return n
 }
 
+func (m *VerificationRelationship_VerificationMethodId) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.VerificationMethodId)
+	n += 1 + l + sovDid(uint64(l))
+	return n
+}
+func (m *VerificationRelationship_VerificationMethod) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.VerificationMethod != nil {
+		l = m.VerificationMethod.Size()
+		n += 1 + l + sovDid(uint64(l))
+	}
+	return n
+}
 func (m *Service) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	l = len(m.ID)
+	l = len(m.Id)
 	if l > 0 {
 		n += 1 + l + sovDid(uint64(l))
 	}
@@ -1072,8 +1121,8 @@ func (m *DIDDocumentWithSeq) Size() (n int) {
 		l = m.Document.Size()
 		n += 1 + l + sovDid(uint64(l))
 	}
-	if m.Seq != 0 {
-		n += 1 + sovDid(uint64(m.Seq))
+	if m.Sequence != 0 {
+		n += 1 + sovDid(uint64(m.Sequence))
 	}
 	return n
 }
@@ -1088,8 +1137,8 @@ func (m *DataWithSeq) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovDid(uint64(l))
 	}
-	if m.Seq != 0 {
-		n += 1 + sovDid(uint64(m.Seq))
+	if m.Sequence != 0 {
+		n += 1 + sovDid(uint64(m.Sequence))
 	}
 	return n
 }
@@ -1249,7 +1298,7 @@ func (m *DIDDocument) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ID", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Id", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -1277,7 +1326,7 @@ func (m *DIDDocument) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.ID = string(dAtA[iNdEx:postIndex])
+			m.Id = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
@@ -1378,7 +1427,7 @@ func (m *DIDDocument) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Authentications = append(m.Authentications, &VerificationRelationship{})
+			m.Authentications = append(m.Authentications, VerificationRelationship{})
 			if err := m.Authentications[len(m.Authentications)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -1412,7 +1461,7 @@ func (m *DIDDocument) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.AssertionMethods = append(m.AssertionMethods, &VerificationRelationship{})
+			m.AssertionMethods = append(m.AssertionMethods, VerificationRelationship{})
 			if err := m.AssertionMethods[len(m.AssertionMethods)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -1446,7 +1495,7 @@ func (m *DIDDocument) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.KeyAgreements = append(m.KeyAgreements, &VerificationRelationship{})
+			m.KeyAgreements = append(m.KeyAgreements, VerificationRelationship{})
 			if err := m.KeyAgreements[len(m.KeyAgreements)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -1480,7 +1529,7 @@ func (m *DIDDocument) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.CapabilityInvocations = append(m.CapabilityInvocations, &VerificationRelationship{})
+			m.CapabilityInvocations = append(m.CapabilityInvocations, VerificationRelationship{})
 			if err := m.CapabilityInvocations[len(m.CapabilityInvocations)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -1514,7 +1563,7 @@ func (m *DIDDocument) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.CapabilityDelegations = append(m.CapabilityDelegations, &VerificationRelationship{})
+			m.CapabilityDelegations = append(m.CapabilityDelegations, VerificationRelationship{})
 			if err := m.CapabilityDelegations[len(m.CapabilityDelegations)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -1605,7 +1654,7 @@ func (m *VerificationMethod) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ID", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Id", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -1633,7 +1682,7 @@ func (m *VerificationMethod) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.ID = string(dAtA[iNdEx:postIndex])
+			m.Id = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
@@ -1701,7 +1750,7 @@ func (m *VerificationMethod) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 4:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field PubKeyBase58", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field PublicKeyBase58", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -1729,7 +1778,7 @@ func (m *VerificationMethod) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.PubKeyBase58 = string(dAtA[iNdEx:postIndex])
+			m.PublicKeyBase58 = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -1783,7 +1832,7 @@ func (m *VerificationRelationship) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field VerificationMethodID", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field VerificationMethodId", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -1811,11 +1860,11 @@ func (m *VerificationRelationship) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.VerificationMethodID = string(dAtA[iNdEx:postIndex])
+			m.Content = &VerificationRelationship_VerificationMethodId{string(dAtA[iNdEx:postIndex])}
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field DedicatedVerificationMethod", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field VerificationMethod", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -1842,12 +1891,11 @@ func (m *VerificationRelationship) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if m.DedicatedVerificationMethod == nil {
-				m.DedicatedVerificationMethod = &VerificationMethod{}
-			}
-			if err := m.DedicatedVerificationMethod.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			v := &VerificationMethod{}
+			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
+			m.Content = &VerificationRelationship_VerificationMethod{v}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -1901,7 +1949,7 @@ func (m *Service) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ID", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Id", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -1929,7 +1977,7 @@ func (m *Service) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.ID = string(dAtA[iNdEx:postIndex])
+			m.Id = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
@@ -2083,9 +2131,9 @@ func (m *DIDDocumentWithSeq) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Seq", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Sequence", wireType)
 			}
-			m.Seq = 0
+			m.Sequence = 0
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowDid
@@ -2095,7 +2143,7 @@ func (m *DIDDocumentWithSeq) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.Seq |= uint64(b&0x7F) << shift
+				m.Sequence |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -2186,9 +2234,9 @@ func (m *DataWithSeq) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Seq", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Sequence", wireType)
 			}
-			m.Seq = 0
+			m.Sequence = 0
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowDid
@@ -2198,7 +2246,7 @@ func (m *DataWithSeq) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.Seq |= uint64(b&0x7F) << shift
+				m.Sequence |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}

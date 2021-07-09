@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"context"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/medibloc/panacea-core/x/did/internal/secp256k1util"
@@ -12,22 +13,22 @@ func (m msgServer) CreateDID(goCtx context.Context, msg *types.MsgCreateDID) (*t
 	keeper := m.Keeper
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	cur := keeper.GetDIDDocument(ctx, msg.DID)
+	cur := keeper.GetDIDDocument(ctx, msg.Did)
 	if !cur.Empty() {
 		if cur.Deactivated() {
-			return nil, sdkerrors.Wrapf(types.ErrDIDDeactivated, "DID: %s", msg.DID)
+			return nil, sdkerrors.Wrapf(types.ErrDIDDeactivated, "DID: %s", msg.Did)
 		}
-		return nil, sdkerrors.Wrapf(types.ErrDIDExists, "DID: %s", msg.DID)
+		return nil, sdkerrors.Wrapf(types.ErrDIDExists, "DID: %s", msg.Did)
 	}
 
 	seq := types.InitialSequence
-	_, err := VerifyDIDOwnership(msg.Document, seq, msg.Document, msg.VerificationMethodID, msg.Signature)
+	_, err := VerifyDIDOwnership(msg.Document, seq, msg.Document, msg.VerificationMethodId, msg.Signature)
 	if err != nil {
 		return nil, err
 	}
 
 	docWithSeq := types.NewDIDDocumentWithSeq(msg.Document, uint64(seq))
-	keeper.SetDIDDocument(ctx, msg.DID, docWithSeq)
+	keeper.SetDIDDocument(ctx, msg.Did, docWithSeq)
 	return &types.MsgCreateDIDResponse{}, nil
 }
 
@@ -35,21 +36,21 @@ func (m msgServer) UpdateDID(goCtx context.Context, msg *types.MsgUpdateDID) (*t
 	keeper := m.Keeper
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	docWithSeq := keeper.GetDIDDocument(ctx, msg.DID)
+	docWithSeq := keeper.GetDIDDocument(ctx, msg.Did)
 	if docWithSeq.Empty() {
-		return nil, sdkerrors.Wrapf(types.ErrDIDNotFound, "DID: %s", msg.DID)
+		return nil, sdkerrors.Wrapf(types.ErrDIDNotFound, "DID: %s", msg.Did)
 	}
 	if docWithSeq.Deactivated() {
-		return nil, sdkerrors.Wrapf(types.ErrDIDDeactivated, "DID: %s", msg.DID)
+		return nil, sdkerrors.Wrapf(types.ErrDIDDeactivated, "DID: %s", msg.Did)
 	}
 
-	newSeq, err := VerifyDIDOwnership(msg.Document, docWithSeq.Seq, docWithSeq.Document, msg.VerificationMethodID, msg.Signature)
+	newSeq, err := VerifyDIDOwnership(msg.Document, docWithSeq.Sequence, docWithSeq.Document, msg.VerificationMethodId, msg.Signature)
 	if err != nil {
 		return nil, err
 	}
 
 	newDocWithSeq := types.NewDIDDocumentWithSeq(msg.Document, newSeq)
-	keeper.SetDIDDocument(ctx, msg.DID, newDocWithSeq)
+	keeper.SetDIDDocument(ctx, msg.Did, newDocWithSeq)
 	return &types.MsgUpdateDIDResponse{}, nil
 }
 
@@ -57,24 +58,24 @@ func (m msgServer) DeactivateDID(goCtx context.Context, msg *types.MsgDeactivate
 	keeper := m.Keeper
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	docWithSeq := keeper.GetDIDDocument(ctx, msg.DID)
+	docWithSeq := keeper.GetDIDDocument(ctx, msg.Did)
 	if docWithSeq.Empty() {
-		return nil, sdkerrors.Wrapf(types.ErrDIDNotFound, "DID: %s", msg.DID)
+		return nil, sdkerrors.Wrapf(types.ErrDIDNotFound, "DID: %s", msg.Did)
 	}
 	if docWithSeq.Deactivated() {
-		return nil, sdkerrors.Wrapf(types.ErrDIDDeactivated, "DID: %s", msg.DID)
+		return nil, sdkerrors.Wrapf(types.ErrDIDDeactivated, "DID: %s", msg.Did)
 	}
 
 	doc := types.DIDDocument{
-		ID: msg.DID,
+		Id: msg.Did,
 	}
 
-	newSeq, err := VerifyDIDOwnership(&doc, docWithSeq.Seq, docWithSeq.Document, msg.VerificationMethodID, msg.Signature)
+	newSeq, err := VerifyDIDOwnership(&doc, docWithSeq.Sequence, docWithSeq.Document, msg.VerificationMethodId, msg.Signature)
 	if err != nil {
 		return nil, err
 	}
 
-	keeper.SetDIDDocument(ctx, msg.DID, docWithSeq.Deactivate(newSeq))
+	keeper.SetDIDDocument(ctx, msg.Did, docWithSeq.Deactivate(newSeq))
 	return &types.MsgDeactivateDIDResponse{}, nil
 
 }
@@ -91,9 +92,9 @@ func VerifyDIDOwnership(signData *types.DIDDocument, seq uint64, doc *types.DIDD
 	if verificationMethod.Type != types.ES256K_2019 && verificationMethod.Type != types.ES256K_2018 {
 		return 0, sdkerrors.Wrapf(types.ErrVerificationMethodKeyTypeNotImplemented, "VerificationMethod: %v", verificationMethod.Type)
 	}
-	pubKeySecp256k1, err := secp256k1util.PubKeyFromBase58(verificationMethod.PubKeyBase58)
+	pubKeySecp256k1, err := secp256k1util.PubKeyFromBase58(verificationMethod.PublicKeyBase58)
 	if err != nil {
-		return 0, sdkerrors.Wrapf(types.ErrInvalidSecp256k1PublicKey, "PublicKey: %v", verificationMethod.PubKeyBase58)
+		return 0, sdkerrors.Wrapf(types.ErrInvalidSecp256k1PublicKey, "PublicKey: %v", verificationMethod.PublicKeyBase58)
 	}
 	newSeq, ok := types.Verify(sig, signData, seq, pubKeySecp256k1)
 	if !ok {

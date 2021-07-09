@@ -12,7 +12,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (k Keeper) TokenAll(c context.Context, req *types.QueryAllTokenRequest) (*types.QueryAllTokenResponse, error) {
+func (k Keeper) Tokens(c context.Context, req *types.QueryTokensRequest) (*types.QueryTokensResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
@@ -37,10 +37,10 @@ func (k Keeper) TokenAll(c context.Context, req *types.QueryAllTokenRequest) (*t
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	return &types.QueryAllTokenResponse{Token: tokens, Pagination: pageRes}, nil
+	return &types.QueryTokensResponse{Token: tokens, Pagination: pageRes}, nil
 }
 
-func (k Keeper) Token(c context.Context, req *types.QueryGetTokenRequest) (*types.QueryGetTokenResponse, error) {
+func (k Keeper) Token(c context.Context, req *types.QueryTokenRequest) (*types.QueryTokenResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
@@ -55,5 +55,5 @@ func (k Keeper) Token(c context.Context, req *types.QueryGetTokenRequest) (*type
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.TokenKeyPrefix)
 	k.cdc.MustUnmarshalBinaryBare(store.Get(GetSymbolBytes(req.Symbol)), &token)
 
-	return &types.QueryGetTokenResponse{Token: &token}, nil
+	return &types.QueryTokenResponse{Token: &token}, nil
 }

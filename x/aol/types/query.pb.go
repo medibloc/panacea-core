@@ -29,24 +29,24 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
-// this line is used by starport scaffolding # 3
-type QueryGetTopicRequest struct {
-	OwnerAddress string `protobuf:"bytes,1,opt,name=ownerAddress,proto3" json:"ownerAddress,omitempty"`
-	TopicName    string `protobuf:"bytes,2,opt,name=topicName,proto3" json:"topicName,omitempty"`
+// QueryTopicRequest is the request type for the Query/Topic RPC method.
+type QueryTopicRequest struct {
+	OwnerAddress string `protobuf:"bytes,1,opt,name=owner_address,json=ownerAddress,proto3" json:"owner_address,omitempty"`
+	TopicName    string `protobuf:"bytes,2,opt,name=topic_name,json=topicName,proto3" json:"topic_name,omitempty"`
 }
 
-func (m *QueryGetTopicRequest) Reset()         { *m = QueryGetTopicRequest{} }
-func (m *QueryGetTopicRequest) String() string { return proto.CompactTextString(m) }
-func (*QueryGetTopicRequest) ProtoMessage()    {}
-func (*QueryGetTopicRequest) Descriptor() ([]byte, []int) {
+func (m *QueryTopicRequest) Reset()         { *m = QueryTopicRequest{} }
+func (m *QueryTopicRequest) String() string { return proto.CompactTextString(m) }
+func (*QueryTopicRequest) ProtoMessage()    {}
+func (*QueryTopicRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_8b31acbf6a9207cf, []int{0}
 }
-func (m *QueryGetTopicRequest) XXX_Unmarshal(b []byte) error {
+func (m *QueryTopicRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *QueryGetTopicRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *QueryTopicRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_QueryGetTopicRequest.Marshal(b, m, deterministic)
+		return xxx_messageInfo_QueryTopicRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -56,48 +56,49 @@ func (m *QueryGetTopicRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte
 		return b[:n], nil
 	}
 }
-func (m *QueryGetTopicRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_QueryGetTopicRequest.Merge(m, src)
+func (m *QueryTopicRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryTopicRequest.Merge(m, src)
 }
-func (m *QueryGetTopicRequest) XXX_Size() int {
+func (m *QueryTopicRequest) XXX_Size() int {
 	return m.Size()
 }
-func (m *QueryGetTopicRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_QueryGetTopicRequest.DiscardUnknown(m)
+func (m *QueryTopicRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryTopicRequest.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_QueryGetTopicRequest proto.InternalMessageInfo
+var xxx_messageInfo_QueryTopicRequest proto.InternalMessageInfo
 
-func (m *QueryGetTopicRequest) GetOwnerAddress() string {
+func (m *QueryTopicRequest) GetOwnerAddress() string {
 	if m != nil {
 		return m.OwnerAddress
 	}
 	return ""
 }
 
-func (m *QueryGetTopicRequest) GetTopicName() string {
+func (m *QueryTopicRequest) GetTopicName() string {
 	if m != nil {
 		return m.TopicName
 	}
 	return ""
 }
 
-type QueryGetTopicResponse struct {
-	Topic *Topic `protobuf:"bytes,1,opt,name=Topic,proto3" json:"Topic,omitempty"`
+// QueryTopicResponse is the response type for the Query/Topic RPC method.
+type QueryTopicResponse struct {
+	Topic *Topic `protobuf:"bytes,1,opt,name=topic,proto3" json:"topic,omitempty"`
 }
 
-func (m *QueryGetTopicResponse) Reset()         { *m = QueryGetTopicResponse{} }
-func (m *QueryGetTopicResponse) String() string { return proto.CompactTextString(m) }
-func (*QueryGetTopicResponse) ProtoMessage()    {}
-func (*QueryGetTopicResponse) Descriptor() ([]byte, []int) {
+func (m *QueryTopicResponse) Reset()         { *m = QueryTopicResponse{} }
+func (m *QueryTopicResponse) String() string { return proto.CompactTextString(m) }
+func (*QueryTopicResponse) ProtoMessage()    {}
+func (*QueryTopicResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_8b31acbf6a9207cf, []int{1}
 }
-func (m *QueryGetTopicResponse) XXX_Unmarshal(b []byte) error {
+func (m *QueryTopicResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *QueryGetTopicResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *QueryTopicResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_QueryGetTopicResponse.Marshal(b, m, deterministic)
+		return xxx_messageInfo_QueryTopicResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -107,42 +108,43 @@ func (m *QueryGetTopicResponse) XXX_Marshal(b []byte, deterministic bool) ([]byt
 		return b[:n], nil
 	}
 }
-func (m *QueryGetTopicResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_QueryGetTopicResponse.Merge(m, src)
+func (m *QueryTopicResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryTopicResponse.Merge(m, src)
 }
-func (m *QueryGetTopicResponse) XXX_Size() int {
+func (m *QueryTopicResponse) XXX_Size() int {
 	return m.Size()
 }
-func (m *QueryGetTopicResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_QueryGetTopicResponse.DiscardUnknown(m)
+func (m *QueryTopicResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryTopicResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_QueryGetTopicResponse proto.InternalMessageInfo
+var xxx_messageInfo_QueryTopicResponse proto.InternalMessageInfo
 
-func (m *QueryGetTopicResponse) GetTopic() *Topic {
+func (m *QueryTopicResponse) GetTopic() *Topic {
 	if m != nil {
 		return m.Topic
 	}
 	return nil
 }
 
-type QueryListTopicsRequest struct {
-	OwnerAddress string             `protobuf:"bytes,1,opt,name=ownerAddress,proto3" json:"ownerAddress,omitempty"`
+// QueryTopicsRequest is the request type for the Query/Topics RPC method.
+type QueryTopicsRequest struct {
+	OwnerAddress string             `protobuf:"bytes,1,opt,name=owner_address,json=ownerAddress,proto3" json:"owner_address,omitempty"`
 	Pagination   *query.PageRequest `protobuf:"bytes,2,opt,name=pagination,proto3" json:"pagination,omitempty"`
 }
 
-func (m *QueryListTopicsRequest) Reset()         { *m = QueryListTopicsRequest{} }
-func (m *QueryListTopicsRequest) String() string { return proto.CompactTextString(m) }
-func (*QueryListTopicsRequest) ProtoMessage()    {}
-func (*QueryListTopicsRequest) Descriptor() ([]byte, []int) {
+func (m *QueryTopicsRequest) Reset()         { *m = QueryTopicsRequest{} }
+func (m *QueryTopicsRequest) String() string { return proto.CompactTextString(m) }
+func (*QueryTopicsRequest) ProtoMessage()    {}
+func (*QueryTopicsRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_8b31acbf6a9207cf, []int{2}
 }
-func (m *QueryListTopicsRequest) XXX_Unmarshal(b []byte) error {
+func (m *QueryTopicsRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *QueryListTopicsRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *QueryTopicsRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_QueryListTopicsRequest.Marshal(b, m, deterministic)
+		return xxx_messageInfo_QueryTopicsRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -152,49 +154,50 @@ func (m *QueryListTopicsRequest) XXX_Marshal(b []byte, deterministic bool) ([]by
 		return b[:n], nil
 	}
 }
-func (m *QueryListTopicsRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_QueryListTopicsRequest.Merge(m, src)
+func (m *QueryTopicsRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryTopicsRequest.Merge(m, src)
 }
-func (m *QueryListTopicsRequest) XXX_Size() int {
+func (m *QueryTopicsRequest) XXX_Size() int {
 	return m.Size()
 }
-func (m *QueryListTopicsRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_QueryListTopicsRequest.DiscardUnknown(m)
+func (m *QueryTopicsRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryTopicsRequest.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_QueryListTopicsRequest proto.InternalMessageInfo
+var xxx_messageInfo_QueryTopicsRequest proto.InternalMessageInfo
 
-func (m *QueryListTopicsRequest) GetOwnerAddress() string {
+func (m *QueryTopicsRequest) GetOwnerAddress() string {
 	if m != nil {
 		return m.OwnerAddress
 	}
 	return ""
 }
 
-func (m *QueryListTopicsRequest) GetPagination() *query.PageRequest {
+func (m *QueryTopicsRequest) GetPagination() *query.PageRequest {
 	if m != nil {
 		return m.Pagination
 	}
 	return nil
 }
 
-type QueryListTopicsResponse struct {
-	TopicNames []string            `protobuf:"bytes,1,rep,name=topicNames,proto3" json:"topicNames,omitempty"`
+// QueryTopicsResponse is the response type for the Query/Topics RPC method.
+type QueryTopicsResponse struct {
+	TopicNames []string            `protobuf:"bytes,1,rep,name=topic_names,json=topicNames,proto3" json:"topic_names,omitempty"`
 	Pagination *query.PageResponse `protobuf:"bytes,2,opt,name=pagination,proto3" json:"pagination,omitempty"`
 }
 
-func (m *QueryListTopicsResponse) Reset()         { *m = QueryListTopicsResponse{} }
-func (m *QueryListTopicsResponse) String() string { return proto.CompactTextString(m) }
-func (*QueryListTopicsResponse) ProtoMessage()    {}
-func (*QueryListTopicsResponse) Descriptor() ([]byte, []int) {
+func (m *QueryTopicsResponse) Reset()         { *m = QueryTopicsResponse{} }
+func (m *QueryTopicsResponse) String() string { return proto.CompactTextString(m) }
+func (*QueryTopicsResponse) ProtoMessage()    {}
+func (*QueryTopicsResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_8b31acbf6a9207cf, []int{3}
 }
-func (m *QueryListTopicsResponse) XXX_Unmarshal(b []byte) error {
+func (m *QueryTopicsResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *QueryListTopicsResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *QueryTopicsResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_QueryListTopicsResponse.Marshal(b, m, deterministic)
+		return xxx_messageInfo_QueryTopicsResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -204,50 +207,51 @@ func (m *QueryListTopicsResponse) XXX_Marshal(b []byte, deterministic bool) ([]b
 		return b[:n], nil
 	}
 }
-func (m *QueryListTopicsResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_QueryListTopicsResponse.Merge(m, src)
+func (m *QueryTopicsResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryTopicsResponse.Merge(m, src)
 }
-func (m *QueryListTopicsResponse) XXX_Size() int {
+func (m *QueryTopicsResponse) XXX_Size() int {
 	return m.Size()
 }
-func (m *QueryListTopicsResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_QueryListTopicsResponse.DiscardUnknown(m)
+func (m *QueryTopicsResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryTopicsResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_QueryListTopicsResponse proto.InternalMessageInfo
+var xxx_messageInfo_QueryTopicsResponse proto.InternalMessageInfo
 
-func (m *QueryListTopicsResponse) GetTopicNames() []string {
+func (m *QueryTopicsResponse) GetTopicNames() []string {
 	if m != nil {
 		return m.TopicNames
 	}
 	return nil
 }
 
-func (m *QueryListTopicsResponse) GetPagination() *query.PageResponse {
+func (m *QueryTopicsResponse) GetPagination() *query.PageResponse {
 	if m != nil {
 		return m.Pagination
 	}
 	return nil
 }
 
-type QueryGetWriterRequest struct {
-	OwnerAddress  string `protobuf:"bytes,1,opt,name=ownerAddress,proto3" json:"ownerAddress,omitempty"`
-	TopicName     string `protobuf:"bytes,2,opt,name=topicName,proto3" json:"topicName,omitempty"`
-	WriterAddress string `protobuf:"bytes,3,opt,name=writerAddress,proto3" json:"writerAddress,omitempty"`
+// QueryWriterRequest is the request type for the Query/Writer RPC method.
+type QueryWriterRequest struct {
+	OwnerAddress  string `protobuf:"bytes,1,opt,name=owner_address,json=ownerAddress,proto3" json:"owner_address,omitempty"`
+	TopicName     string `protobuf:"bytes,2,opt,name=topic_name,json=topicName,proto3" json:"topic_name,omitempty"`
+	WriterAddress string `protobuf:"bytes,3,opt,name=writer_address,json=writerAddress,proto3" json:"writer_address,omitempty"`
 }
 
-func (m *QueryGetWriterRequest) Reset()         { *m = QueryGetWriterRequest{} }
-func (m *QueryGetWriterRequest) String() string { return proto.CompactTextString(m) }
-func (*QueryGetWriterRequest) ProtoMessage()    {}
-func (*QueryGetWriterRequest) Descriptor() ([]byte, []int) {
+func (m *QueryWriterRequest) Reset()         { *m = QueryWriterRequest{} }
+func (m *QueryWriterRequest) String() string { return proto.CompactTextString(m) }
+func (*QueryWriterRequest) ProtoMessage()    {}
+func (*QueryWriterRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_8b31acbf6a9207cf, []int{4}
 }
-func (m *QueryGetWriterRequest) XXX_Unmarshal(b []byte) error {
+func (m *QueryWriterRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *QueryGetWriterRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *QueryWriterRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_QueryGetWriterRequest.Marshal(b, m, deterministic)
+		return xxx_messageInfo_QueryWriterRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -257,55 +261,56 @@ func (m *QueryGetWriterRequest) XXX_Marshal(b []byte, deterministic bool) ([]byt
 		return b[:n], nil
 	}
 }
-func (m *QueryGetWriterRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_QueryGetWriterRequest.Merge(m, src)
+func (m *QueryWriterRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryWriterRequest.Merge(m, src)
 }
-func (m *QueryGetWriterRequest) XXX_Size() int {
+func (m *QueryWriterRequest) XXX_Size() int {
 	return m.Size()
 }
-func (m *QueryGetWriterRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_QueryGetWriterRequest.DiscardUnknown(m)
+func (m *QueryWriterRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryWriterRequest.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_QueryGetWriterRequest proto.InternalMessageInfo
+var xxx_messageInfo_QueryWriterRequest proto.InternalMessageInfo
 
-func (m *QueryGetWriterRequest) GetOwnerAddress() string {
+func (m *QueryWriterRequest) GetOwnerAddress() string {
 	if m != nil {
 		return m.OwnerAddress
 	}
 	return ""
 }
 
-func (m *QueryGetWriterRequest) GetTopicName() string {
+func (m *QueryWriterRequest) GetTopicName() string {
 	if m != nil {
 		return m.TopicName
 	}
 	return ""
 }
 
-func (m *QueryGetWriterRequest) GetWriterAddress() string {
+func (m *QueryWriterRequest) GetWriterAddress() string {
 	if m != nil {
 		return m.WriterAddress
 	}
 	return ""
 }
 
-type QueryGetWriterResponse struct {
-	Writer *Writer `protobuf:"bytes,1,opt,name=Writer,proto3" json:"Writer,omitempty"`
+// QueryWriterResponse is the response type for the Query/Writer RPC method.
+type QueryWriterResponse struct {
+	Writer *Writer `protobuf:"bytes,1,opt,name=writer,proto3" json:"writer,omitempty"`
 }
 
-func (m *QueryGetWriterResponse) Reset()         { *m = QueryGetWriterResponse{} }
-func (m *QueryGetWriterResponse) String() string { return proto.CompactTextString(m) }
-func (*QueryGetWriterResponse) ProtoMessage()    {}
-func (*QueryGetWriterResponse) Descriptor() ([]byte, []int) {
+func (m *QueryWriterResponse) Reset()         { *m = QueryWriterResponse{} }
+func (m *QueryWriterResponse) String() string { return proto.CompactTextString(m) }
+func (*QueryWriterResponse) ProtoMessage()    {}
+func (*QueryWriterResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_8b31acbf6a9207cf, []int{5}
 }
-func (m *QueryGetWriterResponse) XXX_Unmarshal(b []byte) error {
+func (m *QueryWriterResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *QueryGetWriterResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *QueryWriterResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_QueryGetWriterResponse.Marshal(b, m, deterministic)
+		return xxx_messageInfo_QueryWriterResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -315,43 +320,44 @@ func (m *QueryGetWriterResponse) XXX_Marshal(b []byte, deterministic bool) ([]by
 		return b[:n], nil
 	}
 }
-func (m *QueryGetWriterResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_QueryGetWriterResponse.Merge(m, src)
+func (m *QueryWriterResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryWriterResponse.Merge(m, src)
 }
-func (m *QueryGetWriterResponse) XXX_Size() int {
+func (m *QueryWriterResponse) XXX_Size() int {
 	return m.Size()
 }
-func (m *QueryGetWriterResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_QueryGetWriterResponse.DiscardUnknown(m)
+func (m *QueryWriterResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryWriterResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_QueryGetWriterResponse proto.InternalMessageInfo
+var xxx_messageInfo_QueryWriterResponse proto.InternalMessageInfo
 
-func (m *QueryGetWriterResponse) GetWriter() *Writer {
+func (m *QueryWriterResponse) GetWriter() *Writer {
 	if m != nil {
 		return m.Writer
 	}
 	return nil
 }
 
-type QueryListWritersRequest struct {
-	OwnerAddress string             `protobuf:"bytes,1,opt,name=ownerAddress,proto3" json:"ownerAddress,omitempty"`
-	TopicName    string             `protobuf:"bytes,2,opt,name=topicName,proto3" json:"topicName,omitempty"`
+// QueryWritersRequest is the request type for the Query/Writers RPC method.
+type QueryWritersRequest struct {
+	OwnerAddress string             `protobuf:"bytes,1,opt,name=owner_address,json=ownerAddress,proto3" json:"owner_address,omitempty"`
+	TopicName    string             `protobuf:"bytes,2,opt,name=topic_name,json=topicName,proto3" json:"topic_name,omitempty"`
 	Pagination   *query.PageRequest `protobuf:"bytes,3,opt,name=pagination,proto3" json:"pagination,omitempty"`
 }
 
-func (m *QueryListWritersRequest) Reset()         { *m = QueryListWritersRequest{} }
-func (m *QueryListWritersRequest) String() string { return proto.CompactTextString(m) }
-func (*QueryListWritersRequest) ProtoMessage()    {}
-func (*QueryListWritersRequest) Descriptor() ([]byte, []int) {
+func (m *QueryWritersRequest) Reset()         { *m = QueryWritersRequest{} }
+func (m *QueryWritersRequest) String() string { return proto.CompactTextString(m) }
+func (*QueryWritersRequest) ProtoMessage()    {}
+func (*QueryWritersRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_8b31acbf6a9207cf, []int{6}
 }
-func (m *QueryListWritersRequest) XXX_Unmarshal(b []byte) error {
+func (m *QueryWritersRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *QueryListWritersRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *QueryWritersRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_QueryListWritersRequest.Marshal(b, m, deterministic)
+		return xxx_messageInfo_QueryWritersRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -361,56 +367,57 @@ func (m *QueryListWritersRequest) XXX_Marshal(b []byte, deterministic bool) ([]b
 		return b[:n], nil
 	}
 }
-func (m *QueryListWritersRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_QueryListWritersRequest.Merge(m, src)
+func (m *QueryWritersRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryWritersRequest.Merge(m, src)
 }
-func (m *QueryListWritersRequest) XXX_Size() int {
+func (m *QueryWritersRequest) XXX_Size() int {
 	return m.Size()
 }
-func (m *QueryListWritersRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_QueryListWritersRequest.DiscardUnknown(m)
+func (m *QueryWritersRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryWritersRequest.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_QueryListWritersRequest proto.InternalMessageInfo
+var xxx_messageInfo_QueryWritersRequest proto.InternalMessageInfo
 
-func (m *QueryListWritersRequest) GetOwnerAddress() string {
+func (m *QueryWritersRequest) GetOwnerAddress() string {
 	if m != nil {
 		return m.OwnerAddress
 	}
 	return ""
 }
 
-func (m *QueryListWritersRequest) GetTopicName() string {
+func (m *QueryWritersRequest) GetTopicName() string {
 	if m != nil {
 		return m.TopicName
 	}
 	return ""
 }
 
-func (m *QueryListWritersRequest) GetPagination() *query.PageRequest {
+func (m *QueryWritersRequest) GetPagination() *query.PageRequest {
 	if m != nil {
 		return m.Pagination
 	}
 	return nil
 }
 
-type QueryListWritersResponse struct {
-	WriterAddresses []string            `protobuf:"bytes,1,rep,name=writerAddresses,proto3" json:"writerAddresses,omitempty"`
+// QueryWritersResponse is the response type for the Query/Writers RPC method.
+type QueryWritersResponse struct {
+	WriterAddresses []string            `protobuf:"bytes,1,rep,name=writer_addresses,json=writerAddresses,proto3" json:"writer_addresses,omitempty"`
 	Pagination      *query.PageResponse `protobuf:"bytes,2,opt,name=pagination,proto3" json:"pagination,omitempty"`
 }
 
-func (m *QueryListWritersResponse) Reset()         { *m = QueryListWritersResponse{} }
-func (m *QueryListWritersResponse) String() string { return proto.CompactTextString(m) }
-func (*QueryListWritersResponse) ProtoMessage()    {}
-func (*QueryListWritersResponse) Descriptor() ([]byte, []int) {
+func (m *QueryWritersResponse) Reset()         { *m = QueryWritersResponse{} }
+func (m *QueryWritersResponse) String() string { return proto.CompactTextString(m) }
+func (*QueryWritersResponse) ProtoMessage()    {}
+func (*QueryWritersResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_8b31acbf6a9207cf, []int{7}
 }
-func (m *QueryListWritersResponse) XXX_Unmarshal(b []byte) error {
+func (m *QueryWritersResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *QueryListWritersResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *QueryWritersResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_QueryListWritersResponse.Marshal(b, m, deterministic)
+		return xxx_messageInfo_QueryWritersResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -420,50 +427,51 @@ func (m *QueryListWritersResponse) XXX_Marshal(b []byte, deterministic bool) ([]
 		return b[:n], nil
 	}
 }
-func (m *QueryListWritersResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_QueryListWritersResponse.Merge(m, src)
+func (m *QueryWritersResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryWritersResponse.Merge(m, src)
 }
-func (m *QueryListWritersResponse) XXX_Size() int {
+func (m *QueryWritersResponse) XXX_Size() int {
 	return m.Size()
 }
-func (m *QueryListWritersResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_QueryListWritersResponse.DiscardUnknown(m)
+func (m *QueryWritersResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryWritersResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_QueryListWritersResponse proto.InternalMessageInfo
+var xxx_messageInfo_QueryWritersResponse proto.InternalMessageInfo
 
-func (m *QueryListWritersResponse) GetWriterAddresses() []string {
+func (m *QueryWritersResponse) GetWriterAddresses() []string {
 	if m != nil {
 		return m.WriterAddresses
 	}
 	return nil
 }
 
-func (m *QueryListWritersResponse) GetPagination() *query.PageResponse {
+func (m *QueryWritersResponse) GetPagination() *query.PageResponse {
 	if m != nil {
 		return m.Pagination
 	}
 	return nil
 }
 
-type QueryGetRecordRequest struct {
-	OwnerAddress string `protobuf:"bytes,1,opt,name=ownerAddress,proto3" json:"ownerAddress,omitempty"`
-	TopicName    string `protobuf:"bytes,2,opt,name=topicName,proto3" json:"topicName,omitempty"`
+// QueryRecordRequest is the request type for the Query/Record RPC method.
+type QueryRecordRequest struct {
+	OwnerAddress string `protobuf:"bytes,1,opt,name=owner_address,json=ownerAddress,proto3" json:"owner_address,omitempty"`
+	TopicName    string `protobuf:"bytes,2,opt,name=topic_name,json=topicName,proto3" json:"topic_name,omitempty"`
 	Offset       uint64 `protobuf:"varint,3,opt,name=offset,proto3" json:"offset,omitempty"`
 }
 
-func (m *QueryGetRecordRequest) Reset()         { *m = QueryGetRecordRequest{} }
-func (m *QueryGetRecordRequest) String() string { return proto.CompactTextString(m) }
-func (*QueryGetRecordRequest) ProtoMessage()    {}
-func (*QueryGetRecordRequest) Descriptor() ([]byte, []int) {
+func (m *QueryRecordRequest) Reset()         { *m = QueryRecordRequest{} }
+func (m *QueryRecordRequest) String() string { return proto.CompactTextString(m) }
+func (*QueryRecordRequest) ProtoMessage()    {}
+func (*QueryRecordRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_8b31acbf6a9207cf, []int{8}
 }
-func (m *QueryGetRecordRequest) XXX_Unmarshal(b []byte) error {
+func (m *QueryRecordRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *QueryGetRecordRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *QueryRecordRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_QueryGetRecordRequest.Marshal(b, m, deterministic)
+		return xxx_messageInfo_QueryRecordRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -473,55 +481,56 @@ func (m *QueryGetRecordRequest) XXX_Marshal(b []byte, deterministic bool) ([]byt
 		return b[:n], nil
 	}
 }
-func (m *QueryGetRecordRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_QueryGetRecordRequest.Merge(m, src)
+func (m *QueryRecordRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryRecordRequest.Merge(m, src)
 }
-func (m *QueryGetRecordRequest) XXX_Size() int {
+func (m *QueryRecordRequest) XXX_Size() int {
 	return m.Size()
 }
-func (m *QueryGetRecordRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_QueryGetRecordRequest.DiscardUnknown(m)
+func (m *QueryRecordRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryRecordRequest.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_QueryGetRecordRequest proto.InternalMessageInfo
+var xxx_messageInfo_QueryRecordRequest proto.InternalMessageInfo
 
-func (m *QueryGetRecordRequest) GetOwnerAddress() string {
+func (m *QueryRecordRequest) GetOwnerAddress() string {
 	if m != nil {
 		return m.OwnerAddress
 	}
 	return ""
 }
 
-func (m *QueryGetRecordRequest) GetTopicName() string {
+func (m *QueryRecordRequest) GetTopicName() string {
 	if m != nil {
 		return m.TopicName
 	}
 	return ""
 }
 
-func (m *QueryGetRecordRequest) GetOffset() uint64 {
+func (m *QueryRecordRequest) GetOffset() uint64 {
 	if m != nil {
 		return m.Offset
 	}
 	return 0
 }
 
-type QueryGetRecordResponse struct {
-	Record *Record `protobuf:"bytes,1,opt,name=Record,proto3" json:"Record,omitempty"`
+// QueryRecordResponse is the response type for the Query/Record RPC method.
+type QueryRecordResponse struct {
+	Record *Record `protobuf:"bytes,1,opt,name=record,proto3" json:"record,omitempty"`
 }
 
-func (m *QueryGetRecordResponse) Reset()         { *m = QueryGetRecordResponse{} }
-func (m *QueryGetRecordResponse) String() string { return proto.CompactTextString(m) }
-func (*QueryGetRecordResponse) ProtoMessage()    {}
-func (*QueryGetRecordResponse) Descriptor() ([]byte, []int) {
+func (m *QueryRecordResponse) Reset()         { *m = QueryRecordResponse{} }
+func (m *QueryRecordResponse) String() string { return proto.CompactTextString(m) }
+func (*QueryRecordResponse) ProtoMessage()    {}
+func (*QueryRecordResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_8b31acbf6a9207cf, []int{9}
 }
-func (m *QueryGetRecordResponse) XXX_Unmarshal(b []byte) error {
+func (m *QueryRecordResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *QueryGetRecordResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *QueryRecordResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_QueryGetRecordResponse.Marshal(b, m, deterministic)
+		return xxx_messageInfo_QueryRecordResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -531,19 +540,19 @@ func (m *QueryGetRecordResponse) XXX_Marshal(b []byte, deterministic bool) ([]by
 		return b[:n], nil
 	}
 }
-func (m *QueryGetRecordResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_QueryGetRecordResponse.Merge(m, src)
+func (m *QueryRecordResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryRecordResponse.Merge(m, src)
 }
-func (m *QueryGetRecordResponse) XXX_Size() int {
+func (m *QueryRecordResponse) XXX_Size() int {
 	return m.Size()
 }
-func (m *QueryGetRecordResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_QueryGetRecordResponse.DiscardUnknown(m)
+func (m *QueryRecordResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryRecordResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_QueryGetRecordResponse proto.InternalMessageInfo
+var xxx_messageInfo_QueryRecordResponse proto.InternalMessageInfo
 
-func (m *QueryGetRecordResponse) GetRecord() *Record {
+func (m *QueryRecordResponse) GetRecord() *Record {
 	if m != nil {
 		return m.Record
 	}
@@ -551,65 +560,65 @@ func (m *QueryGetRecordResponse) GetRecord() *Record {
 }
 
 func init() {
-	proto.RegisterType((*QueryGetTopicRequest)(nil), "panacea.aol.v2.QueryGetTopicRequest")
-	proto.RegisterType((*QueryGetTopicResponse)(nil), "panacea.aol.v2.QueryGetTopicResponse")
-	proto.RegisterType((*QueryListTopicsRequest)(nil), "panacea.aol.v2.QueryListTopicsRequest")
-	proto.RegisterType((*QueryListTopicsResponse)(nil), "panacea.aol.v2.QueryListTopicsResponse")
-	proto.RegisterType((*QueryGetWriterRequest)(nil), "panacea.aol.v2.QueryGetWriterRequest")
-	proto.RegisterType((*QueryGetWriterResponse)(nil), "panacea.aol.v2.QueryGetWriterResponse")
-	proto.RegisterType((*QueryListWritersRequest)(nil), "panacea.aol.v2.QueryListWritersRequest")
-	proto.RegisterType((*QueryListWritersResponse)(nil), "panacea.aol.v2.QueryListWritersResponse")
-	proto.RegisterType((*QueryGetRecordRequest)(nil), "panacea.aol.v2.QueryGetRecordRequest")
-	proto.RegisterType((*QueryGetRecordResponse)(nil), "panacea.aol.v2.QueryGetRecordResponse")
+	proto.RegisterType((*QueryTopicRequest)(nil), "panacea.aol.v2.QueryTopicRequest")
+	proto.RegisterType((*QueryTopicResponse)(nil), "panacea.aol.v2.QueryTopicResponse")
+	proto.RegisterType((*QueryTopicsRequest)(nil), "panacea.aol.v2.QueryTopicsRequest")
+	proto.RegisterType((*QueryTopicsResponse)(nil), "panacea.aol.v2.QueryTopicsResponse")
+	proto.RegisterType((*QueryWriterRequest)(nil), "panacea.aol.v2.QueryWriterRequest")
+	proto.RegisterType((*QueryWriterResponse)(nil), "panacea.aol.v2.QueryWriterResponse")
+	proto.RegisterType((*QueryWritersRequest)(nil), "panacea.aol.v2.QueryWritersRequest")
+	proto.RegisterType((*QueryWritersResponse)(nil), "panacea.aol.v2.QueryWritersResponse")
+	proto.RegisterType((*QueryRecordRequest)(nil), "panacea.aol.v2.QueryRecordRequest")
+	proto.RegisterType((*QueryRecordResponse)(nil), "panacea.aol.v2.QueryRecordResponse")
 }
 
 func init() { proto.RegisterFile("panacea/aol/v2/query.proto", fileDescriptor_8b31acbf6a9207cf) }
 
 var fileDescriptor_8b31acbf6a9207cf = []byte{
-	// 683 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x55, 0x4f, 0x6b, 0x13, 0x41,
-	0x1c, 0xed, 0xb4, 0x36, 0xd2, 0xa9, 0x7f, 0x60, 0xb0, 0x31, 0xac, 0x65, 0x91, 0xa5, 0xa6, 0x41,
-	0xeb, 0x0c, 0x8d, 0x1e, 0xc4, 0x53, 0x2d, 0xd2, 0x56, 0x14, 0x69, 0x17, 0xc1, 0xe2, 0x6d, 0xb2,
-	0x99, 0xc6, 0x85, 0x64, 0x67, 0xb3, 0xb3, 0x49, 0x2d, 0x21, 0x08, 0xc5, 0xab, 0x28, 0x08, 0x7e,
-	0x01, 0xc1, 0x83, 0x37, 0xef, 0x7e, 0x00, 0x8f, 0x05, 0x2f, 0x1e, 0x25, 0xf1, 0x83, 0x48, 0x66,
-	0x26, 0xc9, 0xee, 0x26, 0x4b, 0x68, 0xcc, 0x71, 0x7f, 0xf3, 0xf6, 0xcd, 0x9b, 0xf7, 0xe6, 0xf7,
-	0x1b, 0x68, 0xf8, 0xd4, 0xa3, 0x0e, 0xa3, 0x84, 0xf2, 0x2a, 0x69, 0x16, 0x49, 0xbd, 0xc1, 0x82,
-	0x13, 0xec, 0x07, 0x3c, 0xe4, 0xe8, 0x8a, 0x5e, 0xc3, 0x94, 0x57, 0x71, 0xb3, 0x68, 0xac, 0x56,
-	0x38, 0xaf, 0x54, 0x19, 0xa1, 0xbe, 0x4b, 0xa8, 0xe7, 0xf1, 0x90, 0x86, 0x2e, 0xf7, 0x84, 0x42,
-	0x1b, 0xb7, 0x1d, 0x2e, 0x6a, 0x5c, 0x90, 0x12, 0x15, 0x4c, 0xd1, 0x90, 0xe6, 0x66, 0x89, 0x85,
-	0x74, 0x93, 0xf8, 0xb4, 0xe2, 0x7a, 0x12, 0xac, 0xb1, 0xc9, 0x5d, 0xf9, 0xb1, 0xc7, 0x02, 0xbd,
-	0x76, 0x23, 0xb1, 0x16, 0x30, 0x87, 0x07, 0xe5, 0x94, 0xc5, 0xe3, 0xc0, 0x0d, 0x07, 0x7f, 0x26,
-	0x59, 0x43, 0xee, 0xbb, 0x8e, 0x5a, 0xb3, 0x0e, 0xe1, 0xb5, 0x83, 0x9e, 0xa6, 0x5d, 0x16, 0xbe,
-	0xe8, 0x95, 0x6d, 0x56, 0x6f, 0x30, 0x11, 0x22, 0x0b, 0x5e, 0x92, 0x9b, 0x3f, 0x2a, 0x97, 0x03,
-	0x26, 0x44, 0x0e, 0xdc, 0x04, 0x85, 0x25, 0x3b, 0x56, 0x43, 0xab, 0x70, 0x49, 0x52, 0x3d, 0xa7,
-	0x35, 0x96, 0x9b, 0x97, 0x80, 0x61, 0xc1, 0x7a, 0x0c, 0x57, 0x12, 0xcc, 0xc2, 0xe7, 0x9e, 0x60,
-	0xe8, 0x0e, 0x5c, 0x94, 0x05, 0xc9, 0xb9, 0x5c, 0x5c, 0xc1, 0x71, 0x3b, 0xb1, 0x42, 0x2b, 0x8c,
-	0xf5, 0x0e, 0xc0, 0xac, 0xa4, 0x79, 0xe6, 0x0a, 0xc5, 0x23, 0xce, 0x23, 0x71, 0x07, 0xc2, 0xa1,
-	0xc9, 0x52, 0xe3, 0x72, 0x31, 0x8f, 0x55, 0x22, 0xb8, 0x97, 0x08, 0x56, 0xc1, 0xea, 0x44, 0xf0,
-	0x3e, 0xad, 0x30, 0xcd, 0x6f, 0x47, 0xfe, 0xb4, 0x4e, 0x01, 0xbc, 0x3e, 0x22, 0x43, 0x9f, 0xc7,
-	0x84, 0x70, 0x70, 0xea, 0x9e, 0x8a, 0x85, 0xc2, 0x92, 0x1d, 0xa9, 0xa0, 0xdd, 0x31, 0x1a, 0xd6,
-	0x27, 0x6a, 0x50, 0xe4, 0x31, 0x11, 0x6f, 0x87, 0x8e, 0xbe, 0x94, 0xf9, 0xce, 0x2c, 0x2c, 0xb4,
-	0x06, 0x2f, 0xab, 0x2b, 0xd3, 0xa7, 0x58, 0x90, 0x88, 0x78, 0xd1, 0xda, 0xd3, 0x59, 0x44, 0x04,
-	0x68, 0x0f, 0x30, 0xcc, 0xa8, 0x8a, 0x0e, 0x35, 0x9b, 0x0c, 0x55, 0xe3, 0x35, 0xca, 0xfa, 0x12,
-	0xf5, 0x53, 0xd5, 0xc4, 0xec, 0x4e, 0x13, 0x4f, 0x7d, 0x61, 0xea, 0xd4, 0xdf, 0x03, 0x98, 0x1b,
-	0x55, 0xa9, 0x8f, 0x5c, 0x80, 0x57, 0x63, 0xee, 0x0c, 0xb2, 0x4f, 0x96, 0x67, 0x77, 0x01, 0xea,
-	0xc3, 0x0b, 0x60, 0xcb, 0xee, 0x9f, 0x9d, 0x65, 0x59, 0x98, 0xe1, 0x47, 0x47, 0x82, 0x85, 0xd2,
-	0xae, 0x0b, 0xb6, 0xfe, 0x8a, 0x46, 0xde, 0xdf, 0x72, 0x18, 0xb9, 0xaa, 0xa4, 0x45, 0xae, 0xf1,
-	0x1a, 0x55, 0xfc, 0x91, 0x81, 0x8b, 0x92, 0x0a, 0x7d, 0x06, 0x7a, 0x02, 0xa0, 0xb5, 0xe4, 0x3f,
-	0xe3, 0x66, 0x91, 0x71, 0x6b, 0x02, 0x4a, 0x09, 0xb2, 0xb6, 0x4e, 0x7f, 0xfd, 0xfd, 0x34, 0xff,
-	0x10, 0x3d, 0x20, 0xe3, 0xa6, 0xa8, 0x20, 0xad, 0xa8, 0x1d, 0x6d, 0x35, 0x05, 0x05, 0x69, 0x0d,
-	0x3c, 0x68, 0xa3, 0x0f, 0x00, 0x66, 0x54, 0x73, 0xa3, 0xfc, 0xd8, 0x3d, 0x47, 0x86, 0x90, 0xb1,
-	0x3e, 0x11, 0xa7, 0xd5, 0xdd, 0x97, 0xea, 0x30, 0xda, 0x38, 0x8f, 0x3a, 0xf4, 0x1d, 0xf4, 0x1b,
-	0x0b, 0xa5, 0xba, 0x10, 0x9b, 0x05, 0x46, 0x7e, 0x12, 0x4c, 0xeb, 0x39, 0x94, 0x7a, 0x6c, 0xb4,
-	0x3f, 0xad, 0x5b, 0xfa, 0x8d, 0x11, 0xa4, 0x15, 0xbb, 0xef, 0x6d, 0xf4, 0x15, 0xc0, 0x8b, 0xba,
-	0x59, 0x50, 0xba, 0x3d, 0xf1, 0xa6, 0x37, 0x0a, 0x93, 0x81, 0x5a, 0xf8, 0x9e, 0x14, 0xbe, 0x8d,
-	0xb6, 0xfe, 0x57, 0x38, 0xfa, 0x06, 0xfa, 0x57, 0x38, 0xdd, 0xdc, 0x58, 0x9f, 0xa5, 0x9b, 0x1b,
-	0xef, 0x0d, 0xeb, 0x40, 0x6a, 0x7c, 0x8a, 0x9e, 0x4c, 0xad, 0x51, 0xbd, 0xee, 0x3d, 0xa4, 0xec,
-	0xc3, 0xf6, 0xf6, 0xce, 0xcf, 0x8e, 0x09, 0xce, 0x3a, 0x26, 0xf8, 0xd3, 0x31, 0xc1, 0xc7, 0xae,
-	0x39, 0x77, 0xd6, 0x35, 0xe7, 0x7e, 0x77, 0xcd, 0xb9, 0x57, 0x1b, 0x15, 0x37, 0x7c, 0xdd, 0x28,
-	0x61, 0x87, 0xd7, 0x48, 0x8d, 0x95, 0xdd, 0x52, 0x95, 0x3b, 0xfd, 0x7d, 0xef, 0x3a, 0x3c, 0x60,
-	0xe4, 0x8d, 0xdc, 0x3e, 0x3c, 0xf1, 0x99, 0x28, 0x65, 0xe4, 0xbb, 0x7f, 0xef, 0x5f, 0x00, 0x00,
-	0x00, 0xff, 0xff, 0x72, 0x3d, 0x04, 0xd9, 0xe1, 0x08, 0x00, 0x00,
+	// 688 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x95, 0x4d, 0x6f, 0xd3, 0x30,
+	0x18, 0xc7, 0xe7, 0x95, 0x06, 0xd5, 0x65, 0x03, 0x0c, 0x4c, 0x53, 0x81, 0x00, 0x19, 0x2f, 0xe3,
+	0x65, 0xb1, 0x56, 0xc4, 0x05, 0x71, 0x59, 0xc5, 0x9b, 0x40, 0xa0, 0x91, 0x81, 0x26, 0xc1, 0x61,
+	0x72, 0x53, 0xaf, 0x44, 0x6a, 0xe3, 0x2c, 0x4e, 0x3b, 0xa6, 0xaa, 0x42, 0x70, 0x42, 0x9c, 0x10,
+	0x7c, 0x01, 0x90, 0x10, 0x47, 0x3e, 0x07, 0xc7, 0x49, 0x5c, 0x38, 0xa2, 0x96, 0x0f, 0x82, 0x6a,
+	0xbb, 0x69, 0x1d, 0x96, 0xa2, 0x6d, 0x3d, 0xd6, 0xfe, 0xe7, 0x79, 0x7e, 0xfe, 0xff, 0xfd, 0xb8,
+	0xb0, 0x10, 0x10, 0x9f, 0xb8, 0x94, 0x60, 0xc2, 0x6a, 0xb8, 0x59, 0xc4, 0x1b, 0x0d, 0x1a, 0x6e,
+	0xd9, 0x41, 0xc8, 0x22, 0x86, 0xa6, 0xd5, 0x9e, 0x4d, 0x58, 0xcd, 0x6e, 0x16, 0x0b, 0xa7, 0xaa,
+	0x8c, 0x55, 0x6b, 0x14, 0x93, 0xc0, 0xc3, 0xc4, 0xf7, 0x59, 0x44, 0x22, 0x8f, 0xf9, 0x5c, 0xaa,
+	0x0b, 0x57, 0x5c, 0xc6, 0xeb, 0x8c, 0xe3, 0x32, 0xe1, 0x54, 0x96, 0xc1, 0xcd, 0xc5, 0x32, 0x8d,
+	0xc8, 0x22, 0x0e, 0x48, 0xd5, 0xf3, 0x85, 0x58, 0x69, 0x93, 0x5d, 0xd9, 0xa6, 0x4f, 0x43, 0xb5,
+	0x77, 0x32, 0xb1, 0x17, 0x52, 0x97, 0x85, 0x95, 0x94, 0xcd, 0xcd, 0xd0, 0x8b, 0xe2, 0x2f, 0x93,
+	0x55, 0x23, 0x16, 0x78, 0xae, 0xdc, 0xb3, 0x56, 0xe1, 0xd1, 0x27, 0x3d, 0xa6, 0xa7, 0xbd, 0x35,
+	0x87, 0x6e, 0x34, 0x28, 0x8f, 0xd0, 0x1c, 0x9c, 0x12, 0x9d, 0xd7, 0x48, 0xa5, 0x12, 0x52, 0xce,
+	0x67, 0xc1, 0x59, 0x30, 0x9f, 0x73, 0x0e, 0x89, 0xc5, 0x25, 0xb9, 0x86, 0x4e, 0x43, 0x28, 0x0a,
+	0xad, 0xf9, 0xa4, 0x4e, 0x67, 0x27, 0x85, 0x22, 0x27, 0x56, 0x1e, 0x93, 0x3a, 0xb5, 0x96, 0x20,
+	0x1a, 0x2e, 0xcc, 0x03, 0xe6, 0x73, 0x8a, 0xae, 0xc2, 0xac, 0x90, 0x88, 0x8a, 0xf9, 0xe2, 0x09,
+	0x5b, 0xb7, 0xd2, 0x96, 0x6a, 0xa9, 0xb1, 0xde, 0x80, 0xe1, 0x1a, 0x7c, 0x57, 0x74, 0x77, 0x21,
+	0x1c, 0xb8, 0x2b, 0xe8, 0xf2, 0xc5, 0x8b, 0xb6, 0x8c, 0xc2, 0xee, 0x45, 0x61, 0xcb, 0x44, 0x55,
+	0x14, 0xf6, 0x32, 0xa9, 0x52, 0xd5, 0xc0, 0x19, 0xfa, 0xd2, 0x7a, 0x0d, 0x8f, 0x69, 0x08, 0xea,
+	0x1c, 0x67, 0x60, 0x7e, 0x70, 0xf8, 0x1e, 0x41, 0x66, 0x3e, 0xe7, 0xc0, 0xf8, 0xf4, 0x1c, 0xdd,
+	0xdb, 0xa1, 0xff, 0xa5, 0xff, 0xf6, 0x97, 0xd5, 0x13, 0x00, 0xd2, 0x83, 0x55, 0x91, 0xe8, 0x18,
+	0x13, 0x42, 0x17, 0xe0, 0xb4, 0xbc, 0x26, 0x71, 0x91, 0x8c, 0x90, 0x4c, 0xc9, 0x55, 0x55, 0xc5,
+	0xba, 0xa3, 0x1c, 0xe8, 0x03, 0x28, 0x07, 0x6c, 0x68, 0x48, 0x9d, 0x8a, 0x72, 0x26, 0x19, 0xa5,
+	0xd2, 0x2b, 0x95, 0xf5, 0x05, 0x68, 0x75, 0xf8, 0x38, 0x4f, 0xa2, 0x87, 0x9d, 0xd9, 0x73, 0xd8,
+	0xef, 0x01, 0x3c, 0xae, 0x33, 0xaa, 0xc3, 0x5e, 0x86, 0x47, 0x74, 0xab, 0xe2, 0xcc, 0x0f, 0x6b,
+	0x66, 0x8d, 0x33, 0xf8, 0x40, 0x05, 0xef, 0x88, 0x39, 0x1f, 0xa7, 0x5d, 0x33, 0xd0, 0x60, 0xeb,
+	0xeb, 0x9c, 0x46, 0xc2, 0xaa, 0x03, 0x8e, 0xfa, 0x15, 0x27, 0xdd, 0xef, 0x38, 0x48, 0x5a, 0xbe,
+	0x35, 0x69, 0x49, 0x2b, 0xbd, 0x52, 0x15, 0xbf, 0x1a, 0x30, 0x2b, 0xea, 0xa0, 0x8f, 0x00, 0x66,
+	0xc5, 0xe0, 0xa0, 0x73, 0xc9, 0x6f, 0xfe, 0x79, 0x74, 0x0a, 0xd6, 0x28, 0x89, 0x44, 0xb1, 0x4a,
+	0x6f, 0x7f, 0xfe, 0xf9, 0x34, 0x79, 0x0b, 0xdd, 0xc4, 0x3b, 0x3d, 0x94, 0x1c, 0xb7, 0x34, 0x6f,
+	0xda, 0xf2, 0xa5, 0xe3, 0xb8, 0x35, 0x70, 0xa3, 0x8d, 0xde, 0x01, 0x68, 0xc8, 0x69, 0x46, 0x23,
+	0x5a, 0xf6, 0xef, 0x67, 0x61, 0x6e, 0xa4, 0x46, 0x71, 0xdd, 0x10, 0x5c, 0x18, 0x2d, 0xec, 0x8a,
+	0x0b, 0x7d, 0x07, 0xd0, 0x90, 0x57, 0x2d, 0x05, 0x45, 0x1b, 0xfa, 0x14, 0x14, 0x7d, 0x2e, 0xad,
+	0x17, 0x02, 0xe5, 0x19, 0x5a, 0xd9, 0xbb, 0x45, 0xea, 0xdf, 0x83, 0xe3, 0x96, 0x7e, 0xe9, 0xdb,
+	0xe8, 0x33, 0x80, 0x07, 0xd5, 0x6c, 0xa0, 0x51, 0x34, 0xb1, 0x7b, 0xe7, 0x47, 0x8b, 0x14, 0xf3,
+	0x03, 0xc1, 0x7c, 0x1b, 0x95, 0xf6, 0xcf, 0x8c, 0xbe, 0x01, 0x68, 0xc8, 0x0b, 0x99, 0xe2, 0xa9,
+	0x36, 0x4f, 0x29, 0x9e, 0xea, 0x13, 0x60, 0xad, 0x08, 0xbe, 0x47, 0xe8, 0xe1, 0x3e, 0xf8, 0xe4,
+	0x70, 0xf4, 0xb4, 0x62, 0xd8, 0xda, 0xa5, 0xfb, 0x3f, 0x3a, 0x26, 0xd8, 0xee, 0x98, 0xe0, 0x77,
+	0xc7, 0x04, 0x1f, 0xba, 0xe6, 0xc4, 0x76, 0xd7, 0x9c, 0xf8, 0xd5, 0x35, 0x27, 0x96, 0xc1, 0xf3,
+	0x6b, 0x55, 0x2f, 0x7a, 0xd9, 0x28, 0xdb, 0x2e, 0xab, 0xe3, 0x3a, 0xad, 0x78, 0xe5, 0x1a, 0x73,
+	0xfb, 0xbd, 0x17, 0x5c, 0x16, 0x52, 0xfc, 0x4a, 0x20, 0x44, 0x5b, 0x01, 0xe5, 0x65, 0x43, 0xfc,
+	0x95, 0x5f, 0xff, 0x1b, 0x00, 0x00, 0xff, 0xff, 0x46, 0x39, 0x89, 0x89, 0xb4, 0x08, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -624,11 +633,16 @@ const _ = grpc.SupportPackageIsVersion4
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type QueryClient interface {
-	Topic(ctx context.Context, in *QueryGetTopicRequest, opts ...grpc.CallOption) (*QueryGetTopicResponse, error)
-	Topics(ctx context.Context, in *QueryListTopicsRequest, opts ...grpc.CallOption) (*QueryListTopicsResponse, error)
-	Writer(ctx context.Context, in *QueryGetWriterRequest, opts ...grpc.CallOption) (*QueryGetWriterResponse, error)
-	Writers(ctx context.Context, in *QueryListWritersRequest, opts ...grpc.CallOption) (*QueryListWritersResponse, error)
-	Record(ctx context.Context, in *QueryGetRecordRequest, opts ...grpc.CallOption) (*QueryGetRecordResponse, error)
+	// Topic returns topic details.
+	Topic(ctx context.Context, in *QueryTopicRequest, opts ...grpc.CallOption) (*QueryTopicResponse, error)
+	// Topics returns topic names.
+	Topics(ctx context.Context, in *QueryTopicsRequest, opts ...grpc.CallOption) (*QueryTopicsResponse, error)
+	// Writer returns writer details.
+	Writer(ctx context.Context, in *QueryWriterRequest, opts ...grpc.CallOption) (*QueryWriterResponse, error)
+	// Writers returns writer addresses.
+	Writers(ctx context.Context, in *QueryWritersRequest, opts ...grpc.CallOption) (*QueryWritersResponse, error)
+	// Record returns record details.
+	Record(ctx context.Context, in *QueryRecordRequest, opts ...grpc.CallOption) (*QueryRecordResponse, error)
 }
 
 type queryClient struct {
@@ -639,8 +653,8 @@ func NewQueryClient(cc grpc1.ClientConn) QueryClient {
 	return &queryClient{cc}
 }
 
-func (c *queryClient) Topic(ctx context.Context, in *QueryGetTopicRequest, opts ...grpc.CallOption) (*QueryGetTopicResponse, error) {
-	out := new(QueryGetTopicResponse)
+func (c *queryClient) Topic(ctx context.Context, in *QueryTopicRequest, opts ...grpc.CallOption) (*QueryTopicResponse, error) {
+	out := new(QueryTopicResponse)
 	err := c.cc.Invoke(ctx, "/panacea.aol.v2.Query/Topic", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -648,8 +662,8 @@ func (c *queryClient) Topic(ctx context.Context, in *QueryGetTopicRequest, opts 
 	return out, nil
 }
 
-func (c *queryClient) Topics(ctx context.Context, in *QueryListTopicsRequest, opts ...grpc.CallOption) (*QueryListTopicsResponse, error) {
-	out := new(QueryListTopicsResponse)
+func (c *queryClient) Topics(ctx context.Context, in *QueryTopicsRequest, opts ...grpc.CallOption) (*QueryTopicsResponse, error) {
+	out := new(QueryTopicsResponse)
 	err := c.cc.Invoke(ctx, "/panacea.aol.v2.Query/Topics", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -657,8 +671,8 @@ func (c *queryClient) Topics(ctx context.Context, in *QueryListTopicsRequest, op
 	return out, nil
 }
 
-func (c *queryClient) Writer(ctx context.Context, in *QueryGetWriterRequest, opts ...grpc.CallOption) (*QueryGetWriterResponse, error) {
-	out := new(QueryGetWriterResponse)
+func (c *queryClient) Writer(ctx context.Context, in *QueryWriterRequest, opts ...grpc.CallOption) (*QueryWriterResponse, error) {
+	out := new(QueryWriterResponse)
 	err := c.cc.Invoke(ctx, "/panacea.aol.v2.Query/Writer", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -666,8 +680,8 @@ func (c *queryClient) Writer(ctx context.Context, in *QueryGetWriterRequest, opt
 	return out, nil
 }
 
-func (c *queryClient) Writers(ctx context.Context, in *QueryListWritersRequest, opts ...grpc.CallOption) (*QueryListWritersResponse, error) {
-	out := new(QueryListWritersResponse)
+func (c *queryClient) Writers(ctx context.Context, in *QueryWritersRequest, opts ...grpc.CallOption) (*QueryWritersResponse, error) {
+	out := new(QueryWritersResponse)
 	err := c.cc.Invoke(ctx, "/panacea.aol.v2.Query/Writers", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -675,8 +689,8 @@ func (c *queryClient) Writers(ctx context.Context, in *QueryListWritersRequest, 
 	return out, nil
 }
 
-func (c *queryClient) Record(ctx context.Context, in *QueryGetRecordRequest, opts ...grpc.CallOption) (*QueryGetRecordResponse, error) {
-	out := new(QueryGetRecordResponse)
+func (c *queryClient) Record(ctx context.Context, in *QueryRecordRequest, opts ...grpc.CallOption) (*QueryRecordResponse, error) {
+	out := new(QueryRecordResponse)
 	err := c.cc.Invoke(ctx, "/panacea.aol.v2.Query/Record", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -686,30 +700,35 @@ func (c *queryClient) Record(ctx context.Context, in *QueryGetRecordRequest, opt
 
 // QueryServer is the server API for Query service.
 type QueryServer interface {
-	Topic(context.Context, *QueryGetTopicRequest) (*QueryGetTopicResponse, error)
-	Topics(context.Context, *QueryListTopicsRequest) (*QueryListTopicsResponse, error)
-	Writer(context.Context, *QueryGetWriterRequest) (*QueryGetWriterResponse, error)
-	Writers(context.Context, *QueryListWritersRequest) (*QueryListWritersResponse, error)
-	Record(context.Context, *QueryGetRecordRequest) (*QueryGetRecordResponse, error)
+	// Topic returns topic details.
+	Topic(context.Context, *QueryTopicRequest) (*QueryTopicResponse, error)
+	// Topics returns topic names.
+	Topics(context.Context, *QueryTopicsRequest) (*QueryTopicsResponse, error)
+	// Writer returns writer details.
+	Writer(context.Context, *QueryWriterRequest) (*QueryWriterResponse, error)
+	// Writers returns writer addresses.
+	Writers(context.Context, *QueryWritersRequest) (*QueryWritersResponse, error)
+	// Record returns record details.
+	Record(context.Context, *QueryRecordRequest) (*QueryRecordResponse, error)
 }
 
 // UnimplementedQueryServer can be embedded to have forward compatible implementations.
 type UnimplementedQueryServer struct {
 }
 
-func (*UnimplementedQueryServer) Topic(ctx context.Context, req *QueryGetTopicRequest) (*QueryGetTopicResponse, error) {
+func (*UnimplementedQueryServer) Topic(ctx context.Context, req *QueryTopicRequest) (*QueryTopicResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Topic not implemented")
 }
-func (*UnimplementedQueryServer) Topics(ctx context.Context, req *QueryListTopicsRequest) (*QueryListTopicsResponse, error) {
+func (*UnimplementedQueryServer) Topics(ctx context.Context, req *QueryTopicsRequest) (*QueryTopicsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Topics not implemented")
 }
-func (*UnimplementedQueryServer) Writer(ctx context.Context, req *QueryGetWriterRequest) (*QueryGetWriterResponse, error) {
+func (*UnimplementedQueryServer) Writer(ctx context.Context, req *QueryWriterRequest) (*QueryWriterResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Writer not implemented")
 }
-func (*UnimplementedQueryServer) Writers(ctx context.Context, req *QueryListWritersRequest) (*QueryListWritersResponse, error) {
+func (*UnimplementedQueryServer) Writers(ctx context.Context, req *QueryWritersRequest) (*QueryWritersResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Writers not implemented")
 }
-func (*UnimplementedQueryServer) Record(ctx context.Context, req *QueryGetRecordRequest) (*QueryGetRecordResponse, error) {
+func (*UnimplementedQueryServer) Record(ctx context.Context, req *QueryRecordRequest) (*QueryRecordResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Record not implemented")
 }
 
@@ -718,7 +737,7 @@ func RegisterQueryServer(s grpc1.Server, srv QueryServer) {
 }
 
 func _Query_Topic_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(QueryGetTopicRequest)
+	in := new(QueryTopicRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -730,13 +749,13 @@ func _Query_Topic_Handler(srv interface{}, ctx context.Context, dec func(interfa
 		FullMethod: "/panacea.aol.v2.Query/Topic",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(QueryServer).Topic(ctx, req.(*QueryGetTopicRequest))
+		return srv.(QueryServer).Topic(ctx, req.(*QueryTopicRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _Query_Topics_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(QueryListTopicsRequest)
+	in := new(QueryTopicsRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -748,13 +767,13 @@ func _Query_Topics_Handler(srv interface{}, ctx context.Context, dec func(interf
 		FullMethod: "/panacea.aol.v2.Query/Topics",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(QueryServer).Topics(ctx, req.(*QueryListTopicsRequest))
+		return srv.(QueryServer).Topics(ctx, req.(*QueryTopicsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _Query_Writer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(QueryGetWriterRequest)
+	in := new(QueryWriterRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -766,13 +785,13 @@ func _Query_Writer_Handler(srv interface{}, ctx context.Context, dec func(interf
 		FullMethod: "/panacea.aol.v2.Query/Writer",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(QueryServer).Writer(ctx, req.(*QueryGetWriterRequest))
+		return srv.(QueryServer).Writer(ctx, req.(*QueryWriterRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _Query_Writers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(QueryListWritersRequest)
+	in := new(QueryWritersRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -784,13 +803,13 @@ func _Query_Writers_Handler(srv interface{}, ctx context.Context, dec func(inter
 		FullMethod: "/panacea.aol.v2.Query/Writers",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(QueryServer).Writers(ctx, req.(*QueryListWritersRequest))
+		return srv.(QueryServer).Writers(ctx, req.(*QueryWritersRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _Query_Record_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(QueryGetRecordRequest)
+	in := new(QueryRecordRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -802,7 +821,7 @@ func _Query_Record_Handler(srv interface{}, ctx context.Context, dec func(interf
 		FullMethod: "/panacea.aol.v2.Query/Record",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(QueryServer).Record(ctx, req.(*QueryGetRecordRequest))
+		return srv.(QueryServer).Record(ctx, req.(*QueryRecordRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -836,7 +855,7 @@ var _Query_serviceDesc = grpc.ServiceDesc{
 	Metadata: "panacea/aol/v2/query.proto",
 }
 
-func (m *QueryGetTopicRequest) Marshal() (dAtA []byte, err error) {
+func (m *QueryTopicRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -846,12 +865,12 @@ func (m *QueryGetTopicRequest) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *QueryGetTopicRequest) MarshalTo(dAtA []byte) (int, error) {
+func (m *QueryTopicRequest) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *QueryGetTopicRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *QueryTopicRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -873,7 +892,7 @@ func (m *QueryGetTopicRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *QueryGetTopicResponse) Marshal() (dAtA []byte, err error) {
+func (m *QueryTopicResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -883,12 +902,12 @@ func (m *QueryGetTopicResponse) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *QueryGetTopicResponse) MarshalTo(dAtA []byte) (int, error) {
+func (m *QueryTopicResponse) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *QueryGetTopicResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *QueryTopicResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -908,7 +927,7 @@ func (m *QueryGetTopicResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *QueryListTopicsRequest) Marshal() (dAtA []byte, err error) {
+func (m *QueryTopicsRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -918,12 +937,12 @@ func (m *QueryListTopicsRequest) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *QueryListTopicsRequest) MarshalTo(dAtA []byte) (int, error) {
+func (m *QueryTopicsRequest) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *QueryListTopicsRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *QueryTopicsRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -950,7 +969,7 @@ func (m *QueryListTopicsRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) 
 	return len(dAtA) - i, nil
 }
 
-func (m *QueryListTopicsResponse) Marshal() (dAtA []byte, err error) {
+func (m *QueryTopicsResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -960,12 +979,12 @@ func (m *QueryListTopicsResponse) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *QueryListTopicsResponse) MarshalTo(dAtA []byte) (int, error) {
+func (m *QueryTopicsResponse) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *QueryListTopicsResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *QueryTopicsResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -994,7 +1013,7 @@ func (m *QueryListTopicsResponse) MarshalToSizedBuffer(dAtA []byte) (int, error)
 	return len(dAtA) - i, nil
 }
 
-func (m *QueryGetWriterRequest) Marshal() (dAtA []byte, err error) {
+func (m *QueryWriterRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -1004,12 +1023,12 @@ func (m *QueryGetWriterRequest) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *QueryGetWriterRequest) MarshalTo(dAtA []byte) (int, error) {
+func (m *QueryWriterRequest) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *QueryGetWriterRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *QueryWriterRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -1038,7 +1057,7 @@ func (m *QueryGetWriterRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *QueryGetWriterResponse) Marshal() (dAtA []byte, err error) {
+func (m *QueryWriterResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -1048,12 +1067,12 @@ func (m *QueryGetWriterResponse) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *QueryGetWriterResponse) MarshalTo(dAtA []byte) (int, error) {
+func (m *QueryWriterResponse) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *QueryGetWriterResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *QueryWriterResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -1073,7 +1092,7 @@ func (m *QueryGetWriterResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) 
 	return len(dAtA) - i, nil
 }
 
-func (m *QueryListWritersRequest) Marshal() (dAtA []byte, err error) {
+func (m *QueryWritersRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -1083,12 +1102,12 @@ func (m *QueryListWritersRequest) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *QueryListWritersRequest) MarshalTo(dAtA []byte) (int, error) {
+func (m *QueryWritersRequest) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *QueryListWritersRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *QueryWritersRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -1122,7 +1141,7 @@ func (m *QueryListWritersRequest) MarshalToSizedBuffer(dAtA []byte) (int, error)
 	return len(dAtA) - i, nil
 }
 
-func (m *QueryListWritersResponse) Marshal() (dAtA []byte, err error) {
+func (m *QueryWritersResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -1132,12 +1151,12 @@ func (m *QueryListWritersResponse) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *QueryListWritersResponse) MarshalTo(dAtA []byte) (int, error) {
+func (m *QueryWritersResponse) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *QueryListWritersResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *QueryWritersResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -1166,7 +1185,7 @@ func (m *QueryListWritersResponse) MarshalToSizedBuffer(dAtA []byte) (int, error
 	return len(dAtA) - i, nil
 }
 
-func (m *QueryGetRecordRequest) Marshal() (dAtA []byte, err error) {
+func (m *QueryRecordRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -1176,12 +1195,12 @@ func (m *QueryGetRecordRequest) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *QueryGetRecordRequest) MarshalTo(dAtA []byte) (int, error) {
+func (m *QueryRecordRequest) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *QueryGetRecordRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *QueryRecordRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -1208,7 +1227,7 @@ func (m *QueryGetRecordRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *QueryGetRecordResponse) Marshal() (dAtA []byte, err error) {
+func (m *QueryRecordResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -1218,12 +1237,12 @@ func (m *QueryGetRecordResponse) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *QueryGetRecordResponse) MarshalTo(dAtA []byte) (int, error) {
+func (m *QueryRecordResponse) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *QueryGetRecordResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *QueryRecordResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -1254,7 +1273,7 @@ func encodeVarintQuery(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	return base
 }
-func (m *QueryGetTopicRequest) Size() (n int) {
+func (m *QueryTopicRequest) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -1271,7 +1290,7 @@ func (m *QueryGetTopicRequest) Size() (n int) {
 	return n
 }
 
-func (m *QueryGetTopicResponse) Size() (n int) {
+func (m *QueryTopicResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -1284,7 +1303,7 @@ func (m *QueryGetTopicResponse) Size() (n int) {
 	return n
 }
 
-func (m *QueryListTopicsRequest) Size() (n int) {
+func (m *QueryTopicsRequest) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -1301,7 +1320,7 @@ func (m *QueryListTopicsRequest) Size() (n int) {
 	return n
 }
 
-func (m *QueryListTopicsResponse) Size() (n int) {
+func (m *QueryTopicsResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -1320,7 +1339,7 @@ func (m *QueryListTopicsResponse) Size() (n int) {
 	return n
 }
 
-func (m *QueryGetWriterRequest) Size() (n int) {
+func (m *QueryWriterRequest) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -1341,7 +1360,7 @@ func (m *QueryGetWriterRequest) Size() (n int) {
 	return n
 }
 
-func (m *QueryGetWriterResponse) Size() (n int) {
+func (m *QueryWriterResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -1354,7 +1373,7 @@ func (m *QueryGetWriterResponse) Size() (n int) {
 	return n
 }
 
-func (m *QueryListWritersRequest) Size() (n int) {
+func (m *QueryWritersRequest) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -1375,7 +1394,7 @@ func (m *QueryListWritersRequest) Size() (n int) {
 	return n
 }
 
-func (m *QueryListWritersResponse) Size() (n int) {
+func (m *QueryWritersResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -1394,7 +1413,7 @@ func (m *QueryListWritersResponse) Size() (n int) {
 	return n
 }
 
-func (m *QueryGetRecordRequest) Size() (n int) {
+func (m *QueryRecordRequest) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -1414,7 +1433,7 @@ func (m *QueryGetRecordRequest) Size() (n int) {
 	return n
 }
 
-func (m *QueryGetRecordResponse) Size() (n int) {
+func (m *QueryRecordResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -1433,7 +1452,7 @@ func sovQuery(x uint64) (n int) {
 func sozQuery(x uint64) (n int) {
 	return sovQuery(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
-func (m *QueryGetTopicRequest) Unmarshal(dAtA []byte) error {
+func (m *QueryTopicRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -1456,10 +1475,10 @@ func (m *QueryGetTopicRequest) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: QueryGetTopicRequest: wiretype end group for non-group")
+			return fmt.Errorf("proto: QueryTopicRequest: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: QueryGetTopicRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: QueryTopicRequest: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -1547,7 +1566,7 @@ func (m *QueryGetTopicRequest) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *QueryGetTopicResponse) Unmarshal(dAtA []byte) error {
+func (m *QueryTopicResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -1570,10 +1589,10 @@ func (m *QueryGetTopicResponse) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: QueryGetTopicResponse: wiretype end group for non-group")
+			return fmt.Errorf("proto: QueryTopicResponse: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: QueryGetTopicResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: QueryTopicResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -1633,7 +1652,7 @@ func (m *QueryGetTopicResponse) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *QueryListTopicsRequest) Unmarshal(dAtA []byte) error {
+func (m *QueryTopicsRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -1656,10 +1675,10 @@ func (m *QueryListTopicsRequest) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: QueryListTopicsRequest: wiretype end group for non-group")
+			return fmt.Errorf("proto: QueryTopicsRequest: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: QueryListTopicsRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: QueryTopicsRequest: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -1751,7 +1770,7 @@ func (m *QueryListTopicsRequest) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *QueryListTopicsResponse) Unmarshal(dAtA []byte) error {
+func (m *QueryTopicsResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -1774,10 +1793,10 @@ func (m *QueryListTopicsResponse) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: QueryListTopicsResponse: wiretype end group for non-group")
+			return fmt.Errorf("proto: QueryTopicsResponse: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: QueryListTopicsResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: QueryTopicsResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -1869,7 +1888,7 @@ func (m *QueryListTopicsResponse) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *QueryGetWriterRequest) Unmarshal(dAtA []byte) error {
+func (m *QueryWriterRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -1892,10 +1911,10 @@ func (m *QueryGetWriterRequest) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: QueryGetWriterRequest: wiretype end group for non-group")
+			return fmt.Errorf("proto: QueryWriterRequest: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: QueryGetWriterRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: QueryWriterRequest: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -2015,7 +2034,7 @@ func (m *QueryGetWriterRequest) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *QueryGetWriterResponse) Unmarshal(dAtA []byte) error {
+func (m *QueryWriterResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -2038,10 +2057,10 @@ func (m *QueryGetWriterResponse) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: QueryGetWriterResponse: wiretype end group for non-group")
+			return fmt.Errorf("proto: QueryWriterResponse: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: QueryGetWriterResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: QueryWriterResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -2101,7 +2120,7 @@ func (m *QueryGetWriterResponse) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *QueryListWritersRequest) Unmarshal(dAtA []byte) error {
+func (m *QueryWritersRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -2124,10 +2143,10 @@ func (m *QueryListWritersRequest) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: QueryListWritersRequest: wiretype end group for non-group")
+			return fmt.Errorf("proto: QueryWritersRequest: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: QueryListWritersRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: QueryWritersRequest: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -2251,7 +2270,7 @@ func (m *QueryListWritersRequest) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *QueryListWritersResponse) Unmarshal(dAtA []byte) error {
+func (m *QueryWritersResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -2274,10 +2293,10 @@ func (m *QueryListWritersResponse) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: QueryListWritersResponse: wiretype end group for non-group")
+			return fmt.Errorf("proto: QueryWritersResponse: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: QueryListWritersResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: QueryWritersResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -2369,7 +2388,7 @@ func (m *QueryListWritersResponse) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *QueryGetRecordRequest) Unmarshal(dAtA []byte) error {
+func (m *QueryRecordRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -2392,10 +2411,10 @@ func (m *QueryGetRecordRequest) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: QueryGetRecordRequest: wiretype end group for non-group")
+			return fmt.Errorf("proto: QueryRecordRequest: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: QueryGetRecordRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: QueryRecordRequest: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -2502,7 +2521,7 @@ func (m *QueryGetRecordRequest) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *QueryGetRecordResponse) Unmarshal(dAtA []byte) error {
+func (m *QueryRecordResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -2525,10 +2544,10 @@ func (m *QueryGetRecordResponse) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: QueryGetRecordResponse: wiretype end group for non-group")
+			return fmt.Errorf("proto: QueryRecordResponse: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: QueryGetRecordResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: QueryRecordResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:

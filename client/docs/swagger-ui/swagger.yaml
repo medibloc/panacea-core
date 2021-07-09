@@ -7347,6 +7347,8 @@ paths:
                           type: string
                           title: checksum
                       title: Module is the type for VersionInfo
+                  cosmos_sdk_version:
+                    type: string
                 description: VersionInfo is the type for the GetNodeInfoResponse message.
             description: >-
               GetNodeInfoResponse is the request type for the Query/GetNodeInfo
@@ -33078,6 +33080,8 @@ definitions:
                   type: string
                   title: checksum
               title: Module is the type for VersionInfo
+          cosmos_sdk_version:
+            type: string
         description: VersionInfo is the type for the GetNodeInfoResponse message.
     description: >-
       GetNodeInfoResponse is the request type for the Query/GetNodeInfo RPC
@@ -33515,6 +33519,8 @@ definitions:
               type: string
               title: checksum
           title: Module is the type for VersionInfo
+      cosmos_sdk_version:
+        type: string
     description: VersionInfo is the type for the GetNodeInfoResponse message.
   tendermint.crypto.PublicKey:
     type: object

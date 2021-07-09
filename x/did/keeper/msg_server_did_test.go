@@ -123,7 +123,7 @@ func (suite msgServerTestSuite) TestHandleMsgUpdateDID() {
 	newDoc.VerificationMethods = append(newDoc.VerificationMethods, &verificationMethod)
 
 	// call
-	updateMsg := newMsgUpdateDID(suite, *newDoc, verificationMethodID, privKey, origDocWithSeq.Seq)
+	updateMsg := newMsgUpdateDID(suite, *newDoc, verificationMethodID, privKey, origDocWithSeq.Sequence)
 	updateRes, err := didMsgServer.UpdateDID(goContext, &updateMsg)
 	suite.Require().NoError(err)
 	suite.Require().NotNil(updateRes)
@@ -131,7 +131,7 @@ func (suite msgServerTestSuite) TestHandleMsgUpdateDID() {
 
 	updatedDoc := didKeeper.GetDIDDocument(suite.Ctx, did)
 	suite.Require().Equal(newDoc, updatedDoc.Document)
-	suite.Require().Equal(origDocWithSeq.Seq+1, updatedDoc.Seq)
+	suite.Require().Equal(origDocWithSeq.Sequence+1, updatedDoc.Sequence)
 
 	// call again with the same signature (replay-attack! should be failed!)
 	updateRes, err = didMsgServer.UpdateDID(goContext, &updateMsg)
@@ -146,7 +146,7 @@ func (suite msgServerTestSuite) TestHandleMsgUpdateDID_DIDNotFound() {
 	_, origDocWithSeq, privKey, verificationMethodID := suite.makeTestData()
 
 	// update without creation
-	msg := newMsgUpdateDID(suite, *origDocWithSeq.Document, verificationMethodID, privKey, origDocWithSeq.Seq)
+	msg := newMsgUpdateDID(suite, *origDocWithSeq.Document, verificationMethodID, privKey, origDocWithSeq.Sequence)
 	res, err := didMsgServer.UpdateDID(goContext, &msg)
 	suite.ErrorIs(types.ErrDIDNotFound, err)
 	suite.Nil(res)
@@ -167,13 +167,13 @@ func (suite msgServerTestSuite) TestHandleMsgUpdateDID_DIDDeactivated() {
 	suite.Require().Equal(origDocWithSeq, didKeeper.GetDIDDocument(suite.Ctx, did))
 
 	// deactivate
-	deactivateMsg := newMsgDeactivateDID(suite, did, verificationMethodID, privKey, origDocWithSeq.Seq)
+	deactivateMsg := newMsgDeactivateDID(suite, did, verificationMethodID, privKey, origDocWithSeq.Sequence)
 	deactivateRes, err := didMsgServer.DeactivateDID(goContext, &deactivateMsg)
 	suite.Require().NoError(err)
 	suite.Require().NotNil(deactivateRes)
 
 	// update
-	updateMsg := newMsgUpdateDID(suite, *origDocWithSeq.Document, verificationMethodID, privKey, origDocWithSeq.Seq)
+	updateMsg := newMsgUpdateDID(suite, *origDocWithSeq.Document, verificationMethodID, privKey, origDocWithSeq.Sequence)
 	updateRes, err := didMsgServer.UpdateDID(goContext, &updateMsg)
 	suite.Require().ErrorIs(types.ErrDIDDeactivated, err)
 	suite.Require().Nil(updateRes)
@@ -203,7 +203,7 @@ func (suite msgServerTestSuite) TestHandleMsgDeactivateDID() {
 	tombstone := didKeeper.GetDIDDocument(suite.Ctx, did)
 	suite.Require().False(tombstone.Empty())
 	suite.Require().True(tombstone.Deactivated())
-	suite.Require().Equal(types.InitialSequence+1, tombstone.Seq)
+	suite.Require().Equal(types.InitialSequence+1, tombstone.Sequence)
 }
 
 func (suite msgServerTestSuite) TestHandleMsgDeactivateDID_DIDNotFound() {
@@ -260,7 +260,7 @@ func (suite msgServerTestSuite) TestHandleMsgDeactivateDID_SigVerificationFailed
 	suite.Require().Equal(1, len(didKeeper.ListDIDs(suite.Ctx)))
 	suite.Require().Equal(docWithSeq, didKeeper.GetDIDDocument(suite.Ctx, did))
 
-	sig, _ := types.Sign(&doc, docWithSeq.Seq, privKey)
+	sig, _ := types.Sign(&doc, docWithSeq.Sequence, privKey)
 	sig[0] += 1 // pollute the signature
 
 	deactivateMsg := types.NewMsgDeactivateDID(did, verificationMethodID, sig, sdk.AccAddress{}.String())
@@ -274,11 +274,11 @@ func (suite msgServerTestSuite) TestVerifyDIDOwnership() {
 	docWithSeq, privKey := suite.newDIDDocumentWithSeq(did)
 	doc := docWithSeq.Document
 
-	sig, _ := types.Sign(doc, docWithSeq.Seq, privKey)
+	sig, _ := types.Sign(doc, docWithSeq.Sequence, privKey)
 
-	newSeq, err := didkeeper.VerifyDIDOwnership(doc, docWithSeq.Seq, docWithSeq.Document, docWithSeq.Document.VerificationMethods[0].ID, sig)
+	newSeq, err := didkeeper.VerifyDIDOwnership(doc, docWithSeq.Sequence, docWithSeq.Document, docWithSeq.Document.VerificationMethods[0].Id, sig)
 	suite.Require().NoError(err)
-	suite.Require().Equal(docWithSeq.Seq+1, newSeq)
+	suite.Require().Equal(docWithSeq.Sequence+1, newSeq)
 }
 
 func (suite msgServerTestSuite) TestVerifyDIDOwnership_SigVerificationFailed() {
@@ -286,16 +286,16 @@ func (suite msgServerTestSuite) TestVerifyDIDOwnership_SigVerificationFailed() {
 	docWithSeq, privKey := suite.newDIDDocumentWithSeq(did)
 	doc := docWithSeq.Document
 
-	sig, _ := types.Sign(doc, docWithSeq.Seq+11234, privKey)
+	sig, _ := types.Sign(doc, docWithSeq.Sequence+11234, privKey)
 
-	_, err := didkeeper.VerifyDIDOwnership(doc, docWithSeq.Seq, docWithSeq.Document, docWithSeq.Document.VerificationMethods[0].ID, sig)
+	_, err := didkeeper.VerifyDIDOwnership(doc, docWithSeq.Sequence, docWithSeq.Document, docWithSeq.Document.VerificationMethods[0].Id, sig)
 	suite.Require().ErrorIs(types.ErrSigVerificationFailed, err)
 }
 
 func (suite msgServerTestSuite) makeTestData() (string, types.DIDDocumentWithSeq, crypto.PrivKey, string) {
 	did := "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm"
 	doc, privKey := suite.newDIDDocumentWithSeq(did)
-	return did, doc, privKey, doc.Document.VerificationMethods[0].ID
+	return did, doc, privKey, doc.Document.VerificationMethods[0].Id
 }
 
 func (suite msgServerTestSuite) newDIDDocumentWithSeq(did string) (types.DIDDocumentWithSeq, crypto.PrivKey) {
@@ -308,9 +308,9 @@ func (suite msgServerTestSuite) newDIDDocumentWithSeq(did string) (types.DIDDocu
 		&es256VerificationMethod,
 		&blsVerificationMethod,
 	}
-	verificationRelationship := types.NewVerificationRelationship(verificationMethods[0].ID)
-	authentications := []*types.VerificationRelationship{
-		&verificationRelationship,
+	verificationRelationship := types.NewVerificationRelationship(verificationMethods[0].Id)
+	authentications := []types.VerificationRelationship{
+		verificationRelationship,
 	}
 	doc := types.NewDIDDocument(did, types.WithVerificationMethods(verificationMethods), types.WithAuthentications(authentications))
 	docWithSeq := types.NewDIDDocumentWithSeq(
@@ -323,18 +323,18 @@ func (suite msgServerTestSuite) newDIDDocumentWithSeq(did string) (types.DIDDocu
 func newMsgCreateDID(suite msgServerTestSuite, doc types.DIDDocument, verificationMethodID string, privKey crypto.PrivKey) types.MsgCreateDID {
 	sig, err := types.Sign(&doc, types.InitialSequence, privKey)
 	suite.Require().NoError(err)
-	return types.NewMsgCreateDID(doc.ID, doc, verificationMethodID, sig, sdk.AccAddress{}.String())
+	return types.NewMsgCreateDID(doc.Id, doc, verificationMethodID, sig, sdk.AccAddress{}.String())
 }
 
 func newMsgUpdateDID(suite msgServerTestSuite, newDoc types.DIDDocument, verificationMethodID string, privKey crypto.PrivKey, seq uint64) types.MsgUpdateDID {
 	sig, err := types.Sign(&newDoc, seq, privKey)
 	suite.Require().NoError(err)
-	return types.NewMsgUpdateDID(newDoc.ID, newDoc, verificationMethodID, sig, sdk.AccAddress{}.String())
+	return types.NewMsgUpdateDID(newDoc.Id, newDoc, verificationMethodID, sig, sdk.AccAddress{}.String())
 }
 
 func newMsgDeactivateDID(suite msgServerTestSuite, did string, verificationMethodID string, privKey crypto.PrivKey, seq uint64) types.MsgDeactivateDID {
 	doc := types.DIDDocument{
-		ID: did,
+		Id: did,
 	}
 
 	sig, err := types.Sign(&doc, seq, privKey)

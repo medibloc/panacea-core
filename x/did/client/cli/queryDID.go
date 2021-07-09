@@ -2,6 +2,8 @@ package cli
 
 import (
 	"context"
+	"encoding/base64"
+
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/medibloc/panacea-core/x/did/types"
@@ -23,11 +25,11 @@ func CmdGetDID() *cobra.Command {
 
 			queryClient := types.NewQueryClient(clientCtx)
 
-			params := &types.QueryGetDIDRequest{
-				DID: id,
+			params := &types.QueryDIDRequest{
+				DidBase64: base64.StdEncoding.EncodeToString([]byte(id)),
 			}
 
-			res, err := queryClient.DIDDocumentWithSeq(context.Background(), params)
+			res, err := queryClient.DID(context.Background(), params)
 
 			if err != nil {
 				return err

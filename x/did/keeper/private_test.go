@@ -1,11 +1,12 @@
 package keeper
 
 import (
+	"testing"
+
 	"github.com/medibloc/panacea-core/x/did/internal/secp256k1util"
 	"github.com/stretchr/testify/require"
 	"github.com/tendermint/tendermint/crypto"
 	"github.com/tendermint/tendermint/crypto/secp256k1"
-	"testing"
 
 	"github.com/medibloc/panacea-core/x/did/types"
 )
@@ -15,11 +16,11 @@ func TestVerifyDIDOwnership(t *testing.T) {
 	docWithSeq, privKey := newDIDDocumentWithSeq(did)
 	doc := docWithSeq.Document
 
-	sig, _ := types.Sign(doc, docWithSeq.Seq, privKey)
+	sig, _ := types.Sign(doc, docWithSeq.Sequence, privKey)
 
-	newSeq, err := VerifyDIDOwnership(doc, docWithSeq.Seq, docWithSeq.Document, docWithSeq.Document.VerificationMethods[0].ID, sig)
+	newSeq, err := VerifyDIDOwnership(doc, docWithSeq.Sequence, docWithSeq.Document, docWithSeq.Document.VerificationMethods[0].Id, sig)
 	require.NoError(t, err)
-	require.Equal(t, docWithSeq.Seq+1, newSeq)
+	require.Equal(t, docWithSeq.Sequence+1, newSeq)
 }
 
 func TestVerifyDIDOwnership_SigVerificationFailed(t *testing.T) {
@@ -27,9 +28,9 @@ func TestVerifyDIDOwnership_SigVerificationFailed(t *testing.T) {
 	docWithSeq, privKey := newDIDDocumentWithSeq(did)
 	doc := docWithSeq.Document
 
-	sig, _ := types.Sign(doc, docWithSeq.Seq+11234, privKey)
+	sig, _ := types.Sign(doc, docWithSeq.Sequence+11234, privKey)
 
-	_, err := VerifyDIDOwnership(doc, docWithSeq.Seq, docWithSeq.Document, docWithSeq.Document.VerificationMethods[0].ID, sig)
+	_, err := VerifyDIDOwnership(doc, docWithSeq.Sequence, docWithSeq.Document, docWithSeq.Document.VerificationMethods[0].Id, sig)
 	require.ErrorIs(t, types.ErrSigVerificationFailed, err)
 }
 
@@ -43,9 +44,9 @@ func newDIDDocumentWithSeq(did string) (types.DIDDocumentWithSeq, crypto.PrivKey
 		&es256VerificationMethod,
 		&blsVerificationMethod,
 	}
-	verificationRelationship := types.NewVerificationRelationship(verificationMethods[0].ID)
-	authentications := []*types.VerificationRelationship{
-		&verificationRelationship,
+	verificationRelationship := types.NewVerificationRelationship(verificationMethods[0].Id)
+	authentications := []types.VerificationRelationship{
+		verificationRelationship,
 	}
 	doc := types.NewDIDDocument(did, types.WithVerificationMethods(verificationMethods), types.WithAuthentications(authentications))
 	docWithSeq := types.NewDIDDocumentWithSeq(

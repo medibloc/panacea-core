@@ -2,11 +2,12 @@ package types_test
 
 import (
 	"fmt"
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/stretchr/testify/require"
 	"os"
 	"strings"
 	"testing"
+
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/stretchr/testify/require"
 
 	"github.com/btcsuite/btcutil/base58"
 	"github.com/tendermint/tendermint/crypto/secp256k1"
@@ -14,7 +15,6 @@ import (
 	"github.com/medibloc/panacea-core/x/did/internal/secp256k1util"
 	"github.com/medibloc/panacea-core/x/did/types"
 )
-
 
 func TestMain(m *testing.M) {
 	config := sdk.GetConfig()
@@ -55,14 +55,14 @@ func TestNewDIDDocument(t *testing.T) {
 	verificationMethodID := types.NewVerificationMethodID(did, "key1")
 	verificationMethod := types.NewVerificationMethod(verificationMethodID, types.ES256K_2019, did, pubKey)
 	verificationMethods := []*types.VerificationMethod{&verificationMethod}
-	verificationRelationship := types.NewVerificationRelationship(verificationMethods[0].ID)
-	authentications := []*types.VerificationRelationship{&verificationRelationship}
+	verificationRelationship := types.NewVerificationRelationship(verificationMethods[0].Id)
+	authentications := []types.VerificationRelationship{verificationRelationship}
 	service := types.NewService("service1", "LinkedDomains", "https://service.org")
 	services := []*types.Service{&service}
 
 	doc := types.NewDIDDocument(did, types.WithVerificationMethods(verificationMethods), types.WithAuthentications(authentications), types.WithServices(services))
 	require.True(t, doc.Valid())
-	require.Equal(t, did, doc.ID)
+	require.Equal(t, did, doc.Id)
 	require.Empty(t, doc.Controller)
 	require.EqualValues(t, verificationMethods, doc.VerificationMethods)
 	require.EqualValues(t, authentications, doc.Authentications)
@@ -81,8 +81,8 @@ func TestDIDDocument_Empty(t *testing.T) {
 func TestDIDDocument_Invalid(t *testing.T) {
 	did := "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm"
 	invalidVerificationRelationship := types.NewVerificationRelationship(types.NewVerificationMethodID("invalid did", "key1"))
-	invalidVerificationRelationships := []*types.VerificationRelationship{
-		&invalidVerificationRelationship,
+	invalidVerificationRelationships := []types.VerificationRelationship{
+		invalidVerificationRelationship,
 	}
 	service := types.NewService("", "", "")
 	invalidServices := []*types.Service{
@@ -124,8 +124,8 @@ func TestDIDDocument_VerificationMethodFrom(t *testing.T) {
 	verificationMethodID := types.NewVerificationMethodID(did, "key1")
 	verificationMethod := types.NewVerificationMethod(verificationMethodID, types.ES256K_2019, did, pubKey)
 	verificationMethods := []*types.VerificationMethod{&verificationMethod}
-	verificationRelationship := types.NewVerificationRelationship(verificationMethods[0].ID)
-	authentications := []*types.VerificationRelationship{&verificationRelationship}
+	verificationRelationship := types.NewVerificationRelationship(verificationMethods[0].Id)
+	authentications := []types.VerificationRelationship{verificationRelationship}
 	doc := types.NewDIDDocument(did, types.WithVerificationMethods(verificationMethods), types.WithAuthentications(authentications))
 
 	found, ok := doc.VerificationMethodFrom(doc.Authentications, verificationMethodID)
@@ -135,7 +135,7 @@ func TestDIDDocument_VerificationMethodFrom(t *testing.T) {
 	_, ok = doc.VerificationMethodFrom(doc.Authentications, types.NewVerificationMethodID(did, "key2"))
 	require.False(t, ok)
 
-	doc.Authentications = []*types.VerificationRelationship{} // clear authentications
+	doc.Authentications = []types.VerificationRelationship{} // clear authentications
 	_, ok = doc.VerificationMethodFrom(doc.Authentications, verificationMethodID)
 	require.False(t, ok)
 }
@@ -224,7 +224,7 @@ func TestNewVerificationMethod(t *testing.T) {
 	pub := types.NewVerificationMethod(types.NewVerificationMethodID(did, "key1"), types.ES256K_2019, did, pubKey)
 	require.True(t, pub.Valid(did))
 
-	require.Equal(t, pubKey[:], base58.Decode(pub.PubKeyBase58))
+	require.Equal(t, pubKey[:], base58.Decode(pub.PublicKeyBase58))
 }
 
 func TestVerificationRelationship_Valid(t *testing.T) {
@@ -233,16 +233,14 @@ func TestVerificationRelationship_Valid(t *testing.T) {
 	verificationMethodID := types.NewVerificationMethodID(did, "key1")
 	verificationMethod := types.NewVerificationMethod(verificationMethodID, types.ES256K_2019, did, pubKey)
 
-	auth := types.VerificationRelationship{VerificationMethodID: verificationMethodID, DedicatedVerificationMethod: nil}
+	auth := types.NewVerificationRelationship(verificationMethodID)
 	require.True(t, auth.Valid(did))
-	auth = types.VerificationRelationship{VerificationMethodID: verificationMethodID, DedicatedVerificationMethod: &verificationMethod}
+	auth = types.NewVerificationRelationshipDedicated(verificationMethod)
 	require.True(t, auth.Valid(did))
 
-	auth = types.VerificationRelationship{VerificationMethodID: "invalid", DedicatedVerificationMethod: nil}
+	auth = types.NewVerificationRelationship("invalid")
 	require.False(t, auth.Valid(did))
-	auth = types.VerificationRelationship{VerificationMethodID: verificationMethodID, DedicatedVerificationMethod: &types.VerificationMethod{ID: "invalid"}}
-	require.False(t, auth.Valid(did))
-	auth = types.VerificationRelationship{VerificationMethodID: types.NewVerificationMethodID(did, "key2"), DedicatedVerificationMethod: &verificationMethod}
+	auth = types.NewVerificationRelationshipDedicated(types.VerificationMethod{Id: "invalid"})
 	require.False(t, auth.Valid(did))
 }
 
@@ -260,7 +258,7 @@ func TestVerificationRelationship_MarshalJSON(t *testing.T) {
 	auth = types.NewVerificationRelationshipDedicated(verificationMethod)
 	bz, err = auth.MarshalJSON()
 	require.NoError(t, err)
-	regex := fmt.Sprintf(`{"id":"%v","type":"%v","controller":"%v","publicKeyBase58":"%v"}`, verificationMethodID, types.ES256K_2019, did, verificationMethod.PubKeyBase58)
+	regex := fmt.Sprintf(`{"id":"%v","type":"%v","controller":"%v","public_key_base58":"%v"}`, verificationMethodID, types.ES256K_2019, did, verificationMethod.PublicKeyBase58)
 	require.Regexp(t, regex, string(bz))
 }
 
@@ -276,7 +274,7 @@ func TestVerificationRelationship_UnmarshalJSON(t *testing.T) {
 	require.Equal(t, types.NewVerificationRelationship(verificationMethodID), auth)
 	require.True(t, auth.Valid(did))
 
-	bz = []byte(fmt.Sprintf(`{"id":"%v","type":"%v","controller":"%v","publicKeyBase58":"%v"}`, verificationMethodID, types.ES256K_2019, did, verificationMethod.PubKeyBase58))
+	bz = []byte(fmt.Sprintf(`{"id":"%v","type":"%v","controller":"%v","publicKeyBase58":"%v"}`, verificationMethodID, types.ES256K_2019, did, verificationMethod.PublicKeyBase58))
 	require.NoError(t, auth.UnmarshalJSON(bz))
 	require.Equal(t, types.NewVerificationRelationshipDedicated(verificationMethod), auth)
 	require.True(t, auth.Valid(did))
@@ -299,7 +297,7 @@ func TestDIDDocumentWithSeq_Valid(t *testing.T) {
 	doc := getValidDIDDocument()
 	require.True(t, types.NewDIDDocumentWithSeq(&doc, types.InitialSequence).Valid())
 	require.False(t, types.DIDDocumentWithSeq{
-		Document: &types.DIDDocument{ID: "invalid_did"},
+		Document: &types.DIDDocument{Id: "invalid_did"},
 	}.Valid())
 }
 
@@ -318,7 +316,7 @@ func getValidDIDDocument() types.DIDDocument {
 	verificationMethodID := types.NewVerificationMethodID(did, "key1")
 	verificationMethod := types.NewVerificationMethod(verificationMethodID, types.ES256K_2019, did, pubKey)
 	verificationMethods := []*types.VerificationMethod{&verificationMethod}
-	verificationRelationship := types.NewVerificationRelationship(verificationMethods[0].ID)
-	authentications := []*types.VerificationRelationship{&verificationRelationship}
+	verificationRelationship := types.NewVerificationRelationship(verificationMethods[0].Id)
+	authentications := []types.VerificationRelationship{verificationRelationship}
 	return types.NewDIDDocument(did, types.WithVerificationMethods(verificationMethods), types.WithAuthentications(authentications))
 }

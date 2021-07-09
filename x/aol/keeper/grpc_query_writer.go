@@ -13,7 +13,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (k Keeper) Writer(c context.Context, req *types.QueryGetWriterRequest) (*types.QueryGetWriterResponse, error) {
+func (k Keeper) Writer(c context.Context, req *types.QueryWriterRequest) (*types.QueryWriterResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
@@ -35,10 +35,10 @@ func (k Keeper) Writer(c context.Context, req *types.QueryGetWriterRequest) (*ty
 	}
 
 	writer := k.GetWriter(ctx, writerKey)
-	return &types.QueryGetWriterResponse{Writer: &writer}, nil
+	return &types.QueryWriterResponse{Writer: &writer}, nil
 }
 
-func (k Keeper) Writers(c context.Context, req *types.QueryListWritersRequest) (*types.QueryListWritersResponse, error) {
+func (k Keeper) Writers(c context.Context, req *types.QueryWritersRequest) (*types.QueryWritersResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
@@ -71,5 +71,5 @@ func (k Keeper) Writers(c context.Context, req *types.QueryListWritersRequest) (
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	return &types.QueryListWritersResponse{WriterAddresses: writerAddresses, Pagination: pageRes}, nil
+	return &types.QueryWritersResponse{WriterAddresses: writerAddresses, Pagination: pageRes}, nil
 }

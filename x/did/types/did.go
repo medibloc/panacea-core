@@ -1,13 +1,17 @@
 package types
 
 import (
+	"bytes"
 	"crypto/sha256"
 	"encoding/json"
 	"fmt"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"log"
 	"regexp"
 	"strings"
+
+	"github.com/gogo/protobuf/jsonpb"
+
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
 	"github.com/btcsuite/btcutil/base58"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -163,7 +167,7 @@ func EmptyDID(did string) bool {
 func NewDIDDocument(id string, opts ...DIDDocumentOption) DIDDocument {
 	doc := DIDDocument{
 		Contexts: &JSONStringOrStrings{ContextDIDV1},
-		ID:       id,
+		Id:       id,
 	}
 
 	for _, opt := range opts {
@@ -187,31 +191,31 @@ func WithVerificationMethods(verificationMethods []*VerificationMethod) DIDDocum
 	}
 }
 
-func WithAuthentications(authentications []*VerificationRelationship) DIDDocumentOption {
+func WithAuthentications(authentications []VerificationRelationship) DIDDocumentOption {
 	return func(opts *DIDDocument) {
 		opts.Authentications = authentications
 	}
 }
 
-func WithAssertionMethods(assertionMethods []*VerificationRelationship) DIDDocumentOption {
+func WithAssertionMethods(assertionMethods []VerificationRelationship) DIDDocumentOption {
 	return func(opts *DIDDocument) {
 		opts.AssertionMethods = assertionMethods
 	}
 }
 
-func WithKeyAgreements(keyAgreements []*VerificationRelationship) DIDDocumentOption {
+func WithKeyAgreements(keyAgreements []VerificationRelationship) DIDDocumentOption {
 	return func(opts *DIDDocument) {
 		opts.KeyAgreements = keyAgreements
 	}
 }
 
-func WithCapabilityInvocations(capabilityInvocations []*VerificationRelationship) DIDDocumentOption {
+func WithCapabilityInvocations(capabilityInvocations []VerificationRelationship) DIDDocumentOption {
 	return func(opts *DIDDocument) {
 		opts.CapabilityInvocations = capabilityInvocations
 	}
 }
 
-func WithCapabilityDelegations(capabilityDelegations []*VerificationRelationship) DIDDocumentOption {
+func WithCapabilityDelegations(capabilityDelegations []VerificationRelationship) DIDDocumentOption {
 	return func(opts *DIDDocument) {
 		opts.CapabilityDelegations = capabilityDelegations
 	}
@@ -228,7 +232,7 @@ func (doc DIDDocument) Valid() bool {
 		return true
 	}
 
-	if !ValidateDID(doc.ID) || doc.VerificationMethods == nil || doc.Authentications == nil {
+	if !ValidateDID(doc.Id) || doc.VerificationMethods == nil || doc.Authentications == nil {
 		return false
 	}
 
@@ -241,7 +245,7 @@ func (doc DIDDocument) Valid() bool {
 	}
 
 	for _, verificationMethod := range doc.VerificationMethods {
-		if !verificationMethod.Valid(doc.ID) {
+		if !verificationMethod.Valid(doc.Id) {
 			return false
 		}
 	}
@@ -271,15 +275,15 @@ func (doc DIDDocument) Valid() bool {
 	return true
 }
 
-func (doc DIDDocument) validVerificationRelationships(relationships []*VerificationRelationship) bool {
+func (doc DIDDocument) validVerificationRelationships(relationships []VerificationRelationship) bool {
 	for _, relationship := range relationships {
-		if !relationship.Valid(doc.ID) {
+		if !relationship.Valid(doc.Id) {
 			return false
 		}
 		if !relationship.hasDedicatedMethod() {
 			// if the relationship isn't a dedicated verification method,
 			// the referenced verification method must be presented in the 'verificationMethod' property.
-			if _, ok := doc.VerificationMethodByID(relationship.VerificationMethodID); !ok {
+			if _, ok := doc.VerificationMethodByID(relationship.GetVerificationMethodId()); !ok {
 				return false
 			}
 		}
@@ -288,7 +292,7 @@ func (doc DIDDocument) validVerificationRelationships(relationships []*Verificat
 }
 
 func (doc DIDDocument) Empty() bool {
-	return EmptyDID(doc.ID)
+	return EmptyDID(doc.Id)
 }
 
 // GetSignBytes returns a byte array which is used to generate a signature for verifying DID ownership.
@@ -300,7 +304,7 @@ func (doc DIDDocument) GetSignBytes() []byte {
 // If the corresponding VerificationMethod doesn't exist, it returns a false.
 func (doc DIDDocument) VerificationMethodByID(id string) (VerificationMethod, bool) {
 	for _, verificationMethod := range doc.VerificationMethods {
-		if verificationMethod.ID == id {
+		if verificationMethod.Id == id {
 			return *verificationMethod, true
 		}
 	}
@@ -310,13 +314,17 @@ func (doc DIDDocument) VerificationMethodByID(id string) (VerificationMethod, bo
 // VerificationMethodFrom finds a VerificationMethod from the slice of VerificationRelationship by its ID.
 // There are two types of VerificationRelationship. If it has a dedicated VerificationMethod, it is returned as it is.
 // If the relationship has only a ID of VerificationMethod, this function tries to find a corresponding VerificationMethod in the DIDDocument.
-func (doc DIDDocument) VerificationMethodFrom(relationships []*VerificationRelationship, id string) (VerificationMethod, bool) {
+func (doc DIDDocument) VerificationMethodFrom(relationships []VerificationRelationship, id string) (VerificationMethod, bool) {
 	for _, relationship := range relationships {
-		if relationship.VerificationMethodID == id {
-			if relationship.hasDedicatedMethod() {
-				return *relationship.DedicatedVerificationMethod, true
-			} else {
-				return doc.VerificationMethodByID(id)
+		if relationship.hasDedicatedMethod() {
+			veriMethod := relationship.GetVerificationMethod()
+			if veriMethod.Id == id {
+				return *veriMethod, true
+			}
+		} else {
+			veriMethodID := relationship.GetVerificationMethodId()
+			if veriMethodID == id {
+				return doc.VerificationMethodByID(veriMethodID)
 			}
 		}
 	}
@@ -401,54 +409,53 @@ func ValidateKeyType(keyType string) bool {
 
 func NewVerificationMethod(id string, keyType string, controller string, pubKey []byte) VerificationMethod {
 	return VerificationMethod{
-		ID:           id,
-		Type:         keyType,
-		Controller:   controller,
-		PubKeyBase58: base58.Encode(pubKey),
+		Id:              id,
+		Type:            keyType,
+		Controller:      controller,
+		PublicKeyBase58: base58.Encode(pubKey),
 	}
 }
 
 func (pk VerificationMethod) Valid(did string) bool {
-	if !ValidateVerificationMethodID(pk.ID, did) || !ValidateKeyType(pk.Type) {
+	if !ValidateVerificationMethodID(pk.Id, did) || !ValidateKeyType(pk.Type) {
 		return false
 	}
 
 	pattern := fmt.Sprintf("^[%s]+$", Base58Charset)
-	matched, _ := regexp.MatchString(pattern, pk.PubKeyBase58)
+	matched, _ := regexp.MatchString(pattern, pk.PublicKeyBase58)
 	return matched
 }
 
 func NewVerificationRelationship(verificationMethodID string) VerificationRelationship {
-	return VerificationRelationship{VerificationMethodID: verificationMethodID, DedicatedVerificationMethod: nil}
+	return VerificationRelationship{
+		Content: &VerificationRelationship_VerificationMethodId{VerificationMethodId: verificationMethodID},
+	}
 }
 
 func NewVerificationRelationshipDedicated(verificationMethod VerificationMethod) VerificationRelationship {
-	return VerificationRelationship{VerificationMethodID: verificationMethod.ID, DedicatedVerificationMethod: &verificationMethod}
+	return VerificationRelationship{
+		Content: &VerificationRelationship_VerificationMethod{VerificationMethod: &verificationMethod},
+	}
 }
 
 func (v VerificationRelationship) hasDedicatedMethod() bool {
-	return v.DedicatedVerificationMethod != nil
+	return v.GetVerificationMethod() != nil
 }
 
 func (v VerificationRelationship) Valid(did string) bool {
-	if !ValidateVerificationMethodID(v.VerificationMethodID, did) {
-		return false
+	if v.hasDedicatedMethod() {
+		return v.GetVerificationMethod().Valid(did)
+	} else {
+		return ValidateVerificationMethodID(v.GetVerificationMethodId(), did)
 	}
-	if v.DedicatedVerificationMethod != nil {
-		if !v.DedicatedVerificationMethod.Valid(did) || v.DedicatedVerificationMethod.ID != v.VerificationMethodID {
-			return false
-		}
-	}
-	return true
 }
 
 func (v VerificationRelationship) MarshalJSON() ([]byte, error) {
-	// if dedicated
-	if v.DedicatedVerificationMethod != nil {
-		return json.Marshal(v.DedicatedVerificationMethod)
+	if v.hasDedicatedMethod() {
+		return json.Marshal(v.GetVerificationMethod())
+	} else {
+		return json.Marshal(v.GetVerificationMethodId())
 	}
-	// if not dedicated
-	return json.Marshal(v.VerificationMethodID)
 }
 
 func (v *VerificationRelationship) UnmarshalJSON(bz []byte) error {
@@ -461,8 +468,9 @@ func (v *VerificationRelationship) UnmarshalJSON(bz []byte) error {
 	}
 
 	// if dedicated
+	// Use jsonpb to handle camelCase as well as snake_case
 	var verificationMethod VerificationMethod
-	if err := json.Unmarshal(bz, &verificationMethod); err != nil {
+	if err := jsonpb.Unmarshal(bytes.NewReader(bz), &verificationMethod); err != nil {
 		return err
 	}
 	*v = NewVerificationRelationshipDedicated(verificationMethod)
@@ -470,24 +478,24 @@ func (v *VerificationRelationship) UnmarshalJSON(bz []byte) error {
 }
 
 func NewService(id string, type_ string, serviceEndpoint string) Service {
-	return Service{ID: id, Type: type_, ServiceEndpoint: serviceEndpoint}
+	return Service{Id: id, Type: type_, ServiceEndpoint: serviceEndpoint}
 }
 
 func (s Service) Valid() bool {
-	return s.ID != "" && s.Type != "" && s.ServiceEndpoint != ""
+	return s.Id != "" && s.Type != "" && s.ServiceEndpoint != ""
 }
 
 func NewDIDDocumentWithSeq(doc *DIDDocument, seq uint64) DIDDocumentWithSeq {
 	return DIDDocumentWithSeq{
 		Document: doc,
-		Seq:      seq,
+		Sequence: seq,
 	}
 }
 
 // Empty returns true if all members in DIDDocumentWithSeq are empty.
 // The empty struct means that the entity doesn't exist.
 func (d DIDDocumentWithSeq) Empty() bool {
-	return d.Document == nil || d.Document.Empty() && d.Seq == InitialSequence
+	return d.Document == nil || d.Document.Empty() && d.Sequence == InitialSequence
 }
 
 func (d DIDDocumentWithSeq) Valid() bool {
@@ -502,5 +510,5 @@ func (d DIDDocumentWithSeq) Deactivate(newSeq uint64) DIDDocumentWithSeq {
 
 // Deactivated returns true if the DIDDocument has been activated.
 func (d DIDDocumentWithSeq) Deactivated() bool {
-	return d.Document.Empty() && d.Seq != InitialSequence
+	return d.Document.Empty() && d.Sequence != InitialSequence
 }

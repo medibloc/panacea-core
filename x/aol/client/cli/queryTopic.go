@@ -19,7 +19,7 @@ func CmdGetTopic() *cobra.Command {
 
 			queryClient := types.NewQueryClient(clientCtx)
 
-			params := &types.QueryGetTopicRequest{
+			params := &types.QueryTopicRequest{
 				OwnerAddress: args[0],
 				TopicName:    args[1],
 			}
@@ -53,7 +53,7 @@ func CmdListTopics() *cobra.Command {
 
 			queryClient := types.NewQueryClient(clientCtx)
 
-			params := &types.QueryListTopicsRequest{
+			params := &types.QueryTopicsRequest{
 				OwnerAddress: args[0],
 				Pagination:   pageReq,
 			}

@@ -1,10 +1,11 @@
 package did
 
 import (
+	"testing"
+
 	"github.com/medibloc/panacea-core/x/did/internal/secp256k1util"
 	"github.com/tendermint/tendermint/crypto"
 	"github.com/tendermint/tendermint/crypto/secp256k1"
-	"testing"
 
 	"github.com/stretchr/testify/suite"
 
@@ -31,7 +32,7 @@ func (suite genesisTestSuite) TestGenesis() {
 
 	didKeeper.SetDIDDocument(suite.Ctx, did1, doc1)
 	didKeeper.SetDIDDocument(suite.Ctx, did2, doc2)
-	doc2Deactivated := doc2.Deactivate(doc2.Seq + 1)
+	doc2Deactivated := doc2.Deactivate(doc2.Sequence + 1)
 	didKeeper.SetDIDDocument(suite.Ctx, did2, doc2Deactivated)
 
 	// export a genesis
@@ -64,9 +65,9 @@ func (suite genesisTestSuite) newDIDDocumentWithSeq(did string) (types.DIDDocume
 		&es256VerificationMethod,
 		&blsVerificationMethod,
 	}
-	verificationRelationship := types.NewVerificationRelationship(verificationMethods[0].ID)
-	authentications := []*types.VerificationRelationship{
-		&verificationRelationship,
+	verificationRelationship := types.NewVerificationRelationship(verificationMethods[0].Id)
+	authentications := []types.VerificationRelationship{
+		verificationRelationship,
 	}
 	doc := types.NewDIDDocument(did, types.WithVerificationMethods(verificationMethods), types.WithAuthentications(authentications))
 	docWithSeq := types.NewDIDDocumentWithSeq(

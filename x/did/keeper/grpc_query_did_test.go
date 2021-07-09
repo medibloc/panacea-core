@@ -1,6 +1,7 @@
 package keeper_test
 
 import (
+	"encoding/base64"
 	"testing"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -25,9 +26,9 @@ func (suite queryDIDTestSuite) TestDIDDocumentWithSeq() {
 
 	didKeeper.SetDIDDocument(suite.Ctx, did, docWithSeq)
 
-	req := types.QueryGetDIDRequest{DID: did}
-	res, err := didKeeper.DIDDocumentWithSeq(sdk.WrapSDKContext(suite.Ctx), &req)
+	req := types.QueryDIDRequest{DidBase64: base64.StdEncoding.EncodeToString([]byte(did))}
+	res, err := didKeeper.DID(sdk.WrapSDKContext(suite.Ctx), &req)
 	suite.Require().NoError(err)
 	suite.Require().NotNil(res)
-	suite.Require().Equal(docWithSeq, *res.DIDDocumentWithSeq)
+	suite.Require().Equal(docWithSeq, *res.DidDocumentWithSeq)
 }
