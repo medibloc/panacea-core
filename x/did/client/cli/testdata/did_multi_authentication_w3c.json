@@ -1,72 +1,72 @@
  {
-  "contexts": [
+  "@context": [
     "https://www.w3.org/ns/did/v1",
     "https://medibloc.org/ko"
   ],
   "id": "did:panacea:27FnaDeQZApXhsRZZDARhWYs2nKFaw3p7evGd9zUSrBZ",
-  "verification_methods": [
+  "verificationMethod": [
     {
       "controller": "did:panacea:27FnaDeQZApXhsRZZDARhWYs2nKFaw3p7evGd9zUSrBZ",
       "id": "did:panacea:27FnaDeQZApXhsRZZDARhWYs2nKFaw3p7evGd9zUSrBZ#key1",
-      "public_key_base58": "hfiFwEqzHPx3RbQBmkgg4UEMtejfbL27CspYNKiVuURN",
+      "publicKeyBase58": "hfiFwEqzHPx3RbQBmkgg4UEMtejfbL27CspYNKiVuURN",
       "type": "Secp256k1VerificationKey2018"
     },
     {
       "controller": "did:panacea:27FnaDeQZApXhsRZZDARhWYs2nKFaw3p7evGd9zUSrBZ",
       "id": "did:panacea:27FnaDeQZApXhsRZZDARhWYs2nKFaw3p7evGd9zUSrBZ#key3",
-      "public_key_base58": "asdfwEqzHPx3RbQBmkgg4UEMtejfbL27CspYNKiV1234",
+      "publicKeyBase58": "asdfwEqzHPx3RbQBmkgg4UEMtejfbL27CspYNKiV1234",
       "type": "Secp256k1VerificationKey2018"
     }
   ],
-   "authentications": [
+   "authentication": [
      "did:panacea:27FnaDeQZApXhsRZZDARhWYs2nKFaw3p7evGd9zUSrBZ#key1",
      {
        "controller": "did:panacea:27FnaDeQZApXhsRZZDARhWYs2nKFaw3p7evGd9zUSrBZ",
        "id": "did:panacea:27FnaDeQZApXhsRZZDARhWYs2nKFaw3p7evGd9zUSrBZ#key2",
-       "public_key_base58": "zH3C2AVvLMv6gmMNam3uVAjZpfkcJCwDwnZn6z3wXmqPV",
+       "publicKeyBase58": "zH3C2AVvLMv6gmMNam3uVAjZpfkcJCwDwnZn6z3wXmqPV",
        "type": "Secp256k1VerificationKey2018"
      }
    ],
-   "assertion_methods": [
+   "assertionMethod": [
      "did:panacea:27FnaDeQZApXhsRZZDARhWYs2nKFaw3p7evGd9zUSrBZ#key1",
      {
        "controller": "did:panacea:27FnaDeQZApXhsRZZDARhWYs2nKFaw3p7evGd9zUSrBZ",
        "id": "did:panacea:27FnaDeQZApXhsRZZDARhWYs2nKFaw3p7evGd9zUSrBZ#key2",
-       "public_key_base58": "aH3C2AVvLMv6gmMNam3uVAjZpfkcJCwDwnZn6z3wXmqPs",
+       "publicKeyBase58": "aH3C2AVvLMv6gmMNam3uVAjZpfkcJCwDwnZn6z3wXmqPs",
        "type": "Secp256k1VerificationKey2018"
      },
      {
        "controller": "did:panacea:27FnaDeQZApXhsRZZDARhWYs2nKFaw3p7evGd9zUSrBZ",
        "id": "did:panacea:27FnaDeQZApXhsRZZDARhWYs2nKFaw3p7evGd9zUSrBZ#key3",
-       "public_key_base58": "bH3C2AVvLMv6gmMNam3uVAjZpfkcJCwDwnZn6z3wXmqPo",
+       "publicKeyBase58": "bH3C2AVvLMv6gmMNam3uVAjZpfkcJCwDwnZn6z3wXmqPo",
        "type": "Secp256k1VerificationKey2018"
      }
    ],
-   "key_agreements": [
+   "keyAgreement": [
      "did:panacea:27FnaDeQZApXhsRZZDARhWYs2nKFaw3p7evGd9zUSrBZ#key1",
      {
        "controller": "did:panacea:27FnaDeQZApXhsRZZDARhWYs2nKFaw3p7evGd9zUSrBZ",
        "id": "did:panacea:27FnaDeQZApXhsRZZDARhWYs2nKFaw3p7evGd9zUSrBZ#key2",
-       "public_key_base58": "oH3C2AVvLMv6gmMNam3uVAjZpfkcJCwDwnZn6z3wXmqPP",
+       "publicKeyBase58": "oH3C2AVvLMv6gmMNam3uVAjZpfkcJCwDwnZn6z3wXmqPP",
        "type": "Secp256k1VerificationKey2018"
      },
      "did:panacea:27FnaDeQZApXhsRZZDARhWYs2nKFaw3p7evGd9zUSrBZ#key3"
    ],
-   "capability_invocations": [
+   "capabilityInvocation": [
      "did:panacea:27FnaDeQZApXhsRZZDARhWYs2nKFaw3p7evGd9zUSrBZ#key1",
      {
        "controller": "did:panacea:27FnaDeQZApXhsRZZDARhWYs2nKFaw3p7evGd9zUSrBZ",
        "id": "did:panacea:27FnaDeQZApXhsRZZDARhWYs2nKFaw3p7evGd9zUSrBZ#key2",
-       "public_key_base58": "PH3C2AVvLMv6gmMNam3uVAjZpfkcJCwDwnZn6z3wXmqPp",
+       "publicKeyBase58": "PH3C2AVvLMv6gmMNam3uVAjZpfkcJCwDwnZn6z3wXmqPp",
        "type": "Secp256k1VerificationKey2018"
      }
    ],
-   "capability_delegations": [
+   "capabilityDelegation": [
      "did:panacea:27FnaDeQZApXhsRZZDARhWYs2nKFaw3p7evGd9zUSrBZ#key1",
      {
        "controller": "did:panacea:27FnaDeQZApXhsRZZDARhWYs2nKFaw3p7evGd9zUSrBZ",
        "id": "did:panacea:27FnaDeQZApXhsRZZDARhWYs2nKFaw3p7evGd9zUSrBZ#key2",
-       "public_key_base58": "qH3C2AVvLMv6gmMNam3uVAjZpfkcJCwDwnZn6z3wXmqPQ",
+       "publicKeyBase58": "qH3C2AVvLMv6gmMNam3uVAjZpfkcJCwDwnZn6z3wXmqPQ",
        "type": "Secp256k1VerificationKey2018"
      }
    ]

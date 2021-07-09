@@ -115,9 +115,15 @@ func (suite txTestSuite) TestSaveAndGetPrivKeyFromKeyStore() {
 }
 
 func (suite txTestSuite) TestReadDIDDocOneContext() {
-	path := "./testdata/did_one_context.json"
-	doc, err := readDIDDocFrom(path)
+	suite.testReadDIDDocOneContext("./testdata/did_one_context.json")
+}
 
+func (suite txTestSuite) TestReadDIDDocOneContext_W3C() {
+	suite.testReadDIDDocOneContext("./testdata/did_one_context_w3c.json")
+}
+
+func (suite txTestSuite) testReadDIDDocOneContext(path string) {
+	doc, err := readDIDDocFrom(path)
 	suite.Require().NoError(err)
 	contexts := *doc.Contexts
 	suite.Require().Equal(1, len(contexts))
@@ -133,7 +139,14 @@ func (suite txTestSuite) TestReadDIDDocOneContext() {
 }
 
 func (suite txTestSuite) TestReadDIDDocTwoContexts() {
-	path := "./testdata/did_multi_context.json"
+	suite.testReadDIDDocTwoContexts("./testdata/did_multi_context.json")
+}
+
+func (suite txTestSuite) TestReadDIDDocTwoContexts_W3C() {
+	suite.testReadDIDDocTwoContexts("./testdata/did_multi_context_w3c.json")
+}
+
+func (suite txTestSuite) testReadDIDDocTwoContexts(path string) {
 	doc, err := readDIDDocFrom(path)
 
 	suite.Require().NoError(err)
@@ -152,7 +165,14 @@ func (suite txTestSuite) TestReadDIDDocTwoContexts() {
 }
 
 func (suite txTestSuite) TestReadDIDDocMultiRelationship() {
-	path := "./testdata/did_multi_authentication.json"
+	suite.testReadDIDDocMultiRelationship("./testdata/did_multi_authentication.json")
+}
+
+func (suite txTestSuite) TestReadDIDDocMultiRelationship_W3C() {
+	suite.testReadDIDDocMultiRelationship("./testdata/did_multi_authentication_w3c.json")
+}
+
+func (suite txTestSuite) testReadDIDDocMultiRelationship(path string) {
 	doc, err := readDIDDocFrom(path)
 
 	suite.Require().NoError(err)

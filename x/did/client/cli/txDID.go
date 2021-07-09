@@ -4,11 +4,12 @@ import (
 	"bufio"
 	"context"
 	"encoding/base64"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
+
+	"github.com/gogo/protobuf/jsonpb"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -290,8 +291,8 @@ func readDIDDocFrom(path string) (types.DIDDocument, error) {
 	}
 	defer file.Close()
 
-	err = json.NewDecoder(file).Decode(&doc)
-	if err != nil {
+	// Use gogoproto's jsonpb to handle camelCase and custom types as well as snake_case.
+	if err := jsonpb.Unmarshal(file, &doc); err != nil {
 		return doc, fmt.Errorf("fail to decode DIDDocument JSON: %w", err)
 	}
 	if !doc.Valid() {
