@@ -1,7 +1,5 @@
 # Introduction
 
-![banner](assets/banner.png)
-
 Welcome to the Panacea Core docs.
 
 * Features covers what you can do with the Panacea Core, and gives a high level intuition of its core mechanisms.

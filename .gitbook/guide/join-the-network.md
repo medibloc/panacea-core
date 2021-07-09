@@ -129,14 +129,12 @@ panacead start
 Check that everything is running smoothly:
 
 ```bash
-panaceacli status
+panacead status
 ```
 
 View the status of the network with the Block Explorer
 - Mainnet: https://explorer.medibloc.org
-- Testnet: https://testnet-explorer.medibloc.org
-- Incentivized Testnet: TBD
-
+- Testnet: ~~https://testnet-explorer.medibloc.org~~ https://dev.mintscan.io/hygieia
 
 ## Join as a validator
 

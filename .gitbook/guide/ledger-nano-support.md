@@ -23,31 +23,31 @@ Note: You need to [install the `Panacea` app](#install-the-panacea-ledger-app) o
 
 ### Before you begin
 
-Install `panaceacli` by following the [guide](installation.md).
+Install `panacead` by following the [guide](installation.md).
 
 ### Add your Ledger key
 
 - Connect and unlock your Ledger Nano device.
 - Open the `Panacea` app on your Ledger Nano device.
-- Create an account in `panaceacli` from your Ledger key.
+- Create an account in `panacead` from your Ledger key.
 
 ```bash
-panaceacli keys add <keyName> --ledger
+panacead keys add <keyName> --ledger
 ```
-Note: Be sure to change the `<keyName>` parameter to be a meaningful name. The `--ledger` flag tells `panaceacli` to use your Ledger to seed the account.
+Note: Be sure to change the `<keyName>` parameter to be a meaningful name. The `--ledger` flag tells `panacead` to use your Ledger to seed the account.
 
 Panacea uses HD wallets. This means you can setup many accounts using the same Ledger seed.
 To create another account from your Ledger device, run the following command by changing the integer `<i>`
 to some value >= 0 to choose the account for HD derivation.
 ```bash
-panaceacli keys add <keyName> --ledger --account <i>
+panacead keys add <keyName> --ledger --account <i>
 ```
 
 ### Confirm your address
 
 Run the following command to display your address on the Ledger Nano device. Use the `<keyName>` you gave your Ledger key.
 ```bash
-panaceacli keys show <keyName> -d
+panacead keys show <keyName> -d
 ```
 
 Confirm that the address displayed on the Ledger Nano device matches that displayed when you added the key.
@@ -56,7 +56,7 @@ Confirm that the address displayed on the Ledger Nano device matches that displa
 
 You are now ready to start signing and sending transactions.
 ```bash
-panaceacli tx send <fromAddress> <toAddress> <amount>umed \
+panacead tx bank send <fromAddress> <toAddress> <amount>umed \
   --node http://54.180.169.37:26657 \
   --chain-id panacea-2 \
   --fees 1000000umed
@@ -74,7 +74,7 @@ Be sure to inspect the transaction displayed on the screen.
 To receive funds to the Panacea account on your Ledger Nano device,
 retrieve the address for your Ledger Nano device (the ones with `type: ledger`) with this command:
 ```bash
-panaceacli keys list
+panacead keys list
 
 - name: <keyName>
   type: ledger
