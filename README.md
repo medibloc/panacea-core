@@ -1,52 +1,45 @@
-# Panacea-Core
-![banner](docs/images/banner.png)
+# Panacea Core
 
-**[MediBloc](https://medibloc.org)**, We introduce blockchain which is the key infrastrucuture for our services to reinvent the healthcare experience.
+[![license](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+![ci](https://github.com/medibloc/panacea-core/actions/workflows/ci.yml/badge.svg)
+![ci-docker-publish](https://github.com/medibloc/panacea-core/actions/workflows/docker-publish.yml/badge.svg)
 
-**Key Features:**
+Panacea is a blockchain which is the key infrastructure for our services to reinvent the healthcare experience, developed by **[MediBloc](https://medibloc.org)**.
 
-- In addition to medical data, AOL (Append Only Log), which can store various useful data, is implemented in a block chain.
-- We used Tendermint consensus based on DPoS and PBFT.
 
-**Panacea Core** is a golang implementation of the MediBloc protocol
+## Key Features
 
- Core builds on [Tendermint](https://github.com/tendermint/tendermint) consensus and the [Cosmos SDK](https://github.com/cosmos/cosmos-sdk) toolkits. Please make sure to study these projects as well if you are not already familiar.
+- Fast finality powered by [Cosmos SDK](https://cosmos.network/) and [Tendermint](https://tendermint.com/) based on DPoS and PBFT
+- AOL (Append Only Log) for storing various data including medical data footprints
+- DID (Decentralized Identifier) management
+- Smart contracts based on [CosmWasm](https://cosmwasm.com/)
+- IBC (Inter-Blockchain Communication)
 
-**Note**: Requires [Go 1.13+](https://golang.org/dl/)
 
-## Status
+## Resources
 
-### Network
+### Documentation
 
-- Mainnet Panacea is online. [The launch repo](https://github.com/medibloc/panacea-launch) contains snapshot of the launch as well as network updates. 
+- [User Guide](https://medibloc.gitbook.io/panacea-core/): Installation and usages
 
+### Networks
+
+- [Mainnet](https://github.com/medibloc/panacea-launch)
+- [Testnet](https://github.com/medibloc/panacea-networks)
 
 ### Ecosystem
 
+#### Tools
+
 - [Block Explorers](https://explorer.medibloc.org)
+- [Web Wallet](https://wallet.gopanacea.org)
 
-- Wallet (To Be Released)
+#### Client SDKs
 
-
-## Documentation
-
-See the [docs](https://medibloc.gitbook.io/panacea-core/) here
+- [Java SDK](https://github.com/medibloc/panacea-java)
+- [Typescript SDK](https://github.com/medibloc/panacea-js)
 
 
 ## License
-```
-Copyright (C) 2019  MediBloc
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <https://www.gnu.org/licenses/>.
-```
+[Apache-2.0 License](LICENSE)
