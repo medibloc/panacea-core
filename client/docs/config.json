@@ -138,6 +138,18 @@
           "Params": "IBCTransferParams"
         }
       }
+    },
+    {
+      "url": "./tmp-swagger-gen/panacea/aol/v2/query.swagger.json"
+    },
+    {
+      "url": "./tmp-swagger-gen/panacea/burn/v2/query.swagger.json"
+    },
+    {
+      "url": "./tmp-swagger-gen/panacea/did/v2/query.swagger.json"
+    },
+    {
+      "url": "./tmp-swagger-gen/panacea/token/v2/query.swagger.json"
     }
   ]
 }

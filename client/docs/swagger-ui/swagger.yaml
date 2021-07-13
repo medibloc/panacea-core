@@ -29515,6 +29515,881 @@ paths:
                       format: byte
       tags:
         - Query
+  '/panacea/aol/v2/owners/{owner_address}/topics':
+    get:
+      summary: Topics returns topic names.
+      operationId: Topics
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              topic_names:
+                type: array
+                items:
+                  type: string
+              pagination:
+                type: object
+                properties:
+                  next_key:
+                    type: string
+                    format: byte
+                    title: |-
+                      next_key is the key to be passed to PageRequest.key to
+                      query the next page most efficiently
+                  total:
+                    type: string
+                    format: uint64
+                    title: >-
+                      total is total number of results available if
+                      PageRequest.count_total
+
+                      was set, its value is undefined otherwise
+                description: >-
+                  PageResponse is to be embedded in gRPC response messages where
+                  the
+
+                  corresponding request message has used PageRequest.
+
+                   message SomeResponse {
+                           repeated Bar results = 1;
+                           PageResponse page = 2;
+                   }
+            description: >-
+              QueryTopicsResponse is the response type for the Query/Topics RPC
+              method.
+        default:
+          description: An unexpected error response
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    type_url:
+                      type: string
+                    value:
+                      type: string
+                      format: byte
+      parameters:
+        - name: owner_address
+          in: path
+          required: true
+          type: string
+        - name: pagination.key
+          description: |-
+            key is a value returned in PageResponse.next_key to begin
+            querying the next page most efficiently. Only one of offset or key
+            should be set.
+          in: query
+          required: false
+          type: string
+          format: byte
+        - name: pagination.offset
+          description: >-
+            offset is a numeric offset that can be used when key is unavailable.
+
+            It is less efficient than using key. Only one of offset or key
+            should
+
+            be set.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.limit
+          description: >-
+            limit is the total number of results to be returned in the result
+            page.
+
+            If left empty it will default to a value to be set by each app.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.count_total
+          description: >-
+            count_total is set to true  to indicate that the result set should
+            include
+
+            a count of the total number of items available for pagination in
+            UIs.
+
+            count_total is only respected when offset is used. It is ignored
+            when key
+
+            is set.
+          in: query
+          required: false
+          type: boolean
+          format: boolean
+      tags:
+        - Query
+  '/panacea/aol/v2/owners/{owner_address}/topics/{topic_name}':
+    get:
+      summary: Topic returns topic details.
+      operationId: Topic
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              topic:
+                type: object
+                properties:
+                  description:
+                    type: string
+                  total_records:
+                    type: string
+                    format: uint64
+                  total_writers:
+                    type: string
+                    format: uint64
+                description: Topic defines a topic type.
+            description: >-
+              QueryTopicResponse is the response type for the Query/Topic RPC
+              method.
+        default:
+          description: An unexpected error response
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    type_url:
+                      type: string
+                    value:
+                      type: string
+                      format: byte
+      parameters:
+        - name: owner_address
+          in: path
+          required: true
+          type: string
+        - name: topic_name
+          in: path
+          required: true
+          type: string
+      tags:
+        - Query
+  '/panacea/aol/v2/owners/{owner_address}/topics/{topic_name}/records/{offset}':
+    get:
+      summary: Record returns record details.
+      operationId: Record
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              record:
+                type: object
+                properties:
+                  key:
+                    type: string
+                    format: byte
+                  value:
+                    type: string
+                    format: byte
+                  nano_timestamp:
+                    type: string
+                    format: int64
+                  writer_address:
+                    type: string
+                description: Record defines a record type.
+            description: >-
+              QueryRecordResponse is the response type for the Query/Record RPC
+              method.
+        default:
+          description: An unexpected error response
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    type_url:
+                      type: string
+                    value:
+                      type: string
+                      format: byte
+      parameters:
+        - name: owner_address
+          in: path
+          required: true
+          type: string
+        - name: topic_name
+          in: path
+          required: true
+          type: string
+        - name: offset
+          in: path
+          required: true
+          type: string
+          format: uint64
+      tags:
+        - Query
+  '/panacea/aol/v2/owners/{owner_address}/topics/{topic_name}/writers':
+    get:
+      summary: Writers returns writer addresses.
+      operationId: Writers
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              writer_addresses:
+                type: array
+                items:
+                  type: string
+              pagination:
+                type: object
+                properties:
+                  next_key:
+                    type: string
+                    format: byte
+                    title: |-
+                      next_key is the key to be passed to PageRequest.key to
+                      query the next page most efficiently
+                  total:
+                    type: string
+                    format: uint64
+                    title: >-
+                      total is total number of results available if
+                      PageRequest.count_total
+
+                      was set, its value is undefined otherwise
+                description: >-
+                  PageResponse is to be embedded in gRPC response messages where
+                  the
+
+                  corresponding request message has used PageRequest.
+
+                   message SomeResponse {
+                           repeated Bar results = 1;
+                           PageResponse page = 2;
+                   }
+            description: >-
+              QueryWritersResponse is the response type for the Query/Writers
+              RPC method.
+        default:
+          description: An unexpected error response
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    type_url:
+                      type: string
+                    value:
+                      type: string
+                      format: byte
+      parameters:
+        - name: owner_address
+          in: path
+          required: true
+          type: string
+        - name: topic_name
+          in: path
+          required: true
+          type: string
+        - name: pagination.key
+          description: |-
+            key is a value returned in PageResponse.next_key to begin
+            querying the next page most efficiently. Only one of offset or key
+            should be set.
+          in: query
+          required: false
+          type: string
+          format: byte
+        - name: pagination.offset
+          description: >-
+            offset is a numeric offset that can be used when key is unavailable.
+
+            It is less efficient than using key. Only one of offset or key
+            should
+
+            be set.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.limit
+          description: >-
+            limit is the total number of results to be returned in the result
+            page.
+
+            If left empty it will default to a value to be set by each app.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.count_total
+          description: >-
+            count_total is set to true  to indicate that the result set should
+            include
+
+            a count of the total number of items available for pagination in
+            UIs.
+
+            count_total is only respected when offset is used. It is ignored
+            when key
+
+            is set.
+          in: query
+          required: false
+          type: boolean
+          format: boolean
+      tags:
+        - Query
+  '/panacea/aol/v2/owners/{owner_address}/topics/{topic_name}/writers/{writer_address}':
+    get:
+      summary: Writer returns writer details.
+      operationId: Writer
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              writer:
+                type: object
+                properties:
+                  moniker:
+                    type: string
+                  description:
+                    type: string
+                  nano_timestamp:
+                    type: string
+                    format: int64
+                description: Topic defines a topic type.
+            description: >-
+              QueryWriterResponse is the response type for the Query/Writer RPC
+              method.
+        default:
+          description: An unexpected error response
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    type_url:
+                      type: string
+                    value:
+                      type: string
+                      format: byte
+      parameters:
+        - name: owner_address
+          in: path
+          required: true
+          type: string
+        - name: topic_name
+          in: path
+          required: true
+          type: string
+        - name: writer_address
+          in: path
+          required: true
+          type: string
+      tags:
+        - Query
+  '/panacea/did/v2/dids/{did_base64}':
+    get:
+      summary: DID returns a DID Document with a sequence number.
+      operationId: DID
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              did_document_with_seq:
+                type: object
+                properties:
+                  document:
+                    type: object
+                    properties:
+                      contexts:
+                        type: object
+                        properties:
+                          values:
+                            type: array
+                            items:
+                              type: string
+                        description: >-
+                          Strings defines a JSON-LD string array format which is
+                          marshalled to a single string if the array length is
+                          1.
+                      id:
+                        type: string
+                      controller:
+                        type: object
+                        properties:
+                          values:
+                            type: array
+                            items:
+                              type: string
+                        description: >-
+                          Strings defines a JSON-LD string array format which is
+                          marshalled to a single string if the array length is
+                          1.
+                      verification_methods:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                            type:
+                              type: string
+                            controller:
+                              type: string
+                            public_key_base58:
+                              type: string
+                          title: VerificationMethod defines a W3C verification method
+                      authentications:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            verification_method_id:
+                              type: string
+                            verification_method:
+                              type: object
+                              properties:
+                                id:
+                                  type: string
+                                type:
+                                  type: string
+                                controller:
+                                  type: string
+                                public_key_base58:
+                                  type: string
+                              title: >-
+                                VerificationMethod defines a W3C verification
+                                method
+                          title: >-
+                            VerificationRelationship defines a W3C verification
+                            relationship
+                        title: >-
+                          TODO: the repeated gogoproto.customtype has an issue:
+                          https://github.com/gogo/protobuf/issues/478
+                      assertion_methods:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            verification_method_id:
+                              type: string
+                            verification_method:
+                              type: object
+                              properties:
+                                id:
+                                  type: string
+                                type:
+                                  type: string
+                                controller:
+                                  type: string
+                                public_key_base58:
+                                  type: string
+                              title: >-
+                                VerificationMethod defines a W3C verification
+                                method
+                          title: >-
+                            VerificationRelationship defines a W3C verification
+                            relationship
+                      key_agreements:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            verification_method_id:
+                              type: string
+                            verification_method:
+                              type: object
+                              properties:
+                                id:
+                                  type: string
+                                type:
+                                  type: string
+                                controller:
+                                  type: string
+                                public_key_base58:
+                                  type: string
+                              title: >-
+                                VerificationMethod defines a W3C verification
+                                method
+                          title: >-
+                            VerificationRelationship defines a W3C verification
+                            relationship
+                      capability_invocations:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            verification_method_id:
+                              type: string
+                            verification_method:
+                              type: object
+                              properties:
+                                id:
+                                  type: string
+                                type:
+                                  type: string
+                                controller:
+                                  type: string
+                                public_key_base58:
+                                  type: string
+                              title: >-
+                                VerificationMethod defines a W3C verification
+                                method
+                          title: >-
+                            VerificationRelationship defines a W3C verification
+                            relationship
+                      capability_delegations:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            verification_method_id:
+                              type: string
+                            verification_method:
+                              type: object
+                              properties:
+                                id:
+                                  type: string
+                                type:
+                                  type: string
+                                controller:
+                                  type: string
+                                public_key_base58:
+                                  type: string
+                              title: >-
+                                VerificationMethod defines a W3C verification
+                                method
+                          title: >-
+                            VerificationRelationship defines a W3C verification
+                            relationship
+                      services:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                            type:
+                              type: string
+                            service_endpoint:
+                              type: string
+                          description: Service defines a service in the W3C DID Document.
+                    description: >-
+                      NOTE: All 'json_name' and 'gogoproto.customtype' tags are
+                      for panacea-core to unmarshal the v1.3 genesis which is in
+                      the W3C JSON-LD format.
+                            On the other hand, the panacea-core and cosmos-sdk don't use those tags to marshal result to JSON (via grpc-gateway).
+                    title: DIDDocument defines a W3C DID Document
+                  sequence:
+                    type: string
+                    format: uint64
+                description: >-
+                  DIDDocumentWithSeq defines a message for DID Document with a
+                  sequence number for preventing replay attacks.
+            description: >-
+              QueryDIDResponse is the response type for the
+              Query/DIDDocumentWithSeq RPC method.
+        default:
+          description: An unexpected error response
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    type_url:
+                      type: string
+                    value:
+                      type: string
+                      format: byte
+      parameters:
+        - name: did_base64
+          description: 'NOTE: Using base64 due to the URI path cannot contain colons.'
+          in: path
+          required: true
+          type: string
+      tags:
+        - Query
+  /panacea/token/v2/tokens:
+    get:
+      summary: Tokens returns details of all tokens.
+      operationId: Tokens
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              token:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    symbol:
+                      type: string
+                    total_supply:
+                      type: object
+                      properties:
+                        denom:
+                          type: string
+                        amount:
+                          type: string
+                      description: >-
+                        Coin defines a token with a denomination and an amount.
+
+
+                        NOTE: The amount field is an Int which implements the
+                        custom method
+
+                        signatures required by gogoproto.
+                    mintable:
+                      type: boolean
+                      format: boolean
+                    owner_address:
+                      type: string
+                  description: Token defines a token.
+              pagination:
+                type: object
+                properties:
+                  next_key:
+                    type: string
+                    format: byte
+                    title: |-
+                      next_key is the key to be passed to PageRequest.key to
+                      query the next page most efficiently
+                  total:
+                    type: string
+                    format: uint64
+                    title: >-
+                      total is total number of results available if
+                      PageRequest.count_total
+
+                      was set, its value is undefined otherwise
+                description: >-
+                  PageResponse is to be embedded in gRPC response messages where
+                  the
+
+                  corresponding request message has used PageRequest.
+
+                   message SomeResponse {
+                           repeated Bar results = 1;
+                           PageResponse page = 2;
+                   }
+            description: >-
+              QueryTokensResponse is the response type for the Query/Tokens RPC
+              method.
+        default:
+          description: An unexpected error response
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    type_url:
+                      type: string
+                    value:
+                      type: string
+                      format: byte
+      parameters:
+        - name: pagination.key
+          description: |-
+            key is a value returned in PageResponse.next_key to begin
+            querying the next page most efficiently. Only one of offset or key
+            should be set.
+          in: query
+          required: false
+          type: string
+          format: byte
+        - name: pagination.offset
+          description: >-
+            offset is a numeric offset that can be used when key is unavailable.
+
+            It is less efficient than using key. Only one of offset or key
+            should
+
+            be set.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.limit
+          description: >-
+            limit is the total number of results to be returned in the result
+            page.
+
+            If left empty it will default to a value to be set by each app.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.count_total
+          description: >-
+            count_total is set to true  to indicate that the result set should
+            include
+
+            a count of the total number of items available for pagination in
+            UIs.
+
+            count_total is only respected when offset is used. It is ignored
+            when key
+
+            is set.
+          in: query
+          required: false
+          type: boolean
+          format: boolean
+      tags:
+        - Query
+  '/panacea/token/v2/tokens/{symbol}':
+    get:
+      summary: Token returns token details.
+      operationId: Token
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              token:
+                type: object
+                properties:
+                  name:
+                    type: string
+                  symbol:
+                    type: string
+                  total_supply:
+                    type: object
+                    properties:
+                      denom:
+                        type: string
+                      amount:
+                        type: string
+                    description: >-
+                      Coin defines a token with a denomination and an amount.
+
+
+                      NOTE: The amount field is an Int which implements the
+                      custom method
+
+                      signatures required by gogoproto.
+                  mintable:
+                    type: boolean
+                    format: boolean
+                  owner_address:
+                    type: string
+                description: Token defines a token.
+            description: >-
+              QueryTokenResponse is the response type for the Query/Token RPC
+              method.
+        default:
+          description: An unexpected error response
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    type_url:
+                      type: string
+                    value:
+                      type: string
+                      format: byte
+      parameters:
+        - name: symbol
+          in: path
+          required: true
+          type: string
+      tags:
+        - Query
 securityDefinitions:
   kms:
     type: basic
@@ -48681,3 +49556,838 @@ definitions:
 
               chain.
     description: QueryParamsResponse is the response type for the Query/Params RPC method.
+  panacea.aol.v2.QueryRecordResponse:
+    type: object
+    properties:
+      record:
+        type: object
+        properties:
+          key:
+            type: string
+            format: byte
+          value:
+            type: string
+            format: byte
+          nano_timestamp:
+            type: string
+            format: int64
+          writer_address:
+            type: string
+        description: Record defines a record type.
+    description: QueryRecordResponse is the response type for the Query/Record RPC method.
+  panacea.aol.v2.QueryTopicResponse:
+    type: object
+    properties:
+      topic:
+        type: object
+        properties:
+          description:
+            type: string
+          total_records:
+            type: string
+            format: uint64
+          total_writers:
+            type: string
+            format: uint64
+        description: Topic defines a topic type.
+    description: QueryTopicResponse is the response type for the Query/Topic RPC method.
+  panacea.aol.v2.QueryTopicsResponse:
+    type: object
+    properties:
+      topic_names:
+        type: array
+        items:
+          type: string
+      pagination:
+        type: object
+        properties:
+          next_key:
+            type: string
+            format: byte
+            title: |-
+              next_key is the key to be passed to PageRequest.key to
+              query the next page most efficiently
+          total:
+            type: string
+            format: uint64
+            title: >-
+              total is total number of results available if
+              PageRequest.count_total
+
+              was set, its value is undefined otherwise
+        description: |-
+          PageResponse is to be embedded in gRPC response messages where the
+          corresponding request message has used PageRequest.
+
+           message SomeResponse {
+                   repeated Bar results = 1;
+                   PageResponse page = 2;
+           }
+    description: QueryTopicsResponse is the response type for the Query/Topics RPC method.
+  panacea.aol.v2.QueryWriterResponse:
+    type: object
+    properties:
+      writer:
+        type: object
+        properties:
+          moniker:
+            type: string
+          description:
+            type: string
+          nano_timestamp:
+            type: string
+            format: int64
+        description: Topic defines a topic type.
+    description: QueryWriterResponse is the response type for the Query/Writer RPC method.
+  panacea.aol.v2.QueryWritersResponse:
+    type: object
+    properties:
+      writer_addresses:
+        type: array
+        items:
+          type: string
+      pagination:
+        type: object
+        properties:
+          next_key:
+            type: string
+            format: byte
+            title: |-
+              next_key is the key to be passed to PageRequest.key to
+              query the next page most efficiently
+          total:
+            type: string
+            format: uint64
+            title: >-
+              total is total number of results available if
+              PageRequest.count_total
+
+              was set, its value is undefined otherwise
+        description: |-
+          PageResponse is to be embedded in gRPC response messages where the
+          corresponding request message has used PageRequest.
+
+           message SomeResponse {
+                   repeated Bar results = 1;
+                   PageResponse page = 2;
+           }
+    description: >-
+      QueryWritersResponse is the response type for the Query/Writers RPC
+      method.
+  panacea.aol.v2.Record:
+    type: object
+    properties:
+      key:
+        type: string
+        format: byte
+      value:
+        type: string
+        format: byte
+      nano_timestamp:
+        type: string
+        format: int64
+      writer_address:
+        type: string
+    description: Record defines a record type.
+  panacea.aol.v2.Topic:
+    type: object
+    properties:
+      description:
+        type: string
+      total_records:
+        type: string
+        format: uint64
+      total_writers:
+        type: string
+        format: uint64
+    description: Topic defines a topic type.
+  panacea.aol.v2.Writer:
+    type: object
+    properties:
+      moniker:
+        type: string
+      description:
+        type: string
+      nano_timestamp:
+        type: string
+        format: int64
+    description: Topic defines a topic type.
+  panacea.did.v2.DIDDocument:
+    type: object
+    properties:
+      contexts:
+        type: object
+        properties:
+          values:
+            type: array
+            items:
+              type: string
+        description: >-
+          Strings defines a JSON-LD string array format which is marshalled to a
+          single string if the array length is 1.
+      id:
+        type: string
+      controller:
+        type: object
+        properties:
+          values:
+            type: array
+            items:
+              type: string
+        description: >-
+          Strings defines a JSON-LD string array format which is marshalled to a
+          single string if the array length is 1.
+      verification_methods:
+        type: array
+        items:
+          type: object
+          properties:
+            id:
+              type: string
+            type:
+              type: string
+            controller:
+              type: string
+            public_key_base58:
+              type: string
+          title: VerificationMethod defines a W3C verification method
+      authentications:
+        type: array
+        items:
+          type: object
+          properties:
+            verification_method_id:
+              type: string
+            verification_method:
+              type: object
+              properties:
+                id:
+                  type: string
+                type:
+                  type: string
+                controller:
+                  type: string
+                public_key_base58:
+                  type: string
+              title: VerificationMethod defines a W3C verification method
+          title: VerificationRelationship defines a W3C verification relationship
+        title: >-
+          TODO: the repeated gogoproto.customtype has an issue:
+          https://github.com/gogo/protobuf/issues/478
+      assertion_methods:
+        type: array
+        items:
+          type: object
+          properties:
+            verification_method_id:
+              type: string
+            verification_method:
+              type: object
+              properties:
+                id:
+                  type: string
+                type:
+                  type: string
+                controller:
+                  type: string
+                public_key_base58:
+                  type: string
+              title: VerificationMethod defines a W3C verification method
+          title: VerificationRelationship defines a W3C verification relationship
+      key_agreements:
+        type: array
+        items:
+          type: object
+          properties:
+            verification_method_id:
+              type: string
+            verification_method:
+              type: object
+              properties:
+                id:
+                  type: string
+                type:
+                  type: string
+                controller:
+                  type: string
+                public_key_base58:
+                  type: string
+              title: VerificationMethod defines a W3C verification method
+          title: VerificationRelationship defines a W3C verification relationship
+      capability_invocations:
+        type: array
+        items:
+          type: object
+          properties:
+            verification_method_id:
+              type: string
+            verification_method:
+              type: object
+              properties:
+                id:
+                  type: string
+                type:
+                  type: string
+                controller:
+                  type: string
+                public_key_base58:
+                  type: string
+              title: VerificationMethod defines a W3C verification method
+          title: VerificationRelationship defines a W3C verification relationship
+      capability_delegations:
+        type: array
+        items:
+          type: object
+          properties:
+            verification_method_id:
+              type: string
+            verification_method:
+              type: object
+              properties:
+                id:
+                  type: string
+                type:
+                  type: string
+                controller:
+                  type: string
+                public_key_base58:
+                  type: string
+              title: VerificationMethod defines a W3C verification method
+          title: VerificationRelationship defines a W3C verification relationship
+      services:
+        type: array
+        items:
+          type: object
+          properties:
+            id:
+              type: string
+            type:
+              type: string
+            service_endpoint:
+              type: string
+          description: Service defines a service in the W3C DID Document.
+    description: >-
+      NOTE: All 'json_name' and 'gogoproto.customtype' tags are for panacea-core
+      to unmarshal the v1.3 genesis which is in the W3C JSON-LD format.
+            On the other hand, the panacea-core and cosmos-sdk don't use those tags to marshal result to JSON (via grpc-gateway).
+    title: DIDDocument defines a W3C DID Document
+  panacea.did.v2.DIDDocumentWithSeq:
+    type: object
+    properties:
+      document:
+        type: object
+        properties:
+          contexts:
+            type: object
+            properties:
+              values:
+                type: array
+                items:
+                  type: string
+            description: >-
+              Strings defines a JSON-LD string array format which is marshalled
+              to a single string if the array length is 1.
+          id:
+            type: string
+          controller:
+            type: object
+            properties:
+              values:
+                type: array
+                items:
+                  type: string
+            description: >-
+              Strings defines a JSON-LD string array format which is marshalled
+              to a single string if the array length is 1.
+          verification_methods:
+            type: array
+            items:
+              type: object
+              properties:
+                id:
+                  type: string
+                type:
+                  type: string
+                controller:
+                  type: string
+                public_key_base58:
+                  type: string
+              title: VerificationMethod defines a W3C verification method
+          authentications:
+            type: array
+            items:
+              type: object
+              properties:
+                verification_method_id:
+                  type: string
+                verification_method:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    type:
+                      type: string
+                    controller:
+                      type: string
+                    public_key_base58:
+                      type: string
+                  title: VerificationMethod defines a W3C verification method
+              title: VerificationRelationship defines a W3C verification relationship
+            title: >-
+              TODO: the repeated gogoproto.customtype has an issue:
+              https://github.com/gogo/protobuf/issues/478
+          assertion_methods:
+            type: array
+            items:
+              type: object
+              properties:
+                verification_method_id:
+                  type: string
+                verification_method:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    type:
+                      type: string
+                    controller:
+                      type: string
+                    public_key_base58:
+                      type: string
+                  title: VerificationMethod defines a W3C verification method
+              title: VerificationRelationship defines a W3C verification relationship
+          key_agreements:
+            type: array
+            items:
+              type: object
+              properties:
+                verification_method_id:
+                  type: string
+                verification_method:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    type:
+                      type: string
+                    controller:
+                      type: string
+                    public_key_base58:
+                      type: string
+                  title: VerificationMethod defines a W3C verification method
+              title: VerificationRelationship defines a W3C verification relationship
+          capability_invocations:
+            type: array
+            items:
+              type: object
+              properties:
+                verification_method_id:
+                  type: string
+                verification_method:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    type:
+                      type: string
+                    controller:
+                      type: string
+                    public_key_base58:
+                      type: string
+                  title: VerificationMethod defines a W3C verification method
+              title: VerificationRelationship defines a W3C verification relationship
+          capability_delegations:
+            type: array
+            items:
+              type: object
+              properties:
+                verification_method_id:
+                  type: string
+                verification_method:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    type:
+                      type: string
+                    controller:
+                      type: string
+                    public_key_base58:
+                      type: string
+                  title: VerificationMethod defines a W3C verification method
+              title: VerificationRelationship defines a W3C verification relationship
+          services:
+            type: array
+            items:
+              type: object
+              properties:
+                id:
+                  type: string
+                type:
+                  type: string
+                service_endpoint:
+                  type: string
+              description: Service defines a service in the W3C DID Document.
+        description: >-
+          NOTE: All 'json_name' and 'gogoproto.customtype' tags are for
+          panacea-core to unmarshal the v1.3 genesis which is in the W3C JSON-LD
+          format.
+                On the other hand, the panacea-core and cosmos-sdk don't use those tags to marshal result to JSON (via grpc-gateway).
+        title: DIDDocument defines a W3C DID Document
+      sequence:
+        type: string
+        format: uint64
+    description: >-
+      DIDDocumentWithSeq defines a message for DID Document with a sequence
+      number for preventing replay attacks.
+  panacea.did.v2.QueryDIDResponse:
+    type: object
+    properties:
+      did_document_with_seq:
+        type: object
+        properties:
+          document:
+            type: object
+            properties:
+              contexts:
+                type: object
+                properties:
+                  values:
+                    type: array
+                    items:
+                      type: string
+                description: >-
+                  Strings defines a JSON-LD string array format which is
+                  marshalled to a single string if the array length is 1.
+              id:
+                type: string
+              controller:
+                type: object
+                properties:
+                  values:
+                    type: array
+                    items:
+                      type: string
+                description: >-
+                  Strings defines a JSON-LD string array format which is
+                  marshalled to a single string if the array length is 1.
+              verification_methods:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    type:
+                      type: string
+                    controller:
+                      type: string
+                    public_key_base58:
+                      type: string
+                  title: VerificationMethod defines a W3C verification method
+              authentications:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    verification_method_id:
+                      type: string
+                    verification_method:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        type:
+                          type: string
+                        controller:
+                          type: string
+                        public_key_base58:
+                          type: string
+                      title: VerificationMethod defines a W3C verification method
+                  title: >-
+                    VerificationRelationship defines a W3C verification
+                    relationship
+                title: >-
+                  TODO: the repeated gogoproto.customtype has an issue:
+                  https://github.com/gogo/protobuf/issues/478
+              assertion_methods:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    verification_method_id:
+                      type: string
+                    verification_method:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        type:
+                          type: string
+                        controller:
+                          type: string
+                        public_key_base58:
+                          type: string
+                      title: VerificationMethod defines a W3C verification method
+                  title: >-
+                    VerificationRelationship defines a W3C verification
+                    relationship
+              key_agreements:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    verification_method_id:
+                      type: string
+                    verification_method:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        type:
+                          type: string
+                        controller:
+                          type: string
+                        public_key_base58:
+                          type: string
+                      title: VerificationMethod defines a W3C verification method
+                  title: >-
+                    VerificationRelationship defines a W3C verification
+                    relationship
+              capability_invocations:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    verification_method_id:
+                      type: string
+                    verification_method:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        type:
+                          type: string
+                        controller:
+                          type: string
+                        public_key_base58:
+                          type: string
+                      title: VerificationMethod defines a W3C verification method
+                  title: >-
+                    VerificationRelationship defines a W3C verification
+                    relationship
+              capability_delegations:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    verification_method_id:
+                      type: string
+                    verification_method:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        type:
+                          type: string
+                        controller:
+                          type: string
+                        public_key_base58:
+                          type: string
+                      title: VerificationMethod defines a W3C verification method
+                  title: >-
+                    VerificationRelationship defines a W3C verification
+                    relationship
+              services:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    type:
+                      type: string
+                    service_endpoint:
+                      type: string
+                  description: Service defines a service in the W3C DID Document.
+            description: >-
+              NOTE: All 'json_name' and 'gogoproto.customtype' tags are for
+              panacea-core to unmarshal the v1.3 genesis which is in the W3C
+              JSON-LD format.
+                    On the other hand, the panacea-core and cosmos-sdk don't use those tags to marshal result to JSON (via grpc-gateway).
+            title: DIDDocument defines a W3C DID Document
+          sequence:
+            type: string
+            format: uint64
+        description: >-
+          DIDDocumentWithSeq defines a message for DID Document with a sequence
+          number for preventing replay attacks.
+    description: >-
+      QueryDIDResponse is the response type for the Query/DIDDocumentWithSeq RPC
+      method.
+  panacea.did.v2.Service:
+    type: object
+    properties:
+      id:
+        type: string
+      type:
+        type: string
+      service_endpoint:
+        type: string
+    description: Service defines a service in the W3C DID Document.
+  panacea.did.v2.Strings:
+    type: object
+    properties:
+      values:
+        type: array
+        items:
+          type: string
+    description: >-
+      Strings defines a JSON-LD string array format which is marshalled to a
+      single string if the array length is 1.
+  panacea.did.v2.VerificationMethod:
+    type: object
+    properties:
+      id:
+        type: string
+      type:
+        type: string
+      controller:
+        type: string
+      public_key_base58:
+        type: string
+    title: VerificationMethod defines a W3C verification method
+  panacea.did.v2.VerificationRelationship:
+    type: object
+    properties:
+      verification_method_id:
+        type: string
+      verification_method:
+        type: object
+        properties:
+          id:
+            type: string
+          type:
+            type: string
+          controller:
+            type: string
+          public_key_base58:
+            type: string
+        title: VerificationMethod defines a W3C verification method
+    title: VerificationRelationship defines a W3C verification relationship
+  panacea.token.v2.QueryTokenResponse:
+    type: object
+    properties:
+      token:
+        type: object
+        properties:
+          name:
+            type: string
+          symbol:
+            type: string
+          total_supply:
+            type: object
+            properties:
+              denom:
+                type: string
+              amount:
+                type: string
+            description: >-
+              Coin defines a token with a denomination and an amount.
+
+
+              NOTE: The amount field is an Int which implements the custom
+              method
+
+              signatures required by gogoproto.
+          mintable:
+            type: boolean
+            format: boolean
+          owner_address:
+            type: string
+        description: Token defines a token.
+    description: QueryTokenResponse is the response type for the Query/Token RPC method.
+  panacea.token.v2.QueryTokensResponse:
+    type: object
+    properties:
+      token:
+        type: array
+        items:
+          type: object
+          properties:
+            name:
+              type: string
+            symbol:
+              type: string
+            total_supply:
+              type: object
+              properties:
+                denom:
+                  type: string
+                amount:
+                  type: string
+              description: >-
+                Coin defines a token with a denomination and an amount.
+
+
+                NOTE: The amount field is an Int which implements the custom
+                method
+
+                signatures required by gogoproto.
+            mintable:
+              type: boolean
+              format: boolean
+            owner_address:
+              type: string
+          description: Token defines a token.
+      pagination:
+        type: object
+        properties:
+          next_key:
+            type: string
+            format: byte
+            title: |-
+              next_key is the key to be passed to PageRequest.key to
+              query the next page most efficiently
+          total:
+            type: string
+            format: uint64
+            title: >-
+              total is total number of results available if
+              PageRequest.count_total
+
+              was set, its value is undefined otherwise
+        description: |-
+          PageResponse is to be embedded in gRPC response messages where the
+          corresponding request message has used PageRequest.
+
+           message SomeResponse {
+                   repeated Bar results = 1;
+                   PageResponse page = 2;
+           }
+    description: QueryTokensResponse is the response type for the Query/Tokens RPC method.
+  panacea.token.v2.Token:
+    type: object
+    properties:
+      name:
+        type: string
+      symbol:
+        type: string
+      total_supply:
+        type: object
+        properties:
+          denom:
+            type: string
+          amount:
+            type: string
+        description: |-
+          Coin defines a token with a denomination and an amount.
+
+          NOTE: The amount field is an Int which implements the custom method
+          signatures required by gogoproto.
+      mintable:
+        type: boolean
+        format: boolean
+      owner_address:
+        type: string
+    description: Token defines a token.
