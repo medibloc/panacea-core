@@ -6,10 +6,6 @@ name: Docker
 # documentation.
 
 on:
-  workflow_run:
-    workflows: ["ci"]
-    types:
-      - completed
   push:
     branches: [ master ]
     # Publish semver tags as releases.
