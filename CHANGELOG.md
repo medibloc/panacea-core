@@ -5,13 +5,27 @@
 TBD
 
 
-## [v2.0.0-alpha.1](https://github.com/medibloc/panacea-core/releases/tag/v2.0.0-alpha.1) - 2021-07-01
+## [v2.0.0](https://github.com/medibloc/panacea-core/releases/tag/v2.0.0) - 2021-07-13
 
 ### Features
 
-- [\#116](https://github.com/medibloc/panacea-core/pull/116) feat: Support the new Cosmos SDK v0.42 Stargate
-- [\#141](https://github.com/medibloc/panacea-core/pull/141) feat: Add `x/wasm` module
 - [\#115](https://github.com/medibloc/panacea-core/pull/115) feat: Add `x/burn` module
+- [\#116](https://github.com/medibloc/panacea-core/pull/116) feat: Support the new Cosmos SDK v0.42 Stargate
+  - This PR was merged without being squashed in order to keep the full history. Detail commits can be found on the `master` branch from `36a14b3` to `b275c5e`.
+  - After that, the subsequent changes below have been merged:
+    - [\#157](https://github.com/medibloc/panacea-core/pull/157) feat: Add a Github Action to build/publish a Docker image
+    - [\#168](https://github.com/medibloc/panacea-core/pull/168) feat: Add `java_multiple_files` option in proto files option in proto files option in proto files option in proto files
+    - [\#166](https://github.com/medibloc/panacea-core/pull/166) fix: Add `make proto-lint` and Use snake-case for proto field names in order to import `genesis.json` properly
+      - [\#171](https://github.com/medibloc/panacea-core/pull/171) fix: Use snake-case proto field names for `did.proto` as well
+    - [\#169](https://github.com/medibloc/panacea-core/pull/169) fix: Use the protobuf `oneof` keyword for `VerificationRelationship` in the `x/did`
+    - [\#174](https://github.com/medibloc/panacea-core/pull/174) fix: Accept a `did_base64` (instead of `did`) for querying a DID via REST
+    - [\#177](https://github.com/medibloc/panacea-core/pull/177) feat: feat: Remove unnecessary `gogoproto.jsontag` in the `did.proto`
+    - [\#183](https://github.com/medibloc/panacea-core/pull/183) feat: Bump cosmos-sdk to v0.42.7
+    - [\#184](https://github.com/medibloc/panacea-core/pull/184) chore: Remove a legacy statik.go
+    - [\#185](https://github.com/medibloc/panacea-core/pull/185) docs: Add our custom modules to Swagger UI
+- [\#141](https://github.com/medibloc/panacea-core/pull/141) feat: Add `x/wasm` module
+- [\#165](https://github.com/medibloc/panacea-core/pull/165) docs: Update Gitbook for Panacea v2
+- [\#182](https://github.com/medibloc/panacea-core/pull/182) docs: Refine README for Panacea v2
 
 ### Bug fixes
 
