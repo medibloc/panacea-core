@@ -21,20 +21,3 @@ jobs:
 
     - name: Check out code into the Go module directory
       uses: actions/checkout@v2
-
-    - name: Build (+ generating proto and docs)
-      run: make build-all
-
-    - name: Test
-      run: make test
-
-    - name: Lint
-      uses: golangci/golangci-lint-action@v2
-      with:
-        version: v1.30
-
-    - name: Publish coverage.html as an artifact
-      uses: actions/upload-artifact@master
-      with:
-        name: coverage
-        path: artifacts/coverage.html
