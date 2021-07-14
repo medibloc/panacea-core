@@ -7,12 +7,14 @@ name: Docker
 
 on:
   workflow_run:
+    # When a new commit is pushed to the master (only after CI completes)
     workflows: ["ci"]
+    branches:
+      - master
     types:
       - completed
   push:
-    branches: [ master ]
-    # Publish semver tags as releases.
+    # When a new semver tag is pushed (The CI won't be run)
     tags: [ 'v*.*.*' ]
 
 env:
