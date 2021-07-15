@@ -5,7 +5,6 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/types/query"
 	"github.com/medibloc/panacea-core/x/token/types"
 	"google.golang.org/grpc/codes"
@@ -49,7 +48,7 @@ func (k Keeper) Token(c context.Context, req *types.QueryTokenRequest) (*types.Q
 	ctx := sdk.UnwrapSDKContext(c)
 
 	if !k.HasToken(ctx, req.Symbol) {
-		return nil, sdkerrors.ErrKeyNotFound
+		return nil, status.Error(codes.NotFound, "token not found")
 	}
 
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.TokenKeyPrefix)
