@@ -4,8 +4,6 @@ import (
 	"context"
 	"encoding/base64"
 
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/medibloc/panacea-core/x/did/types"
 	"google.golang.org/grpc/codes"
@@ -21,16 +19,16 @@ func (k Keeper) DID(c context.Context, req *types.QueryDIDRequest) (*types.Query
 
 	didBz, err := base64.StdEncoding.DecodeString(req.DidBase64)
 	if err != nil {
-		return nil, sdkerrors.Wrapf(types.ErrInvalidDID, "DidBase64: %s", req.DidBase64)
+		return nil, status.Error(codes.InvalidArgument, "invalid did_base64")
 	}
 
 	did := string(didBz)
 	docWithSeq := k.GetDIDDocument(ctx, did)
 	if docWithSeq.Empty() {
-		return nil, sdkerrors.Wrapf(types.ErrDIDNotFound, "DID: %s", did)
+		return nil, status.Error(codes.NotFound, "DID not found")
 	}
 	if docWithSeq.Deactivated() {
-		return nil, sdkerrors.Wrapf(types.ErrDIDDeactivated, "DID: %s", did)
+		return nil, status.Error(codes.NotFound, "DID deactivated")
 	}
 
 	return &types.QueryDIDResponse{DidDocumentWithSeq: &docWithSeq}, nil
