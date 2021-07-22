@@ -4,7 +4,7 @@
 
 ### Bug fixes
 
-- [\#195](https://github.com/medibloc/panacea-core/pull/195) Add major version `v2` to `go.mod`
+- [\#197](https://github.com/medibloc/panacea-core/pull/197) Add major version `v2` to `go.mod`
 
 
 ## [v2.0.0](https://github.com/medibloc/panacea-core/releases/tag/v2.0.0) - 2021-07-13
