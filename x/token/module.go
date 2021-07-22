@@ -16,9 +16,9 @@ import (
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
-	"github.com/medibloc/panacea-core/x/token/client/cli"
-	"github.com/medibloc/panacea-core/x/token/keeper"
-	"github.com/medibloc/panacea-core/x/token/types"
+	"github.com/medibloc/panacea-core/v2/x/token/client/cli"
+	"github.com/medibloc/panacea-core/v2/x/token/keeper"
+	"github.com/medibloc/panacea-core/v2/x/token/types"
 	// this line is used by starport scaffolding # ibc/module/import
 )
 

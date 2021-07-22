@@ -1,6 +1,6 @@
 package types
 
-import "github.com/medibloc/panacea-core/types/compkey"
+import "github.com/medibloc/panacea-core/v2/types/compkey"
 
 // this line is used by starport scaffolding # ibc/genesistype/import
 

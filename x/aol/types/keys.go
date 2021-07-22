@@ -5,7 +5,7 @@ import (
 	"strconv"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/medibloc/panacea-core/types/compkey"
+	"github.com/medibloc/panacea-core/v2/types/compkey"
 )
 
 const (

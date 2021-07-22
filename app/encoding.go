@@ -2,7 +2,7 @@ package app
 
 import (
 	"github.com/cosmos/cosmos-sdk/std"
-	"github.com/medibloc/panacea-core/app/params"
+	"github.com/medibloc/panacea-core/v2/app/params"
 )
 
 // MakeEncodingConfig creates an EncodingConfig for testing

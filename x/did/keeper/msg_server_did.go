@@ -5,8 +5,8 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"github.com/medibloc/panacea-core/x/did/internal/secp256k1util"
-	"github.com/medibloc/panacea-core/x/did/types"
+	"github.com/medibloc/panacea-core/v2/x/did/internal/secp256k1util"
+	"github.com/medibloc/panacea-core/v2/x/did/types"
 )
 
 func (m msgServer) CreateDID(goCtx context.Context, msg *types.MsgCreateDID) (*types.MsgCreateDIDResponse, error) {

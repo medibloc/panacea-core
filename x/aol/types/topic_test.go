@@ -1,11 +1,12 @@
 package types_test
 
 import (
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/medibloc/panacea-core/x/aol/types"
-	"github.com/stretchr/testify/require"
 	"os"
 	"testing"
+
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/medibloc/panacea-core/v2/x/aol/types"
+	"github.com/stretchr/testify/require"
 )
 
 func TestMain(m *testing.M) {
@@ -20,7 +21,7 @@ func TestIncrease_Decrease(t *testing.T) {
 	topic := types.Topic{
 		TotalRecords: 0,
 		TotalWriters: 0,
-		Description: "test topic",
+		Description:  "test topic",
 	}
 
 	topic = topic.IncreaseTotalWriters()

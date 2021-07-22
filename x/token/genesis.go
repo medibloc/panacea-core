@@ -2,8 +2,8 @@ package token
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/medibloc/panacea-core/x/token/keeper"
-	"github.com/medibloc/panacea-core/x/token/types"
+	"github.com/medibloc/panacea-core/v2/x/token/keeper"
+	"github.com/medibloc/panacea-core/v2/x/token/types"
 )
 
 // InitGenesis initializes the capability module's state from a provided genesis

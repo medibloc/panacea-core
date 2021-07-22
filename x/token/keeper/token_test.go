@@ -1,18 +1,19 @@
 package keeper_test
 
 import (
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
-	tokentypes "github.com/medibloc/panacea-core/x/token/types"
-	"github.com/tendermint/tendermint/crypto/secp256k1"
 	"testing"
 
-	"github.com/medibloc/panacea-core/types/testsuite"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
+	tokentypes "github.com/medibloc/panacea-core/v2/x/token/types"
+	"github.com/tendermint/tendermint/crypto/secp256k1"
+
+	"github.com/medibloc/panacea-core/v2/types/testsuite"
 	"github.com/stretchr/testify/suite"
 )
 
 var (
-	pubKey = secp256k1.GenPrivKey().PubKey()
+	pubKey       = secp256k1.GenPrivKey().PubKey()
 	ownerAddress = sdk.AccAddress(pubKey.Address())
 )
 
@@ -22,7 +23,6 @@ type tokenTestSuite struct {
 
 func TestTokenTestSuite(t *testing.T) {
 	suite.Run(t, new(tokenTestSuite))
-
 
 }
 
@@ -45,7 +45,6 @@ func (suite tokenTestSuite) TestTokenOneSymbol() {
 		TotalSupply:  totalCoin,
 		Mintable:     true,
 		OwnerAddress: ownerAddress.String(),
-
 	}
 
 	tokenKeeper.SetToken(ctx, token)
@@ -133,7 +132,6 @@ func (suite tokenTestSuite) TestInvalidFromAddress() {
 		TotalSupply:  totalCoin,
 		Mintable:     true,
 		OwnerAddress: "invalid address",
-
 	}
 
 	tokenKeeper.SetToken(ctx, token)
@@ -160,7 +158,6 @@ func (suite tokenTestSuite) TestInvalidNewCoin() {
 		TotalSupply:  totalCoin,
 		Mintable:     true,
 		OwnerAddress: ownerAddress.String(),
-
 	}
 
 	tokenKeeper.SetToken(ctx, token)

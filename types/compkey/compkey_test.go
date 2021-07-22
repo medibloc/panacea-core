@@ -11,7 +11,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/medibloc/panacea-core/types/compkey"
+	"github.com/medibloc/panacea-core/v2/types/compkey"
 )
 
 const (

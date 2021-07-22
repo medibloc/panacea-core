@@ -12,8 +12,8 @@ import (
 	"github.com/btcsuite/btcutil/base58"
 	"github.com/tendermint/tendermint/crypto/secp256k1"
 
-	"github.com/medibloc/panacea-core/x/did/internal/secp256k1util"
-	"github.com/medibloc/panacea-core/x/did/types"
+	"github.com/medibloc/panacea-core/v2/x/did/internal/secp256k1util"
+	"github.com/medibloc/panacea-core/v2/x/did/types"
 )
 
 func TestMain(m *testing.M) {

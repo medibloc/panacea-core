@@ -3,14 +3,14 @@ package did
 import (
 	"testing"
 
-	"github.com/medibloc/panacea-core/x/did/internal/secp256k1util"
+	"github.com/medibloc/panacea-core/v2/x/did/internal/secp256k1util"
 	"github.com/tendermint/tendermint/crypto"
 	"github.com/tendermint/tendermint/crypto/secp256k1"
 
 	"github.com/stretchr/testify/suite"
 
-	"github.com/medibloc/panacea-core/types/testsuite"
-	"github.com/medibloc/panacea-core/x/did/types"
+	"github.com/medibloc/panacea-core/v2/types/testsuite"
+	"github.com/medibloc/panacea-core/v2/x/did/types"
 )
 
 type genesisTestSuite struct {

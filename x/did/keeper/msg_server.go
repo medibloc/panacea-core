@@ -1,6 +1,6 @@
 package keeper
 
-import "github.com/medibloc/panacea-core/x/did/types"
+import "github.com/medibloc/panacea-core/v2/x/did/types"
 
 type msgServer struct {
 	Keeper

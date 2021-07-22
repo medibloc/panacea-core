@@ -5,7 +5,7 @@ import (
 	"encoding/base64"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/medibloc/panacea-core/x/did/types"
+	"github.com/medibloc/panacea-core/v2/x/did/types"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )

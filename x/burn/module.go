@@ -17,8 +17,8 @@ import (
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
-	"github.com/medibloc/panacea-core/x/burn/keeper"
-	"github.com/medibloc/panacea-core/x/burn/types"
+	"github.com/medibloc/panacea-core/v2/x/burn/keeper"
+	"github.com/medibloc/panacea-core/v2/x/burn/types"
 )
 
 var (

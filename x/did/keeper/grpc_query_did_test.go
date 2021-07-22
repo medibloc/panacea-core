@@ -7,8 +7,8 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/suite"
 
-	"github.com/medibloc/panacea-core/types/testsuite"
-	"github.com/medibloc/panacea-core/x/did/types"
+	"github.com/medibloc/panacea-core/v2/types/testsuite"
+	"github.com/medibloc/panacea-core/v2/x/did/types"
 )
 
 type queryDIDTestSuite struct {

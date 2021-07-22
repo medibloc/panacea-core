@@ -5,7 +5,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"github.com/medibloc/panacea-core/x/aol/types"
+	"github.com/medibloc/panacea-core/v2/x/aol/types"
 )
 
 func (k msgServer) AddWriter(goCtx context.Context, msg *types.MsgAddWriter) (*types.MsgAddWriterResponse, error) {
