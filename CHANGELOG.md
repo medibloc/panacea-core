@@ -11,8 +11,10 @@
 
 ### Features
 
-- [\#115](https://github.com/medibloc/panacea-core/pull/115) feat: Add `x/burn` module
-- [\#116](https://github.com/medibloc/panacea-core/pull/116) feat: Support the new Cosmos SDK v0.42 Stargate
+- (x/did) [\#97](https://github.com/medibloc/panacea-core/pull/97) Support more key types for DID verification method
+- (x/did) [\#98](https://github.com/medibloc/panacea-core/pull/98) Support service / controller / various verificationRelationship in DID Document
+- (x/burn) [\#115](https://github.com/medibloc/panacea-core/pull/115) Add `x/burn` module
+- (stargate) [\#116](https://github.com/medibloc/panacea-core/pull/116) Support the new Cosmos SDK v0.42 Stargate
   - This PR was merged without being squashed in order to keep the full history. Detail commits can be found on the `master` branch from `36a14b3` to `b275c5e`.
   - After that, the subsequent changes below have been merged:
     - [\#157](https://github.com/medibloc/panacea-core/pull/157) feat: Add a Github Action to build/publish a Docker image
@@ -25,13 +27,14 @@
     - [\#183](https://github.com/medibloc/panacea-core/pull/183) feat: Bump cosmos-sdk to v0.42.7
     - [\#184](https://github.com/medibloc/panacea-core/pull/184) chore: Remove a legacy statik.go
     - [\#185](https://github.com/medibloc/panacea-core/pull/185) docs: Add our custom modules to Swagger UI
-- [\#141](https://github.com/medibloc/panacea-core/pull/141) feat: Add `x/wasm` module
+- (x/wasm) [\#141](https://github.com/medibloc/panacea-core/pull/141) Add `x/wasm` module
 - [\#165](https://github.com/medibloc/panacea-core/pull/165) docs: Update Gitbook for Panacea v2
 - [\#182](https://github.com/medibloc/panacea-core/pull/182) docs: Refine README for Panacea v2
 
 ### Bug fixes
 
-- [\#95](https://github.com/medibloc/panacea-core/pull/95) x/token: Fix to update the total supply of all coins when issuing new tokens
+- (x/token) [\#95](https://github.com/medibloc/panacea-core/pull/95) Fix to update the total supply of all coins when issuing new tokens
+- (x/did) [\#100](https://github.com/medibloc/panacea-core/pull/100) Fix checking if VerificationRelationships are valid
 
 
 ## [v1.3.3](https://github.com/medibloc/panacea-core/releases/tag/v1.3.3) - 2020-12-03
