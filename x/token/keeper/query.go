@@ -2,7 +2,7 @@ package keeper
 
 import (
 	// this line is used by starport scaffolding # 1
-	"github.com/medibloc/panacea-core/x/token/types"
+	"github.com/medibloc/panacea-core/v2/x/token/types"
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"

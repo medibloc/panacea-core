@@ -1,4 +1,4 @@
-module github.com/medibloc/panacea-core
+module github.com/medibloc/panacea-core/v2
 
 go 1.15
 

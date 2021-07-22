@@ -5,8 +5,8 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"github.com/medibloc/panacea-core/x/did/keeper"
-	"github.com/medibloc/panacea-core/x/did/types"
+	"github.com/medibloc/panacea-core/v2/x/did/keeper"
+	"github.com/medibloc/panacea-core/v2/x/did/types"
 )
 
 // NewHandler ...

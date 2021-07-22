@@ -8,7 +8,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/client"
 	// "github.com/cosmos/cosmos-sdk/client/flags"
-	"github.com/medibloc/panacea-core/x/token/types"
+	"github.com/medibloc/panacea-core/v2/x/token/types"
 )
 
 var (

@@ -1,7 +1,7 @@
 package keeper
 
 import (
-	"github.com/medibloc/panacea-core/x/aol/types"
+	"github.com/medibloc/panacea-core/v2/x/aol/types"
 )
 
 type msgServer struct {

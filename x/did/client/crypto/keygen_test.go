@@ -1,11 +1,12 @@
 package crypto_test
 
 import (
-	"github.com/stretchr/testify/suite"
 	"testing"
 
-	"github.com/medibloc/panacea-core/types/testsuite"
-	"github.com/medibloc/panacea-core/x/did/client/crypto"
+	"github.com/stretchr/testify/suite"
+
+	"github.com/medibloc/panacea-core/v2/types/testsuite"
+	"github.com/medibloc/panacea-core/v2/x/did/client/crypto"
 	"github.com/tendermint/tendermint/crypto/secp256k1"
 )
 

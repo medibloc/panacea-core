@@ -2,8 +2,8 @@ package did
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/medibloc/panacea-core/x/did/keeper"
-	"github.com/medibloc/panacea-core/x/did/types"
+	"github.com/medibloc/panacea-core/v2/x/did/keeper"
+	"github.com/medibloc/panacea-core/v2/x/did/types"
 )
 
 // InitGenesis initializes the capability module's state from a provided genesis

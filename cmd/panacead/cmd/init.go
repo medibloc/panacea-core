@@ -26,8 +26,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/cosmos/cosmos-sdk/x/genutil"
 	genutilcli "github.com/cosmos/cosmos-sdk/x/genutil/client/cli"
-	"github.com/medibloc/panacea-core/app"
-	"github.com/medibloc/panacea-core/types/assets"
+	"github.com/medibloc/panacea-core/v2/app"
+	"github.com/medibloc/panacea-core/v2/types/assets"
 	"github.com/spf13/cobra"
 	"github.com/tendermint/tendermint/types"
 )

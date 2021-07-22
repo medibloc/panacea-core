@@ -10,7 +10,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 
 	"github.com/cosmos/cosmos-sdk/snapshots"
-	"github.com/medibloc/panacea-core/app/params"
+	"github.com/medibloc/panacea-core/v2/app/params"
 
 	"github.com/spf13/cast"
 	"github.com/spf13/cobra"
@@ -36,7 +36,7 @@ import (
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	"github.com/cosmos/cosmos-sdk/x/crisis"
 	genutilcli "github.com/cosmos/cosmos-sdk/x/genutil/client/cli"
-	"github.com/medibloc/panacea-core/app"
+	"github.com/medibloc/panacea-core/v2/app"
 
 	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
 )

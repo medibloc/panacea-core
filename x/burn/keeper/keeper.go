@@ -6,7 +6,7 @@ import (
 	"github.com/tendermint/tendermint/libs/log"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/medibloc/panacea-core/x/burn/types"
+	"github.com/medibloc/panacea-core/v2/x/burn/types"
 )
 
 type (

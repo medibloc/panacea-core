@@ -19,15 +19,15 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/go-bip39"
-	"github.com/medibloc/panacea-core/x/did/internal/secp256k1util"
+	"github.com/medibloc/panacea-core/v2/x/did/internal/secp256k1util"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/tendermint/tendermint/crypto"
 	"github.com/tendermint/tendermint/crypto/secp256k1"
 	"github.com/tendermint/tendermint/libs/cli"
 
-	didcrypto "github.com/medibloc/panacea-core/x/did/client/crypto"
-	"github.com/medibloc/panacea-core/x/did/types"
+	didcrypto "github.com/medibloc/panacea-core/v2/x/did/client/crypto"
+	"github.com/medibloc/panacea-core/v2/x/did/types"
 )
 
 const (

@@ -6,7 +6,7 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/medibloc/panacea-core/x/aol/types"
+	"github.com/medibloc/panacea-core/v2/x/aol/types"
 )
 
 func (k msgServer) AddRecord(goCtx context.Context, msg *types.MsgAddRecord) (*types.MsgAddRecordResponse, error) {

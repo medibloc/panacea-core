@@ -4,8 +4,8 @@ import (
 	"testing"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/medibloc/panacea-core/types/testsuite"
-	aoltypes "github.com/medibloc/panacea-core/x/aol/types"
+	"github.com/medibloc/panacea-core/v2/types/testsuite"
+	aoltypes "github.com/medibloc/panacea-core/v2/x/aol/types"
 	"github.com/stretchr/testify/suite"
 )
 

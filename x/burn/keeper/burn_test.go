@@ -1,14 +1,15 @@
 package keeper_test
 
 import (
-	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
-	"github.com/medibloc/panacea-core/types/testsuite"
 	"testing"
+
+	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
+	"github.com/medibloc/panacea-core/v2/types/testsuite"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/suite"
 
-	"github.com/medibloc/panacea-core/types/assets"
+	"github.com/medibloc/panacea-core/v2/types/assets"
 	"github.com/tendermint/tendermint/crypto"
 	"github.com/tendermint/tendermint/crypto/secp256k1"
 )

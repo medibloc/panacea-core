@@ -2,9 +2,9 @@ package aol
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/medibloc/panacea-core/types/compkey"
-	"github.com/medibloc/panacea-core/x/aol/keeper"
-	"github.com/medibloc/panacea-core/x/aol/types"
+	"github.com/medibloc/panacea-core/v2/types/compkey"
+	"github.com/medibloc/panacea-core/v2/x/aol/keeper"
+	"github.com/medibloc/panacea-core/v2/x/aol/types"
 )
 
 // InitGenesis initializes the capability module's state from a provided genesis

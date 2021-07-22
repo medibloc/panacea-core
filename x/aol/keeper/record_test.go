@@ -1,12 +1,13 @@
 package keeper_test
 
 import (
+	"testing"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/medibloc/panacea-core/types/testsuite"
-	aoltypes "github.com/medibloc/panacea-core/x/aol/types"
+	"github.com/medibloc/panacea-core/v2/types/testsuite"
+	aoltypes "github.com/medibloc/panacea-core/v2/x/aol/types"
 	"github.com/stretchr/testify/suite"
 	"github.com/tendermint/tendermint/crypto/secp256k1"
-	"testing"
 )
 
 var (
@@ -31,11 +32,11 @@ func (suite recordTestSuite) TestOneRecord() {
 	key := aoltypes.RecordCompositeKey{
 		OwnerAddress: recordAddress,
 		TopicName:    topicName,
-		Offset: 0,
+		Offset:       0,
 	}
 	record := aoltypes.Record{
-		Key: []byte("recordKey"),
-		Value: []byte("recordValue"),
+		Key:           []byte("recordKey"),
+		Value:         []byte("recordValue"),
 		NanoTimestamp: ctx.BlockTime().UnixNano(),
 		WriterAddress: address.String(),
 	}
@@ -61,22 +62,22 @@ func (suite recordTestSuite) TestMultiRecord() {
 	key := aoltypes.RecordCompositeKey{
 		OwnerAddress: recordAddress,
 		TopicName:    topicName,
-		Offset: 0,
+		Offset:       0,
 	}
 	key2 := aoltypes.RecordCompositeKey{
 		OwnerAddress: recordAddress,
 		TopicName:    topicName,
-		Offset: 1,
+		Offset:       1,
 	}
 	record := aoltypes.Record{
-		Key: []byte("recordKey"),
-		Value: []byte("recordValue"),
+		Key:           []byte("recordKey"),
+		Value:         []byte("recordValue"),
 		NanoTimestamp: ctx.BlockTime().UnixNano(),
 		WriterAddress: address.String(),
 	}
 	record2 := aoltypes.Record{
-		Key: []byte("recordKey2"),
-		Value: []byte("recordValue2"),
+		Key:           []byte("recordKey2"),
+		Value:         []byte("recordValue2"),
 		NanoTimestamp: ctx.BlockTime().UnixNano(),
 		WriterAddress: address.String(),
 	}

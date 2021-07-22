@@ -8,7 +8,7 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/medibloc/panacea-core/types/assets"
+	"github.com/medibloc/panacea-core/v2/types/assets"
 )
 
 const (

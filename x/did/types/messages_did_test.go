@@ -6,8 +6,8 @@ import (
 	"github.com/stretchr/testify/require"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/medibloc/panacea-core/x/did/internal/secp256k1util"
-	"github.com/medibloc/panacea-core/x/did/types"
+	"github.com/medibloc/panacea-core/v2/x/did/internal/secp256k1util"
+	"github.com/medibloc/panacea-core/v2/x/did/types"
 )
 
 func TestMsgCreateDID(t *testing.T) {

@@ -4,7 +4,7 @@ import (
 	"context"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/medibloc/panacea-core/x/aol/types"
+	"github.com/medibloc/panacea-core/v2/x/aol/types"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )

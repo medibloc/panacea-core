@@ -4,7 +4,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
-	"github.com/medibloc/panacea-core/x/aol/types"
+	"github.com/medibloc/panacea-core/v2/x/aol/types"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )

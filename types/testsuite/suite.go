@@ -13,11 +13,11 @@ import (
 	capabilitytypes "github.com/cosmos/cosmos-sdk/x/capability/types"
 	paramskeeper "github.com/cosmos/cosmos-sdk/x/params/keeper"
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
-	aolkeeper "github.com/medibloc/panacea-core/x/aol/keeper"
-	aoltypes "github.com/medibloc/panacea-core/x/aol/types"
-	burnkeeper "github.com/medibloc/panacea-core/x/burn/keeper"
-	tokenkeeper "github.com/medibloc/panacea-core/x/token/keeper"
-	tokentypes "github.com/medibloc/panacea-core/x/token/types"
+	aolkeeper "github.com/medibloc/panacea-core/v2/x/aol/keeper"
+	aoltypes "github.com/medibloc/panacea-core/v2/x/aol/types"
+	burnkeeper "github.com/medibloc/panacea-core/v2/x/burn/keeper"
+	tokenkeeper "github.com/medibloc/panacea-core/v2/x/token/keeper"
+	tokentypes "github.com/medibloc/panacea-core/v2/x/token/types"
 	"github.com/stretchr/testify/suite"
 	"github.com/tendermint/tendermint/crypto/secp256k1"
 	"github.com/tendermint/tendermint/libs/log"
@@ -25,9 +25,9 @@ import (
 	"github.com/tendermint/tendermint/types/time"
 	dbm "github.com/tendermint/tm-db"
 
-	"github.com/medibloc/panacea-core/app/params"
-	didkeeper "github.com/medibloc/panacea-core/x/did/keeper"
-	didtypes "github.com/medibloc/panacea-core/x/did/types"
+	"github.com/medibloc/panacea-core/v2/app/params"
+	didkeeper "github.com/medibloc/panacea-core/v2/x/did/keeper"
+	didtypes "github.com/medibloc/panacea-core/v2/x/did/types"
 )
 
 type TestSuite struct {

@@ -2,8 +2,8 @@ package burn
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/medibloc/panacea-core/x/burn/keeper"
-	"github.com/medibloc/panacea-core/x/burn/types"
+	"github.com/medibloc/panacea-core/v2/x/burn/keeper"
+	"github.com/medibloc/panacea-core/v2/x/burn/types"
 )
 
 // InitGenesis initializes the capability module's state from a provided genesis
