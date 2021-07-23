@@ -11,9 +11,9 @@ If you want to install the `panacead` binary to run your node or to communicate 
 please clone the `panacea-core` project and build it.
 
 ```bash
-git clone https://github.com/medibloc/panacea-core
+# Make sure to checkout the correct branch.
+git clone -b v2.0.0 https://github.com/medibloc/panacea-core
 cd panacea-core
-git checkout v2.0.0
 make install  # All binaries are installed in $GOPATH/bin
 ```
 
