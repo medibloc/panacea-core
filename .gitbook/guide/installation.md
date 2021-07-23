@@ -7,7 +7,7 @@
 
 ## Install the `panacead`
 
-If you want to install the `panacead` binary to run your node or communicate with other nodes,
+If you want to install the `panacead` binary to run your node or to communicate with other nodes,
 please clone the `panacea-core` project and build it.
 
 ```bash
