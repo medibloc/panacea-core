@@ -31,7 +31,7 @@ go: go version go1.16.3 darwin/amd64
 ## Import `panacea-core` as a Go dependency
 
 If you want to develop Go applications by importing the `panacea-core`,
-you cannot run `go get github.com/medibloc/panacea-core/v2` directly due to [the design of Go Modules](https://github.com/golang/go/issues/30354).
+you cannot run `go get github.com/medibloc/panacea-core/v2` directly due to [the design of Go Modules](https://github.com/golang/go/issues/30354)
 , which doesn't honor `replace` directives in the `go.mod` of the `panacea-core`.
 
 As a workaround, please add `replace` directives in your `go.mod` as below.
