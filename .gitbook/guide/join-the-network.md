@@ -83,12 +83,12 @@ Then, modify the `timeout_commit` in the `~/.panacead/config/config.toml` as bel
 timeout_commit = "1s"
 ```
 
-After that, edit the `~/.panacead/config/app.toml` file in order to enable the anti-spam mechanism and reject incoming transactions with less than a minimum fee:
+After that, edit the `~/.panacead/config/app.toml` file in order to enable the anti-spam mechanism and reject incoming transactions with less than the `minimum-gas-prices`:
 ```toml
-# Validators reject any tx from the mempool with less than the minimum fee per gas.
-minimum_fees = "5.0umed"
+# Validators reject any tx from the mempool with less than the minimum-gas-prices.
+minimum-gas-prices = "5umed"
 
-# NOTE: For the Testnet, please set minimum_fees as "", so that no fee is required.
+# NOTE: For the Testnet, please set minimum-gas-prices as "", so that no fee is required.
 ```
 
 Now, your full node has been initialized!
