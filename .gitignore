@@ -5,6 +5,3 @@ build/
 
 # artifacts
 artifacts/
-
-# gRPC 3rd party
-third_party/
