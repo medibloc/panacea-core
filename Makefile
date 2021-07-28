@@ -44,21 +44,25 @@ lint:
 ########################################
 ### Protobuf
 
-proto-gen: proto-update-deps
+proto-gen:
 	@echo "Generating *.pb.go files from *.proto files"
 	$(DOCKER) run --rm -v $(CURDIR):/workspace --workdir /workspace tendermintdev/sdk-proto-gen:v0.2 sh ./scripts/protocgen.sh
 
-proto-swagger-gen: proto-update-deps
+proto-swagger-gen:
 	@echo "Generating swagger.yaml from *.proto files"
 	$(DOCKER) run --rm -v $(CURDIR):/workspace --workdir /workspace tendermintdev/sdk-proto-gen:v0.2 sh ./scripts/protoc-swagger-gen.sh
 
-proto-lint: proto-update-deps
+proto-lint:
 	$(DOCKER) run --rm -v $(CURDIR):/workspace --workdir /workspace bufbuild/buf lint --error-format=json
 
-proto-update-deps:
-	@echo "Fetching Protobuf dependencies"
-	GO111MODULE=off go get github.com/stormcat24/protodep
-	protodep up --use-https
+PROTO_DIR = third_party/proto
+COSMOS_VER_SHORT = 0.42.7
+COSMOS_VER = v$(COSMOS_VER_SHORT)
+
+proto-update-dep:
+	@mkdir -p $(PROTO_DIR)
+	@curl https://codeload.github.com/cosmos/cosmos-sdk/tar.gz/$(COSMOS_VER) | tar -xz -C $(PROTO_DIR) --strip=3 cosmos-sdk-$(COSMOS_VER_SHORT)/third_party/proto
+	@curl https://codeload.github.com/cosmos/cosmos-sdk/tar.gz/$(COSMOS_VER) | tar -xz -C $(PROTO_DIR) --strip=2 cosmos-sdk-$(COSMOS_VER_SHORT)/proto
 
 ########################################
 ### Build/Install
