@@ -2,10 +2,17 @@
 
 ## Unreleased
 
+TBD
+
+
+## [v2.0.1](https://github.com/medibloc/panacea-core/releases/tag/v2.0.1) - 2021-07-28
+
 ### Bug fixes
 
+- (x/did, x/token) [\#192](https://github.com/medibloc/panacea-core/pull/192) Return gRPC status code from `grpc_query_*.go` in `x/did` and `x/token`
+- (x/token) [\#194](https://github.com/medibloc/panacea-core/pull/194) Remove legacy REST API of `x/token`
 - [\#197](https://github.com/medibloc/panacea-core/pull/197) Add major version `v2` to `go.mod`
-- []() Discard the `protodep`
+- [\#202](https://github.com/medibloc/panacea-core/pull/202) Discard the `protodep`
 
 
 ## [v2.0.0](https://github.com/medibloc/panacea-core/releases/tag/v2.0.0) - 2021-07-13
