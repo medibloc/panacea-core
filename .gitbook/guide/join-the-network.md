@@ -98,7 +98,6 @@ Now, your full node has been initialized!
 Fetch the `genesis.json` file of the latest chain from the following links, and place it to `~/.panacead/config/genesis.json`.
 - Mainnet: https://github.com/medibloc/panacea-mainnet
 - Testnet: https://github.com/medibloc/panacea-testnet
-- Public Testnet: https://github.com/medibloc/panacea-public-testnet
 
 ### Configure Seed Nodes
 
@@ -107,7 +106,6 @@ Your node needs to know how to find peers.
 Seed nodes can be found in:
 - Mainnet: https://github.com/medibloc/panacea-mainnet#seed-nodes
 - Testnet: https://github.com/medibloc/panacea-testnet#seed-nodes
-- Public Testnet: https://github.com/medibloc/panacea-public-testnet#seed-nodes
 
 Insert those `<node_id>@<ip>`s with 26656 port to the `persistent_peers` field in `~/.panacead/config/config.toml`.
 ```toml
