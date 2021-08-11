@@ -2,7 +2,9 @@
 
 ## Unreleased
 
-TBD
+### Bug fixes
+
+- [\#x](https://github.com/medibloc/panacea-core/pull/x) Bump cosmos-sdk to v0.42.9
 
 
 ## [v2.0.1](https://github.com/medibloc/panacea-core/releases/tag/v2.0.1) - 2021-07-28
