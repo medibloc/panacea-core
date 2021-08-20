@@ -24,20 +24,13 @@ Panacea is a blockchain which is the key infrastructure for our services to rein
 
 ### Networks
 
-- [Mainnet](https://github.com/medibloc/panacea-launch)
-- [Testnet](https://github.com/medibloc/panacea-networks)
+- [Mainnet](https://github.com/medibloc/panacea-mainnet)
+- [Testnet](https://github.com/medibloc/panacea-testnet)
 
-### Ecosystem
-
-#### Tools
-
-- [Block Explorers](https://explorer.medibloc.org)
-- [Web Wallet](https://wallet.gopanacea.org)
-
-#### Client SDKs
+### Client SDKs
 
 - [Java SDK](https://github.com/medibloc/panacea-java)
-- [Typescript SDK](https://github.com/medibloc/panacea-js)
+- [Typescript SDK](https://github.com/medibloc/panacea-js) (A [CosmJS](https://github.com/cosmos/cosmjs) wrapper)
 
 
 ## License
