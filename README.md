@@ -11,9 +11,9 @@ Panacea is a blockchain which is the key infrastructure for our services to rein
 
 - Fast finality powered by [Cosmos SDK](https://cosmos.network/) and [Tendermint](https://tendermint.com/) based on DPoS and PBFT
 - AOL (Append Only Log) for storing various data including medical data footprints
-- DID (Decentralized Identifier) management
+- [DID](https://www.w3.org/TR/did-core/) (Decentralized Identifier) management
 - Smart contracts based on [CosmWasm](https://cosmwasm.com/)
-- IBC (Inter-Blockchain Communication)
+- [IBC](https://ibcprotocol.org/) (Inter-Blockchain Communication)
 
 
 ## Resources
@@ -24,20 +24,13 @@ Panacea is a blockchain which is the key infrastructure for our services to rein
 
 ### Networks
 
-- [Mainnet](https://github.com/medibloc/panacea-launch)
-- [Testnet](https://github.com/medibloc/panacea-networks)
+- [Mainnet](https://github.com/medibloc/panacea-mainnet)
+- [Testnet](https://github.com/medibloc/panacea-testnet)
 
-### Ecosystem
-
-#### Tools
-
-- [Block Explorers](https://explorer.medibloc.org)
-- [Web Wallet](https://wallet.gopanacea.org)
-
-#### Client SDKs
+### Client SDKs
 
 - [Java SDK](https://github.com/medibloc/panacea-java)
-- [Typescript SDK](https://github.com/medibloc/panacea-js)
+- [Typescript SDK](https://github.com/medibloc/panacea-js) (A [CosmJS](https://github.com/cosmos/cosmjs) wrapper)
 
 
 ## License
