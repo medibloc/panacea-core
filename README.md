@@ -11,7 +11,7 @@ Panacea is a blockchain which is the key infrastructure for our services to rein
 
 - Fast finality powered by [Cosmos SDK](https://cosmos.network/) and [Tendermint](https://tendermint.com/) based on DPoS and PBFT
 - AOL (Append Only Log) for storing various data including medical data footprints
-- DID (Decentralized Identifier) management
+- [DID](https://www.w3.org/TR/did-core/) (Decentralized Identifier) management
 - Smart contracts based on [CosmWasm](https://cosmwasm.com/)
 - [IBC](https://ibcprotocol.org/) (Inter-Blockchain Communication)
 
