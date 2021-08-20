@@ -13,7 +13,7 @@ Panacea is a blockchain which is the key infrastructure for our services to rein
 - AOL (Append Only Log) for storing various data including medical data footprints
 - DID (Decentralized Identifier) management
 - Smart contracts based on [CosmWasm](https://cosmwasm.com/)
-- IBC (Inter-Blockchain Communication)
+- [IBC](https://ibcprotocol.org/) (Inter-Blockchain Communication)
 
 
 ## Resources
