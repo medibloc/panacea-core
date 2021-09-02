@@ -1,7 +1,9 @@
 # Table of contents
 
-* [Introduction](README.md)
+## Overview
 
+* [Introduction](README.md)
+* [Tech Stack](overview/tech-stack.md)
 
 ## Guide
 
