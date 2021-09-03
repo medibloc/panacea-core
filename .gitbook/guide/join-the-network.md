@@ -76,11 +76,11 @@ panacead init <your_custom_moniker>
 The `moniker` can contains only ASCII characters. Using Unicode characters will render your node unreachable.
 {% endhint %}
 
-Then, modify the `timeout_commit` in the `~/.panacead/config/config.toml` as below.
+Then, set the `timeout_commit` in the `~/.panacead/config/config.toml` as below.
 ```toml
 [consensus]
 
-timeout_commit = "1s"
+timeout_commit = "5s"
 ```
 
 After that, edit the `~/.panacead/config/app.toml` file in order to enable the anti-spam mechanism and reject incoming transactions with less than the `minimum-gas-prices`:
