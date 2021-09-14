@@ -80,7 +80,7 @@ Then, modify the `timeout_commit` in the `~/.panacead/config/config.toml` as bel
 ```toml
 [consensus]
 
-timeout_commit = "1s"
+timeout_commit = "5s"
 ```
 
 After that, edit the `~/.panacead/config/app.toml` file in order to enable the anti-spam mechanism and reject incoming transactions with less than the `minimum-gas-prices`:
