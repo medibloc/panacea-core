@@ -560,6 +560,8 @@ func New(
 	app.ScopedTransferKeeper = scopedTransferKeeper
 	app.ScopedWasmKeeper = scopedWasmKeeper
 
+	app.registerUpgradeHandlers()
+
 	return app
 }
 
@@ -723,4 +725,8 @@ func initParamsKeeper(appCodec codec.BinaryMarshaler, legacyAmino *codec.LegacyA
 	paramsKeeper.Subspace(wasm.ModuleName)
 
 	return paramsKeeper
+}
+
+func (app *App) registerUpgradeHandlers() {
+	app.UpgradeKeeper.SetUpgradeHandler("v2.0.2", func(ctx sdk.Context, plan upgradetypes.Plan) { })
 }
