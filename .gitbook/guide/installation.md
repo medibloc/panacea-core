@@ -12,20 +12,15 @@ please clone the `panacea-core` project and build it.
 
 ```bash
 # Make sure to checkout the correct branch.
-git clone -b v2.0.1 https://github.com/medibloc/panacea-core
+git clone -b v2.0.2 https://github.com/medibloc/panacea-core
 cd panacea-core
 make install  # All binaries are installed in $GOPATH/bin
 ```
 
 Verify that the `panacead` binary is installed successfully.
 ```bash
-$ panacead version --long
-name: panacea-core
-server_name: <appd>
-version: 2.0.1
-commit: b36d1dac432c75a6d865e75767fe227a4ca125ca
-build_tags: ' ledger'
-go: go version go1.16.3 darwin/amd64
+$ panacead version
+2.0.2
 ```
 
 ## Import `panacea-core` as a Go dependency
