@@ -2,9 +2,18 @@
 
 ## Unreleased
 
+TBD
+
+
+## [v2.0.2](https://github.com/medibloc/panacea-core/releases/tag/v2.0.2) - 2021-09-14
+
 ### Bug fixes
 
-- [\#213](https://github.com/medibloc/panacea-core/pull/213) Bump cosmos-sdk to v0.42.9
+- [\#213](https://github.com/medibloc/panacea-core/pull/213) Bump cosmos-sdk to [v0.42.9](https://github.com/cosmos/cosmos-sdk/releases/tag/v0.42.9) which fixes a bug that prohibit IBC to create new channels.
+
+### Improvements
+
+- [\#236](https://github.com/medibloc/panacea-core/pull/236) Add an empty upgrade handler for v2.0.2.
 
 
 ## [v2.0.1](https://github.com/medibloc/panacea-core/releases/tag/v2.0.1) - 2021-07-28
