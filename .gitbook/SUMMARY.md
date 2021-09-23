@@ -14,6 +14,7 @@
 * [Deploy a Testnet](guide/deploy-a-testnet.md)
 * [Interaction with the network: CLI](guide/interaction-with-the-network-cli.md)
 * [Ledger Nano Support](guide/ledger-nano-support.md)
+* [Cosmovisor](guide/cosmovisor.md)
 
 ## Specifications
 
