@@ -42,14 +42,14 @@ Type | Protocol | Port range |  Description
 SSH | TCP | 22 |
 Custom TCP | TCP | 26656 | P2P with other nodes
 Custom TCP | TCP | 26657 | RPC
-Custom TCP | TCP | 1317 | HTTP
+Custom TCP | TCP | 1317 | REST API
 
 The P2P `26656` port must be exposed to other Panacea nodes.
 If your node will be in the VPC guarded by Sentry nodes, expose `26656` to only Sentry nodes (recommended).
 If not, expose it to anywhere.
 For details about Sentry nodes, please see the [Tendermint guide](https://docs.tendermint.com/master/nodes/validators.html#local-configuration).
 
-The RPC `26657` and HTTP `1317` ports are for sending transactions/queries to your node.
+The RPC `26657` and REST API `1317` ports are for sending transactions/queries to your node.
 So, expose them to the network where you perform operational actions.
 
 
