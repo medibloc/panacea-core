@@ -76,14 +76,14 @@ panacead init <your_custom_moniker>
 The `moniker` can contains only ASCII characters. Using Unicode characters will render your node unreachable.
 {% endhint %}
 
-Then, modify the `timeout_commit` in the `~/.panacead/config/config.toml` as below.
+Then, modify the `timeout_commit` in the `~/.panacea/config/config.toml` as below.
 ```toml
 [consensus]
 
 timeout_commit = "5s"
 ```
 
-After that, edit the `~/.panacead/config/app.toml` file in order to enable the anti-spam mechanism and reject incoming transactions with less than the `minimum-gas-prices`:
+After that, edit the `~/.panacea/config/app.toml` file in order to enable the anti-spam mechanism and reject incoming transactions with less than the `minimum-gas-prices`:
 ```toml
 # Validators reject any tx from the mempool with less than the minimum-gas-prices.
 minimum-gas-prices = "5umed"
@@ -95,23 +95,19 @@ Now, your full node has been initialized!
 
 ### Copy the Genesis file
 
-Fetch the `genesis.json` file of the latest chain from the following links, and place it to `~/.panacead/config/genesis.json`.
+Fetch the `genesis.json` file of the latest chain from the following links, and place it to `~/.panacea/config/genesis.json`.
 - Mainnet: https://github.com/medibloc/panacea-mainnet
 - Testnet: https://github.com/medibloc/panacea-testnet
 
-### Configure Seed Nodes
+### Configure Persistent Peers
 
-Your node needs to know how to find peers.
+MediBloc is not operating seed nodes, but will provide them in near future.
 
-Seed nodes can be found in:
-- Mainnet: https://github.com/medibloc/panacea-mainnet#seed-nodes
-- Testnet: https://github.com/medibloc/panacea-testnet#seed-nodes
+Until then, please use public full nodes provided by MediBloc.
+- Mainnet: https://github.com/medibloc/panacea-mainnet#persistent-peers
+- Testnet: https://github.com/medibloc/panacea-testnet#persistent-peers
 
-Insert those `<node_id>@<ip>`s with 26656 port to the `persistent_peers` field in `~/.panacead/config/config.toml`.
-```toml
-# Comma separated list of nodes to keep persistent connections to
-persistent_peers = "8c41cc8a6fc59f05138ae6c16a9eec05d601ef71@13.209.177.91:26656,cc0285c4d9cec8489f8bfed0a749dd8636406a0d@54.180.169.37:26656,1fc4a41660986ee22106445b67444ec094221e76@52.78.132.151:26656"
-```
+Insert those public nodes to the `persistent_peers` field in the `~/.panacea/config/config.toml`.
 
 For more information on seeds and peers, see the [Using Tendermint: Peers](https://docs.tendermint.com/master/tendermint-core/using-tendermint.html#peers).
 
@@ -131,8 +127,8 @@ panacead status
 ```
 
 View the status of the network with the Block Explorer
-- Mainnet: https://explorer.medibloc.org
-- Testnet: ~~https://testnet-explorer.medibloc.org~~ https://dev.mintscan.io/hygieia
+- Mainnet: https://www.mintscan.io/medibloc or https://explorer.gopanacea.org/
+- Testnet: https://testnet-explorer.gopanacea.org/
 
 ## Join as a validator
 
@@ -140,7 +136,3 @@ If you want to participate in validating blocks as a validator,
 you can register yourself into the validator set by submitting a transaction.
 
 For more details, see the [CLI guide](interaction-with-the-network-cli.md#staking).
-
-
-
-
