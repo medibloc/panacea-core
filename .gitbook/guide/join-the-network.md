@@ -126,7 +126,57 @@ Check that everything is running smoothly:
 panacead status
 ```
 
-View the status of the network with the Block Explorer
+### Background Process
+
+To run the node in a background process with automatic restarts, you can use a service manager like [systemd](https://wiki.archlinux.org/title/systemd).
+This is more reliable way to run a background process in the long term.
+To set this up, run the following:
+```
+sudo tee /etc/systemd/system/panacead.service > /dev/null <<EOF  
+[Unit]
+Description=Panacea Daemon
+After=network-online.target
+
+[Service]
+User=$USER
+ExecStart=$(which panacead) start
+Restart=always
+RestartSec=3
+LimitNOFILE=4096
+
+[Install]
+WantedBy=multi-user.target
+EOF
+```
+
+It is very important to set the `LimitNOFILE=4096` since Panacea opens many DB files.
+
+If you're using Cosmovisor, add the following environment variables after the `LimitNOFILE` line and replace `$(which panacead)` with `$(which cosmovisor)`.
+```
+Environment="DAEMON_HOME=$HOME/.panacea"
+Environment="DAEMON_NAME=panacead"
+Environment="DAEMON_ALLOW_DOWNLOAD_BINARIES=false"
+Environment="DAEMON_RESTART_AFTER_UPGRADE=true"
+```
+For more details about those environment variables, please see the [Cosmovisor guide](cosmovisor.md).
+
+Then, setup the daemon.
+```bash
+sudo -S systemctl daemon-reload
+sudo -S systemctl enable panacead  # the process will be started automatically whenever your system is booted.
+```
+
+You can then start the process and confirm that it is running.
+```bash
+sudo -S systemctl start panacead
+sudo systemctl status panacead
+
+sudo journalctl -u panacead -f --output cat   # See logs from panacead
+```
+
+## Monitor the chain using block explorers
+
+View the status of the network with block explorers.
 - Mainnet: https://www.mintscan.io/medibloc or https://explorer.gopanacea.org/
 - Testnet: https://testnet-explorer.gopanacea.org/
 
