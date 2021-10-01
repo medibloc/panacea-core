@@ -171,7 +171,7 @@ sudo -S systemctl enable panacead  # the process will be started automatically w
 You can then start the process and confirm that it is running.
 ```bash
 sudo -S systemctl start panacead
-sudo systemctl status panacead
+sudo service panacead status
 
 sudo journalctl -u panacead -f --output cat   # See logs from panacead
 ```
