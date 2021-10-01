@@ -126,12 +126,14 @@ Check that everything is running smoothly:
 panacead status
 ```
 
+In production, it is recommended to run the process in background by following the guide below.
+
 ### Background Process
 
 To run the node in a background process with automatic restarts, you can use a service manager like [systemd](https://wiki.archlinux.org/title/systemd).
 This is more reliable way to run a background process in the long term.
 To set this up, run the following:
-```
+```bash
 sudo tee /etc/systemd/system/panacead.service > /dev/null <<EOF  
 [Unit]
 Description=Panacea Daemon
