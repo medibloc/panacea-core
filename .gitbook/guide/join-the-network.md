@@ -146,7 +146,7 @@ panacead tx staking edit-validator \
   --website "input your website" \
   --identity 6A0D65E29A4CBC8E \
   --details "To infinity and beyond!" \
-  --chain-id panacea-3 \
+  --chain-id <chain_id> \
   --from <key_name>
 ```
 - moniker: Enter the name of the validator.
