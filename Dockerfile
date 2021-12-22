@@ -4,7 +4,7 @@ FROM golang:1.16.5-alpine3.14 AS build-env
 RUN set -eux; apk add --no-cache ca-certificates build-base;
 
 RUN apk add git
-RUN apk add linux-headers
+RUN apk add libusb-dev linux-headers
 
 # Create directory
 RUN mkdir -p /src/panacea-core /src/wasmvm
@@ -23,10 +23,10 @@ RUN make clean && BUILD_TAGS=muslc make build
 
 # Final image
 FROM debian:buster-slim
-
-# Copy over binaries from the build-env
+#
+## Copy over binaries from the build-env
 COPY --from=build-env /src/panacea-core/build/panacead /usr/bin/panacead
-
+#
 RUN chmod +x /usr/bin/panacead
-
+#
 EXPOSE 26656 26657 1317 9090
