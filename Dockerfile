@@ -22,7 +22,7 @@ RUN sha256sum /lib/libwasmvm_muslc.a | grep 0e62296b9f24cf3a05f8513f99cee536c708
 RUN make clean && LEDGER_ENABLED=true BUILD_TAGS=muslc make build
 
 # Final image
-FROM alpine:3.12
+FROM debian:buster-slim
 
 # Copy over binaries from the build-env
 COPY --from=build-env /src/panacea-core/build/panacead /usr/bin/panacead
