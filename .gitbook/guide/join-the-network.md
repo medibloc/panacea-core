@@ -187,25 +187,6 @@ View the status of the network with block explorers.
 If you want to participate in validating blocks as a validator,
 you can register yourself into the validator set by submitting a transaction.
 
-For more details, see the [CLI guide](interaction-with-the-network-cli.md#staking).
+For more details, see the [CLI guide: Create your validator](interaction-with-the-network-cli.md#create-your-validator).
 
-### Edit Validator Description
-
-You can edit your validator's description.
-```bash
-panacead tx staking edit-validator \ 
-  --moniker "choose a moniker" \
-  --website "input your website" \
-  --identity 6A0D65E29A4CBC8E \
-  --details "To infinity and beyond!" \
-  --chain-id <chain_id> \
-  --from <key_name>
-```
-- moniker: Enter the name of the validator.
-- website: Enter the validator's website url.
-- identity: The `identity` can be used as to verify identity with systems like Keybase or UPort. When using with Keybase `identity` should be populated with a 16-digit string that is generated with a [keybase.io](https://keybase.io/) account.
-- details: Enter the validator's details.
-- chain-id: You can enter the mainnet chain ID.
-- from: Enter the name of the key to sign.
-
-If you want to expose the image in Mintscan and Cosmostation's mobile wallet, please refer to [this guide](https://github.com/cosmostation/cosmostation_token_resource).
+If you already joined as a validator and if you want to modify your validator details, please see the [CLI guide: Edit validator description](interaction-with-the-network-cli.md#edit-validator-description).

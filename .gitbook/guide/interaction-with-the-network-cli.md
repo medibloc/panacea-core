@@ -276,6 +276,8 @@ Don't use more `umed` than you have!
 panacead tx staking create-validator \
   --pubkey $(panacead tendermint show-validator) \
   --moniker "choose a moniker" \
+  --details "This is a detail description" \
+  --identity 6A0D65E... \
   --chain-id <chain-id> \
   --commission-rate "0.10" \
   --commission-max-rate "0.20" \
@@ -290,6 +292,8 @@ panacead tx staking create-validator \
   The public key can be resolved by `panacead tendermint show-validator` in the node that you want to make as a validator.
   For details about various key types, please see this [guide](interaction-with-the-network-cli.md#keys).
 - `moniker`: A validator nickname that will be displayed publicly
+- `details`: A detail description of the validator
+- `identity`: The `identity` can be used as to verify identity with systems like Keybase or UPort. When using with Keybase `identity` should be populated with a 16-digit string that is generated with a [keybase.io](https://keybase.io/) account.
 - `commission-rate`: An initial commission rate on block rewards and fees charged to delegators
 - `commission-max-rate`: A maximum commission rate which this validator can charge. This cannot be changed after the
   `create-validator` transaction is processed.
@@ -323,17 +327,22 @@ panacead tx staking edit-validator \
   --moniker "choose a new moniker" \
   --website "https://example.com" \
   --details "This is a detail description" \
+  --identity 6A0D65E... \
   --chain-id <chain_id> \
   --commission-rate "0.15" \
   --from <key_name> \
   --fees "1000000umed"
 ```
 
+For more details of each flag, please see the [`Create your validator`](#create-your-validator) guide.
+
 **Note**: The `--commission-rate` value must adhere to the following invariants:
 
 - Must be between 0 and the validator's `commission-max-rate`
 - Must not exceed the validator's `commission-max-change-rate` which is maximum % point change rate **per day**.
   In other words, a validator can only change its commission once per day and within `commission-max-change-rate` bounds.
+
+If you want to set a logo image of your validator which will be displayed on Mintscan and Cosmostation, please refer to [this guide](https://github.com/cosmostation/cosmostation_token_resource).
 
 ### Delegate to a Validator
 
