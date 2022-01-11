@@ -101,6 +101,9 @@ import (
 	"github.com/medibloc/panacea-core/v2/x/did"
 	didkeeper "github.com/medibloc/panacea-core/v2/x/did/keeper"
 	didtypes "github.com/medibloc/panacea-core/v2/x/did/types"
+	"github.com/medibloc/panacea-core/v2/x/market"
+	marketkeeper "github.com/medibloc/panacea-core/v2/x/market/keeper"
+	markettypes "github.com/medibloc/panacea-core/v2/x/market/types"
 	"github.com/medibloc/panacea-core/v2/x/token"
 	tokenkeeper "github.com/medibloc/panacea-core/v2/x/token/keeper"
 	tokentypes "github.com/medibloc/panacea-core/v2/x/token/types"
@@ -181,6 +184,7 @@ var (
 		token.AppModuleBasic{},
 		burn.AppModuleBasic{},
 		wasm.AppModuleBasic{},
+		market.AppModuleBasic{},
 	)
 
 	// module account permissions
@@ -248,14 +252,15 @@ type App struct {
 	ScopedTransferKeeper capabilitykeeper.ScopedKeeper
 	ScopedWasmKeeper     capabilitykeeper.ScopedKeeper
 
-	aolKeeper   aolkeeper.Keeper
-	didKeeper   didkeeper.Keeper
-	burnKeeper  burnkeeper.Keeper
-	tokenKeeper tokenkeeper.Keeper
-	wasmKeeper  wasm.Keeper
+	aolKeeper    aolkeeper.Keeper
+	didKeeper    didkeeper.Keeper
+	burnKeeper   burnkeeper.Keeper
+	tokenKeeper  tokenkeeper.Keeper
+	wasmKeeper   wasm.Keeper
+	MarketKeeper marketkeeper.Keeper
 
 	// the module manager
-	mm *module.Manager
+	mm           *module.Manager
 }
 
 // New returns a reference to an initialized Gaia.
@@ -285,6 +290,7 @@ func New(
 		tokentypes.StoreKey,
 		burntypes.StoreKey,
 		wasm.StoreKey,
+		markettypes.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
@@ -329,7 +335,8 @@ func New(
 	)
 	app.DistrKeeper = distrkeeper.NewKeeper(
 		appCodec, keys[distrtypes.StoreKey], app.GetSubspace(distrtypes.ModuleName), app.AccountKeeper, app.BankKeeper,
-		&stakingKeeper, authtypes.FeeCollectorName, app.ModuleAccountAddrs(),
+		&stakingKeeper, authtypes.FeeCollectorName,
+		app.ModuleAccountAddrs(),
 	)
 	app.SlashingKeeper = slashingkeeper.NewKeeper(
 		appCodec, keys[slashingtypes.StoreKey], &stakingKeeper, app.GetSubspace(slashingtypes.ModuleName),
@@ -425,6 +432,14 @@ func New(
 		wasmOpts...,
 	)
 
+	app.MarketKeeper = *marketkeeper.NewKeeper(
+		appCodec,
+		keys[markettypes.StoreKey],
+		keys[markettypes.MemStoreKey],
+		app.BankKeeper,
+		app.AccountKeeper,
+	)
+
 	// The gov proposal types can be individually enabled
 	if len(enabledWasmProposals) != 0 {
 		govRouter.AddRoute(wasm.RouterKey, wasm.NewWasmProposalHandler(app.wasmKeeper, enabledWasmProposals))
@@ -476,6 +491,7 @@ func New(
 		token.NewAppModule(appCodec, app.tokenKeeper),
 		burn.NewAppModule(appCodec, app.burnKeeper),
 		wasm.NewAppModule(appCodec, &app.wasmKeeper, app.StakingKeeper),
+		market.NewAppModule(appCodec, app.MarketKeeper),
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -513,6 +529,7 @@ func New(
 		tokentypes.ModuleName,
 		burntypes.ModuleName,
 		wasm.ModuleName,
+		markettypes.ModuleName,
 	)
 
 	app.mm.RegisterInvariants(&app.CrisisKeeper)
@@ -723,10 +740,11 @@ func initParamsKeeper(appCodec codec.BinaryMarshaler, legacyAmino *codec.LegacyA
 	paramsKeeper.Subspace(tokentypes.ModuleName)
 	paramsKeeper.Subspace(burntypes.ModuleName)
 	paramsKeeper.Subspace(wasm.ModuleName)
+	paramsKeeper.Subspace(markettypes.ModuleName)
 
 	return paramsKeeper
 }
 
 func (app *App) registerUpgradeHandlers() {
-	app.UpgradeKeeper.SetUpgradeHandler("v2.0.2", func(ctx sdk.Context, plan upgradetypes.Plan) { })
+	app.UpgradeKeeper.SetUpgradeHandler("v2.0.2", func(ctx sdk.Context, plan upgradetypes.Plan) {})
 }

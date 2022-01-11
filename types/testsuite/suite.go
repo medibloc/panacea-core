@@ -16,6 +16,8 @@ import (
 	aolkeeper "github.com/medibloc/panacea-core/v2/x/aol/keeper"
 	aoltypes "github.com/medibloc/panacea-core/v2/x/aol/types"
 	burnkeeper "github.com/medibloc/panacea-core/v2/x/burn/keeper"
+	marketkeeper "github.com/medibloc/panacea-core/v2/x/market/keeper"
+	markettypes "github.com/medibloc/panacea-core/v2/x/market/types"
 	tokenkeeper "github.com/medibloc/panacea-core/v2/x/token/keeper"
 	tokentypes "github.com/medibloc/panacea-core/v2/x/token/types"
 	"github.com/stretchr/testify/suite"
@@ -35,14 +37,16 @@ type TestSuite struct {
 
 	Ctx sdk.Context
 
-	AccountKeeper authkeeper.AccountKeeper
-	AolKeeper     aolkeeper.Keeper
-	AolMsgServer  aoltypes.MsgServer
-	BankKeeper    bankkeeper.Keeper
-	BurnKeeper    burnkeeper.Keeper
-	DIDMsgServer  didtypes.MsgServer
-	DIDKeeper     didkeeper.Keeper
-	TokenKeeper   tokenkeeper.Keeper
+	AccountKeeper   authkeeper.AccountKeeper
+	AolKeeper       aolkeeper.Keeper
+	AolMsgServer    aoltypes.MsgServer
+	BankKeeper      bankkeeper.Keeper
+	BurnKeeper      burnkeeper.Keeper
+	DIDMsgServer    didtypes.MsgServer
+	DIDKeeper       didkeeper.Keeper
+	TokenKeeper     tokenkeeper.Keeper
+	MarketKeeper    marketkeeper.Keeper
+	MarketMsgServer markettypes.MsgServer
 }
 
 func (suite *TestSuite) SetupTest() {
@@ -52,7 +56,8 @@ func (suite *TestSuite) SetupTest() {
 		banktypes.StoreKey,
 		paramstypes.StoreKey,
 		didtypes.StoreKey,
-		tokentypes.StoreKey)
+		tokentypes.StoreKey,
+		markettypes.StoreKey)
 	tKeyParams := sdk.NewTransientStoreKey(paramstypes.TStoreKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
 
@@ -121,6 +126,14 @@ func (suite *TestSuite) SetupTest() {
 		memKeys[tokentypes.MemStoreKey],
 		suite.BankKeeper,
 	)
+
+	suite.MarketKeeper = *marketkeeper.NewKeeper(
+		cdc.Marshaler,
+		keyParams[markettypes.StoreKey],
+		memKeys[markettypes.MemStoreKey],
+		suite.BankKeeper,
+		suite.AccountKeeper)
+	suite.MarketMsgServer = marketkeeper.NewMsgServerImpl(suite.MarketKeeper)
 }
 
 func (suite *TestSuite) BeforeTest(suiteName, testName string) {
@@ -137,6 +150,7 @@ func newTestCodec() params.EncodingConfig {
 	authtypes.RegisterInterfaces(interfaceRegistry)
 	banktypes.RegisterInterfaces(interfaceRegistry)
 	didtypes.RegisterInterfaces(interfaceRegistry)
+	markettypes.RegisterInterfaces(interfaceRegistry)
 	marshaler := codec.NewProtoCodec(interfaceRegistry)
 
 	return params.EncodingConfig{

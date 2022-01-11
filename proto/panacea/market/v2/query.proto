@@ -1,0 +1,29 @@
+syntax = "proto3";
+package panacea.market.v2;
+
+import "google/api/annotations.proto";
+import "cosmos/base/query/v1beta1/pagination.proto";
+
+import "panacea/market/v2/deal.proto";
+import "google/protobuf/any.proto";
+import "gogoproto/gogo.proto";
+
+option go_package = "github.com/medibloc/panacea-core/x/market/types";
+
+// Query defines the gRPC querier service.
+service Query {
+  // Deal returns a Deal.
+  rpc Deal(QueryDealRequest) returns (QueryDealResponse) {
+    option (google.api.http).get = "/panacea/deal/v2/deals/{deal_id}";
+  }
+}
+
+// QueryDealRequest is the request type for Query/Deal RPC method.
+message QueryDealRequest {
+  uint64 deal_id = 1;
+}
+
+// QueryDealResponse is the response type for the Query/Deal RPC method.
+message QueryDealResponse {
+  Deal deal = 1;
+}

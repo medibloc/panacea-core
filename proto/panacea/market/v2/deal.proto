@@ -1,0 +1,21 @@
+syntax = "proto3";
+package panacea.market.v2;
+
+option go_package = "github.com/medibloc/panacea-core/x/market/types";
+
+import "gogoproto/gogo.proto";
+import "cosmos/base/v1beta1/coin.proto";
+
+// Deal defines a deal.
+// TODO: Could remove complete_data_count field
+message Deal {
+  uint64 deal_id = 1;
+  string deal_address = 2;
+  repeated string data_schema = 3;
+  cosmos.base.v1beta1.Coin budget = 4;
+  repeated string trusted_data_validator = 5;
+  uint64 want_data_count = 6;
+  uint64 complete_data_count = 7;
+  string owner = 8;
+  string status = 9;
+}
