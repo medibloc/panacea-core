@@ -12,10 +12,7 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 	k.SetNextDealNumber(ctx, genState.NextDealNumber)
 
 	for _, deal := range genState.Deals {
-		err := k.SetDeal(ctx, *deal)
-		if err != nil {
-			panic(err)
-		}
+		k.SetDeal(ctx, *deal)
 	}
 }
 

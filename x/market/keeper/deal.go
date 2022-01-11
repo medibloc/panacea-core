@@ -25,7 +25,7 @@ func (k Keeper) CreateNewDeal(ctx sdk.Context, owner sdk.AccAddress, deal types.
 		return 0, sdkerrors.Wrapf(types.ErrDealAlreadyExist, "deal %d already exist", dealId)
 	}
 
-	err = k.SetDeal(ctx, newDeal)
+	k.SetDeal(ctx, newDeal)
 
 	acc = k.accountKeeper.NewAccount(ctx, authtypes.NewModuleAccount(
 		authtypes.NewBaseAccountWithAddress(
@@ -36,6 +36,9 @@ func (k Keeper) CreateNewDeal(ctx sdk.Context, owner sdk.AccAddress, deal types.
 	k.accountKeeper.SetAccount(ctx, acc)
 
 	err = k.bankKeeper.SendCoins(ctx, owner, sdk.AccAddress(newDeal.GetDealAddress()), coins)
+	if err != nil {
+		return 0, nil
+	}
 	return newDeal.GetDealId(), nil
 }
 
@@ -104,11 +107,9 @@ func (k Keeper) GetDeal(ctx sdk.Context, dealId uint64) (types.Deal, error) {
 	return deal, nil
 }
 
-func (k Keeper) SetDeal(ctx sdk.Context, deal types.Deal) error {
+func (k Keeper) SetDeal(ctx sdk.Context, deal types.Deal) {
 	store := ctx.KVStore(k.storeKey)
 	dealKey := types.GetKeyPrefixDeals(deal.GetDealId())
 	bz := k.cdc.MustMarshalBinaryLengthPrefixed(&deal)
 	store.Set(dealKey, bz)
-
-	return nil
 }

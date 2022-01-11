@@ -21,7 +21,6 @@ func TestDealTestSuite(t *testing.T) {
 var (
 	acc1 = sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address())
 	acc2 = sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address())
-	acc3 = sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address())
 )
 
 func (suite *dealTestSuite) BeforeTest(_, _ string) {
