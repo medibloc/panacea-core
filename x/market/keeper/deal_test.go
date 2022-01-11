@@ -19,8 +19,9 @@ func TestDealTestSuite(t *testing.T) {
 }
 
 var (
-	acc1 = sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address())
-	acc2 = sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address())
+	acc1                   = sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address())
+	acc2                   = sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address())
+	defaultFunds sdk.Coins = sdk.NewCoins(sdk.NewCoin("umed", sdk.NewInt(10000000000)))
 )
 
 func (suite *dealTestSuite) BeforeTest(_, _ string) {
@@ -28,7 +29,13 @@ func (suite *dealTestSuite) BeforeTest(_, _ string) {
 	market.InitGenesis(suite.Ctx, suite.MarketKeeper, types.GenesisState{Deals: map[uint64]*types.Deal{
 		testDeal.GetDealId(): &testDeal,
 	}, NextDealNumber: 2})
+
 	suite.MarketKeeper.SetDeal(suite.Ctx, testDeal)
+
+	err := suite.BankKeeper.AddCoins(suite.Ctx, acc1, defaultFunds)
+	if err != nil {
+		panic(err)
+	}
 }
 
 func (suite *dealTestSuite) TestCreateNewDeal() {

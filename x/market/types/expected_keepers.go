@@ -15,4 +15,12 @@ type AccountKeeper interface {
 
 	SetAccount(ctx sdk.Context, acc authtypes.AccountI)
 	GetAccount(ctx sdk.Context, addr sdk.AccAddress) authtypes.AccountI
+
+	ValidatePermissions(macc authtypes.ModuleAccountI) error
+
+	GetModuleAddress(moduleName string) sdk.AccAddress
+	GetModuleAddressAndPermissions(moduleName string) (addr sdk.AccAddress, permissions []string)
+	GetModuleAccountAndPermissions(ctx sdk.Context, moduleName string) (authtypes.ModuleAccountI, []string)
+	GetModuleAccount(ctx sdk.Context, moduleName string) authtypes.ModuleAccountI
+	SetModuleAccount(ctx sdk.Context, macc authtypes.ModuleAccountI)
 }
