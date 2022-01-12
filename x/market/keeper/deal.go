@@ -27,17 +27,22 @@ func (k Keeper) CreateNewDeal(ctx sdk.Context, owner sdk.AccAddress, deal types.
 
 	k.SetDeal(ctx, newDeal)
 
+	dealAddress, err := types.AccDealAddressFromBech32(newDeal.GetDealAddress())
+	if err != nil {
+		return 0, err
+	}
+
 	acc = k.accountKeeper.NewAccount(ctx, authtypes.NewModuleAccount(
 		authtypes.NewBaseAccountWithAddress(
-			sdk.AccAddress(newDeal.GetDealAddress()),
+			dealAddress,
 		),
 		newDeal.DealAddress),
 	)
 	k.accountKeeper.SetAccount(ctx, acc)
 
-	err = k.bankKeeper.SendCoins(ctx, owner, sdk.AccAddress(newDeal.GetDealAddress()), coins)
+	err = k.bankKeeper.SendCoins(ctx, owner, dealAddress, coins)
 	if err != nil {
-		return 0, nil
+		return 0, sdkerrors.Wrapf(types.ErrNotEnoughBalance, "The owner's balance is not enough to make deal")
 	}
 	return newDeal.GetDealId(), nil
 }

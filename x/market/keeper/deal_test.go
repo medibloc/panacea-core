@@ -3,7 +3,6 @@ package keeper_test
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/medibloc/panacea-core/v2/types/testsuite"
-	"github.com/medibloc/panacea-core/v2/x/market"
 	"github.com/medibloc/panacea-core/v2/x/market/types"
 	"github.com/stretchr/testify/suite"
 	"github.com/tendermint/tendermint/crypto/secp256k1"
@@ -26,19 +25,16 @@ var (
 
 func (suite *dealTestSuite) BeforeTest(_, _ string) {
 	testDeal := makeTestDeal()
-	market.InitGenesis(suite.Ctx, suite.MarketKeeper, types.GenesisState{Deals: map[uint64]*types.Deal{
-		testDeal.GetDealId(): &testDeal,
-	}, NextDealNumber: 2})
-
+	suite.MarketKeeper.SetNextDealNumber(suite.Ctx, 2)
 	suite.MarketKeeper.SetDeal(suite.Ctx, testDeal)
+}
 
+func (suite *dealTestSuite) TestCreateNewDeal() {
 	err := suite.BankKeeper.AddCoins(suite.Ctx, acc1, defaultFunds)
 	if err != nil {
 		panic(err)
 	}
-}
 
-func (suite *dealTestSuite) TestCreateNewDeal() {
 	tempDeal := types.Deal{
 		DataSchema:           []string{acc1.String()},
 		Budget:               &sdk.Coin{Denom: "umed", Amount: sdk.NewInt(10000000)},
@@ -50,8 +46,10 @@ func (suite *dealTestSuite) TestCreateNewDeal() {
 	owner, _ := sdk.AccAddressFromBech32(tempDeal.GetOwner())
 
 	dealId, _ := suite.MarketKeeper.CreateNewDeal(suite.Ctx, owner, tempDeal)
-	suite.Require().Equal(dealId, uint64(2))
-	deal, _ := suite.MarketKeeper.GetDeal(suite.Ctx, 2)
+	expectedId := suite.MarketKeeper.GetNextDealNumberAndIncrement(suite.Ctx) - 1
+	suite.Require().Equal(dealId, expectedId)
+
+	deal, _ := suite.MarketKeeper.GetDeal(suite.Ctx, dealId)
 	suite.Require().Equal(deal.GetDataSchema(), tempDeal.GetDataSchema())
 	suite.Require().Equal(deal.GetBudget(), tempDeal.GetBudget())
 	suite.Require().Equal(deal.GetWantDataCount(), tempDeal.GetWantDataCount())
@@ -72,6 +70,32 @@ func (suite *dealTestSuite) TestGetDeal() {
 	suite.Require().Equal(deal.GetTrustedDataValidator(), testDeal.GetTrustedDataValidator())
 	suite.Require().Equal(deal.GetOwner(), testDeal.GetOwner())
 	suite.Require().Equal(deal.GetStatus(), testDeal.GetStatus())
+}
+
+func (suite *dealTestSuite) TestGetBalanceOfDeal() {
+	err := suite.BankKeeper.AddCoins(suite.Ctx, acc1, defaultFunds)
+	if err != nil {
+		panic(err)
+	}
+
+	tempDeal := types.Deal{
+		DataSchema:           []string{acc1.String()},
+		Budget:               &sdk.Coin{Denom: "umed", Amount: sdk.NewInt(10000000)},
+		WantDataCount:        10000,
+		TrustedDataValidator: []string{acc2.String()},
+		Owner:                acc1.String(),
+	}
+
+	owner, _ := sdk.AccAddressFromBech32(tempDeal.GetOwner())
+
+	dealId, _ := suite.MarketKeeper.CreateNewDeal(suite.Ctx, owner, tempDeal)
+	deal, _ := suite.MarketKeeper.GetDeal(suite.Ctx, dealId)
+	addr, _ := types.AccDealAddressFromBech32(deal.GetDealAddress())
+
+	balance := suite.BankKeeper.GetBalance(suite.Ctx, addr, "umed")
+	suite.Require().Equal(balance, *tempDeal.GetBudget())
+	ownerBalance := suite.BankKeeper.GetBalance(suite.Ctx, acc1, "umed")
+	suite.Require().Equal(ownerBalance, sdk.NewCoin("umed", sdk.NewInt(10000000000)).Sub(balance))
 }
 
 func makeTestDeal() types.Deal {

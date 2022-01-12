@@ -2,45 +2,49 @@ package market_test
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	panaceaapp "github.com/medibloc/panacea-core/v2/app"
+	"github.com/medibloc/panacea-core/v2/types/testsuite"
 	"github.com/medibloc/panacea-core/v2/x/market"
 	"github.com/medibloc/panacea-core/v2/x/market/types"
-	"github.com/stretchr/testify/require"
+	"github.com/stretchr/testify/suite"
 	"github.com/tendermint/tendermint/crypto/secp256k1"
-	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 	"testing"
 )
 
 var acc1 = secp256k1.GenPrivKey().PubKey().Address()
 
-func TestMarketInitGenesis(t *testing.T) {
-	app := panaceaapp.SetUp(false)
-	ctx := app.BaseApp.NewContext(false, tmproto.Header{})
+type genesisTestSuite struct {
+	testsuite.TestSuite
+}
 
+func TestGenesisTestSuite(t *testing.T) {
+	suite.Run(t, new(genesisTestSuite))
+}
+
+func (suite *genesisTestSuite) TestMarketInitGenesis() {
 	newDeal, err := makeTestDeal()
-	require.NoError(t, err)
+	suite.Require().NoError(err)
 
-	market.InitGenesis(ctx, app.MarketKeeper, types.GenesisState{
+	market.InitGenesis(suite.Ctx, suite.MarketKeeper, types.GenesisState{
 		Deals: map[uint64]*types.Deal{
 			newDeal.GetDealId(): &newDeal,
 		},
 		NextDealNumber: 2,
 	})
 
-	require.Equal(t, app.MarketKeeper.GetNextDealNumberAndIncrement(ctx), uint64(2))
-	require.NoError(t, err)
+	suite.Require().Equal(suite.MarketKeeper.GetNextDealNumberAndIncrement(suite.Ctx), uint64(2))
 
-	dealStored, err := app.MarketKeeper.GetDeal(ctx, 1)
-	require.NoError(t, err)
-	require.Equal(t, newDeal.GetDealId(), dealStored.GetDealId())
-	require.Equal(t, newDeal.GetDealAddress(), dealStored.GetDealAddress())
-	require.Equal(t, newDeal.GetBudget(), dealStored.GetBudget())
-	require.Equal(t, newDeal.GetWantDataCount(), dealStored.GetWantDataCount())
-	require.Equal(t, newDeal.GetOwner(), dealStored.GetOwner())
-	require.Equal(t, newDeal.GetStatus(), dealStored.GetStatus())
+	dealStored, err := suite.MarketKeeper.GetDeal(suite.Ctx, 1)
+	suite.Require().NoError(err)
+	suite.Require().Equal(newDeal.GetDealId(), dealStored.GetDealId())
+	suite.Require().Equal(newDeal.GetDealAddress(), dealStored.GetDealAddress())
+	suite.Require().Equal(newDeal.GetBudget(), dealStored.GetBudget())
+	suite.Require().Equal(newDeal.GetWantDataCount(), dealStored.GetWantDataCount())
+	suite.Require().Equal(newDeal.GetOwner(), dealStored.GetOwner())
+	suite.Require().Equal(newDeal.GetStatus(), dealStored.GetStatus())
 
-	_, err = app.MarketKeeper.GetDeal(ctx, 2)
-	require.Error(t, err)
+	_, err = suite.MarketKeeper.GetDeal(suite.Ctx, 2)
+	suite.Require().NoError(err)
+
 }
 
 func makeTestDeal() (types.Deal, error) {

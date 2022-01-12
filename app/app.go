@@ -257,7 +257,7 @@ type App struct {
 	burnKeeper   burnkeeper.Keeper
 	tokenKeeper  tokenkeeper.Keeper
 	wasmKeeper   wasm.Keeper
-	MarketKeeper marketkeeper.Keeper
+	marketKeeper marketkeeper.Keeper
 
 	// the module manager
 	mm           *module.Manager
@@ -432,7 +432,7 @@ func New(
 		wasmOpts...,
 	)
 
-	app.MarketKeeper = *marketkeeper.NewKeeper(
+	app.marketKeeper = *marketkeeper.NewKeeper(
 		appCodec,
 		keys[markettypes.StoreKey],
 		keys[markettypes.MemStoreKey],
@@ -491,7 +491,7 @@ func New(
 		token.NewAppModule(appCodec, app.tokenKeeper),
 		burn.NewAppModule(appCodec, app.burnKeeper),
 		wasm.NewAppModule(appCodec, &app.wasmKeeper, app.StakingKeeper),
-		market.NewAppModule(appCodec, app.MarketKeeper),
+		market.NewAppModule(appCodec, app.marketKeeper),
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
