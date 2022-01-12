@@ -43,7 +43,7 @@ func (suite *genesisTestSuite) TestMarketInitGenesis() {
 	suite.Require().Equal(newDeal.GetStatus(), dealStored.GetStatus())
 
 	_, err = suite.MarketKeeper.GetDeal(suite.Ctx, 2)
-	suite.Require().NoError(err)
+	suite.Require().Error(err)
 
 }
 
