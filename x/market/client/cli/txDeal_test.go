@@ -14,5 +14,6 @@ func TestTxTestSuite(t *testing.T) {
 	suite.Run(t, new(txTestSuite))
 }
 
+//TODO: TestNewMsgCreateDeal Test Code
 func (suite *txTestSuite) TestNewMsgCreateDeal() {
 }

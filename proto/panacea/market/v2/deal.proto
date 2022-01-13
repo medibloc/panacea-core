@@ -13,9 +13,9 @@ message Deal {
   string deal_address = 2;
   repeated string data_schema = 3;
   cosmos.base.v1beta1.Coin budget = 4;
-  repeated string trusted_data_validator = 5;
-  uint64 want_data_count = 6;
-  uint64 complete_data_count = 7;
+  repeated string trusted_data_validators = 5;
+  uint64 target_num_data = 6;
+  uint64 filled_num_data = 7;
   string owner = 8;
   string status = 9;
 }

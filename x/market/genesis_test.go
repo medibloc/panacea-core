@@ -38,7 +38,7 @@ func (suite *genesisTestSuite) TestMarketInitGenesis() {
 	suite.Require().Equal(newDeal.GetDealId(), dealStored.GetDealId())
 	suite.Require().Equal(newDeal.GetDealAddress(), dealStored.GetDealAddress())
 	suite.Require().Equal(newDeal.GetBudget(), dealStored.GetBudget())
-	suite.Require().Equal(newDeal.GetWantDataCount(), dealStored.GetWantDataCount())
+	suite.Require().Equal(newDeal.GetTargetNumData(), dealStored.GetTargetNumData())
 	suite.Require().Equal(newDeal.GetOwner(), dealStored.GetOwner())
 	suite.Require().Equal(newDeal.GetStatus(), dealStored.GetStatus())
 
@@ -49,14 +49,14 @@ func (suite *genesisTestSuite) TestMarketInitGenesis() {
 
 func makeTestDeal() (types.Deal, error) {
 	return types.Deal{
-		DealId:               1,
-		DealAddress:          types.NewDealAddress(1).String(),
-		DataSchema:           nil,
-		Budget:               &sdk.Coin{Denom: "umed", Amount: sdk.NewInt(10000000)},
-		TrustedDataValidator: nil,
-		WantDataCount:        10000,
-		CompleteDataCount:    0,
-		Owner:                acc1.String(),
-		Status:               "ACTIVE",
+		DealId:                1,
+		DealAddress:           types.NewDealAddress(1).String(),
+		DataSchema:            nil,
+		Budget:                &sdk.Coin{Denom: "umed", Amount: sdk.NewInt(10000000)},
+		TrustedDataValidators: nil,
+		TargetNumData:         10000,
+		FilledNumData:         0,
+		Owner:                 acc1.String(),
+		Status:                "ACTIVE",
 	}, nil
 }

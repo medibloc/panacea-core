@@ -6,13 +6,13 @@ import (
 
 var _ sdk.Msg = &MsgCreateDeal{}
 
-func NewMsgCreateDeal(dataSchema []string, budget *sdk.Coin, wantDataCount uint64, trustedDataValidator []string, owner string) *MsgCreateDeal {
+func NewMsgCreateDeal(dataSchema []string, budget *sdk.Coin, targetNumData uint64, trustedDataValidator []string, owner string) *MsgCreateDeal {
 	return &MsgCreateDeal{
-		DataSchema:           dataSchema,
-		Budget:               budget,
-		WantDataCount:        wantDataCount,
-		TrustedDataValidator: trustedDataValidator,
-		Owner:                owner,
+		DataSchema:            dataSchema,
+		Budget:                budget,
+		TargetNumData:         targetNumData,
+		TrustedDataValidators: trustedDataValidator,
+		Owner:                 owner,
 	}
 }
 

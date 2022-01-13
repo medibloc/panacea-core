@@ -18,8 +18,8 @@ service Msg {
 message MsgCreateDeal {
   repeated string data_schema = 1;
   cosmos.base.v1beta1.Coin budget = 2;
-  uint64 want_data_count = 3;
-  repeated string trusted_data_validator = 4;
+  uint64 target_num_data = 3;
+  repeated string trusted_data_validators = 4;
   string owner = 5;
 }
 
