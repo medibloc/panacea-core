@@ -23,23 +23,23 @@ func (k Keeper) CreateNewDeal(ctx sdk.Context, owner sdk.AccAddress, deal types.
 	var coins sdk.Coins
 	coins = append(coins, *deal.GetBudget())
 
-	acc := k.accountKeeper.GetAccount(ctx, sdk.AccAddress(newDeal.GetDealAddress()))
+	dealAddress, err := types.AccDealAddressFromBech32(newDeal.GetDealAddress())
+	if err != nil {
+		return 0, err
+	}
+
+	acc := k.accountKeeper.GetAccount(ctx, dealAddress)
 	if acc != nil {
 		return 0, sdkerrors.Wrapf(types.ErrDealAlreadyExist, "deal %d already exist", dealId)
 	}
 
 	k.SetDeal(ctx, newDeal)
 
-	dealAddress, err := types.AccDealAddressFromBech32(newDeal.GetDealAddress())
-	if err != nil {
-		return 0, err
-	}
-
 	acc = k.accountKeeper.NewAccount(ctx, authtypes.NewModuleAccount(
 		authtypes.NewBaseAccountWithAddress(
 			dealAddress,
 		),
-		newDeal.DealAddress),
+		newDeal.GetDealAddress()),
 	)
 	k.accountKeeper.SetAccount(ctx, acc)
 

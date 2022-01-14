@@ -1,4 +1,4 @@
-package keeper_test
+package keeper
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -55,7 +55,7 @@ func (suite *dealTestSuite) TestCreateNewDeal() {
 	suite.Require().Equal(deal.GetTargetNumData(), tempDeal.GetTargetNumData())
 	suite.Require().Equal(deal.GetTrustedDataValidators(), tempDeal.GetTrustedDataValidators())
 	suite.Require().Equal(deal.GetOwner(), tempDeal.GetOwner())
-	suite.Require().Equal(deal.GetStatus(), "ACTIVE")
+	suite.Require().Equal(deal.GetStatus(), ACTIVE)
 }
 
 func (suite *dealTestSuite) TestGetDeal() {
@@ -108,6 +108,6 @@ func makeTestDeal() types.Deal {
 		FilledNumData:         0,
 		TrustedDataValidators: []string{acc2.String()},
 		Owner:                 acc1.String(),
-		Status:                "ACTIVE",
+		Status:                ACTIVE,
 	}
 }
