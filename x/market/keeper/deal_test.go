@@ -1,4 +1,4 @@
-package keeper
+package keeper_test
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -16,6 +16,12 @@ type dealTestSuite struct {
 func TestDealTestSuite(t *testing.T) {
 	suite.Run(t, new(dealTestSuite))
 }
+
+const (
+	ACTIVE    = "ACTIVE"    // When deal is activated.
+	INACTIVE  = "INACTIVE"  // When deal is deactivated.
+	COMPLETED = "COMPLETED" // When deal is completed.
+)
 
 var (
 	acc1                   = sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address())
