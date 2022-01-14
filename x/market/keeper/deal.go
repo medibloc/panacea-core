@@ -9,34 +9,37 @@ import (
 	"github.com/medibloc/panacea-core/v2/x/market/types"
 )
 
+const (
+	ACTIVE    = "ACTIVE"    // When deal is activated.
+	INACTIVE  = "INACTIVE"  // When deal is deactivated.
+	COMPLETED = "COMPLETED" // When deal is completed.
+)
+
 func (k Keeper) CreateNewDeal(ctx sdk.Context, owner sdk.AccAddress, deal types.Deal) (uint64, error) {
 	dealId := k.GetNextDealNumberAndIncrement(ctx)
 
-	newDeal, err := k.newDeal(dealId, deal)
-	if err != nil {
-		return 0, err
-	}
+	newDeal := newDeal(dealId, deal)
 
 	var coins sdk.Coins
 	coins = append(coins, *deal.GetBudget())
-
-	acc := k.accountKeeper.GetAccount(ctx, sdk.AccAddress(newDeal.GetDealAddress()))
-	if acc != nil {
-		return 0, sdkerrors.Wrapf(types.ErrDealAlreadyExist, "deal %d already exist", dealId)
-	}
-
-	k.SetDeal(ctx, newDeal)
 
 	dealAddress, err := types.AccDealAddressFromBech32(newDeal.GetDealAddress())
 	if err != nil {
 		return 0, err
 	}
 
+	acc := k.accountKeeper.GetAccount(ctx, dealAddress)
+	if acc != nil {
+		return 0, sdkerrors.Wrapf(types.ErrDealAlreadyExist, "deal %d already exist", dealId)
+	}
+
+	k.SetDeal(ctx, newDeal)
+
 	acc = k.accountKeeper.NewAccount(ctx, authtypes.NewModuleAccount(
 		authtypes.NewBaseAccountWithAddress(
 			dealAddress,
 		),
-		newDeal.DealAddress),
+		newDeal.GetDealAddress()),
 	)
 	k.accountKeeper.SetAccount(ctx, acc)
 
@@ -47,23 +50,23 @@ func (k Keeper) CreateNewDeal(ctx sdk.Context, owner sdk.AccAddress, deal types.
 	return newDeal.GetDealId(), nil
 }
 
-func (k Keeper) newDeal(dealId uint64, deal types.Deal) (types.Deal, error) {
+func newDeal(dealId uint64, deal types.Deal) types.Deal {
 
 	dealAddress := types.NewDealAddress(dealId)
 
 	newDeal := &types.Deal{
-		DealId:               dealId,
-		DealAddress:          dealAddress.String(),
-		DataSchema:           deal.GetDataSchema(),
-		Budget:               deal.GetBudget(),
-		TrustedDataValidator: deal.GetTrustedDataValidator(),
-		WantDataCount:        deal.GetWantDataCount(),
-		CompleteDataCount:    0,
-		Owner:                deal.GetOwner(),
-		Status:               "ACTIVE",
+		DealId:                dealId,
+		DealAddress:           dealAddress.String(),
+		DataSchema:            deal.GetDataSchema(),
+		Budget:                deal.GetBudget(),
+		TrustedDataValidators: deal.GetTrustedDataValidators(),
+		TargetNumData:         deal.GetTargetNumData(),
+		FilledNumData:         0,
+		Owner:                 deal.GetOwner(),
+		Status:                ACTIVE,
 	}
 
-	return *newDeal, nil
+	return *newDeal
 }
 
 func (k Keeper) SetNextDealNumber(ctx sdk.Context, dealNumber uint64) {

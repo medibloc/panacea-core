@@ -24,6 +24,5 @@ func GetQueryCmd(queryRoute string) *cobra.Command {
 		RunE:                       client.ValidateCmd,
 	}
 
-	return cmd 
+	return cmd
 }
-

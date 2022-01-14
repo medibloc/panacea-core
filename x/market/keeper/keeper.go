@@ -8,15 +8,13 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/medibloc/panacea-core/v2/x/market/types"
-	// this line is used by starport scaffolding # ibc/keeper/import
 )
 
 type (
 	Keeper struct {
-		cdc      codec.Marshaler
-		storeKey sdk.StoreKey
-		memKey   sdk.StoreKey
-		// this line is used by starport scaffolding # ibc/keeper/attribute
+		cdc           codec.Marshaler
+		storeKey      sdk.StoreKey
+		memKey        sdk.StoreKey
 		bankKeeper    types.BankKeeper
 		accountKeeper types.AccountKeeper
 	}

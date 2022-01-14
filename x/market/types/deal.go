@@ -4,7 +4,7 @@ import (
 	"fmt"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"github.com/medibloc/panacea-core/v2/x/market/util/address"
+	"github.com/medibloc/panacea-core/v2/x/market/v044_temp/address"
 	"strings"
 )
 
@@ -36,7 +36,7 @@ func AccDealAddressFromBech32(address string) (sdk.AccAddress, error) {
 func VerifyDealAddressFormat(bz []byte) error {
 	verifier := sdk.GetConfig().GetAddressVerifier()
 	if verifier != nil {
-		return nil
+		return verifier(bz)
 	}
 
 	if len(bz) == 0 {

@@ -10,11 +10,11 @@ func (m msgServer) CreateDeal(goCtx context.Context, msg *types.MsgCreateDeal) (
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	var deal = types.Deal{
-		DataSchema:           msg.DataSchema,
-		Budget:               msg.Budget,
-		WantDataCount:        msg.WantDataCount,
-		TrustedDataValidator: msg.TrustedDataValidator,
-		Owner:                msg.Owner,
+		DataSchema:            msg.DataSchema,
+		Budget:                msg.Budget,
+		TargetNumData:         msg.TargetNumData,
+		TrustedDataValidators: msg.GetTrustedDataValidators(),
+		Owner:                 msg.Owner,
 	}
 
 	owner, err := sdk.AccAddressFromBech32(msg.Owner)
