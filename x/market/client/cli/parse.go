@@ -6,7 +6,7 @@ import (
 )
 
 const (
-	FlagDealFile = "deal-json-file"
+	FlagDealFile = "deal-file"
 )
 
 type createDealInputs struct {
