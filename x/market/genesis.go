@@ -28,5 +28,6 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 
 	return &types.GenesisState{
 		Deals: dealsMap,
+		NextDealNumber: k.GetNextDealNumber(ctx),
 	}
 }

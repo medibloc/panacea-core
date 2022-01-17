@@ -16,11 +16,11 @@ service Msg {
 
 //MsgCreateDeal defines the Msg/CreateDeal request type.
 message MsgCreateDeal {
-  repeated string data_schema = 1 [(gogoproto.nullable) = false];
-  cosmos.base.v1beta1.Coin budget = 2 [(gogoproto.nullable) = false];
-  uint64 max_num_data = 3 [(gogoproto.nullable) = false];
-  repeated string trusted_data_validators = 4 [(gogoproto.nullable) = false];
-  string owner = 5 [(gogoproto.nullable) = false];
+  repeated string data_schema = 1;
+  cosmos.base.v1beta1.Coin budget = 2;
+  uint64 max_num_data = 3;
+  repeated string trusted_data_validators = 4;
+  string owner = 5;
 }
 
 //MsgCreateDealResponse defines the Msg/CreateDeal response type.

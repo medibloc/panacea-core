@@ -75,7 +75,7 @@ func (k Keeper) SetNextDealNumber(ctx sdk.Context, dealNumber uint64) {
 	store.Set(types.KeyDealNextNumber, bz)
 }
 
-func (k Keeper) GetNextDealNumberAndIncrement(ctx sdk.Context) uint64 {
+func (k Keeper) GetNextDealNumber(ctx sdk.Context) uint64 {
 	var dealNumber uint64
 	store := ctx.KVStore(k.storeKey)
 
@@ -92,7 +92,11 @@ func (k Keeper) GetNextDealNumberAndIncrement(ctx sdk.Context) uint64 {
 
 		dealNumber = val.GetValue()
 	}
+	return dealNumber
+}
 
+func (k Keeper) GetNextDealNumberAndIncrement(ctx sdk.Context) uint64 {
+	dealNumber := k.GetNextDealNumber(ctx)
 	k.SetNextDealNumber(ctx, dealNumber+1)
 	return dealNumber
 }

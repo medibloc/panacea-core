@@ -32,9 +32,22 @@ func (msg *MsgCreateDeal) ValidateBasic() error {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
 
+	schema := msg.DataSchema
+	if len(schema) == 0 {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "no data schema")
+	}
+
 	budget := msg.Budget
+	if budget == nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "budget is empty")
+	}
 	if !budget.IsValid() {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "budget is not a valid Coin object")
+	}
+
+	data := msg.MaxNumData
+	if data <= 0 {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "max num of data is negative number")
 	}
 
 	for _, validator := range msg.TrustedDataValidators {
