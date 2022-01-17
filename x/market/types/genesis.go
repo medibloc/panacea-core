@@ -10,6 +10,7 @@ func DefaultGenesis() *GenesisState {
 
 // Validate performs basic genesis state validation returning an error upon any
 // failure.
+// TODO: Validate genesis state after implement GetDealList Deal.
 func (gs GenesisState) Validate() error {
 	return nil
 }

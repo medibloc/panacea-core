@@ -60,8 +60,8 @@ func newDeal(dealId uint64, deal types.Deal) types.Deal {
 		DataSchema:            deal.GetDataSchema(),
 		Budget:                deal.GetBudget(),
 		TrustedDataValidators: deal.GetTrustedDataValidators(),
-		TargetNumData:         deal.GetTargetNumData(),
-		FilledNumData:         0,
+		MaxNumData:            deal.GetMaxNumData(),
+		CurNumData:            0,
 		Owner:                 deal.GetOwner(),
 		Status:                ACTIVE,
 	}

@@ -12,7 +12,7 @@ func (m msgServer) CreateDeal(goCtx context.Context, msg *types.MsgCreateDeal) (
 	var deal = types.Deal{
 		DataSchema:            msg.DataSchema,
 		Budget:                msg.Budget,
-		TargetNumData:         msg.TargetNumData,
+		MaxNumData:            msg.MaxNumData,
 		TrustedDataValidators: msg.GetTrustedDataValidators(),
 		Owner:                 msg.Owner,
 	}
