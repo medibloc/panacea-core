@@ -44,7 +44,7 @@ func (suite *dealTestSuite) TestCreateNewDeal() {
 	tempDeal := types.Deal{
 		DataSchema:            []string{acc1.String()},
 		Budget:                &sdk.Coin{Denom: "umed", Amount: sdk.NewInt(10000000)},
-		TargetNumData:         10000,
+		MaxNumData:            10000,
 		TrustedDataValidators: []string{acc2.String()},
 		Owner:                 acc1.String(),
 	}
@@ -58,7 +58,7 @@ func (suite *dealTestSuite) TestCreateNewDeal() {
 	deal, _ := suite.MarketKeeper.GetDeal(suite.Ctx, dealId)
 	suite.Require().Equal(deal.GetDataSchema(), tempDeal.GetDataSchema())
 	suite.Require().Equal(deal.GetBudget(), tempDeal.GetBudget())
-	suite.Require().Equal(deal.GetTargetNumData(), tempDeal.GetTargetNumData())
+	suite.Require().Equal(deal.GetMaxNumData(), tempDeal.GetMaxNumData())
 	suite.Require().Equal(deal.GetTrustedDataValidators(), tempDeal.GetTrustedDataValidators())
 	suite.Require().Equal(deal.GetOwner(), tempDeal.GetOwner())
 	suite.Require().Equal(deal.GetStatus(), ACTIVE)
@@ -72,7 +72,7 @@ func (suite *dealTestSuite) TestGetDeal() {
 	suite.Require().Equal(deal.GetDealAddress(), testDeal.GetDealAddress())
 	suite.Require().Equal(deal.GetDataSchema(), testDeal.GetDataSchema())
 	suite.Require().Equal(deal.GetBudget(), testDeal.GetBudget())
-	suite.Require().Equal(deal.GetTargetNumData(), testDeal.GetTargetNumData())
+	suite.Require().Equal(deal.GetMaxNumData(), testDeal.GetMaxNumData())
 	suite.Require().Equal(deal.GetTrustedDataValidators(), testDeal.GetTrustedDataValidators())
 	suite.Require().Equal(deal.GetOwner(), testDeal.GetOwner())
 	suite.Require().Equal(deal.GetStatus(), testDeal.GetStatus())
@@ -87,7 +87,7 @@ func (suite *dealTestSuite) TestGetBalanceOfDeal() {
 	tempDeal := types.Deal{
 		DataSchema:            []string{acc1.String()},
 		Budget:                &sdk.Coin{Denom: "umed", Amount: sdk.NewInt(10000000)},
-		TargetNumData:         10000,
+		MaxNumData:            10000,
 		TrustedDataValidators: []string{acc2.String()},
 		Owner:                 acc1.String(),
 	}
@@ -110,8 +110,8 @@ func makeTestDeal() types.Deal {
 		DealAddress:           types.NewDealAddress(1).String(),
 		DataSchema:            []string{acc1.String()},
 		Budget:                &sdk.Coin{Denom: "umed", Amount: sdk.NewInt(1000000000)},
-		TargetNumData:         10000,
-		FilledNumData:         0,
+		MaxNumData:            10000,
+		CurNumData:            0,
 		TrustedDataValidators: []string{acc2.String()},
 		Owner:                 acc1.String(),
 		Status:                ACTIVE,

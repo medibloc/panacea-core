@@ -12,7 +12,7 @@ const (
 type createDealInputs struct {
 	DataSchema            []string `json:"data_schema"`
 	Budget                string   `json:"budget"`
-	TargetNumData         uint64   `json:"target_num_data"`
+	MaxNumData            uint64   `json:"max_num_data"`
 	TrustedDataValidators []string `json:"trusted_data_validators"`
 }
 

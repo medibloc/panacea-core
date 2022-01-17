@@ -38,7 +38,7 @@ func (suite *genesisTestSuite) TestMarketInitGenesis() {
 	suite.Require().Equal(newDeal.GetDealId(), dealStored.GetDealId())
 	suite.Require().Equal(newDeal.GetDealAddress(), dealStored.GetDealAddress())
 	suite.Require().Equal(newDeal.GetBudget(), dealStored.GetBudget())
-	suite.Require().Equal(newDeal.GetTargetNumData(), dealStored.GetTargetNumData())
+	suite.Require().Equal(newDeal.GetMaxNumData(), dealStored.GetMaxNumData())
 	suite.Require().Equal(newDeal.GetOwner(), dealStored.GetOwner())
 	suite.Require().Equal(newDeal.GetStatus(), dealStored.GetStatus())
 
@@ -54,8 +54,8 @@ func makeTestDeal() (types.Deal, error) {
 		DataSchema:            nil,
 		Budget:                &sdk.Coin{Denom: "umed", Amount: sdk.NewInt(10000000)},
 		TrustedDataValidators: nil,
-		TargetNumData:         10000,
-		FilledNumData:         0,
+		MaxNumData:            10000,
+		CurNumData:            0,
 		Owner:                 acc1.String(),
 		Status:                "ACTIVE",
 	}, nil

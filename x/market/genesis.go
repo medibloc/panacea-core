@@ -22,12 +22,12 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 
 	dealsMap := make(map[uint64]*types.Deal)
 
-	//TODO: Implement GetDeals and Mapping to dealsMap
+	//TODO: Implement GetDealsList and Mapping to dealsMap
 	//for _, deal := k.GetDeals(ctx) {
 	//}
 
 	return &types.GenesisState{
-		Deals:          dealsMap,
-		NextDealNumber: k.GetNextDealNumberAndIncrement(ctx),
+		Deals: dealsMap,
+		NextDealNumber: k.GetNextDealNumber(ctx),
 	}
 }

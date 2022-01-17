@@ -54,7 +54,7 @@ func NewBuildCreateDealMsg(clientCtx client.Context, txf tx.Factory, fs *flag.Fl
 	msg := types.NewMsgCreateDeal(
 		deal.DataSchema,
 		&budget,
-		deal.TargetNumData,
+		deal.MaxNumData,
 		deal.TrustedDataValidators,
 		clientCtx.GetFromAddress().String(),
 	)
