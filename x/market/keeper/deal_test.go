@@ -28,7 +28,7 @@ var (
 	acc2                   = sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address())
 	acc3                   = sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address())
 	defaultFunds sdk.Coins = sdk.NewCoins(sdk.NewCoin("umed", sdk.NewInt(10000000000)))
-	zeroFunds sdk.Coins = sdk.NewCoins(sdk.NewCoin("umed", sdk.NewInt(0)))
+	zeroFunds    sdk.Coins = sdk.NewCoins(sdk.NewCoin("umed", sdk.NewInt(0)))
 )
 
 func (suite *dealTestSuite) BeforeTest(_, _ string) {
@@ -160,7 +160,7 @@ func makeTestCert() types.DataValidationCertificate {
 
 	return types.DataValidationCertificate{
 		UnsignedCert: &uCert,
-		Signature: acc1.Bytes(),
+		Signature:    acc1.Bytes(),
 	}
 
 }
