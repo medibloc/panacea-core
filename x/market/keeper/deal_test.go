@@ -26,7 +26,9 @@ const (
 var (
 	acc1                   = sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address())
 	acc2                   = sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address())
+	acc3                   = sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address())
 	defaultFunds sdk.Coins = sdk.NewCoins(sdk.NewCoin("umed", sdk.NewInt(10000000000)))
+	zeroFunds sdk.Coins = sdk.NewCoins(sdk.NewCoin("umed", sdk.NewInt(0)))
 )
 
 func (suite *dealTestSuite) BeforeTest(_, _ string) {
@@ -104,6 +106,35 @@ func (suite *dealTestSuite) TestGetBalanceOfDeal() {
 	suite.Require().Equal(ownerBalance, sdk.NewCoin("umed", sdk.NewInt(10000000000)).Sub(balance))
 }
 
+func (suite *dealTestSuite) TestSellOwnData() {
+	err := suite.BankKeeper.AddCoins(suite.Ctx, acc1, defaultFunds)
+	suite.Require().NoError(err)
+
+	err = suite.BankKeeper.AddCoins(suite.Ctx, acc3, zeroFunds)
+	suite.Require().NoError(err)
+
+	tempDeal := types.Deal{
+		DataSchema:            []string{acc1.String()},
+		Budget:                &sdk.Coin{Denom: "umed", Amount: sdk.NewInt(10000000)},
+		MaxNumData:            10000,
+		TrustedDataValidators: []string{acc2.String()},
+		Owner:                 acc1.String(),
+	}
+
+	newDeal, err := suite.MarketKeeper.CreateNewDeal(suite.Ctx, acc1, tempDeal)
+	suite.Require().NoError(err)
+
+	cert := makeTestCert()
+	deal, _ := suite.MarketKeeper.GetDeal(suite.Ctx, newDeal)
+
+	reward, err := suite.MarketKeeper.SellOwnData(suite.Ctx, acc3, cert)
+	suite.Require().NoError(err)
+
+	suite.Require().Equal(cert.GetUnsignedCert().GetDealId(), deal.GetDealId())
+	sellerBalance := suite.BankKeeper.GetBalance(suite.Ctx, acc3, "umed")
+	suite.Require().Equal(sellerBalance, reward)
+}
+
 func makeTestDeal() types.Deal {
 	return types.Deal{
 		DealId:                1,
@@ -116,4 +147,20 @@ func makeTestDeal() types.Deal {
 		Owner:                 acc1.String(),
 		Status:                ACTIVE,
 	}
+}
+
+func makeTestCert() types.DataValidationCertificate {
+	uCert := types.UnsignedDataValidationCertificate{
+		DealId:               2,
+		DataHash:             "1a312c123x23",
+		EncryptedDataUrl:     "https://panacea.org/a/123.json",
+		DataValidatorAddress: acc2.String(),
+		RequesterAddress:     acc3.String(),
+	}
+
+	return types.DataValidationCertificate{
+		UnsignedCert: &uCert,
+		Signature: acc1.Bytes(),
+	}
+
 }

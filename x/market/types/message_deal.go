@@ -71,3 +71,43 @@ func (msg *MsgCreateDeal) GetSigners() []sdk.AccAddress {
 	}
 	return []sdk.AccAddress{creator}
 }
+
+var _ sdk.Msg = &MsgSellData{}
+
+func NewSellData(cert DataValidationCertificate, seller string) *MsgSellData {
+	return &MsgSellData{
+		Cert:   &cert,
+		Seller: seller,
+	}
+}
+
+func (msg *MsgSellData) Route() string {
+	return RouterKey
+}
+
+func (msg *MsgSellData) Type() string {
+	return "SellData"
+}
+
+// ValidateBasic is validation for MsgCreateDeal.
+func (msg *MsgSellData) ValidateBasic() error {
+	_, err := sdk.AccAddressFromBech32(msg.Seller)
+	if err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
+	}
+
+	return nil
+}
+
+func (msg *MsgSellData) GetSignBytes() []byte {
+	bz := ModuleCdc.MustMarshalJSON(msg)
+	return sdk.MustSortJSON(bz)
+}
+
+func (msg *MsgSellData) GetSigners() []sdk.AccAddress {
+	creator, err := sdk.AccAddressFromBech32(msg.Seller)
+	if err != nil {
+		panic(err)
+	}
+	return []sdk.AccAddress{creator}
+}
