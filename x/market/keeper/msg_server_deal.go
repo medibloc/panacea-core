@@ -50,7 +50,15 @@ func (m msgServer) SellData(goCtx context.Context, msg *types.MsgSellData) (*typ
 		Signature:    msg.Cert.Signature,
 	}
 
-	//TODO: Verification function for original data and signature refer to auth.go
+	validatorAddr, err := sdk.AccAddressFromBech32(unSignedCert.GetDataValidatorAddress())
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = m.Keeper.Verify(ctx, validatorAddr, unSignedCert, cert)
+	if err != nil {
+		return nil, err
+	}
 
 	reward, err := m.Keeper.SellOwnData(ctx, seller, cert)
 	if err != nil {
@@ -59,3 +67,4 @@ func (m msgServer) SellData(goCtx context.Context, msg *types.MsgSellData) (*typ
 
 	return &types.MsgSellDataResponse{Reward: &reward}, nil
 }
+

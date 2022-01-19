@@ -135,7 +135,7 @@ func (k Keeper) SellOwnData(ctx sdk.Context, seller sdk.AccAddress, cert types.D
 
 	// Is deal activated
 	if findDeal.GetStatus() != ACTIVE {
-		return sdk.Coin{}, fmt.Errorf("deal is not activated")
+		return sdk.Coin{}, sdkerrors.Wrap(err, "deal is not activated")
 	}
 
 	dealAddress, err := types.AccDealAddressFromBech32(findDeal.GetDealAddress())
@@ -155,7 +155,7 @@ func (k Keeper) SellOwnData(ctx sdk.Context, seller sdk.AccAddress, cert types.D
 		}
 	}
 	if !flag {
-		return sdk.Coin{}, fmt.Errorf("data validator is invalid address")
+		return sdk.Coin{}, sdkerrors.Wrap(err, "data validator is invalid address")
 	}
 
 	// Is deal's balance insufficient
@@ -197,4 +197,20 @@ func (k Keeper) SetData(ctx sdk.Context, dealId uint64, cert types.DataValidatio
 func (k Keeper) SetCurNumData(deal types.Deal) {
 	curNumData := deal.GetCurNumData() + 1
 	deal.CurNumData = curNumData
+}
+
+func (k Keeper) Verify(ctx sdk.Context, validatorAddr sdk.AccAddress, unSignedCert types.UnsignedDataValidationCertificate, cert types.DataValidationCertificate) (bool, error) {
+	validatorAcc := k.accountKeeper.GetAccount(ctx, validatorAddr)
+
+	unSignedMarshaled, err := unSignedCert.Marshal()
+	if err != nil {
+		return false, sdkerrors.Wrapf(err, "invalid marshaled value")
+	}
+
+	isValid := validatorAcc.GetPubKey().VerifySignature(unSignedMarshaled, cert.GetSignature())
+	if !isValid {
+		return false, sdkerrors.Wrapf(types.ErrInvalidSignature, "%s", cert.GetSignature())
+	}
+
+	return isValid, nil
 }
