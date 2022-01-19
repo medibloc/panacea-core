@@ -24,13 +24,3 @@ func (suite *txTestSuite) TestNewMsgCreateDeal() {
 func (suite *txTestSuite) TestNewMsgSellData() {
 
 }
-
-// TODO: Test Client Command-Line MsgSellData
-func (suite *txTestSuite) TestNewMsgSellData() {
-
-}
-
-// TODO: Test Client Command-Line MsgSellData
-func (suite *txTestSuite) TestNewMsgSellData() {
-
-}
