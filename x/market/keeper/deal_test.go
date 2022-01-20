@@ -1,11 +1,11 @@
 package keeper_test
 
 import (
+	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/medibloc/panacea-core/v2/types/testsuite"
 	"github.com/medibloc/panacea-core/v2/x/market/types"
 	"github.com/stretchr/testify/suite"
-	"github.com/tendermint/tendermint/crypto/secp256k1"
 	"testing"
 )
 
@@ -137,17 +137,22 @@ func (suite *dealTestSuite) TestSellOwnData() {
 	suite.Require().Equal(sellerBalance, reward)
 }
 
-//func (suite *dealTestSuite) TestVerify() {
-//	cert := makeTestCert()
-//
-//	validatorAddr, err := sdk.AccAddressFromBech32(cert.UnsignedCert.GetDataValidatorAddress())
-//	suite.Require().NoError(err)
-//	suite.Require().Equal(newAddr, validatorAddr)
-//
-//	verify, err := suite.MarketKeeper.Verify(suite.Ctx, validatorAddr, *cert.UnsignedCert, cert)
-//	suite.Require().Equal(true, verify)
-//	suite.Require().NoError(err)
-//}
+func (suite *dealTestSuite) TestVerify() {
+	cert := makeTestCert()
+
+	validatorAddr, err := sdk.AccAddressFromBech32(cert.UnsignedCert.GetDataValidatorAddress())
+	suite.Require().NoError(err)
+	suite.Require().Equal(newAddr, validatorAddr)
+
+	account := suite.AccountKeeper.NewAccountWithAddress(suite.Ctx, validatorAddr)
+	err = account.SetPubKey(privKey.PubKey())
+	suite.Require().NoError(err)
+	suite.AccountKeeper.SetAccount(suite.Ctx, account)
+
+	verify, err := suite.MarketKeeper.Verify(suite.Ctx, validatorAddr, *cert.UnsignedCert, cert)
+	suite.Require().Equal(true, verify)
+	suite.Require().NoError(err)
+}
 
 func makeTestDeal() types.Deal {
 	return types.Deal{
