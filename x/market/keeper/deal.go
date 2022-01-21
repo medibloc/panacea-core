@@ -179,6 +179,10 @@ func (k Keeper) SellOwnData(ctx sdk.Context, seller sdk.AccAddress, cert types.D
 
 	pricePerData := sdk.NewCoin("umed", sdk.NewIntFromUint64(totalAmount/countOfData))
 
+	if dealBalance.IsLT(pricePerData) {
+		return sdk.Coin{}, fmt.Errorf("deal's balance is smaller than reward")
+	}
+
 	coins := append(sdk.Coins{}, pricePerData)
 
 	err = k.bankKeeper.SendCoins(ctx, dealAddress, seller, coins)
@@ -189,6 +193,7 @@ func (k Keeper) SellOwnData(ctx sdk.Context, seller sdk.AccAddress, cert types.D
 	SetCurNumData(findDeal)
 	k.SetDataCertificate(ctx, findDeal.GetDealId(), cert)
 	return pricePerData, nil
+
 }
 
 func (k Keeper) isDataCertDuplicate(ctx sdk.Context, cert types.DataValidationCertificate) (sdk.Coin, error) {
