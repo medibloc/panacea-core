@@ -60,6 +60,7 @@ func (m msgServer) SellData(goCtx context.Context, msg *types.MsgSellData) (*typ
 		return nil, err
 	}
 
+	//TODO: Verification function for original data and signature in ft/na/sell-data-2 branch.
 	reward, err := m.Keeper.SellOwnData(ctx, seller, cert)
 	if err != nil {
 		return nil, err
