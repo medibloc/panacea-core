@@ -106,6 +106,7 @@ func (suite *dealTestSuite) TestGetBalanceOfDeal() {
 	suite.Require().Equal(ownerBalance, sdk.NewCoin("umed", sdk.NewInt(10000000000)).Sub(balance))
 }
 
+//TODO: Get Num of DataCertificate stored in KV store.
 func (suite *dealTestSuite) TestSellOwnData() {
 	err := suite.BankKeeper.AddCoins(suite.Ctx, acc1, defaultFunds)
 	suite.Require().NoError(err)

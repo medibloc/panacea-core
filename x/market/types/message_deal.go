@@ -89,7 +89,8 @@ func (msg *MsgSellData) Type() string {
 	return "SellData"
 }
 
-// ValidateBasic is validation for MsgCreateDeal.
+// ValidateBasic is validation for MsgSellData.
+// TODO: Basic Validation for MsgSellData.
 func (msg *MsgSellData) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.Seller)
 	if err != nil {
@@ -105,9 +106,9 @@ func (msg *MsgSellData) GetSignBytes() []byte {
 }
 
 func (msg *MsgSellData) GetSigners() []sdk.AccAddress {
-	creator, err := sdk.AccAddressFromBech32(msg.Seller)
+	signer, err := sdk.AccAddressFromBech32(msg.Cert.UnsignedCert.GetRequesterAddress())
 	if err != nil {
 		panic(err)
 	}
-	return []sdk.AccAddress{creator}
+	return []sdk.AccAddress{signer}
 }
