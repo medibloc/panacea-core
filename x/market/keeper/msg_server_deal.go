@@ -55,7 +55,7 @@ func (m msgServer) SellData(goCtx context.Context, msg *types.MsgSellData) (*typ
 		return nil, err
 	}
 
-	_, err = m.Keeper.Verify(ctx, validatorAddr, unSignedCert, cert)
+	_, err = m.Keeper.Verify(ctx, validatorAddr, cert)
 	if err != nil {
 		return nil, err
 	}

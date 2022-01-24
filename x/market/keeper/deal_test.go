@@ -150,7 +150,7 @@ func (suite *dealTestSuite) TestVerify() {
 	suite.Require().NoError(err)
 	suite.AccountKeeper.SetAccount(suite.Ctx, account)
 
-	verify, err := suite.MarketKeeper.Verify(suite.Ctx, validatorAddr, *cert.UnsignedCert, cert)
+	verify, err := suite.MarketKeeper.Verify(suite.Ctx, validatorAddr, cert)
 	suite.Require().Equal(true, verify)
 	suite.Require().NoError(err)
 }
