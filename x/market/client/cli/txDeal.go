@@ -62,7 +62,7 @@ func SellDataCmd() *cobra.Command {
 		},
 	}
 
-	cmd.Flags().String(ReceiptDataFile, "", "Receipt data file path")
+	cmd.Flags().String(DataVerificationCertificateFile, "", "Data Verification Certificate file path")
 	flags.AddTxFlagsToCmd(cmd)
 	return cmd
 }
@@ -136,10 +136,10 @@ func NewSellDataMsg(clientCtx client.Context, txf tx.Factory, fs *flag.FlagSet) 
 
 func parseSellDataFlags(fs *flag.FlagSet) (*sellDataInputs, error) {
 	sellData := &sellDataInputs{}
-	receiptFile, _ := fs.GetString(ReceiptDataFile)
+	receiptFile, _ := fs.GetString(DataVerificationCertificateFile)
 
 	if receiptFile == "" {
-		return nil, fmt.Errorf("need receipt json file using --%s flag", ReceiptDataFile)
+		return nil, fmt.Errorf("need receipt json file using --%s flag", DataVerificationCertificateFile)
 	}
 
 	contents, err := ioutil.ReadFile(receiptFile)

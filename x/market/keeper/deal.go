@@ -198,7 +198,7 @@ func (k Keeper) SellOwnData(ctx sdk.Context, seller sdk.AccAddress, cert types.D
 
 func (k Keeper) isDataCertDuplicate(ctx sdk.Context, cert types.DataValidationCertificate) (sdk.Coin, error) {
 	store := ctx.KVStore(k.storeKey)
-	dataCertKey := types.CombineKeys(sdk.Uint64ToBigEndian(cert.UnsignedCert.GetDealId()), []byte(cert.UnsignedCert.GetDataHash()))
+	dataCertKey := types.GetKeyPrefixCertificate(cert.UnsignedCert.GetDealId(), cert.UnsignedCert.GetDataHash())
 
 	if store.Has(dataCertKey) {
 		return sdk.Coin{}, fmt.Errorf("duplicated data")

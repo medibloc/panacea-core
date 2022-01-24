@@ -7,7 +7,7 @@ import (
 
 const (
 	FlagDealFile    = "deal-file"
-	ReceiptDataFile = "receipt-file"
+	DataVerificationCertificateFile = "data-verification-certificate-file"
 )
 
 type createDealInputs struct {
