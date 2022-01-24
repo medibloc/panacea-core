@@ -1,11 +1,11 @@
 package keeper_test
 
 import (
+	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/medibloc/panacea-core/v2/types/testsuite"
 	"github.com/medibloc/panacea-core/v2/x/market/types"
 	"github.com/stretchr/testify/suite"
-	"github.com/tendermint/tendermint/crypto/secp256k1"
 	"testing"
 )
 
@@ -29,6 +29,8 @@ var (
 	acc3                   = sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address())
 	defaultFunds sdk.Coins = sdk.NewCoins(sdk.NewCoin("umed", sdk.NewInt(10000000000)))
 	zeroFunds    sdk.Coins = sdk.NewCoins(sdk.NewCoin("umed", sdk.NewInt(0)))
+	privKey                = secp256k1.GenPrivKey()
+	newAddr                = sdk.AccAddress(privKey.PubKey().Address())
 )
 
 func (suite *dealTestSuite) BeforeTest(_, _ string) {
@@ -118,7 +120,7 @@ func (suite *dealTestSuite) TestSellOwnData() {
 		DataSchema:            []string{acc1.String()},
 		Budget:                &sdk.Coin{Denom: "umed", Amount: sdk.NewInt(10000000)},
 		MaxNumData:            10000,
-		TrustedDataValidators: []string{acc2.String()},
+		TrustedDataValidators: []string{newAddr.String()},
 		Owner:                 acc1.String(),
 	}
 
@@ -131,9 +133,26 @@ func (suite *dealTestSuite) TestSellOwnData() {
 	reward, err := suite.MarketKeeper.SellOwnData(suite.Ctx, acc3, cert)
 	suite.Require().NoError(err)
 
-	suite.Require().Equal(cert.GetUnsignedCert().GetDealId(), deal.GetDealId())
+	suite.Require().Equal(cert.UnsignedCert.GetDealId(), deal.GetDealId())
 	sellerBalance := suite.BankKeeper.GetBalance(suite.Ctx, acc3, "umed")
 	suite.Require().Equal(sellerBalance, reward)
+}
+
+func (suite *dealTestSuite) TestVerify() {
+	cert := makeTestCert()
+
+	validatorAddr, err := sdk.AccAddressFromBech32(cert.UnsignedCert.GetDataValidatorAddress())
+	suite.Require().NoError(err)
+	suite.Require().Equal(newAddr, validatorAddr)
+
+	account := suite.AccountKeeper.NewAccountWithAddress(suite.Ctx, validatorAddr)
+	err = account.SetPubKey(privKey.PubKey())
+	suite.Require().NoError(err)
+	suite.AccountKeeper.SetAccount(suite.Ctx, account)
+
+	verify, err := suite.MarketKeeper.Verify(suite.Ctx, validatorAddr, cert)
+	suite.Require().Equal(true, verify)
+	suite.Require().NoError(err)
 }
 
 func makeTestDeal() types.Deal {
@@ -155,13 +174,23 @@ func makeTestCert() types.DataValidationCertificate {
 		DealId:               2,
 		DataHash:             "1a312c123x23",
 		EncryptedDataUrl:     "https://panacea.org/a/123.json",
-		DataValidatorAddress: acc2.String(),
+		DataValidatorAddress: newAddr.String(),
 		RequesterAddress:     acc3.String(),
+	}
+
+	marshal, err := uCert.Marshal()
+	if err != nil {
+		return types.DataValidationCertificate{}
+	}
+
+	sign, err := privKey.Sign(marshal)
+	if err != nil {
+		return types.DataValidationCertificate{}
 	}
 
 	return types.DataValidationCertificate{
 		UnsignedCert: &uCert,
-		Signature:    acc1.Bytes(),
+		Signature:    sign,
 	}
 
 }

@@ -138,7 +138,7 @@ func (k Keeper) SellOwnData(ctx sdk.Context, seller sdk.AccAddress, cert types.D
 	}
 
 	if findDeal.GetStatus() != ACTIVE {
-		return sdk.Coin{}, fmt.Errorf("deal is not activated")
+		return sdk.Coin{}, sdkerrors.Wrap(err, "deal is not activated")
 	}
 
 	dealAddress, err := types.AccDealAddressFromBech32(findDeal.GetDealAddress())
@@ -172,11 +172,12 @@ func (k Keeper) SellOwnData(ctx sdk.Context, seller sdk.AccAddress, cert types.D
 	SetCurNumData(findDeal)
 	k.SetDataCertificate(ctx, findDeal.GetDealId(), cert)
 	return pricePerData, nil
+
 }
 
 func (k Keeper) isDataCertDuplicate(ctx sdk.Context, cert types.DataValidationCertificate) (sdk.Coin, error) {
 	store := ctx.KVStore(k.storeKey)
-	dataCertKey := types.CombineKeys(sdk.Uint64ToBigEndian(cert.UnsignedCert.GetDealId()), []byte(cert.UnsignedCert.GetDataHash()))
+	dataCertKey := types.GetKeyPrefixCertificate(cert.UnsignedCert.GetDealId(), cert.UnsignedCert.GetDataHash())
 
 	if store.Has(dataCertKey) {
 		return sdk.Coin{}, fmt.Errorf("duplicated data")
@@ -208,4 +209,20 @@ func (k Keeper) SetDataCertificate(ctx sdk.Context, dealId uint64, cert types.Da
 func SetCurNumData(deal types.Deal) {
 	curNumData := deal.GetCurNumData() + 1
 	deal.CurNumData = curNumData
+}
+
+func (k Keeper) Verify(ctx sdk.Context, validatorAddr sdk.AccAddress, cert types.DataValidationCertificate) (bool, error) {
+	validatorAcc := k.accountKeeper.GetAccount(ctx, validatorAddr)
+
+	unSignedMarshaled, err := cert.UnsignedCert.Marshal()
+	if err != nil {
+		return false, sdkerrors.Wrapf(err, "invalid marshaled value")
+	}
+
+	isValid := validatorAcc.GetPubKey().VerifySignature(unSignedMarshaled, cert.GetSignature())
+	if !isValid {
+		return false, sdkerrors.Wrapf(types.ErrInvalidSignature, "%s", cert.GetSignature())
+	}
+
+	return isValid, nil
 }
