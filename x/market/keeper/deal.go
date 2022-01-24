@@ -146,28 +146,6 @@ func (k Keeper) SellOwnData(ctx sdk.Context, seller sdk.AccAddress, cert types.D
 		return sdk.Coin{}, err
 	}
 
-	// Is trusted validator
-	validator := cert.UnsignedCert.GetDataValidatorAddress()
-	trustedValidators := findDeal.GetTrustedDataValidators()
-
-	flag := false
-	for _, v := range trustedValidators {
-		if validator == v {
-			flag = true
-			break
-		}
-	}
-	if !flag {
-		return sdk.Coin{}, sdkerrors.Wrap(err, "data validator is invalid address")
-	}
-
-	// Is deal's balance insufficient
-	dealBalance := k.bankKeeper.GetBalance(ctx, dealAddress, "umed")
-	sellerBalance := k.bankKeeper.GetBalance(ctx, seller, "umed")
-	if dealBalance.IsLT(sellerBalance) {
-		return sdk.Coin{}, fmt.Errorf("deal's balance is smaller than seller's balance")
-	}
-
 	err = k.isTrustedValidator(cert, findDeal)
 	if err != nil {
 		return sdk.Coin{}, err
@@ -179,6 +157,7 @@ func (k Keeper) SellOwnData(ctx sdk.Context, seller sdk.AccAddress, cert types.D
 
 	pricePerData := sdk.NewCoin("umed", sdk.NewIntFromUint64(totalAmount/countOfData))
 
+	dealBalance := k.bankKeeper.GetBalance(ctx, dealAddress, "umed")
 	if dealBalance.IsLT(pricePerData) {
 		return sdk.Coin{}, fmt.Errorf("deal's balance is smaller than reward")
 	}
@@ -232,10 +211,10 @@ func SetCurNumData(deal types.Deal) {
 	deal.CurNumData = curNumData
 }
 
-func (k Keeper) Verify(ctx sdk.Context, validatorAddr sdk.AccAddress, unSignedCert types.UnsignedDataValidationCertificate, cert types.DataValidationCertificate) (bool, error) {
+func (k Keeper) Verify(ctx sdk.Context, validatorAddr sdk.AccAddress, cert types.DataValidationCertificate) (bool, error) {
 	validatorAcc := k.accountKeeper.GetAccount(ctx, validatorAddr)
 
-	unSignedMarshaled, err := unSignedCert.Marshal()
+	unSignedMarshaled, err := cert.UnsignedCert.Marshal()
 	if err != nil {
 		return false, sdkerrors.Wrapf(err, "invalid marshaled value")
 	}

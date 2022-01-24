@@ -35,10 +35,8 @@ type UnsignedDataValidationCertification struct {
 	RequesterAddress     string `json:"requester_address"`
 }
 
-type XCreateDealInputs createDealInputs
-
 func (input *createDealInputs) UnmarshalJSON(data []byte) error {
-	var createDeal XCreateDealInputs
+	var createDeal createDealInputs
 	dec := json.NewDecoder(bytes.NewReader(data))
 	dec.DisallowUnknownFields()
 
@@ -46,14 +44,12 @@ func (input *createDealInputs) UnmarshalJSON(data []byte) error {
 		return nil
 	}
 
-	*input = createDealInputs(createDeal)
+	*input = createDeal
 	return nil
 }
 
-type XSellDataInputs sellDataInputs
-
 func (input *sellDataInputs) UnmarshalJSON(data []byte) error {
-	var sellData XSellDataInputs
+	var sellData sellDataInputs
 	dec := json.NewDecoder(bytes.NewReader(data))
 	dec.DisallowUnknownFields()
 
@@ -61,6 +57,6 @@ func (input *sellDataInputs) UnmarshalJSON(data []byte) error {
 		return err
 	}
 
-	*input = sellDataInputs(sellData)
+	*input = sellData
 	return nil
 }
