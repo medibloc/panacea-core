@@ -134,6 +134,7 @@ func (suite *dealTestSuite) TestSellOwnData() {
 	suite.Require().NoError(err)
 	suite.Require().Equal(cert.UnsignedCert.GetDealId(), deal.GetDealId())
 
+	suite.Require().Equal(cert.UnsignedCert.GetDealId(), deal.GetDealId())
 	sellerBalance := suite.BankKeeper.GetBalance(suite.Ctx, acc3, "umed")
 	suite.Require().Equal(sellerBalance, reward)
 

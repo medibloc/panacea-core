@@ -173,6 +173,7 @@ func (k Keeper) SellOwnData(ctx sdk.Context, seller sdk.AccAddress, cert types.D
 	SetCurNumData(&findDeal)
 	k.SetDeal(ctx, findDeal)
 	return pricePerData, nil
+
 }
 
 func (k Keeper) isDataCertDuplicate(ctx sdk.Context, cert types.DataValidationCertificate) error {
