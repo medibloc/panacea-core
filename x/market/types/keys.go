@@ -29,7 +29,7 @@ var (
 	// KeyPrefixDeals defines key to store deals
 	KeyPrefixDeals = []byte{0x02}
 
-	// KeyPrefixDataCertificateStore defines key to store data
+	// KeyPrefixDataCertificateStore defines key to store data certificate
 	KeyPrefixDataCertificateStore = []byte{0x03}
 
 	KeyIndexSeparator = []byte{0x07}
@@ -41,8 +41,8 @@ func GetKeyPrefixDeals(dealId uint64) []byte {
 
 func GetKeyPrefixCertificate(dealId uint64, dataHash string) []byte {
 	beDealId := sdk.Uint64ToBigEndian(dealId)
-	bytes := []byte(dataHash)
-	keys := CombineKeys(beDealId, bytes)
+	dataHashBytes := []byte(dataHash)
+	keys := CombineKeys(beDealId, dataHashBytes)
 	return append(KeyPrefixDataCertificateStore, keys...)
 }
 

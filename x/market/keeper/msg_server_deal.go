@@ -37,6 +37,11 @@ func (m msgServer) SellData(goCtx context.Context, msg *types.MsgSellData) (*typ
 		return nil, err
 	}
 
+	validatorAddr, err := sdk.AccAddressFromBech32(msg.Cert.UnsignedCert.DataValidatorAddress)
+	if err != nil {
+		return nil, err
+	}
+
 	unSignedCert := types.UnsignedDataValidationCertificate{
 		DealId:               msg.Cert.UnsignedCert.DealId,
 		DataHash:             msg.Cert.UnsignedCert.DataHash,
@@ -50,17 +55,11 @@ func (m msgServer) SellData(goCtx context.Context, msg *types.MsgSellData) (*typ
 		Signature:    msg.Cert.Signature,
 	}
 
-	validatorAddr, err := sdk.AccAddressFromBech32(unSignedCert.GetDataValidatorAddress())
-	if err != nil {
-		return nil, err
-	}
-
 	_, err = m.Keeper.Verify(ctx, validatorAddr, cert)
 	if err != nil {
 		return nil, err
 	}
 
-	//TODO: Verification function for original data and signature in ft/na/sell-data-2 branch.
 	reward, err := m.Keeper.SellOwnData(ctx, seller, cert)
 	if err != nil {
 		return nil, err
@@ -68,4 +67,3 @@ func (m msgServer) SellData(goCtx context.Context, msg *types.MsgSellData) (*typ
 
 	return &types.MsgSellDataResponse{Reward: &reward}, nil
 }
-

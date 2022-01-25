@@ -1,6 +1,8 @@
 package cli
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -90,7 +92,7 @@ func NewBuildCreateDealMsg(clientCtx client.Context, txf tx.Factory, fs *flag.Fl
 }
 
 func parseCreateDealFlags(fs *flag.FlagSet) (*createDealInputs, error) {
-	deal := &createDealInputs{}
+	var createDeal createDealInputs
 	dealFile, _ := fs.GetString(FlagDealFile)
 
 	if dealFile == "" {
@@ -102,18 +104,19 @@ func parseCreateDealFlags(fs *flag.FlagSet) (*createDealInputs, error) {
 		return nil, err
 	}
 
-	err = deal.UnmarshalJSON(contents)
-	if err != nil {
+	dec := json.NewDecoder(bytes.NewReader(contents))
+
+	if err := dec.Decode(&createDeal); err != nil {
 		return nil, err
 	}
 
-	return deal, nil
+	return &createDeal, nil
 }
 
 func NewSellDataMsg(clientCtx client.Context, txf tx.Factory, fs *flag.FlagSet) (tx.Factory, sdk.Msg, error) {
 	sellData, err := parseSellDataFlags(fs)
 	if err != nil {
-		return txf, nil, fmt.Errorf("failed to parse receipt: %w", err)
+		return txf, nil, fmt.Errorf("failed to parse data certificate file: %w", err)
 	}
 
 	unSigned := types.UnsignedDataValidationCertificate{
@@ -126,7 +129,7 @@ func NewSellDataMsg(clientCtx client.Context, txf tx.Factory, fs *flag.FlagSet) 
 
 	signed := types.DataValidationCertificate{
 		UnsignedCert: &unSigned,
-		Signature:    []byte(sellData.Cert.Signature),
+		Signature:    sellData.Cert.Signature,
 	}
 
 	msg := types.NewMsgSellData(signed, clientCtx.GetFromAddress().String())
@@ -135,7 +138,7 @@ func NewSellDataMsg(clientCtx client.Context, txf tx.Factory, fs *flag.FlagSet) 
 }
 
 func parseSellDataFlags(fs *flag.FlagSet) (*sellDataInputs, error) {
-	sellData := &sellDataInputs{}
+	var sellData sellDataInputs
 	receiptFile, _ := fs.GetString(DataVerificationCertificateFile)
 
 	if receiptFile == "" {
@@ -147,10 +150,11 @@ func parseSellDataFlags(fs *flag.FlagSet) (*sellDataInputs, error) {
 		return nil, err
 	}
 
-	err = sellData.UnmarshalJSON(contents)
-	if err != nil {
+	dec := json.NewDecoder(bytes.NewReader(contents))
+
+	if err := dec.Decode(&sellData); err != nil {
 		return nil, err
 	}
 
-	return sellData, nil
+	return &sellData, nil
 }

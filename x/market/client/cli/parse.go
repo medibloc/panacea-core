@@ -1,12 +1,7 @@
 package cli
 
-import (
-	"bytes"
-	"encoding/json"
-)
-
 const (
-	FlagDealFile    = "deal-file"
+	FlagDealFile                    = "deal-file"
 	DataVerificationCertificateFile = "data-verification-certificate-file"
 )
 
@@ -24,7 +19,7 @@ type sellDataInputs struct {
 
 type DataValidationCertification struct {
 	UnsignedCert UnsignedDataValidationCertification `json:"unsigned_cert"`
-	Signature    string                              `json:"signature"`
+	Signature    []byte                              `json:"signature"`
 }
 
 type UnsignedDataValidationCertification struct {
@@ -33,30 +28,4 @@ type UnsignedDataValidationCertification struct {
 	EncryptedDataUrl     string `json:"encrypted_data_url"`
 	DataValidatorAddress string `json:"data_validator_address"`
 	RequesterAddress     string `json:"requester_address"`
-}
-
-func (input *createDealInputs) UnmarshalJSON(data []byte) error {
-	var createDeal createDealInputs
-	dec := json.NewDecoder(bytes.NewReader(data))
-	dec.DisallowUnknownFields()
-
-	if err := dec.Decode(&createDeal); err != nil {
-		return nil
-	}
-
-	*input = createDeal
-	return nil
-}
-
-func (input *sellDataInputs) UnmarshalJSON(data []byte) error {
-	var sellData sellDataInputs
-	dec := json.NewDecoder(bytes.NewReader(data))
-	dec.DisallowUnknownFields()
-
-	if err := dec.Decode(&sellData); err != nil {
-		return err
-	}
-
-	*input = sellData
-	return nil
 }

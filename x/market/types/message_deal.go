@@ -53,7 +53,7 @@ func (msg *MsgCreateDeal) ValidateBasic() error {
 	for _, validator := range msg.TrustedDataValidators {
 		_, err = sdk.AccAddressFromBech32(validator)
 		if err != nil {
-			return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
+			return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid data validator address (%s)", err)
 		}
 	}
 	return nil
@@ -90,11 +90,52 @@ func (msg *MsgSellData) Type() string {
 }
 
 // ValidateBasic is validation for MsgSellData.
-// TODO: Basic Validation for MsgSellData.
 func (msg *MsgSellData) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.Seller)
 	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
+	}
+
+	if msg.Cert == nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "empty certificate")
+	}
+
+	signature := msg.Cert.Signature
+	if signature == nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "empty signature")
+	}
+
+	unsignedCert := msg.Cert.UnsignedCert
+	if unsignedCert == nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "no unsigned data certificate")
+	}
+
+	if unsignedCert.DealId <= 0 {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid deal id format")
+	}
+
+	if unsignedCert.DataHash == "" {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "empty data hash")
+	}
+
+	if unsignedCert.EncryptedDataUrl == "" {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "empty encrypted data url")
+	}
+
+	if unsignedCert.DataValidatorAddress == "" {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "empty data validator address")
+	}
+	_, err = sdk.AccAddressFromBech32(unsignedCert.DataValidatorAddress)
+	if err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid data validator address (%s)", err)
+	}
+
+	if unsignedCert.RequesterAddress == "" {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "empty requester address")
+	}
+	_, err = sdk.AccAddressFromBech32(unsignedCert.RequesterAddress)
+	if err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid requester address (%s)", err)
 	}
 
 	return nil
@@ -106,9 +147,9 @@ func (msg *MsgSellData) GetSignBytes() []byte {
 }
 
 func (msg *MsgSellData) GetSigners() []sdk.AccAddress {
-	signer, err := sdk.AccAddressFromBech32(msg.Cert.UnsignedCert.GetRequesterAddress())
+	seller, err := sdk.AccAddressFromBech32(msg.Seller)
 	if err != nil {
 		panic(err)
 	}
-	return []sdk.AccAddress{signer}
+	return []sdk.AccAddress{seller}
 }

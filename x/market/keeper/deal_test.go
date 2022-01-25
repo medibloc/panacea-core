@@ -1,6 +1,7 @@
 package keeper_test
 
 import (
+	"fmt"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/medibloc/panacea-core/v2/types/testsuite"
@@ -108,7 +109,6 @@ func (suite *dealTestSuite) TestGetBalanceOfDeal() {
 	suite.Require().Equal(ownerBalance, sdk.NewCoin("umed", sdk.NewInt(10000000000)).Sub(balance))
 }
 
-//TODO: Get Num of DataCertificate stored in KV store.
 func (suite *dealTestSuite) TestSellOwnData() {
 	err := suite.BankKeeper.AddCoins(suite.Ctx, acc1, defaultFunds)
 	suite.Require().NoError(err)
@@ -124,18 +124,23 @@ func (suite *dealTestSuite) TestSellOwnData() {
 		Owner:                 acc1.String(),
 	}
 
-	newDeal, err := suite.MarketKeeper.CreateNewDeal(suite.Ctx, acc1, tempDeal)
+	newDealId, err := suite.MarketKeeper.CreateNewDeal(suite.Ctx, acc1, tempDeal)
 	suite.Require().NoError(err)
 
 	cert := makeTestCert()
-	deal, _ := suite.MarketKeeper.GetDeal(suite.Ctx, newDeal)
+	deal, _ := suite.MarketKeeper.GetDeal(suite.Ctx, newDealId)
 
 	reward, err := suite.MarketKeeper.SellOwnData(suite.Ctx, acc3, cert)
 	suite.Require().NoError(err)
-
 	suite.Require().Equal(cert.UnsignedCert.GetDealId(), deal.GetDealId())
+
 	sellerBalance := suite.BankKeeper.GetBalance(suite.Ctx, acc3, "umed")
 	suite.Require().Equal(sellerBalance, reward)
+
+	updatedDeal, err := suite.MarketKeeper.GetDeal(suite.Ctx, newDealId)
+	suite.Require().NoError(err)
+
+	suite.Require().Equal(updatedDeal.GetCurNumData(), deal.GetCurNumData()+1)
 }
 
 func (suite *dealTestSuite) TestVerify() {
@@ -183,6 +188,7 @@ func makeTestCert() types.DataValidationCertificate {
 		return types.DataValidationCertificate{}
 	}
 
+	fmt.Println(newAddr.String())
 	sign, err := privKey.Sign(marshal)
 	if err != nil {
 		return types.DataValidationCertificate{}
