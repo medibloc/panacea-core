@@ -45,7 +45,7 @@ func (suite *dealTestSuite) TestCreateNewDeal() {
 	suite.Require().NoError(err)
 
 	tempDeal := types.Deal{
-		DataSchema:            []string{acc1.String()},
+		DataSchema:            []string{"http://jsonld.com"},
 		Budget:                &sdk.Coin{Denom: assets.MicroMedDenom, Amount: sdk.NewInt(10000000)},
 		MaxNumData:            10000,
 		TrustedDataValidators: []string{acc2.String()},
@@ -93,7 +93,7 @@ func (suite *dealTestSuite) TestGetBalanceOfDeal() {
 	suite.Require().NoError(err)
 
 	tempDeal := types.Deal{
-		DataSchema:            []string{acc1.String()},
+		DataSchema:            []string{"http://jsonld.com"},
 		Budget:                &sdk.Coin{Denom: assets.MicroMedDenom, Amount: sdk.NewInt(10000000)},
 		MaxNumData:            10000,
 		TrustedDataValidators: []string{acc2.String()},
@@ -127,7 +127,7 @@ func (suite *dealTestSuite) TestSellOwnData() {
 	suite.Require().NoError(err)
 
 	tempDeal := types.Deal{
-		DataSchema:            []string{acc1.String()},
+		DataSchema:            []string{"http://jsonld.com"},
 		Budget:                &sdk.Coin{Denom: assets.MicroMedDenom, Amount: sdk.NewInt(10000000)},
 		MaxNumData:            10000,
 		TrustedDataValidators: []string{newAddr.String()},
@@ -151,6 +151,91 @@ func (suite *dealTestSuite) TestSellOwnData() {
 	updatedDeal, err := suite.MarketKeeper.GetDeal(suite.Ctx, newDealId)
 	suite.Require().NoError(err)
 	suite.Require().Equal(updatedDeal.GetCurNumData(), deal.GetCurNumData()+1)
+}
+
+func (suite *dealTestSuite) TestIsDataCertDuplicate() {
+	err := suite.BankKeeper.AddCoins(suite.Ctx, acc1, defaultFunds)
+	suite.Require().NoError(err)
+
+	err = suite.BankKeeper.AddCoins(suite.Ctx, acc3, zeroFunds)
+	suite.Require().NoError(err)
+
+	tempDeal := types.Deal{
+		DataSchema:            []string{"http://jsonld.com"},
+		Budget:                &sdk.Coin{Denom: assets.MicroMedDenom, Amount: sdk.NewInt(10000000)},
+		MaxNumData:            10000,
+		TrustedDataValidators: []string{newAddr.String()},
+		Owner:                 acc1.String(),
+	}
+
+	_, err = suite.MarketKeeper.CreateNewDeal(suite.Ctx, acc1, tempDeal)
+	suite.Require().NoError(err)
+
+	testCert1 := makeTestCert()
+	_, err = suite.MarketKeeper.SellOwnData(suite.Ctx, acc3, testCert1)
+	suite.Require().NoError(err)
+
+	testCert2 := makeTestCert()
+	_, err = suite.MarketKeeper.SellOwnData(suite.Ctx, acc3, testCert2)
+	suite.Require().Error(err, "duplicated data")
+}
+
+func (suite *dealTestSuite) TestIsTrustedDataValidator_Invalid() {
+	err := suite.BankKeeper.AddCoins(suite.Ctx, acc1, defaultFunds)
+	suite.Require().NoError(err)
+
+	err = suite.BankKeeper.AddCoins(suite.Ctx, acc3, zeroFunds)
+	suite.Require().NoError(err)
+
+	errValidator1 := secp256k1.GenPrivKey().PubKey().Address().String()
+	errValidator2 := secp256k1.GenPrivKey().PubKey().Address().String()
+
+	tempDeal := types.Deal{
+		DataSchema:            []string{"http://jsonld.com"},
+		Budget:                &sdk.Coin{Denom: assets.MicroMedDenom, Amount: sdk.NewInt(10000000)},
+		MaxNumData:            10000,
+		TrustedDataValidators: []string{errValidator1,  errValidator2},
+		Owner:                 acc1.String(),
+	}
+
+	_, err = suite.MarketKeeper.CreateNewDeal(suite.Ctx, acc1, tempDeal)
+	suite.Require().NoError(err)
+
+	testCert1 := makeTestCert()
+	_, err = suite.MarketKeeper.SellOwnData(suite.Ctx, acc3, testCert1)
+	suite.Require().Error(err, "data validator is invalid address")
+}
+
+func (suite *dealTestSuite) TestDealStatusInactiveOrCompleted() {
+	err := suite.BankKeeper.AddCoins(suite.Ctx, acc1, defaultFunds)
+	suite.Require().NoError(err)
+
+	err = suite.BankKeeper.AddCoins(suite.Ctx, acc3, zeroFunds)
+	suite.Require().NoError(err)
+
+	tempDeal := types.Deal{
+		DataSchema:            []string{"http://jsonld.com"},
+		Budget:                &sdk.Coin{Denom: assets.MicroMedDenom, Amount: sdk.NewInt(10000000)},
+		MaxNumData:            10000,
+		TrustedDataValidators: []string{newAddr.String()},
+		Owner:                 acc1.String(),
+	}
+
+	dealId, err := suite.MarketKeeper.CreateNewDeal(suite.Ctx, acc1, tempDeal)
+	suite.Require().NoError(err)
+	findDeal, err := suite.MarketKeeper.GetDeal(suite.Ctx, dealId)
+	suite.Require().NoError(err)
+
+	findDeal.Status = INACTIVE
+	suite.MarketKeeper.SetDeal(suite.Ctx, findDeal)
+
+	testCert1 := makeTestCert()
+	_, err = suite.MarketKeeper.SellOwnData(suite.Ctx, acc3, testCert1)
+	suite.Require().Error(err, "the deal's state is INACTIVE")
+
+	findDeal.Status = COMPLETED
+	suite.MarketKeeper.SetDeal(suite.Ctx, findDeal)
+	suite.Require().Error(err, "the deal's state is COMPLETED")
 }
 
 func (suite *dealTestSuite) TestVerify() {
