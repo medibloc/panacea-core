@@ -2,14 +2,12 @@ package cli
 
 import (
 	"github.com/medibloc/panacea-core/v2/types/testsuite"
-	flag "github.com/spf13/pflag"
 	"github.com/stretchr/testify/suite"
 	"testing"
 )
 
 type txTestSuite struct {
 	testsuite.TestSuite
-	fs *flag.FlagSet
 }
 
 func TestTxTestSuite(t *testing.T) {
@@ -38,11 +36,11 @@ func (suite *txTestSuite) TestCmdSellData() {
 
 }
 
-func makeTestCreateDealInputs() createDealInputs {
-	return createDealInputs{
-		DataSchema:            []string{"https://www.json.ld"},
-		Budget:                "10000000umed",
-		MaxNumData:            10000,
-		TrustedDataValidators: []string{"panacea153rk89lyqnahmzfygy6ca6gs0n69g9sa8kdght"},
-	}
-}
+//func makeTestCreateDealInputs() createDealInputs {
+//	return createDealInputs{
+//		DataSchema:            []string{"https://www.json.ld"},
+//		Budget:                "10000000umed",
+//		MaxNumData:            10000,
+//		TrustedDataValidators: []string{"panacea153rk89lyqnahmzfygy6ca6gs0n69g9sa8kdght"},
+//	}
+//}
