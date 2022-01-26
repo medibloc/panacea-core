@@ -138,6 +138,10 @@ func (msg *MsgSellData) ValidateBasic() error {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid requester address (%s)", err)
 	}
 
+	if unsignedCert.RequesterAddress == msg.Seller {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "request address and seller address is not same")
+	}
+
 	return nil
 }
 

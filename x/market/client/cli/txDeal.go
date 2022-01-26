@@ -14,7 +14,7 @@ import (
 	"io/ioutil"
 )
 
-func NewCreateDealCmd() *cobra.Command {
+func CmdCreateDeal() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "create-deal [flags]",
 		Short: "create a new deal",
@@ -42,7 +42,7 @@ func NewCreateDealCmd() *cobra.Command {
 	return cmd
 }
 
-func SellDataCmd() *cobra.Command {
+func CmdSellData() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "sell-data [flags]",
 		Short: "sell data",

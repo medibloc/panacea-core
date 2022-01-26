@@ -6,6 +6,7 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	gogotypes "github.com/gogo/protobuf/types"
+	"github.com/medibloc/panacea-core/v2/types/assets"
 	"github.com/medibloc/panacea-core/v2/x/market/types"
 )
 
@@ -137,8 +138,8 @@ func (k Keeper) SellOwnData(ctx sdk.Context, seller sdk.AccAddress, cert types.D
 		return sdk.Coin{}, err
 	}
 
-	if findDeal.GetStatus() == INACTIVE || findDeal.GetStatus() == COMPLETED {
-		return sdk.Coin{}, sdkerrors.Wrap(err, "deal is not activated")
+	if findDeal.GetStatus() != ACTIVE {
+		return sdk.Coin{}, fmt.Errorf("the deal's state is %s", findDeal.GetStatus())
 	}
 
 	dealAddress, err := types.AccDealAddressFromBech32(findDeal.GetDealAddress())
@@ -155,9 +156,9 @@ func (k Keeper) SellOwnData(ctx sdk.Context, seller sdk.AccAddress, cert types.D
 	totalAmount := findDeal.GetBudget().Amount.Uint64()
 	countOfData := findDeal.GetMaxNumData()
 
-	pricePerData := sdk.NewCoin("umed", sdk.NewIntFromUint64(totalAmount/countOfData))
+	pricePerData := sdk.NewCoin(assets.MicroMedDenom, sdk.NewIntFromUint64(totalAmount/countOfData))
 
-	dealBalance := k.bankKeeper.GetBalance(ctx, dealAddress, "umed")
+	dealBalance := k.bankKeeper.GetBalance(ctx, dealAddress, assets.MicroMedDenom)
 	if dealBalance.IsLT(pricePerData) {
 		return sdk.Coin{}, fmt.Errorf("deal's balance is smaller than reward")
 	}
@@ -218,12 +219,21 @@ func (k Keeper) Verify(ctx sdk.Context, validatorAddr sdk.AccAddress, cert types
 		return false, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid validator address")
 	}
 
+	if validatorAcc.GetPubKey() == nil {
+		return false, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "the publicKey does not exist in the validator account")
+	}
+
 	unSignedMarshaled, err := cert.UnsignedCert.Marshal()
 	if err != nil {
 		return false, sdkerrors.Wrapf(err, "invalid marshaled value")
 	}
 
-	isValid := validatorAcc.GetPubKey().VerifySignature(unSignedMarshaled, cert.GetSignature())
+	validatorPubKey := validatorAcc.GetPubKey()
+	if validatorPubKey == nil {
+		return false, sdkerrors.Wrapf(err, "validator has no public key")
+	}
+
+	isValid := validatorPubKey.VerifySignature(unSignedMarshaled, cert.GetSignature())
 	if !isValid {
 		return false, sdkerrors.Wrapf(types.ErrInvalidSignature, "%s", cert.GetSignature())
 	}

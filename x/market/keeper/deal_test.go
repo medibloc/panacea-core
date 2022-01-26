@@ -1,9 +1,9 @@
 package keeper_test
 
 import (
-	"fmt"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/medibloc/panacea-core/v2/types/assets"
 	"github.com/medibloc/panacea-core/v2/types/testsuite"
 	"github.com/medibloc/panacea-core/v2/x/market/types"
 	"github.com/stretchr/testify/suite"
@@ -28,8 +28,8 @@ var (
 	acc1                   = sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address())
 	acc2                   = sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address())
 	acc3                   = sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address())
-	defaultFunds sdk.Coins = sdk.NewCoins(sdk.NewCoin("umed", sdk.NewInt(10000000000)))
-	zeroFunds    sdk.Coins = sdk.NewCoins(sdk.NewCoin("umed", sdk.NewInt(0)))
+	defaultFunds sdk.Coins = sdk.NewCoins(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(10000000000)))
+	zeroFunds    sdk.Coins = sdk.NewCoins(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(0)))
 	privKey                = secp256k1.GenPrivKey()
 	newAddr                = sdk.AccAddress(privKey.PubKey().Address())
 )
@@ -42,35 +42,39 @@ func (suite *dealTestSuite) BeforeTest(_, _ string) {
 
 func (suite *dealTestSuite) TestCreateNewDeal() {
 	err := suite.BankKeeper.AddCoins(suite.Ctx, acc1, defaultFunds)
-	if err != nil {
-		panic(err)
-	}
+	suite.Require().NoError(err)
 
 	tempDeal := types.Deal{
 		DataSchema:            []string{acc1.String()},
-		Budget:                &sdk.Coin{Denom: "umed", Amount: sdk.NewInt(10000000)},
+		Budget:                &sdk.Coin{Denom: assets.MicroMedDenom, Amount: sdk.NewInt(10000000)},
 		MaxNumData:            10000,
 		TrustedDataValidators: []string{acc2.String()},
 		Owner:                 acc1.String(),
 	}
 
-	owner, _ := sdk.AccAddressFromBech32(tempDeal.GetOwner())
+	owner, err := sdk.AccAddressFromBech32(tempDeal.GetOwner())
+	suite.Require().NoError(err)
 
-	dealId, _ := suite.MarketKeeper.CreateNewDeal(suite.Ctx, owner, tempDeal)
+	dealId, err := suite.MarketKeeper.CreateNewDeal(suite.Ctx, owner, tempDeal)
+	suite.Require().NoError(err)
+
 	expectedId := suite.MarketKeeper.GetNextDealNumberAndIncrement(suite.Ctx) - 1
 	suite.Require().Equal(dealId, expectedId)
 
-	deal, _ := suite.MarketKeeper.GetDeal(suite.Ctx, dealId)
+	deal, err := suite.MarketKeeper.GetDeal(suite.Ctx, dealId)
+	suite.Require().NoError(err)
 	suite.Require().Equal(deal.GetDataSchema(), tempDeal.GetDataSchema())
 	suite.Require().Equal(deal.GetBudget(), tempDeal.GetBudget())
 	suite.Require().Equal(deal.GetMaxNumData(), tempDeal.GetMaxNumData())
+	suite.Require().Equal(deal.GetCurNumData(), tempDeal.GetCurNumData())
 	suite.Require().Equal(deal.GetTrustedDataValidators(), tempDeal.GetTrustedDataValidators())
 	suite.Require().Equal(deal.GetOwner(), tempDeal.GetOwner())
 	suite.Require().Equal(deal.GetStatus(), ACTIVE)
 }
 
 func (suite *dealTestSuite) TestGetDeal() {
-	deal, _ := suite.MarketKeeper.GetDeal(suite.Ctx, 1)
+	deal, err := suite.MarketKeeper.GetDeal(suite.Ctx, 1)
+	suite.Require().NoError(err)
 	testDeal := makeTestDeal()
 
 	suite.Require().Equal(deal.GetDealId(), testDeal.GetDealId())
@@ -78,6 +82,7 @@ func (suite *dealTestSuite) TestGetDeal() {
 	suite.Require().Equal(deal.GetDataSchema(), testDeal.GetDataSchema())
 	suite.Require().Equal(deal.GetBudget(), testDeal.GetBudget())
 	suite.Require().Equal(deal.GetMaxNumData(), testDeal.GetMaxNumData())
+	suite.Require().Equal(deal.GetCurNumData(), testDeal.GetCurNumData())
 	suite.Require().Equal(deal.GetTrustedDataValidators(), testDeal.GetTrustedDataValidators())
 	suite.Require().Equal(deal.GetOwner(), testDeal.GetOwner())
 	suite.Require().Equal(deal.GetStatus(), testDeal.GetStatus())
@@ -85,28 +90,33 @@ func (suite *dealTestSuite) TestGetDeal() {
 
 func (suite *dealTestSuite) TestGetBalanceOfDeal() {
 	err := suite.BankKeeper.AddCoins(suite.Ctx, acc1, defaultFunds)
-	if err != nil {
-		panic(err)
-	}
+	suite.Require().NoError(err)
 
 	tempDeal := types.Deal{
 		DataSchema:            []string{acc1.String()},
-		Budget:                &sdk.Coin{Denom: "umed", Amount: sdk.NewInt(10000000)},
+		Budget:                &sdk.Coin{Denom: assets.MicroMedDenom, Amount: sdk.NewInt(10000000)},
 		MaxNumData:            10000,
 		TrustedDataValidators: []string{acc2.String()},
 		Owner:                 acc1.String(),
 	}
 
-	owner, _ := sdk.AccAddressFromBech32(tempDeal.GetOwner())
+	owner, err := sdk.AccAddressFromBech32(tempDeal.GetOwner())
+	suite.Require().NoError(err)
 
-	dealId, _ := suite.MarketKeeper.CreateNewDeal(suite.Ctx, owner, tempDeal)
-	deal, _ := suite.MarketKeeper.GetDeal(suite.Ctx, dealId)
-	addr, _ := types.AccDealAddressFromBech32(deal.GetDealAddress())
+	dealId, err := suite.MarketKeeper.CreateNewDeal(suite.Ctx, owner, tempDeal)
+	suite.Require().NoError(err)
 
-	balance := suite.BankKeeper.GetBalance(suite.Ctx, addr, "umed")
+	deal, err := suite.MarketKeeper.GetDeal(suite.Ctx, dealId)
+	suite.Require().NoError(err)
+
+	addr, err := types.AccDealAddressFromBech32(deal.GetDealAddress())
+	suite.Require().NoError(err)
+
+	balance := suite.BankKeeper.GetBalance(suite.Ctx, addr, assets.MicroMedDenom)
 	suite.Require().Equal(balance, *tempDeal.GetBudget())
-	ownerBalance := suite.BankKeeper.GetBalance(suite.Ctx, acc1, "umed")
-	suite.Require().Equal(ownerBalance, sdk.NewCoin("umed", sdk.NewInt(10000000000)).Sub(balance))
+
+	ownerBalance := suite.BankKeeper.GetBalance(suite.Ctx, acc1, assets.MicroMedDenom)
+	suite.Require().Equal(ownerBalance, sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(10000000000)).Sub(balance))
 }
 
 func (suite *dealTestSuite) TestSellOwnData() {
@@ -118,7 +128,7 @@ func (suite *dealTestSuite) TestSellOwnData() {
 
 	tempDeal := types.Deal{
 		DataSchema:            []string{acc1.String()},
-		Budget:                &sdk.Coin{Denom: "umed", Amount: sdk.NewInt(10000000)},
+		Budget:                &sdk.Coin{Denom: assets.MicroMedDenom, Amount: sdk.NewInt(10000000)},
 		MaxNumData:            10000,
 		TrustedDataValidators: []string{newAddr.String()},
 		Owner:                 acc1.String(),
@@ -128,19 +138,18 @@ func (suite *dealTestSuite) TestSellOwnData() {
 	suite.Require().NoError(err)
 
 	cert := makeTestCert()
-	deal, _ := suite.MarketKeeper.GetDeal(suite.Ctx, newDealId)
+	deal, err := suite.MarketKeeper.GetDeal(suite.Ctx, newDealId)
+	suite.Require().NoError(err)
 
 	reward, err := suite.MarketKeeper.SellOwnData(suite.Ctx, acc3, cert)
 	suite.Require().NoError(err)
 	suite.Require().Equal(cert.UnsignedCert.GetDealId(), deal.GetDealId())
 
-	suite.Require().Equal(cert.UnsignedCert.GetDealId(), deal.GetDealId())
-	sellerBalance := suite.BankKeeper.GetBalance(suite.Ctx, acc3, "umed")
+	sellerBalance := suite.BankKeeper.GetBalance(suite.Ctx, acc3, assets.MicroMedDenom)
 	suite.Require().Equal(sellerBalance, reward)
 
 	updatedDeal, err := suite.MarketKeeper.GetDeal(suite.Ctx, newDealId)
 	suite.Require().NoError(err)
-
 	suite.Require().Equal(updatedDeal.GetCurNumData(), deal.GetCurNumData()+1)
 }
 
@@ -166,7 +175,7 @@ func makeTestDeal() types.Deal {
 		DealId:                1,
 		DealAddress:           types.NewDealAddress(1).String(),
 		DataSchema:            []string{acc1.String()},
-		Budget:                &sdk.Coin{Denom: "umed", Amount: sdk.NewInt(1000000000)},
+		Budget:                &sdk.Coin{Denom: assets.MicroMedDenom, Amount: sdk.NewInt(1000000000)},
 		MaxNumData:            10000,
 		CurNumData:            0,
 		TrustedDataValidators: []string{acc2.String()},
@@ -189,7 +198,6 @@ func makeTestCert() types.DataValidationCertificate {
 		return types.DataValidationCertificate{}
 	}
 
-	fmt.Println(newAddr.String())
 	sign, err := privKey.Sign(marshal)
 	if err != nil {
 		return types.DataValidationCertificate{}
