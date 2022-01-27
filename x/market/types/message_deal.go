@@ -114,11 +114,11 @@ func (msg *MsgSellData) ValidateBasic() error {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid deal id format")
 	}
 
-	if unsignedCert.DataHash == "" {
+	if unsignedCert.DataHash == nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "empty data hash")
 	}
 
-	if unsignedCert.EncryptedDataUrl == "" {
+	if unsignedCert.EncryptedDataUrl == nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "empty encrypted data url")
 	}
 

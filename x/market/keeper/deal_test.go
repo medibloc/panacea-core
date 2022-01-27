@@ -272,8 +272,8 @@ func makeTestDeal() types.Deal {
 func makeTestCert() types.DataValidationCertificate {
 	uCert := types.UnsignedDataValidationCertificate{
 		DealId:               2,
-		DataHash:             "1a312c123x23",
-		EncryptedDataUrl:     "https://panacea.org/a/123.json",
+		DataHash:             []byte("1a312c123x23"),
+		EncryptedDataUrl:     []byte("https://panacea.org/a/123.json"),
 		DataValidatorAddress: newAddr.String(),
 		RequesterAddress:     acc3.String(),
 	}
