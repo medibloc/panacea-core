@@ -18,14 +18,14 @@ type sellDataInputs struct {
 }
 
 type DataValidationCertification struct {
-	UnsignedCert UnsignedDataValidationCertification `json:"unsigned_cert"`
-	Signature    []byte                              `json:"signature"`
+	UnsignedCert    UnsignedDataValidationCertification `json:"unsigned_cert"`
+	SignatureBase64 string                              `json:"signature_base64"`
 }
 
 type UnsignedDataValidationCertification struct {
-	DealId               uint64 `json:"deal_id"`
-	DataHash             string `json:"data_hash"`
-	EncryptedDataUrl     string `json:"encrypted_data_url"`
-	DataValidatorAddress string `json:"data_validator_address"`
-	RequesterAddress     string `json:"requester_address"`
+	DealId                 uint64 `json:"deal_id"`
+	DataHashBase64         string `json:"data_hash_base64"`
+	EncryptedDataUrlBase64 string `json:"encrypted_data_url_base64"`
+	DataValidatorAddress   string `json:"data_validator_address"`
+	RequesterAddress       string `json:"requester_address"`
 }

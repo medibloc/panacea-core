@@ -2,6 +2,7 @@ package cli
 
 import (
 	"bytes"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"github.com/cosmos/cosmos-sdk/client"
@@ -119,17 +120,32 @@ func NewSellDataMsg(clientCtx client.Context, txf tx.Factory, fs *flag.FlagSet) 
 		return txf, nil, fmt.Errorf("failed to parse data certificate file: %w", err)
 	}
 
+	encryptedDataUrlBytes, err := base64.URLEncoding.DecodeString(sellData.Cert.UnsignedCert.EncryptedDataUrlBase64)
+	if err != nil {
+		return txf, nil, err
+	}
+
+	dataHashBytes, err := base64.StdEncoding.DecodeString(sellData.Cert.UnsignedCert.DataHashBase64)
+	if err != nil {
+		return txf, nil, err
+	}
+
 	unSigned := types.UnsignedDataValidationCertificate{
 		DealId:               sellData.Cert.UnsignedCert.DealId,
-		DataHash:             sellData.Cert.UnsignedCert.DataHash,
-		EncryptedDataUrl:     sellData.Cert.UnsignedCert.EncryptedDataUrl,
+		DataHash:             dataHashBytes,
+		EncryptedDataUrl:     encryptedDataUrlBytes,
 		DataValidatorAddress: sellData.Cert.UnsignedCert.DataValidatorAddress,
 		RequesterAddress:     sellData.Cert.UnsignedCert.RequesterAddress,
 	}
 
+	signatureBytes, err := base64.StdEncoding.DecodeString(sellData.Cert.SignatureBase64)
+	if err != nil {
+		return txf, nil, err
+	}
+
 	signed := types.DataValidationCertificate{
 		UnsignedCert: &unSigned,
-		Signature:    sellData.Cert.Signature,
+		Signature:    signatureBytes,
 	}
 
 	msg := types.NewMsgSellData(signed, clientCtx.GetFromAddress().String())

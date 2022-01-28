@@ -39,10 +39,9 @@ func GetKeyPrefixDeals(dealId uint64) []byte {
 	return append(KeyPrefixDeals, sdk.Uint64ToBigEndian(dealId)...)
 }
 
-func GetKeyPrefixCertificate(dealId uint64, dataHash string) []byte {
+func GetKeyPrefixCertificate(dealId uint64, dataHash []byte) []byte {
 	beDealId := sdk.Uint64ToBigEndian(dealId)
-	dataHashBytes := []byte(dataHash)
-	keys := CombineKeys(beDealId, dataHashBytes)
+	keys := CombineKeys(beDealId, dataHash)
 	return append(KeyPrefixDataCertificateStore, keys...)
 }
 

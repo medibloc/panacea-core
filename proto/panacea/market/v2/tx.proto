@@ -50,8 +50,8 @@ message DataValidationCertificate {
 // UnsignedDataValidationCertificate defines unsigned data validation certificate.
 message UnsignedDataValidationCertificate {
   uint64 deal_id = 1;
-  string data_hash = 2;
-  string encrypted_data_url = 3;
+  bytes data_hash = 2;
+  bytes encrypted_data_url = 3;
   string data_validator_address = 4;
   string requester_address = 5;
 }
