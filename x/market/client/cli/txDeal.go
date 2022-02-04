@@ -120,7 +120,7 @@ func NewSellDataMsg(clientCtx client.Context, txf tx.Factory, fs *flag.FlagSet) 
 		return txf, nil, fmt.Errorf("failed to parse data certificate file: %w", err)
 	}
 
-	encryptedDataUrlBytes, err := base64.StdEncoding.DecodeString(sellData.Cert.UnsignedCert.EncryptedDataUrlBase64)
+	encryptedDataUrlBytes, err := base64.URLEncoding.DecodeString(sellData.Cert.UnsignedCert.EncryptedDataUrlBase64)
 	if err != nil {
 		return txf, nil, err
 	}
