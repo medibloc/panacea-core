@@ -10,12 +10,14 @@ import (
 )
 
 func RegisterCodec(cdc *codec.LegacyAmino) {
-	cdc.RegisterConcrete(&MsgCreateDeal{}, "did/CreateDeal", nil)
+	cdc.RegisterConcrete(&MsgCreateDeal{}, "market/CreateDeal", nil)
+	cdc.RegisterConcrete(&MsgSellData{}, "market/SellData", nil)
 }
 
 func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 	registry.RegisterImplementations((*sdk.Msg)(nil),
 		&MsgCreateDeal{},
+		&MsgSellData{},
 	)
 	msgservice.RegisterMsgServiceDesc(registry, &_Msg_serviceDesc)
 }

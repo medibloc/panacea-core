@@ -1,0 +1,12 @@
+{
+  "certificate": {
+    "unsigned_cert": {
+      "deal_id": 2,
+      "data_hash": "12e3d12fc312x3",
+      "encrypted_data_url": "http://panacea.org/123.json",
+      "data_validator_address": "panacea1ugrau4qqr9446rpuj0srjrxspz02dd9nmlrjg3",
+      "requester_address": "panacea1fpfugtgpzux8spqpe3kyqqpyy6rular2zlpusu"
+    },
+    "signature": [252,6,84,24,233,130,241,127,115,161,168,5,239,139,166,34,123,20,102,207,240,69,87,74,36,128,171,152,23,206,103,34,120,99,162,146,56,204,200,227,62,207,212,125,11,145,93,112,162,66,132,155,254,45,219,253,39,163,91,207,254,161,156,104]
+  }
+}

@@ -6,6 +6,7 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	gogotypes "github.com/gogo/protobuf/types"
+	"github.com/medibloc/panacea-core/v2/types/assets"
 	"github.com/medibloc/panacea-core/v2/x/market/types"
 )
 
@@ -124,4 +125,118 @@ func (k Keeper) SetDeal(ctx sdk.Context, deal types.Deal) {
 	dealKey := types.GetKeyPrefixDeals(deal.GetDealId())
 	bz := k.cdc.MustMarshalBinaryLengthPrefixed(&deal)
 	store.Set(dealKey, bz)
+}
+
+func (k Keeper) SellOwnData(ctx sdk.Context, seller sdk.AccAddress, cert types.DataValidationCertificate) (sdk.Coin, error) {
+	err := k.isDataCertDuplicate(ctx, cert)
+	if err != nil {
+		return sdk.Coin{}, err
+	}
+
+	findDeal, err := k.GetDeal(ctx, cert.UnsignedCert.GetDealId())
+	if err != nil {
+		return sdk.Coin{}, err
+	}
+
+	if findDeal.GetStatus() != ACTIVE {
+		return sdk.Coin{}, fmt.Errorf("the deal's state is %s", findDeal.GetStatus())
+	}
+
+	dealAddress, err := types.AccDealAddressFromBech32(findDeal.GetDealAddress())
+	if err != nil {
+		return sdk.Coin{}, err
+	}
+
+	err = k.isTrustedValidator(cert, findDeal)
+	if err != nil {
+		return sdk.Coin{}, err
+	}
+
+	//TODO: Change the field(max_num_data) to price_per_data
+	totalAmount := findDeal.GetBudget().Amount.Uint64()
+	countOfData := findDeal.GetMaxNumData()
+
+	pricePerData := sdk.NewCoin(assets.MicroMedDenom, sdk.NewIntFromUint64(totalAmount/countOfData))
+
+	dealBalance := k.bankKeeper.GetBalance(ctx, dealAddress, assets.MicroMedDenom)
+	if dealBalance.IsLT(pricePerData) {
+		return sdk.Coin{}, fmt.Errorf("deal's balance is smaller than reward")
+	}
+
+	coins := append(sdk.Coins{}, pricePerData)
+
+	err = k.bankKeeper.SendCoins(ctx, dealAddress, seller, coins)
+	if err != nil {
+		return sdk.Coin{}, sdkerrors.Wrapf(types.ErrNotEnoughBalance, "The deal's balance is not enough to make deal")
+	}
+
+	k.SetDataCertificate(ctx, findDeal.GetDealId(), cert)
+	SetCurNumData(&findDeal)
+	k.SetDeal(ctx, findDeal)
+	return pricePerData, nil
+
+}
+
+func (k Keeper) isDataCertDuplicate(ctx sdk.Context, cert types.DataValidationCertificate) error {
+	store := ctx.KVStore(k.storeKey)
+	dataCertKey := types.GetKeyPrefixCertificate(cert.UnsignedCert.GetDealId(), cert.UnsignedCert.GetDataHash())
+
+	if store.Has(dataCertKey) {
+		return fmt.Errorf("duplicated data")
+	}
+
+	return nil
+}
+
+func (k Keeper) isTrustedValidator(cert types.DataValidationCertificate, findDeal types.Deal) error {
+	validator := cert.UnsignedCert.GetDataValidatorAddress()
+	trustedValidators := findDeal.GetTrustedDataValidators()
+
+	for _, v := range trustedValidators {
+		if validator == v {
+			return nil
+		}
+	}
+	return fmt.Errorf("data validator is invalid address")
+}
+
+func (k Keeper) SetDataCertificate(ctx sdk.Context, dealId uint64, cert types.DataValidationCertificate) {
+	store := ctx.KVStore(k.storeKey)
+	dataHash := cert.UnsignedCert.GetDataHash()
+	dataCertificateKey := types.GetKeyPrefixCertificate(dealId, dataHash)
+	storedDataCertificate := k.cdc.MustMarshalBinaryLengthPrefixed(&cert)
+	store.Set(dataCertificateKey, storedDataCertificate)
+}
+
+func SetCurNumData(deal *types.Deal) {
+	curNumData := deal.GetCurNumData() + 1
+	deal.CurNumData = curNumData
+}
+
+func (k Keeper) Verify(ctx sdk.Context, validatorAddr sdk.AccAddress, cert types.DataValidationCertificate) (bool, error) {
+	validatorAcc := k.accountKeeper.GetAccount(ctx, validatorAddr)
+	if validatorAcc == nil {
+		return false, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid validator address")
+	}
+
+	if validatorAcc.GetPubKey() == nil {
+		return false, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "the publicKey does not exist in the validator account")
+	}
+
+	unSignedMarshaled, err := cert.UnsignedCert.Marshal()
+	if err != nil {
+		return false, sdkerrors.Wrapf(err, "invalid marshaled value")
+	}
+
+	validatorPubKey := validatorAcc.GetPubKey()
+	if validatorPubKey == nil {
+		return false, sdkerrors.Wrapf(err, "validator has no public key")
+	}
+
+	isValid := validatorPubKey.VerifySignature(unSignedMarshaled, cert.GetSignature())
+	if !isValid {
+		return false, sdkerrors.Wrapf(types.ErrInvalidSignature, "%s", cert.GetSignature())
+	}
+
+	return isValid, nil
 }

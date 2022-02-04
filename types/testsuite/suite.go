@@ -3,6 +3,7 @@ package testsuite
 import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
+	cryptocodec "github.com/cosmos/cosmos-sdk/crypto/codec"
 	"github.com/cosmos/cosmos-sdk/store"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
@@ -149,6 +150,7 @@ func newTestCodec() params.EncodingConfig {
 	interfaceRegistry := codectypes.NewInterfaceRegistry()
 	authtypes.RegisterInterfaces(interfaceRegistry)
 	banktypes.RegisterInterfaces(interfaceRegistry)
+	cryptocodec.RegisterInterfaces(interfaceRegistry)
 	didtypes.RegisterInterfaces(interfaceRegistry)
 	markettypes.RegisterInterfaces(interfaceRegistry)
 	marshaler := codec.NewProtoCodec(interfaceRegistry)

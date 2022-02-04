@@ -1,6 +1,9 @@
 package types
 
-import sdk "github.com/cosmos/cosmos-sdk/types"
+import (
+	"bytes"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+)
 
 const (
 	// ModuleName defines the module name
@@ -25,8 +28,24 @@ var (
 
 	// KeyPrefixDeals defines key to store deals
 	KeyPrefixDeals = []byte{0x02}
+
+	// KeyPrefixDataCertificateStore defines key to store data certificate
+	KeyPrefixDataCertificateStore = []byte{0x03}
+
+	KeyIndexSeparator = []byte{0x07}
 )
 
 func GetKeyPrefixDeals(dealId uint64) []byte {
 	return append(KeyPrefixDeals, sdk.Uint64ToBigEndian(dealId)...)
+}
+
+func GetKeyPrefixCertificate(dealId uint64, dataHash []byte) []byte {
+	beDealId := sdk.Uint64ToBigEndian(dealId)
+	keys := CombineKeys(beDealId, dataHash)
+	return append(KeyPrefixDataCertificateStore, keys...)
+}
+
+// CombineKeys function defines combines deal_id with data_hash.
+func CombineKeys(keys ...[]byte) []byte {
+	return bytes.Join(keys, KeyIndexSeparator)
 }

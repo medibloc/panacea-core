@@ -1,6 +1,9 @@
 package cli
 
 import (
+	"bytes"
+	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -12,7 +15,7 @@ import (
 	"io/ioutil"
 )
 
-func NewCreateDealCmd() *cobra.Command {
+func CmdCreateDeal() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "create-deal [flags]",
 		Short: "create a new deal",
@@ -40,6 +43,33 @@ func NewCreateDealCmd() *cobra.Command {
 	return cmd
 }
 
+func CmdSellData() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "sell-data [flags]",
+		Short: "sell data",
+		Args:  cobra.ExactArgs(0),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return nil
+			}
+
+			txf := tx.NewFactoryCLI(clientCtx, cmd.Flags()).WithTxConfig(clientCtx.TxConfig).WithAccountRetriever(clientCtx.AccountRetriever)
+
+			txf, msg, err := NewSellDataMsg(clientCtx, txf, cmd.Flags())
+			if err != nil {
+				return err
+			}
+
+			return tx.GenerateOrBroadcastTxWithFactory(clientCtx, txf, msg)
+		},
+	}
+
+	cmd.Flags().String(DataVerificationCertificateFile, "", "Data Verification Certificate file path")
+	flags.AddTxFlagsToCmd(cmd)
+	return cmd
+}
+
 func NewBuildCreateDealMsg(clientCtx client.Context, txf tx.Factory, fs *flag.FlagSet) (tx.Factory, sdk.Msg, error) {
 	deal, err := parseCreateDealFlags(fs)
 	if err != nil {
@@ -63,7 +93,7 @@ func NewBuildCreateDealMsg(clientCtx client.Context, txf tx.Factory, fs *flag.Fl
 }
 
 func parseCreateDealFlags(fs *flag.FlagSet) (*createDealInputs, error) {
-	deal := &createDealInputs{}
+	var createDeal createDealInputs
 	dealFile, _ := fs.GetString(FlagDealFile)
 
 	if dealFile == "" {
@@ -75,10 +105,72 @@ func parseCreateDealFlags(fs *flag.FlagSet) (*createDealInputs, error) {
 		return nil, err
 	}
 
-	err = deal.UnmarshalJSON(contents)
+	dec := json.NewDecoder(bytes.NewReader(contents))
+
+	if err := dec.Decode(&createDeal); err != nil {
+		return nil, err
+	}
+
+	return &createDeal, nil
+}
+
+func NewSellDataMsg(clientCtx client.Context, txf tx.Factory, fs *flag.FlagSet) (tx.Factory, sdk.Msg, error) {
+	sellData, err := parseSellDataFlags(fs)
+	if err != nil {
+		return txf, nil, fmt.Errorf("failed to parse data certificate file: %w", err)
+	}
+
+	encryptedDataUrlBytes, err := base64.StdEncoding.DecodeString(sellData.Cert.UnsignedCert.EncryptedDataUrlBase64)
+	if err != nil {
+		return txf, nil, err
+	}
+
+	dataHashBytes, err := base64.StdEncoding.DecodeString(sellData.Cert.UnsignedCert.DataHashBase64)
+	if err != nil {
+		return txf, nil, err
+	}
+
+	unSigned := types.UnsignedDataValidationCertificate{
+		DealId:               sellData.Cert.UnsignedCert.DealId,
+		DataHash:             dataHashBytes,
+		EncryptedDataUrl:     encryptedDataUrlBytes,
+		DataValidatorAddress: sellData.Cert.UnsignedCert.DataValidatorAddress,
+		RequesterAddress:     sellData.Cert.UnsignedCert.RequesterAddress,
+	}
+
+	signatureBytes, err := base64.StdEncoding.DecodeString(sellData.Cert.SignatureBase64)
+	if err != nil {
+		return txf, nil, err
+	}
+
+	signed := types.DataValidationCertificate{
+		UnsignedCert: &unSigned,
+		Signature:    signatureBytes,
+	}
+
+	msg := types.NewMsgSellData(signed, clientCtx.GetFromAddress().String())
+
+	return txf, msg, nil
+}
+
+func parseSellDataFlags(fs *flag.FlagSet) (*sellDataInputs, error) {
+	var sellData sellDataInputs
+	receiptFile, _ := fs.GetString(DataVerificationCertificateFile)
+
+	if receiptFile == "" {
+		return nil, fmt.Errorf("need receipt json file using --%s flag", DataVerificationCertificateFile)
+	}
+
+	contents, err := ioutil.ReadFile(receiptFile)
 	if err != nil {
 		return nil, err
 	}
 
-	return deal, nil
+	dec := json.NewDecoder(bytes.NewReader(contents))
+
+	if err := dec.Decode(&sellData); err != nil {
+		return nil, err
+	}
+
+	return &sellData, nil
 }

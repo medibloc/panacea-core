@@ -12,6 +12,8 @@ import "cosmos/base/v1beta1/coin.proto";
 service Msg {
   // CreateDeal defines a method for creating a deal.
   rpc CreateDeal(MsgCreateDeal) returns (MsgCreateDealResponse);
+  // SellData defines a method for selling a data.
+  rpc SellData(MsgSellData) returns (MsgSellDataResponse);
 }
 
 //MsgCreateDeal defines the Msg/CreateDeal request type.
@@ -26,4 +28,30 @@ message MsgCreateDeal {
 //MsgCreateDealResponse defines the Msg/CreateDeal response type.
 message MsgCreateDealResponse {
   uint64 deal_id = 1;
+}
+
+//MsgSellData defines the Msg/SellData request type.
+message MsgSellData {
+  DataValidationCertificate cert = 1;
+  string seller = 2;
+}
+
+//MsgSellDataResponse defines the Msg/SellData response type.
+message MsgSellDataResponse {
+  cosmos.base.v1beta1.Coin reward = 1;
+}
+
+// DataValidationCertificate defines data validation certificate.
+message DataValidationCertificate {
+  UnsignedDataValidationCertificate unsigned_cert = 1;
+  bytes signature = 2;
+}
+
+// UnsignedDataValidationCertificate defines unsigned data validation certificate.
+message UnsignedDataValidationCertificate {
+  uint64 deal_id = 1;
+  bytes data_hash = 2;
+  bytes encrypted_data_url = 3;
+  string data_validator_address = 4;
+  string requester_address = 5;
 }
