@@ -76,10 +76,10 @@ func (m msgServer) DeactivateDeal(goCtx context.Context, msg *types.MsgDeactivat
 		return nil, err
 	}
 
-	deactivateResponse, err := m.Keeper.DeactivateDeal(ctx, msg.DealId, requester)
+	deactivatedDealId, err := m.Keeper.DeactivateDeal(ctx, msg.DealId, requester)
 	if err != nil {
 		return nil, err
 	}
 
-	return &deactivateResponse, nil
+	return &types.MsgDeactivateDealResponse{DealId: deactivatedDealId}, nil
 }
