@@ -19,5 +19,6 @@ func GetTxCmd() *cobra.Command {
 
 	cmd.AddCommand(CmdCreateDeal())
 	cmd.AddCommand(CmdSellData())
+	cmd.AddCommand(CmdDeactivateDeal())
 	return cmd
 }

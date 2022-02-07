@@ -13,6 +13,7 @@ import (
 	"github.com/spf13/cobra"
 	flag "github.com/spf13/pflag"
 	"io/ioutil"
+	"strconv"
 )
 
 func CmdCreateDeal() *cobra.Command {
@@ -66,6 +67,35 @@ func CmdSellData() *cobra.Command {
 	}
 
 	cmd.Flags().String(DataVerificationCertificateFile, "", "Data Verification Certificate file path")
+	flags.AddTxFlagsToCmd(cmd)
+	return cmd
+}
+
+func CmdDeactivateDeal() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "deactivate-deal [dealId]",
+		Short: "deactivate-deal",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return nil
+			}
+
+			dealId, err := strconv.ParseUint(args[0], 10, 64)
+			if err != nil {
+				return nil
+			}
+
+			requesterAddress := clientCtx.GetFromAddress()
+			msg := types.NewMsgDeactivateDeal(dealId, requesterAddress.String())
+			if err := msg.ValidateBasic(); err != nil {
+				return err
+			}
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
+		},
+	}
+
 	flags.AddTxFlagsToCmd(cmd)
 	return cmd
 }
