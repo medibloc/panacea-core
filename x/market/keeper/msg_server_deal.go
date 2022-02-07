@@ -67,7 +67,6 @@ func (m msgServer) SellData(goCtx context.Context, msg *types.MsgSellData) (*typ
 
 	return &types.MsgSellDataResponse{Reward: &reward}, nil
 }
-<<<<<<< HEAD
 
 func (m msgServer) DeactivateDeal(goCtx context.Context, msg *types.MsgDeactivateDeal) (*types.MsgDeactivateDealResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
@@ -84,5 +83,3 @@ func (m msgServer) DeactivateDeal(goCtx context.Context, msg *types.MsgDeactivat
 
 	return &deactivateResponse, nil
 }
-=======
->>>>>>> fd49aba48464f8990c70e5142af535a11a8a793f
