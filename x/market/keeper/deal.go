@@ -241,39 +241,39 @@ func (k Keeper) Verify(ctx sdk.Context, validatorAddr sdk.AccAddress, cert types
 	return isValid, nil
 }
 
-func (k Keeper) DeactivateDeal(ctx sdk.Context, dealId uint64, requester sdk.AccAddress) (types.MsgDeactivateDealResponse, error) {
+func (k Keeper) DeactivateDeal(ctx sdk.Context, dealId uint64, requester sdk.AccAddress) (uint64, error) {
 	findDeal, err := k.GetDeal(ctx, dealId)
 	if err != nil {
-		return types.MsgDeactivateDealResponse{}, err
+		return 0, err
 	}
 
 	dealOwner, err := sdk.AccAddressFromBech32(findDeal.GetOwner())
 	if err != nil {
-		return types.MsgDeactivateDealResponse{}, err
+		return 0, err
 	}
 
 	if !dealOwner.Equals(requester) {
-		return types.MsgDeactivateDealResponse{IsSuccess: false, DealId: 0}, fmt.Errorf("the owner of deal and requester is not equal")
+		return 0, fmt.Errorf("the owner of deal and requester is not equal")
 	}
 
-	if findDeal.GetStatus() == INACTIVE || findDeal.GetStatus() == COMPLETED {
-		return types.MsgDeactivateDealResponse{IsSuccess: false, DealId: 0}, fmt.Errorf("the deal's status is not activated")
+	if findDeal.GetStatus() != ACTIVE {
+		return 0, fmt.Errorf("the deal's status is not activated")
 	}
 
 	findDealAddress, err := types.AccDealAddressFromBech32(findDeal.GetDealAddress())
 	if err != nil {
-		return types.MsgDeactivateDealResponse{}, err
+		return 0, err
 	}
 
 	remainDealBalance := k.bankKeeper.GetBalance(ctx, findDealAddress, assets.MicroMedDenom)
 
 	err = k.bankKeeper.SendCoins(ctx, findDealAddress, requester, sdk.Coins{remainDealBalance})
 	if err != nil {
-		return types.MsgDeactivateDealResponse{}, err
+		return 0, err
 	}
 
 	findDeal.Status = INACTIVE
 	k.SetDeal(ctx, findDeal)
 
-	return types.MsgDeactivateDealResponse{IsSuccess: true, DealId: dealId}, nil
+	return dealId, nil
 }

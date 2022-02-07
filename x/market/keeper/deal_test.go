@@ -287,13 +287,12 @@ func (suite *dealTestSuite) TestDeactivateDeal() {
 
 	beforeDeactivateBalance := suite.BankKeeper.GetBalance(suite.Ctx, acc1, assets.MicroMedDenom)
 
-	dealResponse, err := suite.MarketKeeper.DeactivateDeal(suite.Ctx, dealId, acc1)
+	deactivatedDealId, err := suite.MarketKeeper.DeactivateDeal(suite.Ctx, dealId, acc1)
 	suite.Require().NoError(err)
 
 	newAcc1Balance := suite.BankKeeper.GetBalance(suite.Ctx, acc1, assets.MicroMedDenom)
 
-	suite.Require().Equal(dealResponse.GetDealId(), dealId)
-	suite.Require().Equal(dealResponse.GetIsSuccess(), true)
+	suite.Require().Equal(deactivatedDealId, dealId)
 
 	suite.Require().Equal(newAcc1Balance, beforeDeactivateBalance.Add(dealBalance))
 }

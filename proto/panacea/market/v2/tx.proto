@@ -66,6 +66,5 @@ message MsgDeactivateDeal {
 
 // MsgDeactivateDealResponse defines the Msg/DeactivateDeal response type.
 message MsgDeactivateDealResponse {
-  bool is_success = 1;
-  uint64 deal_id = 2;
+  uint64 deal_id = 1;
 }
