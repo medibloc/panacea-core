@@ -275,11 +275,7 @@ func (k Keeper) DeactivateDeal(ctx sdk.Context, dealId uint64, requester sdk.Acc
 	}
 
 	if findDeal.GetStatus() != ACTIVE {
-<<<<<<< HEAD
 		return 0, sdkerrors.Wrapf(types.ErrInvalidStatus, "%s", findDeal.GetStatus())
-=======
-		return 0, fmt.Errorf("the deal's status is not activated")
->>>>>>> master
 	}
 
 	findDealAddress, err := types.AccDealAddressFromBech32(findDeal.GetDealAddress())

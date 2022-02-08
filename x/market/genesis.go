@@ -15,12 +15,9 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 		k.SetDeal(ctx, *deal)
 	}
 
-<<<<<<< HEAD
 	for _, dataCertificate := range genState.DataCertificate {
 		k.SetDataCertificate(ctx, dataCertificate.UnsignedCert.DealId, *dataCertificate)
 	}
-=======
->>>>>>> master
 }
 
 // ExportGenesis returns the capability module's exported genesis.
