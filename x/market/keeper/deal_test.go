@@ -3,6 +3,7 @@ package keeper_test
 import (
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/medibloc/panacea-core/v2/types/assets"
 	"github.com/medibloc/panacea-core/v2/types/testsuite"
 	"github.com/medibloc/panacea-core/v2/x/market/types"
@@ -177,7 +178,7 @@ func (suite *dealTestSuite) TestIsDataCertDuplicate() {
 
 	testCert2 := makeTestCert()
 	_, err = suite.MarketKeeper.SellOwnData(suite.Ctx, acc3, testCert2)
-	suite.Require().Error(err, "duplicated data")
+	suite.Require().Error(err, types.ErrDataAlreadyExist)
 }
 
 func (suite *dealTestSuite) TestIsTrustedDataValidator_Invalid() {
@@ -203,7 +204,7 @@ func (suite *dealTestSuite) TestIsTrustedDataValidator_Invalid() {
 
 	testCert1 := makeTestCert()
 	_, err = suite.MarketKeeper.SellOwnData(suite.Ctx, acc3, testCert1)
-	suite.Require().Error(err, "data validator is invalid address")
+	suite.Require().Error(err, sdkerrors.ErrInvalidAddress)
 }
 
 func (suite *dealTestSuite) TestDealStatusInactiveOrCompleted() {
@@ -231,11 +232,11 @@ func (suite *dealTestSuite) TestDealStatusInactiveOrCompleted() {
 
 	testCert1 := makeTestCert()
 	_, err = suite.MarketKeeper.SellOwnData(suite.Ctx, acc3, testCert1)
-	suite.Require().Error(err, "the deal's state is INACTIVE")
+	suite.Require().Error(err, types.ErrInvalidStatus)
 
 	findDeal.Status = COMPLETED
 	suite.MarketKeeper.SetDeal(suite.Ctx, findDeal)
-	suite.Require().Error(err, "the deal's state is COMPLETED")
+	suite.Require().Error(err, types.ErrInvalidStatus)
 }
 
 func (suite *dealTestSuite) TestVerify() {
@@ -348,12 +349,20 @@ func (suite *dealTestSuite) TestDealIsNotActive() {
 	suite.MarketKeeper.SetDeal(suite.Ctx, findDeal)
 
 	_, err = suite.MarketKeeper.DeactivateDeal(suite.Ctx, dealId, acc1)
+<<<<<<< HEAD
+	suite.Require().Error(err, types.ErrInvalidStatus)
+=======
+>>>>>>> master
 	suite.Require().Error(err, "the deal's status is not activated")
 
 	findDeal.Status = COMPLETED
 	suite.MarketKeeper.SetDeal(suite.Ctx, findDeal)
 
 	_, err = suite.MarketKeeper.DeactivateDeal(suite.Ctx, dealId, acc1)
+<<<<<<< HEAD
+	suite.Require().Error(err, types.ErrInvalidStatus)
+=======
+>>>>>>> master
 	suite.Require().Error(err, "the deal's status is not activated")
 }
 

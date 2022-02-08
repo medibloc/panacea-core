@@ -3,8 +3,9 @@ package types
 // DefaultGenesis returns the default Capability genesis state
 func DefaultGenesis() *GenesisState {
 	return &GenesisState{
-		Deals:          map[uint64]*Deal{},
-		NextDealNumber: 1,
+		Deals:           map[uint64]*Deal{},
+		DataCertificate: map[string]*DataValidationCertificate{},
+		NextDealNumber:  1,
 	}
 }
 
