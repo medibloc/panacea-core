@@ -15,7 +15,7 @@ func NewDealAddress(dealId uint64) sdk.AccAddress {
 
 func AccDealAddressFromBech32(address string) (sdk.AccAddress, error) {
 	if len(strings.TrimSpace(address)) == 0 {
-		return sdk.AccAddress{}, fmt.Errorf("empty address string is not allowd")
+		return sdk.AccAddress{}, fmt.Errorf("empty address string is not allowed")
 	}
 
 	bech32PrefixAccAddr := sdk.GetConfig().GetBech32AccountAddrPrefix()

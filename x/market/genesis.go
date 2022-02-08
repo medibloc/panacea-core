@@ -14,6 +14,7 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 	for _, deal := range genState.Deals {
 		k.SetDeal(ctx, *deal)
 	}
+
 }
 
 // ExportGenesis returns the capability module's exported genesis.

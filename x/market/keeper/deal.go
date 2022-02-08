@@ -152,7 +152,7 @@ func (k Keeper) SellOwnData(ctx sdk.Context, seller sdk.AccAddress, cert types.D
 		return sdk.Coin{}, err
 	}
 
-	//TODO: Change the field(max_num_data) to price_per_data
+	//TODO: Fields max_num_data and cur_num_data will be changed in next data market model.
 	totalAmount := findDeal.GetBudget().Amount.Uint64()
 	countOfData := findDeal.GetMaxNumData()
 
