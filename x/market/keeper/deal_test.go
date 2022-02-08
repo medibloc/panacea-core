@@ -349,20 +349,14 @@ func (suite *dealTestSuite) TestDealIsNotActive() {
 	suite.MarketKeeper.SetDeal(suite.Ctx, findDeal)
 
 	_, err = suite.MarketKeeper.DeactivateDeal(suite.Ctx, dealId, acc1)
-<<<<<<< HEAD
 	suite.Require().Error(err, types.ErrInvalidStatus)
-=======
->>>>>>> master
 	suite.Require().Error(err, "the deal's status is not activated")
 
 	findDeal.Status = COMPLETED
 	suite.MarketKeeper.SetDeal(suite.Ctx, findDeal)
 
 	_, err = suite.MarketKeeper.DeactivateDeal(suite.Ctx, dealId, acc1)
-<<<<<<< HEAD
 	suite.Require().Error(err, types.ErrInvalidStatus)
-=======
->>>>>>> master
 	suite.Require().Error(err, "the deal's status is not activated")
 }
 
