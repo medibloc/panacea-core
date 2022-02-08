@@ -67,3 +67,19 @@ func (m msgServer) SellData(goCtx context.Context, msg *types.MsgSellData) (*typ
 
 	return &types.MsgSellDataResponse{Reward: &reward}, nil
 }
+
+func (m msgServer) DeactivateDeal(goCtx context.Context, msg *types.MsgDeactivateDeal) (*types.MsgDeactivateDealResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	requester, err := sdk.AccAddressFromBech32(msg.DeactivateRequester)
+	if err != nil {
+		return nil, err
+	}
+
+	deactivatedDealId, err := m.Keeper.DeactivateDeal(ctx, msg.DealId, requester)
+	if err != nil {
+		return nil, err
+	}
+
+	return &types.MsgDeactivateDealResponse{DealId: deactivatedDealId}, nil
+}

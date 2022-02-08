@@ -152,7 +152,7 @@ func (k Keeper) SellOwnData(ctx sdk.Context, seller sdk.AccAddress, cert types.D
 		return sdk.Coin{}, err
 	}
 
-	//TODO: Change the field(max_num_data) to price_per_data
+	//TODO: Fields max_num_data and cur_num_data will be changed in next data market model.
 	totalAmount := findDeal.GetBudget().Amount.Uint64()
 	countOfData := findDeal.GetMaxNumData()
 
@@ -239,4 +239,41 @@ func (k Keeper) Verify(ctx sdk.Context, validatorAddr sdk.AccAddress, cert types
 	}
 
 	return isValid, nil
+}
+
+func (k Keeper) DeactivateDeal(ctx sdk.Context, dealId uint64, requester sdk.AccAddress) (uint64, error) {
+	findDeal, err := k.GetDeal(ctx, dealId)
+	if err != nil {
+		return 0, err
+	}
+
+	dealOwner, err := sdk.AccAddressFromBech32(findDeal.GetOwner())
+	if err != nil {
+		return 0, err
+	}
+
+	if !dealOwner.Equals(requester) {
+		return 0, fmt.Errorf("the owner of deal and requester is not equal")
+	}
+
+	if findDeal.GetStatus() != ACTIVE {
+		return 0, fmt.Errorf("the deal's status is not activated")
+	}
+
+	findDealAddress, err := types.AccDealAddressFromBech32(findDeal.GetDealAddress())
+	if err != nil {
+		return 0, err
+	}
+
+	remainDealBalance := k.bankKeeper.GetBalance(ctx, findDealAddress, assets.MicroMedDenom)
+
+	err = k.bankKeeper.SendCoins(ctx, findDealAddress, requester, sdk.Coins{remainDealBalance})
+	if err != nil {
+		return 0, err
+	}
+
+	findDeal.Status = INACTIVE
+	k.SetDeal(ctx, findDeal)
+
+	return dealId, nil
 }

@@ -157,3 +157,44 @@ func (msg *MsgSellData) GetSigners() []sdk.AccAddress {
 	}
 	return []sdk.AccAddress{seller}
 }
+
+func NewMsgDeactivateDeal(dealId uint64, deactivateRequester string) *MsgDeactivateDeal {
+	return &MsgDeactivateDeal{
+		DealId:              dealId,
+		DeactivateRequester: deactivateRequester,
+	}
+}
+
+func (msg *MsgDeactivateDeal) Route() string {
+	return RouterKey
+}
+
+func (msg *MsgDeactivateDeal) Type() string {
+	return "DeactivateDeal"
+}
+
+// ValidateBasic is validation for MsgCreateDeal.
+func (msg *MsgDeactivateDeal) ValidateBasic() error {
+	_, err := sdk.AccAddressFromBech32(msg.DeactivateRequester)
+	if err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid requester address (%s)", err)
+	}
+
+	if msg.DealId <= 0 {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "invalid deal id format")
+	}
+	return nil
+}
+
+func (msg *MsgDeactivateDeal) GetSignBytes() []byte {
+	bz := ModuleCdc.MustMarshalJSON(msg)
+	return sdk.MustSortJSON(bz)
+}
+
+func (msg *MsgDeactivateDeal) GetSigners() []sdk.AccAddress {
+	creator, err := sdk.AccAddressFromBech32(msg.DeactivateRequester)
+	if err != nil {
+		panic(err)
+	}
+	return []sdk.AccAddress{creator}
+}
