@@ -15,6 +15,9 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 		k.SetDeal(ctx, *deal)
 	}
 
+	for _, dataCertificate := range genState.DataCertificates {
+		k.SetDataCertificate(ctx, dataCertificate.UnsignedCert.DealId, *dataCertificate)
+	}
 }
 
 // ExportGenesis returns the capability module's exported genesis.
@@ -23,12 +26,14 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 
 	dealsMap := make(map[uint64]*types.Deal)
 
-	//TODO: Implement GetDealsList and Mapping to dealsMap
+	dataCertificateMap := make(map[string]*types.DataValidationCertificate)
+	//TODO: Implement GetDealsList and GetDataCertificateByDealId Mapping to dealsMap and dataCertificateMap.
 	//for _, deal := k.GetDeals(ctx) {
 	//}
 
 	return &types.GenesisState{
-		Deals:          dealsMap,
-		NextDealNumber: k.GetNextDealNumber(ctx),
+		Deals:            dealsMap,
+		DataCertificates: dataCertificateMap,
+		NextDealNumber:   k.GetNextDealNumber(ctx),
 	}
 }

@@ -11,6 +11,8 @@ import (
 )
 
 var acc1 = secp256k1.GenPrivKey().PubKey().Address()
+var privKey = secp256k1.GenPrivKey()
+var acc2 = privKey.PubKey().Address()
 
 type genesisTestSuite struct {
 	testsuite.TestSuite
@@ -21,12 +23,18 @@ func TestGenesisTestSuite(t *testing.T) {
 }
 
 func (suite *genesisTestSuite) TestMarketInitGenesis() {
-	newDeal, err := makeTestDeal()
-	suite.Require().NoError(err)
+	newDeal := makeTestDeal()
+	newDataCert := makeTestDataCert()
+
+	dataCertificateKey := types.GetKeyPrefixDataCertificate(newDataCert.UnsignedCert.DealId, newDataCert.UnsignedCert.DataHash)
+	stringDataCertificateKey := string(dataCertificateKey[:])
 
 	market.InitGenesis(suite.Ctx, suite.MarketKeeper, types.GenesisState{
 		Deals: map[uint64]*types.Deal{
 			newDeal.GetDealId(): &newDeal,
+		},
+		DataCertificates: map[string]*types.DataValidationCertificate{
+			stringDataCertificateKey: &newDataCert,
 		},
 		NextDealNumber: 2,
 	})
@@ -48,9 +56,17 @@ func (suite *genesisTestSuite) TestMarketInitGenesis() {
 	_, err = suite.MarketKeeper.GetDeal(suite.Ctx, 2)
 	suite.Require().Error(err)
 
+	dataCertificateStored, err := suite.MarketKeeper.GetDataCertificate(suite.Ctx, newDataCert)
+	suite.Require().NoError(err)
+	suite.Require().Equal(newDataCert.GetSignature(), dataCertificateStored.GetSignature())
+	suite.Require().Equal(newDataCert.UnsignedCert.GetDealId(), dataCertificateStored.UnsignedCert.GetDealId())
+	suite.Require().Equal(newDataCert.UnsignedCert.GetDataHash(), dataCertificateStored.UnsignedCert.GetDataHash())
+	suite.Require().Equal(newDataCert.UnsignedCert.GetEncryptedDataUrl(), dataCertificateStored.UnsignedCert.GetEncryptedDataUrl())
+	suite.Require().Equal(newDataCert.UnsignedCert.GetDataValidatorAddress(), dataCertificateStored.UnsignedCert.GetDataValidatorAddress())
+	suite.Require().Equal(newDataCert.UnsignedCert.GetRequesterAddress(), dataCertificateStored.UnsignedCert.GetRequesterAddress())
 }
 
-func makeTestDeal() (types.Deal, error) {
+func makeTestDeal() types.Deal {
 	return types.Deal{
 		DealId:                1,
 		DealAddress:           types.NewDealAddress(1).String(),
@@ -61,5 +77,31 @@ func makeTestDeal() (types.Deal, error) {
 		CurNumData:            0,
 		Owner:                 acc1.String(),
 		Status:                "ACTIVE",
-	}, nil
+	}
+}
+
+func makeTestDataCert() types.DataValidationCertificate {
+	uCert := types.UnsignedDataValidationCertificate{
+		DealId:               2,
+		DataHash:             []byte("1a312c123x23"),
+		EncryptedDataUrl:     []byte("https://panacea.org/a/123.json"),
+		DataValidatorAddress: acc1.String(),
+		RequesterAddress:     acc2.String(),
+	}
+
+	marshal, err := uCert.Marshal()
+	if err != nil {
+		return types.DataValidationCertificate{}
+	}
+
+	sign, err := privKey.Sign(marshal)
+	if err != nil {
+		return types.DataValidationCertificate{}
+	}
+
+	return types.DataValidationCertificate{
+		UnsignedCert: &uCert,
+		Signature:    sign,
+	}
+
 }

@@ -106,7 +106,7 @@ func (k Keeper) GetDeal(ctx sdk.Context, dealId uint64) (types.Deal, error) {
 	store := ctx.KVStore(k.storeKey)
 	dealKey := types.GetKeyPrefixDeals(dealId)
 	if !store.Has(dealKey) {
-		return types.Deal{}, fmt.Errorf("deal with ID %d does not exist", dealId)
+		return types.Deal{}, sdkerrors.Wrapf(types.ErrDealNotFound, "deal with ID %d does not exist", dealId)
 	}
 
 	bz := store.Get(dealKey)
@@ -139,7 +139,7 @@ func (k Keeper) SellOwnData(ctx sdk.Context, seller sdk.AccAddress, cert types.D
 	}
 
 	if findDeal.GetStatus() != ACTIVE {
-		return sdk.Coin{}, fmt.Errorf("the deal's state is %s", findDeal.GetStatus())
+		return sdk.Coin{}, sdkerrors.Wrapf(types.ErrInvalidStatus, "%s", findDeal.GetStatus())
 	}
 
 	dealAddress, err := types.AccDealAddressFromBech32(findDeal.GetDealAddress())
@@ -179,10 +179,10 @@ func (k Keeper) SellOwnData(ctx sdk.Context, seller sdk.AccAddress, cert types.D
 
 func (k Keeper) isDataCertDuplicate(ctx sdk.Context, cert types.DataValidationCertificate) error {
 	store := ctx.KVStore(k.storeKey)
-	dataCertKey := types.GetKeyPrefixCertificate(cert.UnsignedCert.GetDealId(), cert.UnsignedCert.GetDataHash())
+	dataCertKey := types.GetKeyPrefixDataCertificate(cert.UnsignedCert.GetDealId(), cert.UnsignedCert.GetDataHash())
 
 	if store.Has(dataCertKey) {
-		return fmt.Errorf("duplicated data")
+		return sdkerrors.Wrapf(types.ErrDataAlreadyExist, "data %s is already exist.", dataCertKey)
 	}
 
 	return nil
@@ -197,13 +197,31 @@ func (k Keeper) isTrustedValidator(cert types.DataValidationCertificate, findDea
 			return nil
 		}
 	}
-	return fmt.Errorf("data validator is invalid address")
+	return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "invalid validator address")
+}
+
+func (k Keeper) GetDataCertificate(ctx sdk.Context, cert types.DataValidationCertificate) (types.DataValidationCertificate, error) {
+	store := ctx.KVStore(k.storeKey)
+	dataCertificateKey := types.GetKeyPrefixDataCertificate(cert.UnsignedCert.DealId, cert.UnsignedCert.DataHash)
+	if !store.Has(dataCertificateKey) {
+		return types.DataValidationCertificate{}, sdkerrors.Wrapf(types.ErrDataNotFound, "data with ID %s does not exist", dataCertificateKey)
+	}
+
+	bz := store.Get(dataCertificateKey)
+
+	var dataCertificate types.DataValidationCertificate
+	err := k.cdc.UnmarshalBinaryLengthPrefixed(bz, &dataCertificate)
+	if err != nil {
+		return types.DataValidationCertificate{}, err
+	}
+
+	return dataCertificate, nil
 }
 
 func (k Keeper) SetDataCertificate(ctx sdk.Context, dealId uint64, cert types.DataValidationCertificate) {
 	store := ctx.KVStore(k.storeKey)
 	dataHash := cert.UnsignedCert.GetDataHash()
-	dataCertificateKey := types.GetKeyPrefixCertificate(dealId, dataHash)
+	dataCertificateKey := types.GetKeyPrefixDataCertificate(dealId, dataHash)
 	storedDataCertificate := k.cdc.MustMarshalBinaryLengthPrefixed(&cert)
 	store.Set(dataCertificateKey, storedDataCertificate)
 }
@@ -257,7 +275,7 @@ func (k Keeper) DeactivateDeal(ctx sdk.Context, dealId uint64, requester sdk.Acc
 	}
 
 	if findDeal.GetStatus() != ACTIVE {
-		return 0, fmt.Errorf("the deal's status is not activated")
+		return 0, sdkerrors.Wrapf(types.ErrInvalidStatus, "%s", findDeal.GetStatus())
 	}
 
 	findDealAddress, err := types.AccDealAddressFromBech32(findDeal.GetDealAddress())
