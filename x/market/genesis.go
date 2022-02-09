@@ -15,7 +15,7 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 		k.SetDeal(ctx, *deal)
 	}
 
-	for _, dataCertificate := range genState.DataCertificate {
+	for _, dataCertificate := range genState.DataCertificates {
 		k.SetDataCertificate(ctx, dataCertificate.UnsignedCert.DealId, *dataCertificate)
 	}
 }
@@ -32,8 +32,8 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	//}
 
 	return &types.GenesisState{
-		Deals:           dealsMap,
-		DataCertificate: dataCertificateMap,
-		NextDealNumber:  k.GetNextDealNumber(ctx),
+		Deals:            dealsMap,
+		DataCertificates: dataCertificateMap,
+		NextDealNumber:   k.GetNextDealNumber(ctx),
 	}
 }

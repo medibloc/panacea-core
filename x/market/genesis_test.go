@@ -33,7 +33,7 @@ func (suite *genesisTestSuite) TestMarketInitGenesis() {
 		Deals: map[uint64]*types.Deal{
 			newDeal.GetDealId(): &newDeal,
 		},
-		DataCertificate: map[string]*types.DataValidationCertificate{
+		DataCertificates: map[string]*types.DataValidationCertificate{
 			stringDataCertificateKey: &newDataCert,
 		},
 		NextDealNumber: 2,
