@@ -1,26 +1,16 @@
 package cli
 
 import (
-	"github.com/medibloc/panacea-core/v2/types/testsuite"
-	"github.com/stretchr/testify/suite"
+	"github.com/stretchr/testify/require"
 	"testing"
 )
 
-type txTestSuite struct {
-	testsuite.TestSuite
-}
+func TestParseSellDataFlags(t *testing.T) {
+	flags := CmdSellData().Flags()
+	err := flags.Set(DataVerificationCertificateFile, "./testdata/data_certificate_file.json")
 
-func TestTxTestSuite(t *testing.T) {
-	suite.Run(t, new(txTestSuite))
-}
+	require.NoError(t, err)
 
-// TestNewMsgCreateDeal
-// TODO: Test Client Command-Line MsgCreateDeal
-func (suite *txTestSuite) TestCmdCreateDeal() {
-
-}
-
-// TODO: Test Client Command-Line MsgSellData
-func (suite *txTestSuite) TestCmdSellData() {
-
+	_, err = parseSellDataFlags(flags)
+	require.NoError(t, err)
 }
