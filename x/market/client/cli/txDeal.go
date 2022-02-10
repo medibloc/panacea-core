@@ -150,20 +150,7 @@ func NewSellDataMsg(clientCtx client.Context, txf tx.Factory, fs *flag.FlagSet) 
 		return txf, nil, fmt.Errorf("failed to parse data certificate file: %w", err)
 	}
 
-	unSigned := types.UnsignedDataValidationCertificate{
-		DealId:               sellData.UnsignedCert.DealId,
-		DataHash:             sellData.UnsignedCert.DataHash,
-		EncryptedDataUrl:     sellData.UnsignedCert.EncryptedDataUrl,
-		DataValidatorAddress: sellData.UnsignedCert.DataValidatorAddress,
-		RequesterAddress:     sellData.UnsignedCert.RequesterAddress,
-	}
-
-	signed := types.DataValidationCertificate{
-		UnsignedCert: &unSigned,
-		Signature:    sellData.Signature,
-	}
-
-	msg := types.NewMsgSellData(signed, clientCtx.GetFromAddress().String())
+	msg := types.NewMsgSellData(sellData, clientCtx.GetFromAddress().String())
 
 	return txf, msg, nil
 }

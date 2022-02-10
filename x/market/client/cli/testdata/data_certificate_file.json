@@ -1,10 +1,10 @@
 {
-  "unsignedCert": {
-    "dealId": "1",
-    "dataHash": "ZGF0YUhhc2g=",
-    "encryptedDataUrl": "ZW5jcnlwdGVkRGF0YVVSTA==",
-    "dataValidatorAddress": "panacea1ugrau4qqr9446rpuj0srjrxspz02dd9nmlrjg3",
-    "requesterAddress": "panacea1fpfugtgpzux8spqpe3kyqqpyy6rular2zlpusu"
+  "unsigned_cert": {
+    "deal_id": "1",
+    "data_hash": "ZGF0YUhhc2g=",
+    "encrypted_data_url": "ZW5jcnlwdGVkRGF0YVVSTA==",
+    "data_validator_address": "panacea1ugrau4qqr9446rpuj0srjrxspz02dd9nmlrjg3",
+    "requester_address": "panacea1fpfugtgpzux8spqpe3kyqqpyy6rular2zlpusu"
   },
   "signature": "c2lnbmF0dXJl"
 }
