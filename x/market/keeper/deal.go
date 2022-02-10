@@ -127,6 +127,28 @@ func (k Keeper) SetDeal(ctx sdk.Context, deal types.Deal) {
 	store.Set(dealKey, bz)
 }
 
+func (k Keeper) ListDeals(ctx sdk.Context) ([]types.Deal, error) {
+	store := ctx.KVStore(k.storeKey)
+	deals := make([]types.Deal, 0)
+
+	iter := sdk.KVStorePrefixIterator(store, types.KeyPrefixDeals)
+	defer iter.Close()
+
+	for ; iter.Valid(); iter.Next() {
+		bz := iter.Value()
+		var deal types.Deal
+
+		err := k.cdc.UnmarshalBinaryLengthPrefixed(bz, &deal)
+		if err != nil {
+			return []types.Deal{}, err
+		}
+
+		deals = append(deals, deal)
+	}
+
+	return deals, nil
+}
+
 func (k Keeper) SellOwnData(ctx sdk.Context, seller sdk.AccAddress, cert types.DataValidationCertificate) (sdk.Coin, error) {
 	err := k.isDataCertDuplicate(ctx, cert)
 	if err != nil {
@@ -216,6 +238,26 @@ func (k Keeper) GetDataCertificate(ctx sdk.Context, cert types.DataValidationCer
 	}
 
 	return dataCertificate, nil
+}
+
+func (k Keeper) ListDataCertificates(ctx sdk.Context) ([]types.DataValidationCertificate, error) {
+	store := ctx.KVStore(k.storeKey)
+	dataCertificates := make([]types.DataValidationCertificate, 0)
+
+	iter := sdk.KVStorePrefixIterator(store, types.KeyPrefixDataCertificateStore)
+	defer iter.Close()
+
+	for ; iter.Valid(); iter.Next() {
+		bz := iter.Value()
+		var dataCertificate types.DataValidationCertificate
+
+		err := k.cdc.UnmarshalBinaryLengthPrefixed(bz, &dataCertificate)
+		if err != nil {
+			return []types.DataValidationCertificate{}, err
+		}
+		dataCertificates = append(dataCertificates, dataCertificate)
+	}
+	return dataCertificates, nil
 }
 
 func (k Keeper) SetDataCertificate(ctx sdk.Context, dealId uint64, cert types.DataValidationCertificate) {

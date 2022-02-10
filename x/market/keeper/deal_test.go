@@ -89,6 +89,48 @@ func (suite *dealTestSuite) TestGetDeal() {
 	suite.Require().Equal(deal.GetStatus(), testDeal.GetStatus())
 }
 
+func (suite *dealTestSuite) TestListDeals() {
+	err := suite.BankKeeper.AddCoins(suite.Ctx, acc1, defaultFunds)
+	suite.Require().NoError(err)
+
+	tempDeal := types.Deal{
+		DataSchema:            []string{"http://jsonld.com"},
+		Budget:                &sdk.Coin{Denom: assets.MicroMedDenom, Amount: sdk.NewInt(10000000)},
+		MaxNumData:            10000,
+		TrustedDataValidators: []string{acc2.String()},
+		Owner:                 acc1.String(),
+	}
+
+	owner, err := sdk.AccAddressFromBech32(tempDeal.GetOwner())
+	suite.Require().NoError(err)
+
+	dealIds := make([]uint64, 0)
+
+	for i := 0; i < 5; i++ {
+		dealId, err := suite.MarketKeeper.CreateNewDeal(suite.Ctx, owner, tempDeal)
+		suite.Require().NoError(err)
+		dealIds = append(dealIds, dealId)
+	}
+
+	deals, err := suite.MarketKeeper.ListDeals(suite.Ctx)
+	suite.Require().NoError(err)
+
+	for i, dealId := range dealIds {
+		deal, err := suite.MarketKeeper.GetDeal(suite.Ctx, dealId)
+		suite.Require().NoError(err)
+
+		suite.Require().Equal(deal.GetDealId(), deals[i + 1].GetDealId())
+		suite.Require().Equal(deal.GetDealAddress(), deals[i + 1].GetDealAddress())
+		suite.Require().Equal(deal.GetDataSchema(), deals[i + 1].GetDataSchema())
+		suite.Require().Equal(deal.GetBudget(), deals[i + 1].GetBudget())
+		suite.Require().Equal(deal.GetMaxNumData(), deals[i + 1].GetMaxNumData())
+		suite.Require().Equal(deal.GetCurNumData(), deals[i + 1].GetCurNumData())
+		suite.Require().Equal(deal.GetTrustedDataValidators(), deals[i + 1].GetTrustedDataValidators())
+		suite.Require().Equal(deal.GetOwner(), deals[i + 1].GetOwner())
+		suite.Require().Equal(deal.GetStatus(), deals[i + 1].GetStatus())
+	}
+}
+
 func (suite *dealTestSuite) TestGetBalanceOfDeal() {
 	err := suite.BankKeeper.AddCoins(suite.Ctx, acc1, defaultFunds)
 	suite.Require().NoError(err)
@@ -254,6 +296,83 @@ func (suite *dealTestSuite) TestVerify() {
 	verify, err := suite.MarketKeeper.Verify(suite.Ctx, validatorAddr, cert)
 	suite.Require().Equal(true, verify)
 	suite.Require().NoError(err)
+}
+
+func (suite *dealTestSuite) TestGetDataCertificate() {
+	err := suite.BankKeeper.AddCoins(suite.Ctx, acc1, defaultFunds)
+	suite.Require().NoError(err)
+
+	err = suite.BankKeeper.AddCoins(suite.Ctx, acc3, zeroFunds)
+	suite.Require().NoError(err)
+
+	tempDeal := types.Deal{
+		DataSchema:            []string{"http://jsonld.com"},
+		Budget:                &sdk.Coin{Denom: assets.MicroMedDenom, Amount: sdk.NewInt(10000000)},
+		MaxNumData:            10000,
+		TrustedDataValidators: []string{newAddr.String()},
+		Owner:                 acc1.String(),
+	}
+
+	newDealId, err := suite.MarketKeeper.CreateNewDeal(suite.Ctx, acc1, tempDeal)
+	suite.Require().NoError(err)
+
+	cert := makeTestCert()
+	_, err = suite.MarketKeeper.GetDeal(suite.Ctx, newDealId)
+	suite.Require().NoError(err)
+
+	_, err = suite.MarketKeeper.SellOwnData(suite.Ctx, acc3, cert)
+	suite.Require().NoError(err)
+
+	getCertificate, err := suite.MarketKeeper.GetDataCertificate(suite.Ctx, cert)
+	suite.Require().NoError(err)
+
+	suite.Require().Equal(getCertificate.GetSignature(), cert.GetSignature())
+	suite.Require().Equal(getCertificate.UnsignedCert.GetDealId(), cert.UnsignedCert.GetDealId())
+	suite.Require().Equal(getCertificate.UnsignedCert.GetDataHash(), cert.UnsignedCert.GetDataHash())
+	suite.Require().Equal(getCertificate.UnsignedCert.GetEncryptedDataUrl(), cert.UnsignedCert.GetEncryptedDataUrl())
+	suite.Require().Equal(getCertificate.UnsignedCert.GetDataValidatorAddress(), cert.UnsignedCert.GetDataValidatorAddress())
+	suite.Require().Equal(getCertificate.UnsignedCert.GetRequesterAddress(), cert.UnsignedCert.GetRequesterAddress())
+}
+
+func (suite *dealTestSuite) TestListDataCertificates() {
+	err := suite.BankKeeper.AddCoins(suite.Ctx, acc1, defaultFunds)
+	suite.Require().NoError(err)
+
+	err = suite.BankKeeper.AddCoins(suite.Ctx, acc3, zeroFunds)
+	suite.Require().NoError(err)
+
+	tempDeal := types.Deal{
+		DataSchema:            []string{"http://jsonld.com"},
+		Budget:                &sdk.Coin{Denom: assets.MicroMedDenom, Amount: sdk.NewInt(10000000)},
+		MaxNumData:            10000,
+		TrustedDataValidators: []string{newAddr.String()},
+		Owner:                 acc1.String(),
+	}
+
+	newDealId, err := suite.MarketKeeper.CreateNewDeal(suite.Ctx, acc1, tempDeal)
+	suite.Require().NoError(err)
+
+	cert := makeTestCert()
+	_, err = suite.MarketKeeper.GetDeal(suite.Ctx, newDealId)
+	suite.Require().NoError(err)
+
+	dataCertificates := make([]types.DataValidationCertificate, 0)
+
+	for i := 0; i < 5; i++ {
+		dataCertificates = append(dataCertificates, cert)
+	}
+
+	listDataCertificates, err := suite.MarketKeeper.ListDataCertificates(suite.Ctx)
+	suite.Require().NoError(err)
+
+	for i, dataCertificate := range listDataCertificates {
+		suite.Require().Equal(dataCertificate.GetSignature(), dataCertificates[i + 1].GetSignature())
+		suite.Require().Equal(dataCertificate.UnsignedCert.GetDealId(), dataCertificates[i + 1].UnsignedCert.GetDealId())
+		suite.Require().Equal(dataCertificate.UnsignedCert.GetDataHash(), dataCertificates[i + 1].UnsignedCert.GetDataHash())
+		suite.Require().Equal(dataCertificate.UnsignedCert.GetEncryptedDataUrl(), dataCertificates[i + 1].UnsignedCert.GetEncryptedDataUrl())
+		suite.Require().Equal(dataCertificate.UnsignedCert.GetDataValidatorAddress(), dataCertificates[i + 1].UnsignedCert.GetDataValidatorAddress())
+		suite.Require().Equal(dataCertificate.UnsignedCert.GetRequesterAddress(), dataCertificates[i + 1].UnsignedCert.GetRequesterAddress())
+	}
 }
 
 func (suite *dealTestSuite) TestDeactivateDeal() {
