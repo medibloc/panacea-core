@@ -31,7 +31,7 @@ func (suite *genesisTestSuite) TestMarketInitGenesis() {
 	newDataCert := makeTestDataCert()
 
 	dataCertificateKey := types.GetKeyPrefixDataCertificate(newDataCert.UnsignedCert.DealId, newDataCert.UnsignedCert.DataHash)
-	stringDataCertificateKey := string(dataCertificateKey[:])
+	stringDataCertificateKey := string(dataCertificateKey)
 
 	market.InitGenesis(suite.Ctx, suite.MarketKeeper, types.GenesisState{
 		Deals: map[uint64]*types.Deal{
@@ -75,7 +75,7 @@ func (suite *genesisTestSuite) TestMarketExportGenesis() {
 	newDataCert := makeTestDataCert()
 
 	dataCertificateKey := types.GetKeyPrefixDataCertificate(newDataCert.UnsignedCert.DealId, newDataCert.UnsignedCert.DataHash)
-	stringDataCertificateKey := string(dataCertificateKey[:])
+	stringDataCertificateKey := string(dataCertificateKey)
 
 	market.InitGenesis(suite.Ctx, suite.MarketKeeper, types.GenesisState{
 		Deals: map[uint64]*types.Deal{
