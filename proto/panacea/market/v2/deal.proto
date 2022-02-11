@@ -7,7 +7,6 @@ import "gogoproto/gogo.proto";
 import "cosmos/base/v1beta1/coin.proto";
 
 // Deal defines a deal.
-// TODO: Remove max_num_data field and cur_num_data
 message Deal {
   uint64 deal_id = 1;
   string deal_address = 2;

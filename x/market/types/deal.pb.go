@@ -25,7 +25,6 @@ var _ = math.Inf
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 // Deal defines a deal.
-// TODO: Remove max_num_data field and cur_num_data
 type Deal struct {
 	DealId                uint64      `protobuf:"varint,1,opt,name=deal_id,json=dealId,proto3" json:"deal_id,omitempty"`
 	DealAddress           string      `protobuf:"bytes,2,opt,name=deal_address,json=dealAddress,proto3" json:"deal_address,omitempty"`
