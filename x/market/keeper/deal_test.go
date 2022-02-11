@@ -239,7 +239,7 @@ func (suite *dealTestSuite) TestDealStatusInactiveOrCompleted() {
 	suite.Require().Error(err, types.ErrInvalidStatus)
 }
 
-func (suite *dealTestSuite) TestVerify() {
+func (suite *dealTestSuite) TestVerifyDataCertificate() {
 	cert := makeTestCert()
 
 	validatorAddr, err := sdk.AccAddressFromBech32(cert.UnsignedCert.GetDataValidatorAddress())
@@ -251,7 +251,7 @@ func (suite *dealTestSuite) TestVerify() {
 	suite.Require().NoError(err)
 	suite.AccountKeeper.SetAccount(suite.Ctx, account)
 
-	verify, err := suite.MarketKeeper.Verify(suite.Ctx, validatorAddr, cert)
+	verify, err := suite.MarketKeeper.VerifyDataCertificate(suite.Ctx, validatorAddr, cert)
 	suite.Require().Equal(true, verify)
 	suite.Require().NoError(err)
 }
