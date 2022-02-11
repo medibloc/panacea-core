@@ -1,26 +1,47 @@
 package cli
 
 import (
-	"github.com/medibloc/panacea-core/v2/types/testsuite"
-	"github.com/stretchr/testify/suite"
+	"encoding/base64"
+	"github.com/medibloc/panacea-core/v2/x/market/types"
+	"github.com/stretchr/testify/require"
 	"testing"
 )
 
-type txTestSuite struct {
-	testsuite.TestSuite
+func TestParseSellDataFlags(t *testing.T) {
+	flags := CmdSellData().Flags()
+	err := flags.Set(DataVerificationCertificateFile, "./testdata/data_certificate_file.json")
+	require.NoError(t, err)
+
+	testCert := makeTestCert()
+	parsedDataCert, err := parseSellDataFlags(flags)
+	require.NoError(t, err)
+
+	require.Equal(t, parsedDataCert.GetSignature(), testCert.GetSignature())
+	require.Equal(t, parsedDataCert.UnsignedCert.GetDealId(), testCert.UnsignedCert.GetDealId())
+	require.Equal(t, parsedDataCert.UnsignedCert.GetDataHash(), testCert.UnsignedCert.GetDataHash())
+	require.Equal(t, parsedDataCert.UnsignedCert.GetEncryptedDataUrl(), testCert.UnsignedCert.GetEncryptedDataUrl())
+	require.Equal(t, parsedDataCert.UnsignedCert.GetDataValidatorAddress(), testCert.UnsignedCert.GetDataValidatorAddress())
+	require.Equal(t, parsedDataCert.UnsignedCert.GetRequesterAddress(), testCert.UnsignedCert.GetRequesterAddress())
 }
 
-func TestTxTestSuite(t *testing.T) {
-	suite.Run(t, new(txTestSuite))
-}
+func makeTestCert() types.DataValidationCertificate {
 
-// TestNewMsgCreateDeal
-// TODO: Test Client Command-Line MsgCreateDeal
-func (suite *txTestSuite) TestCmdCreateDeal() {
+	decodeDataHash, _ := base64.StdEncoding.DecodeString("ZGF0YUhhc2g=")
+	decodeURL, _ := base64.StdEncoding.DecodeString("ZW5jcnlwdGVkRGF0YVVSTA==")
 
-}
+	unsignedDataValidationCertificate := types.UnsignedDataValidationCertificate{
+		DealId:               1,
+		DataHash:             decodeDataHash,
+		EncryptedDataUrl:     decodeURL,
+		DataValidatorAddress: "panacea1ugrau4qqr9446rpuj0srjrxspz02dd9nmlrjg3",
+		RequesterAddress:     "panacea1fpfugtgpzux8spqpe3kyqqpyy6rular2zlpusu",
+	}
 
-// TODO: Test Client Command-Line MsgSellData
-func (suite *txTestSuite) TestCmdSellData() {
+	decodeSig, _ := base64.StdEncoding.DecodeString("c2lnbmF0dXJl")
+	dataValidationCertificate := types.DataValidationCertificate{
+		UnsignedCert: &unsignedDataValidationCertificate,
+		Signature:    decodeSig,
+	}
 
+	return dataValidationCertificate
 }
