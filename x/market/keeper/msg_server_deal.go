@@ -42,25 +42,12 @@ func (m msgServer) SellData(goCtx context.Context, msg *types.MsgSellData) (*typ
 		return nil, err
 	}
 
-	unSignedCert := types.UnsignedDataValidationCertificate{
-		DealId:               msg.Cert.UnsignedCert.DealId,
-		DataHash:             msg.Cert.UnsignedCert.DataHash,
-		EncryptedDataUrl:     msg.Cert.UnsignedCert.EncryptedDataUrl,
-		DataValidatorAddress: msg.Cert.UnsignedCert.DataValidatorAddress,
-		RequesterAddress:     msg.Cert.UnsignedCert.RequesterAddress,
-	}
-
-	cert := types.DataValidationCertificate{
-		UnsignedCert: &unSignedCert,
-		Signature:    msg.Cert.Signature,
-	}
-
-	_, err = m.Keeper.Verify(ctx, validatorAddr, cert)
+	_, err = m.Keeper.VerifyDataCertificate(ctx, validatorAddr, *msg.Cert)
 	if err != nil {
 		return nil, err
 	}
 
-	reward, err := m.Keeper.SellOwnData(ctx, seller, cert)
+	reward, err := m.Keeper.SellOwnData(ctx, seller, *msg.Cert)
 	if err != nil {
 		return nil, err
 	}
