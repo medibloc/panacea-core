@@ -273,7 +273,7 @@ func SetCurNumData(deal *types.Deal) {
 	deal.CurNumData = curNumData
 }
 
-func (k Keeper) Verify(ctx sdk.Context, validatorAddr sdk.AccAddress, cert types.DataValidationCertificate) (bool, error) {
+func (k Keeper) VerifyDataCertificate(ctx sdk.Context, validatorAddr sdk.AccAddress, cert types.DataValidationCertificate) (bool, error) {
 	validatorAcc := k.accountKeeper.GetAccount(ctx, validatorAddr)
 	if validatorAcc == nil {
 		return false, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid validator address")
