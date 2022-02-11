@@ -2,13 +2,13 @@ package cli
 
 import (
 	"bytes"
-	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/gogo/protobuf/jsonpb"
 	"github.com/medibloc/panacea-core/v2/x/market/types"
 	"github.com/spf13/cobra"
 	flag "github.com/spf13/pflag"
@@ -150,57 +150,28 @@ func NewSellDataMsg(clientCtx client.Context, txf tx.Factory, fs *flag.FlagSet) 
 		return txf, nil, fmt.Errorf("failed to parse data certificate file: %w", err)
 	}
 
-	encryptedDataUrlBytes, err := base64.StdEncoding.DecodeString(sellData.Cert.UnsignedCert.EncryptedDataUrlBase64)
-	if err != nil {
-		return txf, nil, err
-	}
-
-	dataHashBytes, err := base64.StdEncoding.DecodeString(sellData.Cert.UnsignedCert.DataHashBase64)
-	if err != nil {
-		return txf, nil, err
-	}
-
-	unSigned := types.UnsignedDataValidationCertificate{
-		DealId:               sellData.Cert.UnsignedCert.DealId,
-		DataHash:             dataHashBytes,
-		EncryptedDataUrl:     encryptedDataUrlBytes,
-		DataValidatorAddress: sellData.Cert.UnsignedCert.DataValidatorAddress,
-		RequesterAddress:     sellData.Cert.UnsignedCert.RequesterAddress,
-	}
-
-	signatureBytes, err := base64.StdEncoding.DecodeString(sellData.Cert.SignatureBase64)
-	if err != nil {
-		return txf, nil, err
-	}
-
-	signed := types.DataValidationCertificate{
-		UnsignedCert: &unSigned,
-		Signature:    signatureBytes,
-	}
-
-	msg := types.NewMsgSellData(signed, clientCtx.GetFromAddress().String())
+	msg := types.NewMsgSellData(sellData, clientCtx.GetFromAddress().String())
 
 	return txf, msg, nil
 }
 
-func parseSellDataFlags(fs *flag.FlagSet) (*sellDataInputs, error) {
-	var sellData sellDataInputs
+func parseSellDataFlags(fs *flag.FlagSet) (types.DataValidationCertificate, error) {
+	sellData := types.DataValidationCertificate{}
 	receiptFile, _ := fs.GetString(DataVerificationCertificateFile)
 
 	if receiptFile == "" {
-		return nil, fmt.Errorf("need receipt json file using --%s flag", DataVerificationCertificateFile)
+		return types.DataValidationCertificate{}, fmt.Errorf("need receipt json file using --%s flag", DataVerificationCertificateFile)
 	}
 
 	contents, err := ioutil.ReadFile(receiptFile)
 	if err != nil {
-		return nil, err
+		return types.DataValidationCertificate{}, err
 	}
 
-	dec := json.NewDecoder(bytes.NewReader(contents))
-
-	if err := dec.Decode(&sellData); err != nil {
-		return nil, err
+	err = jsonpb.Unmarshal(bytes.NewReader(contents), &sellData)
+	if err != nil {
+		return types.DataValidationCertificate{}, err
 	}
 
-	return &sellData, nil
+	return sellData, nil
 }
