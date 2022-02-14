@@ -2,6 +2,7 @@ package market_test
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/medibloc/panacea-core/v2/types/assets"
 	"github.com/medibloc/panacea-core/v2/types/testsuite"
 	"github.com/medibloc/panacea-core/v2/x/market"
 	"github.com/medibloc/panacea-core/v2/x/market/types"
@@ -10,9 +11,12 @@ import (
 	"testing"
 )
 
-var acc1 = secp256k1.GenPrivKey().PubKey().Address()
-var privKey = secp256k1.GenPrivKey()
-var acc2 = privKey.PubKey().Address()
+var (
+	acc1                   = sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address())
+	privKey                = secp256k1.GenPrivKey()
+	acc2                   = sdk.AccAddress(privKey.PubKey().Address())
+	defaultFunds sdk.Coins = sdk.NewCoins(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(10000000000)))
+)
 
 type genesisTestSuite struct {
 	testsuite.TestSuite
@@ -27,7 +31,7 @@ func (suite *genesisTestSuite) TestMarketInitGenesis() {
 	newDataCert := makeTestDataCert()
 
 	dataCertificateKey := types.GetKeyPrefixDataCertificate(newDataCert.UnsignedCert.DealId, newDataCert.UnsignedCert.DataHash)
-	stringDataCertificateKey := string(dataCertificateKey[:])
+	stringDataCertificateKey := string(dataCertificateKey)
 
 	market.InitGenesis(suite.Ctx, suite.MarketKeeper, types.GenesisState{
 		Deals: map[uint64]*types.Deal{
@@ -64,6 +68,47 @@ func (suite *genesisTestSuite) TestMarketInitGenesis() {
 	suite.Require().Equal(newDataCert.UnsignedCert.GetEncryptedDataUrl(), dataCertificateStored.UnsignedCert.GetEncryptedDataUrl())
 	suite.Require().Equal(newDataCert.UnsignedCert.GetDataValidatorAddress(), dataCertificateStored.UnsignedCert.GetDataValidatorAddress())
 	suite.Require().Equal(newDataCert.UnsignedCert.GetRequesterAddress(), dataCertificateStored.UnsignedCert.GetRequesterAddress())
+}
+
+func (suite *genesisTestSuite) TestMarketExportGenesis() {
+	newDeal := makeTestDeal()
+	newDataCert := makeTestDataCert()
+
+	dataCertificateKey := types.GetKeyPrefixDataCertificate(newDataCert.UnsignedCert.DealId, newDataCert.UnsignedCert.DataHash)
+	stringDataCertificateKey := string(dataCertificateKey)
+
+	market.InitGenesis(suite.Ctx, suite.MarketKeeper, types.GenesisState{
+		Deals: map[uint64]*types.Deal{
+			newDeal.GetDealId(): &newDeal,
+		},
+		DataCertificates: map[string]*types.DataValidationCertificate{
+			stringDataCertificateKey: &newDataCert,
+		},
+		NextDealNumber: 2,
+	})
+
+	err := suite.BankKeeper.AddCoins(suite.Ctx, acc1, defaultFunds)
+	suite.Require().NoError(err)
+
+	tempDeal := types.Deal{
+		DataSchema:            []string{"http://jsonld.com"},
+		Budget:                &sdk.Coin{Denom: assets.MicroMedDenom, Amount: sdk.NewInt(10000000)},
+		MaxNumData:            10000,
+		TrustedDataValidators: []string{acc1.String()},
+		Owner:                 acc1.String(),
+	}
+
+	_, err = suite.MarketKeeper.CreateNewDeal(suite.Ctx, acc1, tempDeal)
+	suite.Require().NoError(err)
+
+	newDataCert2 := makeTestDataCert2()
+	_, err = suite.MarketKeeper.SellOwnData(suite.Ctx, acc2, newDataCert2)
+	suite.Require().NoError(err)
+
+	genesis := market.ExportGenesis(suite.Ctx, suite.MarketKeeper)
+	suite.Require().Equal(genesis.NextDealNumber, uint64(3))
+	suite.Require().Len(genesis.Deals, 2)
+	suite.Require().Len(genesis.DataCertificates, 2)
 }
 
 func makeTestDeal() types.Deal {
@@ -103,5 +148,29 @@ func makeTestDataCert() types.DataValidationCertificate {
 		UnsignedCert: &uCert,
 		Signature:    sign,
 	}
+}
 
+func makeTestDataCert2() types.DataValidationCertificate {
+	uCert := types.UnsignedDataValidationCertificate{
+		DealId:               2,
+		DataHash:             []byte("1a312c1223x2fs3"),
+		EncryptedDataUrl:     []byte("https://panacea.org/a/123.json"),
+		DataValidatorAddress: acc1.String(),
+		RequesterAddress:     acc2.String(),
+	}
+
+	marshal, err := uCert.Marshal()
+	if err != nil {
+		return types.DataValidationCertificate{}
+	}
+
+	sign, err := privKey.Sign(marshal)
+	if err != nil {
+		return types.DataValidationCertificate{}
+	}
+
+	return types.DataValidationCertificate{
+		UnsignedCert: &uCert,
+		Signature:    sign,
+	}
 }
