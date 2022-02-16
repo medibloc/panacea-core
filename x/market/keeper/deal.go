@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"fmt"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
@@ -194,9 +195,13 @@ func (k Keeper) SellOwnData(ctx sdk.Context, seller sdk.AccAddress, cert types.D
 
 	k.SetDataCertificate(ctx, findDeal.GetDealId(), cert)
 	SetCurNumData(&findDeal)
+
+	if findDeal.GetCurNumData() == findDeal.GetMaxNumData() {
+		SetStatusCompleted(&findDeal)
+	}
+
 	k.SetDeal(ctx, findDeal)
 	return pricePerData, nil
-
 }
 
 func (k Keeper) isDataCertDuplicate(ctx sdk.Context, cert types.DataValidationCertificate) error {
@@ -271,6 +276,10 @@ func (k Keeper) SetDataCertificate(ctx sdk.Context, dealId uint64, cert types.Da
 func SetCurNumData(deal *types.Deal) {
 	curNumData := deal.GetCurNumData() + 1
 	deal.CurNumData = curNumData
+}
+
+func SetStatusCompleted(deal *types.Deal) {
+	deal.Status = COMPLETED
 }
 
 func (k Keeper) VerifyDataCertificate(ctx sdk.Context, validatorAddr sdk.AccAddress, cert types.DataValidationCertificate) (bool, error) {
