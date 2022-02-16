@@ -1,6 +1,8 @@
 package keeper_test
 
 import (
+	"testing"
+
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -8,7 +10,6 @@ import (
 	"github.com/medibloc/panacea-core/v2/types/testsuite"
 	"github.com/medibloc/panacea-core/v2/x/market/types"
 	"github.com/stretchr/testify/suite"
-	"testing"
 )
 
 type dealTestSuite struct {
@@ -119,15 +120,15 @@ func (suite *dealTestSuite) TestListDeals() {
 		deal, err := suite.MarketKeeper.GetDeal(suite.Ctx, dealId)
 		suite.Require().NoError(err)
 
-		suite.Require().Equal(deal.GetDealId(), deals[i + 1].GetDealId())
-		suite.Require().Equal(deal.GetDealAddress(), deals[i + 1].GetDealAddress())
-		suite.Require().Equal(deal.GetDataSchema(), deals[i + 1].GetDataSchema())
-		suite.Require().Equal(deal.GetBudget(), deals[i + 1].GetBudget())
-		suite.Require().Equal(deal.GetMaxNumData(), deals[i + 1].GetMaxNumData())
-		suite.Require().Equal(deal.GetCurNumData(), deals[i + 1].GetCurNumData())
-		suite.Require().Equal(deal.GetTrustedDataValidators(), deals[i + 1].GetTrustedDataValidators())
-		suite.Require().Equal(deal.GetOwner(), deals[i + 1].GetOwner())
-		suite.Require().Equal(deal.GetStatus(), deals[i + 1].GetStatus())
+		suite.Require().Equal(deal.GetDealId(), deals[i+1].GetDealId())
+		suite.Require().Equal(deal.GetDealAddress(), deals[i+1].GetDealAddress())
+		suite.Require().Equal(deal.GetDataSchema(), deals[i+1].GetDataSchema())
+		suite.Require().Equal(deal.GetBudget(), deals[i+1].GetBudget())
+		suite.Require().Equal(deal.GetMaxNumData(), deals[i+1].GetMaxNumData())
+		suite.Require().Equal(deal.GetCurNumData(), deals[i+1].GetCurNumData())
+		suite.Require().Equal(deal.GetTrustedDataValidators(), deals[i+1].GetTrustedDataValidators())
+		suite.Require().Equal(deal.GetOwner(), deals[i+1].GetOwner())
+		suite.Require().Equal(deal.GetStatus(), deals[i+1].GetStatus())
 	}
 }
 
@@ -298,6 +299,41 @@ func (suite *dealTestSuite) TestVerifyDataCertificate() {
 	suite.Require().NoError(err)
 }
 
+func (suite *dealTestSuite) TestIsDealStatusCompleted() {
+	err := suite.BankKeeper.AddCoins(suite.Ctx, acc1, defaultFunds)
+	suite.Require().NoError(err)
+
+	err = suite.BankKeeper.AddCoins(suite.Ctx, acc2, zeroFunds)
+	suite.Require().NoError(err)
+
+	err = suite.BankKeeper.AddCoins(suite.Ctx, acc3, zeroFunds)
+	suite.Require().NoError(err)
+
+	tempDeal := types.Deal{
+		DataSchema:            []string{"http://jsonld.com"},
+		Budget:                &sdk.Coin{Denom: assets.MicroMedDenom, Amount: sdk.NewInt(10000000)},
+		MaxNumData:            2,
+		TrustedDataValidators: []string{newAddr.String()},
+		Owner:                 acc1.String(),
+	}
+
+	dealId, err := suite.MarketKeeper.CreateNewDeal(suite.Ctx, acc1, tempDeal)
+	suite.Require().NoError(err)
+
+	testCert1 := makeTestCert()
+	_, err = suite.MarketKeeper.SellOwnData(suite.Ctx, acc3, testCert1)
+	suite.Require().NoError(err)
+
+	testCert2 := makeTestDataCert2()
+	_, err = suite.MarketKeeper.SellOwnData(suite.Ctx, acc2, testCert2)
+	suite.Require().NoError(err)
+
+	updatedDeal, err := suite.MarketKeeper.GetDeal(suite.Ctx, dealId)
+	suite.Require().NoError(err)
+
+	suite.Require().Equal(updatedDeal.GetStatus(), COMPLETED)
+}
+
 func (suite *dealTestSuite) TestGetDataCertificate() {
 	err := suite.BankKeeper.AddCoins(suite.Ctx, acc1, defaultFunds)
 	suite.Require().NoError(err)
@@ -366,12 +402,12 @@ func (suite *dealTestSuite) TestListDataCertificates() {
 	suite.Require().NoError(err)
 
 	for i, dataCertificate := range listDataCertificates {
-		suite.Require().Equal(dataCertificate.GetSignature(), dataCertificates[i + 1].GetSignature())
-		suite.Require().Equal(dataCertificate.UnsignedCert.GetDealId(), dataCertificates[i + 1].UnsignedCert.GetDealId())
-		suite.Require().Equal(dataCertificate.UnsignedCert.GetDataHash(), dataCertificates[i + 1].UnsignedCert.GetDataHash())
-		suite.Require().Equal(dataCertificate.UnsignedCert.GetEncryptedDataUrl(), dataCertificates[i + 1].UnsignedCert.GetEncryptedDataUrl())
-		suite.Require().Equal(dataCertificate.UnsignedCert.GetDataValidatorAddress(), dataCertificates[i + 1].UnsignedCert.GetDataValidatorAddress())
-		suite.Require().Equal(dataCertificate.UnsignedCert.GetRequesterAddress(), dataCertificates[i + 1].UnsignedCert.GetRequesterAddress())
+		suite.Require().Equal(dataCertificate.GetSignature(), dataCertificates[i+1].GetSignature())
+		suite.Require().Equal(dataCertificate.UnsignedCert.GetDealId(), dataCertificates[i+1].UnsignedCert.GetDealId())
+		suite.Require().Equal(dataCertificate.UnsignedCert.GetDataHash(), dataCertificates[i+1].UnsignedCert.GetDataHash())
+		suite.Require().Equal(dataCertificate.UnsignedCert.GetEncryptedDataUrl(), dataCertificates[i+1].UnsignedCert.GetEncryptedDataUrl())
+		suite.Require().Equal(dataCertificate.UnsignedCert.GetDataValidatorAddress(), dataCertificates[i+1].UnsignedCert.GetDataValidatorAddress())
+		suite.Require().Equal(dataCertificate.UnsignedCert.GetRequesterAddress(), dataCertificates[i+1].UnsignedCert.GetRequesterAddress())
 	}
 }
 
@@ -516,5 +552,29 @@ func makeTestCert() types.DataValidationCertificate {
 		UnsignedCert: &uCert,
 		Signature:    sign,
 	}
+}
 
+func makeTestDataCert2() types.DataValidationCertificate {
+	uCert := types.UnsignedDataValidationCertificate{
+		DealId:               2,
+		DataHash:             []byte("1a312c1223x2fs3"),
+		EncryptedDataUrl:     []byte("https://panacea.org/a/123.json"),
+		DataValidatorAddress: newAddr.String(),
+		RequesterAddress:     acc2.String(),
+	}
+
+	marshal, err := uCert.Marshal()
+	if err != nil {
+		return types.DataValidationCertificate{}
+	}
+
+	sign, err := privKey.Sign(marshal)
+	if err != nil {
+		return types.DataValidationCertificate{}
+	}
+
+	return types.DataValidationCertificate{
+		UnsignedCert: &uCert,
+		Signature:    sign,
+	}
 }
