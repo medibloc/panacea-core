@@ -1,6 +1,7 @@
 package keeper_test
 
 import (
+	"strconv"
 	"testing"
 
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
@@ -181,10 +182,10 @@ func (suite *dealTestSuite) TestSellOwnData() {
 	newDealId, err := suite.MarketKeeper.CreateNewDeal(suite.Ctx, acc1, tempDeal)
 	suite.Require().NoError(err)
 
-	cert := makeTestCert()
 	deal, err := suite.MarketKeeper.GetDeal(suite.Ctx, newDealId)
 	suite.Require().NoError(err)
 
+	cert := makeTestCert("1a312c1223x2fs3", newAddr, acc3)
 	reward, err := suite.MarketKeeper.SellOwnData(suite.Ctx, acc3, cert)
 	suite.Require().NoError(err)
 	suite.Require().Equal(cert.UnsignedCert.GetDealId(), deal.GetDealId())
@@ -215,11 +216,11 @@ func (suite *dealTestSuite) TestIsDataCertDuplicate() {
 	_, err = suite.MarketKeeper.CreateNewDeal(suite.Ctx, acc1, tempDeal)
 	suite.Require().NoError(err)
 
-	testCert1 := makeTestCert()
+	testCert1 := makeTestCert("1a312c1223x", newAddr, acc3)
 	_, err = suite.MarketKeeper.SellOwnData(suite.Ctx, acc3, testCert1)
 	suite.Require().NoError(err)
 
-	testCert2 := makeTestCert()
+	testCert2 := makeTestCert("1a312c1223x", newAddr, acc3)
 	_, err = suite.MarketKeeper.SellOwnData(suite.Ctx, acc3, testCert2)
 	suite.Require().Error(err, types.ErrDataAlreadyExist)
 }
@@ -245,7 +246,7 @@ func (suite *dealTestSuite) TestIsTrustedDataValidator_Invalid() {
 	_, err = suite.MarketKeeper.CreateNewDeal(suite.Ctx, acc1, tempDeal)
 	suite.Require().NoError(err)
 
-	testCert1 := makeTestCert()
+	testCert1 := makeTestCert("1a312c1223x2fs3", newAddr, acc3)
 	_, err = suite.MarketKeeper.SellOwnData(suite.Ctx, acc3, testCert1)
 	suite.Require().Error(err, sdkerrors.ErrInvalidAddress)
 }
@@ -273,7 +274,7 @@ func (suite *dealTestSuite) TestDealStatusInactiveOrCompleted() {
 	findDeal.Status = INACTIVE
 	suite.MarketKeeper.SetDeal(suite.Ctx, findDeal)
 
-	testCert1 := makeTestCert()
+	testCert1 := makeTestCert("1a312c1223x2fs3", newAddr, acc3)
 	_, err = suite.MarketKeeper.SellOwnData(suite.Ctx, acc3, testCert1)
 	suite.Require().Error(err, types.ErrInvalidStatus)
 
@@ -283,7 +284,7 @@ func (suite *dealTestSuite) TestDealStatusInactiveOrCompleted() {
 }
 
 func (suite *dealTestSuite) TestVerifyDataCertificate() {
-	cert := makeTestCert()
+	cert := makeTestCert("1a312c1223x2fs3", newAddr, acc3)
 
 	validatorAddr, err := sdk.AccAddressFromBech32(cert.UnsignedCert.GetDataValidatorAddress())
 	suite.Require().NoError(err)
@@ -320,11 +321,11 @@ func (suite *dealTestSuite) TestIsDealStatusCompleted() {
 	dealId, err := suite.MarketKeeper.CreateNewDeal(suite.Ctx, acc1, tempDeal)
 	suite.Require().NoError(err)
 
-	testCert1 := makeTestCert()
+	testCert1 := makeTestCert("1a312c1223x2fs3", newAddr, acc3)
 	_, err = suite.MarketKeeper.SellOwnData(suite.Ctx, acc3, testCert1)
 	suite.Require().NoError(err)
 
-	testCert2 := makeTestDataCert2()
+	testCert2 := makeTestCert("1a312c1223x", newAddr, acc2)
 	_, err = suite.MarketKeeper.SellOwnData(suite.Ctx, acc2, testCert2)
 	suite.Require().NoError(err)
 
@@ -352,7 +353,7 @@ func (suite *dealTestSuite) TestGetDataCertificate() {
 	newDealId, err := suite.MarketKeeper.CreateNewDeal(suite.Ctx, acc1, tempDeal)
 	suite.Require().NoError(err)
 
-	cert := makeTestCert()
+	cert := makeTestCert("1a312c1223x2fs3", newAddr, acc3)
 	_, err = suite.MarketKeeper.GetDeal(suite.Ctx, newDealId)
 	suite.Require().NoError(err)
 
@@ -388,7 +389,7 @@ func (suite *dealTestSuite) TestListDataCertificates() {
 	newDealId, err := suite.MarketKeeper.CreateNewDeal(suite.Ctx, acc1, tempDeal)
 	suite.Require().NoError(err)
 
-	cert := makeTestCert()
+	cert := makeTestCert("1a312c1223x2fs3", newAddr, acc3)
 	_, err = suite.MarketKeeper.GetDeal(suite.Ctx, newDealId)
 	suite.Require().NoError(err)
 
@@ -429,7 +430,7 @@ func (suite *dealTestSuite) TestDeactivateDeal() {
 	dealId, err := suite.MarketKeeper.CreateNewDeal(suite.Ctx, acc1, tempDeal)
 	suite.Require().NoError(err)
 
-	testCert := makeTestCert()
+	testCert := makeTestCert("1a312c1223x2fs3", newAddr, acc3)
 	_, err = suite.MarketKeeper.SellOwnData(suite.Ctx, acc3, testCert)
 	suite.Require().NoError(err)
 
@@ -471,7 +472,7 @@ func (suite *dealTestSuite) TestIsNotEqualOwner() {
 	dealId, err := suite.MarketKeeper.CreateNewDeal(suite.Ctx, acc1, tempDeal)
 	suite.Require().NoError(err)
 
-	testCert := makeTestCert()
+	testCert := makeTestCert("1a312c1223x2fs3", newAddr, acc3)
 	_, err = suite.MarketKeeper.SellOwnData(suite.Ctx, acc3, testCert)
 	suite.Require().NoError(err)
 
@@ -489,7 +490,7 @@ func (suite *dealTestSuite) TestDealIsNotActive() {
 	tempDeal := types.Deal{
 		DataSchema:            []string{"http://jsonld.com"},
 		Budget:                &sdk.Coin{Denom: assets.MicroMedDenom, Amount: sdk.NewInt(1000000000)},
-		MaxNumData:            10000,
+		MaxNumData:            10,
 		TrustedDataValidators: []string{newAddr.String()},
 		Owner:                 acc1.String(),
 	}
@@ -507,11 +508,22 @@ func (suite *dealTestSuite) TestDealIsNotActive() {
 	suite.Require().Error(err, types.ErrInvalidStatus)
 	suite.Require().Error(err, "the deal's status is not activated")
 
-	findDeal.Status = COMPLETED
+	findDeal.Status = ACTIVE
 	suite.MarketKeeper.SetDeal(suite.Ctx, findDeal)
+
+	dataHash := "123456"
+	for i := 0; i < 10; i++ {
+		cert := makeTestCert(dataHash+strconv.Itoa(i), newAddr, acc1)
+		_, err := suite.MarketKeeper.SellOwnData(suite.Ctx, acc1, cert)
+		suite.Require().NoError(err)
+	}
+
+	completedDeal, err := suite.MarketKeeper.GetDeal(suite.Ctx, dealId)
+	suite.Require().NoError(err)
 
 	_, err = suite.MarketKeeper.DeactivateDeal(suite.Ctx, dealId, acc1)
 	suite.Require().Error(err, types.ErrInvalidStatus)
+	suite.Require().Equal(completedDeal.GetStatus(), COMPLETED)
 	suite.Require().Error(err, "the deal's status is not activated")
 }
 
@@ -529,38 +541,13 @@ func makeTestDeal() types.Deal {
 	}
 }
 
-func makeTestCert() types.DataValidationCertificate {
+func makeTestCert(dataHash string, validatorAddress sdk.AccAddress, requesterAddress sdk.AccAddress) types.DataValidationCertificate {
 	uCert := types.UnsignedDataValidationCertificate{
 		DealId:               2,
-		DataHash:             []byte("1a312c123x23"),
+		DataHash:             []byte(dataHash),
 		EncryptedDataUrl:     []byte("https://panacea.org/a/123.json"),
-		DataValidatorAddress: newAddr.String(),
-		RequesterAddress:     acc3.String(),
-	}
-
-	marshal, err := uCert.Marshal()
-	if err != nil {
-		return types.DataValidationCertificate{}
-	}
-
-	sign, err := privKey.Sign(marshal)
-	if err != nil {
-		return types.DataValidationCertificate{}
-	}
-
-	return types.DataValidationCertificate{
-		UnsignedCert: &uCert,
-		Signature:    sign,
-	}
-}
-
-func makeTestDataCert2() types.DataValidationCertificate {
-	uCert := types.UnsignedDataValidationCertificate{
-		DealId:               2,
-		DataHash:             []byte("1a312c1223x2fs3"),
-		EncryptedDataUrl:     []byte("https://panacea.org/a/123.json"),
-		DataValidatorAddress: newAddr.String(),
-		RequesterAddress:     acc2.String(),
+		DataValidatorAddress: validatorAddress.String(),
+		RequesterAddress:     requesterAddress.String(),
 	}
 
 	marshal, err := uCert.Marshal()
