@@ -1,0 +1,70 @@
+syntax = "proto3";
+package panacea.datadeal.v2;
+
+// this line is used by starport scaffolding # proto/tx/import
+
+option go_package = "github.com/medibloc/panacea-core/x/datadeal/types";
+
+import "gogoproto/gogo.proto";
+import "cosmos/base/v1beta1/coin.proto";
+
+// Msg defines the Msg service.
+service Msg {
+  // CreateDeal defines a method for creating a deal.
+  rpc CreateDeal(MsgCreateDeal) returns (MsgCreateDealResponse);
+  // SellData defines a method for selling a data.
+  rpc SellData(MsgSellData) returns (MsgSellDataResponse);
+  // DeactivateDeal defines a method for deactivating a deal.
+  rpc DeactivateDeal(MsgDeactivateDeal) returns (MsgDeactivateDealResponse);
+}
+
+//MsgCreateDeal defines the Msg/CreateDeal request type.
+message MsgCreateDeal {
+  repeated string data_schema = 1;
+  cosmos.base.v1beta1.Coin budget = 2;
+  uint64 max_num_data = 3;
+  repeated string trusted_data_validators = 4;
+  string owner = 5;
+}
+
+//MsgCreateDealResponse defines the Msg/CreateDeal response type.
+message MsgCreateDealResponse {
+  uint64 deal_id = 1;
+}
+
+//MsgSellData defines the Msg/SellData request type.
+message MsgSellData {
+  DataValidationCertificate cert = 1;
+  string seller = 2;
+}
+
+//MsgSellDataResponse defines the Msg/SellData response type.
+message MsgSellDataResponse {
+  cosmos.base.v1beta1.Coin reward = 1;
+}
+
+// DataValidationCertificate defines data validation certificate.
+message DataValidationCertificate {
+  UnsignedDataValidationCertificate unsigned_cert = 1;
+  bytes signature = 2;
+}
+
+// UnsignedDataValidationCertificate defines unsigned data validation certificate.
+message UnsignedDataValidationCertificate {
+  uint64 deal_id = 1;
+  bytes data_hash = 2;
+  bytes encrypted_data_url = 3;
+  string data_validator_address = 4;
+  string requester_address = 5;
+}
+
+// MsgDeactivateDeal defines the Msg/DeactivateDeal request type.
+message MsgDeactivateDeal {
+  uint64 deal_id = 1;
+  string deactivate_requester = 2;
+}
+
+// MsgDeactivateDealResponse defines the Msg/DeactivateDeal response type.
+message MsgDeactivateDealResponse {
+  uint64 deal_id = 1;
+}
