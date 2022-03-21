@@ -1,0 +1,9 @@
+syntax = "proto3";
+package panacea.datapool.v2;
+
+// this line is used by starport scaffolding # proto/tx/import
+
+option go_package = "github.com/medibloc/panacea-core/x/datapool/types";
+
+// Msg defines the Msg service.
+service Msg {}
