@@ -18,13 +18,13 @@ func TestQueryDealTest(t *testing.T) {
 
 func (suite *queryDealTestSuite) TestQueryDeal() {
 	deal := makeTestDeal()
-	suite.DatadealKeeper.SetDeal(suite.Ctx, deal)
-	suite.DatadealKeeper.SetNextDealNumber(suite.Ctx, 2)
+	suite.DataDealKeeper.SetDeal(suite.Ctx, deal)
+	suite.DataDealKeeper.SetNextDealNumber(suite.Ctx, 2)
 
 	req := types.QueryDealRequest{
 		DealId: deal.GetDealId(),
 	}
-	res, err := suite.DatadealKeeper.Deal(sdk.WrapSDKContext(suite.Ctx), &req)
+	res, err := suite.DataDealKeeper.Deal(sdk.WrapSDKContext(suite.Ctx), &req)
 	suite.Require().NoError(err)
 	suite.Require().NotNil(res)
 	suite.Require().Equal(deal, *res.Deal)

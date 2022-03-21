@@ -26,14 +26,14 @@ func TestGenesisTestSuite(t *testing.T) {
 	suite.Run(t, new(genesisTestSuite))
 }
 
-func (suite *genesisTestSuite) TestDatadealInitGenesis() {
+func (suite *genesisTestSuite) TestDataDealInitGenesis() {
 	newDeal := makeTestDeal()
 	newDataCert := makeTestDataCert()
 
 	dataCertificateKey := types.GetKeyPrefixDataCertificate(newDataCert.UnsignedCert.DealId, newDataCert.UnsignedCert.DataHash)
 	stringDataCertificateKey := string(dataCertificateKey)
 
-	datadeal.InitGenesis(suite.Ctx, suite.DatadealKeeper, types.GenesisState{
+	datadeal.InitGenesis(suite.Ctx, suite.DataDealKeeper, types.GenesisState{
 		Deals: map[uint64]*types.Deal{
 			newDeal.GetDealId(): &newDeal,
 		},
@@ -43,9 +43,9 @@ func (suite *genesisTestSuite) TestDatadealInitGenesis() {
 		NextDealNumber: 2,
 	})
 
-	suite.Require().Equal(suite.DatadealKeeper.GetNextDealNumberAndIncrement(suite.Ctx), uint64(2))
+	suite.Require().Equal(suite.DataDealKeeper.GetNextDealNumberAndIncrement(suite.Ctx), uint64(2))
 
-	dealStored, err := suite.DatadealKeeper.GetDeal(suite.Ctx, 1)
+	dealStored, err := suite.DataDealKeeper.GetDeal(suite.Ctx, 1)
 	suite.Require().NoError(err)
 	suite.Require().Equal(newDeal.GetDealId(), dealStored.GetDealId())
 	suite.Require().Equal(newDeal.GetDealAddress(), dealStored.GetDealAddress())
@@ -57,10 +57,10 @@ func (suite *genesisTestSuite) TestDatadealInitGenesis() {
 	suite.Require().Equal(newDeal.GetOwner(), dealStored.GetOwner())
 	suite.Require().Equal(newDeal.GetStatus(), dealStored.GetStatus())
 
-	_, err = suite.DatadealKeeper.GetDeal(suite.Ctx, 2)
+	_, err = suite.DataDealKeeper.GetDeal(suite.Ctx, 2)
 	suite.Require().Error(err)
 
-	dataCertificateStored, err := suite.DatadealKeeper.GetDataCertificate(suite.Ctx, newDataCert)
+	dataCertificateStored, err := suite.DataDealKeeper.GetDataCertificate(suite.Ctx, newDataCert)
 	suite.Require().NoError(err)
 	suite.Require().Equal(newDataCert.GetSignature(), dataCertificateStored.GetSignature())
 	suite.Require().Equal(newDataCert.UnsignedCert.GetDealId(), dataCertificateStored.UnsignedCert.GetDealId())
@@ -70,14 +70,14 @@ func (suite *genesisTestSuite) TestDatadealInitGenesis() {
 	suite.Require().Equal(newDataCert.UnsignedCert.GetRequesterAddress(), dataCertificateStored.UnsignedCert.GetRequesterAddress())
 }
 
-func (suite *genesisTestSuite) TestDatadealExportGenesis() {
+func (suite *genesisTestSuite) TestDataDealExportGenesis() {
 	newDeal := makeTestDeal()
 	newDataCert := makeTestDataCert()
 
 	dataCertificateKey := types.GetKeyPrefixDataCertificate(newDataCert.UnsignedCert.DealId, newDataCert.UnsignedCert.DataHash)
 	stringDataCertificateKey := string(dataCertificateKey)
 
-	datadeal.InitGenesis(suite.Ctx, suite.DatadealKeeper, types.GenesisState{
+	datadeal.InitGenesis(suite.Ctx, suite.DataDealKeeper, types.GenesisState{
 		Deals: map[uint64]*types.Deal{
 			newDeal.GetDealId(): &newDeal,
 		},
@@ -98,14 +98,14 @@ func (suite *genesisTestSuite) TestDatadealExportGenesis() {
 		Owner:                 acc1.String(),
 	}
 
-	_, err = suite.DatadealKeeper.CreateNewDeal(suite.Ctx, acc1, tempDeal)
+	_, err = suite.DataDealKeeper.CreateNewDeal(suite.Ctx, acc1, tempDeal)
 	suite.Require().NoError(err)
 
 	newDataCert2 := makeTestDataCert2()
-	_, err = suite.DatadealKeeper.SellOwnData(suite.Ctx, acc2, newDataCert2)
+	_, err = suite.DataDealKeeper.SellOwnData(suite.Ctx, acc2, newDataCert2)
 	suite.Require().NoError(err)
 
-	genesis := datadeal.ExportGenesis(suite.Ctx, suite.DatadealKeeper)
+	genesis := datadeal.ExportGenesis(suite.Ctx, suite.DataDealKeeper)
 	suite.Require().Equal(genesis.NextDealNumber, uint64(3))
 	suite.Require().Len(genesis.Deals, 2)
 	suite.Require().Len(genesis.DataCertificates, 2)

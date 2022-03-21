@@ -99,8 +99,8 @@ import (
 	burnkeeper "github.com/medibloc/panacea-core/v2/x/burn/keeper"
 	burntypes "github.com/medibloc/panacea-core/v2/x/burn/types"
 	"github.com/medibloc/panacea-core/v2/x/datadeal"
-	datadealkeeper "github.com/medibloc/panacea-core/v2/x/datadeal/keeper"
-	datadealtypes "github.com/medibloc/panacea-core/v2/x/datadeal/types"
+	dataDealkeeper "github.com/medibloc/panacea-core/v2/x/datadeal/keeper"
+	dataDealtypes "github.com/medibloc/panacea-core/v2/x/datadeal/types"
 	"github.com/medibloc/panacea-core/v2/x/did"
 	didkeeper "github.com/medibloc/panacea-core/v2/x/did/keeper"
 	didtypes "github.com/medibloc/panacea-core/v2/x/did/types"
@@ -257,7 +257,7 @@ type App struct {
 	burnKeeper     burnkeeper.Keeper
 	tokenKeeper    tokenkeeper.Keeper
 	wasmKeeper     wasm.Keeper
-	datadealKeeper datadealkeeper.Keeper
+	dataDealKeeper dataDealkeeper.Keeper
 
 	// the module manager
 	mm *module.Manager
@@ -290,7 +290,7 @@ func New(
 		tokentypes.StoreKey,
 		burntypes.StoreKey,
 		wasm.StoreKey,
-		datadealtypes.StoreKey,
+		dataDealtypes.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
@@ -432,10 +432,10 @@ func New(
 		wasmOpts...,
 	)
 
-	app.datadealKeeper = *datadealkeeper.NewKeeper(
+	app.dataDealKeeper = *dataDealkeeper.NewKeeper(
 		appCodec,
-		keys[datadealtypes.StoreKey],
-		keys[datadealtypes.MemStoreKey],
+		keys[dataDealtypes.StoreKey],
+		keys[dataDealtypes.MemStoreKey],
 		app.BankKeeper,
 		app.AccountKeeper,
 	)
@@ -491,7 +491,7 @@ func New(
 		token.NewAppModule(appCodec, app.tokenKeeper),
 		burn.NewAppModule(appCodec, app.burnKeeper),
 		wasm.NewAppModule(appCodec, &app.wasmKeeper, app.StakingKeeper),
-		datadeal.NewAppModule(appCodec, app.datadealKeeper),
+		datadeal.NewAppModule(appCodec, app.dataDealKeeper),
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -529,7 +529,7 @@ func New(
 		tokentypes.ModuleName,
 		burntypes.ModuleName,
 		wasm.ModuleName,
-		datadealtypes.ModuleName,
+		dataDealtypes.ModuleName,
 	)
 
 	app.mm.RegisterInvariants(&app.CrisisKeeper)
@@ -740,7 +740,7 @@ func initParamsKeeper(appCodec codec.BinaryMarshaler, legacyAmino *codec.LegacyA
 	paramsKeeper.Subspace(tokentypes.ModuleName)
 	paramsKeeper.Subspace(burntypes.ModuleName)
 	paramsKeeper.Subspace(wasm.ModuleName)
-	paramsKeeper.Subspace(datadealtypes.ModuleName)
+	paramsKeeper.Subspace(dataDealtypes.ModuleName)
 
 	return paramsKeeper
 }
