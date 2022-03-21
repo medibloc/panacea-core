@@ -14,10 +14,12 @@ service Query {
   }
 }
 
+// QueryPoolRequest is the request type for the Query/Pool RPC method.
 message QueryPoolRequest {
   uint64 pool_id = 1;
 }
 
+// QueryPoolResponse is the response type for the Query/Pool RPC method.
 message QueryPoolResponse {
   Pool pool = 1;
 }

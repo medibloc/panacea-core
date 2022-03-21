@@ -28,6 +28,7 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
+// QueryPoolRequest is the request type for the Query/Pool RPC method.
 type QueryPoolRequest struct {
 	PoolId uint64 `protobuf:"varint,1,opt,name=pool_id,json=poolId,proto3" json:"pool_id,omitempty"`
 }
@@ -72,6 +73,7 @@ func (m *QueryPoolRequest) GetPoolId() uint64 {
 	return 0
 }
 
+// QueryPoolResponse is the response type for the Query/Pool RPC method.
 type QueryPoolResponse struct {
 	Pool *Pool `protobuf:"bytes,1,opt,name=pool,proto3" json:"pool,omitempty"`
 }
