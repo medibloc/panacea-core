@@ -260,7 +260,7 @@ type App struct {
 	marketKeeper marketkeeper.Keeper
 
 	// the module manager
-	mm           *module.Manager
+	mm *module.Manager
 }
 
 // New returns a reference to an initialized Gaia.
@@ -411,7 +411,7 @@ func New(
 		panic("failed to read wasm config: " + err.Error())
 	}
 
-	supportedFeatures := "staking,stargate"
+	supportedFeatures := "iterator,staking,stargate"
 	app.wasmKeeper = wasm.NewKeeper(
 		appCodec,
 		keys[wasm.StoreKey],
