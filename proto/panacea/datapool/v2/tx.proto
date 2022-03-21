@@ -11,10 +11,33 @@ import "google/protobuf/duration.proto";
 
 // Msg defines the Msg service.
 service Msg {
-  // CreatePool defines a method for creating data pool
+  // RegisterDataValidator defines a method for registration of data validator.
+  rpc RegisterDataValidator(MsgRegisterDataValidator) returns (MsgRegisterDataValidatorResponse);
+
+  // CreatePool defines a method for creating data pool.
   rpc CreatePool(MsgCreatePool) returns (MsgCreatePoolResponse);
+
+  // SellData defines a method for selling data
+  rpc SellData(MsgSellData) returns (MsgSellDataResponse);
+
+  // BuyDataAccessNFT defines a method for buying data access NFT
+  rpc BuyDataAccessNFT(MsgBuyDataAccessNFT) returns (MsgBuyDataAccessNFTResponse);
+
+  // RedeemDataAccessNFT defines a method for redeeming data access NFT to get data
+  rpc RedeemDataAccessNFT(MsgRedeemDataAccessNFT) returns (MsgRedeemDataAccessNFTResponse);
 }
 
+// MsgRegisterDataValidator defines the Msg/RegisterDataValidator request type.
+message MsgRegisterDataValidator {
+  string address = 1;       // The address of data validator to be registered
+  string endpoint = 2;      // https://my-validator.org
+}
+
+// MsgRegisterDataValidatorResponse defines the Msg/RegisterDataValidator response type.
+message MsgRegisterDataValidatorResponse {
+}
+
+// MsgCreatePool defines the Msg/CreatePool request type.
 message MsgCreatePool {
   repeated string          data_schema = 1;             // JSON Schema URIs
   uint64                   target_num_data = 2;         // A target num of data to be collected
@@ -29,8 +52,72 @@ message MsgCreatePool {
   string                   curator = 9;                 // 'panacea1' address
 }
 
+// MsgCreatePoolResponse defines the Msg/CreatePool response type.
 message MsgCreatePoolResponse {
   uint64 pool_id = 1;
   uint64 round = 2;           // Always 1 for v0
   uint64 curation_nft_id = 3; // A NFT that presents the right to curate this pool continuously
+}
+
+// MsgSellData defines the Msg/SellData request type.
+message MsgSellData {
+  DataValidationCertificate cert = 1;     // certificate for data validation
+  string                    seller = 2;   // 'panacea1' address of seller
+}
+
+// MsgSellDataResponse defines the Msg/SellData response type.
+message MsgSellDataResponse {
+  cosmos.base.v1beta1.Coin accumPoolShareToken = 1;  // denom: DP-{pood-id}
+}
+
+// DataValidationCertificate defines the certificate for data validation w/ data validator signature.
+message DataValidationCertificate {
+  UnsignedDataValidationCertificate unsigned_cert = 1;  // unsigned certificate
+  bytes                             signature = 2;      // signature for data validation by data validator
+}
+
+// UnsignedDataValidationCertificate defines the unsigned certificate for data validation.
+message UnsignedDataValidationCertificate {
+  uint64 pool_id = 1;           // pool Id for selling data
+  uint64 round = 2;             // Always 1 for v0
+  bytes  data_hash = 3;         // sha-256 hash of the data
+  string data_validator = 4;    // 'panacea1' address of data validator
+  string requester = 5;         // 'panacea1' address of seller
+}
+
+// MsgBuyDataAccessNFT defines the Msg/BuyDataAccessNFT request type.
+message MsgBuyDataAccessNFT {
+  uint64                   pool_id = 1;
+  uint64                   round = 2;
+  cosmos.base.v1beta1.Coin payment = 3;
+  string                   buyer = 4;   // 'panacea1' address of buyer
+}
+
+// MsgBuyDataAccessNFTResponse defines the Msg/BuyDataAccessNFT response type.
+message MsgBuyDataAccessNFTResponse {
+  uint64 pool_id = 1;
+  uint64 round = 2;
+  uint64 nft_id = 3;
+}
+
+// MsgRedeemDataAccessNFT defines the Msg/RedeemDataAccessNFT request type.
+message MsgRedeemDataAccessNFT {
+  uint64 pool_id = 1;
+  uint64 round = 2;
+  uint64 nft_id = 3;
+  string redeemer = 4;  // 'panacea1' address
+}
+
+// MsgRedeemDataAccessNFTResponse defines the Msg/RedeemDataAccessNFT response type.
+message MsgRedeemDataAccessNFTResponse {
+  DataAccessNFTRedeemReceipt receipt = 1;
+}
+
+// DataAccessNFTRedeemReceipt defines a receipt for redeeming data access NFT to get data.
+message DataAccessNFTRedeemReceipt {
+  uint64 pool_id = 1;
+  uint64 round = 2;
+  uint64 nft_id = 3;
+  string redeemer = 4;      // 'panacea1' address of redeemer
+  uint64 block_height = 5;  // The block height at which NFT redeemed
 }
