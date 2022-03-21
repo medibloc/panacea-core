@@ -5,5 +5,30 @@ package panacea.datapool.v2;
 
 option go_package = "github.com/medibloc/panacea-core/x/datapool/types";
 
+import "gogoproto/gogo.proto";
+import "cosmos/base/v1beta1/coin.proto";
+import "google/protobuf/duration.proto";
+
 // Msg defines the Msg service.
-service Msg {}
+service Msg {
+  // CreatePool defines a method for creating data pool
+  rpc CreatePool(MsgCreatePool) returns (MsgCreatePoolResponse);
+}
+
+message MsgCreatePool {
+  repeated string          data_schema = 1;             // JSON Schema URIs
+  uint64                   target_num_data = 2;         // A target num of data to be collected
+  uint64                   max_nft_supply = 3;          // A max num of NFTs that can be minted (= A total num of potential buyers)
+  cosmos.base.v1beta1.Coin nft_price = 4;               // A price of a NFT
+  repeated string          trusted_data_validators = 5;
+  repeated string          trusted_data_issuers = 6;    // Optional. Data isusers that is trusted by the curator
+  cosmos.base.v1beta1.Coin deposit = 7;
+  google.protobuf.Duration download_period = 8;         // A download period after redeeming NFT
+  string                   curator = 9;                 // 'panacea1' address
+}
+
+message MsgCreatePoolResponse {
+  uint64 pool_id = 1;
+  uint64 round = 2;           // Always 1 for v0
+  uint64 curation_nft_id = 3; // A NFT that presents the right to curate this pool continuously
+}

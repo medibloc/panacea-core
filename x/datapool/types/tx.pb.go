@@ -6,12 +6,17 @@ package types
 import (
 	context "context"
 	fmt "fmt"
-	_ "github.com/cosmos/cosmos-sdk/types"
+	types "github.com/cosmos/cosmos-sdk/types"
 	_ "github.com/gogo/protobuf/gogoproto"
 	grpc1 "github.com/gogo/protobuf/grpc"
 	proto "github.com/gogo/protobuf/proto"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
+	durationpb "google.golang.org/protobuf/types/known/durationpb"
+	io "io"
 	math "math"
+	math_bits "math/bits"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -25,22 +30,216 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
+type MsgCreatePool struct {
+	DataSchema            []string             `protobuf:"bytes,1,rep,name=data_schema,json=dataSchema,proto3" json:"data_schema,omitempty"`
+	TargetNumData         uint64               `protobuf:"varint,2,opt,name=target_num_data,json=targetNumData,proto3" json:"target_num_data,omitempty"`
+	MaxNftSupply          uint64               `protobuf:"varint,3,opt,name=max_nft_supply,json=maxNftSupply,proto3" json:"max_nft_supply,omitempty"`
+	NftPrice              *types.Coin          `protobuf:"bytes,4,opt,name=nft_price,json=nftPrice,proto3" json:"nft_price,omitempty"`
+	TrustedDataValidators []string             `protobuf:"bytes,5,rep,name=trusted_data_validators,json=trustedDataValidators,proto3" json:"trusted_data_validators,omitempty"`
+	TrustedDataIssuers    []string             `protobuf:"bytes,6,rep,name=trusted_data_issuers,json=trustedDataIssuers,proto3" json:"trusted_data_issuers,omitempty"`
+	Deposit               *types.Coin          `protobuf:"bytes,7,opt,name=deposit,proto3" json:"deposit,omitempty"`
+	DownloadPeriod        *durationpb.Duration `protobuf:"bytes,8,opt,name=download_period,json=downloadPeriod,proto3" json:"download_period,omitempty"`
+	Curator               string               `protobuf:"bytes,9,opt,name=curator,proto3" json:"curator,omitempty"`
+}
+
+func (m *MsgCreatePool) Reset()         { *m = MsgCreatePool{} }
+func (m *MsgCreatePool) String() string { return proto.CompactTextString(m) }
+func (*MsgCreatePool) ProtoMessage()    {}
+func (*MsgCreatePool) Descriptor() ([]byte, []int) {
+	return fileDescriptor_eb3d400cb0e531d6, []int{0}
+}
+func (m *MsgCreatePool) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgCreatePool) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgCreatePool.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgCreatePool) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgCreatePool.Merge(m, src)
+}
+func (m *MsgCreatePool) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgCreatePool) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgCreatePool.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgCreatePool proto.InternalMessageInfo
+
+func (m *MsgCreatePool) GetDataSchema() []string {
+	if m != nil {
+		return m.DataSchema
+	}
+	return nil
+}
+
+func (m *MsgCreatePool) GetTargetNumData() uint64 {
+	if m != nil {
+		return m.TargetNumData
+	}
+	return 0
+}
+
+func (m *MsgCreatePool) GetMaxNftSupply() uint64 {
+	if m != nil {
+		return m.MaxNftSupply
+	}
+	return 0
+}
+
+func (m *MsgCreatePool) GetNftPrice() *types.Coin {
+	if m != nil {
+		return m.NftPrice
+	}
+	return nil
+}
+
+func (m *MsgCreatePool) GetTrustedDataValidators() []string {
+	if m != nil {
+		return m.TrustedDataValidators
+	}
+	return nil
+}
+
+func (m *MsgCreatePool) GetTrustedDataIssuers() []string {
+	if m != nil {
+		return m.TrustedDataIssuers
+	}
+	return nil
+}
+
+func (m *MsgCreatePool) GetDeposit() *types.Coin {
+	if m != nil {
+		return m.Deposit
+	}
+	return nil
+}
+
+func (m *MsgCreatePool) GetDownloadPeriod() *durationpb.Duration {
+	if m != nil {
+		return m.DownloadPeriod
+	}
+	return nil
+}
+
+func (m *MsgCreatePool) GetCurator() string {
+	if m != nil {
+		return m.Curator
+	}
+	return ""
+}
+
+type MsgCreatePoolResponse struct {
+	PoolId        uint64 `protobuf:"varint,1,opt,name=pool_id,json=poolId,proto3" json:"pool_id,omitempty"`
+	Round         uint64 `protobuf:"varint,2,opt,name=round,proto3" json:"round,omitempty"`
+	CurationNftId uint64 `protobuf:"varint,3,opt,name=curation_nft_id,json=curationNftId,proto3" json:"curation_nft_id,omitempty"`
+}
+
+func (m *MsgCreatePoolResponse) Reset()         { *m = MsgCreatePoolResponse{} }
+func (m *MsgCreatePoolResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgCreatePoolResponse) ProtoMessage()    {}
+func (*MsgCreatePoolResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_eb3d400cb0e531d6, []int{1}
+}
+func (m *MsgCreatePoolResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgCreatePoolResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgCreatePoolResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgCreatePoolResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgCreatePoolResponse.Merge(m, src)
+}
+func (m *MsgCreatePoolResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgCreatePoolResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgCreatePoolResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgCreatePoolResponse proto.InternalMessageInfo
+
+func (m *MsgCreatePoolResponse) GetPoolId() uint64 {
+	if m != nil {
+		return m.PoolId
+	}
+	return 0
+}
+
+func (m *MsgCreatePoolResponse) GetRound() uint64 {
+	if m != nil {
+		return m.Round
+	}
+	return 0
+}
+
+func (m *MsgCreatePoolResponse) GetCurationNftId() uint64 {
+	if m != nil {
+		return m.CurationNftId
+	}
+	return 0
+}
+
+func init() {
+	proto.RegisterType((*MsgCreatePool)(nil), "panacea.datapool.v2.MsgCreatePool")
+	proto.RegisterType((*MsgCreatePoolResponse)(nil), "panacea.datapool.v2.MsgCreatePoolResponse")
+}
+
 func init() { proto.RegisterFile("panacea/datapool/v2/tx.proto", fileDescriptor_eb3d400cb0e531d6) }
 
 var fileDescriptor_eb3d400cb0e531d6 = []byte{
-	// 181 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x44, 0xce, 0x31, 0x0e, 0x82, 0x40,
-	0x10, 0x05, 0x50, 0x88, 0xd1, 0x82, 0x52, 0xad, 0x88, 0x99, 0x1b, 0xb8, 0x13, 0xf0, 0x06, 0xb6,
-	0xc6, 0x0b, 0xd8, 0xcd, 0x2e, 0x9b, 0x95, 0x04, 0x98, 0x0d, 0xbb, 0x12, 0xbc, 0x85, 0xc7, 0xb2,
-	0xa4, 0xb4, 0x34, 0x70, 0x11, 0x23, 0x60, 0xec, 0x26, 0x79, 0x93, 0xff, 0x7f, 0xb4, 0xb3, 0x54,
-	0x91, 0xd2, 0x84, 0x19, 0x79, 0xb2, 0xcc, 0x05, 0x36, 0x29, 0xfa, 0x56, 0xd8, 0x9a, 0x3d, 0xaf,
-	0x37, 0xb3, 0x8a, 0x9f, 0x8a, 0x26, 0x8d, 0xb7, 0x86, 0x0d, 0x8f, 0x8e, 0xdf, 0x6b, 0x7a, 0x8d,
-	0x41, 0xb1, 0x2b, 0xd9, 0xa1, 0x24, 0xa7, 0xb1, 0x49, 0xa4, 0xf6, 0x94, 0xa0, 0xe2, 0xbc, 0x9a,
-	0x3c, 0x5d, 0x46, 0x8b, 0xb3, 0x33, 0xc7, 0xd3, 0xb3, 0x87, 0xb0, 0xeb, 0x21, 0x7c, 0xf7, 0x10,
-	0x3e, 0x06, 0x08, 0xba, 0x01, 0x82, 0xd7, 0x00, 0xc1, 0x25, 0x31, 0xb9, 0xbf, 0xde, 0xa4, 0x50,
-	0x5c, 0x62, 0xa9, 0xb3, 0x5c, 0x16, 0xac, 0x70, 0xee, 0xdf, 0x2b, 0xae, 0x35, 0xb6, 0xff, 0x91,
-	0xfe, 0x6e, 0xb5, 0x93, 0xab, 0x31, 0xfa, 0xf0, 0x09, 0x00, 0x00, 0xff, 0xff, 0x71, 0xa5, 0x45,
-	0x66, 0xc5, 0x00, 0x00, 0x00,
+	// 526 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x84, 0x53, 0xd1, 0x6a, 0xdb, 0x3c,
+	0x14, 0xae, 0xff, 0xb4, 0x4d, 0xa3, 0xfe, 0x6d, 0x41, 0x6b, 0xa9, 0x17, 0x86, 0x17, 0xc2, 0x18,
+	0x61, 0x30, 0x69, 0x49, 0xa1, 0x0f, 0xd0, 0xf6, 0x26, 0x8c, 0x86, 0xe0, 0xc2, 0x2e, 0xc6, 0xc0,
+	0xc8, 0x96, 0xe2, 0x0a, 0x6c, 0x1f, 0x23, 0xc9, 0x59, 0xfa, 0x16, 0x7b, 0x97, 0xbd, 0xc4, 0x2e,
+	0x7b, 0xb9, 0xcb, 0x91, 0xbc, 0xc8, 0x90, 0x6c, 0x6f, 0x0d, 0x0c, 0x7a, 0xe7, 0x73, 0xbe, 0xef,
+	0xb3, 0xbe, 0xa3, 0xef, 0x08, 0xbd, 0x2a, 0x59, 0xc1, 0x12, 0xc1, 0x28, 0x67, 0x86, 0x95, 0x00,
+	0x19, 0x5d, 0x4e, 0xa8, 0x59, 0x91, 0x52, 0x81, 0x01, 0xfc, 0xa2, 0x41, 0x49, 0x8b, 0x92, 0xe5,
+	0xa4, 0x7f, 0x9a, 0x42, 0x0a, 0x0e, 0xa7, 0xf6, 0xab, 0xa6, 0xf6, 0x83, 0x04, 0x74, 0x0e, 0x9a,
+	0xc6, 0x4c, 0x0b, 0xba, 0x1c, 0xc7, 0xc2, 0xb0, 0x31, 0x4d, 0x40, 0x16, 0x2d, 0x9e, 0x02, 0xa4,
+	0x99, 0xa0, 0xae, 0x8a, 0xab, 0x05, 0xe5, 0x95, 0x62, 0x46, 0x42, 0x83, 0x0f, 0xbf, 0x77, 0xd0,
+	0xd1, 0xad, 0x4e, 0xaf, 0x95, 0x60, 0x46, 0xcc, 0x01, 0x32, 0xfc, 0x1a, 0x1d, 0xda, 0x63, 0x23,
+	0x9d, 0xdc, 0x8b, 0x9c, 0xf9, 0xde, 0xa0, 0x33, 0xea, 0x85, 0xc8, 0xb6, 0xee, 0x5c, 0x07, 0xbf,
+	0x45, 0x27, 0x86, 0xa9, 0x54, 0x98, 0xa8, 0xa8, 0xf2, 0xc8, 0x02, 0xfe, 0x7f, 0x03, 0x6f, 0xb4,
+	0x1b, 0x1e, 0xd5, 0xed, 0x59, 0x95, 0xdf, 0x30, 0xc3, 0xf0, 0x1b, 0x74, 0x9c, 0xb3, 0x55, 0x54,
+	0x2c, 0x4c, 0xa4, 0xab, 0xb2, 0xcc, 0x1e, 0xfc, 0x8e, 0xa3, 0xfd, 0x9f, 0xb3, 0xd5, 0x6c, 0x61,
+	0xee, 0x5c, 0x0f, 0x5f, 0xa2, 0x9e, 0x65, 0x94, 0x4a, 0x26, 0xc2, 0xdf, 0x1d, 0x78, 0xa3, 0xc3,
+	0xc9, 0x4b, 0x52, 0x0f, 0x45, 0xec, 0x50, 0xa4, 0x19, 0x8a, 0x5c, 0x83, 0x2c, 0xc2, 0x83, 0x62,
+	0x61, 0xe6, 0x96, 0x8a, 0x2f, 0xd1, 0xb9, 0x51, 0x95, 0x36, 0x82, 0x3b, 0x0b, 0xd1, 0x92, 0x65,
+	0x92, 0x33, 0x03, 0x4a, 0xfb, 0x7b, 0xce, 0xf2, 0x59, 0x03, 0x5b, 0x2f, 0x9f, 0xfe, 0x80, 0xf8,
+	0x03, 0x3a, 0xdd, 0xd2, 0x49, 0xad, 0x2b, 0xa1, 0xb4, 0xbf, 0xef, 0x44, 0xf8, 0x89, 0x68, 0x5a,
+	0x23, 0xf8, 0x02, 0x75, 0xb9, 0x28, 0x41, 0x4b, 0xe3, 0x77, 0x9f, 0xf3, 0xd7, 0x32, 0xf1, 0x15,
+	0x3a, 0xe1, 0xf0, 0xb5, 0xc8, 0x80, 0xf1, 0xa8, 0x14, 0x4a, 0x02, 0xf7, 0x0f, 0x1a, 0x71, 0x9d,
+	0x08, 0x69, 0x13, 0x21, 0x37, 0x4d, 0x22, 0xe1, 0x71, 0xab, 0x98, 0x3b, 0x01, 0xf6, 0x51, 0x37,
+	0xb1, 0x18, 0x28, 0xbf, 0x37, 0xf0, 0x46, 0xbd, 0xb0, 0x2d, 0x87, 0x05, 0x3a, 0xdb, 0x0a, 0x2d,
+	0x14, 0xba, 0x84, 0x42, 0x0b, 0x7c, 0x8e, 0xba, 0x76, 0x5f, 0x22, 0xc9, 0x7d, 0xcf, 0x5d, 0xf6,
+	0xbe, 0x2d, 0xa7, 0x1c, 0x9f, 0xa2, 0x3d, 0x05, 0x55, 0xc1, 0x9b, 0xa8, 0xea, 0xc2, 0x46, 0x99,
+	0x34, 0xa7, 0xbb, 0x9c, 0x24, 0x6f, 0x32, 0x3a, 0x6a, 0xdb, 0xb3, 0x85, 0x99, 0xf2, 0x49, 0x82,
+	0x3a, 0xb7, 0x3a, 0xc5, 0x5f, 0x10, 0x7a, 0xb2, 0x28, 0x43, 0xf2, 0x8f, 0x35, 0x25, 0x5b, 0xbe,
+	0xfa, 0xef, 0x9e, 0xe7, 0xb4, 0xde, 0xaf, 0x3e, 0xfe, 0x58, 0x07, 0xde, 0xe3, 0x3a, 0xf0, 0x7e,
+	0xad, 0x03, 0xef, 0xdb, 0x26, 0xd8, 0x79, 0xdc, 0x04, 0x3b, 0x3f, 0x37, 0xc1, 0xce, 0xe7, 0x71,
+	0x2a, 0xcd, 0x7d, 0x15, 0x93, 0x04, 0x72, 0x9a, 0x0b, 0x2e, 0xe3, 0x0c, 0x12, 0xda, 0xfc, 0xf8,
+	0x7d, 0x02, 0x4a, 0xd0, 0xd5, 0xdf, 0x87, 0x64, 0x1e, 0x4a, 0xa1, 0xe3, 0x7d, 0x77, 0xbd, 0x17,
+	0xbf, 0x03, 0x00, 0x00, 0xff, 0xff, 0x50, 0x2d, 0x29, 0x1c, 0x69, 0x03, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -55,6 +254,8 @@ const _ = grpc.SupportPackageIsVersion4
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type MsgClient interface {
+	// CreatePool defines a method for creating data pool
+	CreatePool(ctx context.Context, in *MsgCreatePool, opts ...grpc.CallOption) (*MsgCreatePoolResponse, error)
 }
 
 type msgClient struct {
@@ -65,22 +266,801 @@ func NewMsgClient(cc grpc1.ClientConn) MsgClient {
 	return &msgClient{cc}
 }
 
+func (c *msgClient) CreatePool(ctx context.Context, in *MsgCreatePool, opts ...grpc.CallOption) (*MsgCreatePoolResponse, error) {
+	out := new(MsgCreatePoolResponse)
+	err := c.cc.Invoke(ctx, "/panacea.datapool.v2.Msg/CreatePool", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // MsgServer is the server API for Msg service.
 type MsgServer interface {
+	// CreatePool defines a method for creating data pool
+	CreatePool(context.Context, *MsgCreatePool) (*MsgCreatePoolResponse, error)
 }
 
 // UnimplementedMsgServer can be embedded to have forward compatible implementations.
 type UnimplementedMsgServer struct {
 }
 
+func (*UnimplementedMsgServer) CreatePool(ctx context.Context, req *MsgCreatePool) (*MsgCreatePoolResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreatePool not implemented")
+}
+
 func RegisterMsgServer(s grpc1.Server, srv MsgServer) {
 	s.RegisterService(&_Msg_serviceDesc, srv)
+}
+
+func _Msg_CreatePool_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgCreatePool)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).CreatePool(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/panacea.datapool.v2.Msg/CreatePool",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).CreatePool(ctx, req.(*MsgCreatePool))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 var _Msg_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "panacea.datapool.v2.Msg",
 	HandlerType: (*MsgServer)(nil),
-	Methods:     []grpc.MethodDesc{},
-	Streams:     []grpc.StreamDesc{},
-	Metadata:    "panacea/datapool/v2/tx.proto",
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "CreatePool",
+			Handler:    _Msg_CreatePool_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "panacea/datapool/v2/tx.proto",
 }
+
+func (m *MsgCreatePool) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgCreatePool) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgCreatePool) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Curator) > 0 {
+		i -= len(m.Curator)
+		copy(dAtA[i:], m.Curator)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Curator)))
+		i--
+		dAtA[i] = 0x4a
+	}
+	if m.DownloadPeriod != nil {
+		{
+			size, err := m.DownloadPeriod.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintTx(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x42
+	}
+	if m.Deposit != nil {
+		{
+			size, err := m.Deposit.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintTx(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x3a
+	}
+	if len(m.TrustedDataIssuers) > 0 {
+		for iNdEx := len(m.TrustedDataIssuers) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.TrustedDataIssuers[iNdEx])
+			copy(dAtA[i:], m.TrustedDataIssuers[iNdEx])
+			i = encodeVarintTx(dAtA, i, uint64(len(m.TrustedDataIssuers[iNdEx])))
+			i--
+			dAtA[i] = 0x32
+		}
+	}
+	if len(m.TrustedDataValidators) > 0 {
+		for iNdEx := len(m.TrustedDataValidators) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.TrustedDataValidators[iNdEx])
+			copy(dAtA[i:], m.TrustedDataValidators[iNdEx])
+			i = encodeVarintTx(dAtA, i, uint64(len(m.TrustedDataValidators[iNdEx])))
+			i--
+			dAtA[i] = 0x2a
+		}
+	}
+	if m.NftPrice != nil {
+		{
+			size, err := m.NftPrice.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintTx(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x22
+	}
+	if m.MaxNftSupply != 0 {
+		i = encodeVarintTx(dAtA, i, uint64(m.MaxNftSupply))
+		i--
+		dAtA[i] = 0x18
+	}
+	if m.TargetNumData != 0 {
+		i = encodeVarintTx(dAtA, i, uint64(m.TargetNumData))
+		i--
+		dAtA[i] = 0x10
+	}
+	if len(m.DataSchema) > 0 {
+		for iNdEx := len(m.DataSchema) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.DataSchema[iNdEx])
+			copy(dAtA[i:], m.DataSchema[iNdEx])
+			i = encodeVarintTx(dAtA, i, uint64(len(m.DataSchema[iNdEx])))
+			i--
+			dAtA[i] = 0xa
+		}
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgCreatePoolResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgCreatePoolResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgCreatePoolResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.CurationNftId != 0 {
+		i = encodeVarintTx(dAtA, i, uint64(m.CurationNftId))
+		i--
+		dAtA[i] = 0x18
+	}
+	if m.Round != 0 {
+		i = encodeVarintTx(dAtA, i, uint64(m.Round))
+		i--
+		dAtA[i] = 0x10
+	}
+	if m.PoolId != 0 {
+		i = encodeVarintTx(dAtA, i, uint64(m.PoolId))
+		i--
+		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
+}
+
+func encodeVarintTx(dAtA []byte, offset int, v uint64) int {
+	offset -= sovTx(v)
+	base := offset
+	for v >= 1<<7 {
+		dAtA[offset] = uint8(v&0x7f | 0x80)
+		v >>= 7
+		offset++
+	}
+	dAtA[offset] = uint8(v)
+	return base
+}
+func (m *MsgCreatePool) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if len(m.DataSchema) > 0 {
+		for _, s := range m.DataSchema {
+			l = len(s)
+			n += 1 + l + sovTx(uint64(l))
+		}
+	}
+	if m.TargetNumData != 0 {
+		n += 1 + sovTx(uint64(m.TargetNumData))
+	}
+	if m.MaxNftSupply != 0 {
+		n += 1 + sovTx(uint64(m.MaxNftSupply))
+	}
+	if m.NftPrice != nil {
+		l = m.NftPrice.Size()
+		n += 1 + l + sovTx(uint64(l))
+	}
+	if len(m.TrustedDataValidators) > 0 {
+		for _, s := range m.TrustedDataValidators {
+			l = len(s)
+			n += 1 + l + sovTx(uint64(l))
+		}
+	}
+	if len(m.TrustedDataIssuers) > 0 {
+		for _, s := range m.TrustedDataIssuers {
+			l = len(s)
+			n += 1 + l + sovTx(uint64(l))
+		}
+	}
+	if m.Deposit != nil {
+		l = m.Deposit.Size()
+		n += 1 + l + sovTx(uint64(l))
+	}
+	if m.DownloadPeriod != nil {
+		l = m.DownloadPeriod.Size()
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.Curator)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	return n
+}
+
+func (m *MsgCreatePoolResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.PoolId != 0 {
+		n += 1 + sovTx(uint64(m.PoolId))
+	}
+	if m.Round != 0 {
+		n += 1 + sovTx(uint64(m.Round))
+	}
+	if m.CurationNftId != 0 {
+		n += 1 + sovTx(uint64(m.CurationNftId))
+	}
+	return n
+}
+
+func sovTx(x uint64) (n int) {
+	return (math_bits.Len64(x|1) + 6) / 7
+}
+func sozTx(x uint64) (n int) {
+	return sovTx(uint64((x << 1) ^ uint64((int64(x) >> 63))))
+}
+func (m *MsgCreatePool) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgCreatePool: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgCreatePool: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field DataSchema", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.DataSchema = append(m.DataSchema, string(dAtA[iNdEx:postIndex]))
+			iNdEx = postIndex
+		case 2:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field TargetNumData", wireType)
+			}
+			m.TargetNumData = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.TargetNumData |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 3:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field MaxNftSupply", wireType)
+			}
+			m.MaxNftSupply = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.MaxNftSupply |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field NftPrice", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.NftPrice == nil {
+				m.NftPrice = &types.Coin{}
+			}
+			if err := m.NftPrice.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 5:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field TrustedDataValidators", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.TrustedDataValidators = append(m.TrustedDataValidators, string(dAtA[iNdEx:postIndex]))
+			iNdEx = postIndex
+		case 6:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field TrustedDataIssuers", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.TrustedDataIssuers = append(m.TrustedDataIssuers, string(dAtA[iNdEx:postIndex]))
+			iNdEx = postIndex
+		case 7:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Deposit", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Deposit == nil {
+				m.Deposit = &types.Coin{}
+			}
+			if err := m.Deposit.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 8:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field DownloadPeriod", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.DownloadPeriod == nil {
+				m.DownloadPeriod = &durationpb.Duration{}
+			}
+			if err := m.DownloadPeriod.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 9:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Curator", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Curator = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgCreatePoolResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgCreatePoolResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgCreatePoolResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field PoolId", wireType)
+			}
+			m.PoolId = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.PoolId |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 2:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Round", wireType)
+			}
+			m.Round = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Round |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 3:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field CurationNftId", wireType)
+			}
+			m.CurationNftId = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.CurationNftId |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func skipTx(dAtA []byte) (n int, err error) {
+	l := len(dAtA)
+	iNdEx := 0
+	depth := 0
+	for iNdEx < l {
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return 0, ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return 0, io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		wireType := int(wire & 0x7)
+		switch wireType {
+		case 0:
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return 0, ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return 0, io.ErrUnexpectedEOF
+				}
+				iNdEx++
+				if dAtA[iNdEx-1] < 0x80 {
+					break
+				}
+			}
+		case 1:
+			iNdEx += 8
+		case 2:
+			var length int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return 0, ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return 0, io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				length |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if length < 0 {
+				return 0, ErrInvalidLengthTx
+			}
+			iNdEx += length
+		case 3:
+			depth++
+		case 4:
+			if depth == 0 {
+				return 0, ErrUnexpectedEndOfGroupTx
+			}
+			depth--
+		case 5:
+			iNdEx += 4
+		default:
+			return 0, fmt.Errorf("proto: illegal wireType %d", wireType)
+		}
+		if iNdEx < 0 {
+			return 0, ErrInvalidLengthTx
+		}
+		if depth == 0 {
+			return iNdEx, nil
+		}
+	}
+	return 0, io.ErrUnexpectedEOF
+}
+
+var (
+	ErrInvalidLengthTx        = fmt.Errorf("proto: negative length found during unmarshaling")
+	ErrIntOverflowTx          = fmt.Errorf("proto: integer overflow")
+	ErrUnexpectedEndOfGroupTx = fmt.Errorf("proto: unexpected end of group")
+)
