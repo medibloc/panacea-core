@@ -411,7 +411,7 @@ func New(
 		panic("failed to read wasm config: " + err.Error())
 	}
 
-	supportedFeatures := "staking,stargate"
+	supportedFeatures := "iterator,staking,stargate"
 	app.wasmKeeper = wasm.NewKeeper(
 		appCodec,
 		keys[wasm.StoreKey],
