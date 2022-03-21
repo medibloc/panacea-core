@@ -3,4 +3,50 @@ package panacea.datapool.v2;
 
 option go_package = "github.com/medibloc/panacea-core/x/datapool/types";
 
+import "gogoproto/gogo.proto";
+import "cosmos/base/v1beta1/coin.proto";
+import "google/protobuf/duration.proto";
 
+// Pool defines a data pool
+message Pool {
+  uint64                    pool_id = 1;
+  uint64                    round = 2;
+  repeated string           data_schema = 3;
+  uint64                    target_num_data = 4; // target number of data
+  uint64                    cur_num_data = 5;    // current number of data
+  uint64                    max_nft_supply = 6;  // max supply of data access NFT of the pool
+  uint64                    issued_nft = 7;      // current issued NFT
+  cosmos.base.v1beta1.Coin  nft_price = 8;
+  repeated string           trusted_data_validators = 9;
+  repeated string           trusted_data_issuers = 10;
+  cosmos.base.v1beta1.Coin  deposit = 11;
+  google.protobuf.Duration  download_period = 12 [
+    (gogoproto.stdduration) = true
+  ];
+  string                    curator = 13;
+  string                    status = 14;
+}
+
+// DataValidationCertificate defines the certificate for data validation w/ data validator signature.
+message DataValidationCertificate {
+  UnsignedDataValidationCertificate unsigned_cert = 1;  // unsigned certificate
+  bytes                             signature = 2;      // signature for data validation by data validator
+}
+
+// UnsignedDataValidationCertificate defines the unsigned certificate for data validation.
+message UnsignedDataValidationCertificate {
+  uint64 pool_id = 1;           // pool Id for selling data
+  uint64 round = 2;             // Always 1 for v0
+  bytes  data_hash = 3;         // sha-256 hash of the data
+  string data_validator = 4;    // 'panacea1' address of data validator
+  string requester = 5;         // 'panacea1' address of seller
+}
+
+// DataAccessNFTRedeemReceipt defines a receipt for redeeming data access NFT to get data.
+message DataAccessNFTRedeemReceipt {
+  uint64 pool_id = 1;
+  uint64 round = 2;
+  uint64 nft_id = 3;
+  string redeemer = 4;      // 'panacea1' address of redeemer
+  uint64 block_height = 5;  // The block height at which NFT redeemed
+}

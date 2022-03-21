@@ -8,6 +8,7 @@ option go_package = "github.com/medibloc/panacea-core/x/datapool/types";
 import "gogoproto/gogo.proto";
 import "cosmos/base/v1beta1/coin.proto";
 import "google/protobuf/duration.proto";
+import "panacea/datapool/v2/pool.proto";
 
 // Msg defines the Msg service.
 service Msg {
@@ -70,21 +71,6 @@ message MsgSellDataResponse {
   cosmos.base.v1beta1.Coin accumPoolShareToken = 1;  // denom: DP-{pood-id}
 }
 
-// DataValidationCertificate defines the certificate for data validation w/ data validator signature.
-message DataValidationCertificate {
-  UnsignedDataValidationCertificate unsigned_cert = 1;  // unsigned certificate
-  bytes                             signature = 2;      // signature for data validation by data validator
-}
-
-// UnsignedDataValidationCertificate defines the unsigned certificate for data validation.
-message UnsignedDataValidationCertificate {
-  uint64 pool_id = 1;           // pool Id for selling data
-  uint64 round = 2;             // Always 1 for v0
-  bytes  data_hash = 3;         // sha-256 hash of the data
-  string data_validator = 4;    // 'panacea1' address of data validator
-  string requester = 5;         // 'panacea1' address of seller
-}
-
 // MsgBuyDataAccessNFT defines the Msg/BuyDataAccessNFT request type.
 message MsgBuyDataAccessNFT {
   uint64                   pool_id = 1;
@@ -111,13 +97,4 @@ message MsgRedeemDataAccessNFT {
 // MsgRedeemDataAccessNFTResponse defines the Msg/RedeemDataAccessNFT response type.
 message MsgRedeemDataAccessNFTResponse {
   DataAccessNFTRedeemReceipt receipt = 1;
-}
-
-// DataAccessNFTRedeemReceipt defines a receipt for redeeming data access NFT to get data.
-message DataAccessNFTRedeemReceipt {
-  uint64 pool_id = 1;
-  uint64 round = 2;
-  uint64 nft_id = 3;
-  string redeemer = 4;      // 'panacea1' address of redeemer
-  uint64 block_height = 5;  // The block height at which NFT redeemed
 }
