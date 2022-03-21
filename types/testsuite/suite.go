@@ -17,8 +17,8 @@ import (
 	aolkeeper "github.com/medibloc/panacea-core/v2/x/aol/keeper"
 	aoltypes "github.com/medibloc/panacea-core/v2/x/aol/types"
 	burnkeeper "github.com/medibloc/panacea-core/v2/x/burn/keeper"
-	dataDealkeeper "github.com/medibloc/panacea-core/v2/x/datadeal/keeper"
-	dataDealtypes "github.com/medibloc/panacea-core/v2/x/datadeal/types"
+	datadealkeeper "github.com/medibloc/panacea-core/v2/x/datadeal/keeper"
+	datadealtypes "github.com/medibloc/panacea-core/v2/x/datadeal/types"
 	tokenkeeper "github.com/medibloc/panacea-core/v2/x/token/keeper"
 	tokentypes "github.com/medibloc/panacea-core/v2/x/token/types"
 	"github.com/stretchr/testify/suite"
@@ -46,8 +46,8 @@ type TestSuite struct {
 	DIDMsgServer      didtypes.MsgServer
 	DIDKeeper         didkeeper.Keeper
 	TokenKeeper       tokenkeeper.Keeper
-	DataDealKeeper    dataDealkeeper.Keeper
-	DataDealMsgServer dataDealtypes.MsgServer
+	DataDealKeeper    datadealkeeper.Keeper
+	DataDealMsgServer datadealtypes.MsgServer
 }
 
 func (suite *TestSuite) SetupTest() {
@@ -58,7 +58,7 @@ func (suite *TestSuite) SetupTest() {
 		paramstypes.StoreKey,
 		didtypes.StoreKey,
 		tokentypes.StoreKey,
-		dataDealtypes.StoreKey)
+		datadealtypes.StoreKey)
 	tKeyParams := sdk.NewTransientStoreKey(paramstypes.TStoreKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
 
@@ -128,13 +128,13 @@ func (suite *TestSuite) SetupTest() {
 		suite.BankKeeper,
 	)
 
-	suite.DataDealKeeper = *dataDealkeeper.NewKeeper(
+	suite.DataDealKeeper = *datadealkeeper.NewKeeper(
 		cdc.Marshaler,
-		keyParams[dataDealtypes.StoreKey],
-		memKeys[dataDealtypes.MemStoreKey],
+		keyParams[datadealtypes.StoreKey],
+		memKeys[datadealtypes.MemStoreKey],
 		suite.BankKeeper,
 		suite.AccountKeeper)
-	suite.DataDealMsgServer = dataDealkeeper.NewMsgServerImpl(suite.DataDealKeeper)
+	suite.DataDealMsgServer = datadealkeeper.NewMsgServerImpl(suite.DataDealKeeper)
 }
 
 func (suite *TestSuite) BeforeTest(suiteName, testName string) {
@@ -152,7 +152,7 @@ func newTestCodec() params.EncodingConfig {
 	banktypes.RegisterInterfaces(interfaceRegistry)
 	cryptocodec.RegisterInterfaces(interfaceRegistry)
 	didtypes.RegisterInterfaces(interfaceRegistry)
-	dataDealtypes.RegisterInterfaces(interfaceRegistry)
+	datadealtypes.RegisterInterfaces(interfaceRegistry)
 	marshaler := codec.NewProtoCodec(interfaceRegistry)
 
 	return params.EncodingConfig{
