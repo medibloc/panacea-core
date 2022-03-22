@@ -15,7 +15,7 @@ message Pool {
   uint64                    target_num_data = 4; // target number of data
   uint64                    cur_num_data = 5;    // current number of data
   uint64                    max_nft_supply = 6;  // max supply of data access NFT of the pool
-  uint64                    issued_nft = 7;      // current issued NFT
+  uint64                    num_issued_nft = 7;  // current issued NFT
   cosmos.base.v1beta1.Coin  nft_price = 8;
   repeated string           trusted_data_validators = 9;
   repeated string           trusted_data_issuers = 10;
