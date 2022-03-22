@@ -1,0 +1,9 @@
+syntax = "proto3";
+package panacea.datapool.v2;
+
+option go_package = "github.com/medibloc/panacea-core/x/datapool/types";
+
+import "google/protobuf/any.proto";
+
+// GenesisState defines the datapool module's genesis state.
+message GenesisState {}
