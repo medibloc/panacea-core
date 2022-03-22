@@ -98,12 +98,12 @@ import (
 	"github.com/medibloc/panacea-core/v2/x/burn"
 	burnkeeper "github.com/medibloc/panacea-core/v2/x/burn/keeper"
 	burntypes "github.com/medibloc/panacea-core/v2/x/burn/types"
+	"github.com/medibloc/panacea-core/v2/x/datadeal"
+	datadealkeeper "github.com/medibloc/panacea-core/v2/x/datadeal/keeper"
+	datadealtypes "github.com/medibloc/panacea-core/v2/x/datadeal/types"
 	"github.com/medibloc/panacea-core/v2/x/did"
 	didkeeper "github.com/medibloc/panacea-core/v2/x/did/keeper"
 	didtypes "github.com/medibloc/panacea-core/v2/x/did/types"
-	"github.com/medibloc/panacea-core/v2/x/market"
-	marketkeeper "github.com/medibloc/panacea-core/v2/x/market/keeper"
-	markettypes "github.com/medibloc/panacea-core/v2/x/market/types"
 	"github.com/medibloc/panacea-core/v2/x/token"
 	tokenkeeper "github.com/medibloc/panacea-core/v2/x/token/keeper"
 	tokentypes "github.com/medibloc/panacea-core/v2/x/token/types"
@@ -184,7 +184,7 @@ var (
 		token.AppModuleBasic{},
 		burn.AppModuleBasic{},
 		wasm.AppModuleBasic{},
-		market.AppModuleBasic{},
+		datadeal.AppModuleBasic{},
 	)
 
 	// module account permissions
@@ -252,12 +252,12 @@ type App struct {
 	ScopedTransferKeeper capabilitykeeper.ScopedKeeper
 	ScopedWasmKeeper     capabilitykeeper.ScopedKeeper
 
-	aolKeeper    aolkeeper.Keeper
-	didKeeper    didkeeper.Keeper
-	burnKeeper   burnkeeper.Keeper
-	tokenKeeper  tokenkeeper.Keeper
-	wasmKeeper   wasm.Keeper
-	marketKeeper marketkeeper.Keeper
+	aolKeeper      aolkeeper.Keeper
+	didKeeper      didkeeper.Keeper
+	burnKeeper     burnkeeper.Keeper
+	tokenKeeper    tokenkeeper.Keeper
+	wasmKeeper     wasm.Keeper
+	dataDealKeeper datadealkeeper.Keeper
 
 	// the module manager
 	mm *module.Manager
@@ -290,7 +290,7 @@ func New(
 		tokentypes.StoreKey,
 		burntypes.StoreKey,
 		wasm.StoreKey,
-		markettypes.StoreKey,
+		datadealtypes.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
@@ -432,10 +432,10 @@ func New(
 		wasmOpts...,
 	)
 
-	app.marketKeeper = *marketkeeper.NewKeeper(
+	app.dataDealKeeper = *datadealkeeper.NewKeeper(
 		appCodec,
-		keys[markettypes.StoreKey],
-		keys[markettypes.MemStoreKey],
+		keys[datadealtypes.StoreKey],
+		keys[datadealtypes.MemStoreKey],
 		app.BankKeeper,
 		app.AccountKeeper,
 	)
@@ -491,7 +491,7 @@ func New(
 		token.NewAppModule(appCodec, app.tokenKeeper),
 		burn.NewAppModule(appCodec, app.burnKeeper),
 		wasm.NewAppModule(appCodec, &app.wasmKeeper, app.StakingKeeper),
-		market.NewAppModule(appCodec, app.marketKeeper),
+		datadeal.NewAppModule(appCodec, app.dataDealKeeper),
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -529,7 +529,7 @@ func New(
 		tokentypes.ModuleName,
 		burntypes.ModuleName,
 		wasm.ModuleName,
-		markettypes.ModuleName,
+		datadealtypes.ModuleName,
 	)
 
 	app.mm.RegisterInvariants(&app.CrisisKeeper)
@@ -740,7 +740,7 @@ func initParamsKeeper(appCodec codec.BinaryMarshaler, legacyAmino *codec.LegacyA
 	paramsKeeper.Subspace(tokentypes.ModuleName)
 	paramsKeeper.Subspace(burntypes.ModuleName)
 	paramsKeeper.Subspace(wasm.ModuleName)
-	paramsKeeper.Subspace(markettypes.ModuleName)
+	paramsKeeper.Subspace(datadealtypes.ModuleName)
 
 	return paramsKeeper
 }
