@@ -7,6 +7,10 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/medibloc/panacea-core/v2/x/datapool"
+	datapoolkeeper "github.com/medibloc/panacea-core/v2/x/datapool/keeper"
+	datapooltypes "github.com/medibloc/panacea-core/v2/x/datapool/types"
+
 	"github.com/CosmWasm/wasmd/x/wasm"
 	wasmclient "github.com/CosmWasm/wasmd/x/wasm/client"
 
@@ -185,6 +189,7 @@ var (
 		burn.AppModuleBasic{},
 		wasm.AppModuleBasic{},
 		datadeal.AppModuleBasic{},
+		datapool.AppModuleBasic{},
 	)
 
 	// module account permissions
@@ -258,6 +263,7 @@ type App struct {
 	tokenKeeper    tokenkeeper.Keeper
 	wasmKeeper     wasm.Keeper
 	dataDealKeeper datadealkeeper.Keeper
+	dataPoolKeeper datapoolkeeper.Keeper
 
 	// the module manager
 	mm *module.Manager
@@ -291,6 +297,7 @@ func New(
 		burntypes.StoreKey,
 		wasm.StoreKey,
 		datadealtypes.StoreKey,
+		datapooltypes.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
@@ -440,6 +447,14 @@ func New(
 		app.AccountKeeper,
 	)
 
+	app.dataPoolKeeper = *datapoolkeeper.NewKeeper(
+		appCodec,
+		keys[datapooltypes.StoreKey],
+		keys[datapooltypes.MemStoreKey],
+		app.BankKeeper,
+		app.AccountKeeper,
+	)
+
 	// The gov proposal types can be individually enabled
 	if len(enabledWasmProposals) != 0 {
 		govRouter.AddRoute(wasm.RouterKey, wasm.NewWasmProposalHandler(app.wasmKeeper, enabledWasmProposals))
@@ -492,6 +507,7 @@ func New(
 		burn.NewAppModule(appCodec, app.burnKeeper),
 		wasm.NewAppModule(appCodec, &app.wasmKeeper, app.StakingKeeper),
 		datadeal.NewAppModule(appCodec, app.dataDealKeeper),
+		datapool.NewAppModule(appCodec, app.dataPoolKeeper),
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -530,6 +546,7 @@ func New(
 		burntypes.ModuleName,
 		wasm.ModuleName,
 		datadealtypes.ModuleName,
+		datapooltypes.ModuleName,
 	)
 
 	app.mm.RegisterInvariants(&app.CrisisKeeper)
@@ -741,6 +758,7 @@ func initParamsKeeper(appCodec codec.BinaryMarshaler, legacyAmino *codec.LegacyA
 	paramsKeeper.Subspace(burntypes.ModuleName)
 	paramsKeeper.Subspace(wasm.ModuleName)
 	paramsKeeper.Subspace(datadealtypes.ModuleName)
+	paramsKeeper.Subspace(datapooltypes.ModuleName)
 
 	return paramsKeeper
 }

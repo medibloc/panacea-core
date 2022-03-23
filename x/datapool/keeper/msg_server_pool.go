@@ -3,10 +3,24 @@ package keeper
 import (
 	"context"
 
+	sdk "github.com/cosmos/cosmos-sdk/types"
+
 	"github.com/medibloc/panacea-core/v2/x/datapool/types"
 )
 
 func (m msgServer) RegisterDataValidator(goCtx context.Context, msg *types.MsgRegisterDataValidator) (*types.MsgRegisterDataValidatorResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	dataValidator, err := sdk.AccAddressFromBech32(msg.Address)
+	if err != nil {
+		return nil, err
+	}
+
+	err = m.Keeper.RegisterDataValidator(ctx, dataValidator, *msg.ValidatorDetail)
+	if err != nil {
+		return nil, err
+	}
+
 	return &types.MsgRegisterDataValidatorResponse{}, nil
 }
 

@@ -1,5 +1,7 @@
 package types
 
+import sdk "github.com/cosmos/cosmos-sdk/types"
+
 const (
 	// ModuleName defines the module name
 	ModuleName = "datapool"
@@ -19,4 +21,11 @@ const (
 	// this line is used by starport scaffolding # ibc/keys/name
 )
 
-// this line is used by starport scaffolding # ibc/keys/port
+var (
+	// KeyPrefixDataValidators defines key to store data validator
+	KeyPrefixDataValidators = []byte{0x01}
+)
+
+func GetKeyPrefixDataValidator(dataValidatorAddr sdk.AccAddress) []byte {
+	return append(KeyPrefixDataValidators, dataValidatorAddr.Bytes()...)
+}
