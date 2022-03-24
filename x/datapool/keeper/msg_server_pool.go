@@ -11,12 +11,12 @@ import (
 func (m msgServer) RegisterDataValidator(goCtx context.Context, msg *types.MsgRegisterDataValidator) (*types.MsgRegisterDataValidatorResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	dataValidator, err := sdk.AccAddressFromBech32(msg.Address)
+	_, err := sdk.AccAddressFromBech32(msg.ValidatorDetail.Address)
 	if err != nil {
 		return nil, err
 	}
 
-	err = m.Keeper.RegisterDataValidator(ctx, dataValidator, *msg.ValidatorDetail)
+	err = m.Keeper.RegisterDataValidator(ctx, *msg.ValidatorDetail)
 	if err != nil {
 		return nil, err
 	}

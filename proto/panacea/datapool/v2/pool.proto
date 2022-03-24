@@ -54,4 +54,5 @@ message DataAccessNFTRedeemReceipt {
 // DataValidator defines a detail of data validator.
 message DataValidator {
   string endpoint = 1;
+  string address = 2;
 }

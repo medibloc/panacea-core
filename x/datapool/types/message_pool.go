@@ -7,9 +7,8 @@ import (
 
 var _ sdk.Msg = &MsgRegisterDataValidator{}
 
-func NewMsgRegisterDataValidator(address string, dataValidator *DataValidator) *MsgRegisterDataValidator {
+func NewMsgRegisterDataValidator(dataValidator *DataValidator) *MsgRegisterDataValidator {
 	return &MsgRegisterDataValidator{
-		Address:         address,
 		ValidatorDetail: dataValidator,
 	}
 }
@@ -23,7 +22,7 @@ func (msg *MsgRegisterDataValidator) Type() string {
 }
 
 func (msg *MsgRegisterDataValidator) ValidateBasic() error {
-	_, err := sdk.AccAddressFromBech32(msg.Address)
+	_, err := sdk.AccAddressFromBech32(msg.ValidatorDetail.Address)
 	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
@@ -36,7 +35,7 @@ func (msg *MsgRegisterDataValidator) GetSignBytes() []byte {
 }
 
 func (msg *MsgRegisterDataValidator) GetSigners() []sdk.AccAddress {
-	dataValidator, err := sdk.AccAddressFromBech32(msg.Address)
+	dataValidator, err := sdk.AccAddressFromBech32(msg.ValidatorDetail.Address)
 	if err != nil {
 		panic(err)
 	}
