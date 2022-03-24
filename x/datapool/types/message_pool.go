@@ -24,7 +24,11 @@ func (msg *MsgRegisterDataValidator) Type() string {
 func (msg *MsgRegisterDataValidator) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.ValidatorDetail.Address)
 	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid data validator address (%s)", err)
+	}
+
+	if msg.ValidatorDetail.Endpoint == "" {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "empty data validator endpoint URL")
 	}
 	return nil
 }
@@ -55,7 +59,7 @@ func (msg *MsgCreatePool) Type() string {
 func (msg *MsgCreatePool) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.Curator)
 	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid curator address (%s)", err)
 	}
 	return nil
 }
@@ -86,7 +90,7 @@ func (msg *MsgSellData) Type() string {
 func (msg *MsgSellData) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.Seller)
 	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid seller address (%s)", err)
 	}
 	return nil
 }
@@ -117,7 +121,7 @@ func (msg *MsgBuyDataAccessNFT) Type() string {
 func (msg *MsgBuyDataAccessNFT) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.Buyer)
 	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid buyer address (%s)", err)
 	}
 	return nil
 }
@@ -148,7 +152,7 @@ func (msg *MsgRedeemDataAccessNFT) Type() string {
 func (msg *MsgRedeemDataAccessNFT) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.Redeemer)
 	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid redeemer address (%s)", err)
 	}
 	return nil
 }
