@@ -25,7 +25,20 @@ func (m msgServer) RegisterDataValidator(goCtx context.Context, msg *types.MsgRe
 }
 
 func (m msgServer) CreatePool(goCtx context.Context, msg *types.MsgCreatePool) (*types.MsgCreatePoolResponse, error) {
-	return &types.MsgCreatePoolResponse{}, nil
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	curator, err := sdk.AccAddressFromBech32(msg.Curator)
+	if err != nil {
+		return nil, err
+	}
+
+	newPoolId, err := m.Keeper.CreatePool(ctx, curator, *msg.PoolParams)
+	if err != nil {
+		return nil, err
+	}
+
+	// TODO: return curation NFT id
+	return &types.MsgCreatePoolResponse{PoolId: newPoolId, Round: 1}, nil
 }
 
 func (m msgServer) SellData(goCtx context.Context, msg *types.MsgSellData) (*types.MsgSellDataResponse, error) {

@@ -1,6 +1,7 @@
 package testsuite
 
 import (
+	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	cryptocodec "github.com/cosmos/cosmos-sdk/crypto/codec"
@@ -52,6 +53,7 @@ type TestSuite struct {
 	DataDealMsgServer datadealtypes.MsgServer
 	DataPoolKeeper    datapoolkeeper.Keeper
 	DataPoolMsgServer datapooltypes.MsgServer
+	WasmKeeper        wasmkeeper.Keeper
 }
 
 func (suite *TestSuite) SetupTest() {
@@ -147,7 +149,9 @@ func (suite *TestSuite) SetupTest() {
 		keyParams[datapooltypes.StoreKey],
 		memKeys[datapooltypes.MemStoreKey],
 		suite.BankKeeper,
-		suite.AccountKeeper)
+		suite.AccountKeeper,
+		suite.WasmKeeper,
+	)
 	suite.DataPoolMsgServer = datapoolkeeper.NewMsgServerImpl(suite.DataPoolKeeper)
 }
 

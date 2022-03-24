@@ -6,4 +6,6 @@ option go_package = "github.com/medibloc/panacea-core/x/datapool/types";
 import "google/protobuf/any.proto";
 
 // GenesisState defines the datapool module's genesis state.
-message GenesisState {}
+message GenesisState {
+  uint64 next_pool_number = 1;
+}

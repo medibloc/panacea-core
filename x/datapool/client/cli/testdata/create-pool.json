@@ -1,0 +1,12 @@
+{
+  "data_schema": [
+    "https://www.json.ld"
+  ],
+  "target_num_data": 100,
+  "max_nft_supply": 10,
+  "nft_price": "1000000umed",
+  "trusted_data_validators": [],
+  "trusted_data_issuers": [],
+  "deposit": "1000umed",
+  "download_period": "1000000s"
+}

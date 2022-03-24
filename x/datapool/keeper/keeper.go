@@ -3,12 +3,18 @@ package keeper
 import (
 	"fmt"
 
+	"github.com/CosmWasm/wasmd/x/wasm"
+
 	"github.com/tendermint/tendermint/libs/log"
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/medibloc/panacea-core/v2/x/datapool/types"
+
 	// this line is used by starport scaffolding # ibc/keeper/import
+
+	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
+	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
 )
 
 type (
@@ -18,6 +24,7 @@ type (
 		memKey        sdk.StoreKey
 		bankKeeper    types.BankKeeper
 		accountKeeper types.AccountKeeper
+		wasmKeeper    wasmtypes.ContractOpsKeeper
 	}
 )
 
@@ -27,6 +34,7 @@ func NewKeeper(
 	memKey sdk.StoreKey,
 	bankKeeper types.BankKeeper,
 	accountKeeper types.AccountKeeper,
+	wasmKeeper wasm.Keeper,
 ) *Keeper {
 	return &Keeper{
 		cdc:           cdc,
@@ -34,6 +42,7 @@ func NewKeeper(
 		memKey:        memKey,
 		bankKeeper:    bankKeeper,
 		accountKeeper: accountKeeper,
+		wasmKeeper:    wasmkeeper.NewDefaultPermissionKeeper(wasmKeeper),
 	}
 }
 

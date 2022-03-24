@@ -21,5 +21,6 @@ func GetTxCmd() *cobra.Command {
 	}
 
 	cmd.AddCommand(CmdRegisterDataValidator())
+	cmd.AddCommand(CmdCreatePool())
 	return cmd
 }

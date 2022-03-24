@@ -9,22 +9,14 @@ import "google/protobuf/duration.proto";
 
 // Pool defines a data pool
 message Pool {
-  uint64                    pool_id = 1;
-  uint64                    round = 2;
-  repeated string           data_schema = 3;
-  uint64                    target_num_data = 4; // target number of data
-  uint64                    cur_num_data = 5;    // current number of data
-  uint64                    max_nft_supply = 6;  // max supply of data access NFT of the pool
-  uint64                    num_issued_nft = 7;  // current issued NFT
-  cosmos.base.v1beta1.Coin  nft_price = 8;
-  repeated string           trusted_data_validators = 9;
-  repeated string           trusted_data_issuers = 10;
-  cosmos.base.v1beta1.Coin  deposit = 11;
-  google.protobuf.Duration  download_period = 12 [
-    (gogoproto.stdduration) = true
-  ];
-  string                    curator = 13;
-  string                    status = 14;
+  uint64     pool_id = 1;
+  string     pool_address = 2;
+  uint64     round = 3;
+  PoolParams pool_params = 4;
+  uint64     cur_num_data = 5;    // current number of data
+  uint64     num_issued_nft = 6;  // current issued NFT
+  string     status = 7;
+  string     curator = 8;
 }
 
 // DataValidationCertificate defines the certificate for data validation w/ data validator signature.
@@ -55,4 +47,18 @@ message DataAccessNFTRedeemReceipt {
 message DataValidator {
   string endpoint = 1;
   string address = 2;
+}
+
+// PoolParams defines parameters for data pool
+message PoolParams {
+  repeated string          data_schema = 1;             // JSON Schema URIs
+  uint64                   target_num_data = 2;         // A target num of data to be collected
+  uint64                   max_nft_supply = 3;          // A max num of NFTs that can be minted (= A total num of potential buyers)
+  cosmos.base.v1beta1.Coin nft_price = 4;               // A price of a NFT
+  repeated string          trusted_data_validators = 5; // Trusted data validators' addresses
+  repeated string          trusted_data_issuers = 6;    // Optional. Data issuers that is trusted by the curator
+  cosmos.base.v1beta1.Coin deposit = 7;
+  google.protobuf.Duration download_period = 8 [
+    (gogoproto.stdduration) = true
+  ];                                                    // A download period after redeeming NFT
 }

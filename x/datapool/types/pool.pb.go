@@ -30,20 +30,14 @@ const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 // Pool defines a data pool
 type Pool struct {
-	PoolId                uint64         `protobuf:"varint,1,opt,name=pool_id,json=poolId,proto3" json:"pool_id,omitempty"`
-	Round                 uint64         `protobuf:"varint,2,opt,name=round,proto3" json:"round,omitempty"`
-	DataSchema            []string       `protobuf:"bytes,3,rep,name=data_schema,json=dataSchema,proto3" json:"data_schema,omitempty"`
-	TargetNumData         uint64         `protobuf:"varint,4,opt,name=target_num_data,json=targetNumData,proto3" json:"target_num_data,omitempty"`
-	CurNumData            uint64         `protobuf:"varint,5,opt,name=cur_num_data,json=curNumData,proto3" json:"cur_num_data,omitempty"`
-	MaxNftSupply          uint64         `protobuf:"varint,6,opt,name=max_nft_supply,json=maxNftSupply,proto3" json:"max_nft_supply,omitempty"`
-	NumIssuedNft          uint64         `protobuf:"varint,7,opt,name=num_issued_nft,json=numIssuedNft,proto3" json:"num_issued_nft,omitempty"`
-	NftPrice              *types.Coin    `protobuf:"bytes,8,opt,name=nft_price,json=nftPrice,proto3" json:"nft_price,omitempty"`
-	TrustedDataValidators []string       `protobuf:"bytes,9,rep,name=trusted_data_validators,json=trustedDataValidators,proto3" json:"trusted_data_validators,omitempty"`
-	TrustedDataIssuers    []string       `protobuf:"bytes,10,rep,name=trusted_data_issuers,json=trustedDataIssuers,proto3" json:"trusted_data_issuers,omitempty"`
-	Deposit               *types.Coin    `protobuf:"bytes,11,opt,name=deposit,proto3" json:"deposit,omitempty"`
-	DownloadPeriod        *time.Duration `protobuf:"bytes,12,opt,name=download_period,json=downloadPeriod,proto3,stdduration" json:"download_period,omitempty"`
-	Curator               string         `protobuf:"bytes,13,opt,name=curator,proto3" json:"curator,omitempty"`
-	Status                string         `protobuf:"bytes,14,opt,name=status,proto3" json:"status,omitempty"`
+	PoolId       uint64      `protobuf:"varint,1,opt,name=pool_id,json=poolId,proto3" json:"pool_id,omitempty"`
+	PoolAddress  string      `protobuf:"bytes,2,opt,name=pool_address,json=poolAddress,proto3" json:"pool_address,omitempty"`
+	Round        uint64      `protobuf:"varint,3,opt,name=round,proto3" json:"round,omitempty"`
+	PoolParams   *PoolParams `protobuf:"bytes,4,opt,name=pool_params,json=poolParams,proto3" json:"pool_params,omitempty"`
+	CurNumData   uint64      `protobuf:"varint,5,opt,name=cur_num_data,json=curNumData,proto3" json:"cur_num_data,omitempty"`
+	NumIssuedNft uint64      `protobuf:"varint,6,opt,name=num_issued_nft,json=numIssuedNft,proto3" json:"num_issued_nft,omitempty"`
+	Status       string      `protobuf:"bytes,7,opt,name=status,proto3" json:"status,omitempty"`
+	Curator      string      `protobuf:"bytes,8,opt,name=curator,proto3" json:"curator,omitempty"`
 }
 
 func (m *Pool) Reset()         { *m = Pool{} }
@@ -86,6 +80,13 @@ func (m *Pool) GetPoolId() uint64 {
 	return 0
 }
 
+func (m *Pool) GetPoolAddress() string {
+	if m != nil {
+		return m.PoolAddress
+	}
+	return ""
+}
+
 func (m *Pool) GetRound() uint64 {
 	if m != nil {
 		return m.Round
@@ -93,30 +94,16 @@ func (m *Pool) GetRound() uint64 {
 	return 0
 }
 
-func (m *Pool) GetDataSchema() []string {
+func (m *Pool) GetPoolParams() *PoolParams {
 	if m != nil {
-		return m.DataSchema
+		return m.PoolParams
 	}
 	return nil
-}
-
-func (m *Pool) GetTargetNumData() uint64 {
-	if m != nil {
-		return m.TargetNumData
-	}
-	return 0
 }
 
 func (m *Pool) GetCurNumData() uint64 {
 	if m != nil {
 		return m.CurNumData
-	}
-	return 0
-}
-
-func (m *Pool) GetMaxNftSupply() uint64 {
-	if m != nil {
-		return m.MaxNftSupply
 	}
 	return 0
 }
@@ -128,51 +115,16 @@ func (m *Pool) GetNumIssuedNft() uint64 {
 	return 0
 }
 
-func (m *Pool) GetNftPrice() *types.Coin {
+func (m *Pool) GetStatus() string {
 	if m != nil {
-		return m.NftPrice
+		return m.Status
 	}
-	return nil
-}
-
-func (m *Pool) GetTrustedDataValidators() []string {
-	if m != nil {
-		return m.TrustedDataValidators
-	}
-	return nil
-}
-
-func (m *Pool) GetTrustedDataIssuers() []string {
-	if m != nil {
-		return m.TrustedDataIssuers
-	}
-	return nil
-}
-
-func (m *Pool) GetDeposit() *types.Coin {
-	if m != nil {
-		return m.Deposit
-	}
-	return nil
-}
-
-func (m *Pool) GetDownloadPeriod() *time.Duration {
-	if m != nil {
-		return m.DownloadPeriod
-	}
-	return nil
+	return ""
 }
 
 func (m *Pool) GetCurator() string {
 	if m != nil {
 		return m.Curator
-	}
-	return ""
-}
-
-func (m *Pool) GetStatus() string {
-	if m != nil {
-		return m.Status
 	}
 	return ""
 }
@@ -437,65 +389,170 @@ func (m *DataValidator) GetAddress() string {
 	return ""
 }
 
+// PoolParams defines parameters for data pool
+type PoolParams struct {
+	DataSchema            []string       `protobuf:"bytes,1,rep,name=data_schema,json=dataSchema,proto3" json:"data_schema,omitempty"`
+	TargetNumData         uint64         `protobuf:"varint,2,opt,name=target_num_data,json=targetNumData,proto3" json:"target_num_data,omitempty"`
+	MaxNftSupply          uint64         `protobuf:"varint,3,opt,name=max_nft_supply,json=maxNftSupply,proto3" json:"max_nft_supply,omitempty"`
+	NftPrice              *types.Coin    `protobuf:"bytes,4,opt,name=nft_price,json=nftPrice,proto3" json:"nft_price,omitempty"`
+	TrustedDataValidators []string       `protobuf:"bytes,5,rep,name=trusted_data_validators,json=trustedDataValidators,proto3" json:"trusted_data_validators,omitempty"`
+	TrustedDataIssuers    []string       `protobuf:"bytes,6,rep,name=trusted_data_issuers,json=trustedDataIssuers,proto3" json:"trusted_data_issuers,omitempty"`
+	Deposit               *types.Coin    `protobuf:"bytes,7,opt,name=deposit,proto3" json:"deposit,omitempty"`
+	DownloadPeriod        *time.Duration `protobuf:"bytes,8,opt,name=download_period,json=downloadPeriod,proto3,stdduration" json:"download_period,omitempty"`
+}
+
+func (m *PoolParams) Reset()         { *m = PoolParams{} }
+func (m *PoolParams) String() string { return proto.CompactTextString(m) }
+func (*PoolParams) ProtoMessage()    {}
+func (*PoolParams) Descriptor() ([]byte, []int) {
+	return fileDescriptor_4ffa39381925211c, []int{5}
+}
+func (m *PoolParams) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *PoolParams) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_PoolParams.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *PoolParams) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_PoolParams.Merge(m, src)
+}
+func (m *PoolParams) XXX_Size() int {
+	return m.Size()
+}
+func (m *PoolParams) XXX_DiscardUnknown() {
+	xxx_messageInfo_PoolParams.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_PoolParams proto.InternalMessageInfo
+
+func (m *PoolParams) GetDataSchema() []string {
+	if m != nil {
+		return m.DataSchema
+	}
+	return nil
+}
+
+func (m *PoolParams) GetTargetNumData() uint64 {
+	if m != nil {
+		return m.TargetNumData
+	}
+	return 0
+}
+
+func (m *PoolParams) GetMaxNftSupply() uint64 {
+	if m != nil {
+		return m.MaxNftSupply
+	}
+	return 0
+}
+
+func (m *PoolParams) GetNftPrice() *types.Coin {
+	if m != nil {
+		return m.NftPrice
+	}
+	return nil
+}
+
+func (m *PoolParams) GetTrustedDataValidators() []string {
+	if m != nil {
+		return m.TrustedDataValidators
+	}
+	return nil
+}
+
+func (m *PoolParams) GetTrustedDataIssuers() []string {
+	if m != nil {
+		return m.TrustedDataIssuers
+	}
+	return nil
+}
+
+func (m *PoolParams) GetDeposit() *types.Coin {
+	if m != nil {
+		return m.Deposit
+	}
+	return nil
+}
+
+func (m *PoolParams) GetDownloadPeriod() *time.Duration {
+	if m != nil {
+		return m.DownloadPeriod
+	}
+	return nil
+}
+
 func init() {
 	proto.RegisterType((*Pool)(nil), "panacea.datapool.v2.Pool")
 	proto.RegisterType((*DataValidationCertificate)(nil), "panacea.datapool.v2.DataValidationCertificate")
 	proto.RegisterType((*UnsignedDataValidationCertificate)(nil), "panacea.datapool.v2.UnsignedDataValidationCertificate")
 	proto.RegisterType((*DataAccessNFTRedeemReceipt)(nil), "panacea.datapool.v2.DataAccessNFTRedeemReceipt")
 	proto.RegisterType((*DataValidator)(nil), "panacea.datapool.v2.DataValidator")
+	proto.RegisterType((*PoolParams)(nil), "panacea.datapool.v2.PoolParams")
 }
 
 func init() { proto.RegisterFile("panacea/datapool/v2/pool.proto", fileDescriptor_4ffa39381925211c) }
 
 var fileDescriptor_4ffa39381925211c = []byte{
-	// 739 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x54, 0x4d, 0x6f, 0xeb, 0x44,
-	0x14, 0xad, 0x69, 0x9a, 0xc4, 0x93, 0x8f, 0x27, 0x0d, 0x7d, 0x3c, 0xbf, 0x80, 0xfc, 0xf2, 0x22,
-	0x40, 0xd9, 0x60, 0xd3, 0x3c, 0xa9, 0x7b, 0x5e, 0x0b, 0x6a, 0x84, 0x14, 0x55, 0x2e, 0xb0, 0x80,
-	0x85, 0x35, 0x99, 0xb9, 0x71, 0x46, 0xc4, 0x1e, 0x33, 0x1f, 0xa1, 0xfd, 0x17, 0xac, 0x10, 0x5b,
-	0xfe, 0x03, 0x7b, 0xb6, 0x2c, 0xbb, 0x64, 0x07, 0x6a, 0xff, 0x08, 0x9a, 0xb1, 0xdd, 0xb4, 0x12,
-	0x4f, 0x55, 0x57, 0xc9, 0x3d, 0xe7, 0xdc, 0x3b, 0x67, 0xe6, 0x9e, 0x04, 0x85, 0x25, 0x29, 0x08,
-	0x05, 0x12, 0x33, 0xa2, 0x49, 0x29, 0xc4, 0x26, 0xde, 0xce, 0x62, 0xfb, 0x19, 0x95, 0x52, 0x68,
-	0x81, 0xdf, 0xaf, 0xf9, 0xa8, 0xe1, 0xa3, 0xed, 0x6c, 0x74, 0x98, 0x89, 0x4c, 0x38, 0x3e, 0xb6,
-	0xdf, 0x2a, 0xe9, 0x28, 0xa4, 0x42, 0xe5, 0x42, 0xc5, 0x4b, 0xa2, 0x20, 0xde, 0x1e, 0x2d, 0x41,
-	0x93, 0xa3, 0x98, 0x0a, 0x5e, 0x34, 0x7c, 0x26, 0x44, 0xb6, 0x81, 0xd8, 0x55, 0x4b, 0xb3, 0x8a,
-	0x99, 0x91, 0x44, 0x73, 0x51, 0xf3, 0x93, 0x3f, 0x5b, 0xa8, 0x75, 0x2e, 0xc4, 0x06, 0xbf, 0x40,
-	0x1d, 0x7b, 0x52, 0xca, 0x59, 0xe0, 0x8d, 0xbd, 0x69, 0x2b, 0x69, 0xdb, 0x72, 0xce, 0xf0, 0x21,
-	0x3a, 0x90, 0xc2, 0x14, 0x2c, 0x78, 0xcf, 0xc1, 0x55, 0x81, 0x5f, 0xa1, 0x9e, 0x35, 0x97, 0x2a,
-	0xba, 0x86, 0x9c, 0x04, 0xfb, 0xe3, 0xfd, 0xa9, 0x9f, 0x20, 0x0b, 0x5d, 0x38, 0x04, 0x7f, 0x8a,
-	0x9e, 0x69, 0x22, 0x33, 0xd0, 0x69, 0x61, 0xf2, 0xd4, 0x12, 0x41, 0xcb, 0x0d, 0x18, 0x54, 0xf0,
-	0xc2, 0xe4, 0xa7, 0x44, 0x13, 0x3c, 0x46, 0x7d, 0x6a, 0xe4, 0x4e, 0x74, 0xe0, 0x44, 0x88, 0x1a,
-	0xd9, 0x28, 0x3e, 0x46, 0xc3, 0x9c, 0x5c, 0xa6, 0xc5, 0x4a, 0xa7, 0xca, 0x94, 0xe5, 0xe6, 0x2a,
-	0x68, 0x3b, 0x4d, 0x3f, 0x27, 0x97, 0x8b, 0x95, 0xbe, 0x70, 0x98, 0x55, 0xd9, 0x19, 0x5c, 0x29,
-	0x03, 0xcc, 0x8a, 0x83, 0x4e, 0xa5, 0x2a, 0x4c, 0x3e, 0x77, 0xe0, 0x62, 0xa5, 0xf1, 0x31, 0xf2,
-	0xed, 0x9c, 0x52, 0x72, 0x0a, 0x41, 0x77, 0xec, 0x4d, 0x7b, 0xb3, 0x97, 0x51, 0xf5, 0x84, 0x91,
-	0x7d, 0xc2, 0xa8, 0x7e, 0xc2, 0xe8, 0x44, 0xf0, 0x22, 0xe9, 0x16, 0x2b, 0x7d, 0x6e, 0xa5, 0xf8,
-	0x18, 0xbd, 0xd0, 0xd2, 0x28, 0x0d, 0xcc, 0xb9, 0x4c, 0xb7, 0x64, 0xc3, 0x19, 0xd1, 0x42, 0xaa,
-	0xc0, 0x77, 0x57, 0x7f, 0x5e, 0xd3, 0xd6, 0xf1, 0x77, 0x77, 0x24, 0xfe, 0x1c, 0x1d, 0x3e, 0xe8,
-	0x73, 0xf6, 0xa4, 0x0a, 0x90, 0x6b, 0xc2, 0xf7, 0x9a, 0xe6, 0x15, 0x83, 0xdf, 0xa0, 0x0e, 0x83,
-	0x52, 0x28, 0xae, 0x83, 0xde, 0x63, 0xfe, 0x1a, 0x25, 0x3e, 0x43, 0xcf, 0x98, 0xf8, 0xb9, 0xd8,
-	0x08, 0xc2, 0xd2, 0x12, 0x24, 0x17, 0x2c, 0xe8, 0xd7, 0xcd, 0xd5, 0xfe, 0xa3, 0x66, 0xff, 0xd1,
-	0x69, 0xbd, 0xff, 0xb7, 0xad, 0xdf, 0xfe, 0x79, 0xe5, 0x25, 0xc3, 0xa6, 0xef, 0xdc, 0xb5, 0xe1,
-	0x00, 0x75, 0xa8, 0x55, 0x08, 0x19, 0x0c, 0xc6, 0xde, 0xd4, 0x4f, 0x9a, 0x12, 0x7f, 0x80, 0xda,
-	0x4a, 0x13, 0x6d, 0x54, 0x30, 0x74, 0x44, 0x5d, 0x4d, 0x7e, 0xf5, 0xd0, 0xcb, 0x7b, 0xb7, 0xe6,
-	0xa2, 0x38, 0x01, 0xa9, 0xf9, 0x8a, 0x53, 0xa2, 0x01, 0xff, 0x80, 0x06, 0xa6, 0x50, 0x3c, 0x2b,
-	0x80, 0xa5, 0x14, 0xa4, 0x76, 0xe1, 0xea, 0xcd, 0x8e, 0xa3, 0xff, 0x89, 0x78, 0xf4, 0x6d, 0xad,
-	0x7c, 0xe7, 0xb8, 0xa4, 0xdf, 0x0c, 0xb3, 0x20, 0xfe, 0x08, 0xf9, 0xb6, 0x22, 0xda, 0x48, 0x70,
-	0xf1, 0xec, 0x27, 0x3b, 0x60, 0xf2, 0x87, 0x87, 0x5e, 0x3f, 0x3a, 0xf1, 0xa9, 0xb9, 0xff, 0x10,
-	0xf9, 0x6e, 0x91, 0x6b, 0xa2, 0xd6, 0xc1, 0xbe, 0x3b, 0xb2, 0x6b, 0x81, 0x33, 0xa2, 0xd6, 0xf8,
-	0x13, 0x34, 0x7c, 0x98, 0x0e, 0x17, 0x79, 0x3f, 0x19, 0xb0, 0xfb, 0xa9, 0xb0, 0xb6, 0x25, 0xfc,
-	0x64, 0x40, 0x69, 0x90, 0x2e, 0xef, 0x7e, 0xb2, 0x03, 0x26, 0xbf, 0x7b, 0x68, 0x64, 0xed, 0x7e,
-	0x41, 0x29, 0x28, 0xb5, 0xf8, 0xea, 0x9b, 0x04, 0x18, 0x40, 0x9e, 0x00, 0x05, 0x5e, 0xea, 0xa7,
-	0xfa, 0x7d, 0x8e, 0xda, 0x36, 0xf0, 0x9c, 0x39, 0xb3, 0xad, 0xe4, 0xa0, 0x58, 0xe9, 0x39, 0xc3,
-	0x23, 0xd4, 0x95, 0x6e, 0x2c, 0x34, 0x1e, 0xef, 0x6a, 0xfc, 0x1a, 0xf5, 0x97, 0x1b, 0x41, 0x7f,
-	0x4c, 0xd7, 0xc0, 0xb3, 0xb5, 0xae, 0x7f, 0x91, 0x3d, 0x87, 0x9d, 0x39, 0x68, 0xf2, 0x25, 0x1a,
-	0x3c, 0x08, 0xba, 0x9d, 0x07, 0x05, 0x2b, 0x05, 0x2f, 0xaa, 0x0d, 0xfb, 0xc9, 0x5d, 0x6d, 0x23,
-	0x45, 0x18, 0x93, 0xa0, 0x94, 0xb3, 0xe6, 0x27, 0x4d, 0xf9, 0xf6, 0xeb, 0xbf, 0x6e, 0x42, 0xef,
-	0xfa, 0x26, 0xf4, 0xfe, 0xbd, 0x09, 0xbd, 0x5f, 0x6e, 0xc3, 0xbd, 0xeb, 0xdb, 0x70, 0xef, 0xef,
-	0xdb, 0x70, 0xef, 0xfb, 0xa3, 0x8c, 0xeb, 0xb5, 0x59, 0x46, 0x54, 0xe4, 0x71, 0x0e, 0x8c, 0xdb,
-	0xc3, 0xe3, 0x3a, 0x32, 0x9f, 0x51, 0x21, 0x21, 0xbe, 0xdc, 0xfd, 0x79, 0xea, 0xab, 0x12, 0xd4,
-	0xb2, 0xed, 0x22, 0xfe, 0xe6, 0xbf, 0x00, 0x00, 0x00, 0xff, 0xff, 0x39, 0xd1, 0x5c, 0x4a, 0x5d,
-	0x05, 0x00, 0x00,
+	// 792 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x54, 0xcd, 0x6e, 0xe4, 0x44,
+	0x10, 0x8e, 0xf3, 0x33, 0x99, 0xa9, 0x99, 0x64, 0xa5, 0x26, 0xcb, 0x7a, 0x07, 0xe4, 0xcc, 0x8e,
+	0x00, 0xe5, 0x82, 0x4d, 0xb2, 0x52, 0xce, 0xec, 0x6e, 0x40, 0x89, 0x90, 0xa2, 0xc8, 0x0b, 0x1c,
+	0xe0, 0x60, 0xf5, 0x74, 0x97, 0x3d, 0x2d, 0xc6, 0x6e, 0xd3, 0x3f, 0x21, 0xfb, 0x16, 0x1c, 0x10,
+	0xe2, 0xc0, 0x85, 0x77, 0xe0, 0x21, 0x38, 0xee, 0x91, 0x1b, 0x28, 0x79, 0x11, 0xd4, 0x6d, 0x7b,
+	0x26, 0x23, 0xed, 0x82, 0x38, 0xd9, 0xf5, 0x7d, 0x5f, 0x75, 0x57, 0xd7, 0x1f, 0x44, 0x35, 0xad,
+	0x28, 0x43, 0x9a, 0x70, 0x6a, 0x68, 0x2d, 0xe5, 0x22, 0xb9, 0x3e, 0x49, 0xdc, 0x37, 0xae, 0x95,
+	0x34, 0x92, 0xbc, 0xd3, 0xf2, 0x71, 0xc7, 0xc7, 0xd7, 0x27, 0xe3, 0x83, 0x42, 0x16, 0xd2, 0xf3,
+	0x89, 0xfb, 0x6b, 0xa4, 0xe3, 0x88, 0x49, 0x5d, 0x4a, 0x9d, 0xcc, 0xa8, 0xc6, 0xe4, 0xfa, 0x78,
+	0x86, 0x86, 0x1e, 0x27, 0x4c, 0x8a, 0xaa, 0xe3, 0x0b, 0x29, 0x8b, 0x05, 0x26, 0xde, 0x9a, 0xd9,
+	0x3c, 0xe1, 0x56, 0x51, 0x23, 0x64, 0xcb, 0x4f, 0x7f, 0xda, 0x84, 0xed, 0x2b, 0x29, 0x17, 0xe4,
+	0x11, 0xec, 0xba, 0x9b, 0x32, 0xc1, 0xc3, 0x60, 0x12, 0x1c, 0x6d, 0xa7, 0x3d, 0x67, 0x5e, 0x70,
+	0xf2, 0x04, 0x46, 0x9e, 0xa0, 0x9c, 0x2b, 0xd4, 0x3a, 0xdc, 0x9c, 0x04, 0x47, 0x83, 0x74, 0xe8,
+	0xb0, 0x67, 0x0d, 0x44, 0x0e, 0x60, 0x47, 0x49, 0x5b, 0xf1, 0x70, 0xcb, 0x7b, 0x36, 0x06, 0xf9,
+	0x14, 0xbc, 0x28, 0xab, 0xa9, 0xa2, 0xa5, 0x0e, 0xb7, 0x27, 0xc1, 0xd1, 0xf0, 0xe4, 0x30, 0x7e,
+	0xc3, 0xdb, 0x62, 0x17, 0xc1, 0x95, 0x97, 0xa5, 0x50, 0x2f, 0xff, 0xc9, 0x04, 0x46, 0xcc, 0xaa,
+	0xac, 0xb2, 0x65, 0xe6, 0xd4, 0xe1, 0x8e, 0x3f, 0x1e, 0x98, 0x55, 0x97, 0xb6, 0x3c, 0xa3, 0x86,
+	0x92, 0x0f, 0x60, 0xdf, 0xb1, 0x42, 0x6b, 0x8b, 0x3c, 0xab, 0x72, 0x13, 0xf6, 0xbc, 0x66, 0x54,
+	0xd9, 0xf2, 0xc2, 0x83, 0x97, 0xb9, 0x21, 0xef, 0x42, 0x4f, 0x1b, 0x6a, 0xac, 0x0e, 0x77, 0x7d,
+	0xf0, 0xad, 0x45, 0x42, 0xd8, 0x65, 0x2e, 0x1d, 0x52, 0x85, 0x7d, 0x4f, 0x74, 0xe6, 0xf4, 0xe7,
+	0x00, 0x1e, 0xbb, 0x0b, 0xbe, 0xa6, 0x0b, 0xc1, 0x7d, 0xbe, 0x5e, 0xa0, 0x32, 0x22, 0x17, 0x8c,
+	0x1a, 0x24, 0xdf, 0xc2, 0x9e, 0xad, 0xb4, 0x28, 0x2a, 0xe4, 0x19, 0x43, 0x65, 0x7c, 0xc6, 0x86,
+	0x27, 0xa7, 0x6f, 0x7c, 0xdb, 0x57, 0xad, 0xf2, 0xad, 0xc7, 0xa5, 0xa3, 0xee, 0x30, 0x07, 0x92,
+	0xf7, 0x61, 0xe0, 0x2c, 0x6a, 0xac, 0x42, 0x9f, 0xec, 0x51, 0xba, 0x02, 0xa6, 0xbf, 0x07, 0xf0,
+	0xe4, 0x3f, 0x4f, 0x7c, 0x7b, 0x31, 0x97, 0x95, 0xda, 0xbc, 0x5f, 0xa9, 0xf7, 0x60, 0xe0, 0x22,
+	0xce, 0xe6, 0x54, 0xcf, 0x7d, 0x0d, 0x47, 0x69, 0xdf, 0x01, 0xe7, 0x54, 0xcf, 0xc9, 0x87, 0xb0,
+	0xef, 0xc9, 0xeb, 0xe6, 0x26, 0xa9, 0x7c, 0x25, 0x07, 0xe9, 0x1e, 0x5f, 0x5d, 0x2f, 0x95, 0x0b,
+	0x5b, 0xe1, 0xf7, 0x16, 0xb5, 0x41, 0xe5, 0x0b, 0x35, 0x48, 0x57, 0xc0, 0xf4, 0xb7, 0x00, 0xc6,
+	0x2e, 0xdc, 0x67, 0x8c, 0xa1, 0xd6, 0x97, 0x9f, 0x7f, 0x99, 0x22, 0x47, 0x2c, 0x53, 0x64, 0x28,
+	0x6a, 0xf3, 0x7f, 0xe3, 0x7d, 0x08, 0xbd, 0x2a, 0x37, 0x4e, 0xdd, 0x36, 0x5c, 0x95, 0x9b, 0x0b,
+	0x4e, 0xc6, 0xd0, 0x57, 0xfe, 0x58, 0xec, 0x62, 0x5c, 0xda, 0xae, 0x8b, 0x67, 0x0b, 0xc9, 0xbe,
+	0xcb, 0xe6, 0x28, 0x8a, 0xb9, 0x69, 0x5b, 0x69, 0xe8, 0xb1, 0x73, 0x0f, 0x4d, 0x3f, 0x83, 0xbd,
+	0xb3, 0xb5, 0x27, 0x8d, 0xa1, 0x8f, 0x15, 0xaf, 0xa5, 0xa8, 0x9a, 0x0a, 0x0f, 0xd2, 0xa5, 0xed,
+	0x5a, 0x67, 0x7d, 0x20, 0x3a, 0x73, 0xfa, 0xeb, 0x16, 0xc0, 0xaa, 0x9f, 0xc9, 0x21, 0x0c, 0x7d,
+	0xfa, 0x34, 0x9b, 0x63, 0x49, 0xc3, 0x60, 0xb2, 0x75, 0x34, 0x48, 0xc1, 0x41, 0x2f, 0x3d, 0x42,
+	0x3e, 0x82, 0x07, 0x86, 0xaa, 0x02, 0xcd, 0xaa, 0xcf, 0x9b, 0xc7, 0xee, 0x35, 0xf0, 0xbd, 0x56,
+	0x2f, 0xe9, 0x8d, 0xeb, 0xf1, 0x4c, 0xdb, 0xba, 0x5e, 0xbc, 0x6a, 0x1f, 0x3f, 0x2a, 0xe9, 0xcd,
+	0x65, 0x6e, 0x5e, 0x7a, 0x8c, 0x9c, 0xc2, 0xc0, 0x29, 0x6a, 0x25, 0x18, 0xb6, 0x23, 0xf7, 0x38,
+	0x6e, 0x76, 0x44, 0xec, 0x76, 0x44, 0xdc, 0xee, 0x88, 0xf8, 0x85, 0x14, 0x55, 0xda, 0xaf, 0x72,
+	0x73, 0xe5, 0xa4, 0xe4, 0x14, 0x1e, 0x19, 0x65, 0xb5, 0x41, 0x9e, 0xad, 0x57, 0x5b, 0x87, 0x3b,
+	0x3e, 0xe4, 0x87, 0x2d, 0xbd, 0x96, 0x22, 0x4d, 0x3e, 0x81, 0x83, 0x35, 0x3f, 0x3f, 0x89, 0x4a,
+	0x87, 0x3d, 0xef, 0x44, 0xee, 0x39, 0x5d, 0x34, 0x0c, 0x79, 0x0a, 0xbb, 0x1c, 0x6b, 0xa9, 0x85,
+	0xf1, 0xd3, 0xf8, 0xaf, 0xf1, 0x75, 0x4a, 0x72, 0x0e, 0x0f, 0xb8, 0xfc, 0xa1, 0x5a, 0x48, 0xca,
+	0xb3, 0x1a, 0x95, 0x90, 0xdc, 0x4f, 0xac, 0x73, 0x6e, 0x16, 0x5c, 0xdc, 0x2d, 0xb8, 0xf8, 0xac,
+	0x5d, 0x70, 0xcf, 0xb7, 0x7f, 0xf9, 0xeb, 0x30, 0x48, 0xf7, 0x3b, 0xbf, 0x2b, 0xef, 0xf6, 0xfc,
+	0x8b, 0x3f, 0x6e, 0xa3, 0xe0, 0xf5, 0x6d, 0x14, 0xfc, 0x7d, 0x1b, 0x05, 0x3f, 0xde, 0x45, 0x1b,
+	0xaf, 0xef, 0xa2, 0x8d, 0x3f, 0xef, 0xa2, 0x8d, 0x6f, 0x8e, 0x0b, 0x61, 0xe6, 0x76, 0x16, 0x33,
+	0x59, 0x26, 0x25, 0x72, 0xe1, 0x7a, 0x23, 0x69, 0x27, 0xfa, 0x63, 0x26, 0x15, 0x26, 0x37, 0xab,
+	0x85, 0x6d, 0x5e, 0xd5, 0xa8, 0x67, 0x3d, 0x7f, 0xeb, 0xd3, 0x7f, 0x02, 0x00, 0x00, 0xff, 0xff,
+	0x1a, 0x0a, 0x62, 0xe3, 0xd1, 0x05, 0x00, 0x00,
 }
 
 func (m *Pool) Marshal() (dAtA []byte, err error) {
@@ -518,79 +575,22 @@ func (m *Pool) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if len(m.Status) > 0 {
-		i -= len(m.Status)
-		copy(dAtA[i:], m.Status)
-		i = encodeVarintPool(dAtA, i, uint64(len(m.Status)))
-		i--
-		dAtA[i] = 0x72
-	}
 	if len(m.Curator) > 0 {
 		i -= len(m.Curator)
 		copy(dAtA[i:], m.Curator)
 		i = encodeVarintPool(dAtA, i, uint64(len(m.Curator)))
 		i--
-		dAtA[i] = 0x6a
-	}
-	if m.DownloadPeriod != nil {
-		n1, err1 := github_com_gogo_protobuf_types.StdDurationMarshalTo(*m.DownloadPeriod, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdDuration(*m.DownloadPeriod):])
-		if err1 != nil {
-			return 0, err1
-		}
-		i -= n1
-		i = encodeVarintPool(dAtA, i, uint64(n1))
-		i--
-		dAtA[i] = 0x62
-	}
-	if m.Deposit != nil {
-		{
-			size, err := m.Deposit.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintPool(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0x5a
-	}
-	if len(m.TrustedDataIssuers) > 0 {
-		for iNdEx := len(m.TrustedDataIssuers) - 1; iNdEx >= 0; iNdEx-- {
-			i -= len(m.TrustedDataIssuers[iNdEx])
-			copy(dAtA[i:], m.TrustedDataIssuers[iNdEx])
-			i = encodeVarintPool(dAtA, i, uint64(len(m.TrustedDataIssuers[iNdEx])))
-			i--
-			dAtA[i] = 0x52
-		}
-	}
-	if len(m.TrustedDataValidators) > 0 {
-		for iNdEx := len(m.TrustedDataValidators) - 1; iNdEx >= 0; iNdEx-- {
-			i -= len(m.TrustedDataValidators[iNdEx])
-			copy(dAtA[i:], m.TrustedDataValidators[iNdEx])
-			i = encodeVarintPool(dAtA, i, uint64(len(m.TrustedDataValidators[iNdEx])))
-			i--
-			dAtA[i] = 0x4a
-		}
-	}
-	if m.NftPrice != nil {
-		{
-			size, err := m.NftPrice.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintPool(dAtA, i, uint64(size))
-		}
-		i--
 		dAtA[i] = 0x42
+	}
+	if len(m.Status) > 0 {
+		i -= len(m.Status)
+		copy(dAtA[i:], m.Status)
+		i = encodeVarintPool(dAtA, i, uint64(len(m.Status)))
+		i--
+		dAtA[i] = 0x3a
 	}
 	if m.NumIssuedNft != 0 {
 		i = encodeVarintPool(dAtA, i, uint64(m.NumIssuedNft))
-		i--
-		dAtA[i] = 0x38
-	}
-	if m.MaxNftSupply != 0 {
-		i = encodeVarintPool(dAtA, i, uint64(m.MaxNftSupply))
 		i--
 		dAtA[i] = 0x30
 	}
@@ -599,24 +599,29 @@ func (m *Pool) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x28
 	}
-	if m.TargetNumData != 0 {
-		i = encodeVarintPool(dAtA, i, uint64(m.TargetNumData))
-		i--
-		dAtA[i] = 0x20
-	}
-	if len(m.DataSchema) > 0 {
-		for iNdEx := len(m.DataSchema) - 1; iNdEx >= 0; iNdEx-- {
-			i -= len(m.DataSchema[iNdEx])
-			copy(dAtA[i:], m.DataSchema[iNdEx])
-			i = encodeVarintPool(dAtA, i, uint64(len(m.DataSchema[iNdEx])))
-			i--
-			dAtA[i] = 0x1a
+	if m.PoolParams != nil {
+		{
+			size, err := m.PoolParams.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintPool(dAtA, i, uint64(size))
 		}
+		i--
+		dAtA[i] = 0x22
 	}
 	if m.Round != 0 {
 		i = encodeVarintPool(dAtA, i, uint64(m.Round))
 		i--
-		dAtA[i] = 0x10
+		dAtA[i] = 0x18
+	}
+	if len(m.PoolAddress) > 0 {
+		i -= len(m.PoolAddress)
+		copy(dAtA[i:], m.PoolAddress)
+		i = encodeVarintPool(dAtA, i, uint64(len(m.PoolAddress)))
+		i--
+		dAtA[i] = 0x12
 	}
 	if m.PoolId != 0 {
 		i = encodeVarintPool(dAtA, i, uint64(m.PoolId))
@@ -809,6 +814,100 @@ func (m *DataValidator) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
+func (m *PoolParams) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *PoolParams) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *PoolParams) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.DownloadPeriod != nil {
+		n3, err3 := github_com_gogo_protobuf_types.StdDurationMarshalTo(*m.DownloadPeriod, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdDuration(*m.DownloadPeriod):])
+		if err3 != nil {
+			return 0, err3
+		}
+		i -= n3
+		i = encodeVarintPool(dAtA, i, uint64(n3))
+		i--
+		dAtA[i] = 0x42
+	}
+	if m.Deposit != nil {
+		{
+			size, err := m.Deposit.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintPool(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x3a
+	}
+	if len(m.TrustedDataIssuers) > 0 {
+		for iNdEx := len(m.TrustedDataIssuers) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.TrustedDataIssuers[iNdEx])
+			copy(dAtA[i:], m.TrustedDataIssuers[iNdEx])
+			i = encodeVarintPool(dAtA, i, uint64(len(m.TrustedDataIssuers[iNdEx])))
+			i--
+			dAtA[i] = 0x32
+		}
+	}
+	if len(m.TrustedDataValidators) > 0 {
+		for iNdEx := len(m.TrustedDataValidators) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.TrustedDataValidators[iNdEx])
+			copy(dAtA[i:], m.TrustedDataValidators[iNdEx])
+			i = encodeVarintPool(dAtA, i, uint64(len(m.TrustedDataValidators[iNdEx])))
+			i--
+			dAtA[i] = 0x2a
+		}
+	}
+	if m.NftPrice != nil {
+		{
+			size, err := m.NftPrice.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintPool(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x22
+	}
+	if m.MaxNftSupply != 0 {
+		i = encodeVarintPool(dAtA, i, uint64(m.MaxNftSupply))
+		i--
+		dAtA[i] = 0x18
+	}
+	if m.TargetNumData != 0 {
+		i = encodeVarintPool(dAtA, i, uint64(m.TargetNumData))
+		i--
+		dAtA[i] = 0x10
+	}
+	if len(m.DataSchema) > 0 {
+		for iNdEx := len(m.DataSchema) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.DataSchema[iNdEx])
+			copy(dAtA[i:], m.DataSchema[iNdEx])
+			i = encodeVarintPool(dAtA, i, uint64(len(m.DataSchema[iNdEx])))
+			i--
+			dAtA[i] = 0xa
+		}
+	}
+	return len(dAtA) - i, nil
+}
+
 func encodeVarintPool(dAtA []byte, offset int, v uint64) int {
 	offset -= sovPool(v)
 	base := offset
@@ -829,56 +928,28 @@ func (m *Pool) Size() (n int) {
 	if m.PoolId != 0 {
 		n += 1 + sovPool(uint64(m.PoolId))
 	}
+	l = len(m.PoolAddress)
+	if l > 0 {
+		n += 1 + l + sovPool(uint64(l))
+	}
 	if m.Round != 0 {
 		n += 1 + sovPool(uint64(m.Round))
 	}
-	if len(m.DataSchema) > 0 {
-		for _, s := range m.DataSchema {
-			l = len(s)
-			n += 1 + l + sovPool(uint64(l))
-		}
-	}
-	if m.TargetNumData != 0 {
-		n += 1 + sovPool(uint64(m.TargetNumData))
+	if m.PoolParams != nil {
+		l = m.PoolParams.Size()
+		n += 1 + l + sovPool(uint64(l))
 	}
 	if m.CurNumData != 0 {
 		n += 1 + sovPool(uint64(m.CurNumData))
 	}
-	if m.MaxNftSupply != 0 {
-		n += 1 + sovPool(uint64(m.MaxNftSupply))
-	}
 	if m.NumIssuedNft != 0 {
 		n += 1 + sovPool(uint64(m.NumIssuedNft))
 	}
-	if m.NftPrice != nil {
-		l = m.NftPrice.Size()
-		n += 1 + l + sovPool(uint64(l))
-	}
-	if len(m.TrustedDataValidators) > 0 {
-		for _, s := range m.TrustedDataValidators {
-			l = len(s)
-			n += 1 + l + sovPool(uint64(l))
-		}
-	}
-	if len(m.TrustedDataIssuers) > 0 {
-		for _, s := range m.TrustedDataIssuers {
-			l = len(s)
-			n += 1 + l + sovPool(uint64(l))
-		}
-	}
-	if m.Deposit != nil {
-		l = m.Deposit.Size()
-		n += 1 + l + sovPool(uint64(l))
-	}
-	if m.DownloadPeriod != nil {
-		l = github_com_gogo_protobuf_types.SizeOfStdDuration(*m.DownloadPeriod)
-		n += 1 + l + sovPool(uint64(l))
-	}
-	l = len(m.Curator)
+	l = len(m.Status)
 	if l > 0 {
 		n += 1 + l + sovPool(uint64(l))
 	}
-	l = len(m.Status)
+	l = len(m.Curator)
 	if l > 0 {
 		n += 1 + l + sovPool(uint64(l))
 	}
@@ -971,6 +1042,51 @@ func (m *DataValidator) Size() (n int) {
 	return n
 }
 
+func (m *PoolParams) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if len(m.DataSchema) > 0 {
+		for _, s := range m.DataSchema {
+			l = len(s)
+			n += 1 + l + sovPool(uint64(l))
+		}
+	}
+	if m.TargetNumData != 0 {
+		n += 1 + sovPool(uint64(m.TargetNumData))
+	}
+	if m.MaxNftSupply != 0 {
+		n += 1 + sovPool(uint64(m.MaxNftSupply))
+	}
+	if m.NftPrice != nil {
+		l = m.NftPrice.Size()
+		n += 1 + l + sovPool(uint64(l))
+	}
+	if len(m.TrustedDataValidators) > 0 {
+		for _, s := range m.TrustedDataValidators {
+			l = len(s)
+			n += 1 + l + sovPool(uint64(l))
+		}
+	}
+	if len(m.TrustedDataIssuers) > 0 {
+		for _, s := range m.TrustedDataIssuers {
+			l = len(s)
+			n += 1 + l + sovPool(uint64(l))
+		}
+	}
+	if m.Deposit != nil {
+		l = m.Deposit.Size()
+		n += 1 + l + sovPool(uint64(l))
+	}
+	if m.DownloadPeriod != nil {
+		l = github_com_gogo_protobuf_types.SizeOfStdDuration(*m.DownloadPeriod)
+		n += 1 + l + sovPool(uint64(l))
+	}
+	return n
+}
+
 func sovPool(x uint64) (n int) {
 	return (math_bits.Len64(x|1) + 6) / 7
 }
@@ -1026,27 +1142,8 @@ func (m *Pool) Unmarshal(dAtA []byte) error {
 				}
 			}
 		case 2:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Round", wireType)
-			}
-			m.Round = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowPool
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.Round |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 3:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field DataSchema", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field PoolAddress", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -1074,13 +1171,13 @@ func (m *Pool) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.DataSchema = append(m.DataSchema, string(dAtA[iNdEx:postIndex]))
+			m.PoolAddress = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 4:
+		case 3:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field TargetNumData", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Round", wireType)
 			}
-			m.TargetNumData = 0
+			m.Round = 0
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowPool
@@ -1090,11 +1187,47 @@ func (m *Pool) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.TargetNumData |= uint64(b&0x7F) << shift
+				m.Round |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field PoolParams", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowPool
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthPool
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthPool
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.PoolParams == nil {
+				m.PoolParams = &PoolParams{}
+			}
+			if err := m.PoolParams.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
 		case 5:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field CurNumData", wireType)
@@ -1116,25 +1249,6 @@ func (m *Pool) Unmarshal(dAtA []byte) error {
 			}
 		case 6:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field MaxNftSupply", wireType)
-			}
-			m.MaxNftSupply = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowPool
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.MaxNftSupply |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 7:
-			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field NumIssuedNft", wireType)
 			}
 			m.NumIssuedNft = 0
@@ -1152,211 +1266,7 @@ func (m *Pool) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
-		case 8:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field NftPrice", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowPool
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthPool
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthPool
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.NftPrice == nil {
-				m.NftPrice = &types.Coin{}
-			}
-			if err := m.NftPrice.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 9:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field TrustedDataValidators", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowPool
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthPool
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthPool
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.TrustedDataValidators = append(m.TrustedDataValidators, string(dAtA[iNdEx:postIndex]))
-			iNdEx = postIndex
-		case 10:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field TrustedDataIssuers", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowPool
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthPool
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthPool
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.TrustedDataIssuers = append(m.TrustedDataIssuers, string(dAtA[iNdEx:postIndex]))
-			iNdEx = postIndex
-		case 11:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Deposit", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowPool
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthPool
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthPool
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.Deposit == nil {
-				m.Deposit = &types.Coin{}
-			}
-			if err := m.Deposit.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 12:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field DownloadPeriod", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowPool
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthPool
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthPool
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.DownloadPeriod == nil {
-				m.DownloadPeriod = new(time.Duration)
-			}
-			if err := github_com_gogo_protobuf_types.StdDurationUnmarshal(m.DownloadPeriod, dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 13:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Curator", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowPool
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthPool
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthPool
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Curator = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 14:
+		case 7:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Status", wireType)
 			}
@@ -1387,6 +1297,38 @@ func (m *Pool) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			m.Status = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 8:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Curator", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowPool
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthPool
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthPool
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Curator = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -1965,6 +1907,298 @@ func (m *DataValidator) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			m.Address = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipPool(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthPool
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *PoolParams) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowPool
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: PoolParams: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: PoolParams: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field DataSchema", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowPool
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthPool
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthPool
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.DataSchema = append(m.DataSchema, string(dAtA[iNdEx:postIndex]))
+			iNdEx = postIndex
+		case 2:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field TargetNumData", wireType)
+			}
+			m.TargetNumData = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowPool
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.TargetNumData |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 3:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field MaxNftSupply", wireType)
+			}
+			m.MaxNftSupply = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowPool
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.MaxNftSupply |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field NftPrice", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowPool
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthPool
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthPool
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.NftPrice == nil {
+				m.NftPrice = &types.Coin{}
+			}
+			if err := m.NftPrice.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 5:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field TrustedDataValidators", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowPool
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthPool
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthPool
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.TrustedDataValidators = append(m.TrustedDataValidators, string(dAtA[iNdEx:postIndex]))
+			iNdEx = postIndex
+		case 6:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field TrustedDataIssuers", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowPool
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthPool
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthPool
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.TrustedDataIssuers = append(m.TrustedDataIssuers, string(dAtA[iNdEx:postIndex]))
+			iNdEx = postIndex
+		case 7:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Deposit", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowPool
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthPool
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthPool
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Deposit == nil {
+				m.Deposit = &types.Coin{}
+			}
+			if err := m.Deposit.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 8:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field DownloadPeriod", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowPool
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthPool
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthPool
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.DownloadPeriod == nil {
+				m.DownloadPeriod = new(time.Duration)
+			}
+			if err := github_com_gogo_protobuf_types.StdDurationUnmarshal(m.DownloadPeriod, dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
