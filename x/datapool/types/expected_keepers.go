@@ -1,9 +1,14 @@
 package types
 
+import (
+	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+)
+
 type BankKeeper interface {
-	// Methods imported from bank should be defined here
+	GetBalance(ctx sdk.Context, addr sdk.AccAddress, denom string) sdk.Coin
 }
 
 type AccountKeeper interface {
-	// Methods imported from account should be defined here
+	GetPubKey(sdk.Context, sdk.AccAddress) (cryptotypes.PubKey, error)
 }

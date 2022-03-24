@@ -50,3 +50,9 @@ message DataAccessNFTRedeemReceipt {
   string redeemer = 4;      // 'panacea1' address of redeemer
   uint64 block_height = 5;  // The block height at which NFT redeemed
 }
+
+// DataValidator defines a detail of data validator.
+message DataValidator {
+  string endpoint = 1;
+  string address = 2;
+}

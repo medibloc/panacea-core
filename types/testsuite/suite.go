@@ -19,6 +19,8 @@ import (
 	burnkeeper "github.com/medibloc/panacea-core/v2/x/burn/keeper"
 	datadealkeeper "github.com/medibloc/panacea-core/v2/x/datadeal/keeper"
 	datadealtypes "github.com/medibloc/panacea-core/v2/x/datadeal/types"
+	datapoolkeeper "github.com/medibloc/panacea-core/v2/x/datapool/keeper"
+	datapooltypes "github.com/medibloc/panacea-core/v2/x/datapool/types"
 	tokenkeeper "github.com/medibloc/panacea-core/v2/x/token/keeper"
 	tokentypes "github.com/medibloc/panacea-core/v2/x/token/types"
 	"github.com/stretchr/testify/suite"
@@ -48,6 +50,8 @@ type TestSuite struct {
 	TokenKeeper       tokenkeeper.Keeper
 	DataDealKeeper    datadealkeeper.Keeper
 	DataDealMsgServer datadealtypes.MsgServer
+	DataPoolKeeper    datapoolkeeper.Keeper
+	DataPoolMsgServer datapooltypes.MsgServer
 }
 
 func (suite *TestSuite) SetupTest() {
@@ -58,7 +62,9 @@ func (suite *TestSuite) SetupTest() {
 		paramstypes.StoreKey,
 		didtypes.StoreKey,
 		tokentypes.StoreKey,
-		datadealtypes.StoreKey)
+		datadealtypes.StoreKey,
+		datapooltypes.StoreKey,
+	)
 	tKeyParams := sdk.NewTransientStoreKey(paramstypes.TStoreKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
 
@@ -135,6 +141,14 @@ func (suite *TestSuite) SetupTest() {
 		suite.BankKeeper,
 		suite.AccountKeeper)
 	suite.DataDealMsgServer = datadealkeeper.NewMsgServerImpl(suite.DataDealKeeper)
+
+	suite.DataPoolKeeper = *datapoolkeeper.NewKeeper(
+		cdc.Marshaler,
+		keyParams[datapooltypes.StoreKey],
+		memKeys[datapooltypes.MemStoreKey],
+		suite.BankKeeper,
+		suite.AccountKeeper)
+	suite.DataPoolMsgServer = datapoolkeeper.NewMsgServerImpl(suite.DataPoolKeeper)
 }
 
 func (suite *TestSuite) BeforeTest(suiteName, testName string) {
@@ -153,6 +167,7 @@ func newTestCodec() params.EncodingConfig {
 	cryptocodec.RegisterInterfaces(interfaceRegistry)
 	didtypes.RegisterInterfaces(interfaceRegistry)
 	datadealtypes.RegisterInterfaces(interfaceRegistry)
+	datapooltypes.RegisterInterfaces(interfaceRegistry)
 	marshaler := codec.NewProtoCodec(interfaceRegistry)
 
 	return params.EncodingConfig{

@@ -30,8 +30,7 @@ service Msg {
 
 // MsgRegisterDataValidator defines the Msg/RegisterDataValidator request type.
 message MsgRegisterDataValidator {
-  string address = 1;       // The address of data validator to be registered
-  string endpoint = 2;      // https://my-validator.org
+  DataValidator validator_detail = 1;      // Detail of data validator
 }
 
 // MsgRegisterDataValidatorResponse defines the Msg/RegisterDataValidator response type.
