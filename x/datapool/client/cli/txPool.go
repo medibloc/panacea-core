@@ -1,7 +1,6 @@
 package cli
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -79,9 +78,7 @@ func NewCreatePoolMsg(clientCtx client.Context, file string) (sdk.Msg, error) {
 		return nil, fmt.Errorf("failed to read file")
 	}
 
-	dec := json.NewDecoder(bytes.NewReader(contents))
-
-	if err := dec.Decode(&poolParamsInput); err != nil {
+	if err := json.Unmarshal(contents, &poolParamsInput); err != nil {
 		return nil, err
 	}
 
