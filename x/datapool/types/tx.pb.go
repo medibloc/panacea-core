@@ -324,26 +324,26 @@ func (m *MsgSellDataResponse) GetAccumPoolShareToken() *types.Coin {
 	return nil
 }
 
-// MsgBuyDataAccessNFT defines the Msg/BuyDataAccessNFT request type.
-type MsgBuyDataAccessNFT struct {
+// MsgBuyDataAccessNft defines the Msg/BuyDataAccessNft request type.
+type MsgBuyDataAccessNft struct {
 	PoolId  uint64      `protobuf:"varint,1,opt,name=pool_id,json=poolId,proto3" json:"pool_id,omitempty"`
 	Round   uint64      `protobuf:"varint,2,opt,name=round,proto3" json:"round,omitempty"`
 	Payment *types.Coin `protobuf:"bytes,3,opt,name=payment,proto3" json:"payment,omitempty"`
 	Buyer   string      `protobuf:"bytes,4,opt,name=buyer,proto3" json:"buyer,omitempty"`
 }
 
-func (m *MsgBuyDataAccessNFT) Reset()         { *m = MsgBuyDataAccessNFT{} }
-func (m *MsgBuyDataAccessNFT) String() string { return proto.CompactTextString(m) }
-func (*MsgBuyDataAccessNFT) ProtoMessage()    {}
-func (*MsgBuyDataAccessNFT) Descriptor() ([]byte, []int) {
+func (m *MsgBuyDataAccessNft) Reset()         { *m = MsgBuyDataAccessNft{} }
+func (m *MsgBuyDataAccessNft) String() string { return proto.CompactTextString(m) }
+func (*MsgBuyDataAccessNft) ProtoMessage()    {}
+func (*MsgBuyDataAccessNft) Descriptor() ([]byte, []int) {
 	return fileDescriptor_eb3d400cb0e531d6, []int{6}
 }
-func (m *MsgBuyDataAccessNFT) XXX_Unmarshal(b []byte) error {
+func (m *MsgBuyDataAccessNft) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *MsgBuyDataAccessNFT) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *MsgBuyDataAccessNft) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_MsgBuyDataAccessNFT.Marshal(b, m, deterministic)
+		return xxx_messageInfo_MsgBuyDataAccessNft.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -353,65 +353,65 @@ func (m *MsgBuyDataAccessNFT) XXX_Marshal(b []byte, deterministic bool) ([]byte,
 		return b[:n], nil
 	}
 }
-func (m *MsgBuyDataAccessNFT) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgBuyDataAccessNFT.Merge(m, src)
+func (m *MsgBuyDataAccessNft) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgBuyDataAccessNft.Merge(m, src)
 }
-func (m *MsgBuyDataAccessNFT) XXX_Size() int {
+func (m *MsgBuyDataAccessNft) XXX_Size() int {
 	return m.Size()
 }
-func (m *MsgBuyDataAccessNFT) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgBuyDataAccessNFT.DiscardUnknown(m)
+func (m *MsgBuyDataAccessNft) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgBuyDataAccessNft.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_MsgBuyDataAccessNFT proto.InternalMessageInfo
+var xxx_messageInfo_MsgBuyDataAccessNft proto.InternalMessageInfo
 
-func (m *MsgBuyDataAccessNFT) GetPoolId() uint64 {
+func (m *MsgBuyDataAccessNft) GetPoolId() uint64 {
 	if m != nil {
 		return m.PoolId
 	}
 	return 0
 }
 
-func (m *MsgBuyDataAccessNFT) GetRound() uint64 {
+func (m *MsgBuyDataAccessNft) GetRound() uint64 {
 	if m != nil {
 		return m.Round
 	}
 	return 0
 }
 
-func (m *MsgBuyDataAccessNFT) GetPayment() *types.Coin {
+func (m *MsgBuyDataAccessNft) GetPayment() *types.Coin {
 	if m != nil {
 		return m.Payment
 	}
 	return nil
 }
 
-func (m *MsgBuyDataAccessNFT) GetBuyer() string {
+func (m *MsgBuyDataAccessNft) GetBuyer() string {
 	if m != nil {
 		return m.Buyer
 	}
 	return ""
 }
 
-// MsgBuyDataAccessNFTResponse defines the Msg/BuyDataAccessNFT response type.
-type MsgBuyDataAccessNFTResponse struct {
+// MsgBuyDataAccessNftResponse defines the Msg/BuyDataAccessNft response type.
+type MsgBuyDataAccessNftResponse struct {
 	PoolId uint64 `protobuf:"varint,1,opt,name=pool_id,json=poolId,proto3" json:"pool_id,omitempty"`
 	Round  uint64 `protobuf:"varint,2,opt,name=round,proto3" json:"round,omitempty"`
 	NftId  uint64 `protobuf:"varint,3,opt,name=nft_id,json=nftId,proto3" json:"nft_id,omitempty"`
 }
 
-func (m *MsgBuyDataAccessNFTResponse) Reset()         { *m = MsgBuyDataAccessNFTResponse{} }
-func (m *MsgBuyDataAccessNFTResponse) String() string { return proto.CompactTextString(m) }
-func (*MsgBuyDataAccessNFTResponse) ProtoMessage()    {}
-func (*MsgBuyDataAccessNFTResponse) Descriptor() ([]byte, []int) {
+func (m *MsgBuyDataAccessNftResponse) Reset()         { *m = MsgBuyDataAccessNftResponse{} }
+func (m *MsgBuyDataAccessNftResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgBuyDataAccessNftResponse) ProtoMessage()    {}
+func (*MsgBuyDataAccessNftResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_eb3d400cb0e531d6, []int{7}
 }
-func (m *MsgBuyDataAccessNFTResponse) XXX_Unmarshal(b []byte) error {
+func (m *MsgBuyDataAccessNftResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *MsgBuyDataAccessNFTResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *MsgBuyDataAccessNftResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_MsgBuyDataAccessNFTResponse.Marshal(b, m, deterministic)
+		return xxx_messageInfo_MsgBuyDataAccessNftResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -421,59 +421,59 @@ func (m *MsgBuyDataAccessNFTResponse) XXX_Marshal(b []byte, deterministic bool) 
 		return b[:n], nil
 	}
 }
-func (m *MsgBuyDataAccessNFTResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgBuyDataAccessNFTResponse.Merge(m, src)
+func (m *MsgBuyDataAccessNftResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgBuyDataAccessNftResponse.Merge(m, src)
 }
-func (m *MsgBuyDataAccessNFTResponse) XXX_Size() int {
+func (m *MsgBuyDataAccessNftResponse) XXX_Size() int {
 	return m.Size()
 }
-func (m *MsgBuyDataAccessNFTResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgBuyDataAccessNFTResponse.DiscardUnknown(m)
+func (m *MsgBuyDataAccessNftResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgBuyDataAccessNftResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_MsgBuyDataAccessNFTResponse proto.InternalMessageInfo
+var xxx_messageInfo_MsgBuyDataAccessNftResponse proto.InternalMessageInfo
 
-func (m *MsgBuyDataAccessNFTResponse) GetPoolId() uint64 {
+func (m *MsgBuyDataAccessNftResponse) GetPoolId() uint64 {
 	if m != nil {
 		return m.PoolId
 	}
 	return 0
 }
 
-func (m *MsgBuyDataAccessNFTResponse) GetRound() uint64 {
+func (m *MsgBuyDataAccessNftResponse) GetRound() uint64 {
 	if m != nil {
 		return m.Round
 	}
 	return 0
 }
 
-func (m *MsgBuyDataAccessNFTResponse) GetNftId() uint64 {
+func (m *MsgBuyDataAccessNftResponse) GetNftId() uint64 {
 	if m != nil {
 		return m.NftId
 	}
 	return 0
 }
 
-// MsgRedeemDataAccessNFT defines the Msg/RedeemDataAccessNFT request type.
-type MsgRedeemDataAccessNFT struct {
+// MsgRedeemDataAccessNft defines the Msg/RedeemDataAccessNft request type.
+type MsgRedeemDataAccessNft struct {
 	PoolId   uint64 `protobuf:"varint,1,opt,name=pool_id,json=poolId,proto3" json:"pool_id,omitempty"`
 	Round    uint64 `protobuf:"varint,2,opt,name=round,proto3" json:"round,omitempty"`
 	NftId    uint64 `protobuf:"varint,3,opt,name=nft_id,json=nftId,proto3" json:"nft_id,omitempty"`
 	Redeemer string `protobuf:"bytes,4,opt,name=redeemer,proto3" json:"redeemer,omitempty"`
 }
 
-func (m *MsgRedeemDataAccessNFT) Reset()         { *m = MsgRedeemDataAccessNFT{} }
-func (m *MsgRedeemDataAccessNFT) String() string { return proto.CompactTextString(m) }
-func (*MsgRedeemDataAccessNFT) ProtoMessage()    {}
-func (*MsgRedeemDataAccessNFT) Descriptor() ([]byte, []int) {
+func (m *MsgRedeemDataAccessNft) Reset()         { *m = MsgRedeemDataAccessNft{} }
+func (m *MsgRedeemDataAccessNft) String() string { return proto.CompactTextString(m) }
+func (*MsgRedeemDataAccessNft) ProtoMessage()    {}
+func (*MsgRedeemDataAccessNft) Descriptor() ([]byte, []int) {
 	return fileDescriptor_eb3d400cb0e531d6, []int{8}
 }
-func (m *MsgRedeemDataAccessNFT) XXX_Unmarshal(b []byte) error {
+func (m *MsgRedeemDataAccessNft) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *MsgRedeemDataAccessNFT) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *MsgRedeemDataAccessNft) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_MsgRedeemDataAccessNFT.Marshal(b, m, deterministic)
+		return xxx_messageInfo_MsgRedeemDataAccessNft.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -483,63 +483,63 @@ func (m *MsgRedeemDataAccessNFT) XXX_Marshal(b []byte, deterministic bool) ([]by
 		return b[:n], nil
 	}
 }
-func (m *MsgRedeemDataAccessNFT) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgRedeemDataAccessNFT.Merge(m, src)
+func (m *MsgRedeemDataAccessNft) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgRedeemDataAccessNft.Merge(m, src)
 }
-func (m *MsgRedeemDataAccessNFT) XXX_Size() int {
+func (m *MsgRedeemDataAccessNft) XXX_Size() int {
 	return m.Size()
 }
-func (m *MsgRedeemDataAccessNFT) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgRedeemDataAccessNFT.DiscardUnknown(m)
+func (m *MsgRedeemDataAccessNft) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgRedeemDataAccessNft.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_MsgRedeemDataAccessNFT proto.InternalMessageInfo
+var xxx_messageInfo_MsgRedeemDataAccessNft proto.InternalMessageInfo
 
-func (m *MsgRedeemDataAccessNFT) GetPoolId() uint64 {
+func (m *MsgRedeemDataAccessNft) GetPoolId() uint64 {
 	if m != nil {
 		return m.PoolId
 	}
 	return 0
 }
 
-func (m *MsgRedeemDataAccessNFT) GetRound() uint64 {
+func (m *MsgRedeemDataAccessNft) GetRound() uint64 {
 	if m != nil {
 		return m.Round
 	}
 	return 0
 }
 
-func (m *MsgRedeemDataAccessNFT) GetNftId() uint64 {
+func (m *MsgRedeemDataAccessNft) GetNftId() uint64 {
 	if m != nil {
 		return m.NftId
 	}
 	return 0
 }
 
-func (m *MsgRedeemDataAccessNFT) GetRedeemer() string {
+func (m *MsgRedeemDataAccessNft) GetRedeemer() string {
 	if m != nil {
 		return m.Redeemer
 	}
 	return ""
 }
 
-// MsgRedeemDataAccessNFTResponse defines the Msg/RedeemDataAccessNFT response type.
-type MsgRedeemDataAccessNFTResponse struct {
-	Receipt *DataAccessNFTRedeemReceipt `protobuf:"bytes,1,opt,name=receipt,proto3" json:"receipt,omitempty"`
+// MsgRedeemDataAccessNftResponse defines the Msg/RedeemDataAccessNFT response type.
+type MsgRedeemDataAccessNftResponse struct {
+	Receipt *DataAccessNftRedeemReceipt `protobuf:"bytes,1,opt,name=receipt,proto3" json:"receipt,omitempty"`
 }
 
-func (m *MsgRedeemDataAccessNFTResponse) Reset()         { *m = MsgRedeemDataAccessNFTResponse{} }
-func (m *MsgRedeemDataAccessNFTResponse) String() string { return proto.CompactTextString(m) }
-func (*MsgRedeemDataAccessNFTResponse) ProtoMessage()    {}
-func (*MsgRedeemDataAccessNFTResponse) Descriptor() ([]byte, []int) {
+func (m *MsgRedeemDataAccessNftResponse) Reset()         { *m = MsgRedeemDataAccessNftResponse{} }
+func (m *MsgRedeemDataAccessNftResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgRedeemDataAccessNftResponse) ProtoMessage()    {}
+func (*MsgRedeemDataAccessNftResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_eb3d400cb0e531d6, []int{9}
 }
-func (m *MsgRedeemDataAccessNFTResponse) XXX_Unmarshal(b []byte) error {
+func (m *MsgRedeemDataAccessNftResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *MsgRedeemDataAccessNFTResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *MsgRedeemDataAccessNftResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_MsgRedeemDataAccessNFTResponse.Marshal(b, m, deterministic)
+		return xxx_messageInfo_MsgRedeemDataAccessNftResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -549,19 +549,19 @@ func (m *MsgRedeemDataAccessNFTResponse) XXX_Marshal(b []byte, deterministic boo
 		return b[:n], nil
 	}
 }
-func (m *MsgRedeemDataAccessNFTResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgRedeemDataAccessNFTResponse.Merge(m, src)
+func (m *MsgRedeemDataAccessNftResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgRedeemDataAccessNftResponse.Merge(m, src)
 }
-func (m *MsgRedeemDataAccessNFTResponse) XXX_Size() int {
+func (m *MsgRedeemDataAccessNftResponse) XXX_Size() int {
 	return m.Size()
 }
-func (m *MsgRedeemDataAccessNFTResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgRedeemDataAccessNFTResponse.DiscardUnknown(m)
+func (m *MsgRedeemDataAccessNftResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgRedeemDataAccessNftResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_MsgRedeemDataAccessNFTResponse proto.InternalMessageInfo
+var xxx_messageInfo_MsgRedeemDataAccessNftResponse proto.InternalMessageInfo
 
-func (m *MsgRedeemDataAccessNFTResponse) GetReceipt() *DataAccessNFTRedeemReceipt {
+func (m *MsgRedeemDataAccessNftResponse) GetReceipt() *DataAccessNftRedeemReceipt {
 	if m != nil {
 		return m.Receipt
 	}
@@ -575,60 +575,60 @@ func init() {
 	proto.RegisterType((*MsgCreatePoolResponse)(nil), "panacea.datapool.v2.MsgCreatePoolResponse")
 	proto.RegisterType((*MsgSellData)(nil), "panacea.datapool.v2.MsgSellData")
 	proto.RegisterType((*MsgSellDataResponse)(nil), "panacea.datapool.v2.MsgSellDataResponse")
-	proto.RegisterType((*MsgBuyDataAccessNFT)(nil), "panacea.datapool.v2.MsgBuyDataAccessNFT")
-	proto.RegisterType((*MsgBuyDataAccessNFTResponse)(nil), "panacea.datapool.v2.MsgBuyDataAccessNFTResponse")
-	proto.RegisterType((*MsgRedeemDataAccessNFT)(nil), "panacea.datapool.v2.MsgRedeemDataAccessNFT")
-	proto.RegisterType((*MsgRedeemDataAccessNFTResponse)(nil), "panacea.datapool.v2.MsgRedeemDataAccessNFTResponse")
+	proto.RegisterType((*MsgBuyDataAccessNft)(nil), "panacea.datapool.v2.MsgBuyDataAccessNft")
+	proto.RegisterType((*MsgBuyDataAccessNftResponse)(nil), "panacea.datapool.v2.MsgBuyDataAccessNftResponse")
+	proto.RegisterType((*MsgRedeemDataAccessNft)(nil), "panacea.datapool.v2.MsgRedeemDataAccessNft")
+	proto.RegisterType((*MsgRedeemDataAccessNftResponse)(nil), "panacea.datapool.v2.MsgRedeemDataAccessNftResponse")
 }
 
 func init() { proto.RegisterFile("panacea/datapool/v2/tx.proto", fileDescriptor_eb3d400cb0e531d6) }
 
 var fileDescriptor_eb3d400cb0e531d6 = []byte{
-	// 691 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xa4, 0x55, 0x51, 0x4f, 0xd4, 0x40,
-	0x10, 0xe6, 0xe4, 0xb8, 0x83, 0x21, 0x04, 0xd2, 0x03, 0x3c, 0xab, 0xa9, 0xa4, 0x0f, 0x86, 0x68,
-	0x68, 0xe5, 0x88, 0xef, 0x0a, 0xc4, 0x84, 0x98, 0x23, 0xa4, 0x10, 0x1e, 0x8c, 0xc9, 0x65, 0x6f,
-	0x3b, 0x57, 0x36, 0xf4, 0xba, 0xcd, 0xee, 0xde, 0xc9, 0x99, 0xf8, 0x1b, 0xf4, 0x3f, 0xf8, 0x67,
-	0x7c, 0xe4, 0xd1, 0x47, 0x03, 0x7f, 0xc4, 0xec, 0xde, 0xb5, 0x80, 0xb4, 0x22, 0xfa, 0xd6, 0xe9,
-	0x7c, 0xdf, 0x7c, 0xf3, 0xcd, 0xce, 0xb6, 0xf0, 0x24, 0x25, 0x09, 0xa1, 0x48, 0xfc, 0x90, 0x28,
-	0x92, 0x72, 0x1e, 0xfb, 0xc3, 0x96, 0xaf, 0xce, 0xbc, 0x54, 0x70, 0xc5, 0xad, 0xc6, 0x24, 0xeb,
-	0x65, 0x59, 0x6f, 0xd8, 0xb2, 0x97, 0x23, 0x1e, 0x71, 0x93, 0xf7, 0xf5, 0xd3, 0x18, 0x6a, 0x3b,
-	0x94, 0xcb, 0x3e, 0x97, 0x7e, 0x97, 0x48, 0xf4, 0x87, 0x9b, 0x5d, 0x54, 0x64, 0xd3, 0xa7, 0x9c,
-	0x25, 0x59, 0x3e, 0xe2, 0x3c, 0x8a, 0xd1, 0x37, 0x51, 0x77, 0xd0, 0xf3, 0xc3, 0x81, 0x20, 0x8a,
-	0xf1, 0x3c, 0x5f, 0xd4, 0x88, 0x91, 0x34, 0x79, 0x97, 0x41, 0xb3, 0x2d, 0xa3, 0x00, 0x23, 0x26,
-	0x15, 0x8a, 0x5d, 0xa2, 0xc8, 0x31, 0x89, 0x59, 0x48, 0x14, 0x17, 0x56, 0x1b, 0x96, 0x86, 0x59,
-	0xd0, 0x09, 0x51, 0x11, 0x16, 0x37, 0x2b, 0x6b, 0x95, 0xf5, 0xf9, 0x96, 0xeb, 0x15, 0x38, 0xf0,
-	0x6e, 0xb0, 0x83, 0xc5, 0x9c, 0xbb, 0x6b, 0xa8, 0xae, 0x0b, 0x6b, 0x65, 0x52, 0x01, 0xca, 0x94,
-	0x27, 0x12, 0xdd, 0x53, 0x58, 0x68, 0xcb, 0x68, 0x47, 0x20, 0x51, 0x78, 0xc0, 0x79, 0x6c, 0x35,
-	0xa1, 0x4e, 0xb5, 0x23, 0x2e, 0x8c, 0xf4, 0x5c, 0x90, 0x85, 0xd6, 0x6b, 0x98, 0xd7, 0xc2, 0x9d,
-	0x94, 0x08, 0xd2, 0x97, 0xcd, 0x07, 0xa6, 0xb1, 0xa7, 0x85, 0x8d, 0xe9, 0x4a, 0x07, 0x06, 0x16,
-	0x40, 0x9a, 0x3f, 0xbb, 0x09, 0xac, 0xdc, 0x10, 0xcb, 0xba, 0xb0, 0x1e, 0x42, 0xdd, 0x94, 0x66,
-	0xa1, 0x11, 0xad, 0x06, 0x35, 0x1d, 0xee, 0x85, 0xd6, 0x32, 0xcc, 0x08, 0x3e, 0x48, 0x42, 0xa3,
-	0x56, 0x0d, 0xc6, 0x81, 0xf5, 0x0c, 0x16, 0xe9, 0x64, 0xea, 0x9d, 0xa4, 0xa7, 0x34, 0x6d, 0xda,
-	0xe4, 0x17, 0xb2, 0xd7, 0xfb, 0x3d, 0xb5, 0x17, 0xba, 0x0c, 0xe6, 0xdb, 0x32, 0x3a, 0xc4, 0x38,
-	0xd6, 0xe6, 0xad, 0x6d, 0xa8, 0x52, 0x14, 0x6a, 0x32, 0x52, 0xef, 0xae, 0x91, 0x32, 0x9e, 0xec,
-	0xa0, 0x50, 0xac, 0xc7, 0x28, 0x51, 0x18, 0x18, 0xae, 0xb5, 0x0a, 0x35, 0x89, 0x71, 0x8c, 0xc2,
-	0x74, 0x34, 0x17, 0x4c, 0x22, 0x17, 0xa1, 0x71, 0x4d, 0x2a, 0x37, 0xb6, 0x0f, 0xab, 0x84, 0xd2,
-	0x41, 0xbf, 0x63, 0xec, 0xc9, 0x13, 0x22, 0xb0, 0xa3, 0xf8, 0x29, 0x26, 0x93, 0x26, 0x1e, 0x79,
-	0xe3, 0x75, 0xf3, 0xf4, 0xba, 0x79, 0x93, 0x75, 0xf3, 0x76, 0x38, 0x4b, 0x82, 0x86, 0x21, 0xea,
-	0x31, 0x1d, 0x6a, 0xda, 0x91, 0x66, 0xb9, 0x5f, 0x2a, 0x46, 0x67, 0x7b, 0x30, 0xd2, 0x32, 0x6f,
-	0x28, 0x45, 0x29, 0xf7, 0xdf, 0x1e, 0xdd, 0x77, 0x80, 0x5b, 0x50, 0x4f, 0xc9, 0xa8, 0x8f, 0x89,
-	0x32, 0x83, 0xfb, 0x63, 0x1f, 0x19, 0x52, 0x97, 0xea, 0x0e, 0x46, 0x28, 0x9a, 0x55, 0xe3, 0x7c,
-	0x1c, 0xb8, 0x14, 0x1e, 0x17, 0x34, 0xf4, 0xaf, 0x27, 0xbb, 0x02, 0xb5, 0x1b, 0x07, 0x3a, 0x93,
-	0x98, 0x83, 0xfc, 0x04, 0xab, 0x66, 0x93, 0x43, 0xc4, 0xfe, 0x7f, 0x19, 0x2f, 0xae, 0x6f, 0xd9,
-	0x30, 0x2b, 0x4c, 0xf1, 0xdc, 0x5d, 0x1e, 0xbb, 0xa7, 0xe0, 0x14, 0x6b, 0xe7, 0x1e, 0xf7, 0xa0,
-	0x2e, 0x90, 0x22, 0x4b, 0xb3, 0xd5, 0xf2, 0x4b, 0x57, 0xeb, 0x1a, 0x59, 0xd7, 0x0b, 0xc6, 0xb4,
-	0x20, 0xe3, 0xb7, 0xbe, 0x55, 0x61, 0xba, 0x2d, 0x23, 0xeb, 0x33, 0xac, 0x14, 0x7f, 0x22, 0x36,
-	0x0a, 0x4b, 0x97, 0x5d, 0x73, 0xfb, 0xd5, 0xbd, 0xe0, 0xb9, 0xa3, 0x0f, 0x00, 0xd7, 0x3e, 0x09,
-	0x6e, 0x59, 0x91, 0x2b, 0x8c, 0xfd, 0xfc, 0x6e, 0x4c, 0x5e, 0xfd, 0x18, 0x66, 0xf3, 0x3b, 0xb9,
-	0x56, 0xc6, 0xcb, 0x10, 0xf6, 0xfa, 0x5d, 0x88, 0xbc, 0x6e, 0x02, 0x4b, 0xb7, 0x2e, 0x46, 0x29,
-	0xfb, 0x77, 0xa4, 0xfd, 0xf2, 0x6f, 0x91, 0xb9, 0xde, 0x47, 0x68, 0x14, 0xad, 0xe4, 0x8b, 0xf2,
-	0x99, 0xdf, 0x02, 0xdb, 0x5b, 0xf7, 0x00, 0x67, 0xc2, 0xdb, 0xef, 0xbe, 0x5f, 0x38, 0x95, 0xf3,
-	0x0b, 0xa7, 0xf2, 0xf3, 0xc2, 0xa9, 0x7c, 0xbd, 0x74, 0xa6, 0xce, 0x2f, 0x9d, 0xa9, 0x1f, 0x97,
-	0xce, 0xd4, 0xfb, 0xcd, 0x88, 0xa9, 0x93, 0x41, 0xd7, 0xa3, 0xbc, 0xef, 0xf7, 0x31, 0x64, 0xdd,
-	0x98, 0x53, 0x7f, 0xa2, 0xb0, 0x41, 0xb9, 0x40, 0xff, 0xec, 0xea, 0xc7, 0xa4, 0x46, 0x29, 0xca,
-	0x6e, 0xcd, 0xfc, 0x97, 0xb6, 0x7e, 0x05, 0x00, 0x00, 0xff, 0xff, 0x8d, 0x08, 0x9a, 0xaf, 0x42,
-	0x07, 0x00, 0x00,
+	// 692 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xa4, 0x55, 0xc1, 0x4e, 0xdb, 0x4c,
+	0x10, 0x26, 0x3f, 0x21, 0x81, 0x41, 0x08, 0xe4, 0x00, 0x7f, 0x7e, 0xff, 0x95, 0x8b, 0x7c, 0xa8,
+	0x50, 0x2b, 0xec, 0x12, 0xd4, 0x7b, 0x0b, 0x5c, 0x50, 0x15, 0x84, 0x4c, 0xc5, 0xa1, 0xaa, 0x14,
+	0x6d, 0xd6, 0x13, 0xb3, 0xc2, 0xf1, 0x5a, 0xbb, 0x9b, 0x94, 0x54, 0xea, 0x33, 0xb4, 0xef, 0xd0,
+	0x97, 0xe9, 0x91, 0x63, 0x8f, 0x15, 0xbc, 0x48, 0xb5, 0x1b, 0xdb, 0x40, 0xb1, 0x4b, 0x69, 0x6f,
+	0x1e, 0xcf, 0xf7, 0xcd, 0x37, 0xdf, 0xec, 0xac, 0x0d, 0x8f, 0x52, 0x92, 0x10, 0x8a, 0xc4, 0x0f,
+	0x89, 0x22, 0x29, 0xe7, 0xb1, 0x3f, 0xee, 0xf8, 0xea, 0xdc, 0x4b, 0x05, 0x57, 0xdc, 0x6a, 0x65,
+	0x59, 0x2f, 0xcf, 0x7a, 0xe3, 0x8e, 0xbd, 0x1a, 0xf1, 0x88, 0x9b, 0xbc, 0xaf, 0x9f, 0xa6, 0x50,
+	0xdb, 0xa1, 0x5c, 0x0e, 0xb9, 0xf4, 0xfb, 0x44, 0xa2, 0x3f, 0xde, 0xee, 0xa3, 0x22, 0xdb, 0x3e,
+	0xe5, 0x2c, 0xc9, 0xf3, 0x11, 0xe7, 0x51, 0x8c, 0xbe, 0x89, 0xfa, 0xa3, 0x81, 0x1f, 0x8e, 0x04,
+	0x51, 0x8c, 0x17, 0xf9, 0xb2, 0x46, 0x8c, 0xa4, 0xc9, 0xbb, 0x0c, 0xda, 0x5d, 0x19, 0x05, 0x18,
+	0x31, 0xa9, 0x50, 0xec, 0x13, 0x45, 0x4e, 0x48, 0xcc, 0x42, 0xa2, 0xb8, 0xb0, 0xba, 0xb0, 0x32,
+	0xce, 0x83, 0x5e, 0x88, 0x8a, 0xb0, 0xb8, 0x5d, 0xdb, 0xa8, 0x6d, 0x2e, 0x76, 0x5c, 0xaf, 0xc4,
+	0x81, 0x77, 0x8b, 0x1d, 0x2c, 0x17, 0xdc, 0x7d, 0x43, 0x75, 0x5d, 0xd8, 0xa8, 0x92, 0x0a, 0x50,
+	0xa6, 0x3c, 0x91, 0xe8, 0x9e, 0xc1, 0x52, 0x57, 0x46, 0x7b, 0x02, 0x89, 0xc2, 0x23, 0xce, 0x63,
+	0xab, 0x0d, 0x4d, 0xaa, 0x1d, 0x71, 0x61, 0xa4, 0x17, 0x82, 0x3c, 0xb4, 0x5e, 0xc2, 0xa2, 0x16,
+	0xee, 0xa5, 0x44, 0x90, 0xa1, 0x6c, 0xff, 0x63, 0x1a, 0x7b, 0x5c, 0xda, 0x98, 0xae, 0x74, 0x64,
+	0x60, 0x01, 0xa4, 0xc5, 0xb3, 0x9b, 0xc0, 0xda, 0x2d, 0xb1, 0xbc, 0x0b, 0xeb, 0x5f, 0x68, 0x9a,
+	0xd2, 0x2c, 0x34, 0xa2, 0xf5, 0xa0, 0xa1, 0xc3, 0x83, 0xd0, 0x5a, 0x85, 0x39, 0xc1, 0x47, 0x49,
+	0x68, 0xd4, 0xea, 0xc1, 0x34, 0xb0, 0x9e, 0xc0, 0x32, 0xcd, 0xa6, 0xde, 0x4b, 0x06, 0x4a, 0xd3,
+	0x66, 0x4d, 0x7e, 0x29, 0x7f, 0x7d, 0x38, 0x50, 0x07, 0xa1, 0xcb, 0x60, 0xb1, 0x2b, 0xa3, 0x63,
+	0x8c, 0x63, 0x6d, 0xde, 0xda, 0x85, 0x3a, 0x45, 0xa1, 0xb2, 0x91, 0x7a, 0xf7, 0x8d, 0x94, 0xf1,
+	0x64, 0x0f, 0x85, 0x62, 0x03, 0x46, 0x89, 0xc2, 0xc0, 0x70, 0xad, 0x75, 0x68, 0x48, 0x8c, 0x63,
+	0x14, 0xa6, 0xa3, 0x85, 0x20, 0x8b, 0x5c, 0x84, 0xd6, 0x0d, 0xa9, 0xc2, 0xd8, 0x21, 0xac, 0x13,
+	0x4a, 0x47, 0xc3, 0x9e, 0xb1, 0x27, 0x4f, 0x89, 0xc0, 0x9e, 0xe2, 0x67, 0x98, 0x64, 0x4d, 0xfc,
+	0xe7, 0x4d, 0xd7, 0xcd, 0xd3, 0xeb, 0xe6, 0x65, 0xeb, 0xe6, 0xed, 0x71, 0x96, 0x04, 0x2d, 0x43,
+	0xd4, 0x63, 0x3a, 0xd6, 0xb4, 0x37, 0x9a, 0xe5, 0x7e, 0xaa, 0x19, 0x9d, 0xdd, 0xd1, 0x44, 0xcb,
+	0xbc, 0xa2, 0x14, 0xa5, 0x3c, 0x1c, 0xa8, 0x87, 0x0e, 0x70, 0x07, 0x9a, 0x29, 0x99, 0x0c, 0x31,
+	0x51, 0x66, 0x70, 0xbf, 0xec, 0x23, 0x47, 0xea, 0x52, 0xfd, 0xd1, 0x04, 0x45, 0xbb, 0x6e, 0x9c,
+	0x4f, 0x03, 0x97, 0xc2, 0xff, 0x25, 0x0d, 0xfd, 0xe9, 0xc9, 0xae, 0x41, 0xe3, 0xd6, 0x81, 0xce,
+	0x25, 0xe6, 0x20, 0x3f, 0xc0, 0xba, 0xd9, 0xe4, 0x10, 0x71, 0xf8, 0x57, 0xc6, 0xcb, 0xeb, 0x5b,
+	0x36, 0xcc, 0x0b, 0x53, 0xbc, 0x70, 0x57, 0xc4, 0xee, 0x19, 0x38, 0xe5, 0xda, 0x85, 0xc7, 0x03,
+	0x68, 0x0a, 0xa4, 0xc8, 0xd2, 0x7c, 0xb5, 0xfc, 0xca, 0xd5, 0xba, 0x41, 0xd6, 0xf5, 0x82, 0x29,
+	0x2d, 0xc8, 0xf9, 0x9d, 0x2f, 0x75, 0x98, 0xed, 0xca, 0xc8, 0xfa, 0x08, 0x6b, 0xe5, 0x9f, 0x88,
+	0xad, 0xd2, 0xd2, 0x55, 0xd7, 0xdc, 0x7e, 0xf1, 0x20, 0x78, 0xe1, 0xe8, 0x1d, 0xc0, 0x8d, 0x4f,
+	0x82, 0x5b, 0x55, 0xe4, 0x1a, 0x63, 0x3f, 0xbd, 0x1f, 0x53, 0x54, 0x3f, 0x81, 0xf9, 0xe2, 0x4e,
+	0x6e, 0x54, 0xf1, 0x72, 0x84, 0xbd, 0x79, 0x1f, 0xa2, 0xa8, 0x9b, 0xc0, 0xca, 0x9d, 0x8b, 0x51,
+	0xc9, 0xfe, 0x19, 0x69, 0x3f, 0xff, 0x5d, 0x64, 0xa1, 0xf7, 0x1e, 0x5a, 0x65, 0x2b, 0xf9, 0xac,
+	0x7a, 0xe6, 0x77, 0xc0, 0xf6, 0xce, 0x03, 0xc0, 0xb9, 0xf0, 0xee, 0xeb, 0xaf, 0x97, 0x4e, 0xed,
+	0xe2, 0xd2, 0xa9, 0x7d, 0xbf, 0x74, 0x6a, 0x9f, 0xaf, 0x9c, 0x99, 0x8b, 0x2b, 0x67, 0xe6, 0xdb,
+	0x95, 0x33, 0xf3, 0x76, 0x3b, 0x62, 0xea, 0x74, 0xd4, 0xf7, 0x28, 0x1f, 0xfa, 0x43, 0x0c, 0x59,
+	0x3f, 0xe6, 0xd4, 0xcf, 0x14, 0xb6, 0x28, 0x17, 0xe8, 0x9f, 0x5f, 0xff, 0x98, 0xd4, 0x24, 0x45,
+	0xd9, 0x6f, 0x98, 0xff, 0xd2, 0xce, 0x8f, 0x00, 0x00, 0x00, 0xff, 0xff, 0xdd, 0x57, 0xcb, 0x8c,
+	0x42, 0x07, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -649,10 +649,10 @@ type MsgClient interface {
 	CreatePool(ctx context.Context, in *MsgCreatePool, opts ...grpc.CallOption) (*MsgCreatePoolResponse, error)
 	// SellData defines a method for selling data
 	SellData(ctx context.Context, in *MsgSellData, opts ...grpc.CallOption) (*MsgSellDataResponse, error)
-	// BuyDataAccessNFT defines a method for buying data access NFT
-	BuyDataAccessNFT(ctx context.Context, in *MsgBuyDataAccessNFT, opts ...grpc.CallOption) (*MsgBuyDataAccessNFTResponse, error)
-	// RedeemDataAccessNFT defines a method for redeeming data access NFT to get data
-	RedeemDataAccessNFT(ctx context.Context, in *MsgRedeemDataAccessNFT, opts ...grpc.CallOption) (*MsgRedeemDataAccessNFTResponse, error)
+	// BuyDataAccessNft defines a method for buying data access NFT
+	BuyDataAccessNft(ctx context.Context, in *MsgBuyDataAccessNft, opts ...grpc.CallOption) (*MsgBuyDataAccessNftResponse, error)
+	// RedeemDataAccessNft defines a method for redeeming data access NFT to get data
+	RedeemDataAccessNft(ctx context.Context, in *MsgRedeemDataAccessNft, opts ...grpc.CallOption) (*MsgRedeemDataAccessNftResponse, error)
 }
 
 type msgClient struct {
@@ -690,18 +690,18 @@ func (c *msgClient) SellData(ctx context.Context, in *MsgSellData, opts ...grpc.
 	return out, nil
 }
 
-func (c *msgClient) BuyDataAccessNFT(ctx context.Context, in *MsgBuyDataAccessNFT, opts ...grpc.CallOption) (*MsgBuyDataAccessNFTResponse, error) {
-	out := new(MsgBuyDataAccessNFTResponse)
-	err := c.cc.Invoke(ctx, "/panacea.datapool.v2.Msg/BuyDataAccessNFT", in, out, opts...)
+func (c *msgClient) BuyDataAccessNft(ctx context.Context, in *MsgBuyDataAccessNft, opts ...grpc.CallOption) (*MsgBuyDataAccessNftResponse, error) {
+	out := new(MsgBuyDataAccessNftResponse)
+	err := c.cc.Invoke(ctx, "/panacea.datapool.v2.Msg/BuyDataAccessNft", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *msgClient) RedeemDataAccessNFT(ctx context.Context, in *MsgRedeemDataAccessNFT, opts ...grpc.CallOption) (*MsgRedeemDataAccessNFTResponse, error) {
-	out := new(MsgRedeemDataAccessNFTResponse)
-	err := c.cc.Invoke(ctx, "/panacea.datapool.v2.Msg/RedeemDataAccessNFT", in, out, opts...)
+func (c *msgClient) RedeemDataAccessNft(ctx context.Context, in *MsgRedeemDataAccessNft, opts ...grpc.CallOption) (*MsgRedeemDataAccessNftResponse, error) {
+	out := new(MsgRedeemDataAccessNftResponse)
+	err := c.cc.Invoke(ctx, "/panacea.datapool.v2.Msg/RedeemDataAccessNft", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -716,10 +716,10 @@ type MsgServer interface {
 	CreatePool(context.Context, *MsgCreatePool) (*MsgCreatePoolResponse, error)
 	// SellData defines a method for selling data
 	SellData(context.Context, *MsgSellData) (*MsgSellDataResponse, error)
-	// BuyDataAccessNFT defines a method for buying data access NFT
-	BuyDataAccessNFT(context.Context, *MsgBuyDataAccessNFT) (*MsgBuyDataAccessNFTResponse, error)
-	// RedeemDataAccessNFT defines a method for redeeming data access NFT to get data
-	RedeemDataAccessNFT(context.Context, *MsgRedeemDataAccessNFT) (*MsgRedeemDataAccessNFTResponse, error)
+	// BuyDataAccessNft defines a method for buying data access NFT
+	BuyDataAccessNft(context.Context, *MsgBuyDataAccessNft) (*MsgBuyDataAccessNftResponse, error)
+	// RedeemDataAccessNft defines a method for redeeming data access NFT to get data
+	RedeemDataAccessNft(context.Context, *MsgRedeemDataAccessNft) (*MsgRedeemDataAccessNftResponse, error)
 }
 
 // UnimplementedMsgServer can be embedded to have forward compatible implementations.
@@ -735,11 +735,11 @@ func (*UnimplementedMsgServer) CreatePool(ctx context.Context, req *MsgCreatePoo
 func (*UnimplementedMsgServer) SellData(ctx context.Context, req *MsgSellData) (*MsgSellDataResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SellData not implemented")
 }
-func (*UnimplementedMsgServer) BuyDataAccessNFT(ctx context.Context, req *MsgBuyDataAccessNFT) (*MsgBuyDataAccessNFTResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method BuyDataAccessNFT not implemented")
+func (*UnimplementedMsgServer) BuyDataAccessNft(ctx context.Context, req *MsgBuyDataAccessNft) (*MsgBuyDataAccessNftResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method BuyDataAccessNft not implemented")
 }
-func (*UnimplementedMsgServer) RedeemDataAccessNFT(ctx context.Context, req *MsgRedeemDataAccessNFT) (*MsgRedeemDataAccessNFTResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method RedeemDataAccessNFT not implemented")
+func (*UnimplementedMsgServer) RedeemDataAccessNft(ctx context.Context, req *MsgRedeemDataAccessNft) (*MsgRedeemDataAccessNftResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RedeemDataAccessNft not implemented")
 }
 
 func RegisterMsgServer(s grpc1.Server, srv MsgServer) {
@@ -800,38 +800,38 @@ func _Msg_SellData_Handler(srv interface{}, ctx context.Context, dec func(interf
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Msg_BuyDataAccessNFT_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(MsgBuyDataAccessNFT)
+func _Msg_BuyDataAccessNft_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgBuyDataAccessNft)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MsgServer).BuyDataAccessNFT(ctx, in)
+		return srv.(MsgServer).BuyDataAccessNft(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/panacea.datapool.v2.Msg/BuyDataAccessNFT",
+		FullMethod: "/panacea.datapool.v2.Msg/BuyDataAccessNft",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MsgServer).BuyDataAccessNFT(ctx, req.(*MsgBuyDataAccessNFT))
+		return srv.(MsgServer).BuyDataAccessNft(ctx, req.(*MsgBuyDataAccessNft))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Msg_RedeemDataAccessNFT_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(MsgRedeemDataAccessNFT)
+func _Msg_RedeemDataAccessNft_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgRedeemDataAccessNft)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MsgServer).RedeemDataAccessNFT(ctx, in)
+		return srv.(MsgServer).RedeemDataAccessNft(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/panacea.datapool.v2.Msg/RedeemDataAccessNFT",
+		FullMethod: "/panacea.datapool.v2.Msg/RedeemDataAccessNft",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MsgServer).RedeemDataAccessNFT(ctx, req.(*MsgRedeemDataAccessNFT))
+		return srv.(MsgServer).RedeemDataAccessNft(ctx, req.(*MsgRedeemDataAccessNft))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -853,12 +853,12 @@ var _Msg_serviceDesc = grpc.ServiceDesc{
 			Handler:    _Msg_SellData_Handler,
 		},
 		{
-			MethodName: "BuyDataAccessNFT",
-			Handler:    _Msg_BuyDataAccessNFT_Handler,
+			MethodName: "BuyDataAccessNft",
+			Handler:    _Msg_BuyDataAccessNft_Handler,
 		},
 		{
-			MethodName: "RedeemDataAccessNFT",
-			Handler:    _Msg_RedeemDataAccessNFT_Handler,
+			MethodName: "RedeemDataAccessNft",
+			Handler:    _Msg_RedeemDataAccessNft_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
@@ -1080,7 +1080,7 @@ func (m *MsgSellDataResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *MsgBuyDataAccessNFT) Marshal() (dAtA []byte, err error) {
+func (m *MsgBuyDataAccessNft) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -1090,12 +1090,12 @@ func (m *MsgBuyDataAccessNFT) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *MsgBuyDataAccessNFT) MarshalTo(dAtA []byte) (int, error) {
+func (m *MsgBuyDataAccessNft) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *MsgBuyDataAccessNFT) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MsgBuyDataAccessNft) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -1132,7 +1132,7 @@ func (m *MsgBuyDataAccessNFT) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *MsgBuyDataAccessNFTResponse) Marshal() (dAtA []byte, err error) {
+func (m *MsgBuyDataAccessNftResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -1142,12 +1142,12 @@ func (m *MsgBuyDataAccessNFTResponse) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *MsgBuyDataAccessNFTResponse) MarshalTo(dAtA []byte) (int, error) {
+func (m *MsgBuyDataAccessNftResponse) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *MsgBuyDataAccessNFTResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MsgBuyDataAccessNftResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -1170,7 +1170,7 @@ func (m *MsgBuyDataAccessNFTResponse) MarshalToSizedBuffer(dAtA []byte) (int, er
 	return len(dAtA) - i, nil
 }
 
-func (m *MsgRedeemDataAccessNFT) Marshal() (dAtA []byte, err error) {
+func (m *MsgRedeemDataAccessNft) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -1180,12 +1180,12 @@ func (m *MsgRedeemDataAccessNFT) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *MsgRedeemDataAccessNFT) MarshalTo(dAtA []byte) (int, error) {
+func (m *MsgRedeemDataAccessNft) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *MsgRedeemDataAccessNFT) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MsgRedeemDataAccessNft) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -1215,7 +1215,7 @@ func (m *MsgRedeemDataAccessNFT) MarshalToSizedBuffer(dAtA []byte) (int, error) 
 	return len(dAtA) - i, nil
 }
 
-func (m *MsgRedeemDataAccessNFTResponse) Marshal() (dAtA []byte, err error) {
+func (m *MsgRedeemDataAccessNftResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -1225,12 +1225,12 @@ func (m *MsgRedeemDataAccessNFTResponse) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *MsgRedeemDataAccessNFTResponse) MarshalTo(dAtA []byte) (int, error) {
+func (m *MsgRedeemDataAccessNftResponse) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *MsgRedeemDataAccessNFTResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MsgRedeemDataAccessNftResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -1348,7 +1348,7 @@ func (m *MsgSellDataResponse) Size() (n int) {
 	return n
 }
 
-func (m *MsgBuyDataAccessNFT) Size() (n int) {
+func (m *MsgBuyDataAccessNft) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -1371,7 +1371,7 @@ func (m *MsgBuyDataAccessNFT) Size() (n int) {
 	return n
 }
 
-func (m *MsgBuyDataAccessNFTResponse) Size() (n int) {
+func (m *MsgBuyDataAccessNftResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -1389,7 +1389,7 @@ func (m *MsgBuyDataAccessNFTResponse) Size() (n int) {
 	return n
 }
 
-func (m *MsgRedeemDataAccessNFT) Size() (n int) {
+func (m *MsgRedeemDataAccessNft) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -1411,7 +1411,7 @@ func (m *MsgRedeemDataAccessNFT) Size() (n int) {
 	return n
 }
 
-func (m *MsgRedeemDataAccessNFTResponse) Size() (n int) {
+func (m *MsgRedeemDataAccessNftResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -1995,7 +1995,7 @@ func (m *MsgSellDataResponse) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *MsgBuyDataAccessNFT) Unmarshal(dAtA []byte) error {
+func (m *MsgBuyDataAccessNft) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -2018,10 +2018,10 @@ func (m *MsgBuyDataAccessNFT) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: MsgBuyDataAccessNFT: wiretype end group for non-group")
+			return fmt.Errorf("proto: MsgBuyDataAccessNft: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgBuyDataAccessNFT: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MsgBuyDataAccessNft: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -2151,7 +2151,7 @@ func (m *MsgBuyDataAccessNFT) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *MsgBuyDataAccessNFTResponse) Unmarshal(dAtA []byte) error {
+func (m *MsgBuyDataAccessNftResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -2174,10 +2174,10 @@ func (m *MsgBuyDataAccessNFTResponse) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: MsgBuyDataAccessNFTResponse: wiretype end group for non-group")
+			return fmt.Errorf("proto: MsgBuyDataAccessNftResponse: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgBuyDataAccessNFTResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MsgBuyDataAccessNftResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -2258,7 +2258,7 @@ func (m *MsgBuyDataAccessNFTResponse) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *MsgRedeemDataAccessNFT) Unmarshal(dAtA []byte) error {
+func (m *MsgRedeemDataAccessNft) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -2281,10 +2281,10 @@ func (m *MsgRedeemDataAccessNFT) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: MsgRedeemDataAccessNFT: wiretype end group for non-group")
+			return fmt.Errorf("proto: MsgRedeemDataAccessNft: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgRedeemDataAccessNFT: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MsgRedeemDataAccessNft: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -2397,7 +2397,7 @@ func (m *MsgRedeemDataAccessNFT) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *MsgRedeemDataAccessNFTResponse) Unmarshal(dAtA []byte) error {
+func (m *MsgRedeemDataAccessNftResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -2420,10 +2420,10 @@ func (m *MsgRedeemDataAccessNFTResponse) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: MsgRedeemDataAccessNFTResponse: wiretype end group for non-group")
+			return fmt.Errorf("proto: MsgRedeemDataAccessNftResponse: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgRedeemDataAccessNFTResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MsgRedeemDataAccessNftResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -2456,7 +2456,7 @@ func (m *MsgRedeemDataAccessNFTResponse) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.Receipt == nil {
-				m.Receipt = &DataAccessNFTRedeemReceipt{}
+				m.Receipt = &DataAccessNftRedeemReceipt{}
 			}
 			if err := m.Receipt.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err

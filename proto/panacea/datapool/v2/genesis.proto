@@ -8,4 +8,5 @@ import "google/protobuf/any.proto";
 // GenesisState defines the datapool module's genesis state.
 message GenesisState {
   uint64 next_pool_number = 1;
+  // TODO: add genesis state of pools
 }

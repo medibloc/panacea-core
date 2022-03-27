@@ -21,11 +21,11 @@ service Msg {
   // SellData defines a method for selling data
   rpc SellData(MsgSellData) returns (MsgSellDataResponse);
 
-  // BuyDataAccessNFT defines a method for buying data access NFT
-  rpc BuyDataAccessNFT(MsgBuyDataAccessNFT) returns (MsgBuyDataAccessNFTResponse);
+  // BuyDataAccessNft defines a method for buying data access NFT
+  rpc BuyDataAccessNft(MsgBuyDataAccessNft) returns (MsgBuyDataAccessNftResponse);
 
-  // RedeemDataAccessNFT defines a method for redeeming data access NFT to get data
-  rpc RedeemDataAccessNFT(MsgRedeemDataAccessNFT) returns (MsgRedeemDataAccessNFTResponse);
+  // RedeemDataAccessNft defines a method for redeeming data access NFT to get data
+  rpc RedeemDataAccessNft(MsgRedeemDataAccessNft) returns (MsgRedeemDataAccessNftResponse);
 }
 
 // MsgRegisterDataValidator defines the Msg/RegisterDataValidator request type.
@@ -61,30 +61,30 @@ message MsgSellDataResponse {
   cosmos.base.v1beta1.Coin accum_pool_share_token = 1;  // denom: DP-{pood-id}
 }
 
-// MsgBuyDataAccessNFT defines the Msg/BuyDataAccessNFT request type.
-message MsgBuyDataAccessNFT {
+// MsgBuyDataAccessNft defines the Msg/BuyDataAccessNft request type.
+message MsgBuyDataAccessNft {
   uint64                   pool_id = 1;
   uint64                   round = 2;
   cosmos.base.v1beta1.Coin payment = 3;
   string                   buyer = 4;   // 'panacea1' address of buyer
 }
 
-// MsgBuyDataAccessNFTResponse defines the Msg/BuyDataAccessNFT response type.
-message MsgBuyDataAccessNFTResponse {
+// MsgBuyDataAccessNftResponse defines the Msg/BuyDataAccessNft response type.
+message MsgBuyDataAccessNftResponse {
   uint64 pool_id = 1;
   uint64 round = 2;
   uint64 nft_id = 3;
 }
 
-// MsgRedeemDataAccessNFT defines the Msg/RedeemDataAccessNFT request type.
-message MsgRedeemDataAccessNFT {
+// MsgRedeemDataAccessNft defines the Msg/RedeemDataAccessNft request type.
+message MsgRedeemDataAccessNft {
   uint64 pool_id = 1;
   uint64 round = 2;
   uint64 nft_id = 3;
   string redeemer = 4;  // 'panacea1' address
 }
 
-// MsgRedeemDataAccessNFTResponse defines the Msg/RedeemDataAccessNFT response type.
-message MsgRedeemDataAccessNFTResponse {
-  DataAccessNFTRedeemReceipt receipt = 1;
+// MsgRedeemDataAccessNftResponse defines the Msg/RedeemDataAccessNFT response type.
+message MsgRedeemDataAccessNftResponse {
+  DataAccessNftRedeemReceipt receipt = 1;
 }

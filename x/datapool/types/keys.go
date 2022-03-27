@@ -36,6 +36,6 @@ func GetKeyPrefixDataValidator(dataValidatorAddr sdk.AccAddress) []byte {
 	return append(KeyPrefixDataValidators, dataValidatorAddr.Bytes()...)
 }
 
-func GetKeyPrefixPools(poolId uint64) []byte {
-	return append(KeyPrefixPools, sdk.Uint64ToBigEndian(poolId)...)
+func GetKeyPrefixPools(poolID uint64) []byte {
+	return append(KeyPrefixPools, sdk.Uint64ToBigEndian(poolID)...)
 }

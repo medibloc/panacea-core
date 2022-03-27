@@ -77,10 +77,10 @@ func (k Keeper) IsRegisteredDataValidator(ctx sdk.Context, dataValidatorAddress 
 
 func (k Keeper) CreatePool(ctx sdk.Context, curator sdk.AccAddress, poolParams types.PoolParams) (uint64, error) {
 	// Get the next pool id
-	poolId := k.GetNextPoolNumberAndIncrement(ctx)
+	poolID := k.GetNextPoolNumberAndIncrement(ctx)
 
 	// new pool
-	newPool := types.NewPool(poolId, curator, poolParams)
+	newPool := types.NewPool(poolID, curator, poolParams)
 
 	// pool address for deposit
 	poolAddress, err := types.AccPoolAddressFromBech32(newPool.GetPoolAddress())
@@ -91,7 +91,7 @@ func (k Keeper) CreatePool(ctx sdk.Context, curator sdk.AccAddress, poolParams t
 	// check if account with pool address exists or not
 	acc := k.accountKeeper.GetAccount(ctx, poolAddress)
 	if acc != nil {
-		return 0, sdkerrors.Wrapf(types.ErrPoolAlreadyExist, "pool %d already exist", poolId)
+		return 0, sdkerrors.Wrapf(types.ErrPoolAlreadyExist, "pool %d already exist", poolID)
 	}
 
 	// set new account for pool
@@ -110,9 +110,8 @@ func (k Keeper) CreatePool(ctx sdk.Context, curator sdk.AccAddress, poolParams t
 	}
 
 	// curator send deposit to pool for creation of pool
-	var deposit sdk.Coins
-	deposit = append(deposit, *newPool.PoolParams.Deposit)
 
+	deposit := sdk.NewCoins(*newPool.PoolParams.Deposit)
 	err = k.bankKeeper.SendCoins(ctx, curator, poolAddress, deposit)
 	if err != nil {
 		return 0, sdkerrors.Wrapf(types.ErrNotEnoughPoolDeposit, "The curator's balance is not enough to make a data pool")

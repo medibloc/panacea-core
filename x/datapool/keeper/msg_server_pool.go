@@ -45,10 +45,10 @@ func (m msgServer) SellData(goCtx context.Context, msg *types.MsgSellData) (*typ
 	return &types.MsgSellDataResponse{}, nil
 }
 
-func (m msgServer) BuyDataAccessNFT(goCtx context.Context, msg *types.MsgBuyDataAccessNFT) (*types.MsgBuyDataAccessNFTResponse, error) {
-	return &types.MsgBuyDataAccessNFTResponse{}, nil
+func (m msgServer) BuyDataAccessNft(goCtx context.Context, msg *types.MsgBuyDataAccessNft) (*types.MsgBuyDataAccessNftResponse, error) {
+	return &types.MsgBuyDataAccessNftResponse{}, nil
 }
 
-func (m msgServer) RedeemDataAccessNFT(goCtx context.Context, msg *types.MsgRedeemDataAccessNFT) (*types.MsgRedeemDataAccessNFTResponse, error) {
-	return &types.MsgRedeemDataAccessNFTResponse{}, nil
+func (m msgServer) RedeemDataAccessNft(goCtx context.Context, msg *types.MsgRedeemDataAccessNft) (*types.MsgRedeemDataAccessNftResponse, error) {
+	return &types.MsgRedeemDataAccessNftResponse{}, nil
 }

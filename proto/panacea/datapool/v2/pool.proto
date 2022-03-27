@@ -14,7 +14,7 @@ message Pool {
   uint64     round = 3;
   PoolParams pool_params = 4;
   uint64     cur_num_data = 5;    // current number of data
-  uint64     num_issued_nft = 6;  // current issued NFT
+  uint64     num_issued_nfts = 6;  // current issued NFTs
   string     status = 7;
   string     curator = 8;
 }
@@ -34,8 +34,8 @@ message UnsignedDataValidationCertificate {
   string requester = 5;         // 'panacea1' address of seller
 }
 
-// DataAccessNFTRedeemReceipt defines a receipt for redeeming data access NFT to get data.
-message DataAccessNFTRedeemReceipt {
+// DataAccessNftRedeemReceipt defines a receipt for redeeming data access NFT to get data.
+message DataAccessNftRedeemReceipt {
   uint64 pool_id = 1;
   uint64 round = 2;
   uint64 nft_id = 3;

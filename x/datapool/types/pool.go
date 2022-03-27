@@ -14,23 +14,23 @@ const (
 	ACTIVE  = "ACTIVE"
 )
 
-func NewPool(poolId uint64, curator sdk.AccAddress, poolParams PoolParams) *Pool {
-	poolAddress := NewPoolAddress(poolId)
+func NewPool(poolID uint64, curator sdk.AccAddress, poolParams PoolParams) *Pool {
+	poolAddress := newPoolAddress(poolID)
 
 	return &Pool{
-		PoolId:       poolId,
-		PoolAddress:  poolAddress.String(),
-		Round:        1,
-		PoolParams:   &poolParams,
-		CurNumData:   0,
-		NumIssuedNft: 0,
-		Curator:      curator.String(),
-		Status:       PENDING,
+		PoolId:        poolID,
+		PoolAddress:   poolAddress.String(),
+		Round:         1,
+		PoolParams:    &poolParams,
+		CurNumData:    0,
+		NumIssuedNfts: 0,
+		Curator:       curator.String(),
+		Status:        PENDING,
 	}
 }
 
-func NewPoolAddress(poolId uint64) sdk.AccAddress {
-	key := append([]byte("pool"), sdk.Uint64ToBigEndian(poolId)...)
+func newPoolAddress(poolID uint64) sdk.AccAddress {
+	key := append([]byte("pool"), sdk.Uint64ToBigEndian(poolID)...)
 	return address.Module(ModuleName, key)
 }
 
@@ -46,7 +46,7 @@ func AccPoolAddressFromBech32(address string) (sdk.AccAddress, error) {
 		return nil, err
 	}
 
-	err = VerifyPoolAddressFormat(bz)
+	err = verifyPoolAddressFormat(bz)
 	if err != nil {
 		return nil, err
 	}
@@ -54,7 +54,7 @@ func AccPoolAddressFromBech32(address string) (sdk.AccAddress, error) {
 	return sdk.AccAddress(bz), nil
 }
 
-func VerifyPoolAddressFormat(bz []byte) error {
+func verifyPoolAddressFormat(bz []byte) error {
 	verifier := sdk.GetConfig().GetAddressVerifier()
 	if verifier != nil {
 		return verifier(bz)
