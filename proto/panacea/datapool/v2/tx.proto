@@ -84,7 +84,7 @@ message MsgRedeemDataAccessNft {
   string redeemer = 4;  // 'panacea1' address
 }
 
-// MsgRedeemDataAccessNftResponse defines the Msg/RedeemDataAccessNFT response type.
+// MsgRedeemDataAccessNftResponse defines the Msg/RedeemDataAccessNft response type.
 message MsgRedeemDataAccessNftResponse {
   DataAccessNftRedeemReceipt receipt = 1;
 }
