@@ -249,10 +249,10 @@ func (msg *MsgRegisterNFTContract) Type() string {
 }
 
 func (msg *MsgRegisterNFTContract) ValidateBasic() error {
-	_, err := sdk.AccAddressFromBech32(msg.Sender)
-	if err != nil {
+	if _, err := sdk.AccAddressFromBech32(msg.Sender); err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid redeemer address (%s)", err)
 	}
+
 	return nil
 }
 
@@ -287,8 +287,7 @@ func (msg *MsgUpgradeNFTContract) Type() string {
 }
 
 func (msg *MsgUpgradeNFTContract) ValidateBasic() error {
-	_, err := sdk.AccAddressFromBech32(msg.Sender)
-	if err != nil {
+	if _, err := sdk.AccAddressFromBech32(msg.Sender); err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid redeemer address (%s)", err)
 	}
 
