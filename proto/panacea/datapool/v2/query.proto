@@ -15,7 +15,7 @@ service Query {
 
   // Contract returns a contract address registered to x/datapool module
   rpc Contract(QueryContractRequest) returns (QueryContractResponse) {
-    option (google.api.http).get = "/panacea/datapool/v2/contract_address";
+    option (google.api.http).get = "/panacea/datapool/v2/contract";
   }
 }
 

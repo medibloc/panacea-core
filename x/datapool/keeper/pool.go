@@ -203,7 +203,7 @@ func (k Keeper) GetContractAddress(ctx sdk.Context) (sdk.AccAddress, error) {
 }
 
 func (k Keeper) CreateContract(ctx sdk.Context, creator sdk.AccAddress, wasmCode []byte) (uint64, error) {
-	// contract access configuration
+	// access configuration of only for creator address
 	accessConfig := &wasmtypes.AccessConfig{
 		Permission: wasmtypes.AccessTypeOnlyAddress,
 		Address:    creator.String(),
@@ -218,7 +218,7 @@ func (k Keeper) CreateContract(ctx sdk.Context, creator sdk.AccAddress, wasmCode
 	return codeID, nil
 }
 
-// DeployAndRegisterContract creates, instantiate
+// DeployAndRegisterContract creates, instantiate contract and store contract address
 func (k Keeper) DeployAndRegisterContract(ctx sdk.Context, wasmCode []byte) error {
 	moduleAddr := types.GetModuleAddress()
 
@@ -242,6 +242,7 @@ func (k Keeper) DeployAndRegisterContract(ctx sdk.Context, wasmCode []byte) erro
 	return nil
 }
 
+// MigrateContract creates new contract and migrate
 func (k Keeper) MigrateContract(ctx sdk.Context, newWasmCode []byte) error {
 	moduleAddr := types.GetModuleAddress()
 

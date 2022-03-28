@@ -28,14 +28,9 @@ func CmdRegisterNFTContract() *cobra.Command {
 				return fmt.Errorf("failed to read file")
 			}
 
-			if wasmUtils.IsWasm(wasm) {
-				wasm, err = wasmUtils.GzipIt(wasm)
-
-				if err != nil {
-					return err
-				}
-			} else if !wasmUtils.IsGzip(wasm) {
-				return fmt.Errorf("invalid input file. Use wasm binary or gzip")
+			wasm, err = gzipWasm(wasm)
+			if err != nil {
+				return err
 			}
 
 			msg := types.NewMsgRegisterNFTContract(wasm, clientCtx.GetFromAddress().String())
@@ -66,14 +61,9 @@ func CmdUpgradeNFTContract() *cobra.Command {
 				return fmt.Errorf("failed to read file")
 			}
 
-			if wasmUtils.IsWasm(newWasmCode) {
-				newWasmCode, err = wasmUtils.GzipIt(newWasmCode)
-
-				if err != nil {
-					return err
-				}
-			} else if !wasmUtils.IsGzip(newWasmCode) {
-				return fmt.Errorf("invalid input file. Use wasm binary or gzip")
+			newWasmCode, err = gzipWasm(newWasmCode)
+			if err != nil {
+				return err
 			}
 
 			msg := types.NewMsgUpgradeNFTContract(newWasmCode, clientCtx.GetFromAddress().String())
@@ -87,4 +77,18 @@ func CmdUpgradeNFTContract() *cobra.Command {
 
 	flags.AddTxFlagsToCmd(cmd)
 	return cmd
+}
+
+func gzipWasm(wasm []byte) ([]byte, error) {
+	if wasmUtils.IsWasm(wasm) {
+		wasm, err := wasmUtils.GzipIt(wasm)
+		if err != nil {
+			return nil, err
+		}
+		return wasm, nil
+	} else if !wasmUtils.IsGzip(wasm) {
+		return nil, fmt.Errorf("invalid input file. Use wasm binary or gzip")
+	}
+
+	return wasm, nil
 }

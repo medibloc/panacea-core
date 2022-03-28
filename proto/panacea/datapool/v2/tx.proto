@@ -30,7 +30,7 @@ service Msg {
   // RegisterNFTContract defines a method for deployment and registration of NFT contract
   rpc RegisterNFTContract(MsgRegisterNFTContract) returns (MsgRegisterNFTContractResponse);
 
-  // UpgradeNFTContract defines a method for upgrade of NFT contract
+  // UpgradeNFTContract defines a method for upgrade and migration of NFT contract
   rpc UpgradeNFTContract(MsgUpgradeNFTContract) returns (MsgUpgradeNFTContractResponse);
 }
 
@@ -97,7 +97,7 @@ message MsgRedeemDataAccessNFTResponse {
 
 // MsgRegisterNFTContract defines the Msg/RegisterNFTContract type.
 message MsgRegisterNFTContract {
-  bytes  wasm_code = 1;
+  bytes  wasm_code = 1;   // wasm byte code of NFT contract
   string sender = 2;
 }
 
@@ -106,7 +106,7 @@ message MsgRegisterNFTContractResponse {}
 
 // MsgUpgradeNFTContract defines the Msg/UpgradeNFTContract type.
 message MsgUpgradeNFTContract {
-  bytes  new_wasm_code = 1;
+  bytes  new_wasm_code = 1;   // wasm byte code of NFT contract
   string sender = 2;
 }
 
