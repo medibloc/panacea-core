@@ -129,26 +129,21 @@ func (k Keeper) CreatePool(ctx sdk.Context, curator sdk.AccAddress, poolParams t
 		return 0, err
 	}
 
-	funds, err := sdk.ParseCoinsNormalized("0umed")
+	zeroFund, err := sdk.ParseCoinsNormalized("0umed")
 	if err != nil {
-		return 0, sdkerrors.Wrapf(err, "error in parse coin")
+		return 0, sdkerrors.Wrapf(err, "error in parsing coin")
 	}
 
-	mintMsg := types.NewMsgMintNft(newPool.GetPoolId(), curator.String())
+	mintMsg := types.NewMsgMintNFT(newPool.GetPoolId(), curator.String())
 	mintMsgBz, err := json.Marshal(mintMsg)
 	if err != nil {
 		return 0, sdkerrors.Wrapf(err, "failed to marshal mint NFT msg")
 	}
 
-	_, err = k.wasmKeeper.Execute(
-		ctx,
-		contractAddr,
-		types.GetModuleAddress(),
-		mintMsgBz,
-		funds)
+	_, err = k.wasmKeeper.Execute(ctx, contractAddr, types.GetModuleAddress(), mintMsgBz, zeroFund)
 
 	if err != nil {
-		return 0, err
+		return 0, sdkerrors.Wrapf(err, "failed to mint curator NFT")
 	}
 
 	return newPool.GetPoolId(), nil
@@ -232,7 +227,7 @@ func (k Keeper) DeployAndRegisterContract(ctx sdk.Context, wasmCode []byte) erro
 		return err
 	}
 
-	initMsg := types.NewInstantiateNftMsg("curation", "CUR", moduleAddr.String())
+	initMsg := types.NewInstantiateNFTMsg("curation", "CUR", moduleAddr.String())
 	initMsgBz, err := json.Marshal(initMsg)
 
 	// instantiate contract (set admin to module)
@@ -250,24 +245,26 @@ func (k Keeper) DeployAndRegisterContract(ctx sdk.Context, wasmCode []byte) erro
 func (k Keeper) MigrateContract(ctx sdk.Context, newWasmCode []byte) error {
 	moduleAddr := types.GetModuleAddress()
 
+	// create new contract
 	newCodeID, err := k.CreateContract(ctx, moduleAddr, newWasmCode)
 	if err != nil {
 		return err
 	}
 
+	// get existing contract address
 	contractAddress, err := k.GetContractAddress(ctx)
 	if err != nil {
 		return err
 	}
 
-	migrateMsg := &types.MigrateMsg{
-		Payout: moduleAddr,
-	}
+	// migrate msg
+	migrateMsg := types.NewMigrateContractMsg(moduleAddr)
 	migrateMsgBz, err := json.Marshal(migrateMsg)
 	if err != nil {
 		return err
 	}
 
+	// migrate contract
 	_, err = k.wasmKeeper.Migrate(ctx, contractAddress, moduleAddr, newCodeID, migrateMsgBz)
 	if err != nil {
 		return sdkerrors.Wrapf(err, "failed to migrate contract")

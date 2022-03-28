@@ -14,11 +14,11 @@ type mint struct {
 	Price   sdk.Coin `json:"price"`
 }
 
-type MsgMintNft struct {
+type MsgMintNFT struct {
 	mint `json:"mint"`
 }
 
-func NewMsgMintNft(poolID uint64, owner string) *MsgMintNft {
+func NewMsgMintNFT(poolID uint64, owner string) *MsgMintNFT {
 	tokenID := "data_pool_" + strconv.FormatUint(poolID, 10)
 	zeroFund := sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(0))
 
@@ -29,23 +29,29 @@ func NewMsgMintNft(poolID uint64, owner string) *MsgMintNft {
 		Price:   zeroFund,
 	}
 
-	return &MsgMintNft{mint: *mint}
+	return &MsgMintNFT{mint: *mint}
 }
 
-type InstantiateNftMsg struct {
+type InstantiateNFTMsg struct {
 	Name   string `json:"name"`
 	Symbol string `json:"symbol"`
 	Minter string `json:"minter"`
 }
 
-func NewInstantiateNftMsg(name, symbol, minterAddress string) *InstantiateNftMsg {
-	return &InstantiateNftMsg{
+func NewInstantiateNFTMsg(name, symbol, minterAddress string) *InstantiateNFTMsg {
+	return &InstantiateNFTMsg{
 		Name:   name,
 		Symbol: symbol,
 		Minter: minterAddress,
 	}
 }
 
-type MigrateMsg struct {
+type MigrateContractMsg struct {
 	Payout sdk.AccAddress `json:"payout"`
+}
+
+func NewMigrateContractMsg(payout sdk.AccAddress) *MigrateContractMsg {
+	return &MigrateContractMsg{
+		Payout: payout,
+	}
 }
