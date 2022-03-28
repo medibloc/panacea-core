@@ -169,17 +169,17 @@ func (msg *MsgSellData) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{seller}
 }
 
-var _ sdk.Msg = &MsgBuyDataAccessNft{}
+var _ sdk.Msg = &MsgBuyDataAccessNFT{}
 
-func (msg *MsgBuyDataAccessNft) Route() string {
+func (msg *MsgBuyDataAccessNFT) Route() string {
 	return RouterKey
 }
 
-func (msg *MsgBuyDataAccessNft) Type() string {
-	return "BuyDataAccessNft"
+func (msg *MsgBuyDataAccessNFT) Type() string {
+	return "BuyDataAccessNFT"
 }
 
-func (msg *MsgBuyDataAccessNft) ValidateBasic() error {
+func (msg *MsgBuyDataAccessNFT) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.Buyer)
 	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid buyer address (%s)", err)
@@ -187,12 +187,12 @@ func (msg *MsgBuyDataAccessNft) ValidateBasic() error {
 	return nil
 }
 
-func (msg *MsgBuyDataAccessNft) GetSignBytes() []byte {
+func (msg *MsgBuyDataAccessNFT) GetSignBytes() []byte {
 	bz := ModuleCdc.MustMarshalJSON(msg)
 	return sdk.MustSortJSON(bz)
 }
 
-func (msg *MsgBuyDataAccessNft) GetSigners() []sdk.AccAddress {
+func (msg *MsgBuyDataAccessNFT) GetSigners() []sdk.AccAddress {
 	buyer, err := sdk.AccAddressFromBech32(msg.Buyer)
 	if err != nil {
 		panic(err)
@@ -200,17 +200,17 @@ func (msg *MsgBuyDataAccessNft) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{buyer}
 }
 
-var _ sdk.Msg = &MsgRedeemDataAccessNft{}
+var _ sdk.Msg = &MsgRedeemDataAccessNFT{}
 
-func (msg *MsgRedeemDataAccessNft) Route() string {
+func (msg *MsgRedeemDataAccessNFT) Route() string {
 	return RouterKey
 }
 
-func (msg *MsgRedeemDataAccessNft) Type() string {
-	return "RedeemDataAccessNft"
+func (msg *MsgRedeemDataAccessNFT) Type() string {
+	return "RedeemDataAccessNFT"
 }
 
-func (msg *MsgRedeemDataAccessNft) ValidateBasic() error {
+func (msg *MsgRedeemDataAccessNFT) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.Redeemer)
 	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid redeemer address (%s)", err)
@@ -218,12 +218,12 @@ func (msg *MsgRedeemDataAccessNft) ValidateBasic() error {
 	return nil
 }
 
-func (msg *MsgRedeemDataAccessNft) GetSignBytes() []byte {
+func (msg *MsgRedeemDataAccessNFT) GetSignBytes() []byte {
 	bz := ModuleCdc.MustMarshalJSON(msg)
 	return sdk.MustSortJSON(bz)
 }
 
-func (msg *MsgRedeemDataAccessNft) GetSigners() []sdk.AccAddress {
+func (msg *MsgRedeemDataAccessNFT) GetSigners() []sdk.AccAddress {
 	redeemer, err := sdk.AccAddressFromBech32(msg.Redeemer)
 	if err != nil {
 		panic(err)

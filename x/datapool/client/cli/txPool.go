@@ -82,7 +82,7 @@ func NewCreatePoolMsg(clientCtx client.Context, file string) (sdk.Msg, error) {
 		return nil, err
 	}
 
-	nftPrice, err := sdk.ParseCoinNormalized(poolParamsInput.NftPrice)
+	nftPrice, err := sdk.ParseCoinNormalized(poolParamsInput.NFTPrice)
 	if err != nil {
 		return nil, err
 	}
@@ -100,7 +100,7 @@ func NewCreatePoolMsg(clientCtx client.Context, file string) (sdk.Msg, error) {
 	poolParams := &types.PoolParams{
 		DataSchema:            poolParamsInput.DataSchema,
 		TargetNumData:         poolParamsInput.TargetNumData,
-		MaxNftSupply:          poolParamsInput.MaxNftSupply,
+		MaxNftSupply:          poolParamsInput.MaxNFTSupply,
 		NftPrice:              &nftPrice,
 		TrustedDataValidators: poolParamsInput.TrustedDataValidators,
 		TrustedDataIssuers:    poolParamsInput.TrustedDataIssuers,
