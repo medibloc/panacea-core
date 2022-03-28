@@ -52,3 +52,19 @@ func (m msgServer) BuyDataAccessNFT(goCtx context.Context, msg *types.MsgBuyData
 func (m msgServer) RedeemDataAccessNFT(goCtx context.Context, msg *types.MsgRedeemDataAccessNFT) (*types.MsgRedeemDataAccessNFTResponse, error) {
 	return &types.MsgRedeemDataAccessNFTResponse{}, nil
 }
+
+func (m msgServer) DeployAndRegisterContract(goCtx context.Context, msg *types.MsgDeployAndRegisterContract) (*types.MsgDeployAndRegisterContractResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	_, err := sdk.AccAddressFromBech32(msg.Sender)
+	if err != nil {
+		return nil, err
+	}
+
+	err = m.Keeper.DeployAndRegisterContract(ctx, msg.WasmCode)
+	if err != nil {
+		return nil, err
+	}
+
+	return &types.MsgDeployAndRegisterContractResponse{}, nil
+}

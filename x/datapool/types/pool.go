@@ -70,3 +70,8 @@ func verifyPoolAddressFormat(bz []byte) error {
 
 	return nil
 }
+
+func GetModuleAddress() sdk.AccAddress {
+	// 20 byte length address
+	return address.Module(ModuleName, []byte("module-account"))[:sdk.AddrLen]
+}

@@ -1,0 +1,81 @@
+{
+  "height": "5",
+  "txhash": "3C19CE6FF7CA36ECF29BAE66BBF21840A5FA313DFA940AF81FB58AF2A0F74F15",
+  "codespace": "",
+  "code": 0,
+  "data": "0A100A0A437265617465506F6F6C12021001",
+  "raw_log": "[{\"events\":[{\"type\":\"execute\",\"attributes\":[{\"key\":\"_contract_address\",\"value\":\"panacea14hj2tavq8fpesdwxxcu44rty3hh90vhu4mda6e\"}]},{\"type\":\"message\",\"attributes\":[{\"key\":\"action\",\"value\":\"CreatePool\"},{\"key\":\"sender\",\"value\":\"panacea18qdkaelydmc2hkv7el30ctdr592pggrfftz9h9\"}]},{\"type\":\"transfer\",\"attributes\":[{\"key\":\"recipient\",\"value\":\"panacea18jhrz9re8p4xvuwk3sa77mx0swef7nz6g3gu4gswmauatl6n5ynq6u5uke\"},{\"key\":\"sender\",\"value\":\"panacea18qdkaelydmc2hkv7el30ctdr592pggrfftz9h9\"},{\"key\":\"amount\",\"value\":\"1000umed\"}]},{\"type\":\"wasm\",\"attributes\":[{\"key\":\"_contract_address\",\"value\":\"panacea14hj2tavq8fpesdwxxcu44rty3hh90vhu4mda6e\"},{\"key\":\"action\",\"value\":\"mint\"},{\"key\":\"minter\",\"value\":\"panacea13wdlv3df8ya7n6nr54wuytv4n6pghlasqlyyfr\"},{\"key\":\"token_id\",\"value\":\"data_pool_1\"}]}]}]",
+  "logs": [
+    {
+      "msg_index": 0,
+      "log": "",
+      "events": [
+        {
+          "type": "execute",
+          "attributes": [
+            {
+              "key": "_contract_address",
+              "value": "panacea14hj2tavq8fpesdwxxcu44rty3hh90vhu4mda6e"
+            }
+          ]
+        },
+        {
+          "type": "message",
+          "attributes": [
+            {
+              "key": "action",
+              "value": "CreatePool"
+            },
+            {
+              "key": "sender",
+              "value": "panacea18qdkaelydmc2hkv7el30ctdr592pggrfftz9h9"
+            }
+          ]
+        },
+        {
+          "type": "transfer",
+          "attributes": [
+            {
+              "key": "recipient",
+              "value": "panacea18jhrz9re8p4xvuwk3sa77mx0swef7nz6g3gu4gswmauatl6n5ynq6u5uke"
+            },
+            {
+              "key": "sender",
+              "value": "panacea18qdkaelydmc2hkv7el30ctdr592pggrfftz9h9"
+            },
+            {
+              "key": "amount",
+              "value": "1000umed"
+            }
+          ]
+        },
+        {
+          "type": "wasm",
+          "attributes": [
+            {
+              "key": "_contract_address",
+              "value": "panacea14hj2tavq8fpesdwxxcu44rty3hh90vhu4mda6e"
+            },
+            {
+              "key": "action",
+              "value": "mint"
+            },
+            {
+              "key": "minter",
+              "value": "panacea13wdlv3df8ya7n6nr54wuytv4n6pghlasqlyyfr"
+            },
+            {
+              "key": "token_id",
+              "value": "data_pool_1"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "info": "",
+  "gas_wanted": "200000",
+  "gas_used": "155941",
+  "tx": null,
+  "timestamp": ""
+}

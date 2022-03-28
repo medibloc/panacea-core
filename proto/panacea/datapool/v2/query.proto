@@ -12,6 +12,11 @@ service Query {
   rpc Pool(QueryPoolRequest) returns (QueryPoolResponse) {
     option (google.api.http).get = "/panacea/datapool/v2/pools/{pool_id}";
   }
+
+  // Contract returns a contract address registered
+  rpc Contract(QueryContractRequest) returns (QueryContractResponse) {
+    option (google.api.http).get = "/panacea/datapool/v2/contract_address";
+  }
 }
 
 // QueryPoolRequest is the request type for the Query/Pool RPC method.
@@ -22,4 +27,12 @@ message QueryPoolRequest {
 // QueryPoolResponse is the response type for the Query/Pool RPC method.
 message QueryPoolResponse {
   Pool pool = 1;
+}
+
+// QueryContractRequest
+message QueryContractRequest {}
+
+// QueryContractResponse
+message QueryContractResponse {
+  string contract_address = 1;
 }

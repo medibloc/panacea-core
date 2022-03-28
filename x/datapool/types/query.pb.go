@@ -6,15 +6,16 @@ package types
 import (
 	context "context"
 	fmt "fmt"
+	io "io"
+	math "math"
+	math_bits "math/bits"
+
 	grpc1 "github.com/gogo/protobuf/grpc"
 	proto "github.com/gogo/protobuf/proto"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
-	io "io"
-	math "math"
-	math_bits "math/bits"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -118,34 +119,122 @@ func (m *QueryPoolResponse) GetPool() *Pool {
 	return nil
 }
 
+// QueryContractRequest
+type QueryContractRequest struct {
+}
+
+func (m *QueryContractRequest) Reset()         { *m = QueryContractRequest{} }
+func (m *QueryContractRequest) String() string { return proto.CompactTextString(m) }
+func (*QueryContractRequest) ProtoMessage()    {}
+func (*QueryContractRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_f3fda93d2b4f4508, []int{2}
+}
+func (m *QueryContractRequest) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *QueryContractRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_QueryContractRequest.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *QueryContractRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryContractRequest.Merge(m, src)
+}
+func (m *QueryContractRequest) XXX_Size() int {
+	return m.Size()
+}
+func (m *QueryContractRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryContractRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_QueryContractRequest proto.InternalMessageInfo
+
+// QueryContractResponse
+type QueryContractResponse struct {
+	ContractAddress string `protobuf:"bytes,1,opt,name=contract_address,json=contractAddress,proto3" json:"contract_address,omitempty"`
+}
+
+func (m *QueryContractResponse) Reset()         { *m = QueryContractResponse{} }
+func (m *QueryContractResponse) String() string { return proto.CompactTextString(m) }
+func (*QueryContractResponse) ProtoMessage()    {}
+func (*QueryContractResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_f3fda93d2b4f4508, []int{3}
+}
+func (m *QueryContractResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *QueryContractResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_QueryContractResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *QueryContractResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryContractResponse.Merge(m, src)
+}
+func (m *QueryContractResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *QueryContractResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryContractResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_QueryContractResponse proto.InternalMessageInfo
+
+func (m *QueryContractResponse) GetContractAddress() string {
+	if m != nil {
+		return m.ContractAddress
+	}
+	return ""
+}
+
 func init() {
 	proto.RegisterType((*QueryPoolRequest)(nil), "panacea.datapool.v2.QueryPoolRequest")
 	proto.RegisterType((*QueryPoolResponse)(nil), "panacea.datapool.v2.QueryPoolResponse")
+	proto.RegisterType((*QueryContractRequest)(nil), "panacea.datapool.v2.QueryContractRequest")
+	proto.RegisterType((*QueryContractResponse)(nil), "panacea.datapool.v2.QueryContractResponse")
 }
 
 func init() { proto.RegisterFile("panacea/datapool/v2/query.proto", fileDescriptor_f3fda93d2b4f4508) }
 
 var fileDescriptor_f3fda93d2b4f4508 = []byte{
-	// 289 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0x92, 0x2f, 0x48, 0xcc, 0x4b,
-	0x4c, 0x4e, 0x4d, 0xd4, 0x4f, 0x49, 0x2c, 0x49, 0x2c, 0xc8, 0xcf, 0xcf, 0xd1, 0x2f, 0x33, 0xd2,
-	0x2f, 0x2c, 0x4d, 0x2d, 0xaa, 0xd4, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17, 0x12, 0x86, 0x2a, 0xd0,
-	0x83, 0x29, 0xd0, 0x2b, 0x33, 0x92, 0x92, 0x49, 0xcf, 0xcf, 0x4f, 0xcf, 0x49, 0xd5, 0x4f, 0x2c,
-	0xc8, 0xd4, 0x4f, 0xcc, 0xcb, 0xcb, 0x2f, 0x49, 0x2c, 0xc9, 0xcc, 0xcf, 0x2b, 0x86, 0x68, 0x91,
-	0x92, 0xc3, 0x66, 0x26, 0x58, 0x2b, 0x58, 0x5e, 0x49, 0x9b, 0x4b, 0x20, 0x10, 0x64, 0x43, 0x40,
-	0x7e, 0x7e, 0x4e, 0x50, 0x6a, 0x61, 0x69, 0x6a, 0x71, 0x89, 0x90, 0x38, 0x17, 0x3b, 0x48, 0x45,
-	0x7c, 0x66, 0x8a, 0x04, 0xa3, 0x02, 0xa3, 0x06, 0x4b, 0x10, 0x1b, 0x88, 0xeb, 0x99, 0xa2, 0xe4,
-	0xc4, 0x25, 0x88, 0xa4, 0xb8, 0xb8, 0x20, 0x3f, 0xaf, 0x38, 0x55, 0x48, 0x97, 0x8b, 0x05, 0x24,
-	0x0d, 0x56, 0xca, 0x6d, 0x24, 0xa9, 0x87, 0xc5, 0x8d, 0x7a, 0x60, 0x0d, 0x60, 0x65, 0x46, 0xbd,
-	0x8c, 0x5c, 0xac, 0x60, 0x43, 0x84, 0x9a, 0x19, 0xb9, 0x58, 0x40, 0x12, 0x42, 0xaa, 0x58, 0xf5,
-	0xa0, 0x3b, 0x4b, 0x4a, 0x8d, 0x90, 0x32, 0x88, 0x83, 0x94, 0x74, 0x9a, 0x2e, 0x3f, 0x99, 0xcc,
-	0xa4, 0x26, 0xa4, 0xa2, 0x8f, 0xcb, 0xef, 0xc5, 0xfa, 0xd5, 0x50, 0x0f, 0xd6, 0x3a, 0x79, 0x9f,
-	0x78, 0x24, 0xc7, 0x78, 0xe1, 0x91, 0x1c, 0xe3, 0x83, 0x47, 0x72, 0x8c, 0x13, 0x1e, 0xcb, 0x31,
-	0x5c, 0x78, 0x2c, 0xc7, 0x70, 0xe3, 0xb1, 0x1c, 0x43, 0x94, 0x61, 0x7a, 0x66, 0x49, 0x46, 0x69,
-	0x92, 0x5e, 0x72, 0x7e, 0xae, 0x7e, 0x6e, 0x6a, 0x4a, 0x66, 0x52, 0x4e, 0x7e, 0x32, 0xcc, 0x48,
-	0xdd, 0xe4, 0xfc, 0xa2, 0x54, 0xfd, 0x0a, 0x84, 0xc9, 0x25, 0x95, 0x05, 0xa9, 0xc5, 0x49, 0x6c,
-	0xe0, 0x40, 0x35, 0x06, 0x04, 0x00, 0x00, 0xff, 0xff, 0xf7, 0xcd, 0x9d, 0xb2, 0xca, 0x01, 0x00,
-	0x00,
+	// 366 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x92, 0xcd, 0x4e, 0xc2, 0x40,
+	0x14, 0x85, 0x29, 0x41, 0xd4, 0x71, 0x21, 0x8e, 0xff, 0x8d, 0x19, 0x4d, 0x23, 0x28, 0x2a, 0x9d,
+	0x58, 0x9f, 0x40, 0x5c, 0x19, 0x37, 0xca, 0xd2, 0x0d, 0x19, 0xda, 0x09, 0x36, 0x29, 0xbd, 0xa5,
+	0x33, 0x10, 0x89, 0x71, 0xa3, 0x2f, 0x40, 0xe2, 0x0b, 0xf8, 0x38, 0x2e, 0x49, 0xdc, 0xb8, 0x34,
+	0xe0, 0x83, 0x98, 0x0e, 0x6d, 0x34, 0x4d, 0x89, 0x2e, 0x7b, 0xe7, 0xbb, 0xe7, 0x9c, 0x7b, 0x52,
+	0xb4, 0x1b, 0x30, 0x9f, 0xd9, 0x9c, 0x51, 0x87, 0x49, 0x16, 0x00, 0x78, 0xb4, 0x6f, 0xd1, 0x6e,
+	0x8f, 0x87, 0x03, 0x33, 0x08, 0x41, 0x02, 0x5e, 0x8d, 0x01, 0x33, 0x01, 0xcc, 0xbe, 0xa5, 0xef,
+	0xb4, 0x01, 0xda, 0x1e, 0xa7, 0x2c, 0x70, 0x29, 0xf3, 0x7d, 0x90, 0x4c, 0xba, 0xe0, 0x8b, 0xe9,
+	0x8a, 0x4e, 0xb2, 0x34, 0xd5, 0xaa, 0x7a, 0x37, 0x8e, 0x51, 0xe9, 0x26, 0x72, 0xb8, 0x06, 0xf0,
+	0x1a, 0xbc, 0xdb, 0xe3, 0x42, 0xe2, 0x4d, 0x34, 0x1f, 0x11, 0x4d, 0xd7, 0xd9, 0xd2, 0xf6, 0xb4,
+	0xc3, 0x42, 0xa3, 0x18, 0x7d, 0x5e, 0x3a, 0x46, 0x1d, 0xad, 0xfc, 0x82, 0x45, 0x00, 0xbe, 0xe0,
+	0xb8, 0x86, 0x0a, 0xd1, 0xb3, 0x42, 0x97, 0xac, 0x6d, 0x33, 0x23, 0xa3, 0xa9, 0x16, 0x14, 0x66,
+	0x6c, 0xa0, 0x35, 0xa5, 0x71, 0x01, 0xbe, 0x0c, 0x99, 0x2d, 0x63, 0x53, 0xa3, 0x8e, 0xd6, 0x53,
+	0xf3, 0x58, 0xbf, 0x8a, 0x4a, 0x76, 0x3c, 0x6b, 0x32, 0xc7, 0x09, 0xb9, 0x10, 0xca, 0x6b, 0xb1,
+	0xb1, 0x9c, 0xcc, 0xcf, 0xa7, 0x63, 0xeb, 0x35, 0x8f, 0xe6, 0x94, 0x08, 0x7e, 0xd6, 0x50, 0x21,
+	0x32, 0xc5, 0xe5, 0xcc, 0x3c, 0xe9, 0x93, 0xf5, 0xca, 0x5f, 0xd8, 0x34, 0x8c, 0x71, 0xf2, 0xf4,
+	0xfe, 0xf5, 0x92, 0xaf, 0xe0, 0x7d, 0x3a, 0xab, 0x57, 0x41, 0x1f, 0xe2, 0xf2, 0x1e, 0xf1, 0x50,
+	0x43, 0x0b, 0xc9, 0x3d, 0xb8, 0x3a, 0xdb, 0x22, 0xd5, 0x85, 0x7e, 0xf4, 0x1f, 0x34, 0x4e, 0x54,
+	0x53, 0x89, 0x0e, 0x70, 0x39, 0x33, 0x51, 0xba, 0xb9, 0xfa, 0xd5, 0xdb, 0x98, 0x68, 0xa3, 0x31,
+	0xd1, 0x3e, 0xc7, 0x44, 0x1b, 0x4e, 0x48, 0x6e, 0x34, 0x21, 0xb9, 0x8f, 0x09, 0xc9, 0xdd, 0x9e,
+	0xb6, 0x5d, 0x79, 0xd7, 0x6b, 0x99, 0x36, 0x74, 0x68, 0x87, 0x3b, 0x6e, 0xcb, 0x03, 0x3b, 0xd1,
+	0xac, 0xd9, 0x10, 0x72, 0x7a, 0xff, 0x23, 0x2d, 0x07, 0x01, 0x17, 0xad, 0xa2, 0xfa, 0x87, 0xce,
+	0xbe, 0x03, 0x00, 0x00, 0xff, 0xff, 0x69, 0x96, 0xe7, 0x6e, 0xb9, 0x02, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -162,6 +251,8 @@ const _ = grpc.SupportPackageIsVersion4
 type QueryClient interface {
 	// Pool returns a Pool.
 	Pool(ctx context.Context, in *QueryPoolRequest, opts ...grpc.CallOption) (*QueryPoolResponse, error)
+	// Contract returns a contract address registered
+	Contract(ctx context.Context, in *QueryContractRequest, opts ...grpc.CallOption) (*QueryContractResponse, error)
 }
 
 type queryClient struct {
@@ -181,10 +272,21 @@ func (c *queryClient) Pool(ctx context.Context, in *QueryPoolRequest, opts ...gr
 	return out, nil
 }
 
+func (c *queryClient) Contract(ctx context.Context, in *QueryContractRequest, opts ...grpc.CallOption) (*QueryContractResponse, error) {
+	out := new(QueryContractResponse)
+	err := c.cc.Invoke(ctx, "/panacea.datapool.v2.Query/Contract", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // QueryServer is the server API for Query service.
 type QueryServer interface {
 	// Pool returns a Pool.
 	Pool(context.Context, *QueryPoolRequest) (*QueryPoolResponse, error)
+	// Contract returns a contract address registered
+	Contract(context.Context, *QueryContractRequest) (*QueryContractResponse, error)
 }
 
 // UnimplementedQueryServer can be embedded to have forward compatible implementations.
@@ -193,6 +295,9 @@ type UnimplementedQueryServer struct {
 
 func (*UnimplementedQueryServer) Pool(ctx context.Context, req *QueryPoolRequest) (*QueryPoolResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Pool not implemented")
+}
+func (*UnimplementedQueryServer) Contract(ctx context.Context, req *QueryContractRequest) (*QueryContractResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Contract not implemented")
 }
 
 func RegisterQueryServer(s grpc1.Server, srv QueryServer) {
@@ -217,6 +322,24 @@ func _Query_Pool_Handler(srv interface{}, ctx context.Context, dec func(interfac
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Query_Contract_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryContractRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(QueryServer).Contract(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/panacea.datapool.v2.Query/Contract",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(QueryServer).Contract(ctx, req.(*QueryContractRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _Query_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "panacea.datapool.v2.Query",
 	HandlerType: (*QueryServer)(nil),
@@ -224,6 +347,10 @@ var _Query_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Pool",
 			Handler:    _Query_Pool_Handler,
+		},
+		{
+			MethodName: "Contract",
+			Handler:    _Query_Contract_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
@@ -293,6 +420,59 @@ func (m *QueryPoolResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
+func (m *QueryContractRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *QueryContractRequest) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *QueryContractRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	return len(dAtA) - i, nil
+}
+
+func (m *QueryContractResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *QueryContractResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *QueryContractResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.ContractAddress) > 0 {
+		i -= len(m.ContractAddress)
+		copy(dAtA[i:], m.ContractAddress)
+		i = encodeVarintQuery(dAtA, i, uint64(len(m.ContractAddress)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
 func encodeVarintQuery(dAtA []byte, offset int, v uint64) int {
 	offset -= sovQuery(v)
 	base := offset
@@ -324,6 +504,28 @@ func (m *QueryPoolResponse) Size() (n int) {
 	_ = l
 	if m.Pool != nil {
 		l = m.Pool.Size()
+		n += 1 + l + sovQuery(uint64(l))
+	}
+	return n
+}
+
+func (m *QueryContractRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	return n
+}
+
+func (m *QueryContractResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.ContractAddress)
+	if l > 0 {
 		n += 1 + l + sovQuery(uint64(l))
 	}
 	return n
@@ -468,6 +670,138 @@ func (m *QueryPoolResponse) Unmarshal(dAtA []byte) error {
 			if err := m.Pool.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipQuery(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *QueryContractRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowQuery
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: QueryContractRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: QueryContractRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		default:
+			iNdEx = preIndex
+			skippy, err := skipQuery(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *QueryContractResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowQuery
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: QueryContractResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: QueryContractResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ContractAddress", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.ContractAddress = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex

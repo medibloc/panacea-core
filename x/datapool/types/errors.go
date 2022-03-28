@@ -11,4 +11,5 @@ var (
 	ErrPoolAlreadyExist           = sdkerrors.Register(ModuleName, 3, "data pool already exists")
 	ErrNotEnoughPoolDeposit       = sdkerrors.Register(ModuleName, 4, "The balance is not enough to make a data pool")
 	ErrNotRegisteredDataValidator = sdkerrors.Register(ModuleName, 5, "data validator is not registered")
+	ErrNotRegisteredContract      = sdkerrors.Register(ModuleName, 6, "contract is not registered")
 )

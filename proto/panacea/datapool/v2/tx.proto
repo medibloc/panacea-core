@@ -26,6 +26,9 @@ service Msg {
 
   // RedeemDataAccessNFT defines a method for redeeming data access NFT to get data
   rpc RedeemDataAccessNFT(MsgRedeemDataAccessNFT) returns (MsgRedeemDataAccessNFTResponse);
+
+  // DeployAndRegisterContract
+  rpc DeployAndRegisterContract(MsgDeployAndRegisterContract) returns (MsgDeployAndRegisterContractResponse);
 }
 
 // MsgRegisterDataValidator defines the Msg/RegisterDataValidator request type.
@@ -88,3 +91,12 @@ message MsgRedeemDataAccessNFT {
 message MsgRedeemDataAccessNFTResponse {
   DataAccessNFTRedeemReceipt receipt = 1;
 }
+
+// MsgDeployAndRegisterContract defines the Msg/DeployAndRegisterContract type.
+message MsgDeployAndRegisterContract {
+  bytes  wasm_code = 1;
+  string sender = 2;
+}
+
+// MsgDeployAndRegisterContractResponse defines the Msg/DeployAndRegisterContract response type.
+message MsgDeployAndRegisterContractResponse {}

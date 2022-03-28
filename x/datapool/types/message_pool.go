@@ -230,3 +230,41 @@ func (msg *MsgRedeemDataAccessNFT) GetSigners() []sdk.AccAddress {
 	}
 	return []sdk.AccAddress{redeemer}
 }
+
+var _ sdk.Msg = &MsgDeployAndRegisterContract{}
+
+//func NewMsgRegisterContractAddress(input Msg) *MsgDeployAndRegisterContract {
+//	return &MsgDeployAndRegisterContract{
+//		ContractAddress: contractAddress,
+//		Sender:
+//	}
+//}
+
+func (msg *MsgDeployAndRegisterContract) Route() string {
+	return RouterKey
+}
+
+func (msg *MsgDeployAndRegisterContract) Type() string {
+	return "RegisterContractAddress"
+}
+
+func (msg *MsgDeployAndRegisterContract) ValidateBasic() error {
+	//_, err := sdk.AccAddressFromBech32(msg.ContractAddress)
+	//if err != nil {
+	//	return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid redeemer address (%s)", err)
+	//}
+	return nil
+}
+
+func (msg *MsgDeployAndRegisterContract) GetSignBytes() []byte {
+	bz := ModuleCdc.MustMarshalJSON(msg)
+	return sdk.MustSortJSON(bz)
+}
+
+func (msg *MsgDeployAndRegisterContract) GetSigners() []sdk.AccAddress {
+	redeemer, err := sdk.AccAddressFromBech32(msg.Sender)
+	if err != nil {
+		panic(err)
+	}
+	return []sdk.AccAddress{redeemer}
+}
