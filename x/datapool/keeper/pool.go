@@ -134,7 +134,6 @@ func (k Keeper) CreatePool(ctx sdk.Context, curator sdk.AccAddress, poolParams t
 		return 0, sdkerrors.Wrapf(err, "error in parse coin")
 	}
 
-	//msg := []byte("{\"mint\": {\n    \"token_id\":\"data_pool_" + string(newPool.GetPoolId()) + "\",\n    \"owner\": \"" + curator.String() + "\",\n    \"name\": \"panacea_nft_1\",\n    \"price\": {\n      \"denom\": \"umed\",\n      \"amount\": \"0\"\n    }\n  }\n}")
 	mintMsg := types.NewMsgMintNft(newPool.GetPoolId(), curator.String())
 	mintMsgBz, err := json.Marshal(mintMsg)
 	if err != nil {
