@@ -24,8 +24,11 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 		case *types.MsgCreatePool:
 			res, err := msgServer.CreatePool(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)
-		case *types.MsgDeployAndRegisterContract:
-			res, err := msgServer.DeployAndRegisterContract(sdk.WrapSDKContext(ctx), msg)
+		case *types.MsgRegisterNFTContract:
+			res, err := msgServer.RegisterNFTContract(sdk.WrapSDKContext(ctx), msg)
+			return sdk.WrapServiceResult(ctx, res, err)
+		case *types.MsgUpgradeNFTContract:
+			res, err := msgServer.UpgradeNFTContract(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)
 		default:
 			errMsg := fmt.Sprintf("unrecognized %s message type: %T", types.ModuleName, msg)

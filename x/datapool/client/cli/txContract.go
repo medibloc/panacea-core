@@ -12,11 +12,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// CmdDeployAndRegisterContract is temporary cmd for deploy and register NFT contract to x/datapool module
-func CmdDeployAndRegisterContract() *cobra.Command {
+func CmdRegisterNFTContract() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "deploy-and-register-contract [wasm code]",
-		Short: "deploy and register contract to datapool module",
+		Use:   "register-contract [wasm code]",
+		Short: "register contract to x/datapool module",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
@@ -39,13 +38,49 @@ func CmdDeployAndRegisterContract() *cobra.Command {
 				return fmt.Errorf("invalid input file. Use wasm binary or gzip")
 			}
 
-			msg := &types.MsgDeployAndRegisterContract{
-				WasmCode: wasm,
-				Sender:   clientCtx.GetFromAddress().String(),
-			}
+			msg := types.NewMsgRegisterNFTContract(wasm, clientCtx.GetFromAddress().String())
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
+		},
+	}
+
+	flags.AddTxFlagsToCmd(cmd)
+	return cmd
+}
+
+func CmdUpgradeNFTContract() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "upgrade-contract [new wasm code]",
+		Short: "upgrade contract",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			newWasmCode, err := ioutil.ReadFile(args[0])
+			if err != nil {
+				return fmt.Errorf("failed to read file")
+			}
+
+			if wasmUtils.IsWasm(newWasmCode) {
+				newWasmCode, err = wasmUtils.GzipIt(newWasmCode)
+
+				if err != nil {
+					return err
+				}
+			} else if !wasmUtils.IsGzip(newWasmCode) {
+				return fmt.Errorf("invalid input file. Use wasm binary or gzip")
+			}
+
+			msg := types.NewMsgUpgradeNFTContract(newWasmCode, clientCtx.GetFromAddress().String())
+			if err := msg.ValidateBasic(); err != nil {
+				return err
+			}
+
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
 	}

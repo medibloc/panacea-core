@@ -231,40 +231,79 @@ func (msg *MsgRedeemDataAccessNFT) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{redeemer}
 }
 
-var _ sdk.Msg = &MsgDeployAndRegisterContract{}
+var _ sdk.Msg = &MsgRegisterNFTContract{}
 
-//func NewMsgRegisterContractAddress(input Msg) *MsgDeployAndRegisterContract {
-//	return &MsgDeployAndRegisterContract{
-//		ContractAddress: contractAddress,
-//		Sender:
-//	}
-//}
+func NewMsgRegisterNFTContract(wasmCode []byte, sender string) *MsgRegisterNFTContract {
+	return &MsgRegisterNFTContract{
+		WasmCode: wasmCode,
+		Sender:   sender,
+	}
+}
 
-func (msg *MsgDeployAndRegisterContract) Route() string {
+func (msg *MsgRegisterNFTContract) Route() string {
 	return RouterKey
 }
 
-func (msg *MsgDeployAndRegisterContract) Type() string {
-	return "RegisterContractAddress"
+func (msg *MsgRegisterNFTContract) Type() string {
+	return "RegisterNFTContract"
 }
 
-func (msg *MsgDeployAndRegisterContract) ValidateBasic() error {
-	//_, err := sdk.AccAddressFromBech32(msg.ContractAddress)
-	//if err != nil {
-	//	return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid redeemer address (%s)", err)
-	//}
+func (msg *MsgRegisterNFTContract) ValidateBasic() error {
+	_, err := sdk.AccAddressFromBech32(msg.Sender)
+	if err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid redeemer address (%s)", err)
+	}
 	return nil
 }
 
-func (msg *MsgDeployAndRegisterContract) GetSignBytes() []byte {
+func (msg *MsgRegisterNFTContract) GetSignBytes() []byte {
 	bz := ModuleCdc.MustMarshalJSON(msg)
 	return sdk.MustSortJSON(bz)
 }
 
-func (msg *MsgDeployAndRegisterContract) GetSigners() []sdk.AccAddress {
-	redeemer, err := sdk.AccAddressFromBech32(msg.Sender)
+func (msg *MsgRegisterNFTContract) GetSigners() []sdk.AccAddress {
+	sender, err := sdk.AccAddressFromBech32(msg.Sender)
 	if err != nil {
 		panic(err)
 	}
-	return []sdk.AccAddress{redeemer}
+	return []sdk.AccAddress{sender}
+}
+
+var _ sdk.Msg = &MsgUpgradeNFTContract{}
+
+func NewMsgUpgradeNFTContract(newWasmCode []byte, sender string) *MsgUpgradeNFTContract {
+	return &MsgUpgradeNFTContract{
+		NewWasmCode: newWasmCode,
+		Sender:      sender,
+	}
+}
+
+func (msg *MsgUpgradeNFTContract) Route() string {
+	return RouterKey
+}
+
+func (msg *MsgUpgradeNFTContract) Type() string {
+	return "UpgradeNFTContract"
+}
+
+func (msg *MsgUpgradeNFTContract) ValidateBasic() error {
+	_, err := sdk.AccAddressFromBech32(msg.Sender)
+	if err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid redeemer address (%s)", err)
+	}
+
+	return nil
+}
+
+func (msg *MsgUpgradeNFTContract) GetSignBytes() []byte {
+	bz := ModuleCdc.MustMarshalJSON(msg)
+	return sdk.MustSortJSON(bz)
+}
+
+func (msg *MsgUpgradeNFTContract) GetSigners() []sdk.AccAddress {
+	sender, err := sdk.AccAddressFromBech32(msg.Sender)
+	if err != nil {
+		panic(err)
+	}
+	return []sdk.AccAddress{sender}
 }

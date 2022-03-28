@@ -45,3 +45,7 @@ func NewInstantiateNftMsg(name, symbol, minterAddress string) *InstantiateNftMsg
 		Minter: minterAddress,
 	}
 }
+
+type MigrateMsg struct {
+	Payout sdk.AccAddress `json:"payout"`
+}

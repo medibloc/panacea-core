@@ -6,16 +6,15 @@ package types
 import (
 	context "context"
 	fmt "fmt"
-	io "io"
-	math "math"
-	math_bits "math/bits"
-
 	grpc1 "github.com/gogo/protobuf/grpc"
 	proto "github.com/gogo/protobuf/proto"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
+	io "io"
+	math "math"
+	math_bits "math/bits"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -119,7 +118,7 @@ func (m *QueryPoolResponse) GetPool() *Pool {
 	return nil
 }
 
-// QueryContractRequest
+// QueryContractRequest is the request type for the Query/Contract RPC method.
 type QueryContractRequest struct {
 }
 
@@ -156,7 +155,7 @@ func (m *QueryContractRequest) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_QueryContractRequest proto.InternalMessageInfo
 
-// QueryContractResponse
+// QueryContractResponse is the response type for the Query/Contract RPC method.
 type QueryContractResponse struct {
 	ContractAddress string `protobuf:"bytes,1,opt,name=contract_address,json=contractAddress,proto3" json:"contract_address,omitempty"`
 }
@@ -251,7 +250,7 @@ const _ = grpc.SupportPackageIsVersion4
 type QueryClient interface {
 	// Pool returns a Pool.
 	Pool(ctx context.Context, in *QueryPoolRequest, opts ...grpc.CallOption) (*QueryPoolResponse, error)
-	// Contract returns a contract address registered
+	// Contract returns a contract address registered to x/datapool module
 	Contract(ctx context.Context, in *QueryContractRequest, opts ...grpc.CallOption) (*QueryContractResponse, error)
 }
 
@@ -285,7 +284,7 @@ func (c *queryClient) Contract(ctx context.Context, in *QueryContractRequest, op
 type QueryServer interface {
 	// Pool returns a Pool.
 	Pool(context.Context, *QueryPoolRequest) (*QueryPoolResponse, error)
-	// Contract returns a contract address registered
+	// Contract returns a contract address registered to x/datapool module
 	Contract(context.Context, *QueryContractRequest) (*QueryContractResponse, error)
 }
 
