@@ -229,6 +229,9 @@ func (k Keeper) DeployAndRegisterContract(ctx sdk.Context, wasmCode []byte) erro
 
 	initMsg := types.NewInstantiateNFTMsg("curation", "CUR", moduleAddr.String())
 	initMsgBz, err := json.Marshal(initMsg)
+	if err != nil {
+		return err
+	}
 
 	// instantiate contract (set admin to module)
 	contractAddr, _, err := k.wasmKeeper.Instantiate(ctx, codeID, moduleAddr, moduleAddr, initMsgBz, "curator NFT", nil)
