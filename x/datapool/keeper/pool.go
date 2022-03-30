@@ -91,14 +91,8 @@ func (k Keeper) CreatePool(ctx sdk.Context, curator sdk.AccAddress, poolParams t
 		return 0, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid address of pool %s", newPool.GetPoolAddress())
 	}
 
-	// check if account with pool address exists or not
-	acc := k.accountKeeper.GetAccount(ctx, poolAddress)
-	if acc != nil {
-		return 0, sdkerrors.Wrapf(types.ErrPoolAlreadyExist, "pool %d already exist", poolID)
-	}
-
 	// set new account for pool
-	acc = k.accountKeeper.NewAccount(ctx, authtypes.NewModuleAccount(
+	acc := k.accountKeeper.NewAccount(ctx, authtypes.NewModuleAccount(
 		authtypes.NewBaseAccountWithAddress(poolAddress),
 		newPool.GetPoolAddress(),
 	))
