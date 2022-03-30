@@ -56,13 +56,13 @@ proto-lint:
 	$(DOCKER) run --rm -v $(CURDIR):/workspace --workdir /workspace bufbuild/buf lint --error-format=json
 
 PROTO_DIR = third_party/proto
-COSMOS_VER_SHORT = 0.42.7
+COSMOS_VER_SHORT = 0.42.11-panacea-min-commission-rate-0a76661
 COSMOS_VER = v$(COSMOS_VER_SHORT)
 
 proto-update-dep:
 	@mkdir -p $(PROTO_DIR)
-	@curl https://codeload.github.com/cosmos/cosmos-sdk/tar.gz/$(COSMOS_VER) | tar -xz -C $(PROTO_DIR) --strip=3 cosmos-sdk-$(COSMOS_VER_SHORT)/third_party/proto
-	@curl https://codeload.github.com/cosmos/cosmos-sdk/tar.gz/$(COSMOS_VER) | tar -xz -C $(PROTO_DIR) --strip=2 cosmos-sdk-$(COSMOS_VER_SHORT)/proto
+	@curl https://codeload.github.com/medibloc/cosmos-sdk/tar.gz/$(COSMOS_VER) | tar -xz -C $(PROTO_DIR) --strip=3 cosmos-sdk-$(COSMOS_VER_SHORT)/third_party/proto
+	@curl https://codeload.github.com/medibloc/cosmos-sdk/tar.gz/$(COSMOS_VER) | tar -xz -C $(PROTO_DIR) --strip=2 cosmos-sdk-$(COSMOS_VER_SHORT)/proto
 
 ########################################
 ### Build/Install
