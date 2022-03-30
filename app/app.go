@@ -728,5 +728,25 @@ func initParamsKeeper(appCodec codec.BinaryMarshaler, legacyAmino *codec.LegacyA
 }
 
 func (app *App) registerUpgradeHandlers() {
-	app.UpgradeKeeper.SetUpgradeHandler("v2.0.2", func(ctx sdk.Context, plan upgradetypes.Plan) { })
+	app.UpgradeKeeper.SetUpgradeHandler("v2.0.2", func(ctx sdk.Context, plan upgradetypes.Plan) {})
+
+	app.UpgradeKeeper.SetUpgradeHandler("v2.0.3", func(ctx sdk.Context, plan upgradetypes.Plan) {
+		// Update the commission rate of all validators whose commission rate is smaller than min-commission-rate
+		validators := app.StakingKeeper.GetAllValidators(ctx)
+		minCommissionRate := app.StakingKeeper.GetParams(ctx).MinCommissionRate
+		for _, v := range validators {
+			if v.Commission.Rate.LT(minCommissionRate) {
+				comm, err := app.StakingKeeper.UpdateValidatorCommission(ctx, v, minCommissionRate)
+				if err != nil {
+					panic(err)
+				}
+				v.Commission = comm
+
+				// call the before-modification hook since we're about to update the commission
+				app.StakingKeeper.BeforeValidatorModified(ctx, v.GetOperator())
+
+				app.StakingKeeper.SetValidator(ctx, v)
+			}
+		}
+	})
 }
