@@ -34,4 +34,4 @@ replace google.golang.org/grpc => google.golang.org/grpc v1.33.2
 
 replace github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
 
-replace github.com/cosmos/cosmos-sdk => github.com/medibloc/cosmos-sdk v0.34.4-0.20220330084851-9241201f06a3
+replace github.com/cosmos/cosmos-sdk => github.com/medibloc/cosmos-sdk v0.42.11-panacea-min-commission-rate-0a76661
