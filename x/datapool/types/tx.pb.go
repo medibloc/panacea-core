@@ -846,7 +846,7 @@ type MsgClient interface {
 	RedeemDataAccessNFT(ctx context.Context, in *MsgRedeemDataAccessNFT, opts ...grpc.CallOption) (*MsgRedeemDataAccessNFTResponse, error)
 	// RegisterNFTContract defines a method for deployment and registration of NFT contract
 	RegisterNFTContract(ctx context.Context, in *MsgRegisterNFTContract, opts ...grpc.CallOption) (*MsgRegisterNFTContractResponse, error)
-	// UpgradeNFTContract defines a method for upgrade of NFT contract
+	// UpgradeNFTContract defines a method for upgrade and migration of NFT contract
 	UpgradeNFTContract(ctx context.Context, in *MsgUpgradeNFTContract, opts ...grpc.CallOption) (*MsgUpgradeNFTContractResponse, error)
 }
 
@@ -935,7 +935,7 @@ type MsgServer interface {
 	RedeemDataAccessNFT(context.Context, *MsgRedeemDataAccessNFT) (*MsgRedeemDataAccessNFTResponse, error)
 	// RegisterNFTContract defines a method for deployment and registration of NFT contract
 	RegisterNFTContract(context.Context, *MsgRegisterNFTContract) (*MsgRegisterNFTContractResponse, error)
-	// UpgradeNFTContract defines a method for upgrade of NFT contract
+	// UpgradeNFTContract defines a method for upgrade and migration of NFT contract
 	UpgradeNFTContract(context.Context, *MsgUpgradeNFTContract) (*MsgUpgradeNFTContractResponse, error)
 }
 

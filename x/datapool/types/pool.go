@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"strings"
 
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -73,6 +75,5 @@ func verifyPoolAddressFormat(bz []byte) error {
 }
 
 func GetModuleAddress() sdk.AccAddress {
-	// 20 byte length address
-	return address.Module(ModuleName, []byte("module-account"))[:sdk.AddrLen]
+	return authtypes.NewModuleAddress(ModuleName)
 }
