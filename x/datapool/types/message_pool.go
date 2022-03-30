@@ -49,20 +49,9 @@ func (msg *MsgRegisterDataValidator) GetSigners() []sdk.AccAddress {
 var _ sdk.Msg = &MsgCreatePool{}
 
 func NewMsgCreatePool(poolParams *PoolParams, curator string) *MsgCreatePool {
-	params := &PoolParams{
-		DataSchema:            poolParams.DataSchema,
-		TargetNumData:         poolParams.TargetNumData,
-		MaxNftSupply:          poolParams.MaxNftSupply,
-		NftPrice:              poolParams.NftPrice,
-		TrustedDataValidators: poolParams.TrustedDataValidators,
-		TrustedDataIssuers:    poolParams.TrustedDataIssuers,
-		Deposit:               poolParams.Deposit,
-		DownloadPeriod:        poolParams.DownloadPeriod,
-	}
-
 	return &MsgCreatePool{
 		Curator:    curator,
-		PoolParams: params,
+		PoolParams: poolParams,
 	}
 }
 

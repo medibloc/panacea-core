@@ -4,8 +4,9 @@ import (
 	"fmt"
 	"strings"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/medibloc/panacea-core/v2/x/datadeal/v044_temp/address"
 )
 
@@ -55,17 +56,17 @@ func AccPoolAddressFromBech32(address string) (sdk.AccAddress, error) {
 }
 
 func verifyPoolAddressFormat(bz []byte) error {
-	verifier := sdk.GetConfig().GetAddressVerifier()
-	if verifier != nil {
-		return verifier(bz)
-	}
-
 	if len(bz) == 0 {
 		return sdkerrors.Wrap(sdkerrors.ErrUnknownAddress, "address cannot be empty")
 	}
 
 	if len(bz) > address.MaxAddrLen {
 		return sdkerrors.Wrapf(sdkerrors.ErrUnknownAddress, "address max length is %d, got %d", address.MaxAddrLen, len(bz))
+	}
+
+	verifier := sdk.GetConfig().GetAddressVerifier()
+	if verifier != nil {
+		return verifier(bz)
 	}
 
 	return nil
