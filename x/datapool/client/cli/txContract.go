@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 
-	wasmUtils "github.com/CosmWasm/wasmd/x/wasm/client/utils"
+	wasmutils "github.com/CosmWasm/wasmd/x/wasm/client/utils"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
@@ -80,13 +80,13 @@ func CmdUpgradeNFTContract() *cobra.Command {
 }
 
 func gzipWasm(wasm []byte) ([]byte, error) {
-	if wasmUtils.IsWasm(wasm) {
-		wasm, err := wasmUtils.GzipIt(wasm)
+	if wasmutils.IsWasm(wasm) {
+		wasm, err := wasmutils.GzipIt(wasm)
 		if err != nil {
 			return nil, err
 		}
 		return wasm, nil
-	} else if !wasmUtils.IsGzip(wasm) {
+	} else if !wasmutils.IsGzip(wasm) {
 		return nil, fmt.Errorf("invalid input file. Use wasm binary or gzip")
 	}
 
