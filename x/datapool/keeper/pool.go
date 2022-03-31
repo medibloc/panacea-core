@@ -1,7 +1,10 @@
 package keeper
 
 import (
+	"encoding/json"
 	"fmt"
+
+	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
 
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 
@@ -114,7 +117,28 @@ func (k Keeper) CreatePool(ctx sdk.Context, curator sdk.AccAddress, poolParams t
 	// store pool
 	k.SetPool(ctx, newPool)
 
-	// TODO: issue curation NFT
+	// mint curator NFT
+	contractAddr, err := k.GetNFTContractAddress(ctx)
+	if err != nil {
+		return 0, err
+	}
+
+	zeroFund, err := sdk.ParseCoinsNormalized("0umed")
+	if err != nil {
+		return 0, sdkerrors.Wrapf(err, "error in parsing coin")
+	}
+
+	mintMsg := types.NewMsgMintNFT(newPool.GetPoolId(), curator.String())
+	mintMsgBz, err := json.Marshal(mintMsg)
+	if err != nil {
+		return 0, sdkerrors.Wrapf(err, "failed to marshal mint NFT msg")
+	}
+
+	_, err = k.wasmKeeper.Execute(ctx, contractAddr, types.GetModuleAddress(), mintMsgBz, zeroFund)
+
+	if err != nil {
+		return 0, sdkerrors.Wrapf(err, "failed to mint curator NFT")
+	}
 
 	return newPool.GetPoolId(), nil
 }
@@ -156,4 +180,94 @@ func (k Keeper) SetPool(ctx sdk.Context, pool *types.Pool) {
 	poolKey := types.GetKeyPrefixPools(pool.GetPoolId())
 	bz := k.cdc.MustMarshalBinaryLengthPrefixed(pool)
 	store.Set(poolKey, bz)
+}
+
+func (k Keeper) SetContractAddress(ctx sdk.Context, address sdk.AccAddress) {
+	store := ctx.KVStore(k.storeKey)
+	store.Set(types.KeyNFTContractAddress, address)
+}
+
+func (k Keeper) GetNFTContractAddress(ctx sdk.Context) (sdk.AccAddress, error) {
+	store := ctx.KVStore(k.storeKey)
+	if !store.Has(types.KeyNFTContractAddress) {
+		return nil, sdkerrors.Wrapf(types.ErrNoRegisteredNFTContract, "no contract registered")
+	}
+
+	return store.Get(types.KeyNFTContractAddress), nil
+}
+
+// CreateNFTContract stores NFT contract
+func (k Keeper) CreateNFTContract(ctx sdk.Context, creator sdk.AccAddress, wasmCode []byte) (uint64, error) {
+	// access configuration of only for creator address
+	accessConfig := &wasmtypes.AccessConfig{
+		Permission: wasmtypes.AccessTypeOnlyAddress,
+		Address:    creator.String(),
+	}
+
+	// create contract
+	codeID, err := k.wasmKeeper.Create(ctx, creator, wasmCode, accessConfig)
+	if err != nil {
+		return 0, sdkerrors.Wrapf(err, "failed to create contract")
+	}
+
+	return codeID, nil
+}
+
+// DeployAndRegisterNFTContract creates, instantiate contract and store contract address
+func (k Keeper) DeployAndRegisterNFTContract(ctx sdk.Context, wasmCode []byte) error {
+	moduleAddr := types.GetModuleAddress()
+
+	codeID, err := k.CreateNFTContract(ctx, moduleAddr, wasmCode)
+	if err != nil {
+		return err
+	}
+
+	initMsg := types.NewInstantiateNFTMsg("curation", "CUR", moduleAddr.String())
+	initMsgBz, err := json.Marshal(initMsg)
+	if err != nil {
+		return err
+	}
+
+	// instantiate contract (set admin to module)
+	contractAddr, _, err := k.wasmKeeper.Instantiate(ctx, codeID, moduleAddr, moduleAddr, initMsgBz, "curator NFT", nil)
+	if err != nil {
+		return sdkerrors.Wrapf(err, "failed to instantiate contract")
+	}
+
+	// set contract address
+	k.SetContractAddress(ctx, contractAddr)
+
+	return nil
+}
+
+// MigrateNFTContract creates new contract and migrate
+func (k Keeper) MigrateNFTContract(ctx sdk.Context, newWasmCode []byte) error {
+	moduleAddr := types.GetModuleAddress()
+
+	// create new contract
+	newCodeID, err := k.CreateNFTContract(ctx, moduleAddr, newWasmCode)
+	if err != nil {
+		return err
+	}
+
+	// get existing contract address
+	contractAddress, err := k.GetNFTContractAddress(ctx)
+	if err != nil {
+		return err
+	}
+
+	// migrate msg
+	migrateMsg := types.NewMigrateContractMsg(moduleAddr)
+	migrateMsgBz, err := json.Marshal(migrateMsg)
+	if err != nil {
+		return err
+	}
+
+	// migrate contract
+	_, err = k.wasmKeeper.Migrate(ctx, contractAddress, moduleAddr, newCodeID, migrateMsgBz)
+	if err != nil {
+		return sdkerrors.Wrapf(err, "failed to migrate contract")
+	}
+
+	return nil
 }

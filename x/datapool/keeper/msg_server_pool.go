@@ -52,3 +52,31 @@ func (m msgServer) BuyDataAccessNFT(goCtx context.Context, msg *types.MsgBuyData
 func (m msgServer) RedeemDataAccessNFT(goCtx context.Context, msg *types.MsgRedeemDataAccessNFT) (*types.MsgRedeemDataAccessNFTResponse, error) {
 	return &types.MsgRedeemDataAccessNFTResponse{}, nil
 }
+
+func (m msgServer) RegisterNFTContract(goCtx context.Context, msg *types.MsgRegisterNFTContract) (*types.MsgRegisterNFTContractResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	if _, err := sdk.AccAddressFromBech32(msg.Sender); err != nil {
+		return nil, err
+	}
+
+	if err := m.Keeper.DeployAndRegisterNFTContract(ctx, msg.WasmCode); err != nil {
+		return nil, err
+	}
+
+	return &types.MsgRegisterNFTContractResponse{}, nil
+}
+
+func (m msgServer) UpgradeNFTContract(goCtx context.Context, msg *types.MsgUpgradeNFTContract) (*types.MsgUpgradeNFTContractResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	if _, err := sdk.AccAddressFromBech32(msg.Sender); err != nil {
+		return nil, err
+	}
+
+	if err := m.Keeper.MigrateNFTContract(ctx, msg.NewWasmCode); err != nil {
+		return nil, err
+	}
+
+	return &types.MsgUpgradeNFTContractResponse{}, nil
+}

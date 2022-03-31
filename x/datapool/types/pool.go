@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"strings"
 
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -70,4 +72,8 @@ func verifyPoolAddressFormat(bz []byte) error {
 	}
 
 	return nil
+}
+
+func GetModuleAddress() sdk.AccAddress {
+	return authtypes.NewModuleAddress(ModuleName)
 }

@@ -26,6 +26,12 @@ service Msg {
 
   // RedeemDataAccessNFT defines a method for redeeming data access NFT to get data
   rpc RedeemDataAccessNFT(MsgRedeemDataAccessNFT) returns (MsgRedeemDataAccessNFTResponse);
+
+  // RegisterNFTContract defines a method for deployment and registration of NFT contract
+  rpc RegisterNFTContract(MsgRegisterNFTContract) returns (MsgRegisterNFTContractResponse);
+
+  // UpgradeNFTContract defines a method for upgrade and migration of NFT contract
+  rpc UpgradeNFTContract(MsgUpgradeNFTContract) returns (MsgUpgradeNFTContractResponse);
 }
 
 // MsgRegisterDataValidator defines the Msg/RegisterDataValidator request type.
@@ -88,3 +94,21 @@ message MsgRedeemDataAccessNFT {
 message MsgRedeemDataAccessNFTResponse {
   DataAccessNFTRedeemReceipt receipt = 1;
 }
+
+// MsgRegisterNFTContract defines the Msg/RegisterNFTContract type.
+message MsgRegisterNFTContract {
+  bytes  wasm_code = 1;   // wasm byte code of NFT contract
+  string sender = 2;
+}
+
+// MsgRegisterNFTContractResponse defines the Msg/RegisterNFTContract response type.
+message MsgRegisterNFTContractResponse {}
+
+// MsgUpgradeNFTContract defines the Msg/UpgradeNFTContract type.
+message MsgUpgradeNFTContract {
+  bytes  new_wasm_code = 1;   // wasm byte code of NFT contract
+  string sender = 2;
+}
+
+// MsgUpgradeNFTContractResponse defines the Msg/UpgradeNFTContract response type.
+message MsgUpgradeNFTContractResponse {}

@@ -30,6 +30,9 @@ var (
 
 	// KeyPrefixPools defines key to store Pools
 	KeyPrefixPools = []byte{0x03}
+
+	// KeyNFTContractAddress defines key to contract address
+	KeyNFTContractAddress = []byte{0x04}
 )
 
 func GetKeyPrefixDataValidator(dataValidatorAddr sdk.AccAddress) []byte {
