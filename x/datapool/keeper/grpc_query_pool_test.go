@@ -22,7 +22,8 @@ func (suite *queryPoolTestSuite) TestQueryDataValidator() {
 		Address:  dataVal1.String(),
 		Endpoint: "https://my-validator-url.org",
 	}
-	suite.DataPoolKeeper.SetDataValidator(suite.Ctx, dataValidator)
+	err := suite.DataPoolKeeper.SetDataValidator(suite.Ctx, dataValidator)
+	suite.Require().NoError(err)
 
 	req := types.QueryDataValidatorRequest{
 		Address: dataVal1.String(),
