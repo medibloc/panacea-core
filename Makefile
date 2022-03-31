@@ -57,7 +57,7 @@ proto-lint:
 
 PROTO_DIR = third_party/proto
 # TODO: use the correct version after releasing medibloc/cosmos-sdk
-COSMOS_VER_SHORT = 0.42.11-panacea-min-commission-rate-0a76661
+COSMOS_VER_SHORT = 0.42.11-panacea-min-commission-rate-28eaec9
 COSMOS_VER = v$(COSMOS_VER_SHORT)
 
 proto-update-dep:
