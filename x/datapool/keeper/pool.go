@@ -42,6 +42,28 @@ func (k Keeper) RegisterDataValidator(ctx sdk.Context, dataValidator types.DataV
 	return nil
 }
 
+func (k Keeper) GetAllDataValidators(ctx sdk.Context) ([]types.DataValidator, error) {
+	store := ctx.KVStore(k.storeKey)
+	iterator := sdk.KVStorePrefixIterator(store, types.KeyPrefixDataValidators)
+	defer iterator.Close()
+
+	dataValidators := make([]types.DataValidator, 0)
+
+	for ; iterator.Valid(); iterator.Next() {
+		bz := iterator.Value()
+		var dataValidator types.DataValidator
+
+		err := k.cdc.UnmarshalBinaryLengthPrefixed(bz, &dataValidator)
+		if err != nil {
+			return []types.DataValidator{}, err
+		}
+
+		dataValidators = append(dataValidators, dataValidator)
+	}
+
+	return dataValidators, nil
+}
+
 func (k Keeper) GetDataValidator(ctx sdk.Context, dataValidatorAddress sdk.AccAddress) (types.DataValidator, error) {
 	store := ctx.KVStore(k.storeKey)
 	dataValidatorKey := types.GetKeyPrefixDataValidator(dataValidatorAddress)
@@ -180,6 +202,28 @@ func (k Keeper) SetPool(ctx sdk.Context, pool *types.Pool) {
 	poolKey := types.GetKeyPrefixPools(pool.GetPoolId())
 	bz := k.cdc.MustMarshalBinaryLengthPrefixed(pool)
 	store.Set(poolKey, bz)
+}
+
+func (k Keeper) GetAllPools(ctx sdk.Context) ([]types.Pool, error) {
+	store := ctx.KVStore(k.storeKey)
+	iterator := sdk.KVStorePrefixIterator(store, types.KeyPrefixPools)
+	defer iterator.Close()
+
+	pools := make([]types.Pool, 0)
+
+	for ; iterator.Valid(); iterator.Next() {
+		bz := iterator.Value()
+		var pool types.Pool
+
+		err := k.cdc.UnmarshalBinaryLengthPrefixed(bz, &pool)
+		if err != nil {
+			return []types.Pool{}, err
+		}
+
+		pools = append(pools, pool)
+	}
+
+	return pools, nil
 }
 
 func (k Keeper) SetContractAddress(ctx sdk.Context, address sdk.AccAddress) {

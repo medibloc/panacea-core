@@ -10,6 +10,17 @@ import (
 // state.
 func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) {
 	k.SetPoolNumber(ctx, genState.NextPoolNumber)
+
+	for _, dataValidator := range genState.DataValidators {
+		err := k.SetDataValidator(ctx, *dataValidator)
+		if err != nil {
+			panic(err)
+		}
+	}
+
+	for _, pool := range genState.Pools {
+		k.SetPool(ctx, pool)
+	}
 	// this line is used by starport scaffolding # genesis/module/init
 
 	// this line is used by starport scaffolding # ibc/genesis/init
@@ -19,6 +30,25 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	genesis := types.DefaultGenesis()
 
+	genesis.NextPoolNumber = k.GetNextPoolNumber(ctx)
+
+	dataValidators, err := k.GetAllDataValidators(ctx)
+	if err != nil {
+		panic(err)
+	}
+
+	for _, val := range dataValidators {
+		genesis.DataValidators = append(genesis.DataValidators, &val)
+	}
+
+	pools, err := k.GetAllPools(ctx)
+	if err != nil {
+		panic(err)
+	}
+
+	for _, pool := range pools {
+		genesis.Pools[pool.GetPoolId()] = &pool
+	}
 	// this line is used by starport scaffolding # genesis/module/export
 
 	// this line is used by starport scaffolding # ibc/genesis/export
