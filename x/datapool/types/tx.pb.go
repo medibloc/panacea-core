@@ -10,7 +10,6 @@ import (
 	_ "github.com/gogo/protobuf/gogoproto"
 	grpc1 "github.com/gogo/protobuf/grpc"
 	proto "github.com/gogo/protobuf/proto"
-	github_com_gogo_protobuf_types "github.com/gogo/protobuf/types"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -18,14 +17,12 @@ import (
 	io "io"
 	math "math"
 	math_bits "math/bits"
-	time "time"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal
 var _ = fmt.Errorf
 var _ = math.Inf
-var _ = time.Kitchen
 
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the proto package it is being compiled against.
@@ -117,15 +114,8 @@ var xxx_messageInfo_MsgRegisterDataValidatorResponse proto.InternalMessageInfo
 
 // MsgCreatePool defines the Msg/CreatePool request type.
 type MsgCreatePool struct {
-	DataSchema            []string       `protobuf:"bytes,1,rep,name=data_schema,json=dataSchema,proto3" json:"data_schema,omitempty"`
-	TargetNumData         uint64         `protobuf:"varint,2,opt,name=target_num_data,json=targetNumData,proto3" json:"target_num_data,omitempty"`
-	MaxNftSupply          uint64         `protobuf:"varint,3,opt,name=max_nft_supply,json=maxNftSupply,proto3" json:"max_nft_supply,omitempty"`
-	NftPrice              *types.Coin    `protobuf:"bytes,4,opt,name=nft_price,json=nftPrice,proto3" json:"nft_price,omitempty"`
-	TrustedDataValidators []string       `protobuf:"bytes,5,rep,name=trusted_data_validators,json=trustedDataValidators,proto3" json:"trusted_data_validators,omitempty"`
-	TrustedDataIssuers    []string       `protobuf:"bytes,6,rep,name=trusted_data_issuers,json=trustedDataIssuers,proto3" json:"trusted_data_issuers,omitempty"`
-	Deposit               *types.Coin    `protobuf:"bytes,7,opt,name=deposit,proto3" json:"deposit,omitempty"`
-	DownloadPeriod        *time.Duration `protobuf:"bytes,8,opt,name=download_period,json=downloadPeriod,proto3,stdduration" json:"download_period,omitempty"`
-	Curator               string         `protobuf:"bytes,9,opt,name=curator,proto3" json:"curator,omitempty"`
+	Curator    string      `protobuf:"bytes,1,opt,name=curator,proto3" json:"curator,omitempty"`
+	PoolParams *PoolParams `protobuf:"bytes,2,opt,name=pool_params,json=poolParams,proto3" json:"pool_params,omitempty"`
 }
 
 func (m *MsgCreatePool) Reset()         { *m = MsgCreatePool{} }
@@ -161,67 +151,18 @@ func (m *MsgCreatePool) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgCreatePool proto.InternalMessageInfo
 
-func (m *MsgCreatePool) GetDataSchema() []string {
-	if m != nil {
-		return m.DataSchema
-	}
-	return nil
-}
-
-func (m *MsgCreatePool) GetTargetNumData() uint64 {
-	if m != nil {
-		return m.TargetNumData
-	}
-	return 0
-}
-
-func (m *MsgCreatePool) GetMaxNftSupply() uint64 {
-	if m != nil {
-		return m.MaxNftSupply
-	}
-	return 0
-}
-
-func (m *MsgCreatePool) GetNftPrice() *types.Coin {
-	if m != nil {
-		return m.NftPrice
-	}
-	return nil
-}
-
-func (m *MsgCreatePool) GetTrustedDataValidators() []string {
-	if m != nil {
-		return m.TrustedDataValidators
-	}
-	return nil
-}
-
-func (m *MsgCreatePool) GetTrustedDataIssuers() []string {
-	if m != nil {
-		return m.TrustedDataIssuers
-	}
-	return nil
-}
-
-func (m *MsgCreatePool) GetDeposit() *types.Coin {
-	if m != nil {
-		return m.Deposit
-	}
-	return nil
-}
-
-func (m *MsgCreatePool) GetDownloadPeriod() *time.Duration {
-	if m != nil {
-		return m.DownloadPeriod
-	}
-	return nil
-}
-
 func (m *MsgCreatePool) GetCurator() string {
 	if m != nil {
 		return m.Curator
 	}
 	return ""
+}
+
+func (m *MsgCreatePool) GetPoolParams() *PoolParams {
+	if m != nil {
+		return m.PoolParams
+	}
+	return nil
 }
 
 // MsgCreatePoolResponse defines the Msg/CreatePool response type.
@@ -627,6 +568,186 @@ func (m *MsgRedeemDataAccessNFTResponse) GetReceipt() *DataAccessNFTRedeemReceip
 	return nil
 }
 
+// MsgRegisterNFTContract defines the Msg/RegisterNFTContract type.
+type MsgRegisterNFTContract struct {
+	WasmCode []byte `protobuf:"bytes,1,opt,name=wasm_code,json=wasmCode,proto3" json:"wasm_code,omitempty"`
+	Sender   string `protobuf:"bytes,2,opt,name=sender,proto3" json:"sender,omitempty"`
+}
+
+func (m *MsgRegisterNFTContract) Reset()         { *m = MsgRegisterNFTContract{} }
+func (m *MsgRegisterNFTContract) String() string { return proto.CompactTextString(m) }
+func (*MsgRegisterNFTContract) ProtoMessage()    {}
+func (*MsgRegisterNFTContract) Descriptor() ([]byte, []int) {
+	return fileDescriptor_eb3d400cb0e531d6, []int{10}
+}
+func (m *MsgRegisterNFTContract) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgRegisterNFTContract) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgRegisterNFTContract.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgRegisterNFTContract) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgRegisterNFTContract.Merge(m, src)
+}
+func (m *MsgRegisterNFTContract) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgRegisterNFTContract) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgRegisterNFTContract.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgRegisterNFTContract proto.InternalMessageInfo
+
+func (m *MsgRegisterNFTContract) GetWasmCode() []byte {
+	if m != nil {
+		return m.WasmCode
+	}
+	return nil
+}
+
+func (m *MsgRegisterNFTContract) GetSender() string {
+	if m != nil {
+		return m.Sender
+	}
+	return ""
+}
+
+// MsgRegisterNFTContractResponse defines the Msg/RegisterNFTContract response type.
+type MsgRegisterNFTContractResponse struct {
+}
+
+func (m *MsgRegisterNFTContractResponse) Reset()         { *m = MsgRegisterNFTContractResponse{} }
+func (m *MsgRegisterNFTContractResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgRegisterNFTContractResponse) ProtoMessage()    {}
+func (*MsgRegisterNFTContractResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_eb3d400cb0e531d6, []int{11}
+}
+func (m *MsgRegisterNFTContractResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgRegisterNFTContractResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgRegisterNFTContractResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgRegisterNFTContractResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgRegisterNFTContractResponse.Merge(m, src)
+}
+func (m *MsgRegisterNFTContractResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgRegisterNFTContractResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgRegisterNFTContractResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgRegisterNFTContractResponse proto.InternalMessageInfo
+
+// MsgUpgradeNFTContract defines the Msg/UpgradeNFTContract type.
+type MsgUpgradeNFTContract struct {
+	NewWasmCode []byte `protobuf:"bytes,1,opt,name=new_wasm_code,json=newWasmCode,proto3" json:"new_wasm_code,omitempty"`
+	Sender      string `protobuf:"bytes,2,opt,name=sender,proto3" json:"sender,omitempty"`
+}
+
+func (m *MsgUpgradeNFTContract) Reset()         { *m = MsgUpgradeNFTContract{} }
+func (m *MsgUpgradeNFTContract) String() string { return proto.CompactTextString(m) }
+func (*MsgUpgradeNFTContract) ProtoMessage()    {}
+func (*MsgUpgradeNFTContract) Descriptor() ([]byte, []int) {
+	return fileDescriptor_eb3d400cb0e531d6, []int{12}
+}
+func (m *MsgUpgradeNFTContract) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgUpgradeNFTContract) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgUpgradeNFTContract.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgUpgradeNFTContract) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgUpgradeNFTContract.Merge(m, src)
+}
+func (m *MsgUpgradeNFTContract) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgUpgradeNFTContract) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgUpgradeNFTContract.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgUpgradeNFTContract proto.InternalMessageInfo
+
+func (m *MsgUpgradeNFTContract) GetNewWasmCode() []byte {
+	if m != nil {
+		return m.NewWasmCode
+	}
+	return nil
+}
+
+func (m *MsgUpgradeNFTContract) GetSender() string {
+	if m != nil {
+		return m.Sender
+	}
+	return ""
+}
+
+// MsgUpgradeNFTContractResponse defines the Msg/UpgradeNFTContract response type.
+type MsgUpgradeNFTContractResponse struct {
+}
+
+func (m *MsgUpgradeNFTContractResponse) Reset()         { *m = MsgUpgradeNFTContractResponse{} }
+func (m *MsgUpgradeNFTContractResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgUpgradeNFTContractResponse) ProtoMessage()    {}
+func (*MsgUpgradeNFTContractResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_eb3d400cb0e531d6, []int{13}
+}
+func (m *MsgUpgradeNFTContractResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgUpgradeNFTContractResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgUpgradeNFTContractResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgUpgradeNFTContractResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgUpgradeNFTContractResponse.Merge(m, src)
+}
+func (m *MsgUpgradeNFTContractResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgUpgradeNFTContractResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgUpgradeNFTContractResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgUpgradeNFTContractResponse proto.InternalMessageInfo
+
 func init() {
 	proto.RegisterType((*MsgRegisterDataValidator)(nil), "panacea.datapool.v2.MsgRegisterDataValidator")
 	proto.RegisterType((*MsgRegisterDataValidatorResponse)(nil), "panacea.datapool.v2.MsgRegisterDataValidatorResponse")
@@ -638,66 +759,67 @@ func init() {
 	proto.RegisterType((*MsgBuyDataAccessNFTResponse)(nil), "panacea.datapool.v2.MsgBuyDataAccessNFTResponse")
 	proto.RegisterType((*MsgRedeemDataAccessNFT)(nil), "panacea.datapool.v2.MsgRedeemDataAccessNFT")
 	proto.RegisterType((*MsgRedeemDataAccessNFTResponse)(nil), "panacea.datapool.v2.MsgRedeemDataAccessNFTResponse")
+	proto.RegisterType((*MsgRegisterNFTContract)(nil), "panacea.datapool.v2.MsgRegisterNFTContract")
+	proto.RegisterType((*MsgRegisterNFTContractResponse)(nil), "panacea.datapool.v2.MsgRegisterNFTContractResponse")
+	proto.RegisterType((*MsgUpgradeNFTContract)(nil), "panacea.datapool.v2.MsgUpgradeNFTContract")
+	proto.RegisterType((*MsgUpgradeNFTContractResponse)(nil), "panacea.datapool.v2.MsgUpgradeNFTContractResponse")
 }
 
 func init() { proto.RegisterFile("panacea/datapool/v2/tx.proto", fileDescriptor_eb3d400cb0e531d6) }
 
 var fileDescriptor_eb3d400cb0e531d6 = []byte{
-	// 862 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xa4, 0x55, 0xdd, 0x6e, 0xe3, 0x44,
-	0x14, 0xae, 0x69, 0x9a, 0x34, 0xa7, 0x74, 0xbb, 0x72, 0x7f, 0xd6, 0x04, 0x94, 0x8d, 0x2c, 0x84,
-	0x22, 0xd0, 0xda, 0xdb, 0x56, 0xec, 0x3d, 0x6d, 0x85, 0xa8, 0x50, 0xa2, 0xca, 0x5d, 0xed, 0x05,
-	0x42, 0xb2, 0x26, 0xe3, 0x13, 0x77, 0xb4, 0xb6, 0xc7, 0x9a, 0x19, 0x77, 0x1b, 0x24, 0x9e, 0x01,
-	0x2e, 0xb9, 0xe7, 0x29, 0x78, 0x03, 0x2e, 0xf7, 0x92, 0x3b, 0x50, 0xfb, 0x22, 0x68, 0x26, 0xb6,
-	0xb7, 0x61, 0x9d, 0x96, 0xc2, 0x5d, 0xce, 0x9c, 0xef, 0x3b, 0x3f, 0xf3, 0x7d, 0x9e, 0xc0, 0x27,
-	0x39, 0xc9, 0x08, 0x45, 0xe2, 0x47, 0x44, 0x91, 0x9c, 0xf3, 0xc4, 0xbf, 0x3c, 0xf0, 0xd5, 0x95,
-	0x97, 0x0b, 0xae, 0xb8, 0xbd, 0x5d, 0x66, 0xbd, 0x2a, 0xeb, 0x5d, 0x1e, 0xf4, 0x76, 0x62, 0x1e,
-	0x73, 0x93, 0xf7, 0xf5, 0xaf, 0x39, 0xb4, 0xd7, 0xa7, 0x5c, 0xa6, 0x5c, 0xfa, 0x13, 0x22, 0xd1,
-	0xbf, 0xdc, 0x9f, 0xa0, 0x22, 0xfb, 0x3e, 0xe5, 0x2c, 0xab, 0xf2, 0x31, 0xe7, 0x71, 0x82, 0xbe,
-	0x89, 0x26, 0xc5, 0xd4, 0x8f, 0x0a, 0x41, 0x14, 0xe3, 0x75, 0xbe, 0x69, 0x10, 0xd3, 0xd2, 0xe4,
-	0x5d, 0x06, 0xce, 0x48, 0xc6, 0x01, 0xc6, 0x4c, 0x2a, 0x14, 0x27, 0x44, 0x91, 0x57, 0x24, 0x61,
-	0x11, 0x51, 0x5c, 0xd8, 0x23, 0x78, 0x7c, 0x59, 0x05, 0x61, 0x84, 0x8a, 0xb0, 0xc4, 0xb1, 0x06,
-	0xd6, 0x70, 0xe3, 0xc0, 0xf5, 0x1a, 0x36, 0xf0, 0x16, 0xd8, 0xc1, 0x56, 0xcd, 0x3d, 0x31, 0x54,
-	0xd7, 0x85, 0xc1, 0xb2, 0x56, 0x01, 0xca, 0x9c, 0x67, 0x12, 0xdd, 0xdf, 0x56, 0x61, 0x73, 0x24,
-	0xe3, 0x63, 0x81, 0x44, 0xe1, 0x19, 0xe7, 0x89, 0xfd, 0x14, 0x36, 0x74, 0x8f, 0x50, 0xd2, 0x0b,
-	0x4c, 0x89, 0x63, 0x0d, 0x56, 0x87, 0xdd, 0x00, 0xf4, 0xd1, 0xb9, 0x39, 0xb1, 0x3f, 0x83, 0x2d,
-	0x45, 0x44, 0x8c, 0x2a, 0xcc, 0x8a, 0x34, 0xd4, 0x09, 0xe7, 0x83, 0x81, 0x35, 0x6c, 0x05, 0x9b,
-	0xf3, 0xe3, 0x71, 0x91, 0xea, 0x5e, 0xf6, 0xa7, 0xf0, 0x28, 0x25, 0x57, 0x61, 0x36, 0x55, 0xa1,
-	0x2c, 0xf2, 0x3c, 0x99, 0x39, 0xab, 0x06, 0xf6, 0x61, 0x4a, 0xae, 0xc6, 0x53, 0x75, 0x6e, 0xce,
-	0xec, 0x17, 0xd0, 0xd5, 0x88, 0x5c, 0x30, 0x8a, 0x4e, 0xcb, 0x2c, 0xfb, 0x91, 0x37, 0xd7, 0xc0,
-	0xd3, 0x1a, 0x78, 0xa5, 0x06, 0xde, 0x31, 0x67, 0x59, 0xb0, 0x9e, 0x4d, 0xd5, 0x99, 0x86, 0xda,
-	0x2f, 0xe0, 0x89, 0x12, 0x85, 0x54, 0x18, 0x99, 0x11, 0xc2, 0x7a, 0x79, 0xe9, 0xac, 0x99, 0x91,
-	0x77, 0xcb, 0xf4, 0xc2, 0xde, 0xd2, 0x7e, 0x0e, 0x3b, 0x0b, 0x3c, 0x26, 0x65, 0x81, 0x42, 0x3a,
-	0x6d, 0x43, 0xb2, 0x6f, 0x91, 0x4e, 0xe7, 0x19, 0xfb, 0x10, 0x3a, 0x11, 0xe6, 0x5c, 0x32, 0xe5,
-	0x74, 0xee, 0x9b, 0xaf, 0x42, 0xda, 0xdf, 0xc0, 0x56, 0xc4, 0xdf, 0x64, 0x09, 0x27, 0x51, 0x98,
-	0xa3, 0x60, 0x3c, 0x72, 0xd6, 0x4b, 0xf2, 0xdc, 0x40, 0x5e, 0x65, 0x20, 0xef, 0xa4, 0x34, 0xd0,
-	0x51, 0xeb, 0x97, 0x3f, 0x9f, 0x5a, 0xc1, 0xa3, 0x8a, 0x77, 0x66, 0x68, 0xb6, 0x03, 0x1d, 0xaa,
-	0x11, 0x5c, 0x38, 0xdd, 0x81, 0x35, 0xec, 0x06, 0x55, 0xe8, 0x66, 0xb0, 0xbb, 0x20, 0x5d, 0x25,
-	0xaa, 0xfd, 0x04, 0x3a, 0xda, 0x22, 0x21, 0x8b, 0x8c, 0x7d, 0x5a, 0x41, 0x5b, 0x87, 0xa7, 0x91,
-	0xbd, 0x03, 0x6b, 0x82, 0x17, 0x59, 0x54, 0x0a, 0x36, 0x0f, 0xb4, 0xa0, 0xb4, 0x9c, 0xc1, 0xa8,
-	0xc5, 0xa2, 0x52, 0xa9, 0xcd, 0xea, 0x78, 0x3c, 0x55, 0xa7, 0x91, 0xcb, 0x60, 0x63, 0x24, 0xe3,
-	0x73, 0x4c, 0x12, 0xa3, 0xef, 0x11, 0xb4, 0x28, 0x0a, 0x55, 0x3a, 0xd4, 0xbb, 0xcf, 0xa1, 0x8c,
-	0x67, 0xc7, 0x28, 0x14, 0x9b, 0x32, 0x4a, 0x14, 0x06, 0x86, 0x6b, 0xef, 0x41, 0x5b, 0x62, 0x92,
-	0xa0, 0x30, 0x13, 0x75, 0x83, 0x32, 0x72, 0x11, 0xb6, 0x6f, 0xb5, 0xaa, 0x17, 0x1b, 0xc3, 0x1e,
-	0xa1, 0xb4, 0x48, 0x43, 0xb3, 0x9e, 0xbc, 0x20, 0x02, 0x43, 0xc5, 0x5f, 0x63, 0x56, 0x0e, 0x71,
-	0x87, 0x32, 0xdb, 0x86, 0xa8, 0xaf, 0xe9, 0x5c, 0xd3, 0x5e, 0x6a, 0x96, 0xfb, 0x93, 0x65, 0xfa,
-	0x1c, 0x15, 0x33, 0xdd, 0xe6, 0x2b, 0x4a, 0x51, 0xca, 0xf1, 0xd7, 0x2f, 0x1f, 0x7a, 0x81, 0x87,
-	0xd0, 0xc9, 0xc9, 0x2c, 0xc5, 0x4c, 0x99, 0x8b, 0xbb, 0xdb, 0x21, 0x25, 0x52, 0x97, 0x9a, 0x14,
-	0x33, 0x14, 0xc6, 0xf4, 0xdd, 0x60, 0x1e, 0xb8, 0x14, 0x3e, 0x6e, 0x18, 0xe8, 0xbf, 0x2a, 0xbb,
-	0x0b, 0xed, 0x05, 0x41, 0xd7, 0x32, 0x23, 0xe4, 0x0f, 0xb0, 0x67, 0x1e, 0x86, 0x08, 0x31, 0xfd,
-	0x5f, 0x8b, 0x37, 0xd7, 0xb7, 0x7b, 0xb0, 0x2e, 0x4c, 0xf1, 0x7a, 0xbb, 0x3a, 0x76, 0x5f, 0x43,
-	0xbf, 0xb9, 0x77, 0xbd, 0xe3, 0x29, 0x74, 0x04, 0x52, 0x64, 0x79, 0x65, 0x2d, 0x7f, 0xa9, 0xb5,
-	0x6e, 0x91, 0x75, 0xbd, 0x60, 0x4e, 0x0b, 0x2a, 0xfe, 0xc1, 0xaf, 0x2d, 0x58, 0x1d, 0xc9, 0xd8,
-	0xfe, 0x11, 0x76, 0x9b, 0x5f, 0xdc, 0x67, 0x8d, 0xa5, 0x97, 0xbd, 0x9a, 0xbd, 0x2f, 0x1f, 0x04,
-	0xaf, 0x37, 0xfa, 0x1e, 0xe0, 0xd6, 0x03, 0xeb, 0x2e, 0x2b, 0xf2, 0x0e, 0xd3, 0xfb, 0xfc, 0x7e,
-	0x4c, 0x5d, 0xfd, 0x15, 0xac, 0xd7, 0xdf, 0xe4, 0x60, 0x19, 0xaf, 0x42, 0xf4, 0x86, 0xf7, 0x21,
-	0xea, 0xba, 0x19, 0x3c, 0x7e, 0xef, 0xc3, 0x58, 0xca, 0xfe, 0x27, 0xb2, 0xf7, 0xfc, 0xdf, 0x22,
-	0xeb, 0x7e, 0x6f, 0x60, 0xbb, 0xc9, 0x92, 0x5f, 0x2c, 0xbf, 0xf3, 0xf7, 0xc0, 0xbd, 0xc3, 0x07,
-	0x80, 0xab, 0xc6, 0x47, 0xdf, 0xfe, 0x7e, 0xdd, 0xb7, 0xde, 0x5e, 0xf7, 0xad, 0xbf, 0xae, 0xfb,
-	0xd6, 0xcf, 0x37, 0xfd, 0x95, 0xb7, 0x37, 0xfd, 0x95, 0x3f, 0x6e, 0xfa, 0x2b, 0xdf, 0xed, 0xc7,
-	0x4c, 0x5d, 0x14, 0x13, 0x8f, 0xf2, 0xd4, 0x4f, 0x31, 0x62, 0x93, 0x84, 0x53, 0xbf, 0xec, 0xf0,
-	0x8c, 0x72, 0x81, 0xfe, 0xd5, 0xbb, 0xff, 0x79, 0x35, 0xcb, 0x51, 0x4e, 0xda, 0xe6, 0x5d, 0x3f,
-	0xfc, 0x3b, 0x00, 0x00, 0xff, 0xff, 0x5f, 0xb5, 0x48, 0xd0, 0x91, 0x08, 0x00, 0x00,
+	// 806 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xa4, 0x56, 0xcd, 0x6e, 0xdb, 0x46,
+	0x10, 0xb6, 0x1a, 0x47, 0xb6, 0x47, 0x35, 0x12, 0x50, 0xb1, 0xab, 0x32, 0x2d, 0x23, 0xf0, 0x50,
+	0x04, 0x0d, 0x42, 0xd6, 0x32, 0x7a, 0x6f, 0xad, 0x20, 0x80, 0x51, 0x48, 0x08, 0x68, 0x37, 0x05,
+	0x8a, 0x02, 0xc2, 0x6a, 0x39, 0x62, 0x08, 0x93, 0xbb, 0xc4, 0xee, 0x4a, 0x8a, 0x0a, 0xf4, 0x19,
+	0x5a, 0xf4, 0xa9, 0x7a, 0xcc, 0xb1, 0xc7, 0xc2, 0x7e, 0x91, 0x62, 0x57, 0x24, 0x23, 0x45, 0x64,
+	0x64, 0xb7, 0x37, 0x8d, 0xe6, 0xfb, 0xe6, 0x9b, 0xdf, 0x05, 0xe1, 0x8b, 0x8c, 0x30, 0x42, 0x91,
+	0xf8, 0x21, 0x51, 0x24, 0xe3, 0x3c, 0xf1, 0x67, 0x3d, 0x5f, 0xbd, 0xf5, 0x32, 0xc1, 0x15, 0xb7,
+	0xda, 0xb9, 0xd7, 0x2b, 0xbc, 0xde, 0xac, 0x67, 0x3f, 0x8a, 0x78, 0xc4, 0x8d, 0xdf, 0xd7, 0xbf,
+	0x96, 0x50, 0xdb, 0xa1, 0x5c, 0xa6, 0x5c, 0xfa, 0x63, 0x22, 0xd1, 0x9f, 0x9d, 0x8c, 0x51, 0x91,
+	0x13, 0x9f, 0xf2, 0x98, 0x15, 0xfe, 0x88, 0xf3, 0x28, 0x41, 0xdf, 0x58, 0xe3, 0xe9, 0xc4, 0x0f,
+	0xa7, 0x82, 0xa8, 0x98, 0x97, 0xfe, 0xaa, 0x44, 0x8c, 0xa4, 0xf1, 0xbb, 0x31, 0x74, 0x06, 0x32,
+	0x0a, 0x30, 0x8a, 0xa5, 0x42, 0xf1, 0x82, 0x28, 0xf2, 0x9a, 0x24, 0x71, 0x48, 0x14, 0x17, 0xd6,
+	0x00, 0x1e, 0xce, 0x0a, 0x63, 0x14, 0xa2, 0x22, 0x71, 0xd2, 0x69, 0x74, 0x1b, 0x4f, 0x5b, 0x3d,
+	0xd7, 0xab, 0xa8, 0xc0, 0x5b, 0x63, 0x07, 0x0f, 0x4a, 0xee, 0x0b, 0x43, 0x75, 0x5d, 0xe8, 0xd6,
+	0x49, 0x05, 0x28, 0x33, 0xce, 0x24, 0xba, 0x57, 0x70, 0x38, 0x90, 0x51, 0x5f, 0x20, 0x51, 0xf8,
+	0x8a, 0xf3, 0xc4, 0xea, 0xc0, 0x1e, 0xd5, 0x15, 0x71, 0x61, 0xa4, 0x0f, 0x82, 0xc2, 0xb4, 0xbe,
+	0x83, 0x96, 0x16, 0x1e, 0x65, 0x44, 0x90, 0x54, 0x76, 0x3e, 0x31, 0x89, 0x3d, 0xa9, 0x4c, 0x4c,
+	0x47, 0x7a, 0x65, 0x60, 0x01, 0x64, 0xe5, 0x6f, 0x97, 0xc1, 0xd1, 0x9a, 0x58, 0x91, 0x85, 0xf5,
+	0x19, 0xec, 0x99, 0xd0, 0x71, 0x68, 0x44, 0x77, 0x83, 0xa6, 0x36, 0xcf, 0x43, 0xeb, 0x11, 0xdc,
+	0x17, 0x7c, 0xca, 0x42, 0xa3, 0xb6, 0x1b, 0x2c, 0x0d, 0xeb, 0x2b, 0x78, 0x40, 0xf3, 0xae, 0x8f,
+	0xd8, 0x44, 0x69, 0xda, 0x3d, 0xe3, 0x3f, 0x2c, 0xfe, 0x1e, 0x4e, 0xd4, 0x79, 0xe8, 0xc6, 0xd0,
+	0x1a, 0xc8, 0xe8, 0x02, 0x93, 0x44, 0x17, 0x6f, 0x9d, 0xc1, 0x2e, 0x45, 0xa1, 0xf2, 0x96, 0x7a,
+	0xdb, 0x5a, 0x1a, 0x73, 0xd6, 0x47, 0xa1, 0xe2, 0x49, 0x4c, 0x89, 0xc2, 0xc0, 0x70, 0xad, 0x63,
+	0x68, 0x4a, 0x4c, 0x12, 0x14, 0x26, 0xa3, 0x83, 0x20, 0xb7, 0x5c, 0x84, 0xf6, 0x8a, 0x54, 0x59,
+	0xd8, 0x10, 0x8e, 0x09, 0xa5, 0xd3, 0x74, 0x64, 0xca, 0x93, 0x6f, 0x88, 0xc0, 0x91, 0xe2, 0x57,
+	0xc8, 0xf2, 0x24, 0x3e, 0xf7, 0x96, 0xeb, 0xe6, 0xe9, 0x75, 0xf3, 0xf2, 0x75, 0xf3, 0xfa, 0x3c,
+	0x66, 0x41, 0xdb, 0x10, 0x75, 0x9b, 0x2e, 0x34, 0xed, 0x52, 0xb3, 0xdc, 0xdf, 0x1b, 0x46, 0xe7,
+	0x6c, 0xba, 0xd0, 0x32, 0xdf, 0x53, 0x8a, 0x52, 0x0e, 0x5f, 0x5e, 0xde, 0xb5, 0x81, 0xa7, 0xb0,
+	0x97, 0x91, 0x45, 0x8a, 0x4c, 0x99, 0xc6, 0x7d, 0x34, 0x8f, 0x02, 0xa9, 0x43, 0x8d, 0xa7, 0x0b,
+	0x14, 0x9d, 0x5d, 0x53, 0xf9, 0xd2, 0x70, 0x29, 0x3c, 0xae, 0x48, 0xe8, 0xbf, 0x4e, 0xf6, 0x08,
+	0x9a, 0x6b, 0x03, 0xbd, 0xcf, 0xcc, 0x20, 0x7f, 0x85, 0x63, 0xb3, 0xc9, 0x21, 0x62, 0xfa, 0xbf,
+	0x0a, 0xaf, 0x8e, 0x6f, 0xd9, 0xb0, 0x2f, 0x4c, 0xf0, 0xb2, 0xba, 0xd2, 0x76, 0xaf, 0xc0, 0xa9,
+	0xd6, 0x2e, 0x6b, 0x3c, 0x87, 0x3d, 0x81, 0x14, 0xe3, 0xac, 0x58, 0x2d, 0xbf, 0x76, 0xb5, 0x56,
+	0xc8, 0x3a, 0x5e, 0xb0, 0xa4, 0x05, 0x05, 0xdf, 0x1d, 0xe4, 0x85, 0x2e, 0x4f, 0x76, 0xf8, 0xf2,
+	0xb2, 0xcf, 0x99, 0x12, 0x84, 0x2a, 0xeb, 0x31, 0x1c, 0xcc, 0x89, 0x4c, 0x47, 0x94, 0x87, 0x68,
+	0x64, 0x3e, 0x0d, 0xf6, 0xf5, 0x1f, 0x7d, 0x1e, 0xe2, 0x72, 0x2b, 0x59, 0xb8, 0xba, 0x95, 0xda,
+	0x72, 0xbb, 0x79, 0xee, 0x1b, 0xe1, 0xca, 0xfb, 0xbf, 0x30, 0x27, 0xf9, 0x63, 0x16, 0x09, 0x12,
+	0xe2, 0xaa, 0x9e, 0x0b, 0x87, 0x0c, 0xe7, 0xa3, 0x0f, 0x35, 0x5b, 0x0c, 0xe7, 0x3f, 0x6d, 0x93,
+	0x7d, 0x02, 0x5f, 0x56, 0x06, 0x2d, 0x54, 0x7b, 0x7f, 0x36, 0xe1, 0xde, 0x40, 0x46, 0xd6, 0x6f,
+	0x70, 0x54, 0xfd, 0x12, 0x3e, 0xaf, 0xec, 0x60, 0xdd, 0x6b, 0x66, 0x7f, 0x7b, 0x27, 0x78, 0x39,
+	0xb8, 0x5f, 0x00, 0x56, 0x5e, 0x3e, 0xb7, 0x2e, 0xc8, 0x7b, 0x8c, 0xfd, 0xf5, 0x76, 0x4c, 0x19,
+	0xfd, 0x35, 0xec, 0x97, 0x4f, 0x4f, 0xb7, 0x8e, 0x57, 0x20, 0xec, 0xa7, 0xdb, 0x10, 0x65, 0x5c,
+	0x06, 0x0f, 0x37, 0xee, 0xbf, 0x96, 0xfd, 0x21, 0xd2, 0xfe, 0xe6, 0xb6, 0xc8, 0x52, 0x6f, 0x0e,
+	0xed, 0xaa, 0xcb, 0x7b, 0x56, 0xdf, 0xf3, 0x0d, 0xb0, 0x7d, 0x7a, 0x07, 0xf0, 0xba, 0xf0, 0xe6,
+	0x25, 0x3c, 0xdb, 0x36, 0xec, 0x15, 0xf0, 0xc7, 0x84, 0x6b, 0x8f, 0xc2, 0x52, 0x60, 0x55, 0x5c,
+	0x44, 0xed, 0xec, 0x37, 0xb1, 0x76, 0xef, 0xf6, 0xd8, 0x42, 0xf5, 0xec, 0x87, 0xbf, 0xae, 0x9d,
+	0xc6, 0xbb, 0x6b, 0xa7, 0xf1, 0xcf, 0xb5, 0xd3, 0xf8, 0xe3, 0xc6, 0xd9, 0x79, 0x77, 0xe3, 0xec,
+	0xfc, 0x7d, 0xe3, 0xec, 0xfc, 0x7c, 0x12, 0xc5, 0xea, 0xcd, 0x74, 0xec, 0x51, 0x9e, 0xfa, 0x29,
+	0x86, 0xf1, 0x38, 0xe1, 0xd4, 0xcf, 0x05, 0x9e, 0x53, 0x2e, 0xd0, 0x7f, 0xfb, 0xfe, 0x73, 0x43,
+	0x2d, 0x32, 0x94, 0xe3, 0xa6, 0xf9, 0xda, 0x38, 0xfd, 0x37, 0x00, 0x00, 0xff, 0xff, 0x73, 0x39,
+	0x83, 0x43, 0x18, 0x09, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -722,6 +844,10 @@ type MsgClient interface {
 	BuyDataAccessNFT(ctx context.Context, in *MsgBuyDataAccessNFT, opts ...grpc.CallOption) (*MsgBuyDataAccessNFTResponse, error)
 	// RedeemDataAccessNFT defines a method for redeeming data access NFT to get data
 	RedeemDataAccessNFT(ctx context.Context, in *MsgRedeemDataAccessNFT, opts ...grpc.CallOption) (*MsgRedeemDataAccessNFTResponse, error)
+	// RegisterNFTContract defines a method for deployment and registration of NFT contract
+	RegisterNFTContract(ctx context.Context, in *MsgRegisterNFTContract, opts ...grpc.CallOption) (*MsgRegisterNFTContractResponse, error)
+	// UpgradeNFTContract defines a method for upgrade and migration of NFT contract
+	UpgradeNFTContract(ctx context.Context, in *MsgUpgradeNFTContract, opts ...grpc.CallOption) (*MsgUpgradeNFTContractResponse, error)
 }
 
 type msgClient struct {
@@ -777,6 +903,24 @@ func (c *msgClient) RedeemDataAccessNFT(ctx context.Context, in *MsgRedeemDataAc
 	return out, nil
 }
 
+func (c *msgClient) RegisterNFTContract(ctx context.Context, in *MsgRegisterNFTContract, opts ...grpc.CallOption) (*MsgRegisterNFTContractResponse, error) {
+	out := new(MsgRegisterNFTContractResponse)
+	err := c.cc.Invoke(ctx, "/panacea.datapool.v2.Msg/RegisterNFTContract", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *msgClient) UpgradeNFTContract(ctx context.Context, in *MsgUpgradeNFTContract, opts ...grpc.CallOption) (*MsgUpgradeNFTContractResponse, error) {
+	out := new(MsgUpgradeNFTContractResponse)
+	err := c.cc.Invoke(ctx, "/panacea.datapool.v2.Msg/UpgradeNFTContract", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // MsgServer is the server API for Msg service.
 type MsgServer interface {
 	// RegisterDataValidator defines a method for registration of data validator.
@@ -789,6 +933,10 @@ type MsgServer interface {
 	BuyDataAccessNFT(context.Context, *MsgBuyDataAccessNFT) (*MsgBuyDataAccessNFTResponse, error)
 	// RedeemDataAccessNFT defines a method for redeeming data access NFT to get data
 	RedeemDataAccessNFT(context.Context, *MsgRedeemDataAccessNFT) (*MsgRedeemDataAccessNFTResponse, error)
+	// RegisterNFTContract defines a method for deployment and registration of NFT contract
+	RegisterNFTContract(context.Context, *MsgRegisterNFTContract) (*MsgRegisterNFTContractResponse, error)
+	// UpgradeNFTContract defines a method for upgrade and migration of NFT contract
+	UpgradeNFTContract(context.Context, *MsgUpgradeNFTContract) (*MsgUpgradeNFTContractResponse, error)
 }
 
 // UnimplementedMsgServer can be embedded to have forward compatible implementations.
@@ -809,6 +957,12 @@ func (*UnimplementedMsgServer) BuyDataAccessNFT(ctx context.Context, req *MsgBuy
 }
 func (*UnimplementedMsgServer) RedeemDataAccessNFT(ctx context.Context, req *MsgRedeemDataAccessNFT) (*MsgRedeemDataAccessNFTResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RedeemDataAccessNFT not implemented")
+}
+func (*UnimplementedMsgServer) RegisterNFTContract(ctx context.Context, req *MsgRegisterNFTContract) (*MsgRegisterNFTContractResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RegisterNFTContract not implemented")
+}
+func (*UnimplementedMsgServer) UpgradeNFTContract(ctx context.Context, req *MsgUpgradeNFTContract) (*MsgUpgradeNFTContractResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpgradeNFTContract not implemented")
 }
 
 func RegisterMsgServer(s grpc1.Server, srv MsgServer) {
@@ -905,6 +1059,42 @@ func _Msg_RedeemDataAccessNFT_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Msg_RegisterNFTContract_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgRegisterNFTContract)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).RegisterNFTContract(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/panacea.datapool.v2.Msg/RegisterNFTContract",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).RegisterNFTContract(ctx, req.(*MsgRegisterNFTContract))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Msg_UpgradeNFTContract_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgUpgradeNFTContract)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).UpgradeNFTContract(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/panacea.datapool.v2.Msg/UpgradeNFTContract",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).UpgradeNFTContract(ctx, req.(*MsgUpgradeNFTContract))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _Msg_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "panacea.datapool.v2.Msg",
 	HandlerType: (*MsgServer)(nil),
@@ -928,6 +1118,14 @@ var _Msg_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "RedeemDataAccessNFT",
 			Handler:    _Msg_RedeemDataAccessNFT_Handler,
+		},
+		{
+			MethodName: "RegisterNFTContract",
+			Handler:    _Msg_RegisterNFTContract_Handler,
+		},
+		{
+			MethodName: "UpgradeNFTContract",
+			Handler:    _Msg_UpgradeNFTContract_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
@@ -1012,83 +1210,24 @@ func (m *MsgCreatePool) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
+	if m.PoolParams != nil {
+		{
+			size, err := m.PoolParams.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintTx(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x12
+	}
 	if len(m.Curator) > 0 {
 		i -= len(m.Curator)
 		copy(dAtA[i:], m.Curator)
 		i = encodeVarintTx(dAtA, i, uint64(len(m.Curator)))
 		i--
-		dAtA[i] = 0x4a
-	}
-	if m.DownloadPeriod != nil {
-		n2, err2 := github_com_gogo_protobuf_types.StdDurationMarshalTo(*m.DownloadPeriod, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdDuration(*m.DownloadPeriod):])
-		if err2 != nil {
-			return 0, err2
-		}
-		i -= n2
-		i = encodeVarintTx(dAtA, i, uint64(n2))
-		i--
-		dAtA[i] = 0x42
-	}
-	if m.Deposit != nil {
-		{
-			size, err := m.Deposit.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintTx(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0x3a
-	}
-	if len(m.TrustedDataIssuers) > 0 {
-		for iNdEx := len(m.TrustedDataIssuers) - 1; iNdEx >= 0; iNdEx-- {
-			i -= len(m.TrustedDataIssuers[iNdEx])
-			copy(dAtA[i:], m.TrustedDataIssuers[iNdEx])
-			i = encodeVarintTx(dAtA, i, uint64(len(m.TrustedDataIssuers[iNdEx])))
-			i--
-			dAtA[i] = 0x32
-		}
-	}
-	if len(m.TrustedDataValidators) > 0 {
-		for iNdEx := len(m.TrustedDataValidators) - 1; iNdEx >= 0; iNdEx-- {
-			i -= len(m.TrustedDataValidators[iNdEx])
-			copy(dAtA[i:], m.TrustedDataValidators[iNdEx])
-			i = encodeVarintTx(dAtA, i, uint64(len(m.TrustedDataValidators[iNdEx])))
-			i--
-			dAtA[i] = 0x2a
-		}
-	}
-	if m.NftPrice != nil {
-		{
-			size, err := m.NftPrice.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintTx(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0x22
-	}
-	if m.MaxNftSupply != 0 {
-		i = encodeVarintTx(dAtA, i, uint64(m.MaxNftSupply))
-		i--
-		dAtA[i] = 0x18
-	}
-	if m.TargetNumData != 0 {
-		i = encodeVarintTx(dAtA, i, uint64(m.TargetNumData))
-		i--
-		dAtA[i] = 0x10
-	}
-	if len(m.DataSchema) > 0 {
-		for iNdEx := len(m.DataSchema) - 1; iNdEx >= 0; iNdEx-- {
-			i -= len(m.DataSchema[iNdEx])
-			copy(dAtA[i:], m.DataSchema[iNdEx])
-			i = encodeVarintTx(dAtA, i, uint64(len(m.DataSchema[iNdEx])))
-			i--
-			dAtA[i] = 0xa
-		}
+		dAtA[i] = 0xa
 	}
 	return len(dAtA) - i, nil
 }
@@ -1378,6 +1517,126 @@ func (m *MsgRedeemDataAccessNFTResponse) MarshalToSizedBuffer(dAtA []byte) (int,
 	return len(dAtA) - i, nil
 }
 
+func (m *MsgRegisterNFTContract) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgRegisterNFTContract) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgRegisterNFTContract) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Sender) > 0 {
+		i -= len(m.Sender)
+		copy(dAtA[i:], m.Sender)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Sender)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.WasmCode) > 0 {
+		i -= len(m.WasmCode)
+		copy(dAtA[i:], m.WasmCode)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.WasmCode)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgRegisterNFTContractResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgRegisterNFTContractResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgRegisterNFTContractResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgUpgradeNFTContract) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgUpgradeNFTContract) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgUpgradeNFTContract) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Sender) > 0 {
+		i -= len(m.Sender)
+		copy(dAtA[i:], m.Sender)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Sender)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.NewWasmCode) > 0 {
+		i -= len(m.NewWasmCode)
+		copy(dAtA[i:], m.NewWasmCode)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.NewWasmCode)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgUpgradeNFTContractResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgUpgradeNFTContractResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgUpgradeNFTContractResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	return len(dAtA) - i, nil
+}
+
 func encodeVarintTx(dAtA []byte, offset int, v uint64) int {
 	offset -= sovTx(v)
 	base := offset
@@ -1417,44 +1676,12 @@ func (m *MsgCreatePool) Size() (n int) {
 	}
 	var l int
 	_ = l
-	if len(m.DataSchema) > 0 {
-		for _, s := range m.DataSchema {
-			l = len(s)
-			n += 1 + l + sovTx(uint64(l))
-		}
-	}
-	if m.TargetNumData != 0 {
-		n += 1 + sovTx(uint64(m.TargetNumData))
-	}
-	if m.MaxNftSupply != 0 {
-		n += 1 + sovTx(uint64(m.MaxNftSupply))
-	}
-	if m.NftPrice != nil {
-		l = m.NftPrice.Size()
-		n += 1 + l + sovTx(uint64(l))
-	}
-	if len(m.TrustedDataValidators) > 0 {
-		for _, s := range m.TrustedDataValidators {
-			l = len(s)
-			n += 1 + l + sovTx(uint64(l))
-		}
-	}
-	if len(m.TrustedDataIssuers) > 0 {
-		for _, s := range m.TrustedDataIssuers {
-			l = len(s)
-			n += 1 + l + sovTx(uint64(l))
-		}
-	}
-	if m.Deposit != nil {
-		l = m.Deposit.Size()
-		n += 1 + l + sovTx(uint64(l))
-	}
-	if m.DownloadPeriod != nil {
-		l = github_com_gogo_protobuf_types.SizeOfStdDuration(*m.DownloadPeriod)
-		n += 1 + l + sovTx(uint64(l))
-	}
 	l = len(m.Curator)
 	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	if m.PoolParams != nil {
+		l = m.PoolParams.Size()
 		n += 1 + l + sovTx(uint64(l))
 	}
 	return n
@@ -1581,6 +1808,58 @@ func (m *MsgRedeemDataAccessNFTResponse) Size() (n int) {
 		l = m.Receipt.Size()
 		n += 1 + l + sovTx(uint64(l))
 	}
+	return n
+}
+
+func (m *MsgRegisterNFTContract) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.WasmCode)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.Sender)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	return n
+}
+
+func (m *MsgRegisterNFTContractResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	return n
+}
+
+func (m *MsgUpgradeNFTContract) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.NewWasmCode)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.Sender)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	return n
+}
+
+func (m *MsgUpgradeNFTContractResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
 	return n
 }
 
@@ -1757,248 +2036,6 @@ func (m *MsgCreatePool) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field DataSchema", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthTx
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthTx
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.DataSchema = append(m.DataSchema, string(dAtA[iNdEx:postIndex]))
-			iNdEx = postIndex
-		case 2:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field TargetNumData", wireType)
-			}
-			m.TargetNumData = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.TargetNumData |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 3:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field MaxNftSupply", wireType)
-			}
-			m.MaxNftSupply = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.MaxNftSupply |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 4:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field NftPrice", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthTx
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthTx
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.NftPrice == nil {
-				m.NftPrice = &types.Coin{}
-			}
-			if err := m.NftPrice.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 5:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field TrustedDataValidators", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthTx
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthTx
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.TrustedDataValidators = append(m.TrustedDataValidators, string(dAtA[iNdEx:postIndex]))
-			iNdEx = postIndex
-		case 6:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field TrustedDataIssuers", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthTx
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthTx
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.TrustedDataIssuers = append(m.TrustedDataIssuers, string(dAtA[iNdEx:postIndex]))
-			iNdEx = postIndex
-		case 7:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Deposit", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthTx
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthTx
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.Deposit == nil {
-				m.Deposit = &types.Coin{}
-			}
-			if err := m.Deposit.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 8:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field DownloadPeriod", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthTx
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthTx
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.DownloadPeriod == nil {
-				m.DownloadPeriod = new(time.Duration)
-			}
-			if err := github_com_gogo_protobuf_types.StdDurationUnmarshal(m.DownloadPeriod, dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 9:
-			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Curator", wireType)
 			}
 			var stringLen uint64
@@ -2028,6 +2065,42 @@ func (m *MsgCreatePool) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			m.Curator = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field PoolParams", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.PoolParams == nil {
+				m.PoolParams = &PoolParams{}
+			}
+			if err := m.PoolParams.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -2828,6 +2901,338 @@ func (m *MsgRedeemDataAccessNFTResponse) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgRegisterNFTContract) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgRegisterNFTContract: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgRegisterNFTContract: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field WasmCode", wireType)
+			}
+			var byteLen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				byteLen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if byteLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + byteLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.WasmCode = append(m.WasmCode[:0], dAtA[iNdEx:postIndex]...)
+			if m.WasmCode == nil {
+				m.WasmCode = []byte{}
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Sender", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Sender = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgRegisterNFTContractResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgRegisterNFTContractResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgRegisterNFTContractResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgUpgradeNFTContract) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgUpgradeNFTContract: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgUpgradeNFTContract: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field NewWasmCode", wireType)
+			}
+			var byteLen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				byteLen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if byteLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + byteLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.NewWasmCode = append(m.NewWasmCode[:0], dAtA[iNdEx:postIndex]...)
+			if m.NewWasmCode == nil {
+				m.NewWasmCode = []byte{}
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Sender", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Sender = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgUpgradeNFTContractResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgUpgradeNFTContractResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgUpgradeNFTContractResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
 		default:
 			iNdEx = preIndex
 			skippy, err := skipTx(dAtA[iNdEx:])

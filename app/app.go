@@ -202,6 +202,7 @@ var (
 		govtypes.ModuleName:            {authtypes.Burner},
 		ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
 		wasm.ModuleName:                {authtypes.Burner},
+		datapooltypes.ModuleName:       nil,
 	}
 )
 
@@ -453,6 +454,7 @@ func New(
 		keys[datapooltypes.MemStoreKey],
 		app.BankKeeper,
 		app.AccountKeeper,
+		app.wasmKeeper,
 	)
 
 	// The gov proposal types can be individually enabled

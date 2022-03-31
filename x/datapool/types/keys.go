@@ -24,8 +24,21 @@ const (
 var (
 	// KeyPrefixDataValidators defines key to store data validator
 	KeyPrefixDataValidators = []byte{0x01}
+
+	// KeyPoolNextNumber defines key to store next Pool ID to be used
+	KeyPoolNextNumber = []byte{0x02}
+
+	// KeyPrefixPools defines key to store Pools
+	KeyPrefixPools = []byte{0x03}
+
+	// KeyNFTContractAddress defines key to contract address
+	KeyNFTContractAddress = []byte{0x04}
 )
 
 func GetKeyPrefixDataValidator(dataValidatorAddr sdk.AccAddress) []byte {
 	return append(KeyPrefixDataValidators, dataValidatorAddr.Bytes()...)
+}
+
+func GetKeyPrefixPools(poolID uint64) []byte {
+	return append(KeyPrefixPools, sdk.Uint64ToBigEndian(poolID)...)
 }

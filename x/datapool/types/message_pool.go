@@ -48,6 +48,13 @@ func (msg *MsgRegisterDataValidator) GetSigners() []sdk.AccAddress {
 
 var _ sdk.Msg = &MsgCreatePool{}
 
+func NewMsgCreatePool(poolParams *PoolParams, curator string) *MsgCreatePool {
+	return &MsgCreatePool{
+		Curator:    curator,
+		PoolParams: poolParams,
+	}
+}
+
 func (msg *MsgCreatePool) Route() string {
 	return RouterKey
 }
@@ -61,6 +68,49 @@ func (msg *MsgCreatePool) ValidateBasic() error {
 	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid curator address (%s)", err)
 	}
+
+	poolParams := msg.PoolParams
+
+	if len(poolParams.DataSchema) == 0 {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "no data schema")
+	}
+
+	if poolParams.TargetNumData <= 0 {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "target number of data should be greater than 0")
+	}
+
+	if poolParams.MaxNftSupply <= 0 {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "maximum supply of NFT should be greater than 0")
+	}
+
+	if poolParams.NftPrice == nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "the price of NFT is empty")
+	}
+	if !poolParams.NftPrice.IsValid() {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "the price of NFT is invalid")
+	}
+
+	for _, validatorAddr := range poolParams.TrustedDataValidators {
+		_, err = sdk.AccAddressFromBech32(validatorAddr)
+		if err != nil {
+			return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid data validator address of %s", validatorAddr)
+		}
+	}
+
+	for _, issuerAddr := range poolParams.TrustedDataIssuers {
+		_, err = sdk.AccAddressFromBech32(issuerAddr)
+		if err != nil {
+			return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid issuer address of %s", issuerAddr)
+		}
+	}
+
+	if poolParams.Deposit == nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "the deposit is empty")
+	}
+	if !poolParams.Deposit.IsValid() {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "the deposit is invalid")
+	}
+
 	return nil
 }
 
@@ -168,4 +218,80 @@ func (msg *MsgRedeemDataAccessNFT) GetSigners() []sdk.AccAddress {
 		panic(err)
 	}
 	return []sdk.AccAddress{redeemer}
+}
+
+var _ sdk.Msg = &MsgRegisterNFTContract{}
+
+func NewMsgRegisterNFTContract(wasmCode []byte, sender string) *MsgRegisterNFTContract {
+	return &MsgRegisterNFTContract{
+		WasmCode: wasmCode,
+		Sender:   sender,
+	}
+}
+
+func (msg *MsgRegisterNFTContract) Route() string {
+	return RouterKey
+}
+
+func (msg *MsgRegisterNFTContract) Type() string {
+	return "RegisterNFTContract"
+}
+
+func (msg *MsgRegisterNFTContract) ValidateBasic() error {
+	if _, err := sdk.AccAddressFromBech32(msg.Sender); err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid redeemer address (%s)", err)
+	}
+
+	return nil
+}
+
+func (msg *MsgRegisterNFTContract) GetSignBytes() []byte {
+	bz := ModuleCdc.MustMarshalJSON(msg)
+	return sdk.MustSortJSON(bz)
+}
+
+func (msg *MsgRegisterNFTContract) GetSigners() []sdk.AccAddress {
+	sender, err := sdk.AccAddressFromBech32(msg.Sender)
+	if err != nil {
+		panic(err)
+	}
+	return []sdk.AccAddress{sender}
+}
+
+var _ sdk.Msg = &MsgUpgradeNFTContract{}
+
+func NewMsgUpgradeNFTContract(newWasmCode []byte, sender string) *MsgUpgradeNFTContract {
+	return &MsgUpgradeNFTContract{
+		NewWasmCode: newWasmCode,
+		Sender:      sender,
+	}
+}
+
+func (msg *MsgUpgradeNFTContract) Route() string {
+	return RouterKey
+}
+
+func (msg *MsgUpgradeNFTContract) Type() string {
+	return "UpgradeNFTContract"
+}
+
+func (msg *MsgUpgradeNFTContract) ValidateBasic() error {
+	if _, err := sdk.AccAddressFromBech32(msg.Sender); err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid redeemer address (%s)", err)
+	}
+
+	return nil
+}
+
+func (msg *MsgUpgradeNFTContract) GetSignBytes() []byte {
+	bz := ModuleCdc.MustMarshalJSON(msg)
+	return sdk.MustSortJSON(bz)
+}
+
+func (msg *MsgUpgradeNFTContract) GetSigners() []sdk.AccAddress {
+	sender, err := sdk.AccAddressFromBech32(msg.Sender)
+	if err != nil {
+		panic(err)
+	}
+	return []sdk.AccAddress{sender}
 }

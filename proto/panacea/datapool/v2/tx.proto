@@ -26,6 +26,12 @@ service Msg {
 
   // RedeemDataAccessNFT defines a method for redeeming data access NFT to get data
   rpc RedeemDataAccessNFT(MsgRedeemDataAccessNFT) returns (MsgRedeemDataAccessNFTResponse);
+
+  // RegisterNFTContract defines a method for deployment and registration of NFT contract
+  rpc RegisterNFTContract(MsgRegisterNFTContract) returns (MsgRegisterNFTContractResponse);
+
+  // UpgradeNFTContract defines a method for upgrade and migration of NFT contract
+  rpc UpgradeNFTContract(MsgUpgradeNFTContract) returns (MsgUpgradeNFTContractResponse);
 }
 
 // MsgRegisterDataValidator defines the Msg/RegisterDataValidator request type.
@@ -39,17 +45,8 @@ message MsgRegisterDataValidatorResponse {
 
 // MsgCreatePool defines the Msg/CreatePool request type.
 message MsgCreatePool {
-  repeated string          data_schema = 1;             // JSON Schema URIs
-  uint64                   target_num_data = 2;         // A target num of data to be collected
-  uint64                   max_nft_supply = 3;          // A max num of NFTs that can be minted (= A total num of potential buyers)
-  cosmos.base.v1beta1.Coin nft_price = 4;               // A price of a NFT
-  repeated string          trusted_data_validators = 5; // Trusted data validators' addresses
-  repeated string          trusted_data_issuers = 6;    // Optional. Data issuers that is trusted by the curator
-  cosmos.base.v1beta1.Coin deposit = 7;
-  google.protobuf.Duration download_period = 8 [
-    (gogoproto.stdduration) = true
-  ];                                                    // A download period after redeeming NFT
-  string                   curator = 9;                 // 'panacea1' address
+  string      curator = 1;        // 'panacea1' address
+  PoolParams  pool_params = 2;    // pool parameters
 }
 
 // MsgCreatePoolResponse defines the Msg/CreatePool response type.
@@ -97,3 +94,21 @@ message MsgRedeemDataAccessNFT {
 message MsgRedeemDataAccessNFTResponse {
   DataAccessNFTRedeemReceipt receipt = 1;
 }
+
+// MsgRegisterNFTContract defines the Msg/RegisterNFTContract type.
+message MsgRegisterNFTContract {
+  bytes  wasm_code = 1;   // wasm byte code of NFT contract
+  string sender = 2;
+}
+
+// MsgRegisterNFTContractResponse defines the Msg/RegisterNFTContract response type.
+message MsgRegisterNFTContractResponse {}
+
+// MsgUpgradeNFTContract defines the Msg/UpgradeNFTContract type.
+message MsgUpgradeNFTContract {
+  bytes  new_wasm_code = 1;   // wasm byte code of NFT contract
+  string sender = 2;
+}
+
+// MsgUpgradeNFTContractResponse defines the Msg/UpgradeNFTContract response type.
+message MsgUpgradeNFTContractResponse {}
