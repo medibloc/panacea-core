@@ -130,7 +130,7 @@ func (k Keeper) CreatePool(ctx sdk.Context, curator sdk.AccAddress, poolParams t
 
 	// curator send deposit to pool for creation of pool
 
-	deposit := sdk.NewCoins(*newPool.PoolParams.Deposit)
+	deposit := k.GetParams(ctx).DataPoolDeposit
 	err = k.bankKeeper.SendCoins(ctx, curator, poolAddress, deposit)
 	if err != nil {
 		return 0, sdkerrors.Wrapf(types.ErrNotEnoughPoolDeposit, "The curator's balance is not enough to make a data pool")

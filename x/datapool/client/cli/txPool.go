@@ -87,11 +87,6 @@ func NewCreatePoolMsg(clientCtx client.Context, file string) (sdk.Msg, error) {
 		return nil, err
 	}
 
-	deposit, err := sdk.ParseCoinNormalized(poolParamsInput.Deposit)
-	if err != nil {
-		return nil, err
-	}
-
 	downloadPeriod, err := time.ParseDuration(poolParamsInput.DownloadPeriod)
 	if err != nil {
 		return nil, err
@@ -104,7 +99,6 @@ func NewCreatePoolMsg(clientCtx client.Context, file string) (sdk.Msg, error) {
 		NftPrice:              &nftPrice,
 		TrustedDataValidators: poolParamsInput.TrustedDataValidators,
 		TrustedDataIssuers:    poolParamsInput.TrustedDataIssuers,
-		Deposit:               &deposit,
 		DownloadPeriod:        &downloadPeriod,
 	}
 

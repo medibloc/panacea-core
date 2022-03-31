@@ -104,13 +104,6 @@ func (msg *MsgCreatePool) ValidateBasic() error {
 		}
 	}
 
-	if poolParams.Deposit == nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "the deposit is empty")
-	}
-	if !poolParams.Deposit.IsValid() {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "the deposit is invalid")
-	}
-
 	return nil
 }
 

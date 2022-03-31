@@ -148,6 +148,7 @@ func (suite *TestSuite) SetupTest() {
 		cdc.Marshaler,
 		keyParams[datapooltypes.StoreKey],
 		memKeys[datapooltypes.MemStoreKey],
+		paramsKeeper.Subspace(datapooltypes.ModuleName),
 		suite.BankKeeper,
 		suite.AccountKeeper,
 		suite.WasmKeeper,
