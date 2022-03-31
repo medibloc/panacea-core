@@ -140,7 +140,7 @@ func (k Keeper) CreatePool(ctx sdk.Context, curator sdk.AccAddress, poolParams t
 	k.SetPool(ctx, newPool)
 
 	// mint curator NFT
-	contractAddr, err := k.GetContractAddress(ctx)
+	contractAddr, err := k.GetNFTContractAddress(ctx)
 	if err != nil {
 		return 0, err
 	}
@@ -226,21 +226,21 @@ func (k Keeper) GetAllPools(ctx sdk.Context) ([]types.Pool, error) {
 	return pools, nil
 }
 
-func (k Keeper) SetContractAddress(ctx sdk.Context, address sdk.AccAddress) {
+func (k Keeper) SetNFTContractAddress(ctx sdk.Context, address sdk.AccAddress) {
 	store := ctx.KVStore(k.storeKey)
-	store.Set(types.KeyContractAddress, address)
+	store.Set(types.KeyNFTContractAddress, address)
 }
 
-func (k Keeper) GetContractAddress(ctx sdk.Context) (sdk.AccAddress, error) {
+func (k Keeper) GetNFTContractAddress(ctx sdk.Context) (sdk.AccAddress, error) {
 	store := ctx.KVStore(k.storeKey)
-	if !store.Has(types.KeyContractAddress) {
-		return nil, sdkerrors.Wrapf(types.ErrNoRegisteredContract, "no contract registered")
+	if !store.Has(types.KeyNFTContractAddress) {
+		return nil, sdkerrors.Wrapf(types.ErrNoRegisteredNFTContract, "no contract registered")
 	}
 
-	return store.Get(types.KeyContractAddress), nil
+	return store.Get(types.KeyNFTContractAddress), nil
 }
 
-func (k Keeper) CreateContract(ctx sdk.Context, creator sdk.AccAddress, wasmCode []byte) (uint64, error) {
+func (k Keeper) CreateNFTContract(ctx sdk.Context, creator sdk.AccAddress, wasmCode []byte) (uint64, error) {
 	// access configuration of only for creator address
 	accessConfig := &wasmtypes.AccessConfig{
 		Permission: wasmtypes.AccessTypeOnlyAddress,
@@ -256,11 +256,11 @@ func (k Keeper) CreateContract(ctx sdk.Context, creator sdk.AccAddress, wasmCode
 	return codeID, nil
 }
 
-// DeployAndRegisterContract creates, instantiate contract and store contract address
-func (k Keeper) DeployAndRegisterContract(ctx sdk.Context, wasmCode []byte) error {
+// DeployAndRegisterNFTContract creates, instantiate contract and store contract address
+func (k Keeper) DeployAndRegisterNFTContract(ctx sdk.Context, wasmCode []byte) error {
 	moduleAddr := types.GetModuleAddress()
 
-	codeID, err := k.CreateContract(ctx, moduleAddr, wasmCode)
+	codeID, err := k.CreateNFTContract(ctx, moduleAddr, wasmCode)
 	if err != nil {
 		return err
 	}
@@ -278,23 +278,23 @@ func (k Keeper) DeployAndRegisterContract(ctx sdk.Context, wasmCode []byte) erro
 	}
 
 	// set contract address
-	k.SetContractAddress(ctx, contractAddr)
+	k.SetNFTContractAddress(ctx, contractAddr)
 
 	return nil
 }
 
-// MigrateContract creates new contract and migrate
-func (k Keeper) MigrateContract(ctx sdk.Context, newWasmCode []byte) error {
+// MigrateNFTContract creates new contract and migrate
+func (k Keeper) MigrateNFTContract(ctx sdk.Context, newWasmCode []byte) error {
 	moduleAddr := types.GetModuleAddress()
 
 	// create new contract
-	newCodeID, err := k.CreateContract(ctx, moduleAddr, newWasmCode)
+	newCodeID, err := k.CreateNFTContract(ctx, moduleAddr, newWasmCode)
 	if err != nil {
 		return err
 	}
 
 	// get existing contract address
-	contractAddress, err := k.GetContractAddress(ctx)
+	contractAddress, err := k.GetNFTContractAddress(ctx)
 	if err != nil {
 		return err
 	}

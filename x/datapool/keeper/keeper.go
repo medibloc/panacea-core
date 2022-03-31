@@ -3,6 +3,8 @@ package keeper
 import (
 	"fmt"
 
+	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
+
 	"github.com/CosmWasm/wasmd/x/wasm"
 
 	"github.com/tendermint/tendermint/libs/log"
@@ -14,7 +16,6 @@ import (
 	// this line is used by starport scaffolding # ibc/keeper/import
 
 	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
-	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
 
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
 )

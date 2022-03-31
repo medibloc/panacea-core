@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 
-	wasmUtils "github.com/CosmWasm/wasmd/x/wasm/client/utils"
+	wasmutils "github.com/CosmWasm/wasmd/x/wasm/client/utils"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
@@ -14,8 +14,8 @@ import (
 
 func CmdRegisterNFTContract() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "register-contract [wasm code]",
-		Short: "register contract to x/datapool module",
+		Use:   "register-nft-contract [wasm code]",
+		Short: "register NFT contract to x/datapool module",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
@@ -47,8 +47,8 @@ func CmdRegisterNFTContract() *cobra.Command {
 
 func CmdUpgradeNFTContract() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "upgrade-contract [new wasm code]",
-		Short: "upgrade contract",
+		Use:   "upgrade-nft-contract [new wasm code]",
+		Short: "upgrade NFT contract",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
@@ -80,13 +80,13 @@ func CmdUpgradeNFTContract() *cobra.Command {
 }
 
 func gzipWasm(wasm []byte) ([]byte, error) {
-	if wasmUtils.IsWasm(wasm) {
-		wasm, err := wasmUtils.GzipIt(wasm)
+	if wasmutils.IsWasm(wasm) {
+		wasm, err := wasmutils.GzipIt(wasm)
 		if err != nil {
 			return nil, err
 		}
 		return wasm, nil
-	} else if !wasmUtils.IsGzip(wasm) {
+	} else if !wasmutils.IsGzip(wasm) {
 		return nil, fmt.Errorf("invalid input file. Use wasm binary or gzip")
 	}
 
