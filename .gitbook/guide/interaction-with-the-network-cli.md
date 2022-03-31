@@ -291,6 +291,7 @@ panacead tx staking create-validator \
   For details about various key types, please see this [guide](interaction-with-the-network-cli.md#keys).
 - `moniker`: A validator nickname that will be displayed publicly
 - `commission-rate`: An initial commission rate on block rewards and fees charged to delegators
+  - This shouldn't be smaller than the minimum commission rate (a genesis parameter) that can be queried by `panacead query staking params`.
 - `commission-max-rate`: A maximum commission rate which this validator can charge. This cannot be changed after the
   `create-validator` transaction is processed.
 - `commission-max-change-rate`: A maximum daily increase of the validator commission. This cannot be changed after the
@@ -331,7 +332,7 @@ panacead tx staking edit-validator \
 
 **Note**: The `--commission-rate` value must adhere to the following invariants:
 
-- Must be between 0 and the validator's `commission-max-rate`
+- Must be between the minimum commission rate (a genesis parameter) and the validator's `commission-max-rate`
 - Must not exceed the validator's `commission-max-change-rate` which is maximum % point change rate **per day**.
   In other words, a validator can only change its commission once per day and within `commission-max-change-rate` bounds.
 
