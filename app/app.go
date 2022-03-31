@@ -731,6 +731,11 @@ func (app *App) registerUpgradeHandlers() {
 	app.UpgradeKeeper.SetUpgradeHandler("v2.0.2", func(ctx sdk.Context, plan upgradetypes.Plan) {})
 
 	app.UpgradeKeeper.SetUpgradeHandler("v2.0.3", func(ctx sdk.Context, plan upgradetypes.Plan) {
+		// Set the min-commission-rate to 3%
+		curParams := app.StakingKeeper.GetParams(ctx)
+		curParams.MinCommissionRate = sdk.NewDecWithPrec(3, 2)
+		app.StakingKeeper.SetParams(ctx, curParams)
+
 		// Update the commission rate of all validators whose commission rate is smaller than min-commission-rate
 		validators := app.StakingKeeper.GetAllValidators(ctx)
 		minCommissionRate := app.StakingKeeper.GetParams(ctx).MinCommissionRate
