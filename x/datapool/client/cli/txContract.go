@@ -14,8 +14,8 @@ import (
 
 func CmdRegisterNFTContract() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "register-contract [wasm code]",
-		Short: "register contract to x/datapool module",
+		Use:   "register-nft-contract [wasm code]",
+		Short: "register NFT contract to x/datapool module",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
@@ -47,8 +47,8 @@ func CmdRegisterNFTContract() *cobra.Command {
 
 func CmdUpgradeNFTContract() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "upgrade-contract [new wasm code]",
-		Short: "upgrade contract",
+		Use:   "upgrade-nft-contract [new wasm code]",
+		Short: "upgrade NFT contract",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)

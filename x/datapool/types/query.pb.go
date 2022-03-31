@@ -118,22 +118,22 @@ func (m *QueryPoolResponse) GetPool() *Pool {
 	return nil
 }
 
-// QueryContractRequest is the request type for the Query/Contract RPC method.
-type QueryContractRequest struct {
+// QueryNFTContractRequest is the request type for the Query/NFTContract RPC method.
+type QueryNFTContractRequest struct {
 }
 
-func (m *QueryContractRequest) Reset()         { *m = QueryContractRequest{} }
-func (m *QueryContractRequest) String() string { return proto.CompactTextString(m) }
-func (*QueryContractRequest) ProtoMessage()    {}
-func (*QueryContractRequest) Descriptor() ([]byte, []int) {
+func (m *QueryNFTContractRequest) Reset()         { *m = QueryNFTContractRequest{} }
+func (m *QueryNFTContractRequest) String() string { return proto.CompactTextString(m) }
+func (*QueryNFTContractRequest) ProtoMessage()    {}
+func (*QueryNFTContractRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_f3fda93d2b4f4508, []int{2}
 }
-func (m *QueryContractRequest) XXX_Unmarshal(b []byte) error {
+func (m *QueryNFTContractRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *QueryContractRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *QueryNFTContractRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_QueryContractRequest.Marshal(b, m, deterministic)
+		return xxx_messageInfo_QueryNFTContractRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -143,35 +143,35 @@ func (m *QueryContractRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte
 		return b[:n], nil
 	}
 }
-func (m *QueryContractRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_QueryContractRequest.Merge(m, src)
+func (m *QueryNFTContractRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryNFTContractRequest.Merge(m, src)
 }
-func (m *QueryContractRequest) XXX_Size() int {
+func (m *QueryNFTContractRequest) XXX_Size() int {
 	return m.Size()
 }
-func (m *QueryContractRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_QueryContractRequest.DiscardUnknown(m)
+func (m *QueryNFTContractRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryNFTContractRequest.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_QueryContractRequest proto.InternalMessageInfo
+var xxx_messageInfo_QueryNFTContractRequest proto.InternalMessageInfo
 
-// QueryContractResponse is the response type for the Query/Contract RPC method.
-type QueryContractResponse struct {
-	ContractAddress string `protobuf:"bytes,1,opt,name=contract_address,json=contractAddress,proto3" json:"contract_address,omitempty"`
+// QueryNFTContractResponse is the response type for the Query/NFTContract RPC method.
+type QueryNFTContractResponse struct {
+	NftContractAddress string `protobuf:"bytes,1,opt,name=nft_contract_address,json=nftContractAddress,proto3" json:"nft_contract_address,omitempty"`
 }
 
-func (m *QueryContractResponse) Reset()         { *m = QueryContractResponse{} }
-func (m *QueryContractResponse) String() string { return proto.CompactTextString(m) }
-func (*QueryContractResponse) ProtoMessage()    {}
-func (*QueryContractResponse) Descriptor() ([]byte, []int) {
+func (m *QueryNFTContractResponse) Reset()         { *m = QueryNFTContractResponse{} }
+func (m *QueryNFTContractResponse) String() string { return proto.CompactTextString(m) }
+func (*QueryNFTContractResponse) ProtoMessage()    {}
+func (*QueryNFTContractResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_f3fda93d2b4f4508, []int{3}
 }
-func (m *QueryContractResponse) XXX_Unmarshal(b []byte) error {
+func (m *QueryNFTContractResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *QueryContractResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *QueryNFTContractResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_QueryContractResponse.Marshal(b, m, deterministic)
+		return xxx_messageInfo_QueryNFTContractResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -181,21 +181,21 @@ func (m *QueryContractResponse) XXX_Marshal(b []byte, deterministic bool) ([]byt
 		return b[:n], nil
 	}
 }
-func (m *QueryContractResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_QueryContractResponse.Merge(m, src)
+func (m *QueryNFTContractResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryNFTContractResponse.Merge(m, src)
 }
-func (m *QueryContractResponse) XXX_Size() int {
+func (m *QueryNFTContractResponse) XXX_Size() int {
 	return m.Size()
 }
-func (m *QueryContractResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_QueryContractResponse.DiscardUnknown(m)
+func (m *QueryNFTContractResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryNFTContractResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_QueryContractResponse proto.InternalMessageInfo
+var xxx_messageInfo_QueryNFTContractResponse proto.InternalMessageInfo
 
-func (m *QueryContractResponse) GetContractAddress() string {
+func (m *QueryNFTContractResponse) GetNftContractAddress() string {
 	if m != nil {
-		return m.ContractAddress
+		return m.NftContractAddress
 	}
 	return ""
 }
@@ -203,38 +203,38 @@ func (m *QueryContractResponse) GetContractAddress() string {
 func init() {
 	proto.RegisterType((*QueryPoolRequest)(nil), "panacea.datapool.v2.QueryPoolRequest")
 	proto.RegisterType((*QueryPoolResponse)(nil), "panacea.datapool.v2.QueryPoolResponse")
-	proto.RegisterType((*QueryContractRequest)(nil), "panacea.datapool.v2.QueryContractRequest")
-	proto.RegisterType((*QueryContractResponse)(nil), "panacea.datapool.v2.QueryContractResponse")
+	proto.RegisterType((*QueryNFTContractRequest)(nil), "panacea.datapool.v2.QueryNFTContractRequest")
+	proto.RegisterType((*QueryNFTContractResponse)(nil), "panacea.datapool.v2.QueryNFTContractResponse")
 }
 
 func init() { proto.RegisterFile("panacea/datapool/v2/query.proto", fileDescriptor_f3fda93d2b4f4508) }
 
 var fileDescriptor_f3fda93d2b4f4508 = []byte{
-	// 372 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x92, 0x4f, 0x4f, 0xea, 0x40,
-	0x14, 0xc5, 0x29, 0xe1, 0xf1, 0xde, 0x9b, 0xb7, 0x78, 0x38, 0xfe, 0x6f, 0xcc, 0xa8, 0x55, 0x89,
-	0xa8, 0x74, 0x62, 0xfd, 0x04, 0xe2, 0xca, 0xb8, 0x51, 0x96, 0x6e, 0xc8, 0xd0, 0x8e, 0xd8, 0xa4,
-	0xcc, 0x2d, 0x9d, 0x81, 0x48, 0x8c, 0x1b, 0xdd, 0xba, 0x30, 0x71, 0xeb, 0x07, 0x72, 0x49, 0xe2,
-	0xc6, 0xa5, 0x01, 0x3f, 0x88, 0xe9, 0xd0, 0x46, 0x43, 0x4a, 0x74, 0xd9, 0x3b, 0xbf, 0x7b, 0xce,
-	0xb9, 0x27, 0x45, 0xab, 0x21, 0x13, 0xcc, 0xe5, 0x8c, 0x7a, 0x4c, 0xb1, 0x10, 0x20, 0xa0, 0x3d,
-	0x87, 0x76, 0xba, 0x3c, 0xea, 0xdb, 0x61, 0x04, 0x0a, 0xf0, 0x6c, 0x02, 0xd8, 0x29, 0x60, 0xf7,
-	0x1c, 0x73, 0xa5, 0x05, 0xd0, 0x0a, 0x38, 0x65, 0xa1, 0x4f, 0x99, 0x10, 0xa0, 0x98, 0xf2, 0x41,
-	0xc8, 0xf1, 0x8a, 0x49, 0xb2, 0x34, 0xf5, 0xaa, 0x7e, 0xb7, 0x76, 0x51, 0xe9, 0x2c, 0x76, 0x38,
-	0x05, 0x08, 0xea, 0xbc, 0xd3, 0xe5, 0x52, 0xe1, 0x45, 0xf4, 0x3b, 0x26, 0x1a, 0xbe, 0xb7, 0x64,
-	0xac, 0x19, 0xdb, 0x85, 0x7a, 0x31, 0xfe, 0x3c, 0xf6, 0xac, 0x1a, 0x9a, 0xf9, 0x02, 0xcb, 0x10,
-	0x84, 0xe4, 0xb8, 0x8a, 0x0a, 0xf1, 0xb3, 0x46, 0xff, 0x39, 0xcb, 0x76, 0x46, 0x46, 0x5b, 0x2f,
-	0x68, 0xcc, 0x5a, 0x40, 0x73, 0x5a, 0xe3, 0x08, 0x84, 0x8a, 0x98, 0xab, 0x12, 0x53, 0xab, 0x86,
-	0xe6, 0x27, 0xe6, 0x89, 0x7e, 0x05, 0x95, 0xdc, 0x64, 0xd6, 0x60, 0x9e, 0x17, 0x71, 0x29, 0xb5,
-	0xd7, 0xdf, 0xfa, 0xff, 0x74, 0x7e, 0x38, 0x1e, 0x3b, 0x4f, 0x79, 0xf4, 0x4b, 0x8b, 0xe0, 0x3b,
-	0x03, 0x15, 0x62, 0x53, 0xbc, 0x95, 0x99, 0x67, 0xf2, 0x64, 0xb3, 0xfc, 0x1d, 0x36, 0x0e, 0x63,
-	0xed, 0xdd, 0xbe, 0xbc, 0x3f, 0xe6, 0xcb, 0x78, 0x93, 0x4e, 0xeb, 0x55, 0xd2, 0xeb, 0xa4, 0xbc,
-	0x1b, 0x7c, 0x6f, 0xa0, 0x3f, 0xe9, 0x3d, 0xb8, 0x32, 0xdd, 0x62, 0xa2, 0x0b, 0x73, 0xe7, 0x27,
-	0x68, 0x92, 0xa8, 0xa2, 0x13, 0x6d, 0xe0, 0xf5, 0xcc, 0x44, 0xe2, 0x42, 0x55, 0xd3, 0x96, 0x6a,
-	0x27, 0xcf, 0x43, 0x62, 0x0c, 0x86, 0xc4, 0x78, 0x1b, 0x12, 0xe3, 0x61, 0x44, 0x72, 0x83, 0x11,
-	0xc9, 0xbd, 0x8e, 0x48, 0xee, 0x7c, 0xbf, 0xe5, 0xab, 0xcb, 0x6e, 0xd3, 0x76, 0xa1, 0x4d, 0xdb,
-	0xdc, 0xf3, 0x9b, 0x01, 0xb8, 0xa9, 0x5e, 0xd5, 0x85, 0x88, 0xd3, 0xab, 0x4f, 0x59, 0xd5, 0x0f,
-	0xb9, 0x6c, 0x16, 0xf5, 0xff, 0x73, 0xf0, 0x11, 0x00, 0x00, 0xff, 0xff, 0x5e, 0x4d, 0x8c, 0x95,
-	0xb5, 0x02, 0x00, 0x00,
+	// 381 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x92, 0xc1, 0x4a, 0xeb, 0x40,
+	0x14, 0x86, 0x9b, 0xd2, 0xdb, 0xcb, 0x9d, 0x6e, 0xee, 0x9d, 0x2b, 0xb4, 0x0d, 0x12, 0x35, 0x6a,
+	0x51, 0x6c, 0x33, 0x1a, 0x9f, 0xc0, 0x0a, 0x82, 0x28, 0xa2, 0xc5, 0x95, 0x9b, 0x32, 0x4d, 0xa6,
+	0x35, 0x90, 0xce, 0x49, 0x33, 0xd3, 0x62, 0x11, 0x37, 0xfa, 0x02, 0x82, 0xf8, 0x08, 0xbe, 0x8b,
+	0xcb, 0x82, 0x1b, 0x97, 0xd2, 0xfa, 0x20, 0x92, 0x69, 0x8a, 0xc5, 0xa6, 0xe8, 0x32, 0x39, 0xdf,
+	0xf9, 0xff, 0xff, 0xfc, 0x0c, 0x5a, 0x0a, 0x28, 0xa7, 0x0e, 0xa3, 0xc4, 0xa5, 0x92, 0x06, 0x00,
+	0x3e, 0xe9, 0xd9, 0xa4, 0xd3, 0x65, 0x61, 0xdf, 0x0a, 0x42, 0x90, 0x80, 0xff, 0xc7, 0x80, 0x35,
+	0x01, 0xac, 0x9e, 0xad, 0x2f, 0xb6, 0x00, 0x5a, 0x3e, 0x23, 0x34, 0xf0, 0x08, 0xe5, 0x1c, 0x24,
+	0x95, 0x1e, 0x70, 0x31, 0x5e, 0xd1, 0x8d, 0x24, 0x4d, 0xb5, 0xaa, 0xe6, 0xe6, 0x16, 0xfa, 0x7b,
+	0x16, 0x39, 0x9c, 0x02, 0xf8, 0x35, 0xd6, 0xe9, 0x32, 0x21, 0x71, 0x1e, 0xfd, 0x8e, 0x88, 0xba,
+	0xe7, 0x16, 0xb4, 0x65, 0x6d, 0x23, 0x53, 0xcb, 0x46, 0x9f, 0x87, 0xae, 0x59, 0x45, 0xff, 0xa6,
+	0x60, 0x11, 0x00, 0x17, 0x0c, 0x57, 0x50, 0x26, 0x1a, 0x2b, 0x34, 0x67, 0x17, 0xad, 0x84, 0x8c,
+	0x96, 0x5a, 0x50, 0x98, 0x59, 0x44, 0x79, 0xa5, 0x71, 0x72, 0x70, 0xbe, 0x0f, 0x5c, 0x86, 0xd4,
+	0x91, 0xb1, 0xaf, 0x79, 0x8c, 0x0a, 0xb3, 0xa3, 0xd8, 0x65, 0x1b, 0x2d, 0xf0, 0xa6, 0xac, 0x3b,
+	0xf1, 0xff, 0x3a, 0x75, 0xdd, 0x90, 0x09, 0xa1, 0x5c, 0xff, 0xd4, 0x30, 0x6f, 0xca, 0xc9, 0xca,
+	0xde, 0x78, 0x62, 0x3f, 0xa5, 0xd1, 0x2f, 0x25, 0x87, 0xef, 0x34, 0x94, 0x89, 0x12, 0xe0, 0xf5,
+	0xc4, 0x70, 0x5f, 0xef, 0xd7, 0x4b, 0xdf, 0x61, 0xe3, 0x4c, 0x66, 0xf9, 0xf6, 0xe5, 0xfd, 0x21,
+	0x5d, 0xc2, 0x6b, 0x64, 0x5e, 0xc9, 0x82, 0x5c, 0xc7, 0x4d, 0xde, 0xe0, 0x47, 0x0d, 0xe5, 0xa6,
+	0x2e, 0xc3, 0xe5, 0xf9, 0x2e, 0xb3, 0xdd, 0xe8, 0x95, 0x1f, 0xd2, 0x71, 0xb4, 0x4d, 0x15, 0x6d,
+	0x15, 0xaf, 0x24, 0x46, 0x9b, 0x6e, 0xb2, 0x7a, 0xf4, 0x3c, 0x34, 0xb4, 0xc1, 0xd0, 0xd0, 0xde,
+	0x86, 0x86, 0x76, 0x3f, 0x32, 0x52, 0x83, 0x91, 0x91, 0x7a, 0x1d, 0x19, 0xa9, 0x8b, 0x9d, 0x96,
+	0x27, 0x2f, 0xbb, 0x0d, 0xcb, 0x81, 0x36, 0x69, 0x33, 0xd7, 0x6b, 0xf8, 0xe0, 0x4c, 0xf4, 0x2a,
+	0x0e, 0x84, 0x8c, 0x5c, 0x7d, 0xca, 0xca, 0x7e, 0xc0, 0x44, 0x23, 0xab, 0x5e, 0xd5, 0xee, 0x47,
+	0x00, 0x00, 0x00, 0xff, 0xff, 0xbd, 0x1e, 0x74, 0x6b, 0xcb, 0x02, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -251,8 +251,8 @@ const _ = grpc.SupportPackageIsVersion4
 type QueryClient interface {
 	// Pool returns a Pool.
 	Pool(ctx context.Context, in *QueryPoolRequest, opts ...grpc.CallOption) (*QueryPoolResponse, error)
-	// Contract returns a contract address registered to x/datapool module
-	Contract(ctx context.Context, in *QueryContractRequest, opts ...grpc.CallOption) (*QueryContractResponse, error)
+	// NFTContract returns a NFT contract address registered to x/datapool module
+	NFTContract(ctx context.Context, in *QueryNFTContractRequest, opts ...grpc.CallOption) (*QueryNFTContractResponse, error)
 }
 
 type queryClient struct {
@@ -272,9 +272,9 @@ func (c *queryClient) Pool(ctx context.Context, in *QueryPoolRequest, opts ...gr
 	return out, nil
 }
 
-func (c *queryClient) Contract(ctx context.Context, in *QueryContractRequest, opts ...grpc.CallOption) (*QueryContractResponse, error) {
-	out := new(QueryContractResponse)
-	err := c.cc.Invoke(ctx, "/panacea.datapool.v2.Query/Contract", in, out, opts...)
+func (c *queryClient) NFTContract(ctx context.Context, in *QueryNFTContractRequest, opts ...grpc.CallOption) (*QueryNFTContractResponse, error) {
+	out := new(QueryNFTContractResponse)
+	err := c.cc.Invoke(ctx, "/panacea.datapool.v2.Query/NFTContract", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -285,8 +285,8 @@ func (c *queryClient) Contract(ctx context.Context, in *QueryContractRequest, op
 type QueryServer interface {
 	// Pool returns a Pool.
 	Pool(context.Context, *QueryPoolRequest) (*QueryPoolResponse, error)
-	// Contract returns a contract address registered to x/datapool module
-	Contract(context.Context, *QueryContractRequest) (*QueryContractResponse, error)
+	// NFTContract returns a NFT contract address registered to x/datapool module
+	NFTContract(context.Context, *QueryNFTContractRequest) (*QueryNFTContractResponse, error)
 }
 
 // UnimplementedQueryServer can be embedded to have forward compatible implementations.
@@ -296,8 +296,8 @@ type UnimplementedQueryServer struct {
 func (*UnimplementedQueryServer) Pool(ctx context.Context, req *QueryPoolRequest) (*QueryPoolResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Pool not implemented")
 }
-func (*UnimplementedQueryServer) Contract(ctx context.Context, req *QueryContractRequest) (*QueryContractResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Contract not implemented")
+func (*UnimplementedQueryServer) NFTContract(ctx context.Context, req *QueryNFTContractRequest) (*QueryNFTContractResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method NFTContract not implemented")
 }
 
 func RegisterQueryServer(s grpc1.Server, srv QueryServer) {
@@ -322,20 +322,20 @@ func _Query_Pool_Handler(srv interface{}, ctx context.Context, dec func(interfac
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Query_Contract_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(QueryContractRequest)
+func _Query_NFTContract_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryNFTContractRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(QueryServer).Contract(ctx, in)
+		return srv.(QueryServer).NFTContract(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/panacea.datapool.v2.Query/Contract",
+		FullMethod: "/panacea.datapool.v2.Query/NFTContract",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(QueryServer).Contract(ctx, req.(*QueryContractRequest))
+		return srv.(QueryServer).NFTContract(ctx, req.(*QueryNFTContractRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -349,8 +349,8 @@ var _Query_serviceDesc = grpc.ServiceDesc{
 			Handler:    _Query_Pool_Handler,
 		},
 		{
-			MethodName: "Contract",
-			Handler:    _Query_Contract_Handler,
+			MethodName: "NFTContract",
+			Handler:    _Query_NFTContract_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
@@ -420,7 +420,7 @@ func (m *QueryPoolResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *QueryContractRequest) Marshal() (dAtA []byte, err error) {
+func (m *QueryNFTContractRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -430,12 +430,12 @@ func (m *QueryContractRequest) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *QueryContractRequest) MarshalTo(dAtA []byte) (int, error) {
+func (m *QueryNFTContractRequest) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *QueryContractRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *QueryNFTContractRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -443,7 +443,7 @@ func (m *QueryContractRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *QueryContractResponse) Marshal() (dAtA []byte, err error) {
+func (m *QueryNFTContractResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -453,20 +453,20 @@ func (m *QueryContractResponse) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *QueryContractResponse) MarshalTo(dAtA []byte) (int, error) {
+func (m *QueryNFTContractResponse) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *QueryContractResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *QueryNFTContractResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if len(m.ContractAddress) > 0 {
-		i -= len(m.ContractAddress)
-		copy(dAtA[i:], m.ContractAddress)
-		i = encodeVarintQuery(dAtA, i, uint64(len(m.ContractAddress)))
+	if len(m.NftContractAddress) > 0 {
+		i -= len(m.NftContractAddress)
+		copy(dAtA[i:], m.NftContractAddress)
+		i = encodeVarintQuery(dAtA, i, uint64(len(m.NftContractAddress)))
 		i--
 		dAtA[i] = 0xa
 	}
@@ -509,7 +509,7 @@ func (m *QueryPoolResponse) Size() (n int) {
 	return n
 }
 
-func (m *QueryContractRequest) Size() (n int) {
+func (m *QueryNFTContractRequest) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -518,13 +518,13 @@ func (m *QueryContractRequest) Size() (n int) {
 	return n
 }
 
-func (m *QueryContractResponse) Size() (n int) {
+func (m *QueryNFTContractResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	l = len(m.ContractAddress)
+	l = len(m.NftContractAddress)
 	if l > 0 {
 		n += 1 + l + sovQuery(uint64(l))
 	}
@@ -692,7 +692,7 @@ func (m *QueryPoolResponse) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *QueryContractRequest) Unmarshal(dAtA []byte) error {
+func (m *QueryNFTContractRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -715,10 +715,10 @@ func (m *QueryContractRequest) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: QueryContractRequest: wiretype end group for non-group")
+			return fmt.Errorf("proto: QueryNFTContractRequest: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: QueryContractRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: QueryNFTContractRequest: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		default:
@@ -742,7 +742,7 @@ func (m *QueryContractRequest) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *QueryContractResponse) Unmarshal(dAtA []byte) error {
+func (m *QueryNFTContractResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -765,15 +765,15 @@ func (m *QueryContractResponse) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: QueryContractResponse: wiretype end group for non-group")
+			return fmt.Errorf("proto: QueryNFTContractResponse: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: QueryContractResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: QueryNFTContractResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ContractAddress", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field NftContractAddress", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -801,7 +801,7 @@ func (m *QueryContractResponse) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.ContractAddress = string(dAtA[iNdEx:postIndex])
+			m.NftContractAddress = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex

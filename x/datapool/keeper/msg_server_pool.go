@@ -60,7 +60,7 @@ func (m msgServer) RegisterNFTContract(goCtx context.Context, msg *types.MsgRegi
 		return nil, err
 	}
 
-	if err := m.Keeper.DeployAndRegisterContract(ctx, msg.WasmCode); err != nil {
+	if err := m.Keeper.DeployAndRegisterNFTContract(ctx, msg.WasmCode); err != nil {
 		return nil, err
 	}
 
@@ -74,7 +74,7 @@ func (m msgServer) UpgradeNFTContract(goCtx context.Context, msg *types.MsgUpgra
 		return nil, err
 	}
 
-	if err := m.Keeper.MigrateContract(ctx, msg.NewWasmCode); err != nil {
+	if err := m.Keeper.MigrateNFTContract(ctx, msg.NewWasmCode); err != nil {
 		return nil, err
 	}
 

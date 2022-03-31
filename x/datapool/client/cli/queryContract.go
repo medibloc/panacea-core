@@ -7,10 +7,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func CmdGetContract() *cobra.Command {
+func CmdGetNFTContract() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "get-contract",
-		Short: "Query registered contract address",
+		Use:   "get-nft-contract",
+		Short: "Query registered NFT contract address",
 		Args:  cobra.ExactArgs(0),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientQueryContext(cmd)
@@ -20,7 +20,7 @@ func CmdGetContract() *cobra.Command {
 
 			queryClient := types.NewQueryClient(clientCtx)
 
-			res, err := queryClient.Contract(cmd.Context(), &types.QueryContractRequest{})
+			res, err := queryClient.NFTContract(cmd.Context(), &types.QueryNFTContractRequest{})
 			if err != nil {
 				return err
 			}

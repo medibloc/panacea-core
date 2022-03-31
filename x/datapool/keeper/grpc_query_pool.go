@@ -14,17 +14,17 @@ func (k Keeper) Pool(goCtx context.Context, req *types.QueryPoolRequest) (*types
 	return &types.QueryPoolResponse{}, nil
 }
 
-func (k Keeper) Contract(goCtx context.Context, req *types.QueryContractRequest) (*types.QueryContractResponse, error) {
+func (k Keeper) NFTContract(goCtx context.Context, req *types.QueryNFTContractRequest) (*types.QueryNFTContractResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	contract, err := k.GetContractAddress(ctx)
+	contract, err := k.GetNFTContractAddress(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	return &types.QueryContractResponse{ContractAddress: contract.String()}, nil
+	return &types.QueryNFTContractResponse{NftContractAddress: contract.String()}, nil
 }
