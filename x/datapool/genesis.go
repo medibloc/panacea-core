@@ -48,7 +48,7 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	}
 
 	for _, pool := range pools {
-		genesis.Pools[pool.GetPoolId()] = &pool
+		genesis.Pools = append(genesis.Pools, &pool)
 	}
 
 	genesis.Params = k.GetParams(ctx)

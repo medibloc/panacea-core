@@ -75,7 +75,7 @@ func (m msgServer) RegisterNFTContract(goCtx context.Context, msg *types.MsgRegi
 		return nil, err
 	}
 
-	if err := m.Keeper.DeployAndRegisterNFTContract(ctx, msg.WasmCode); err != nil {
+	if _, err := m.Keeper.DeployAndRegisterNFTContract(ctx, msg.WasmCode); err != nil {
 		return nil, err
 	}
 

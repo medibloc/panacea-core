@@ -1,6 +1,7 @@
 package keeper_test
 
 import (
+	"io/ioutil"
 	"testing"
 	"time"
 
@@ -73,4 +74,32 @@ func (suite *queryPoolTestSuite) TestQueryPool() {
 	suite.Require().Equal(pool.NumIssuedNfts, resultPool.NumIssuedNfts)
 	suite.Require().Equal(types.PENDING, resultPool.Status)
 	suite.Require().Equal(pool.Curator, resultPool.Curator)
+}
+
+func (suite *queryPoolTestSuite) TestGetNFTContract() {
+	contractAddress := suite.setupNFTContract()
+
+	req := types.QueryNFTContractRequest{}
+
+	res, err := suite.DataPoolKeeper.NFTContract(sdk.WrapSDKContext(suite.Ctx), &req)
+	suite.Require().NoError(err)
+	suite.Require().NotNil(res)
+	suite.Require().Equal(res.NftContractAddress, contractAddress.String())
+}
+
+func (suite queryPoolTestSuite) TestNoContract() {
+	req := types.QueryNFTContractRequest{}
+
+	_, err := suite.DataPoolKeeper.NFTContract(sdk.WrapSDKContext(suite.Ctx), &req)
+	suite.Require().Error(err, types.ErrNoRegisteredNFTContract)
+}
+
+func (suite queryPoolTestSuite) setupNFTContract() sdk.AccAddress {
+	wasmCode, err := ioutil.ReadFile("../contracts/cw721_base.wasm")
+	suite.Require().NoError(err)
+
+	contractAddress, err := suite.DataPoolKeeper.DeployAndRegisterNFTContract(suite.Ctx, wasmCode)
+	suite.Require().NoError(err)
+
+	return contractAddress
 }

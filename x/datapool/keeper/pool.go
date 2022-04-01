@@ -94,7 +94,7 @@ func (k Keeper) SetDataValidator(ctx sdk.Context, dataValidator types.DataValida
 	return nil
 }
 
-func (k Keeper) IsRegisteredDataValidator(ctx sdk.Context, dataValidatorAddress sdk.AccAddress) bool {
+func (k Keeper) isRegisteredDataValidator(ctx sdk.Context, dataValidatorAddress sdk.AccAddress) bool {
 	store := ctx.KVStore(k.storeKey)
 	dataValidatorKey := types.GetKeyPrefixDataValidator(dataValidatorAddress)
 	return store.Has(dataValidatorKey)
@@ -139,7 +139,7 @@ func (k Keeper) CreatePool(ctx sdk.Context, curator sdk.AccAddress, poolParams t
 	// check if the trusted_data_validators are registered
 	for _, dataValidator := range poolParams.TrustedDataValidators {
 		accAddr, _ := sdk.AccAddressFromBech32(dataValidator)
-		if !k.IsRegisteredDataValidator(ctx, accAddr) {
+		if !k.isRegisteredDataValidator(ctx, accAddr) {
 			return 0, sdkerrors.Wrapf(types.ErrNotRegisteredDataValidator, "the data validator %s is not registered", dataValidator)
 		}
 	}
@@ -151,9 +151,6 @@ func (k Keeper) CreatePool(ctx sdk.Context, curator sdk.AccAddress, poolParams t
 	if err != nil {
 		return 0, sdkerrors.Wrapf(types.ErrNotEnoughPoolDeposit, "The curator's balance is not enough to make a data pool")
 	}
-
-	// store pool
-	k.SetPool(ctx, newPool)
 
 	// mint curator NFT
 	contractAddr, err := k.GetNFTContractAddress(ctx)
@@ -177,6 +174,9 @@ func (k Keeper) CreatePool(ctx sdk.Context, curator sdk.AccAddress, poolParams t
 	if err != nil {
 		return 0, sdkerrors.Wrapf(err, "failed to mint curator NFT")
 	}
+
+	// store pool
+	k.SetPool(ctx, newPool)
 
 	return newPool.GetPoolId(), nil
 }
@@ -211,6 +211,23 @@ func (k Keeper) SetPoolNumber(ctx sdk.Context, poolNumber uint64) {
 	store := ctx.KVStore(k.storeKey)
 	bz := k.cdc.MustMarshalBinaryLengthPrefixed(&gogotypes.UInt64Value{Value: poolNumber})
 	store.Set(types.KeyPoolNextNumber, bz)
+}
+
+func (k Keeper) GetPool(ctx sdk.Context, poolID uint64) (types.Pool, error) {
+	store := ctx.KVStore(k.storeKey)
+	poolKey := types.GetKeyPrefixPools(poolID)
+	if !store.Has(poolKey) {
+		return types.Pool{}, sdkerrors.Wrapf(types.ErrDataPoolNotFound, "the data pool %d is not found", poolID)
+	}
+	bz := store.Get(poolKey)
+
+	var pool types.Pool
+	err := k.cdc.UnmarshalBinaryLengthPrefixed(bz, &pool)
+	if err != nil {
+		return types.Pool{}, err
+	}
+
+	return pool, nil
 }
 
 func (k Keeper) SetPool(ctx sdk.Context, pool *types.Pool) {
@@ -287,30 +304,30 @@ func (k Keeper) CreateNFTContract(ctx sdk.Context, creator sdk.AccAddress, wasmC
 }
 
 // DeployAndRegisterNFTContract creates, instantiate contract and store contract address
-func (k Keeper) DeployAndRegisterNFTContract(ctx sdk.Context, wasmCode []byte) error {
+func (k Keeper) DeployAndRegisterNFTContract(ctx sdk.Context, wasmCode []byte) (sdk.AccAddress, error) {
 	moduleAddr := types.GetModuleAddress()
 
 	codeID, err := k.CreateNFTContract(ctx, moduleAddr, wasmCode)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	initMsg := types.NewInstantiateNFTMsg("curation", "CUR", moduleAddr.String())
 	initMsgBz, err := json.Marshal(initMsg)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	// instantiate contract (set admin to module)
 	contractAddr, _, err := k.wasmKeeper.Instantiate(ctx, codeID, moduleAddr, moduleAddr, initMsgBz, "curator NFT", nil)
 	if err != nil {
-		return sdkerrors.Wrapf(err, "failed to instantiate contract")
+		return nil, sdkerrors.Wrapf(err, "failed to instantiate contract")
 	}
 
 	// set contract address
 	k.SetNFTContractAddress(ctx, contractAddr)
 
-	return nil
+	return contractAddr, nil
 }
 
 // MigrateNFTContract creates new contract and migrate

@@ -5,7 +5,7 @@ func DefaultGenesis() *GenesisState {
 	return &GenesisState{
 		DataValidators: []*DataValidator{},
 		NextPoolNumber: uint64(1),
-		Pools:          map[uint64]*Pool{},
+		Pools:          []*Pool{},
 		Params:         DefaultParams(),
 		// this line is used by starport scaffolding # ibc/genesistype/default
 		// this line is used by starport scaffolding # genesis/types/default

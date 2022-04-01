@@ -7,6 +7,5 @@
   "nft_price": "1000000umed",
   "trusted_data_validators": [],
   "trusted_data_issuers": [],
-  "deposit": "1000umed",
   "download_period": "1000000s"
 }

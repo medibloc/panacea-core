@@ -1,6 +1,7 @@
 package keeper_test
 
 import (
+	"io/ioutil"
 	"testing"
 	"time"
 
@@ -28,11 +29,23 @@ var (
 	pubKey         = privKey.PubKey()
 	dataVal1       = sdk.AccAddress(pubKey.Address())
 	fundForDataVal = sdk.NewCoins(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(10000000000)))
-
+	fundForCurator = sdk.NewCoins(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(10000000000)))
+	NFTPrice       = sdk.NewCoins(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(10000000)))
+	downloadPeriod = time.Duration(time.Second * 100000000)
+	curator        = sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address())
 	curatorPrivKey = secp256k1.GenPrivKey()
 	curatorPubKey  = curatorPrivKey.PubKey()
 	curatorAddr    = sdk.AccAddress(curatorPubKey.Address())
 )
+
+func (suite poolTestSuite) setupNFTContract() {
+	// Before test
+	wasmCode, err := ioutil.ReadFile("../contracts/cw721_base.wasm")
+	suite.Require().NoError(err)
+
+	_, err = suite.DataPoolKeeper.DeployAndRegisterNFTContract(suite.Ctx, wasmCode)
+	suite.Require().NoError(err)
+}
 
 func (suite *poolTestSuite) TestRegisterDataValidator() {
 	err := suite.BankKeeper.AddCoins(suite.Ctx, dataVal1, fundForDataVal)
@@ -167,4 +180,103 @@ func (suite *poolTestSuite) TestGetPool() {
 	suite.Require().Equal(pool.NumIssuedNfts, resultPool.NumIssuedNfts)
 	suite.Require().Equal(types.PENDING, resultPool.Status)
 	suite.Require().Equal(pool.Curator, resultPool.Curator)
+}
+
+func (suite poolTestSuite) TestCreatePool() {
+	// create and instantiate NFT contract
+	suite.setupNFTContract()
+
+	err := suite.BankKeeper.AddCoins(suite.Ctx, curator, fundForCurator)
+	suite.Require().NoError(err)
+
+	// register data validator
+	err = suite.BankKeeper.AddCoins(suite.Ctx, dataVal1, fundForDataVal)
+	suite.Require().NoError(err)
+
+	validatorAccount := suite.AccountKeeper.NewAccountWithAddress(suite.Ctx, dataVal1)
+	err = validatorAccount.SetPubKey(pubKey)
+	suite.Require().NoError(err)
+	suite.AccountKeeper.SetAccount(suite.Ctx, validatorAccount)
+
+	dataValidator := types.DataValidator{
+		Address:  dataVal1.String(),
+		Endpoint: "https://my-validator.org",
+	}
+
+	err = suite.DataPoolKeeper.RegisterDataValidator(suite.Ctx, dataValidator)
+	suite.Require().NoError(err)
+
+	newPoolParams := makePoolParamsWithDataValidator()
+
+	poolID, err := suite.DataPoolKeeper.CreatePool(suite.Ctx, curator, newPoolParams)
+	suite.Require().NoError(err)
+	suite.Require().Equal(poolID, uint64(1))
+
+	pool, err := suite.DataPoolKeeper.GetPool(suite.Ctx, poolID)
+	suite.Require().NoError(err)
+	suite.Require().Equal(pool.GetPoolId(), uint64(1))
+	suite.Require().Equal(pool.GetPoolAddress(), types.NewPoolAddress(poolID).String())
+	suite.Require().Equal(pool.GetPoolParams(), &newPoolParams)
+	suite.Require().Equal(pool.GetCurator(), curator.String())
+	suite.Require().Equal(pool.GetCurNumData(), uint64(0))
+	suite.Require().Equal(pool.GetNumIssuedNfts(), uint64(0))
+	suite.Require().Equal(pool.GetRound(), uint64(1))
+	suite.Require().Equal(pool.GetStatus(), types.PENDING)
+}
+
+func (suite poolTestSuite) TestNotRegisteredDataValidator() {
+	// create and instantiate NFT contract
+	suite.setupNFTContract()
+
+	err := suite.BankKeeper.AddCoins(suite.Ctx, curator, fundForCurator)
+	suite.Require().NoError(err)
+
+	newPoolParams := makePoolParamsWithDataValidator()
+
+	_, err = suite.DataPoolKeeper.CreatePool(suite.Ctx, curator, newPoolParams)
+	suite.Require().Error(err, types.ErrNotRegisteredDataValidator)
+}
+
+func (suite poolTestSuite) TestNotEnoughBalanceForDeposit() {
+	// create and instantiate NFT contract
+	suite.setupNFTContract()
+
+	newPoolParams := makePoolParamsNoDataValidator()
+
+	_, err := suite.DataPoolKeeper.CreatePool(suite.Ctx, curator, newPoolParams)
+	suite.Require().Error(err, types.ErrNotEnoughPoolDeposit)
+}
+
+func (suite poolTestSuite) TestNotRegisteredNFTContract() {
+	err := suite.BankKeeper.AddCoins(suite.Ctx, curator, fundForCurator)
+	suite.Require().NoError(err)
+
+	newPoolParams := makePoolParamsNoDataValidator()
+
+	_, err = suite.DataPoolKeeper.CreatePool(suite.Ctx, curator, newPoolParams)
+	suite.Require().Error(err, types.ErrNoRegisteredNFTContract)
+}
+
+func makePoolParamsWithDataValidator() types.PoolParams {
+	return types.PoolParams{
+		DataSchema:            []string{"https://www.json.ld"},
+		TargetNumData:         100,
+		MaxNftSupply:          10,
+		NftPrice:              NFTPrice,
+		TrustedDataValidators: []string{dataVal1.String()},
+		TrustedDataIssuers:    []string(nil),
+		DownloadPeriod:        &downloadPeriod,
+	}
+}
+
+func makePoolParamsNoDataValidator() types.PoolParams {
+	return types.PoolParams{
+		DataSchema:            []string{"https://www.json.ld"},
+		TargetNumData:         100,
+		MaxNftSupply:          10,
+		NftPrice:              NFTPrice,
+		TrustedDataValidators: []string(nil),
+		TrustedDataIssuers:    []string(nil),
+		DownloadPeriod:        &downloadPeriod,
+	}
 }
