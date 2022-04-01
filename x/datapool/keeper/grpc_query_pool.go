@@ -28,3 +28,23 @@ func (k Keeper) NFTContract(goCtx context.Context, req *types.QueryNFTContractRe
 
 	return &types.QueryNFTContractResponse{NftContractAddress: contract.String()}, nil
 }
+
+func (k Keeper) DataValidator(goCtx context.Context, req *types.QueryDataValidatorRequest) (*types.QueryDataValidatorResponse, error) {
+	if req == nil {
+		return nil, status.Error(codes.InvalidArgument, "invalid request")
+	}
+
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	accValidatorAddress, err := sdk.AccAddressFromBech32(req.GetAddress())
+	if err != nil {
+		return nil, err
+	}
+
+	dataValidator, err := k.GetDataValidator(ctx, accValidatorAddress)
+	if err != nil {
+		return nil, err
+	}
+
+	return &types.QueryDataValidatorResponse{DataValidator: &dataValidator}, nil
+}
