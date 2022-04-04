@@ -95,7 +95,7 @@ func (suite queryPoolTestSuite) TestNoContract() {
 }
 
 func (suite queryPoolTestSuite) setupNFTContract() sdk.AccAddress {
-	wasmCode, err := ioutil.ReadFile("../contracts/cw721_base.wasm")
+	wasmCode, err := ioutil.ReadFile("./cw721_test.wasm")
 	suite.Require().NoError(err)
 
 	contractAddress, err := suite.DataPoolKeeper.DeployAndRegisterNFTContract(suite.Ctx, wasmCode)

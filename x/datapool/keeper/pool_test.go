@@ -40,7 +40,7 @@ var (
 
 func (suite poolTestSuite) setupNFTContract() {
 	// Before test
-	wasmCode, err := ioutil.ReadFile("../contracts/cw721_base.wasm")
+	wasmCode, err := ioutil.ReadFile("./cw721_test.wasm")
 	suite.Require().NoError(err)
 
 	_, err = suite.DataPoolKeeper.DeployAndRegisterNFTContract(suite.Ctx, wasmCode)
