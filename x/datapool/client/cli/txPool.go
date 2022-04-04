@@ -121,7 +121,7 @@ func newCreatePoolMsg(clientCtx client.Context, file string) (sdk.Msg, error) {
 		DataSchema:            poolParamsInput.DataSchema,
 		TargetNumData:         poolParamsInput.TargetNumData,
 		MaxNftSupply:          poolParamsInput.MaxNFTSupply,
-		NftPrice:              sdk.NewCoins(nftPrice),
+		NftPrice:              &nftPrice,
 		TrustedDataValidators: poolParamsInput.TrustedDataValidators,
 		TrustedDataIssuers:    poolParamsInput.TrustedDataIssuers,
 		DownloadPeriod:        &downloadPeriod,

@@ -18,7 +18,7 @@ import (
 var (
 	dataVal            = sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address())
 	curator            = sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address())
-	NFTPrice           = sdk.NewCoins(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(10000000)))
+	NFTPrice           = sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(10000000))
 	downloadPeriod     = time.Duration(time.Second * 100000000)
 	nftContractAddress = sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address())
 )
@@ -127,7 +127,7 @@ func makeSamplePoolParams() *types.PoolParams {
 		DataSchema:            []string{"https://www.json.ld"},
 		TargetNumData:         100,
 		MaxNftSupply:          10,
-		NftPrice:              NFTPrice,
+		NftPrice:              &NFTPrice,
 		TrustedDataValidators: []string{dataVal.String()},
 		TrustedDataIssuers:    []string(nil),
 		DownloadPeriod:        &downloadPeriod,

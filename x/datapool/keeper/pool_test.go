@@ -30,7 +30,7 @@ var (
 	dataVal1       = sdk.AccAddress(pubKey.Address())
 	fundForDataVal = sdk.NewCoins(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(10000000000)))
 	fundForCurator = sdk.NewCoins(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(10000000000)))
-	NFTPrice       = sdk.NewCoins(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(10000000)))
+	NFTPrice       = sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(10000000))
 	downloadPeriod = time.Duration(time.Second * 100000000)
 	curator        = sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address())
 	curatorPrivKey = secp256k1.GenPrivKey()
@@ -262,7 +262,7 @@ func makePoolParamsWithDataValidator() types.PoolParams {
 		DataSchema:            []string{"https://www.json.ld"},
 		TargetNumData:         100,
 		MaxNftSupply:          10,
-		NftPrice:              NFTPrice,
+		NftPrice:              &NFTPrice,
 		TrustedDataValidators: []string{dataVal1.String()},
 		TrustedDataIssuers:    []string(nil),
 		DownloadPeriod:        &downloadPeriod,
@@ -274,7 +274,7 @@ func makePoolParamsNoDataValidator() types.PoolParams {
 		DataSchema:            []string{"https://www.json.ld"},
 		TargetNumData:         100,
 		MaxNftSupply:          10,
-		NftPrice:              NFTPrice,
+		NftPrice:              &NFTPrice,
 		TrustedDataValidators: []string(nil),
 		TrustedDataIssuers:    []string(nil),
 		DownloadPeriod:        &downloadPeriod,
