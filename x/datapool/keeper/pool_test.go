@@ -90,7 +90,7 @@ func (suite *poolTestSuite) TestIsDataValidatorDuplicate() {
 	suite.Require().Error(err, types.ErrDataValidatorAlreadyExist)
 }
 
-func (suite *poolTestSuite) TestNotGetPubkey() {
+func (suite *poolTestSuite) TestNotGetPubKey() {
 	err := suite.BankKeeper.AddCoins(suite.Ctx, dataVal1, fundForDataVal)
 	suite.Require().NoError(err)
 
@@ -101,4 +101,36 @@ func (suite *poolTestSuite) TestNotGetPubkey() {
 
 	err = suite.DataPoolKeeper.RegisterDataValidator(suite.Ctx, tempDataValidatorDetail)
 	suite.Require().Error(err, sdkerrors.ErrKeyNotFound)
+}
+
+func (suite *poolTestSuite) TestUpdateDataValidator() {
+	err := suite.BankKeeper.AddCoins(suite.Ctx, dataVal1, fundForDataVal)
+	suite.Require().NoError(err)
+
+	validatorAccount := suite.AccountKeeper.NewAccountWithAddress(suite.Ctx, dataVal1)
+	err = validatorAccount.SetPubKey(pubKey)
+	suite.Require().NoError(err)
+	suite.AccountKeeper.SetAccount(suite.Ctx, validatorAccount)
+
+	tempDataValidator := types.DataValidator{
+		Address:  dataVal1.String(),
+		Endpoint: "https://my-validator.org",
+	}
+
+	err = suite.DataPoolKeeper.RegisterDataValidator(suite.Ctx, tempDataValidator)
+	suite.Require().NoError(err)
+
+	updateTempDataValidator := types.DataValidator{
+		Address:  dataVal1.String(),
+		Endpoint: "https://update-my-validator.org",
+	}
+
+	err = suite.DataPoolKeeper.UpdateDataValidator(suite.Ctx, updateTempDataValidator)
+	suite.Require().NoError(err)
+
+	getDataValidator, err := suite.DataPoolKeeper.GetDataValidator(suite.Ctx, dataVal1)
+	suite.Require().NoError(err)
+
+	suite.Require().Equal(getDataValidator.GetAddress(), updateTempDataValidator.GetAddress())
+	suite.Require().Equal(getDataValidator.GetEndpoint(), updateTempDataValidator.GetEndpoint())
 }

@@ -24,6 +24,21 @@ func (m msgServer) RegisterDataValidator(goCtx context.Context, msg *types.MsgRe
 	return &types.MsgRegisterDataValidatorResponse{}, nil
 }
 
+func (m msgServer) UpdateDataValidator(goCtx context.Context, msg *types.MsgUpdateDataValidator) (*types.MsgUpdateDataValidatorResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	_, err := sdk.AccAddressFromBech32(msg.ValidatorDetail.Address)
+	if err != nil {
+		return nil, err
+	}
+
+	err = m.Keeper.UpdateDataValidator(ctx, *msg.ValidatorDetail)
+	if err != nil {
+		return nil, err
+	}
+	return &types.MsgUpdateDataValidatorResponse{}, nil
+}
+
 func (m msgServer) CreatePool(goCtx context.Context, msg *types.MsgCreatePool) (*types.MsgCreatePoolResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 

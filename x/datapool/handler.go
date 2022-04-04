@@ -21,6 +21,9 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 		case *types.MsgRegisterDataValidator:
 			res, err := msgServer.RegisterDataValidator(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)
+		case *types.MsgUpdateDataValidator:
+			res, err := msgServer.UpdateDataValidator(sdk.WrapSDKContext(ctx), msg)
+			return sdk.WrapServiceResult(ctx, res, err)
 		case *types.MsgCreatePool:
 			res, err := msgServer.CreatePool(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)
