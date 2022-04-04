@@ -11,4 +11,5 @@ var (
 	ErrNotEnoughPoolDeposit       = sdkerrors.Register(ModuleName, 3, "the balance is not enough to make a data pool")
 	ErrNotRegisteredDataValidator = sdkerrors.Register(ModuleName, 4, "data validator is not registered")
 	ErrNoRegisteredNFTContract    = sdkerrors.Register(ModuleName, 5, "no NFT contract is registered")
+	ErrNotCreatedPool             = sdkerrors.Register(ModuleName, 6, "pool not created")
 )
