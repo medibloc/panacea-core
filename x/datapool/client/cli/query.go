@@ -28,5 +28,6 @@ func GetQueryCmd(queryRoute string) *cobra.Command {
 
 	cmd.AddCommand(CmdGetNFTContract())
 	cmd.AddCommand(CmdGetDataValidator())
+	cmd.AddCommand(CmdGetPool())
 	return cmd
 }
