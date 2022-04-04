@@ -187,7 +187,7 @@ func (k Keeper) GetPool(ctx sdk.Context, poolID uint64) (*types.Pool, error) {
 	poolKey := types.GetKeyPrefixPools(poolID)
 	bz := store.Get(poolKey)
 	if bz == nil {
-		return nil,  types.ErrNotCreatedPool
+		return nil,  types.ErrPoolNotFound
 	}
 	pool := &types.Pool{}
 	k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, pool)
