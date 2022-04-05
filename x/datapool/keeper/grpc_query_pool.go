@@ -11,7 +11,20 @@ import (
 )
 
 func (k Keeper) Pool(goCtx context.Context, req *types.QueryPoolRequest) (*types.QueryPoolResponse, error) {
-	return &types.QueryPoolResponse{}, nil
+	if req == nil {
+		return nil, status.Error(codes.InvalidArgument, "invalid request")
+	}
+
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	pool, err := k.GetPool(ctx, req.PoolId)
+	if err != nil {
+		return nil, err
+	}
+
+	return &types.QueryPoolResponse{
+		Pool: pool,
+	}, nil
 }
 
 func (k Keeper) NFTContract(goCtx context.Context, req *types.QueryNFTContractRequest) (*types.QueryNFTContractResponse, error) {
