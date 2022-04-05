@@ -54,7 +54,7 @@ message PoolParams {
   repeated string          data_schema = 1;             // JSON Schema URIs
   uint64                   target_num_data = 2;         // A target num of data to be collected
   uint64                   max_nft_supply = 3;          // A max num of NFTs that can be minted (= A total num of potential buyers)
-  cosmos.base.v1beta1.Coin nft_price = 4;               // NFT price
+  cosmos.base.v1beta1.Coin nft_price = 4;               // A price of a NFT
   repeated string          trusted_data_validators = 5; // Trusted data validators' addresses
   repeated string          trusted_data_issuers = 6;    // Optional. Data issuers that is trusted by the curator
   google.protobuf.Duration download_period = 7 [
