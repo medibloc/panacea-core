@@ -203,6 +203,19 @@ func (k Keeper) SetPool(ctx sdk.Context, pool *types.Pool) {
 	store.Set(poolKey, bz)
 }
 
+func (k Keeper) GetPool(ctx sdk.Context, poolID uint64) (*types.Pool, error) {
+	store := ctx.KVStore(k.storeKey)
+	poolKey := types.GetKeyPrefixPools(poolID)
+	bz := store.Get(poolKey)
+	if bz == nil {
+		return nil,  types.ErrPoolNotFound
+	}
+	pool := &types.Pool{}
+	k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, pool)
+
+	return pool, nil
+}
+
 func (k Keeper) SetContractAddress(ctx sdk.Context, address sdk.AccAddress) {
 	store := ctx.KVStore(k.storeKey)
 	store.Set(types.KeyNFTContractAddress, address)
