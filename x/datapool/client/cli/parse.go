@@ -1,6 +1,6 @@
 package cli
 
-type createPoolInput struct {
+type CreatePoolInput struct {
 	DataSchema            []string `json:"data_schema"`
 	TargetNumData         uint64   `json:"target_num_data"`
 	MaxNFTSupply          uint64   `json:"max_nft_supply"`

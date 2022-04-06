@@ -11,10 +11,11 @@ import "panacea/datapool/v2/pool.proto";
 message GenesisState {
   repeated panacea.datapool.v2.DataValidator data_validators = 1;
   uint64                                     next_pool_number = 2;
-  map<uint64, Pool>                          pools = 3;
+  repeated Pool                              pools = 3;
   Params                                     params = 4 [
     (gogoproto.nullable) = false
   ];
+  bytes                                      nft_contract_address = 5;
 }
 
 // Params define parameters of datapool module

@@ -3,7 +3,7 @@
 ```shell
 TX_FLAG=(--chain-id {your chainID} --gas auto --gas-prices 5umed --gas-adjustment 1.3)
 SENDER=$(panacead keys show {your address or key of sender} -a)
-panacead tx datapool register-contract cw721_base.wasm --from $SENDER $TX_FLAG -y
+panacead tx datapool register-contract {your wasm code} --from $SENDER $TX_FLAG -y
 ```
 
 In this example, the `SENDER` doesn't do anything except paying tx fees for registration of NFT contract. 
@@ -12,7 +12,7 @@ In this example, the `SENDER` doesn't do anything except paying tx fees for regi
 
 ```shell
 CURATOR=$(panacead keys show {your address or key of curator} -a)
-panacead tx datapool create-pool create-pool.json --from $CURATOR $TX_FLAG -y
+panacead tx datapool create-pool create_pool_sample.json --from $CURATOR $TX_FLAG -y
 ```
 
 ## Upgrade NFT contract

@@ -78,7 +78,7 @@ func CmdCreatePool() *cobra.Command {
 				return err
 			}
 
-			msg, err := NewCreatePoolMsg(clientCtx, args[0])
+			msg, err := newCreatePoolMsg(clientCtx, args[0])
 			if err != nil {
 				return err
 			}
@@ -95,8 +95,8 @@ func CmdCreatePool() *cobra.Command {
 	return cmd
 }
 
-func NewCreatePoolMsg(clientCtx client.Context, file string) (sdk.Msg, error) {
-	var poolParamsInput createPoolInput
+func newCreatePoolMsg(clientCtx client.Context, file string) (sdk.Msg, error) {
+	var poolParamsInput CreatePoolInput
 
 	contents, err := ioutil.ReadFile(file)
 	if err != nil {

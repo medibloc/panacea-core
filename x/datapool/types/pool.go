@@ -18,7 +18,7 @@ const (
 )
 
 func NewPool(poolID uint64, curator sdk.AccAddress, poolParams PoolParams) *Pool {
-	poolAddress := newPoolAddress(poolID)
+	poolAddress := NewPoolAddress(poolID)
 
 	return &Pool{
 		PoolId:        poolID,
@@ -32,7 +32,7 @@ func NewPool(poolID uint64, curator sdk.AccAddress, poolParams PoolParams) *Pool
 	}
 }
 
-func newPoolAddress(poolID uint64) sdk.AccAddress {
+func NewPoolAddress(poolID uint64) sdk.AccAddress {
 	key := append([]byte("pool"), sdk.Uint64ToBigEndian(poolID)...)
 	return address.Module(ModuleName, key)
 }
