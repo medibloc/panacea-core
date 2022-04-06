@@ -48,7 +48,8 @@ message MsgRegisterDataValidatorResponse {
 
 // MsgUpdateDataValidator defines the Msg/UpdateDataValidator request type.
 message MsgUpdateDataValidator {
-  DataValidator validator_detail = 1;
+  string data_validator = 1;
+  string endpoint = 2;
 }
 
 // MsgUpdateResponse defines the Msg/UpdateDataValidator response type.

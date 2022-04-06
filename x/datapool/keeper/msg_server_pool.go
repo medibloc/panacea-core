@@ -27,12 +27,12 @@ func (m msgServer) RegisterDataValidator(goCtx context.Context, msg *types.MsgRe
 func (m msgServer) UpdateDataValidator(goCtx context.Context, msg *types.MsgUpdateDataValidator) (*types.MsgUpdateDataValidatorResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	_, err := sdk.AccAddressFromBech32(msg.ValidatorDetail.Address)
+	address, err := sdk.AccAddressFromBech32(msg.DataValidator)
 	if err != nil {
 		return nil, err
 	}
 
-	err = m.Keeper.UpdateDataValidator(ctx, *msg.ValidatorDetail)
+	err = m.Keeper.UpdateDataValidator(ctx, address, msg.Endpoint)
 	if err != nil {
 		return nil, err
 	}

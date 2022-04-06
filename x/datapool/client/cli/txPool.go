@@ -54,12 +54,8 @@ func CmdUpdateDataValidator() *cobra.Command {
 			}
 
 			fromAddress := clientCtx.GetFromAddress()
-			updateDataValidator := types.DataValidator{
-				Address:  fromAddress.String(),
-				Endpoint: args[0],
-			}
 
-			msg := types.NewMsgUpdateDataValidator(&updateDataValidator)
+			msg := types.NewMsgUpdateDataValidator(fromAddress.String(), args[0])
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}

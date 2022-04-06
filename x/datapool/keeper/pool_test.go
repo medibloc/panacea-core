@@ -130,7 +130,7 @@ func (suite *poolTestSuite) TestUpdateDataValidator() {
 		Endpoint: "https://update-my-validator.org",
 	}
 
-	err = suite.DataPoolKeeper.UpdateDataValidator(suite.Ctx, updateTempDataValidator)
+	err = suite.DataPoolKeeper.UpdateDataValidator(suite.Ctx, dataVal1, updateTempDataValidator.Endpoint)
 	suite.Require().NoError(err)
 
 	getDataValidator, err := suite.DataPoolKeeper.GetDataValidator(suite.Ctx, dataVal1)

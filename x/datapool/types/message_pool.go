@@ -48,9 +48,10 @@ func (msg *MsgRegisterDataValidator) GetSigners() []sdk.AccAddress {
 
 var _ sdk.Msg = &MsgUpdateDataValidator{}
 
-func NewMsgUpdateDataValidator(dataValidator *DataValidator) *MsgUpdateDataValidator {
+func NewMsgUpdateDataValidator(address, endpoint string) *MsgUpdateDataValidator {
 	return &MsgUpdateDataValidator{
-		ValidatorDetail: dataValidator,
+		DataValidator: address,
+		Endpoint:      endpoint,
 	}
 }
 
@@ -63,12 +64,12 @@ func (msg *MsgUpdateDataValidator) Type() string {
 }
 
 func (msg *MsgUpdateDataValidator) ValidateBasic() error {
-	_, err := sdk.AccAddressFromBech32(msg.ValidatorDetail.Address)
+	_, err := sdk.AccAddressFromBech32(msg.DataValidator)
 	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid data validator address (%s)", err)
 	}
 
-	if msg.ValidatorDetail.Endpoint == "" {
+	if msg.Endpoint == "" {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "empty data validator endpoint URL")
 	}
 	return nil
@@ -80,7 +81,7 @@ func (msg *MsgUpdateDataValidator) GetSignBytes() []byte {
 }
 
 func (msg *MsgUpdateDataValidator) GetSigners() []sdk.AccAddress {
-	dataValidator, err := sdk.AccAddressFromBech32(msg.ValidatorDetail.Address)
+	dataValidator, err := sdk.AccAddressFromBech32(msg.DataValidator)
 	if err != nil {
 		panic(err)
 	}
