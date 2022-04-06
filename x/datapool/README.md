@@ -34,3 +34,26 @@ panacead q wasm contract-state smart $CONTRACT $QUERY_TOKEN_INFO -o json
   }
 }
 ```
+
+### Change parameter by proposal
+
+proposal-example.json
+```json
+{
+  "title": "title",
+  "description": "description",
+  "changes": [
+    {
+      "subspace": "datapool",
+      "key": "datapooldeposit",
+      "value": { "denom": "umed", "amount": "20000000" }
+    }
+  ],
+  "deposit": "1000000umed"
+}
+```
+
+submit-proposal cli command 
+```shell
+panacead tx gov submit-proposal param-change param-example.json --from {proposer account} --chain-id {your chainID} --gas auto --gas-prices 5umed --gas-adjustment 1.3 -y
+```

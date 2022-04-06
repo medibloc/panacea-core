@@ -19,8 +19,7 @@ message GenesisState {
 
 // Params define parameters of datapool module
 message Params {
-  repeated cosmos.base.v1beta1.Coin data_pool_deposit = 1 [
-    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins",
+  cosmos.base.v1beta1.Coin data_pool_deposit = 1 [
     (gogoproto.moretags) = "yaml:\"data_pool_deposit\"",
     (gogoproto.nullable) = false
   ];

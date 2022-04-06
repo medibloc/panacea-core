@@ -10,11 +10,11 @@ import (
 )
 
 var (
-	DefaultDataPoolDeposit = sdk.Coins{sdk.NewInt64Coin(assets.MicroMedDenom, 10000000000)} // 10000 MED
+	DefaultDataPoolDeposit = sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(10000000000))
 )
 
 var (
-	KeyDataPoolDeposit = []byte("DataPoolDeposit")
+	KeyDataPoolDeposit = []byte("datapooldeposit")
 )
 
 var _ paramtypes.ParamSet = (*Params)(nil)
@@ -23,7 +23,7 @@ func ParamKeyTable() paramtypes.KeyTable {
 	return paramtypes.NewKeyTable().RegisterParamSet(&Params{})
 }
 
-func NewParams(dataPoolDeposit sdk.Coins) Params {
+func NewParams(dataPoolDeposit sdk.Coin) Params {
 	return Params{
 		DataPoolDeposit: dataPoolDeposit,
 	}
@@ -50,12 +50,12 @@ func (p *Params) ParamSetPairs() paramtypes.ParamSetPairs {
 }
 
 func validateDataPoolDeposit(i interface{}) error {
-	v, ok := i.(sdk.Coins)
+	deposit, ok := i.(sdk.Coin)
 	if !ok {
 		return fmt.Errorf("invalid parameter type: %T", i)
 	}
 
-	if v.Validate() != nil {
+	if deposit.Validate() != nil {
 		return fmt.Errorf("invalid data pool deposit: %+v", i)
 	}
 
