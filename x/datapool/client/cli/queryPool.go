@@ -1,11 +1,12 @@
 package cli
 
 import (
+	"strconv"
+
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/medibloc/panacea-core/v2/x/datapool/types"
 	"github.com/spf13/cobra"
-	"strconv"
 )
 
 func CmdGetDataValidator() *cobra.Command {

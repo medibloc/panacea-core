@@ -11,6 +11,7 @@ import (
 
 func RegisterCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&MsgRegisterDataValidator{}, "datapool/RegisterDataValidator", nil)
+	cdc.RegisterConcrete(&MsgUpdateDataValidator{}, "datapool/UpdateDataValidator", nil)
 	cdc.RegisterConcrete(&MsgCreatePool{}, "datapool/CreatePool", nil)
 	cdc.RegisterConcrete(&MsgSellData{}, "datapool/SellData", nil)
 	cdc.RegisterConcrete(&MsgBuyDataAccessNFT{}, "datapool/BuyDataAccessNFT", nil)
@@ -22,6 +23,7 @@ func RegisterCodec(cdc *codec.LegacyAmino) {
 func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 	registry.RegisterImplementations((*sdk.Msg)(nil),
 		&MsgRegisterDataValidator{},
+		&MsgUpdateDataValidator{},
 		&MsgCreatePool{},
 		&MsgSellData{},
 		&MsgBuyDataAccessNFT{},

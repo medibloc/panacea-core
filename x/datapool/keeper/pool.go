@@ -78,6 +78,22 @@ func (k Keeper) IsRegisteredDataValidator(ctx sdk.Context, dataValidatorAddress 
 	return store.Has(dataValidatorKey)
 }
 
+func (k Keeper) UpdateDataValidator(ctx sdk.Context, address sdk.AccAddress, endpoint string) error {
+	validator, err := k.GetDataValidator(ctx, address)
+	if err != nil {
+		return err
+	}
+
+	validator.Endpoint = endpoint
+
+	err = k.SetDataValidator(ctx, validator)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (k Keeper) CreatePool(ctx sdk.Context, curator sdk.AccAddress, poolParams types.PoolParams) (uint64, error) {
 	// Get the next pool id
 	poolID := k.GetNextPoolNumberAndIncrement(ctx)
@@ -187,7 +203,7 @@ func (k Keeper) GetPool(ctx sdk.Context, poolID uint64) (*types.Pool, error) {
 	poolKey := types.GetKeyPrefixPools(poolID)
 	bz := store.Get(poolKey)
 	if bz == nil {
-		return nil,  types.ErrPoolNotFound
+		return nil, types.ErrPoolNotFound
 	}
 	pool := &types.Pool{}
 	k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, pool)

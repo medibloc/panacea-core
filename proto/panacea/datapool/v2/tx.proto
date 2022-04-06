@@ -15,6 +15,9 @@ service Msg {
   // RegisterDataValidator defines a method for registration of data validator.
   rpc RegisterDataValidator(MsgRegisterDataValidator) returns (MsgRegisterDataValidatorResponse);
 
+  // UpdateDataValidator defines a method for updating of data validator.
+  rpc UpdateDataValidator(MsgUpdateDataValidator) returns (MsgUpdateDataValidatorResponse);
+
   // CreatePool defines a method for creating data pool.
   rpc CreatePool(MsgCreatePool) returns (MsgCreatePoolResponse);
 
@@ -41,6 +44,17 @@ message MsgRegisterDataValidator {
 
 // MsgRegisterDataValidatorResponse defines the Msg/RegisterDataValidator response type.
 message MsgRegisterDataValidatorResponse {
+}
+
+// MsgUpdateDataValidator defines the Msg/UpdateDataValidator request type.
+message MsgUpdateDataValidator {
+  string data_validator = 1;
+  string endpoint = 2;
+}
+
+// MsgUpdateResponse defines the Msg/UpdateDataValidator response type.
+message MsgUpdateDataValidatorResponse {
+
 }
 
 // MsgCreatePool defines the Msg/CreatePool request type.
