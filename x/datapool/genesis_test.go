@@ -65,7 +65,7 @@ func (suite genesisTestSuite) TestDataPoolInitGenesis() {
 	// check pool
 	poolFromKeeper, err := suite.DataPoolKeeper.GetPool(suite.Ctx, uint64(1))
 	suite.Require().NoError(err)
-	suite.Require().Equal(*pool, poolFromKeeper)
+	suite.Require().Equal(pool, poolFromKeeper)
 
 	// check params
 	paramsFromKeeper := suite.DataPoolKeeper.GetParams(suite.Ctx)

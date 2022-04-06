@@ -12,7 +12,7 @@ In this example, the `SENDER` doesn't do anything except paying tx fees for regi
 
 ```shell
 CURATOR=$(panacead keys show {your address or key of curator} -a)
-panacead tx datapool create-pool create-pool.json --from $CURATOR $TX_FLAG -y
+panacead tx datapool create-pool create_pool_sample.json --from $CURATOR $TX_FLAG -y
 ```
 
 ## Upgrade NFT contract

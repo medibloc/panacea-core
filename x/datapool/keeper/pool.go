@@ -213,23 +213,6 @@ func (k Keeper) SetPoolNumber(ctx sdk.Context, poolNumber uint64) {
 	store.Set(types.KeyPoolNextNumber, bz)
 }
 
-func (k Keeper) GetPool(ctx sdk.Context, poolID uint64) (types.Pool, error) {
-	store := ctx.KVStore(k.storeKey)
-	poolKey := types.GetKeyPrefixPools(poolID)
-	if !store.Has(poolKey) {
-		return types.Pool{}, sdkerrors.Wrapf(types.ErrDataPoolNotFound, "the data pool %d is not found", poolID)
-	}
-	bz := store.Get(poolKey)
-
-	var pool types.Pool
-	err := k.cdc.UnmarshalBinaryLengthPrefixed(bz, &pool)
-	if err != nil {
-		return types.Pool{}, err
-	}
-
-	return pool, nil
-}
-
 func (k Keeper) SetPool(ctx sdk.Context, pool *types.Pool) {
 	store := ctx.KVStore(k.storeKey)
 	poolKey := types.GetKeyPrefixPools(pool.GetPoolId())

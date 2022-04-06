@@ -245,7 +245,7 @@ func (suite *TestSuite) SetupTest() {
 		DataValidators: []*datapooltypes.DataValidator{},
 		NextPoolNumber: 1,
 		Pools:          []*datapooltypes.Pool{},
-		Params:         datapooltypes.Params{DataPoolDeposit: sdk.NewCoins(sdk.NewInt64Coin(assets.MicroMedDenom, 1000000))},
+		Params:         datapooltypes.Params{DataPoolDeposit: sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(1000000))},
 	}
 	datapool.InitGenesis(suite.Ctx, suite.DataPoolKeeper, dataPoolGenState)
 }
