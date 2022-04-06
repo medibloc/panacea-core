@@ -3,6 +3,8 @@ package keeper
 import (
 	"fmt"
 
+	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
+
 	"github.com/CosmWasm/wasmd/x/wasm"
 
 	"github.com/tendermint/tendermint/libs/log"
@@ -14,14 +16,19 @@ import (
 	// this line is used by starport scaffolding # ibc/keeper/import
 
 	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
-	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
+
+	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
 )
 
 type (
 	Keeper struct {
-		cdc           codec.Marshaler
-		storeKey      sdk.StoreKey
-		memKey        sdk.StoreKey
+		cdc      codec.Marshaler
+		storeKey sdk.StoreKey
+		memKey   sdk.StoreKey
+
+		paramSpace paramtypes.Subspace
+
+		// keepers
 		bankKeeper    types.BankKeeper
 		accountKeeper types.AccountKeeper
 		wasmKeeper    wasmtypes.ContractOpsKeeper
@@ -32,14 +39,20 @@ func NewKeeper(
 	cdc codec.Marshaler,
 	storeKey,
 	memKey sdk.StoreKey,
+	paramSpace paramtypes.Subspace,
 	bankKeeper types.BankKeeper,
 	accountKeeper types.AccountKeeper,
 	wasmKeeper wasm.Keeper,
 ) *Keeper {
+	if !paramSpace.HasKeyTable() {
+		paramSpace = paramSpace.WithKeyTable(types.ParamKeyTable())
+	}
+
 	return &Keeper{
 		cdc:           cdc,
 		storeKey:      storeKey,
 		memKey:        memKey,
+		paramSpace:    paramSpace,
 		bankKeeper:    bankKeeper,
 		accountKeeper: accountKeeper,
 		wasmKeeper:    wasmkeeper.NewDefaultPermissionKeeper(wasmKeeper),

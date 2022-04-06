@@ -3,10 +3,25 @@ package panacea.datapool.v2;
 
 option go_package = "github.com/medibloc/panacea-core/x/datapool/types";
 
-import "google/protobuf/any.proto";
+import "gogoproto/gogo.proto";
+import "cosmos/base/v1beta1/coin.proto";
+import "panacea/datapool/v2/pool.proto";
 
 // GenesisState defines the datapool module's genesis state.
 message GenesisState {
-  uint64 next_pool_number = 1;
-  // TODO: add genesis state of pools
+  repeated panacea.datapool.v2.DataValidator data_validators = 1;
+  uint64                                     next_pool_number = 2;
+  repeated Pool                              pools = 3;
+  Params                                     params = 4 [
+    (gogoproto.nullable) = false
+  ];
+  bytes                                      nft_contract_address = 5;
+}
+
+// Params define parameters of datapool module
+message Params {
+  cosmos.base.v1beta1.Coin data_pool_deposit = 1 [
+    (gogoproto.moretags) = "yaml:\"data_pool_deposit\"",
+    (gogoproto.nullable) = false
+  ];
 }

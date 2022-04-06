@@ -78,7 +78,7 @@ func CmdCreatePool() *cobra.Command {
 				return err
 			}
 
-			msg, err := NewCreatePoolMsg(clientCtx, args[0])
+			msg, err := newCreatePoolMsg(clientCtx, args[0])
 			if err != nil {
 				return err
 			}
@@ -95,8 +95,8 @@ func CmdCreatePool() *cobra.Command {
 	return cmd
 }
 
-func NewCreatePoolMsg(clientCtx client.Context, file string) (sdk.Msg, error) {
-	var poolParamsInput createPoolInput
+func newCreatePoolMsg(clientCtx client.Context, file string) (sdk.Msg, error) {
+	var poolParamsInput CreatePoolInput
 
 	contents, err := ioutil.ReadFile(file)
 	if err != nil {
@@ -108,11 +108,6 @@ func NewCreatePoolMsg(clientCtx client.Context, file string) (sdk.Msg, error) {
 	}
 
 	nftPrice, err := sdk.ParseCoinNormalized(poolParamsInput.NFTPrice)
-	if err != nil {
-		return nil, err
-	}
-
-	deposit, err := sdk.ParseCoinNormalized(poolParamsInput.Deposit)
 	if err != nil {
 		return nil, err
 	}
@@ -129,7 +124,6 @@ func NewCreatePoolMsg(clientCtx client.Context, file string) (sdk.Msg, error) {
 		NftPrice:              &nftPrice,
 		TrustedDataValidators: poolParamsInput.TrustedDataValidators,
 		TrustedDataIssuers:    poolParamsInput.TrustedDataIssuers,
-		Deposit:               &deposit,
 		DownloadPeriod:        &downloadPeriod,
 	}
 

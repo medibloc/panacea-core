@@ -452,6 +452,7 @@ func New(
 		appCodec,
 		keys[datapooltypes.StoreKey],
 		keys[datapooltypes.MemStoreKey],
+		app.GetSubspace(datapooltypes.ModuleName),
 		app.BankKeeper,
 		app.AccountKeeper,
 		app.wasmKeeper,

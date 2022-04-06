@@ -57,8 +57,7 @@ message PoolParams {
   cosmos.base.v1beta1.Coin nft_price = 4;               // A price of a NFT
   repeated string          trusted_data_validators = 5; // Trusted data validators' addresses
   repeated string          trusted_data_issuers = 6;    // Optional. Data issuers that is trusted by the curator
-  cosmos.base.v1beta1.Coin deposit = 7;
-  google.protobuf.Duration download_period = 8 [
+  google.protobuf.Duration download_period = 7 [
     (gogoproto.stdduration) = true
   ];                                                    // A download period after redeeming NFT
 }
