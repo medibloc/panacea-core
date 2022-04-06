@@ -1,10 +1,11 @@
 package keeper_test
 
 import (
-	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
-	"github.com/medibloc/panacea-core/v2/types/assets"
 	"testing"
 	"time"
+
+	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
+	"github.com/medibloc/panacea-core/v2/types/assets"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/medibloc/panacea-core/v2/types/testsuite"
@@ -40,12 +41,11 @@ func (suite *queryPoolTestSuite) TestQueryDataValidator() {
 
 func (suite *queryPoolTestSuite) TestQueryPool() {
 	curatorPrivKey = secp256k1.GenPrivKey()
-	curatorPubKey  = curatorPrivKey.PubKey()
-	curatorAddr    = sdk.AccAddress(curatorPubKey.Address())
+	curatorPubKey = curatorPrivKey.PubKey()
+	curatorAddr = sdk.AccAddress(curatorPubKey.Address())
 
 	poolID := uint64(1)
 	nftPrice := sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(1000000))
-	deposit := sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(20000000))
 	downloadPeriod := time.Hour
 	poolParams := types.PoolParams{
 		DataSchema:            []string{"https://json.schemastore.org/github-issue-forms.json"},
@@ -53,7 +53,6 @@ func (suite *queryPoolTestSuite) TestQueryPool() {
 		MaxNftSupply:          10,
 		NftPrice:              &nftPrice,
 		TrustedDataValidators: []string{dataVal1.String()},
-		Deposit:               &deposit,
 		DownloadPeriod:        &downloadPeriod,
 	}
 

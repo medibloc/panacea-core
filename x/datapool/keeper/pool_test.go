@@ -143,7 +143,6 @@ func (suite *poolTestSuite) TestUpdateDataValidator() {
 func (suite *poolTestSuite) TestGetPool() {
 	poolID := uint64(1)
 	nftPrice := sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(1000000))
-	deposit := sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(20000000))
 	downloadPeriod := time.Hour
 	poolParams := types.PoolParams{
 		DataSchema:            []string{"https://json.schemastore.org/github-issue-forms.json"},
@@ -151,7 +150,6 @@ func (suite *poolTestSuite) TestGetPool() {
 		MaxNftSupply:          10,
 		NftPrice:              &nftPrice,
 		TrustedDataValidators: []string{dataVal1.String()},
-		Deposit:               &deposit,
 		DownloadPeriod:        &downloadPeriod,
 	}
 
