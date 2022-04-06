@@ -100,6 +100,22 @@ func (k Keeper) IsRegisteredDataValidator(ctx sdk.Context, dataValidatorAddress 
 	return store.Has(dataValidatorKey)
 }
 
+func (k Keeper) UpdateDataValidator(ctx sdk.Context, address sdk.AccAddress, endpoint string) error {
+	validator, err := k.GetDataValidator(ctx, address)
+	if err != nil {
+		return err
+	}
+
+	validator.Endpoint = endpoint
+
+	err = k.SetDataValidator(ctx, validator)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (k Keeper) CreatePool(ctx sdk.Context, curator sdk.AccAddress, poolParams types.PoolParams) (uint64, error) {
 	// Get the next pool id
 	poolID := k.GetNextPoolNumberAndIncrement(ctx)
@@ -226,6 +242,19 @@ func (k Keeper) GetAllPools(ctx sdk.Context) ([]types.Pool, error) {
 	return pools, nil
 }
 
+func (k Keeper) GetPool(ctx sdk.Context, poolID uint64) (*types.Pool, error) {
+	store := ctx.KVStore(k.storeKey)
+	poolKey := types.GetKeyPrefixPools(poolID)
+	bz := store.Get(poolKey)
+	if bz == nil {
+		return nil, types.ErrPoolNotFound
+	}
+	pool := &types.Pool{}
+	k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, pool)
+
+	return pool, nil
+}
+
 func (k Keeper) SetNFTContractAddress(ctx sdk.Context, address sdk.AccAddress) {
 	store := ctx.KVStore(k.storeKey)
 	store.Set(types.KeyNFTContractAddress, address)
@@ -240,6 +269,7 @@ func (k Keeper) GetNFTContractAddress(ctx sdk.Context) (sdk.AccAddress, error) {
 	return store.Get(types.KeyNFTContractAddress), nil
 }
 
+// CreateNFTContract stores NFT contract
 func (k Keeper) CreateNFTContract(ctx sdk.Context, creator sdk.AccAddress, wasmCode []byte) (uint64, error) {
 	// access configuration of only for creator address
 	accessConfig := &wasmtypes.AccessConfig{

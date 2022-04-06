@@ -46,6 +46,48 @@ func (msg *MsgRegisterDataValidator) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{dataValidator}
 }
 
+var _ sdk.Msg = &MsgUpdateDataValidator{}
+
+func NewMsgUpdateDataValidator(address, endpoint string) *MsgUpdateDataValidator {
+	return &MsgUpdateDataValidator{
+		DataValidator: address,
+		Endpoint:      endpoint,
+	}
+}
+
+func (msg *MsgUpdateDataValidator) Route() string {
+	return RouterKey
+}
+
+func (msg *MsgUpdateDataValidator) Type() string {
+	return "UpdateDataValidator"
+}
+
+func (msg *MsgUpdateDataValidator) ValidateBasic() error {
+	_, err := sdk.AccAddressFromBech32(msg.DataValidator)
+	if err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid data validator address (%s)", err)
+	}
+
+	if msg.Endpoint == "" {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "empty data validator endpoint URL")
+	}
+	return nil
+}
+
+func (msg *MsgUpdateDataValidator) GetSignBytes() []byte {
+	bz := ModuleCdc.MustMarshalJSON(msg)
+	return sdk.MustSortJSON(bz)
+}
+
+func (msg *MsgUpdateDataValidator) GetSigners() []sdk.AccAddress {
+	dataValidator, err := sdk.AccAddressFromBech32(msg.DataValidator)
+	if err != nil {
+		panic(err)
+	}
+	return []sdk.AccAddress{dataValidator}
+}
+
 var _ sdk.Msg = &MsgCreatePool{}
 
 func NewMsgCreatePool(poolParams *PoolParams, curator string) *MsgCreatePool {
