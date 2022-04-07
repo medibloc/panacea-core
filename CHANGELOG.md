@@ -5,7 +5,12 @@
 TBD
 
 
-## [v2.0.2](https://github.com/medibloc/panacea-core/releases/tag/v2.0.2) - 2021-09-14
+## [v2.0.3](https://github.com/medibloc/panacea-core/releases/tag/v2.0.3) - 2022-04-06
+
+### Improvements
+
+- [\#291](https://github.com/medibloc/panacea-core/pull/291) Use [medibloc/cosmos-sdk@v0.42.11-panacea.1](https://github.com/medibloc/cosmos-sdk/releases/tag/v0.42.11-panacea.1) for `min_commission_rate` + add upgrade handler which sets `min_commission_rate` to 3%
+
 
 ### Bug fixes
 
