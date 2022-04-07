@@ -2,15 +2,15 @@ package types
 
 import (
 	"fmt"
-	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	"strconv"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 )
 
 const (
-	PENDING          = "PENDING"
-	ACTIVE           = "ACTIVE"
+	PENDING = "PENDING"
+	ACTIVE  = "ACTIVE"
 
 	ShareTokenPrefix = "DP"
 )
@@ -39,6 +39,26 @@ func GetModuleAddress() sdk.AccAddress {
 	return authtypes.NewModuleAddress(ModuleName)
 }
 
+func GetDenomOfShareToken(poolID uint64) string {
+	return fmt.Sprintf(ShareTokenPrefix+"/%v", poolID)
+}
+
 func GetAccumPoolShareToken(poolID, amount uint64) sdk.Coin {
-	return sdk.NewCoin(fmt.Sprintf(ShareTokenPrefix+"/%v", poolID), sdk.NewIntFromUint64(amount))
+	return sdk.NewCoin(GetDenomOfShareToken(poolID), sdk.NewIntFromUint64(amount))
+}
+
+func (d *DistributeRevenuePools) AppendPoolID(poolID uint64) {
+	d.PoolIds = append(d.PoolIds, poolID)
+}
+
+func (d *DistributeRevenuePools) IsEmpty() bool {
+	return d.PoolIds == nil || len(d.PoolIds) == 0
+}
+
+func (d *DistributeRevenuePools) RemovePeviousIndex(idx int) {
+	if d.IsEmpty() {
+		return
+	}
+
+	d.PoolIds = d.PoolIds[idx:]
 }

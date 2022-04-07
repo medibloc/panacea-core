@@ -41,10 +41,10 @@ var (
 	requesterAddr    = sdk.AccAddress(requesterPubKey.Address())
 
 	fundForDataVal = sdk.NewCoins(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(10000000000)))
-	fundForCurator = sdk.NewCoins(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(10000000000)))
+	fundForCurator = sdk.NewCoins(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(100000000000)))
 	NFTPrice       = sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(10000000))
 
-	downloadPeriod = time.Duration(time.Second * 100000000)
+	downloadPeriod = time.Second * 100000000
 )
 
 func (suite poolTestSuite) setupNFTContract() {
@@ -195,27 +195,9 @@ func (suite *poolTestSuite) TestGetPool() {
 }
 
 func (suite poolTestSuite) TestCreatePool() {
-	// create and instantiate NFT contract
-	suite.setupNFTContract()
+	suite.initCreatePool()
 
-	err := suite.BankKeeper.AddCoins(suite.Ctx, curatorAddr, fundForCurator)
-	suite.Require().NoError(err)
-
-	// register data validator
-	err = suite.BankKeeper.AddCoins(suite.Ctx, dataVal1, fundForDataVal)
-	suite.Require().NoError(err)
-
-	suite.setDataValidatorAccount()
-
-	dataValidator := types.DataValidator{
-		Address:  dataVal1.String(),
-		Endpoint: "https://my-validator.org",
-	}
-
-	err = suite.DataPoolKeeper.RegisterDataValidator(suite.Ctx, dataValidator)
-	suite.Require().NoError(err)
-
-	newPoolParams := makePoolParamsWithDataValidator()
+	newPoolParams := makePoolParamsWithDataValidator(100, 10)
 
 	poolID, err := suite.DataPoolKeeper.CreatePool(suite.Ctx, curatorAddr, newPoolParams)
 	suite.Require().NoError(err)
@@ -240,7 +222,7 @@ func (suite poolTestSuite) TestNotRegisteredDataValidator() {
 	err := suite.BankKeeper.AddCoins(suite.Ctx, curatorAddr, fundForCurator)
 	suite.Require().NoError(err)
 
-	newPoolParams := makePoolParamsWithDataValidator()
+	newPoolParams := makePoolParamsWithDataValidator(100, 10)
 
 	_, err = suite.DataPoolKeeper.CreatePool(suite.Ctx, curatorAddr, newPoolParams)
 	suite.Require().Error(err, types.ErrNotRegisteredDataValidator)
@@ -266,11 +248,11 @@ func (suite poolTestSuite) TestNotRegisteredNFTContract() {
 	suite.Require().Error(err, types.ErrNoRegisteredNFTContract)
 }
 
-func makePoolParamsWithDataValidator() types.PoolParams {
+func makePoolParamsWithDataValidator(targetNumData, MaxNftSupply uint64) types.PoolParams {
 	return types.PoolParams{
 		DataSchema:            []string{"https://www.json.ld"},
-		TargetNumData:         100,
-		MaxNftSupply:          10,
+		TargetNumData:         targetNumData,
+		MaxNftSupply:          MaxNftSupply,
 		NftPrice:              &NFTPrice,
 		TrustedDataValidators: []string{dataVal1.String()},
 		TrustedDataIssuers:    []string(nil),
@@ -339,7 +321,7 @@ func (suite *poolTestSuite) TestSellData() {
 	round := pool.Round
 	dataHash := []byte("dataHash")
 
-	cert, err := makeTestDataCertificate(suite.Cdc.Marshaler, poolID, round, dataHash)
+	cert, err := makeTestDataCertificate(suite.Cdc.Marshaler, poolID, round, dataHash, requesterAddr.String())
 	suite.Require().NoError(err)
 
 	shareToken, err := suite.DataPoolKeeper.SellData(suite.Ctx, requesterAddr, *cert)
@@ -380,7 +362,7 @@ func (suite *poolTestSuite) TestSellData_change_status_activity() {
 	pool.PoolParams.TargetNumData = 1
 	suite.DataPoolKeeper.SetPool(suite.Ctx, pool)
 
-	cert, err := makeTestDataCertificate(suite.Cdc.Marshaler, poolID, round, dataHash)
+	cert, err := makeTestDataCertificate(suite.Cdc.Marshaler, poolID, round, dataHash, requesterAddr.String())
 	suite.Require().NoError(err)
 
 	shareToken, err := suite.DataPoolKeeper.SellData(suite.Ctx, requesterAddr, *cert)
@@ -411,7 +393,7 @@ func (suite *poolTestSuite) TestSellData_not_same_seller() {
 	round := uint64(1)
 	dataHash := []byte("dataHash")
 
-	cert, err := makeTestDataCertificate(suite.Cdc.Marshaler, poolID, round, dataHash)
+	cert, err := makeTestDataCertificate(suite.Cdc.Marshaler, poolID, round, dataHash, requesterAddr.String())
 	suite.Require().NoError(err)
 
 	// A curator requests to sell data
@@ -428,7 +410,7 @@ func (suite *poolTestSuite) TestSellData_failed_get_publicKey_validator_in_signa
 
 	// Unregistered data validator publicKey
 
-	cert, err := makeTestDataCertificate(suite.Cdc.Marshaler, poolID, round, dataHash)
+	cert, err := makeTestDataCertificate(suite.Cdc.Marshaler, poolID, round, dataHash, requesterAddr.String())
 	suite.Require().NoError(err)
 
 	unsignedCertBz, err := suite.Cdc.Marshaler.MarshalBinaryBare(cert.UnsignedCert)
@@ -451,7 +433,7 @@ func (suite *poolTestSuite) TestSellData_invalid_signature() {
 
 	suite.setDataValidatorAccount()
 
-	cert, err := makeTestDataCertificate(suite.Cdc.Marshaler, poolID, round, dataHash)
+	cert, err := makeTestDataCertificate(suite.Cdc.Marshaler, poolID, round, dataHash, requesterAddr.String())
 	suite.Require().NoError(err)
 
 	unsignedCertBz, err := suite.Cdc.Marshaler.MarshalBinaryBare(cert.UnsignedCert)
@@ -481,7 +463,7 @@ func (suite *poolTestSuite) TestSellData_duplicate_data() {
 	round := pool.Round
 	dataHash := []byte("dataHash")
 
-	cert, err := makeTestDataCertificate(suite.Cdc.Marshaler, poolID, round, dataHash)
+	cert, err := makeTestDataCertificate(suite.Cdc.Marshaler, poolID, round, dataHash, requesterAddr.String())
 	suite.Require().NoError(err)
 
 	shareToken, err := suite.DataPoolKeeper.SellData(suite.Ctx, requesterAddr, *cert)
@@ -505,7 +487,7 @@ func (suite *poolTestSuite) TestSellData_not_exist_pool() {
 
 	// Unregistered pool
 
-	cert, err := makeTestDataCertificate(suite.Cdc.Marshaler, poolID, round, dataHash)
+	cert, err := makeTestDataCertificate(suite.Cdc.Marshaler, poolID, round, dataHash, requesterAddr.String())
 	suite.Require().NoError(err)
 
 	shareToken, err := suite.DataPoolKeeper.SellData(suite.Ctx, requesterAddr, *cert)
@@ -526,7 +508,7 @@ func (suite *poolTestSuite) TestSellData_impossible_status_pool() {
 	pool.Status = types.ACTIVE
 	suite.DataPoolKeeper.SetPool(suite.Ctx, pool)
 
-	cert, err := makeTestDataCertificate(suite.Cdc.Marshaler, poolID, round, dataHash)
+	cert, err := makeTestDataCertificate(suite.Cdc.Marshaler, poolID, round, dataHash, requesterAddr.String())
 	suite.Require().NoError(err)
 
 	shareToken, err := suite.DataPoolKeeper.SellData(suite.Ctx, requesterAddr, *cert)
@@ -548,7 +530,7 @@ func (suite *poolTestSuite) TestSellData_mismatch_certificate_and_pool_round() {
 	pool := makeTestDataPool(poolID)
 	suite.DataPoolKeeper.SetPool(suite.Ctx, pool)
 
-	cert, err := makeTestDataCertificate(suite.Cdc.Marshaler, poolID, round, dataHash)
+	cert, err := makeTestDataCertificate(suite.Cdc.Marshaler, poolID, round, dataHash, requesterAddr.String())
 	suite.Require().NoError(err)
 
 	shareToken, err := suite.DataPoolKeeper.SellData(suite.Ctx, requesterAddr, *cert)
@@ -558,13 +540,13 @@ func (suite *poolTestSuite) TestSellData_mismatch_certificate_and_pool_round() {
 	suite.Require().Nil(shareToken)
 }
 
-func makeTestDataCertificate(marshaler codec.Marshaler, poolID, round uint64, dataHash []byte) (*types.DataValidationCertificate, error) {
+func makeTestDataCertificate(marshaler codec.Marshaler, poolID, round uint64, dataHash []byte, requester string) (*types.DataValidationCertificate, error) {
 	unsignedCert := types.UnsignedDataValidationCertificate{
 		PoolId:        poolID,
 		Round:         round,
 		DataHash:      dataHash,
 		DataValidator: dataVal1.String(),
-		Requester:     requesterAddr.String(),
+		Requester:     requester,
 	}
 
 	bz, err := marshaler.MarshalBinaryBare(&unsignedCert)
@@ -595,4 +577,26 @@ func makeTestDataPool(poolID uint64) *types.Pool {
 	}
 
 	return types.NewPool(poolID, curatorAddr, poolParams)
+}
+
+func (suite poolTestSuite) initCreatePool() {
+	// create and instantiate NFT contract
+	suite.setupNFTContract()
+
+	err := suite.BankKeeper.AddCoins(suite.Ctx, curatorAddr, fundForCurator)
+	suite.Require().NoError(err)
+
+	// register data validator
+	err = suite.BankKeeper.AddCoins(suite.Ctx, dataVal1, fundForDataVal)
+	suite.Require().NoError(err)
+
+	suite.setDataValidatorAccount()
+
+	dataValidator := types.DataValidator{
+		Address:  dataVal1.String(),
+		Endpoint: "https://my-validator.org",
+	}
+
+	err = suite.DataPoolKeeper.RegisterDataValidator(suite.Ctx, dataValidator)
+	suite.Require().NoError(err)
 }

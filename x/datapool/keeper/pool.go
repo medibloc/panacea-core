@@ -359,7 +359,8 @@ func (k Keeper) SellData(ctx sdk.Context, seller sdk.AccAddress, cert types.Data
 		return nil, types.ErrExistSameDataHash
 	}
 
-	pool, err := k.GetPool(ctx, cert.UnsignedCert.PoolId)
+	poolID := cert.UnsignedCert.PoolId
+	pool, err := k.GetPool(ctx, poolID)
 	if err != nil {
 		return nil, err
 	}
@@ -372,7 +373,9 @@ func (k Keeper) SellData(ctx sdk.Context, seller sdk.AccAddress, cert types.Data
 
 	k.increaseCurNumAndUpdatePool(ctx, pool)
 
-	shareToken := types.GetAccumPoolShareToken(pool.PoolId, 1)
+	err = k.appendDistributeRevenuePools(ctx, pool)
+
+	shareToken := types.GetAccumPoolShareToken(poolID, 1)
 	err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, seller, sdk.NewCoins(shareToken))
 	if err != nil {
 		return nil, err
@@ -476,8 +479,8 @@ func contains(validators []string, validator string) bool {
 }
 
 func (k Keeper) GetDataValidationCertificate(ctx sdk.Context, poolID, round uint64, dataHash []byte) (types.DataValidationCertificate, error) {
-	key := types.GetKeyPrefixDataValidateCert(poolID, round, dataHash)
 	store := ctx.KVStore(k.storeKey)
+	key := types.GetKeyPrefixDataValidateCert(poolID, round, dataHash)
 	if !store.Has(key) {
 		return types.DataValidationCertificate{}, sdkerrors.Wrap(types.ErrGetDataValidationCert, "certification is not exist")
 	}

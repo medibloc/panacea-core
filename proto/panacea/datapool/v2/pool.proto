@@ -62,3 +62,8 @@ message PoolParams {
     (gogoproto.stdduration) = true
   ];                                                    // A download period after redeeming NFT
 }
+
+// DistributeRevenuePools defines poolID information to distribute revenue.
+message DistributeRevenuePools {
+  repeated uint64 pool_ids = 1;  // Execute information for pool reward distribution
+}
