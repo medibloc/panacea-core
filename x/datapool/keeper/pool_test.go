@@ -1,7 +1,10 @@
 package keeper_test
 
 import (
+	"fmt"
+	"github.com/cosmos/cosmos-sdk/codec"
 	"io/ioutil"
+	"strings"
 	"testing"
 	"time"
 
@@ -25,9 +28,10 @@ func TestPoolTestSuite(t *testing.T) {
 }
 
 var (
-	privKey        = secp256k1.GenPrivKey()
-	pubKey         = privKey.PubKey()
-	dataVal1       = sdk.AccAddress(pubKey.Address())
+	dataValPrivKey = secp256k1.GenPrivKey()
+	dataValPubKey  = dataValPrivKey.PubKey()
+	dataVal1       = sdk.AccAddress(dataValPubKey.Address())
+
 	curatorPrivKey = secp256k1.GenPrivKey()
 	curatorPubKey  = curatorPrivKey.PubKey()
 	curatorAddr    = sdk.AccAddress(curatorPubKey.Address())
@@ -36,7 +40,10 @@ var (
 	fundForCurator = sdk.NewCoins(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(10000000000)))
 	NFTPrice       = sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(10000000))
 
-	downloadPeriod = time.Duration(time.Second * 100000000)
+	downloadPeriod   = time.Duration(time.Second * 100000000)
+	requesterPrivKey = secp256k1.GenPrivKey()
+	requesterPubKey  = requesterPrivKey.PubKey()
+	requesterAddr    = sdk.AccAddress(requesterPubKey.Address())
 )
 
 func (suite poolTestSuite) setupNFTContract() {
@@ -62,7 +69,7 @@ func (suite *poolTestSuite) TestRegisterDataValidator() {
 	suite.Require().NoError(err)
 
 	validatorAccount := suite.AccountKeeper.NewAccountWithAddress(suite.Ctx, dataVal1)
-	err = validatorAccount.SetPubKey(pubKey)
+	err = validatorAccount.SetPubKey(dataValPubKey)
 	suite.Require().NoError(err)
 	suite.AccountKeeper.SetAccount(suite.Ctx, validatorAccount)
 
@@ -80,7 +87,7 @@ func (suite *poolTestSuite) TestGetRegisterDataValidator() {
 	suite.Require().NoError(err)
 
 	validatorAccount := suite.AccountKeeper.NewAccountWithAddress(suite.Ctx, dataVal1)
-	err = validatorAccount.SetPubKey(pubKey)
+	err = validatorAccount.SetPubKey(dataValPubKey)
 	suite.Require().NoError(err)
 	suite.AccountKeeper.SetAccount(suite.Ctx, validatorAccount)
 
@@ -102,7 +109,7 @@ func (suite *poolTestSuite) TestIsDataValidatorDuplicate() {
 	suite.Require().NoError(err)
 
 	validatorAccount := suite.AccountKeeper.NewAccountWithAddress(suite.Ctx, dataVal1)
-	err = validatorAccount.SetPubKey(pubKey)
+	err = validatorAccount.SetPubKey(dataValPubKey)
 	suite.Require().NoError(err)
 	suite.AccountKeeper.SetAccount(suite.Ctx, validatorAccount)
 
@@ -136,7 +143,7 @@ func (suite *poolTestSuite) TestUpdateDataValidator() {
 	suite.Require().NoError(err)
 
 	validatorAccount := suite.AccountKeeper.NewAccountWithAddress(suite.Ctx, dataVal1)
-	err = validatorAccount.SetPubKey(pubKey)
+	err = validatorAccount.SetPubKey(dataValPubKey)
 	suite.Require().NoError(err)
 	suite.AccountKeeper.SetAccount(suite.Ctx, validatorAccount)
 
@@ -204,7 +211,7 @@ func (suite poolTestSuite) TestCreatePool() {
 	suite.Require().NoError(err)
 
 	validatorAccount := suite.AccountKeeper.NewAccountWithAddress(suite.Ctx, dataVal1)
-	err = validatorAccount.SetPubKey(pubKey)
+	err = validatorAccount.SetPubKey(dataValPubKey)
 	suite.Require().NoError(err)
 	suite.AccountKeeper.SetAccount(suite.Ctx, validatorAccount)
 
@@ -289,4 +296,307 @@ func makePoolParamsNoDataValidator() types.PoolParams {
 		TrustedDataIssuers:    []string(nil),
 		DownloadPeriod:        &downloadPeriod,
 	}
+}
+
+func (suite *poolTestSuite) TestSetDataCertificate() {
+	poolID := uint64(1)
+	round := uint64(1)
+	dataHash := []byte("dataHash")
+
+	unsignedCert := types.UnsignedDataValidationCertificate{
+		PoolId:        poolID,
+		Round:         round,
+		DataHash:      dataHash,
+		DataValidator: dataVal1.String(),
+		Requester:     requesterAddr.String(),
+	}
+
+	bz, err := suite.Cdc.Marshaler.MarshalBinaryBare(&unsignedCert)
+	suite.Require().NoError(err)
+
+	sign, err := dataValPrivKey.Sign(bz)
+	suite.Require().NoError(err)
+
+	cert := types.DataValidationCertificate{
+		UnsignedCert: &unsignedCert,
+		Signature:    sign,
+	}
+
+	suite.DataPoolKeeper.SetDataValidationCertificate(suite.Ctx, cert)
+
+	getCert, err := suite.DataPoolKeeper.GetDataValidationCertificate(suite.Ctx, poolID, round, dataHash)
+	suite.Require().NoError(err)
+
+	suite.Require().Equal(cert.UnsignedCert.PoolId, getCert.UnsignedCert.PoolId)
+	suite.Require().Equal(cert.UnsignedCert.Round, getCert.UnsignedCert.Round)
+	suite.Require().Equal(cert.UnsignedCert.DataHash, getCert.UnsignedCert.DataHash)
+	suite.Require().Equal(cert.UnsignedCert.DataValidator, getCert.UnsignedCert.DataValidator)
+	suite.Require().Equal(cert.UnsignedCert.PoolId, getCert.UnsignedCert.PoolId)
+	suite.Require().Equal(cert.UnsignedCert.Requester, getCert.UnsignedCert.Requester)
+	suite.Require().Equal(cert.Signature, getCert.Signature)
+}
+
+func (suite *poolTestSuite) TestSellData() {
+	poolID := uint64(1)
+	round := uint64(1)
+	dataHash := []byte("dataHash")
+
+	validatorAccount := suite.AccountKeeper.NewAccountWithAddress(suite.Ctx, dataVal1)
+	err := validatorAccount.SetPubKey(dataValPubKey)
+	suite.Require().NoError(err)
+	suite.AccountKeeper.SetAccount(suite.Ctx, validatorAccount)
+
+	pool := makeTestDataPool(poolID)
+	suite.DataPoolKeeper.SetPool(suite.Ctx, pool)
+
+	cert, err := makeTestDataCertificate(suite.Cdc.Marshaler, poolID, round, dataHash)
+	suite.Require().NoError(err)
+
+	shareToken, err := suite.DataPoolKeeper.SellData(suite.Ctx, requesterAddr, *cert)
+	suite.Require().NoError(err)
+	suite.Require().Equal("datapool/1", shareToken.Denom)
+	suite.Require().Equal(sdk.NewInt(1), shareToken.Amount)
+
+	// Check the current pool status
+	getPool, err := suite.DataPoolKeeper.GetPool(suite.Ctx, poolID)
+	suite.Require().NoError(err)
+	suite.Equal(uint64(1), getPool.CurNumData)
+	suite.Equal(types.PENDING, getPool.Status)
+}
+
+func (suite *poolTestSuite) TestSellData_change_status_activity() {
+	poolID := uint64(1)
+	round := uint64(1)
+	dataHash := []byte("dataHash")
+
+	validatorAccount := suite.AccountKeeper.NewAccountWithAddress(suite.Ctx, dataVal1)
+	err := validatorAccount.SetPubKey(dataValPubKey)
+	suite.Require().NoError(err)
+	suite.AccountKeeper.SetAccount(suite.Ctx, validatorAccount)
+
+	pool := makeTestDataPool(poolID)
+	// Modify the target data of the pool
+	pool.PoolParams.TargetNumData = 1
+	suite.DataPoolKeeper.SetPool(suite.Ctx, pool)
+
+	cert, err := makeTestDataCertificate(suite.Cdc.Marshaler, poolID, round, dataHash)
+	suite.Require().NoError(err)
+
+	shareToken, err := suite.DataPoolKeeper.SellData(suite.Ctx, requesterAddr, *cert)
+	suite.Require().NoError(err)
+	suite.Require().Equal("datapool/1", shareToken.Denom)
+	suite.Require().Equal(sdk.NewInt(1), shareToken.Amount)
+
+	// Check the current pool status
+	getPool, err := suite.DataPoolKeeper.GetPool(suite.Ctx, poolID)
+	suite.Require().NoError(err)
+	suite.Equal(uint64(1), getPool.CurNumData)
+	suite.Equal(types.ACTIVE, getPool.Status)
+}
+
+func (suite *poolTestSuite) TestSellData_not_same_seller() {
+	poolID := uint64(1)
+	round := uint64(1)
+	dataHash := []byte("dataHash")
+
+	cert, err := makeTestDataCertificate(suite.Cdc.Marshaler, poolID, round, dataHash)
+	suite.Require().NoError(err)
+
+	// A curator requests to sell data
+	shareToken, err := suite.DataPoolKeeper.SellData(suite.Ctx, curatorAddr, *cert)
+	suite.Require().Error(err)
+	suite.Require().Equal(types.ErrNotEqualsSeller.Error(), err.Error())
+	suite.Require().Nil(shareToken)
+}
+
+func (suite *poolTestSuite) TestSellData_failed_get_publicKey_validator_in_signature() {
+	poolID := uint64(1)
+	round := uint64(1)
+	dataHash := []byte("dataHash")
+
+	// Unregistered data validator publicKey
+
+	cert, err := makeTestDataCertificate(suite.Cdc.Marshaler, poolID, round, dataHash)
+	suite.Require().NoError(err)
+
+	unsignedCertBz, err := suite.Cdc.Marshaler.MarshalBinaryBare(cert.UnsignedCert)
+	suite.Require().NoError(err)
+
+	curatorSign, err := curatorPrivKey.Sign(unsignedCertBz)
+	suite.Require().NoError(err)
+	cert.Signature = curatorSign
+
+	shareToken, err := suite.DataPoolKeeper.SellData(suite.Ctx, requesterAddr, *cert)
+	suite.Require().Error(err)
+	fmt.Println(err.Error())
+	suite.Require().True(strings.HasSuffix(err.Error(), types.ErrInvalidSignature.Error()))
+	suite.Require().Nil(shareToken)
+}
+
+func (suite *poolTestSuite) TestSellData_invalid_signature() {
+	poolID := uint64(1)
+	round := uint64(1)
+	dataHash := []byte("dataHash")
+
+	validatorAccount := suite.AccountKeeper.NewAccountWithAddress(suite.Ctx, dataVal1)
+	err := validatorAccount.SetPubKey(dataValPubKey)
+	suite.Require().NoError(err)
+	suite.AccountKeeper.SetAccount(suite.Ctx, validatorAccount)
+
+	cert, err := makeTestDataCertificate(suite.Cdc.Marshaler, poolID, round, dataHash)
+	suite.Require().NoError(err)
+
+	unsignedCertBz, err := suite.Cdc.Marshaler.MarshalBinaryBare(cert.UnsignedCert)
+	suite.Require().NoError(err)
+
+	// Curator's signature
+	curatorSign, err := curatorPrivKey.Sign(unsignedCertBz)
+	suite.Require().NoError(err)
+	cert.Signature = curatorSign
+
+	shareToken, err := suite.DataPoolKeeper.SellData(suite.Ctx, requesterAddr, *cert)
+	suite.Require().Error(err)
+	fmt.Println(err)
+	suite.Require().True(strings.Contains(err.Error(), "invalid signature"))
+	suite.Require().True(strings.HasSuffix(err.Error(), types.ErrInvalidSignature.Error()))
+	suite.Require().Nil(shareToken)
+}
+
+func (suite *poolTestSuite) TestSellData_duplicate_data() {
+	poolID := uint64(1)
+	round := uint64(1)
+	dataHash := []byte("dataHash")
+
+	validatorAccount := suite.AccountKeeper.NewAccountWithAddress(suite.Ctx, dataVal1)
+	err := validatorAccount.SetPubKey(dataValPubKey)
+	suite.Require().NoError(err)
+	suite.AccountKeeper.SetAccount(suite.Ctx, validatorAccount)
+
+	pool := makeTestDataPool(poolID)
+	suite.DataPoolKeeper.SetPool(suite.Ctx, pool)
+
+	cert, err := makeTestDataCertificate(suite.Cdc.Marshaler, poolID, round, dataHash)
+	suite.Require().NoError(err)
+
+	shareToken, err := suite.DataPoolKeeper.SellData(suite.Ctx, requesterAddr, *cert)
+	suite.Require().NoError(err)
+	suite.Require().Equal("datapool/1", shareToken.Denom)
+	suite.Require().Equal(sdk.NewInt(1), shareToken.Amount)
+
+	// Request same sell data
+	shareToken2, err := suite.DataPoolKeeper.SellData(suite.Ctx, requesterAddr, *cert)
+	suite.Require().Error(err)
+	suite.Require().Equal(types.ErrExistSameDataHash.Error(), err.Error())
+	suite.Require().Nil(shareToken2)
+}
+
+func (suite *poolTestSuite) TestSellData_not_exist_pool() {
+	poolID := uint64(1)
+	round := uint64(1)
+	dataHash := []byte("dataHash")
+
+	validatorAccount := suite.AccountKeeper.NewAccountWithAddress(suite.Ctx, dataVal1)
+	err := validatorAccount.SetPubKey(dataValPubKey)
+	suite.Require().NoError(err)
+	suite.AccountKeeper.SetAccount(suite.Ctx, validatorAccount)
+
+	// Unregistered pool
+
+	cert, err := makeTestDataCertificate(suite.Cdc.Marshaler, poolID, round, dataHash)
+	suite.Require().NoError(err)
+
+	shareToken, err := suite.DataPoolKeeper.SellData(suite.Ctx, requesterAddr, *cert)
+	suite.Require().Error(err)
+	suite.Require().Equal(types.ErrPoolNotFound, err)
+	suite.Require().Nil(shareToken)
+}
+
+func (suite *poolTestSuite) TestSellData_impossible_status_pool() {
+	poolID := uint64(1)
+	round := uint64(1)
+	dataHash := []byte("dataHash")
+
+	validatorAccount := suite.AccountKeeper.NewAccountWithAddress(suite.Ctx, dataVal1)
+	err := validatorAccount.SetPubKey(dataValPubKey)
+	suite.Require().NoError(err)
+	suite.AccountKeeper.SetAccount(suite.Ctx, validatorAccount)
+
+	// Already activate status
+	pool := makeTestDataPool(poolID)
+	pool.Status = types.ACTIVE
+	suite.DataPoolKeeper.SetPool(suite.Ctx, pool)
+
+	cert, err := makeTestDataCertificate(suite.Cdc.Marshaler, poolID, round, dataHash)
+	suite.Require().NoError(err)
+
+	shareToken, err := suite.DataPoolKeeper.SellData(suite.Ctx, requesterAddr, *cert)
+	suite.Require().Error(err)
+	fmt.Println(err)
+	suite.Require().True(strings.Contains(err.Error(), "the status of the pool is not 'PENDING'"))
+	suite.Require().True(strings.HasSuffix(err.Error(), types.ErrInvalidDataValidationCert.Error()))
+	suite.Require().Nil(shareToken)
+}
+
+func (suite *poolTestSuite) TestSellData_mismatch_certificate_and_pool_round() {
+	poolID := uint64(1)
+	// Wrong rounds recorded in the certificate
+	round := uint64(2)
+	dataHash := []byte("dataHash")
+
+	validatorAccount := suite.AccountKeeper.NewAccountWithAddress(suite.Ctx, dataVal1)
+	err := validatorAccount.SetPubKey(dataValPubKey)
+	suite.Require().NoError(err)
+	suite.AccountKeeper.SetAccount(suite.Ctx, validatorAccount)
+
+	pool := makeTestDataPool(poolID)
+	suite.DataPoolKeeper.SetPool(suite.Ctx, pool)
+
+	cert, err := makeTestDataCertificate(suite.Cdc.Marshaler, poolID, round, dataHash)
+	suite.Require().NoError(err)
+
+	shareToken, err := suite.DataPoolKeeper.SellData(suite.Ctx, requesterAddr, *cert)
+	suite.Require().Error(err)
+	suite.Require().True(strings.Contains(err.Error(), "pool round do not matched. pool round: 1"))
+	suite.Require().True(strings.HasSuffix(err.Error(), types.ErrInvalidDataValidationCert.Error()))
+	suite.Require().Nil(shareToken)
+}
+
+func makeTestDataCertificate(marshaler codec.Marshaler, poolID, round uint64, dataHash []byte) (*types.DataValidationCertificate, error) {
+	unsignedCert := types.UnsignedDataValidationCertificate{
+		PoolId:        poolID,
+		Round:         round,
+		DataHash:      dataHash,
+		DataValidator: dataVal1.String(),
+		Requester:     requesterAddr.String(),
+	}
+
+	bz, err := marshaler.MarshalBinaryBare(&unsignedCert)
+	if err != nil {
+		return nil, err
+	}
+
+	sign, err := dataValPrivKey.Sign(bz)
+	if err != nil {
+		return nil, err
+	}
+
+	return &types.DataValidationCertificate{
+		UnsignedCert: &unsignedCert,
+		Signature:    sign,
+	}, nil
+}
+
+func makeTestDataPool(poolID uint64) *types.Pool {
+	nftPrice := sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(1000000))
+	downloadPeriod := time.Hour
+	poolParams := types.PoolParams{
+		DataSchema:            []string{"https://json.schemastore.org/github-issue-forms.json"},
+		TargetNumData:         100,
+		MaxNftSupply:          10,
+		NftPrice:              &nftPrice,
+		TrustedDataValidators: []string{dataVal1.String()},
+		DownloadPeriod:        &downloadPeriod,
+	}
+
+	return types.NewPool(poolID, curatorAddr, poolParams)
 }

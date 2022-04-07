@@ -130,3 +130,50 @@ func newCreatePoolMsg(clientCtx client.Context, file string) (sdk.Msg, error) {
 	msg := types.NewMsgCreatePool(poolParams, clientCtx.GetFromAddress().String())
 	return msg, nil
 }
+
+func CmdSellData() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "sell-data [sell data file]",
+		Short: "sell data",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			cert, err := readCertificateFromFile(args[0])
+			if err != nil {
+				return err
+			}
+
+			seller := clientCtx.GetFromAddress().String()
+			msg := &types.MsgSellData{
+				Cert:   cert,
+				Seller: seller,
+			}
+			if err := msg.ValidateBasic(); err != nil {
+				return err
+			}
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
+		},
+	}
+
+	flags.AddTxFlagsToCmd(cmd)
+	return cmd
+}
+
+func readCertificateFromFile(file string) (*types.DataValidationCertificate, error) {
+	contents, err := ioutil.ReadFile(file)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read file")
+	}
+
+	var cert types.DataValidationCertificate
+
+	if err := json.Unmarshal(contents, &cert); err != nil {
+		return nil, err
+	}
+
+	return &cert, nil
+}
