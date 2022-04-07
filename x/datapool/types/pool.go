@@ -11,6 +11,7 @@ import (
 const (
 	PENDING          = "PENDING"
 	ACTIVE           = "ACTIVE"
+
 	ShareTokenPrefix = "datapool"
 )
 
