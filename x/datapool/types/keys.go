@@ -1,6 +1,9 @@
 package types
 
-import sdk "github.com/cosmos/cosmos-sdk/types"
+import (
+	"bytes"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+)
 
 const (
 	// ModuleName defines the module name
@@ -34,8 +37,15 @@ var (
 	// KeyNFTContractAddress defines key to contract address
 	KeyNFTContractAddress = []byte{0x04}
 
-	// KeyPrefixDataValidatorCerts defines key to store dataValidator certs
-	KeyPrefixDataValidatorCerts = []byte{0x05}
+	// KeyPrefixDataValidatorCert defines key to store dataValidator certs
+	KeyPrefixDataValidatorCert = []byte{0x05}
+
+	KeyPrefixDistributeRevenueTarget = []byte{0x06}
+
+	// KeyPrefixDelayedRevenueDistribute defines key to distribute reward pool
+	KeyPrefixDelayedRevenueDistribute = []byte{0x07}
+
+	KeyIndexSeparator = []byte{0x08}
 )
 
 func GetKeyPrefixDataValidator(dataValidatorAddr sdk.AccAddress) []byte {
@@ -46,8 +56,27 @@ func GetKeyPrefixPools(poolID uint64) []byte {
 	return append(KeyPrefixPools, sdk.Uint64ToBigEndian(poolID)...)
 }
 
+func GetKeyPrefixDataValidateCerts(poolID, round *uint64) []byte {
+	prefixOfPoolID := append(KeyPrefixDataValidatorCert, sdk.Uint64ToBigEndian(*poolID)...)
+	if round != nil {
+		return append(prefixOfPoolID, sdk.Uint64ToBigEndian(*round)...)
+	}
+	return prefixOfPoolID
+}
+
 func GetKeyPrefixDataValidateCert(poolID, round uint64, dataHash []byte) []byte {
-	poolAppend := append(KeyPrefixDataValidatorCerts, sdk.Uint64ToBigEndian(poolID)...)
-	roundAppend := append(poolAppend, sdk.Uint64ToBigEndian(round)...)
-	return append(roundAppend, dataHash...)
+	return append(GetKeyPrefixDataValidateCerts(&poolID, &round), dataHash...)
+}
+
+func GetKeyPrefixDistributeRevenueTarget(poolID, round uint64, addr string) []byte {
+	return append(KeyPrefixDistributeRevenueTarget, CombineKeys(sdk.Uint64ToBigEndian(poolID), sdk.Uint64ToBigEndian(round), []byte(addr))...)
+}
+
+func GetKeyPrefixDistributeRevenueTargetByRound(poolID, round uint64) []byte {
+	return append(KeyPrefixDistributeRevenueTarget, CombineKeys(sdk.Uint64ToBigEndian(poolID), sdk.Uint64ToBigEndian(round))...)
+}
+
+// CombineKeys function defines combines deal_id with data_hash.
+func CombineKeys(keys ...[]byte) []byte {
+	return bytes.Join(keys, KeyIndexSeparator)
 }

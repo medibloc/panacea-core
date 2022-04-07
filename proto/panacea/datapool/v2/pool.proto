@@ -18,6 +18,7 @@ message Pool {
   string     status = 7;
   string     curator = 8;
   string     nft_contract_addr = 9; // NFT contract address of pool
+  bool       is_paid_deposit = 10;
 }
 
 // DataValidationCertificate defines the certificate for data validation w/ data validator signature.
@@ -61,4 +62,17 @@ message PoolParams {
   google.protobuf.Duration download_period = 7 [
     (gogoproto.stdduration) = true
   ];                                                    // A download period after redeeming NFT
+}
+
+// DistributeRevenuePools defines poolID information to distribute revenue.
+message DelayedRevenueDistribute {
+  repeated uint64 pool_ids = 1;  // Execute information for pool reward distribution
+}
+
+// RevenueDistributeTarget defines the rounds of each pool and the distribution of proceeds by address.
+message RevenueDistributeTarget {
+  uint64 pool_id = 1;                     // pool Id for selling data
+  uint64 round = 2;                       // Always 1 for v0
+  string address = 3;                     // address to be distributed
+  cosmos.base.v1beta1.Coin paid_coin = 4; // Proceeds distributed in the round
 }
