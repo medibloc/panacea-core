@@ -9,6 +9,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	gogotypes "github.com/gogo/protobuf/types"
 	"github.com/medibloc/panacea-core/v2/x/datapool/types"
 )
@@ -209,7 +210,18 @@ func (k Keeper) CreatePool(ctx sdk.Context, curator sdk.AccAddress, poolParams t
 	// store pool
 	k.SetPool(ctx, newPool)
 
+	// Initialize shareToken supply
+	k.setInitialSupply(ctx, poolID)
+
 	return newPool.GetPoolId(), nil
+}
+
+func (k Keeper) setInitialSupply(ctx sdk.Context, poolID uint64) {
+	supply := banktypes.Supply{
+		Total: sdk.NewCoins(types.GetAccumPoolShareToken(poolID, 0)),
+	}
+
+	k.bankKeeper.SetSupply(ctx, &supply)
 }
 
 func (k Keeper) GetNextPoolNumberAndIncrement(ctx sdk.Context) uint64 {
@@ -355,10 +367,27 @@ func (k Keeper) SellData(ctx sdk.Context, seller sdk.AccAddress, cert types.Data
 
 	k.increaseCurNumAndUpdatePool(ctx, pool)
 
-	shareToken := types.GetAccumPoolShareToken(pool.PoolId, 1)
-	// TODO We need to send the token to the seller.
-	// We now need to consider using the current 'x/token' or looking for another way.(ex. cw20)
+	shareToken, err := k.mintPoolShareToAccount(ctx, pool.PoolId, 1, seller)
+	if err != nil {
+		return nil, err
+	}
 
+	return shareToken, nil
+}
+
+func (k Keeper) mintPoolShareToAccount(ctx sdk.Context, poolID, amount uint64, addr sdk.AccAddress) (*sdk.Coin, error) {
+	shareToken := types.GetAccumPoolShareToken(poolID, amount)
+
+	shareTokens := sdk.Coins{shareToken}
+	err := k.bankKeeper.MintCoins(ctx, types.ModuleName, shareTokens)
+	if err != nil {
+		return nil, sdkerrors.Wrap(types.ErrFailedMintShareToken, err.Error())
+	}
+
+	err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, addr, shareTokens)
+	if err != nil {
+		return nil, sdkerrors.Wrap(types.ErrFailedMintShareToken, err.Error())
+	}
 	return &shareToken, nil
 }
 

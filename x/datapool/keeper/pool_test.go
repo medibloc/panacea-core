@@ -329,14 +329,15 @@ func (suite *poolTestSuite) TestSetDataCertificate() {
 }
 
 func (suite *poolTestSuite) TestSellData() {
-	poolID := uint64(1)
-	round := uint64(1)
-	dataHash := []byte("dataHash")
-
 	suite.setDataValidatorAccount()
 
-	pool := makeTestDataPool(poolID)
-	suite.DataPoolKeeper.SetPool(suite.Ctx, pool)
+	suite.TestCreatePool()
+
+	pool, err := suite.DataPoolKeeper.GetPool(suite.Ctx, 1)
+	suite.Require().NoError(err)
+	poolID := pool.PoolId
+	round := pool.Round
+	dataHash := []byte("dataHash")
 
 	cert, err := makeTestDataCertificate(suite.Cdc.Marshaler, poolID, round, dataHash)
 	suite.Require().NoError(err)
@@ -351,16 +352,23 @@ func (suite *poolTestSuite) TestSellData() {
 	suite.Require().NoError(err)
 	suite.Equal(uint64(1), getPool.CurNumData)
 	suite.Equal(types.PENDING, getPool.Status)
+
+	requesterShareToken := suite.BankKeeper.GetBalance(suite.Ctx, requesterAddr, "DP/1")
+	suite.Require().Equal("DP/1", requesterShareToken.Denom)
+	suite.Require().Equal(sdk.NewInt(1), requesterShareToken.Amount)
 }
 
 func (suite *poolTestSuite) TestSellData_change_status_activity() {
-	poolID := uint64(1)
-	round := uint64(1)
-	dataHash := []byte("dataHash")
-
 	suite.setDataValidatorAccount()
 
-	pool := makeTestDataPool(poolID)
+	suite.TestCreatePool()
+
+	pool, err := suite.DataPoolKeeper.GetPool(suite.Ctx, 1)
+	suite.Require().NoError(err)
+	poolID := pool.PoolId
+	round := pool.Round
+	dataHash := []byte("dataHash")
+
 	// Modify the target data of the pool
 	pool.PoolParams.TargetNumData = 1
 	suite.DataPoolKeeper.SetPool(suite.Ctx, pool)
@@ -378,6 +386,10 @@ func (suite *poolTestSuite) TestSellData_change_status_activity() {
 	suite.Require().NoError(err)
 	suite.Equal(uint64(1), getPool.CurNumData)
 	suite.Equal(types.ACTIVE, getPool.Status)
+
+	requesterShareToken := suite.BankKeeper.GetBalance(suite.Ctx, requesterAddr, "DP/1")
+	suite.Require().Equal("DP/1", requesterShareToken.Denom)
+	suite.Require().Equal(sdk.NewInt(1), requesterShareToken.Amount)
 }
 
 func (suite *poolTestSuite) TestSellData_not_same_seller() {
@@ -445,14 +457,15 @@ func (suite *poolTestSuite) TestSellData_invalid_signature() {
 }
 
 func (suite *poolTestSuite) TestSellData_duplicate_data() {
-	poolID := uint64(1)
-	round := uint64(1)
-	dataHash := []byte("dataHash")
-
 	suite.setDataValidatorAccount()
 
-	pool := makeTestDataPool(poolID)
-	suite.DataPoolKeeper.SetPool(suite.Ctx, pool)
+	suite.TestCreatePool()
+
+	pool, err := suite.DataPoolKeeper.GetPool(suite.Ctx, 1)
+	suite.Require().NoError(err)
+	poolID := pool.PoolId
+	round := pool.Round
+	dataHash := []byte("dataHash")
 
 	cert, err := makeTestDataCertificate(suite.Cdc.Marshaler, poolID, round, dataHash)
 	suite.Require().NoError(err)

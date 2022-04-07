@@ -119,7 +119,7 @@ func (suite *TestSuite) SetupTest() {
 		govtypes.ModuleName:            {authtypes.Burner},
 		ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
 		wasm.ModuleName:                {authtypes.Burner},
-		datapooltypes.ModuleName:       nil,
+		datapooltypes.ModuleName:       {authtypes.Minter},
 	}
 
 	modAccAddrs := make(map[string]bool)
