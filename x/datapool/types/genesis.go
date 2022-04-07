@@ -22,8 +22,10 @@ func (gs GenesisState) Validate() error {
 		return err
 	}
 
-	if err := sdk.VerifyAddressFormat(gs.NftContractAddress); err != nil {
-		return err
+	if gs.NftContractAddress != nil {
+		if err := sdk.VerifyAddressFormat(gs.NftContractAddress); err != nil {
+			return err
+		}
 	}
 	// this line is used by starport scaffolding # ibc/genesistype/validate
 
