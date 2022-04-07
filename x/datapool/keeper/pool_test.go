@@ -353,9 +353,16 @@ func (suite *poolTestSuite) TestSellData() {
 	suite.Equal(uint64(1), getPool.CurNumData)
 	suite.Equal(types.PENDING, getPool.Status)
 
+	// Check actually send to seller
 	requesterShareToken := suite.BankKeeper.GetBalance(suite.Ctx, requesterAddr, "DP/1")
 	suite.Require().Equal("DP/1", requesterShareToken.Denom)
 	suite.Require().Equal(sdk.NewInt(1), requesterShareToken.Amount)
+
+	// Check supply
+	supply := suite.BankKeeper.GetSupply(suite.Ctx)
+	suite.Require().Equal(1, len(supply.GetTotal()))
+	suite.Require().Equal("DP/1", supply.GetTotal()[0].Denom)
+	suite.Require().Equal(sdk.NewInt(1), supply.GetTotal()[0].Amount)
 }
 
 func (suite *poolTestSuite) TestSellData_change_status_activity() {
@@ -387,9 +394,16 @@ func (suite *poolTestSuite) TestSellData_change_status_activity() {
 	suite.Equal(uint64(1), getPool.CurNumData)
 	suite.Equal(types.ACTIVE, getPool.Status)
 
+	// Check actually send to seller
 	requesterShareToken := suite.BankKeeper.GetBalance(suite.Ctx, requesterAddr, "DP/1")
 	suite.Require().Equal("DP/1", requesterShareToken.Denom)
 	suite.Require().Equal(sdk.NewInt(1), requesterShareToken.Amount)
+
+	// Check supply
+	supply := suite.BankKeeper.GetSupply(suite.Ctx)
+	suite.Require().Equal(1, len(supply.GetTotal()))
+	suite.Require().Equal("DP/1", supply.GetTotal()[0].Denom)
+	suite.Require().Equal(sdk.NewInt(1), supply.GetTotal()[0].Amount)
 }
 
 func (suite *poolTestSuite) TestSellData_not_same_seller() {
