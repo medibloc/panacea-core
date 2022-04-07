@@ -354,7 +354,7 @@ func (suite *poolTestSuite) TestSellData() {
 
 	shareToken, err := suite.DataPoolKeeper.SellData(suite.Ctx, requesterAddr, *cert)
 	suite.Require().NoError(err)
-	suite.Require().Equal("datapool/1", shareToken.Denom)
+	suite.Require().Equal("DP/1", shareToken.Denom)
 	suite.Require().Equal(sdk.NewInt(1), shareToken.Amount)
 
 	// Check the current pool status
@@ -384,7 +384,7 @@ func (suite *poolTestSuite) TestSellData_change_status_activity() {
 
 	shareToken, err := suite.DataPoolKeeper.SellData(suite.Ctx, requesterAddr, *cert)
 	suite.Require().NoError(err)
-	suite.Require().Equal("datapool/1", shareToken.Denom)
+	suite.Require().Equal("DP/1", shareToken.Denom)
 	suite.Require().Equal(sdk.NewInt(1), shareToken.Amount)
 
 	// Check the current pool status
@@ -480,7 +480,7 @@ func (suite *poolTestSuite) TestSellData_duplicate_data() {
 
 	shareToken, err := suite.DataPoolKeeper.SellData(suite.Ctx, requesterAddr, *cert)
 	suite.Require().NoError(err)
-	suite.Require().Equal("datapool/1", shareToken.Denom)
+	suite.Require().Equal("DP/1", shareToken.Denom)
 	suite.Require().Equal(sdk.NewInt(1), shareToken.Amount)
 
 	// Request same sell data

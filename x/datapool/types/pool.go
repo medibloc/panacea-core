@@ -12,7 +12,7 @@ const (
 	PENDING          = "PENDING"
 	ACTIVE           = "ACTIVE"
 
-	ShareTokenPrefix = "datapool"
+	ShareTokenPrefix = "DP"
 )
 
 func NewPool(poolID uint64, curator sdk.AccAddress, poolParams PoolParams) *Pool {
