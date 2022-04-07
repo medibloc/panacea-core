@@ -216,6 +216,7 @@ func (k Keeper) CreatePool(ctx sdk.Context, curator sdk.AccAddress, poolParams t
 	return newPool.GetPoolId(), nil
 }
 
+// setInitialSupply defines supply to be initialized for tokens to be minted.
 func (k Keeper) setInitialSupply(ctx sdk.Context, poolID uint64) {
 	supply := banktypes.Supply{
 		Total: sdk.NewCoins(types.GetAccumPoolShareToken(poolID, 0)),
