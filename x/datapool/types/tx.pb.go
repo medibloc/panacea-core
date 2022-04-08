@@ -658,186 +658,6 @@ func (m *MsgRedeemDataAccessNFTResponse) GetReceipt() *DataAccessNFTRedeemReceip
 	return nil
 }
 
-// MsgRegisterNFTContract defines the Msg/RegisterNFTContract type.
-type MsgRegisterNFTContract struct {
-	WasmCode []byte `protobuf:"bytes,1,opt,name=wasm_code,json=wasmCode,proto3" json:"wasm_code,omitempty"`
-	Sender   string `protobuf:"bytes,2,opt,name=sender,proto3" json:"sender,omitempty"`
-}
-
-func (m *MsgRegisterNFTContract) Reset()         { *m = MsgRegisterNFTContract{} }
-func (m *MsgRegisterNFTContract) String() string { return proto.CompactTextString(m) }
-func (*MsgRegisterNFTContract) ProtoMessage()    {}
-func (*MsgRegisterNFTContract) Descriptor() ([]byte, []int) {
-	return fileDescriptor_eb3d400cb0e531d6, []int{12}
-}
-func (m *MsgRegisterNFTContract) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *MsgRegisterNFTContract) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_MsgRegisterNFTContract.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *MsgRegisterNFTContract) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgRegisterNFTContract.Merge(m, src)
-}
-func (m *MsgRegisterNFTContract) XXX_Size() int {
-	return m.Size()
-}
-func (m *MsgRegisterNFTContract) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgRegisterNFTContract.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_MsgRegisterNFTContract proto.InternalMessageInfo
-
-func (m *MsgRegisterNFTContract) GetWasmCode() []byte {
-	if m != nil {
-		return m.WasmCode
-	}
-	return nil
-}
-
-func (m *MsgRegisterNFTContract) GetSender() string {
-	if m != nil {
-		return m.Sender
-	}
-	return ""
-}
-
-// MsgRegisterNFTContractResponse defines the Msg/RegisterNFTContract response type.
-type MsgRegisterNFTContractResponse struct {
-}
-
-func (m *MsgRegisterNFTContractResponse) Reset()         { *m = MsgRegisterNFTContractResponse{} }
-func (m *MsgRegisterNFTContractResponse) String() string { return proto.CompactTextString(m) }
-func (*MsgRegisterNFTContractResponse) ProtoMessage()    {}
-func (*MsgRegisterNFTContractResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_eb3d400cb0e531d6, []int{13}
-}
-func (m *MsgRegisterNFTContractResponse) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *MsgRegisterNFTContractResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_MsgRegisterNFTContractResponse.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *MsgRegisterNFTContractResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgRegisterNFTContractResponse.Merge(m, src)
-}
-func (m *MsgRegisterNFTContractResponse) XXX_Size() int {
-	return m.Size()
-}
-func (m *MsgRegisterNFTContractResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgRegisterNFTContractResponse.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_MsgRegisterNFTContractResponse proto.InternalMessageInfo
-
-// MsgUpgradeNFTContract defines the Msg/UpgradeNFTContract type.
-type MsgUpgradeNFTContract struct {
-	NewWasmCode []byte `protobuf:"bytes,1,opt,name=new_wasm_code,json=newWasmCode,proto3" json:"new_wasm_code,omitempty"`
-	Sender      string `protobuf:"bytes,2,opt,name=sender,proto3" json:"sender,omitempty"`
-}
-
-func (m *MsgUpgradeNFTContract) Reset()         { *m = MsgUpgradeNFTContract{} }
-func (m *MsgUpgradeNFTContract) String() string { return proto.CompactTextString(m) }
-func (*MsgUpgradeNFTContract) ProtoMessage()    {}
-func (*MsgUpgradeNFTContract) Descriptor() ([]byte, []int) {
-	return fileDescriptor_eb3d400cb0e531d6, []int{14}
-}
-func (m *MsgUpgradeNFTContract) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *MsgUpgradeNFTContract) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_MsgUpgradeNFTContract.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *MsgUpgradeNFTContract) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgUpgradeNFTContract.Merge(m, src)
-}
-func (m *MsgUpgradeNFTContract) XXX_Size() int {
-	return m.Size()
-}
-func (m *MsgUpgradeNFTContract) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgUpgradeNFTContract.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_MsgUpgradeNFTContract proto.InternalMessageInfo
-
-func (m *MsgUpgradeNFTContract) GetNewWasmCode() []byte {
-	if m != nil {
-		return m.NewWasmCode
-	}
-	return nil
-}
-
-func (m *MsgUpgradeNFTContract) GetSender() string {
-	if m != nil {
-		return m.Sender
-	}
-	return ""
-}
-
-// MsgUpgradeNFTContractResponse defines the Msg/UpgradeNFTContract response type.
-type MsgUpgradeNFTContractResponse struct {
-}
-
-func (m *MsgUpgradeNFTContractResponse) Reset()         { *m = MsgUpgradeNFTContractResponse{} }
-func (m *MsgUpgradeNFTContractResponse) String() string { return proto.CompactTextString(m) }
-func (*MsgUpgradeNFTContractResponse) ProtoMessage()    {}
-func (*MsgUpgradeNFTContractResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_eb3d400cb0e531d6, []int{15}
-}
-func (m *MsgUpgradeNFTContractResponse) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *MsgUpgradeNFTContractResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_MsgUpgradeNFTContractResponse.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *MsgUpgradeNFTContractResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgUpgradeNFTContractResponse.Merge(m, src)
-}
-func (m *MsgUpgradeNFTContractResponse) XXX_Size() int {
-	return m.Size()
-}
-func (m *MsgUpgradeNFTContractResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgUpgradeNFTContractResponse.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_MsgUpgradeNFTContractResponse proto.InternalMessageInfo
-
 func init() {
 	proto.RegisterType((*MsgRegisterDataValidator)(nil), "panacea.datapool.v2.MsgRegisterDataValidator")
 	proto.RegisterType((*MsgRegisterDataValidatorResponse)(nil), "panacea.datapool.v2.MsgRegisterDataValidatorResponse")
@@ -851,70 +671,59 @@ func init() {
 	proto.RegisterType((*MsgBuyDataAccessNFTResponse)(nil), "panacea.datapool.v2.MsgBuyDataAccessNFTResponse")
 	proto.RegisterType((*MsgRedeemDataAccessNFT)(nil), "panacea.datapool.v2.MsgRedeemDataAccessNFT")
 	proto.RegisterType((*MsgRedeemDataAccessNFTResponse)(nil), "panacea.datapool.v2.MsgRedeemDataAccessNFTResponse")
-	proto.RegisterType((*MsgRegisterNFTContract)(nil), "panacea.datapool.v2.MsgRegisterNFTContract")
-	proto.RegisterType((*MsgRegisterNFTContractResponse)(nil), "panacea.datapool.v2.MsgRegisterNFTContractResponse")
-	proto.RegisterType((*MsgUpgradeNFTContract)(nil), "panacea.datapool.v2.MsgUpgradeNFTContract")
-	proto.RegisterType((*MsgUpgradeNFTContractResponse)(nil), "panacea.datapool.v2.MsgUpgradeNFTContractResponse")
 }
 
 func init() { proto.RegisterFile("panacea/datapool/v2/tx.proto", fileDescriptor_eb3d400cb0e531d6) }
 
 var fileDescriptor_eb3d400cb0e531d6 = []byte{
-	// 863 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xa4, 0x56, 0xdd, 0x6e, 0x1b, 0x45,
-	0x14, 0x8e, 0x69, 0x1a, 0xa7, 0xc7, 0x84, 0x56, 0x9b, 0x26, 0x98, 0x2d, 0xb8, 0xd1, 0x4a, 0xa0,
-	0xaa, 0x51, 0x77, 0x89, 0x23, 0xee, 0x21, 0xae, 0x2a, 0x45, 0xc8, 0x51, 0xb5, 0x49, 0x8b, 0x04,
-	0x48, 0xd6, 0x78, 0xe6, 0x64, 0xbb, 0xca, 0xee, 0xcc, 0x6a, 0x66, 0x9c, 0x34, 0x48, 0x3c, 0x01,
-	0x17, 0xf0, 0x58, 0x5c, 0xf6, 0x92, 0x4b, 0x94, 0xbc, 0x08, 0x9a, 0xf1, 0xee, 0xd4, 0x4e, 0x76,
-	0xe3, 0x86, 0xde, 0xf9, 0x78, 0xbe, 0xf3, 0x7d, 0xe7, 0x5f, 0x0b, 0x5f, 0x16, 0x84, 0x13, 0x8a,
-	0x24, 0x62, 0x44, 0x93, 0x42, 0x88, 0x2c, 0x3a, 0xed, 0x47, 0xfa, 0x6d, 0x58, 0x48, 0xa1, 0x85,
-	0xb7, 0x5e, 0xbe, 0x86, 0xd5, 0x6b, 0x78, 0xda, 0xf7, 0x1f, 0x26, 0x22, 0x11, 0xf6, 0x3d, 0x32,
-	0xbf, 0xa6, 0x50, 0xbf, 0x47, 0x85, 0xca, 0x85, 0x8a, 0xc6, 0x44, 0x61, 0x74, 0xba, 0x33, 0x46,
-	0x4d, 0x76, 0x22, 0x2a, 0x52, 0x5e, 0xbd, 0x27, 0x42, 0x24, 0x19, 0x46, 0xd6, 0x1a, 0x4f, 0x8e,
-	0x23, 0x36, 0x91, 0x44, 0xa7, 0xc2, 0xbd, 0xd7, 0x05, 0x62, 0x25, 0xed, 0x7b, 0x90, 0x42, 0x77,
-	0xa8, 0x92, 0x18, 0x93, 0x54, 0x69, 0x94, 0xcf, 0x89, 0x26, 0xaf, 0x49, 0x96, 0x32, 0xa2, 0x85,
-	0xf4, 0x86, 0xf0, 0xe0, 0xb4, 0x32, 0x46, 0x0c, 0x35, 0x49, 0xb3, 0x6e, 0x6b, 0xab, 0xf5, 0xa4,
-	0xd3, 0x0f, 0xc2, 0x9a, 0x0c, 0xc2, 0x39, 0xef, 0xf8, 0xbe, 0xf3, 0x7d, 0x6e, 0x5d, 0x83, 0x00,
-	0xb6, 0x9a, 0xa4, 0x62, 0x54, 0x85, 0xe0, 0x0a, 0x83, 0x5f, 0x60, 0x73, 0xa8, 0x92, 0x57, 0x05,
-	0x23, 0x1a, 0xe7, 0x83, 0xf9, 0x1a, 0x3e, 0x33, 0x5a, 0x23, 0xc7, 0x6a, 0x43, 0xb9, 0x17, 0xaf,
-	0xb1, 0x39, 0x98, 0x0f, 0xab, 0xc8, 0x59, 0x21, 0x52, 0xae, 0xbb, 0x9f, 0x58, 0x80, 0xb3, 0x83,
-	0x2d, 0xe8, 0xd5, 0x93, 0x3b, 0xf9, 0x13, 0x58, 0x1b, 0xaa, 0x64, 0x20, 0x91, 0x68, 0x7c, 0x29,
-	0x44, 0xe6, 0x75, 0xa1, 0x4d, 0x4d, 0x41, 0x9d, 0x5c, 0x65, 0x7a, 0xdf, 0x43, 0xc7, 0xe4, 0x3d,
-	0x2a, 0x88, 0x24, 0xb9, 0xb2, 0x5a, 0x9d, 0xfe, 0xe3, 0xda, 0xba, 0x18, 0xa6, 0x97, 0x16, 0x16,
-	0x43, 0xe1, 0x7e, 0x07, 0x1c, 0x36, 0xe6, 0xc4, 0xaa, 0x28, 0xbc, 0xcf, 0xa1, 0x6d, 0xa9, 0x53,
-	0x66, 0x45, 0x97, 0xe3, 0x15, 0x63, 0xee, 0x33, 0xef, 0x21, 0xdc, 0x95, 0x62, 0xc2, 0x99, 0x55,
-	0x5b, 0x8e, 0xa7, 0x86, 0xf7, 0x0d, 0xdc, 0xa7, 0x65, 0xd3, 0x47, 0xfc, 0x58, 0x1b, 0xb7, 0x3b,
-	0xf6, 0x7d, 0xad, 0xfa, 0xfb, 0xe0, 0x58, 0xef, 0xb3, 0x20, 0x85, 0xce, 0x50, 0x25, 0x87, 0x98,
-	0x65, 0x26, 0x79, 0x6f, 0x0f, 0x96, 0x29, 0x4a, 0x5d, 0x76, 0x34, 0x5c, 0xd4, 0xd1, 0x54, 0xf0,
-	0x01, 0x4a, 0x9d, 0x1e, 0xa7, 0x94, 0x68, 0x8c, 0xad, 0xaf, 0xb7, 0x09, 0x2b, 0x0a, 0xb3, 0x0c,
-	0x65, 0x59, 0xeb, 0xd2, 0x0a, 0x10, 0xd6, 0x67, 0xa4, 0x5c, 0x62, 0x07, 0xb0, 0x49, 0x28, 0x9d,
-	0xe4, 0x23, 0x9b, 0x9e, 0x7a, 0x43, 0x24, 0x8e, 0xb4, 0x38, 0x41, 0x5e, 0x06, 0xf1, 0x45, 0x38,
-	0x9d, 0xf6, 0xd0, 0x4c, 0x7b, 0x58, 0x4e, 0x7b, 0x38, 0x10, 0x29, 0x8f, 0xd7, 0xad, 0xa3, 0x29,
-	0xd3, 0xa1, 0x71, 0x3b, 0x32, 0x5e, 0xc1, 0x9f, 0x2d, 0xab, 0xb3, 0x37, 0x39, 0x37, 0x32, 0x3f,
-	0x50, 0x8a, 0x4a, 0x1d, 0xbc, 0x38, 0xba, 0x6d, 0x01, 0x77, 0xa1, 0x5d, 0x90, 0xf3, 0x1c, 0xb9,
-	0xb6, 0x85, 0xbb, 0x31, 0x8e, 0x0a, 0x69, 0xa8, 0xc6, 0x93, 0x73, 0x94, 0xdd, 0x65, 0x9b, 0xf9,
-	0xd4, 0x08, 0x28, 0x3c, 0xaa, 0x09, 0xe8, 0xff, 0x76, 0x76, 0x03, 0x56, 0xe6, 0x1a, 0x7a, 0x97,
-	0xdb, 0x46, 0xfe, 0x66, 0x97, 0x24, 0x46, 0x86, 0x98, 0x7f, 0x54, 0xe2, 0xf5, 0xfc, 0x66, 0x87,
-	0xa4, 0x25, 0x77, 0xd9, 0x39, 0x3b, 0x38, 0xb1, 0x3b, 0x54, 0xa3, 0xed, 0x72, 0xdc, 0x87, 0xb6,
-	0x44, 0x8a, 0x69, 0x51, 0x8d, 0x56, 0xd4, 0x38, 0x5a, 0x33, 0xce, 0x86, 0x2f, 0x9e, 0xba, 0xc5,
-	0x95, 0x7f, 0x30, 0x2c, 0x13, 0x9d, 0x5e, 0x8c, 0x83, 0x17, 0x47, 0x03, 0xc1, 0xb5, 0x24, 0x54,
-	0x7b, 0x8f, 0xe0, 0xde, 0x19, 0x51, 0xf9, 0x88, 0x0a, 0x86, 0x56, 0xe6, 0xd3, 0x78, 0xd5, 0xfc,
-	0x31, 0x10, 0x0c, 0xa7, 0x53, 0xc9, 0xd9, 0xec, 0x54, 0x1a, 0xab, 0xdc, 0xff, 0x1a, 0x3a, 0xb7,
-	0xff, 0x87, 0x76, 0x25, 0x5f, 0x15, 0x89, 0x24, 0x0c, 0x67, 0xf5, 0x02, 0x58, 0xe3, 0x78, 0x36,
-	0xba, 0xaa, 0xd9, 0xe1, 0x78, 0xf6, 0xd3, 0x22, 0xd9, 0xc7, 0xf0, 0x55, 0x2d, 0x69, 0xa5, 0xda,
-	0xff, 0xa3, 0x0d, 0x77, 0x86, 0x2a, 0xf1, 0x7e, 0x87, 0x8d, 0xfa, 0x43, 0xfc, 0xac, 0xb6, 0x82,
-	0x4d, 0xc7, 0xd4, 0xff, 0xee, 0x56, 0x70, 0xd7, 0xb8, 0x33, 0x58, 0xaf, 0x3b, 0xbc, 0xdb, 0x4d,
-	0x6c, 0x35, 0x60, 0x7f, 0xf7, 0x16, 0x60, 0x27, 0xfc, 0x2b, 0xc0, 0xcc, 0xc9, 0x0d, 0x9a, 0x28,
-	0xde, 0x63, 0xfc, 0xa7, 0x8b, 0x31, 0x8e, 0xfd, 0x35, 0xac, 0xba, 0x9b, 0xb7, 0xd5, 0xe4, 0x57,
-	0x21, 0xfc, 0x27, 0x8b, 0x10, 0x8e, 0x97, 0xc3, 0x83, 0x6b, 0x87, 0xa7, 0xd1, 0xfb, 0x2a, 0xd2,
-	0xff, 0xf6, 0x43, 0x91, 0xb3, 0xed, 0xa9, 0x5b, 0xf9, 0xed, 0xe6, 0x66, 0x5f, 0x03, 0x37, 0xb7,
-	0xe7, 0xa6, 0x85, 0xb6, 0xc2, 0xd7, 0x57, 0x70, 0x7b, 0xd1, 0x94, 0xcd, 0x80, 0x6f, 0x12, 0x6e,
-	0xdc, 0x46, 0x4f, 0x83, 0x57, 0xb3, 0x8a, 0x4f, 0x9b, 0x47, 0xec, 0x2a, 0xd6, 0xef, 0x7f, 0x38,
-	0xb6, 0x52, 0xdd, 0xfb, 0xf1, 0xef, 0x8b, 0x5e, 0xeb, 0xdd, 0x45, 0xaf, 0xf5, 0xef, 0x45, 0xaf,
-	0xf5, 0xd7, 0x65, 0x6f, 0xe9, 0xdd, 0x65, 0x6f, 0xe9, 0x9f, 0xcb, 0xde, 0xd2, 0xcf, 0x3b, 0x49,
-	0xaa, 0xdf, 0x4c, 0xc6, 0x21, 0x15, 0x79, 0x94, 0x23, 0x4b, 0xc7, 0x99, 0xa0, 0x51, 0x29, 0xf0,
-	0x8c, 0x0a, 0x89, 0xd1, 0xdb, 0xf7, 0x9f, 0x59, 0xfa, 0xbc, 0x40, 0x35, 0x5e, 0xb1, 0x5f, 0x59,
-	0xbb, 0xff, 0x05, 0x00, 0x00, 0xff, 0xff, 0x03, 0xf6, 0x35, 0xce, 0x10, 0x0a, 0x00, 0x00,
+	// 748 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xa4, 0x55, 0xdd, 0x4e, 0x3b, 0x45,
+	0x14, 0xa7, 0x52, 0x5a, 0x3c, 0x0d, 0x42, 0xb6, 0x80, 0x75, 0x35, 0x6b, 0xb3, 0x89, 0x86, 0x48,
+	0xd8, 0x95, 0x12, 0xef, 0x15, 0x88, 0x09, 0x31, 0x25, 0x64, 0x41, 0x2e, 0xd4, 0xa4, 0x99, 0xce,
+	0x9e, 0x2e, 0x13, 0xb6, 0x3b, 0x9b, 0x9d, 0x69, 0xa5, 0x26, 0x3e, 0x83, 0x3e, 0x80, 0x0f, 0xe4,
+	0x25, 0x97, 0x5e, 0x1a, 0x78, 0x11, 0x33, 0xd3, 0xdd, 0xa1, 0x95, 0x5d, 0x10, 0xff, 0x77, 0x3d,
+	0x3d, 0xbf, 0x8f, 0x73, 0xe6, 0x9c, 0x99, 0x85, 0x4f, 0x52, 0x92, 0x10, 0x8a, 0xc4, 0x0f, 0x89,
+	0x24, 0x29, 0xe7, 0xb1, 0x3f, 0xed, 0xf9, 0xf2, 0xce, 0x4b, 0x33, 0x2e, 0xb9, 0xd5, 0xce, 0xb3,
+	0x5e, 0x91, 0xf5, 0xa6, 0x3d, 0x7b, 0x3b, 0xe2, 0x11, 0xd7, 0x79, 0x5f, 0xfd, 0x9a, 0x43, 0x6d,
+	0x87, 0x72, 0x31, 0xe6, 0xc2, 0x1f, 0x12, 0x81, 0xfe, 0xf4, 0x70, 0x88, 0x92, 0x1c, 0xfa, 0x94,
+	0xb3, 0xa4, 0xc8, 0x47, 0x9c, 0x47, 0x31, 0xfa, 0x3a, 0x1a, 0x4e, 0x46, 0x7e, 0x38, 0xc9, 0x88,
+	0x64, 0xdc, 0xe4, 0xcb, 0x0a, 0xd1, 0x96, 0x3a, 0xef, 0x32, 0xe8, 0xf4, 0x45, 0x14, 0x60, 0xc4,
+	0x84, 0xc4, 0xec, 0x94, 0x48, 0x72, 0x4d, 0x62, 0x16, 0x12, 0xc9, 0x33, 0xab, 0x0f, 0x5b, 0xd3,
+	0x22, 0x18, 0x84, 0x28, 0x09, 0x8b, 0x3b, 0xb5, 0x6e, 0x6d, 0xaf, 0xd5, 0x73, 0xbd, 0x92, 0x0e,
+	0xbc, 0x25, 0x76, 0xb0, 0x69, 0xb8, 0xa7, 0x9a, 0xea, 0xba, 0xd0, 0xad, 0xb2, 0x0a, 0x50, 0xa4,
+	0x3c, 0x11, 0xe8, 0xfe, 0x08, 0xbb, 0x7d, 0x11, 0x7d, 0x9f, 0x86, 0x44, 0xe2, 0x72, 0x31, 0x9f,
+	0xc1, 0x07, 0xca, 0x6b, 0x60, 0x54, 0x75, 0x29, 0xef, 0x07, 0x1b, 0xe1, 0x12, 0xcc, 0x86, 0x75,
+	0x4c, 0xc2, 0x94, 0xb3, 0x44, 0x76, 0xde, 0xd3, 0x00, 0x13, 0xbb, 0x5d, 0x70, 0xca, 0xc5, 0x8d,
+	0xfd, 0x2d, 0x6c, 0xf4, 0x45, 0x74, 0x92, 0x21, 0x91, 0x78, 0xc1, 0x79, 0x6c, 0x75, 0xa0, 0x49,
+	0xd5, 0x81, 0x1a, 0xbb, 0x22, 0xb4, 0xbe, 0x86, 0x96, 0xea, 0x7b, 0x90, 0x92, 0x8c, 0x8c, 0x85,
+	0xf6, 0x6a, 0xf5, 0x3e, 0x2d, 0x3d, 0x17, 0xa5, 0x74, 0xa1, 0x61, 0x01, 0xa4, 0xe6, 0xb7, 0x9b,
+	0xc0, 0xce, 0x92, 0x59, 0x51, 0x85, 0xf5, 0x21, 0x34, 0xb5, 0x34, 0x0b, 0xb5, 0x69, 0x3d, 0x68,
+	0xa8, 0xf0, 0x2c, 0xb4, 0xb6, 0x61, 0x2d, 0xe3, 0x93, 0x24, 0xd4, 0x6e, 0xf5, 0x60, 0x1e, 0x58,
+	0x9f, 0xc3, 0x26, 0xcd, 0x87, 0x3e, 0x48, 0x46, 0x52, 0xd1, 0x56, 0x75, 0x7e, 0xa3, 0xf8, 0xfb,
+	0x7c, 0x24, 0xcf, 0x42, 0x97, 0x41, 0xab, 0x2f, 0xa2, 0x4b, 0x8c, 0x63, 0xd5, 0xbc, 0x75, 0x0c,
+	0x75, 0x8a, 0x99, 0xcc, 0x27, 0xea, 0xbd, 0x36, 0x51, 0xc6, 0x93, 0x13, 0xcc, 0x24, 0x1b, 0x31,
+	0x4a, 0x24, 0x06, 0x9a, 0x6b, 0xed, 0x42, 0x43, 0x60, 0x1c, 0x63, 0x96, 0x9f, 0x75, 0x1e, 0xb9,
+	0x08, 0xed, 0x05, 0x2b, 0xd3, 0xd8, 0x39, 0xec, 0x12, 0x4a, 0x27, 0xe3, 0x81, 0x6e, 0x4f, 0xdc,
+	0x90, 0x0c, 0x07, 0x92, 0xdf, 0x62, 0x92, 0x17, 0xf1, 0x91, 0x37, 0xdf, 0x76, 0x4f, 0x6d, 0xbb,
+	0x97, 0x6f, 0xbb, 0x77, 0xc2, 0x59, 0x12, 0xb4, 0x35, 0x51, 0x1d, 0xd3, 0xa5, 0xa2, 0x5d, 0x29,
+	0x96, 0xfb, 0x5b, 0x4d, 0xfb, 0x1c, 0x4f, 0x66, 0xca, 0xe6, 0x1b, 0x4a, 0x51, 0x88, 0xf3, 0x6f,
+	0xaf, 0xde, 0x7a, 0x80, 0x47, 0xd0, 0x4c, 0xc9, 0x6c, 0x8c, 0x89, 0xd4, 0x07, 0xf7, 0x62, 0x1d,
+	0x05, 0x52, 0x49, 0x0d, 0x27, 0x33, 0xcc, 0x3a, 0x75, 0xdd, 0xf9, 0x3c, 0x70, 0x29, 0x7c, 0x5c,
+	0x52, 0xd0, 0xff, 0x9d, 0xec, 0x0e, 0x34, 0x96, 0x06, 0xba, 0x96, 0xe8, 0x41, 0xfe, 0xa2, 0x2f,
+	0x49, 0x80, 0x21, 0xe2, 0xf8, 0x9d, 0x1a, 0x2f, 0xd7, 0x57, 0x77, 0x28, 0xd3, 0xe2, 0xa6, 0x3b,
+	0x13, 0xbb, 0xb7, 0xfa, 0x0e, 0x95, 0x78, 0x9b, 0x1e, 0xcf, 0xa0, 0x99, 0x21, 0x45, 0x96, 0x16,
+	0xab, 0xe5, 0x57, 0xae, 0xd6, 0x02, 0x59, 0xe9, 0x05, 0x73, 0x5a, 0x50, 0xf0, 0x7b, 0x7f, 0xac,
+	0xc1, 0x6a, 0x5f, 0x44, 0xd6, 0xaf, 0xb0, 0x53, 0xfe, 0x42, 0x1d, 0x94, 0x4a, 0x57, 0xbd, 0x32,
+	0xf6, 0x57, 0x6f, 0x82, 0x9b, 0x8e, 0x7e, 0x86, 0x76, 0xd9, 0x8b, 0xb4, 0x5f, 0xa5, 0x56, 0x02,
+	0xb6, 0x8f, 0xde, 0x00, 0x36, 0xc6, 0x3f, 0x01, 0x2c, 0xbc, 0x45, 0x6e, 0x95, 0xc4, 0x13, 0xc6,
+	0xfe, 0xe2, 0x75, 0x8c, 0x51, 0xbf, 0x86, 0x75, 0xf3, 0x18, 0x74, 0xab, 0x78, 0x05, 0xc2, 0xde,
+	0x7b, 0x0d, 0x61, 0x74, 0x13, 0xd8, 0x7a, 0x76, 0x23, 0x2b, 0xd9, 0xff, 0x46, 0xda, 0x5f, 0xfe,
+	0x57, 0xe4, 0xe2, 0x78, 0xca, 0xee, 0xc2, 0x7e, 0xf5, 0xb0, 0x9f, 0x81, 0xab, 0xc7, 0xf3, 0xc2,
+	0xa6, 0x1f, 0x7f, 0xf7, 0xe7, 0x83, 0x53, 0xbb, 0x7f, 0x70, 0x6a, 0x7f, 0x3f, 0x38, 0xb5, 0xdf,
+	0x1f, 0x9d, 0x95, 0xfb, 0x47, 0x67, 0xe5, 0xaf, 0x47, 0x67, 0xe5, 0x87, 0xc3, 0x88, 0xc9, 0x9b,
+	0xc9, 0xd0, 0xa3, 0x7c, 0xec, 0x8f, 0x31, 0x64, 0xc3, 0x98, 0x53, 0x3f, 0x77, 0x38, 0xa0, 0x3c,
+	0x43, 0xff, 0xee, 0xe9, 0x83, 0x2c, 0x67, 0x29, 0x8a, 0x61, 0x43, 0x7f, 0x8f, 0x8f, 0xfe, 0x09,
+	0x00, 0x00, 0xff, 0xff, 0x7c, 0xc2, 0xa5, 0x03, 0x3a, 0x08, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -941,10 +750,6 @@ type MsgClient interface {
 	BuyDataAccessNFT(ctx context.Context, in *MsgBuyDataAccessNFT, opts ...grpc.CallOption) (*MsgBuyDataAccessNFTResponse, error)
 	// RedeemDataAccessNFT defines a method for redeeming data access NFT to get data
 	RedeemDataAccessNFT(ctx context.Context, in *MsgRedeemDataAccessNFT, opts ...grpc.CallOption) (*MsgRedeemDataAccessNFTResponse, error)
-	// RegisterNFTContract defines a method for deployment and registration of NFT contract
-	RegisterNFTContract(ctx context.Context, in *MsgRegisterNFTContract, opts ...grpc.CallOption) (*MsgRegisterNFTContractResponse, error)
-	// UpgradeNFTContract defines a method for upgrade and migration of NFT contract
-	UpgradeNFTContract(ctx context.Context, in *MsgUpgradeNFTContract, opts ...grpc.CallOption) (*MsgUpgradeNFTContractResponse, error)
 }
 
 type msgClient struct {
@@ -1009,24 +814,6 @@ func (c *msgClient) RedeemDataAccessNFT(ctx context.Context, in *MsgRedeemDataAc
 	return out, nil
 }
 
-func (c *msgClient) RegisterNFTContract(ctx context.Context, in *MsgRegisterNFTContract, opts ...grpc.CallOption) (*MsgRegisterNFTContractResponse, error) {
-	out := new(MsgRegisterNFTContractResponse)
-	err := c.cc.Invoke(ctx, "/panacea.datapool.v2.Msg/RegisterNFTContract", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *msgClient) UpgradeNFTContract(ctx context.Context, in *MsgUpgradeNFTContract, opts ...grpc.CallOption) (*MsgUpgradeNFTContractResponse, error) {
-	out := new(MsgUpgradeNFTContractResponse)
-	err := c.cc.Invoke(ctx, "/panacea.datapool.v2.Msg/UpgradeNFTContract", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 // MsgServer is the server API for Msg service.
 type MsgServer interface {
 	// RegisterDataValidator defines a method for registration of data validator.
@@ -1041,10 +828,6 @@ type MsgServer interface {
 	BuyDataAccessNFT(context.Context, *MsgBuyDataAccessNFT) (*MsgBuyDataAccessNFTResponse, error)
 	// RedeemDataAccessNFT defines a method for redeeming data access NFT to get data
 	RedeemDataAccessNFT(context.Context, *MsgRedeemDataAccessNFT) (*MsgRedeemDataAccessNFTResponse, error)
-	// RegisterNFTContract defines a method for deployment and registration of NFT contract
-	RegisterNFTContract(context.Context, *MsgRegisterNFTContract) (*MsgRegisterNFTContractResponse, error)
-	// UpgradeNFTContract defines a method for upgrade and migration of NFT contract
-	UpgradeNFTContract(context.Context, *MsgUpgradeNFTContract) (*MsgUpgradeNFTContractResponse, error)
 }
 
 // UnimplementedMsgServer can be embedded to have forward compatible implementations.
@@ -1068,12 +851,6 @@ func (*UnimplementedMsgServer) BuyDataAccessNFT(ctx context.Context, req *MsgBuy
 }
 func (*UnimplementedMsgServer) RedeemDataAccessNFT(ctx context.Context, req *MsgRedeemDataAccessNFT) (*MsgRedeemDataAccessNFTResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RedeemDataAccessNFT not implemented")
-}
-func (*UnimplementedMsgServer) RegisterNFTContract(ctx context.Context, req *MsgRegisterNFTContract) (*MsgRegisterNFTContractResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method RegisterNFTContract not implemented")
-}
-func (*UnimplementedMsgServer) UpgradeNFTContract(ctx context.Context, req *MsgUpgradeNFTContract) (*MsgUpgradeNFTContractResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method UpgradeNFTContract not implemented")
 }
 
 func RegisterMsgServer(s grpc1.Server, srv MsgServer) {
@@ -1188,42 +965,6 @@ func _Msg_RedeemDataAccessNFT_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Msg_RegisterNFTContract_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(MsgRegisterNFTContract)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(MsgServer).RegisterNFTContract(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/panacea.datapool.v2.Msg/RegisterNFTContract",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MsgServer).RegisterNFTContract(ctx, req.(*MsgRegisterNFTContract))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Msg_UpgradeNFTContract_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(MsgUpgradeNFTContract)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(MsgServer).UpgradeNFTContract(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/panacea.datapool.v2.Msg/UpgradeNFTContract",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MsgServer).UpgradeNFTContract(ctx, req.(*MsgUpgradeNFTContract))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 var _Msg_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "panacea.datapool.v2.Msg",
 	HandlerType: (*MsgServer)(nil),
@@ -1251,14 +992,6 @@ var _Msg_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "RedeemDataAccessNFT",
 			Handler:    _Msg_RedeemDataAccessNFT_Handler,
-		},
-		{
-			MethodName: "RegisterNFTContract",
-			Handler:    _Msg_RegisterNFTContract_Handler,
-		},
-		{
-			MethodName: "UpgradeNFTContract",
-			Handler:    _Msg_UpgradeNFTContract_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
@@ -1710,126 +1443,6 @@ func (m *MsgRedeemDataAccessNFTResponse) MarshalToSizedBuffer(dAtA []byte) (int,
 	return len(dAtA) - i, nil
 }
 
-func (m *MsgRegisterNFTContract) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *MsgRegisterNFTContract) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *MsgRegisterNFTContract) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if len(m.Sender) > 0 {
-		i -= len(m.Sender)
-		copy(dAtA[i:], m.Sender)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.Sender)))
-		i--
-		dAtA[i] = 0x12
-	}
-	if len(m.WasmCode) > 0 {
-		i -= len(m.WasmCode)
-		copy(dAtA[i:], m.WasmCode)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.WasmCode)))
-		i--
-		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *MsgRegisterNFTContractResponse) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *MsgRegisterNFTContractResponse) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *MsgRegisterNFTContractResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	return len(dAtA) - i, nil
-}
-
-func (m *MsgUpgradeNFTContract) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *MsgUpgradeNFTContract) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *MsgUpgradeNFTContract) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if len(m.Sender) > 0 {
-		i -= len(m.Sender)
-		copy(dAtA[i:], m.Sender)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.Sender)))
-		i--
-		dAtA[i] = 0x12
-	}
-	if len(m.NewWasmCode) > 0 {
-		i -= len(m.NewWasmCode)
-		copy(dAtA[i:], m.NewWasmCode)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.NewWasmCode)))
-		i--
-		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *MsgUpgradeNFTContractResponse) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *MsgUpgradeNFTContractResponse) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *MsgUpgradeNFTContractResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	return len(dAtA) - i, nil
-}
-
 func encodeVarintTx(dAtA []byte, offset int, v uint64) int {
 	offset -= sovTx(v)
 	base := offset
@@ -2027,58 +1640,6 @@ func (m *MsgRedeemDataAccessNFTResponse) Size() (n int) {
 		l = m.Receipt.Size()
 		n += 1 + l + sovTx(uint64(l))
 	}
-	return n
-}
-
-func (m *MsgRegisterNFTContract) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	l = len(m.WasmCode)
-	if l > 0 {
-		n += 1 + l + sovTx(uint64(l))
-	}
-	l = len(m.Sender)
-	if l > 0 {
-		n += 1 + l + sovTx(uint64(l))
-	}
-	return n
-}
-
-func (m *MsgRegisterNFTContractResponse) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	return n
-}
-
-func (m *MsgUpgradeNFTContract) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	l = len(m.NewWasmCode)
-	if l > 0 {
-		n += 1 + l + sovTx(uint64(l))
-	}
-	l = len(m.Sender)
-	if l > 0 {
-		n += 1 + l + sovTx(uint64(l))
-	}
-	return n
-}
-
-func (m *MsgUpgradeNFTContractResponse) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
 	return n
 }
 
@@ -3284,338 +2845,6 @@ func (m *MsgRedeemDataAccessNFTResponse) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipTx(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthTx
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *MsgRegisterNFTContract) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowTx
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: MsgRegisterNFTContract: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgRegisterNFTContract: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field WasmCode", wireType)
-			}
-			var byteLen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				byteLen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if byteLen < 0 {
-				return ErrInvalidLengthTx
-			}
-			postIndex := iNdEx + byteLen
-			if postIndex < 0 {
-				return ErrInvalidLengthTx
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.WasmCode = append(m.WasmCode[:0], dAtA[iNdEx:postIndex]...)
-			if m.WasmCode == nil {
-				m.WasmCode = []byte{}
-			}
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Sender", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthTx
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthTx
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Sender = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipTx(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthTx
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *MsgRegisterNFTContractResponse) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowTx
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: MsgRegisterNFTContractResponse: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgRegisterNFTContractResponse: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		default:
-			iNdEx = preIndex
-			skippy, err := skipTx(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthTx
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *MsgUpgradeNFTContract) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowTx
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: MsgUpgradeNFTContract: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgUpgradeNFTContract: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field NewWasmCode", wireType)
-			}
-			var byteLen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				byteLen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if byteLen < 0 {
-				return ErrInvalidLengthTx
-			}
-			postIndex := iNdEx + byteLen
-			if postIndex < 0 {
-				return ErrInvalidLengthTx
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.NewWasmCode = append(m.NewWasmCode[:0], dAtA[iNdEx:postIndex]...)
-			if m.NewWasmCode == nil {
-				m.NewWasmCode = []byte{}
-			}
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Sender", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthTx
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthTx
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Sender = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipTx(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthTx
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *MsgUpgradeNFTContractResponse) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowTx
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: MsgUpgradeNFTContractResponse: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgUpgradeNFTContractResponse: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
 		default:
 			iNdEx = preIndex
 			skippy, err := skipTx(dAtA[iNdEx:])

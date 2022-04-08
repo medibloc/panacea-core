@@ -13,11 +13,6 @@ service Query {
     option (google.api.http).get = "/panacea/datapool/v2/pools/{pool_id}";
   }
 
-  // NFTContract returns a NFT contract address registered to x/datapool module
-  rpc NFTContract(QueryNFTContractRequest) returns (QueryNFTContractResponse) {
-    option (google.api.http).get = "/panacea/datapool/v2/nft_contract";
-  }
-
   // DataValidator returns a DataValidator.
   rpc DataValidator(QueryDataValidatorRequest) returns (QueryDataValidatorResponse) {
     option (google.api.http).get = "/panacea/datapool/v2/data_validator";
@@ -32,14 +27,6 @@ message QueryPoolRequest {
 // QueryPoolResponse is the response type for the Query/Pool RPC method.
 message QueryPoolResponse {
   Pool pool = 1;
-}
-
-// QueryNFTContractRequest is the request type for the Query/NFTContract RPC method.
-message QueryNFTContractRequest {}
-
-// QueryNFTContractResponse is the response type for the Query/NFTContract RPC method.
-message QueryNFTContractResponse {
-  string nft_contract_address = 1;
 }
 
 // QueryDataValidatorRequest is the request type for the Query/DataValidator RPC method.

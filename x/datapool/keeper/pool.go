@@ -3,8 +3,7 @@ package keeper
 import (
 	"encoding/json"
 	"fmt"
-
-	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
+	"strconv"
 
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 
@@ -123,16 +122,18 @@ func (k Keeper) CreatePool(ctx sdk.Context, curator sdk.AccAddress, poolParams t
 	// new pool
 	newPool := types.NewPool(poolID, curator, poolParams)
 
+	newPoolAddr := newPool.GetPoolAddress()
+
 	// pool address for deposit
-	poolAddress, err := types.AccPoolAddressFromBech32(newPool.GetPoolAddress())
+	poolAddress, err := types.AccPoolAddressFromBech32(newPoolAddr)
 	if err != nil {
-		return 0, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid address of pool %s", newPool.GetPoolAddress())
+		return 0, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid address of pool %s", newPoolAddr)
 	}
 
 	// set new account for pool
 	acc := k.accountKeeper.NewAccount(ctx, authtypes.NewModuleAccount(
 		authtypes.NewBaseAccountWithAddress(poolAddress),
-		newPool.GetPoolAddress(),
+		newPoolAddr,
 	))
 	k.accountKeeper.SetAccount(ctx, acc)
 
@@ -145,17 +146,22 @@ func (k Keeper) CreatePool(ctx sdk.Context, curator sdk.AccAddress, poolParams t
 	}
 
 	// curator send deposit to pool for creation of pool
+	params := k.GetParams(ctx)
 
-	depositParam := k.GetParams(ctx).DataPoolDeposit
-	err = k.bankKeeper.SendCoins(ctx, curator, poolAddress, sdk.NewCoins(depositParam))
+	err = k.bankKeeper.SendCoins(ctx, curator, poolAddress, sdk.NewCoins(params.DataPoolDeposit))
 	if err != nil {
 		return 0, sdkerrors.Wrapf(types.ErrNotEnoughPoolDeposit, "The curator's balance is not enough to make a data pool")
 	}
 
 	// mint curator NFT
-	contractAddr, err := k.GetNFTContractAddress(ctx)
+	nftContractAddrParam := params.DataPoolNftContractAddress
+	if nftContractAddrParam == "" {
+		return 0, sdkerrors.Wrapf(types.ErrNoRegisteredNFTContract, "failed to get NFT contract address")
+	}
+
+	nftContractAddr, err := sdk.AccAddressFromBech32(nftContractAddrParam)
 	if err != nil {
-		return 0, err
+		return 0, sdkerrors.Wrapf(err, "invalid contract address")
 	}
 
 	zeroFund, err := sdk.ParseCoinsNormalized("0umed")
@@ -169,11 +175,37 @@ func (k Keeper) CreatePool(ctx sdk.Context, curator sdk.AccAddress, poolParams t
 		return 0, sdkerrors.Wrapf(err, "failed to marshal mint NFT msg")
 	}
 
-	_, err = k.wasmKeeper.Execute(ctx, contractAddr, types.GetModuleAddress(), mintMsgBz, zeroFund)
+	moduleAddr := types.GetModuleAddress()
+
+	_, err = k.wasmKeeper.Execute(ctx, nftContractAddr, moduleAddr, mintMsgBz, zeroFund)
 
 	if err != nil {
 		return 0, sdkerrors.Wrapf(err, "failed to mint curator NFT")
 	}
+
+	poolName := "pool_" + strconv.FormatUint(newPool.GetPoolId(), 10)
+	symbol := "DATA" + strconv.FormatUint(newPool.GetPoolId(), 10)
+
+	instantiateMsg := types.NewInstantiateNFTMsg(poolName, symbol, newPoolAddr)
+	instantiateMsgBz, err := json.Marshal(instantiateMsg)
+	if err != nil {
+		return 0, sdkerrors.Wrapf(err, "failed to marshal instantiateMsg")
+	}
+
+	codeID := k.GetParams(ctx).DataPoolCodeId
+
+	poolAccAddr, err := sdk.AccAddressFromBech32(newPoolAddr)
+	if err != nil {
+		return 0, sdkerrors.Wrapf(err, "invalid new pool address")
+	}
+
+	// instantiate NFT contract for minting data access NFT (set admin to module)
+	poolNFTContractAddr, _, err := k.wasmKeeper.Instantiate(ctx, codeID, moduleAddr, poolAccAddr, instantiateMsgBz, "data access NFT", nil)
+	if err != nil {
+		return 0, sdkerrors.Wrapf(err, "failed to instantiate contract")
+	}
+
+	newPool.NftContractAddr = poolNFTContractAddr.String()
 
 	// store pool
 	k.SetPool(ctx, newPool)
@@ -253,94 +285,4 @@ func (k Keeper) GetPool(ctx sdk.Context, poolID uint64) (*types.Pool, error) {
 	k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, pool)
 
 	return pool, nil
-}
-
-func (k Keeper) SetNFTContractAddress(ctx sdk.Context, address sdk.AccAddress) {
-	store := ctx.KVStore(k.storeKey)
-	store.Set(types.KeyNFTContractAddress, address)
-}
-
-func (k Keeper) GetNFTContractAddress(ctx sdk.Context) (sdk.AccAddress, error) {
-	store := ctx.KVStore(k.storeKey)
-	if !store.Has(types.KeyNFTContractAddress) {
-		return nil, sdkerrors.Wrapf(types.ErrNoRegisteredNFTContract, "no contract registered")
-	}
-
-	return store.Get(types.KeyNFTContractAddress), nil
-}
-
-// CreateNFTContract stores NFT contract
-func (k Keeper) CreateNFTContract(ctx sdk.Context, creator sdk.AccAddress, wasmCode []byte) (uint64, error) {
-	// access configuration of only for creator address
-	accessConfig := &wasmtypes.AccessConfig{
-		Permission: wasmtypes.AccessTypeOnlyAddress,
-		Address:    creator.String(),
-	}
-
-	// create contract
-	codeID, err := k.wasmKeeper.Create(ctx, creator, wasmCode, accessConfig)
-	if err != nil {
-		return 0, sdkerrors.Wrapf(err, "failed to create contract")
-	}
-
-	return codeID, nil
-}
-
-// DeployAndRegisterNFTContract creates, instantiate contract and store contract address
-func (k Keeper) DeployAndRegisterNFTContract(ctx sdk.Context, wasmCode []byte) (sdk.AccAddress, error) {
-	moduleAddr := types.GetModuleAddress()
-
-	codeID, err := k.CreateNFTContract(ctx, moduleAddr, wasmCode)
-	if err != nil {
-		return nil, err
-	}
-
-	initMsg := types.NewInstantiateNFTMsg("curation", "CUR", moduleAddr.String())
-	initMsgBz, err := json.Marshal(initMsg)
-	if err != nil {
-		return nil, err
-	}
-
-	// instantiate contract (set admin to module)
-	contractAddr, _, err := k.wasmKeeper.Instantiate(ctx, codeID, moduleAddr, moduleAddr, initMsgBz, "curator NFT", nil)
-	if err != nil {
-		return nil, sdkerrors.Wrapf(err, "failed to instantiate contract")
-	}
-
-	// set contract address
-	k.SetNFTContractAddress(ctx, contractAddr)
-
-	return contractAddr, nil
-}
-
-// MigrateNFTContract creates new contract and migrate
-func (k Keeper) MigrateNFTContract(ctx sdk.Context, newWasmCode []byte) error {
-	moduleAddr := types.GetModuleAddress()
-
-	// create new contract
-	newCodeID, err := k.CreateNFTContract(ctx, moduleAddr, newWasmCode)
-	if err != nil {
-		return err
-	}
-
-	// get existing contract address
-	contractAddress, err := k.GetNFTContractAddress(ctx)
-	if err != nil {
-		return err
-	}
-
-	// migrate msg
-	migrateMsg := types.NewMigrateContractMsg(moduleAddr)
-	migrateMsgBz, err := json.Marshal(migrateMsg)
-	if err != nil {
-		return err
-	}
-
-	// migrate contract
-	_, err = k.wasmKeeper.Migrate(ctx, contractAddress, moduleAddr, newCodeID, migrateMsgBz)
-	if err != nil {
-		return sdkerrors.Wrapf(err, "failed to migrate contract")
-	}
-
-	return nil
 }

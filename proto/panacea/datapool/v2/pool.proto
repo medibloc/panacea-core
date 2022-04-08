@@ -13,10 +13,11 @@ message Pool {
   string     pool_address = 2;
   uint64     round = 3;
   PoolParams pool_params = 4;
-  uint64     cur_num_data = 5;    // current number of data
+  uint64     cur_num_data = 5;     // current number of data
   uint64     num_issued_nfts = 6;  // current issued NFTs
   string     status = 7;
   string     curator = 8;
+  string     nft_contract_addr = 9; // NFT contract address of pool
 }
 
 // DataValidationCertificate defines the certificate for data validation w/ data validator signature.

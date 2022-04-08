@@ -2,6 +2,7 @@ package types
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
@@ -33,8 +34,8 @@ func NewPool(poolID uint64, curator sdk.AccAddress, poolParams PoolParams) *Pool
 }
 
 func NewPoolAddress(poolID uint64) sdk.AccAddress {
-	key := append([]byte("pool"), sdk.Uint64ToBigEndian(poolID)...)
-	return address.Module(ModuleName, key)
+	poolKey := "pool" + strconv.FormatUint(poolID, 10)
+	return authtypes.NewModuleAddress(poolKey)
 }
 
 func AccPoolAddressFromBech32(address string) (sdk.AccAddress, error) {

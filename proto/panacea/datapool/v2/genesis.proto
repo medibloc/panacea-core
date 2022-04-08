@@ -15,7 +15,6 @@ message GenesisState {
   Params                                     params = 4 [
     (gogoproto.nullable) = false
   ];
-  bytes                                      nft_contract_address = 5;
 }
 
 // Params define parameters of datapool module
@@ -24,4 +23,6 @@ message Params {
     (gogoproto.moretags) = "yaml:\"data_pool_deposit\"",
     (gogoproto.nullable) = false
   ];
+  uint64 data_pool_code_id = 2;
+  string data_pool_nft_contract_address = 3;
 }
