@@ -1,0 +1,17 @@
+{
+  "title": "parameter change of datapool module",
+  "description": "register code ID and address of NFT contract",
+  "changes": [
+    {
+      "subspace": "datapool",
+      "key": "datapoolcodeid",
+      "value": "1"
+    },
+    {
+      "subspace": "datapool",
+      "key": "datapoolnftcontractaddress",
+      "value": "panacea14hj2tavq8fpesdwxxcu44rty3hh90vhu4mda6e"
+    }
+  ],
+  "deposit": "1000000umed"
+}
