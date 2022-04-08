@@ -376,22 +376,6 @@ func (k Keeper) SellData(ctx sdk.Context, seller sdk.AccAddress, cert types.Data
 	return shareToken, nil
 }
 
-func (k Keeper) mintPoolShareToAccount(ctx sdk.Context, poolID, amount uint64, addr sdk.AccAddress) (*sdk.Coin, error) {
-	shareToken := types.GetAccumPoolShareToken(poolID, amount)
-
-	shareTokens := sdk.Coins{shareToken}
-	err := k.bankKeeper.MintCoins(ctx, types.ModuleName, shareTokens)
-	if err != nil {
-		return nil, sdkerrors.Wrap(types.ErrFailedMintShareToken, err.Error())
-	}
-
-	err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, addr, shareTokens)
-	if err != nil {
-		return nil, sdkerrors.Wrap(types.ErrFailedMintShareToken, err.Error())
-	}
-	return &shareToken, nil
-}
-
 // verifySignature verifies that the signature of the dataValidator is correct
 func (k Keeper) verifySignature(ctx sdk.Context, dataValidatorCert types.DataValidationCertificate) error {
 	dataValidator := dataValidatorCert.UnsignedCert.DataValidator
@@ -464,6 +448,22 @@ func (k Keeper) increaseCurNumAndUpdatePool(ctx sdk.Context, pool *types.Pool) {
 	}
 
 	k.SetPool(ctx, pool)
+}
+
+func (k Keeper) mintPoolShareToAccount(ctx sdk.Context, poolID, amount uint64, addr sdk.AccAddress) (*sdk.Coin, error) {
+	shareToken := types.GetAccumPoolShareToken(poolID, amount)
+
+	shareTokens := sdk.Coins{shareToken}
+	err := k.bankKeeper.MintCoins(ctx, types.ModuleName, shareTokens)
+	if err != nil {
+		return nil, sdkerrors.Wrap(types.ErrFailedMintShareToken, err.Error())
+	}
+
+	err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, addr, shareTokens)
+	if err != nil {
+		return nil, sdkerrors.Wrap(types.ErrFailedMintShareToken, err.Error())
+	}
+	return &shareToken, nil
 }
 
 func contains(validators []string, validator string) bool {
