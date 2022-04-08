@@ -46,3 +46,15 @@ func (k Keeper) DataValidator(goCtx context.Context, req *types.QueryDataValidat
 
 	return &types.QueryDataValidatorResponse{DataValidator: &dataValidator}, nil
 }
+
+func (k Keeper) DataPoolParams(goCtx context.Context, req *types.QueryDataPoolParamsRequest) (*types.QueryDataPoolParamsResponse, error) {
+	if req == nil {
+		return nil, status.Error(codes.InvalidArgument, "invalid request")
+	}
+
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	params := k.GetParams(ctx)
+
+	return &types.QueryDataPoolParamsResponse{Params: &params}, nil
+}
