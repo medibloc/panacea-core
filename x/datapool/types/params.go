@@ -43,6 +43,14 @@ func (p Params) Validate() error {
 		return err
 	}
 
+	if err := validateDataPoolCodeID(p.DataPoolCodeId); err != nil {
+		return err
+	}
+
+	if err := validateDataPoolNFTContractAddress(p.DataPoolNftContractAddress); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -68,13 +76,9 @@ func validateDataPoolDeposit(i interface{}) error {
 }
 
 func validateDataPoolCodeID(i interface{}) error {
-	codeID, ok := i.(uint64)
+	_, ok := i.(uint64)
 	if !ok {
 		return fmt.Errorf("invalid parameter type: %T", i)
-	}
-
-	if codeID < 0 {
-		return fmt.Errorf("code id must be non-negative: %d", codeID)
 	}
 
 	return nil
