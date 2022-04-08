@@ -391,7 +391,7 @@ func (k Keeper) isDuplicatedCertificate(ctx sdk.Context, cert types.DataValidati
 	store := ctx.KVStore(k.storeKey)
 	unsignedCert := cert.UnsignedCert
 	for round := uint64(1); round <= unsignedCert.Round; round++ {
-		key := types.GetKeyPrefixDataValidateCerts(unsignedCert.GetPoolId(), round, unsignedCert.GetDataHash())
+		key := types.GetKeyPrefixDataValidateCert(unsignedCert.GetPoolId(), round, unsignedCert.GetDataHash())
 		if store.Has(key) {
 			return true
 		}
@@ -421,7 +421,7 @@ func (k Keeper) validateCertificateByPool(cert types.DataValidationCertificate, 
 
 func (k Keeper) SetDataValidationCertificate(ctx sdk.Context, cert types.DataValidationCertificate) {
 	unsignedCert := cert.UnsignedCert
-	key := types.GetKeyPrefixDataValidateCerts(unsignedCert.PoolId, unsignedCert.Round, unsignedCert.DataHash)
+	key := types.GetKeyPrefixDataValidateCert(unsignedCert.PoolId, unsignedCert.Round, unsignedCert.DataHash)
 	store := ctx.KVStore(k.storeKey)
 	store.Set(key, k.cdc.MustMarshalBinaryLengthPrefixed(&cert))
 }
@@ -446,7 +446,7 @@ func contains(validators []string, validator string) bool {
 }
 
 func (k Keeper) GetDataValidationCertificate(ctx sdk.Context, poolID, round uint64, dataHash []byte) (types.DataValidationCertificate, error) {
-	key := types.GetKeyPrefixDataValidateCerts(poolID, round, dataHash)
+	key := types.GetKeyPrefixDataValidateCert(poolID, round, dataHash)
 	store := ctx.KVStore(k.storeKey)
 	if !store.Has(key) {
 		return types.DataValidationCertificate{}, sdkerrors.Wrap(types.ErrGetDataValidationCert, "certification is not exist")
