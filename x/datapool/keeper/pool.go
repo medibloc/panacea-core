@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"strconv"
 
+	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
+
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -285,4 +287,45 @@ func (k Keeper) GetPool(ctx sdk.Context, poolID uint64) (*types.Pool, error) {
 	k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, pool)
 
 	return pool, nil
+}
+
+// CreateNFTContract stores NFT contract
+func (k Keeper) CreateNFTContract(ctx sdk.Context, creator sdk.AccAddress, wasmCode []byte) (uint64, error) {
+	// access configuration of only for creator address
+	accessConfig := &wasmtypes.AccessConfig{
+		Permission: wasmtypes.AccessTypeOnlyAddress,
+		Address:    creator.String(),
+	}
+
+	// create contract
+	codeID, err := k.wasmKeeper.Create(ctx, creator, wasmCode, accessConfig)
+	if err != nil {
+		return 0, sdkerrors.Wrapf(err, "failed to create contract")
+	}
+
+	return codeID, nil
+}
+
+// DeployAndRegisterNFTContract creates, instantiate contract and store contract address. only used in test code
+func (k Keeper) DeployAndRegisterNFTContract(ctx sdk.Context, wasmCode []byte) (sdk.AccAddress, error) {
+	moduleAddr := types.GetModuleAddress()
+
+	codeID, err := k.CreateNFTContract(ctx, moduleAddr, wasmCode)
+	if err != nil {
+		return nil, err
+	}
+
+	initMsg := types.NewInstantiateNFTMsg("curation", "CUR", moduleAddr.String())
+	initMsgBz, err := json.Marshal(initMsg)
+	if err != nil {
+		return nil, err
+	}
+
+	// instantiate contract (set admin to module)
+	contractAddr, _, err := k.wasmKeeper.Instantiate(ctx, codeID, moduleAddr, moduleAddr, initMsgBz, "curator NFT", nil)
+	if err != nil {
+		return nil, sdkerrors.Wrapf(err, "failed to instantiate contract")
+	}
+
+	return contractAddr, nil
 }
