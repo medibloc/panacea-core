@@ -428,7 +428,6 @@ func (suite *poolTestSuite) TestSellData_failed_get_publicKey_validator_in_signa
 
 	shareToken, err := suite.DataPoolKeeper.SellData(suite.Ctx, requesterAddr, *cert)
 	suite.Require().Error(err)
-	fmt.Println(err.Error())
 	suite.Require().True(strings.HasSuffix(err.Error(), types.ErrInvalidSignature.Error()))
 	suite.Require().Nil(shareToken)
 }
