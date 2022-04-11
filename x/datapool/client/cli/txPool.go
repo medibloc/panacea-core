@@ -166,7 +166,7 @@ func CmdSellData() *cobra.Command {
 func readCertificateFromFile(file string) (*types.DataValidationCertificate, error) {
 	contents, err := ioutil.ReadFile(file)
 	if err != nil {
-		return nil, fmt.Errorf("failed to read file")
+		return nil, fmt.Errorf("failed to read file: %w", err)
 	}
 
 	var cert types.DataValidationCertificate
