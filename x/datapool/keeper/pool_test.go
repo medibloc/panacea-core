@@ -36,14 +36,15 @@ var (
 	curatorPubKey  = curatorPrivKey.PubKey()
 	curatorAddr    = sdk.AccAddress(curatorPubKey.Address())
 
+	requesterPrivKey = secp256k1.GenPrivKey()
+	requesterPubKey  = requesterPrivKey.PubKey()
+	requesterAddr    = sdk.AccAddress(requesterPubKey.Address())
+
 	fundForDataVal = sdk.NewCoins(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(10000000000)))
 	fundForCurator = sdk.NewCoins(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(10000000000)))
 	NFTPrice       = sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(10000000))
 
-	downloadPeriod   = time.Duration(time.Second * 100000000)
-	requesterPrivKey = secp256k1.GenPrivKey()
-	requesterPubKey  = requesterPrivKey.PubKey()
-	requesterAddr    = sdk.AccAddress(requesterPubKey.Address())
+	downloadPeriod = time.Duration(time.Second * 100000000)
 )
 
 func (suite poolTestSuite) setupNFTContract() {
@@ -68,10 +69,7 @@ func (suite *poolTestSuite) TestRegisterDataValidator() {
 	err := suite.BankKeeper.AddCoins(suite.Ctx, dataVal1, fundForDataVal)
 	suite.Require().NoError(err)
 
-	validatorAccount := suite.AccountKeeper.NewAccountWithAddress(suite.Ctx, dataVal1)
-	err = validatorAccount.SetPubKey(dataValPubKey)
-	suite.Require().NoError(err)
-	suite.AccountKeeper.SetAccount(suite.Ctx, validatorAccount)
+	suite.setDataValidatorAccount()
 
 	tempDataValidator := types.DataValidator{
 		Address:  dataVal1.String(),
@@ -82,14 +80,18 @@ func (suite *poolTestSuite) TestRegisterDataValidator() {
 	suite.Require().NoError(err)
 }
 
+func (suite *poolTestSuite) setDataValidatorAccount() {
+	validatorAccount := suite.AccountKeeper.NewAccountWithAddress(suite.Ctx, dataVal1)
+	err := validatorAccount.SetPubKey(dataValPubKey)
+	suite.Require().NoError(err)
+	suite.AccountKeeper.SetAccount(suite.Ctx, validatorAccount)
+}
+
 func (suite *poolTestSuite) TestGetRegisterDataValidator() {
 	err := suite.BankKeeper.AddCoins(suite.Ctx, dataVal1, fundForDataVal)
 	suite.Require().NoError(err)
 
-	validatorAccount := suite.AccountKeeper.NewAccountWithAddress(suite.Ctx, dataVal1)
-	err = validatorAccount.SetPubKey(dataValPubKey)
-	suite.Require().NoError(err)
-	suite.AccountKeeper.SetAccount(suite.Ctx, validatorAccount)
+	suite.setDataValidatorAccount()
 
 	tempDataValidatorDetail := types.DataValidator{
 		Address:  dataVal1.String(),
@@ -108,10 +110,7 @@ func (suite *poolTestSuite) TestIsDataValidatorDuplicate() {
 	err := suite.BankKeeper.AddCoins(suite.Ctx, dataVal1, fundForDataVal)
 	suite.Require().NoError(err)
 
-	validatorAccount := suite.AccountKeeper.NewAccountWithAddress(suite.Ctx, dataVal1)
-	err = validatorAccount.SetPubKey(dataValPubKey)
-	suite.Require().NoError(err)
-	suite.AccountKeeper.SetAccount(suite.Ctx, validatorAccount)
+	suite.setDataValidatorAccount()
 
 	tempDataValidatorDetail := types.DataValidator{
 		Address:  dataVal1.String(),
@@ -142,10 +141,7 @@ func (suite *poolTestSuite) TestUpdateDataValidator() {
 	err := suite.BankKeeper.AddCoins(suite.Ctx, dataVal1, fundForDataVal)
 	suite.Require().NoError(err)
 
-	validatorAccount := suite.AccountKeeper.NewAccountWithAddress(suite.Ctx, dataVal1)
-	err = validatorAccount.SetPubKey(dataValPubKey)
-	suite.Require().NoError(err)
-	suite.AccountKeeper.SetAccount(suite.Ctx, validatorAccount)
+	suite.setDataValidatorAccount()
 
 	tempDataValidator := types.DataValidator{
 		Address:  dataVal1.String(),
@@ -172,13 +168,12 @@ func (suite *poolTestSuite) TestUpdateDataValidator() {
 
 func (suite *poolTestSuite) TestGetPool() {
 	poolID := uint64(1)
-	nftPrice := sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(1000000))
 	downloadPeriod := time.Hour
 	poolParams := types.PoolParams{
 		DataSchema:            []string{"https://json.schemastore.org/github-issue-forms.json"},
 		TargetNumData:         100,
 		MaxNftSupply:          10,
-		NftPrice:              &nftPrice,
+		NftPrice:              &NFTPrice,
 		TrustedDataValidators: []string{dataVal1.String()},
 		DownloadPeriod:        &downloadPeriod,
 	}
@@ -210,10 +205,7 @@ func (suite poolTestSuite) TestCreatePool() {
 	err = suite.BankKeeper.AddCoins(suite.Ctx, dataVal1, fundForDataVal)
 	suite.Require().NoError(err)
 
-	validatorAccount := suite.AccountKeeper.NewAccountWithAddress(suite.Ctx, dataVal1)
-	err = validatorAccount.SetPubKey(dataValPubKey)
-	suite.Require().NoError(err)
-	suite.AccountKeeper.SetAccount(suite.Ctx, validatorAccount)
+	suite.setDataValidatorAccount()
 
 	dataValidator := types.DataValidator{
 		Address:  dataVal1.String(),
@@ -341,10 +333,7 @@ func (suite *poolTestSuite) TestSellData() {
 	round := uint64(1)
 	dataHash := []byte("dataHash")
 
-	validatorAccount := suite.AccountKeeper.NewAccountWithAddress(suite.Ctx, dataVal1)
-	err := validatorAccount.SetPubKey(dataValPubKey)
-	suite.Require().NoError(err)
-	suite.AccountKeeper.SetAccount(suite.Ctx, validatorAccount)
+	suite.setDataValidatorAccount()
 
 	pool := makeTestDataPool(poolID)
 	suite.DataPoolKeeper.SetPool(suite.Ctx, pool)
@@ -369,10 +358,7 @@ func (suite *poolTestSuite) TestSellData_change_status_activity() {
 	round := uint64(1)
 	dataHash := []byte("dataHash")
 
-	validatorAccount := suite.AccountKeeper.NewAccountWithAddress(suite.Ctx, dataVal1)
-	err := validatorAccount.SetPubKey(dataValPubKey)
-	suite.Require().NoError(err)
-	suite.AccountKeeper.SetAccount(suite.Ctx, validatorAccount)
+	suite.setDataValidatorAccount()
 
 	pool := makeTestDataPool(poolID)
 	// Modify the target data of the pool
@@ -437,10 +423,7 @@ func (suite *poolTestSuite) TestSellData_invalid_signature() {
 	round := uint64(1)
 	dataHash := []byte("dataHash")
 
-	validatorAccount := suite.AccountKeeper.NewAccountWithAddress(suite.Ctx, dataVal1)
-	err := validatorAccount.SetPubKey(dataValPubKey)
-	suite.Require().NoError(err)
-	suite.AccountKeeper.SetAccount(suite.Ctx, validatorAccount)
+	suite.setDataValidatorAccount()
 
 	cert, err := makeTestDataCertificate(suite.Cdc.Marshaler, poolID, round, dataHash)
 	suite.Require().NoError(err)
@@ -466,10 +449,7 @@ func (suite *poolTestSuite) TestSellData_duplicate_data() {
 	round := uint64(1)
 	dataHash := []byte("dataHash")
 
-	validatorAccount := suite.AccountKeeper.NewAccountWithAddress(suite.Ctx, dataVal1)
-	err := validatorAccount.SetPubKey(dataValPubKey)
-	suite.Require().NoError(err)
-	suite.AccountKeeper.SetAccount(suite.Ctx, validatorAccount)
+	suite.setDataValidatorAccount()
 
 	pool := makeTestDataPool(poolID)
 	suite.DataPoolKeeper.SetPool(suite.Ctx, pool)
@@ -494,10 +474,7 @@ func (suite *poolTestSuite) TestSellData_not_exist_pool() {
 	round := uint64(1)
 	dataHash := []byte("dataHash")
 
-	validatorAccount := suite.AccountKeeper.NewAccountWithAddress(suite.Ctx, dataVal1)
-	err := validatorAccount.SetPubKey(dataValPubKey)
-	suite.Require().NoError(err)
-	suite.AccountKeeper.SetAccount(suite.Ctx, validatorAccount)
+	suite.setDataValidatorAccount()
 
 	// Unregistered pool
 
@@ -515,10 +492,7 @@ func (suite *poolTestSuite) TestSellData_impossible_status_pool() {
 	round := uint64(1)
 	dataHash := []byte("dataHash")
 
-	validatorAccount := suite.AccountKeeper.NewAccountWithAddress(suite.Ctx, dataVal1)
-	err := validatorAccount.SetPubKey(dataValPubKey)
-	suite.Require().NoError(err)
-	suite.AccountKeeper.SetAccount(suite.Ctx, validatorAccount)
+	suite.setDataValidatorAccount()
 
 	// Already activate status
 	pool := makeTestDataPool(poolID)
@@ -542,10 +516,7 @@ func (suite *poolTestSuite) TestSellData_mismatch_certificate_and_pool_round() {
 	round := uint64(2)
 	dataHash := []byte("dataHash")
 
-	validatorAccount := suite.AccountKeeper.NewAccountWithAddress(suite.Ctx, dataVal1)
-	err := validatorAccount.SetPubKey(dataValPubKey)
-	suite.Require().NoError(err)
-	suite.AccountKeeper.SetAccount(suite.Ctx, validatorAccount)
+	suite.setDataValidatorAccount()
 
 	pool := makeTestDataPool(poolID)
 	suite.DataPoolKeeper.SetPool(suite.Ctx, pool)
@@ -586,13 +557,12 @@ func makeTestDataCertificate(marshaler codec.Marshaler, poolID, round uint64, da
 }
 
 func makeTestDataPool(poolID uint64) *types.Pool {
-	nftPrice := sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(1000000))
 	downloadPeriod := time.Hour
 	poolParams := types.PoolParams{
 		DataSchema:            []string{"https://json.schemastore.org/github-issue-forms.json"},
 		TargetNumData:         100,
 		MaxNftSupply:          10,
-		NftPrice:              &nftPrice,
+		NftPrice:              &NFTPrice,
 		TrustedDataValidators: []string{dataVal1.String()},
 		DownloadPeriod:        &downloadPeriod,
 	}
