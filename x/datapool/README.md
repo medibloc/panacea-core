@@ -4,7 +4,7 @@
 ```shell
 TX_FLAG=(--chain-id {your chainID} --gas auto --gas-prices 5umed --gas-adjustment 1.3)
 VOTER=$(panacead keys show {your voter} -a)
-panacead tx staking delegate $VALIDATOR 1000000umed --from $VOTER $TX_FLAG -y
+panacead tx staking delegate ${validator address} 1000000umed --from $VOTER $TX_FLAG -y
 ```
 
 ### Submit proposal (1): store NFT contract
@@ -34,7 +34,7 @@ panacead tx gov vote {store proposal id} yes --from $VOTER $TX_FLAG -y
 After store NFT contract passed, instantiate the contract
 
 ```shell
-INST_MSG=$(jq -n --arg name "curator" --arg symbol "CUR" --arg minter "panacea1xacc5pqnn00vf4mf8qvhe3y7k0xj4ky2hxgzvz" '{"name": $name, "symbol": $symbol, "minter": $minter}')
+INST_MSG=$(jq -n --arg name "curator" --arg symbol "CUR" --arg minter $MODULE_ADDR '{"name": $name, "symbol": $symbol, "minter": $minter}')
 
 panacead tx gov submit-proposal instantiate-contract {code id} "$INST_MSG" \
 --label "curator NFT" \

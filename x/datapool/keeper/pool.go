@@ -127,7 +127,7 @@ func (k Keeper) CreatePool(ctx sdk.Context, curator sdk.AccAddress, poolParams t
 	newPoolAddr := newPool.GetPoolAddress()
 
 	// pool address for deposit
-	poolAddress, err := types.AccPoolAddressFromBech32(newPoolAddr)
+	poolAddress, err := sdk.AccAddressFromBech32(newPoolAddr)
 	if err != nil {
 		return 0, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid address of pool %s", newPoolAddr)
 	}
@@ -196,13 +196,12 @@ func (k Keeper) CreatePool(ctx sdk.Context, curator sdk.AccAddress, poolParams t
 
 	codeID := k.GetParams(ctx).DataPoolCodeId
 
-	poolAccAddr, err := sdk.AccAddressFromBech32(newPoolAddr)
 	if err != nil {
 		return 0, sdkerrors.Wrapf(err, "invalid new pool address")
 	}
 
 	// instantiate NFT contract for minting data access NFT (set admin to module)
-	poolNFTContractAddr, _, err := k.wasmKeeper.Instantiate(ctx, codeID, moduleAddr, poolAccAddr, instantiateMsgBz, "data access NFT", nil)
+	poolNFTContractAddr, _, err := k.wasmKeeper.Instantiate(ctx, codeID, moduleAddr, poolAddress, instantiateMsgBz, "data access NFT", nil)
 	if err != nil {
 		return 0, sdkerrors.Wrapf(err, "failed to instantiate contract")
 	}
