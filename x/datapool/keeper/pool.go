@@ -372,7 +372,7 @@ func (k Keeper) BuyDataAccessNFT(ctx sdk.Context, buyer sdk.AccAddress, poolID, 
 		}
 	} else {
 		// if pool is PENDING state, add buyer to white list
-		k.addToWhiteList(ctx, poolID, buyer)
+		k.AddToWhiteList(ctx, poolID, buyer)
 	}
 
 	k.increaseIssuedNFT(ctx, pool)
@@ -386,8 +386,35 @@ func (k Keeper) increaseIssuedNFT(ctx sdk.Context, pool *types.Pool) {
 	k.SetPool(ctx, pool)
 }
 
-func (k Keeper) addToWhiteList(ctx sdk.Context, poolID uint64, addr sdk.AccAddress) {
+func (k Keeper) AddToWhiteList(ctx sdk.Context, poolID uint64, addr sdk.AccAddress) {
 	store := ctx.KVStore(k.storeKey)
-	whiteListKey := types.GetKeyWhiteList(poolID, addr)
-	store.Set(whiteListKey, addr)
+	key := types.GetKeyWhiteList(poolID, addr)
+	whiteList := &types.WhiteList{
+		PoolId:  poolID,
+		Address: addr.String(),
+	}
+
+	store.Set(key, k.cdc.MustMarshalBinaryLengthPrefixed(whiteList))
+}
+
+func (k Keeper) GetAllWhiteLists(ctx sdk.Context) ([]types.WhiteList, error) {
+	store := ctx.KVStore(k.storeKey)
+	iterator := sdk.KVStorePrefixIterator(store, types.KeyPrefixPoolWhiteList)
+	defer iterator.Close()
+
+	whiteLists := make([]types.WhiteList, 0)
+
+	for ; iterator.Valid(); iterator.Next() {
+		bz := iterator.Value()
+		var list types.WhiteList
+
+		err := k.cdc.UnmarshalBinaryLengthPrefixed(bz, &list)
+		if err != nil {
+			return []types.WhiteList{}, err
+		}
+
+		whiteLists = append(whiteLists, list)
+	}
+
+	return whiteLists, nil
 }
