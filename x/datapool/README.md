@@ -4,7 +4,7 @@
 ```shell
 TX_FLAG=(--chain-id {your chainID} --gas auto --gas-prices 5umed --gas-adjustment 1.3)
 VOTER=$(panacead keys show {your voter} -a)
-panacead tx staking delegate ${validator address} 1000000umed --from $VOTER $TX_FLAG -y
+panacead tx staking delegate {validator address} 1000000umed --from $VOTER $TX_FLAG -y
 ```
 
 ### Submit proposal (1): store NFT contract
