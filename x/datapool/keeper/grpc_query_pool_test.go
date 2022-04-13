@@ -21,6 +21,25 @@ func TestQueryPoolTest(t *testing.T) {
 	suite.Run(t, new(queryPoolTestSuite))
 }
 
+var (
+	nftContractAddr = sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address())
+)
+
+func (suite queryPoolTestSuite) TestQueryDataPoolParams() {
+	// set datapool module params
+	params := &types.Params{
+		DataPoolNftContractAddress: nftContractAddr.String(),
+		DataPoolCodeId:             2,
+		DataPoolDeposit:            sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(10000)),
+	}
+
+	suite.DataPoolKeeper.SetParams(suite.Ctx, *params)
+
+	res, err := suite.DataPoolKeeper.DataPoolParams(sdk.WrapSDKContext(suite.Ctx), &types.QueryDataPoolParamsRequest{})
+	suite.Require().NoError(err)
+	suite.Require().Equal(params, res.GetParams())
+}
+
 func (suite *queryPoolTestSuite) TestQueryDataValidator() {
 	dataValidator := types.DataValidator{
 		Address:  dataVal1.String(),

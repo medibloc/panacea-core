@@ -85,7 +85,7 @@ panacead tx datapool create-pool create_pool_sample.json --from $CURATOR $TX_FLA
 
 ### Query curator NFT
 ```shell
-CONTRACT="panacea14hj2tavq8fpesdwxxcu44rty3hh90vhu4mda6e"
+CONTRACT=$(panacead q datapool params -o json | jq -r '.data_pool_nft_contract_address')
 QUERY_TOKEN_INFO=$(jq -n --arg owner $CURATOR '{"tokens":{"owner":$owner}}')
 panacead q wasm contract-state smart $CONTRACT $QUERY_TOKEN_INFO -o json
 ```
