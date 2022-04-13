@@ -1,15 +1,8 @@
 ## Deploy and instantiate NFT smart contract
 
-### Setting voter
-```shell
-TX_FLAG=(--chain-id {your chainID} --gas auto --gas-prices 5umed --gas-adjustment 1.3)
-VOTER=$(panacead keys show {your voter} -a)
-panacead tx staking delegate {validator address} 1000000umed --from $VOTER $TX_FLAG -y
-```
-
 ### Submit proposal (1): store NFT contract
 ```shell
-PROPOSER=$(panacead keys show {your proposer} -a)
+VALIDATOR=$(panacead keys show {your validator} -a)
 
 MODULE_ADDR="panacea1xacc5pqnn00vf4mf8qvhe3y7k0xj4ky2hxgzvz"  // TODO: add GetParam query to get module address
 
@@ -19,14 +12,14 @@ panacead tx gov submit-proposal wasm-store cw721_base.wasm \
 --instantiate-only-address $MODULE_ADDR \
 --run-as $MODULE_ADDR \
 --deposit "10000000000umed" \
---from $PROPOSER $TX_FLAG -y
+--from $VALIDATOR $TX_FLAG -y
 ```
 
 The module is the only allowed address to instantiate the contract
 
 ### Vote yes
 ```shell
-panacead tx gov vote {store proposal id} yes --from $VOTER $TX_FLAG -y
+panacead tx gov vote {store proposal id} yes --from $VALIDATOR $TX_FLAG -y
 ```
 
 ### Submit proposal (2): instantiate NFT contract
@@ -43,12 +36,12 @@ panacead tx gov submit-proposal instantiate-contract {code id} "$INST_MSG" \
 --run-as MODULE_ADDR \
 --admin MODULE_ADDR \
 --deposit "100000000umed" \
---from $PROPOSER $TX_FLAG -y
+--from $VALIDATOR $TX_FLAG -y
 ```
 
 ### Vote yes
 ```shell
-panacead tx gov vote {instantiation proposal id} yes --from $VOTER $TX_FLAG -y
+panacead tx gov vote {instantiation proposal id} yes --from $VALIDATOR $TX_FLAG -y
 ```
 
 ### Submit proposal (3): change parameter of code ID & NFT contract address
@@ -75,12 +68,12 @@ param_change_sample.json (when codeID=1, contractAddress=panacea14hj2tavq8fpesdw
 ```
 
 ```shell
-panacead tx gov submit-proposal param-change param_change_sample.json --from $PROPOSER $TX_FLAG -y
+panacead tx gov submit-proposal param-change param_change_sample.json --from $VALIDATOR $TX_FLAG -y
 ```
 
 ### Vote yes
 ```shell
-panacead tx gov vote {param-change proposal id} yes --from $VOTER $TX_FLAG -y
+panacead tx gov vote {param-change proposal id} yes --from $VALIDATOR $TX_FLAG -y
 ```
 
 ### Create data pool
@@ -124,5 +117,5 @@ proposal_example.json
 ```
 
 ```shell
-panacead tx gov submit-proposal param-change param_example.json --from {proposer account} --chain-id {your chainID} --gas auto --gas-prices 5umed --gas-adjustment 1.3 -y
+panacead tx gov submit-proposal param-change param_example.json --from $VALIDATOR $TX_FLAG -y
 ```
