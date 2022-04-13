@@ -79,8 +79,6 @@ func (suite genesisTestSuite) TestDataPoolInitGenesis() {
 	whiteListFromKeeper, err := suite.DataPoolKeeper.GetAllWhiteLists(suite.Ctx)
 	suite.Require().NoError(err)
 	suite.Require().Len(whiteListFromKeeper, 2)
-	suite.Require().Equal(poolID, whiteListFromKeeper[0].GetPoolId())
-	suite.Require().Equal(buyer.String(), whiteListFromKeeper[0].GetAddress())
 }
 
 func (suite genesisTestSuite) TestDataPoolExportGenesis() {

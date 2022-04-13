@@ -418,3 +418,25 @@ func (k Keeper) GetAllWhiteLists(ctx sdk.Context) ([]types.WhiteList, error) {
 
 	return whiteLists, nil
 }
+
+func (k Keeper) GetWhiteList(ctx sdk.Context, poolID uint64) ([]types.WhiteList, error) {
+	store := ctx.KVStore(k.storeKey)
+	iterator := sdk.KVStorePrefixIterator(store, types.GetKeyPoolWhiteList(poolID))
+	defer iterator.Close()
+
+	whiteLists := make([]types.WhiteList, 0)
+
+	for ; iterator.Valid(); iterator.Next() {
+		bz := iterator.Value()
+		var list types.WhiteList
+
+		err := k.cdc.UnmarshalBinaryLengthPrefixed(bz, &list)
+		if err != nil {
+			return []types.WhiteList{}, err
+		}
+
+		whiteLists = append(whiteLists, list)
+	}
+
+	return whiteLists, nil
+}

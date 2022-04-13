@@ -46,18 +46,14 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 		panic(err)
 	}
 
-	for _, val := range dataValidators {
-		genesis.DataValidators = append(genesis.DataValidators, val)
-	}
+	genesis.DataValidators = append(genesis.DataValidators, dataValidators...)
 
 	pools, err := k.GetAllPools(ctx)
 	if err != nil {
 		panic(err)
 	}
 
-	for _, pool := range pools {
-		genesis.Pools = append(genesis.Pools, pool)
-	}
+	genesis.Pools = append(genesis.Pools, pools...)
 
 	genesis.Params = k.GetParams(ctx)
 
@@ -66,9 +62,7 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 		panic(err)
 	}
 
-	for _, list := range whiteLists {
-		genesis.WhiteList = append(genesis.WhiteList, list)
-	}
+	genesis.WhiteList = append(genesis.WhiteList, whiteLists...)
 
 	// this line is used by starport scaffolding # genesis/module/export
 
