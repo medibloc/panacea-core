@@ -4,7 +4,6 @@ import (
 	"strconv"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/medibloc/panacea-core/v2/types/assets"
 )
 
 type mint struct {
@@ -18,15 +17,23 @@ type MsgMintNFT struct {
 	mint `json:"mint"`
 }
 
-func NewMsgMintNFT(poolID uint64, owner string) *MsgMintNFT {
-	tokenID := "data_pool_" + strconv.FormatUint(poolID, 10)
-	zeroFund := sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(0))
-
+func NewMsgMintCuratorNFT(poolID uint64, owner string) *MsgMintNFT {
 	mint := &mint{
-		TokenId: tokenID,
+		TokenId: strconv.FormatUint(poolID, 10),
 		Owner:   owner,
 		Name:    "curator_nft",
-		Price:   zeroFund,
+		Price:   ZeroFund,
+	}
+
+	return &MsgMintNFT{mint: *mint}
+}
+
+func NewMsgMintDataAccessNFT(numNFT uint64, owner string) *MsgMintNFT {
+	mint := &mint{
+		TokenId: strconv.FormatUint(numNFT, 10),
+		Owner:   owner,
+		Name:    "data_access_nft",
+		Price:   ZeroFund,
 	}
 
 	return &MsgMintNFT{mint: *mint}
@@ -43,15 +50,5 @@ func NewInstantiateNFTMsg(name, symbol, minterAddress string) *InstantiateNFTMsg
 		Name:   name,
 		Symbol: symbol,
 		Minter: minterAddress,
-	}
-}
-
-type MigrateContractMsg struct {
-	Payout sdk.AccAddress `json:"payout"`
-}
-
-func NewMigrateContractMsg(payout sdk.AccAddress) *MigrateContractMsg {
-	return &MigrateContractMsg{
-		Payout: payout,
 	}
 }

@@ -129,7 +129,7 @@ func (k Keeper) CreatePool(ctx sdk.Context, curator sdk.AccAddress, poolParams t
 	// pool address for deposit
 	poolAddress, err := sdk.AccAddressFromBech32(newPoolAddr)
 	if err != nil {
-		return 0, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid address of pool %s", newPoolAddr)
+		return 0, sdkerrors.Wrapf(err, "invalid address of pool %s", newPoolAddr)
 	}
 
 	// set new account for pool
@@ -152,7 +152,7 @@ func (k Keeper) CreatePool(ctx sdk.Context, curator sdk.AccAddress, poolParams t
 
 	err = k.bankKeeper.SendCoins(ctx, curator, poolAddress, sdk.NewCoins(params.DataPoolDeposit))
 	if err != nil {
-		return 0, sdkerrors.Wrapf(types.ErrNotEnoughPoolDeposit, "The curator's balance is not enough to make a data pool")
+		return 0, sdkerrors.Wrapf(err, "the balance is not enough to make a data pool")
 	}
 
 	// mint curator NFT
@@ -166,12 +166,7 @@ func (k Keeper) CreatePool(ctx sdk.Context, curator sdk.AccAddress, poolParams t
 		return 0, sdkerrors.Wrapf(err, "invalid contract address")
 	}
 
-	zeroFund, err := sdk.ParseCoinsNormalized("0umed")
-	if err != nil {
-		return 0, sdkerrors.Wrapf(err, "error in parsing coin")
-	}
-
-	mintMsg := types.NewMsgMintNFT(newPool.GetPoolId(), curator.String())
+	mintMsg := types.NewMsgMintCuratorNFT(newPool.GetPoolId(), curator.String())
 	mintMsgBz, err := json.Marshal(mintMsg)
 	if err != nil {
 		return 0, sdkerrors.Wrapf(err, "failed to marshal mint NFT msg")
@@ -179,19 +174,18 @@ func (k Keeper) CreatePool(ctx sdk.Context, curator sdk.AccAddress, poolParams t
 
 	moduleAddr := types.GetModuleAddress()
 
-	_, err = k.wasmKeeper.Execute(ctx, nftContractAddr, moduleAddr, mintMsgBz, zeroFund)
-
+	_, err = k.wasmKeeper.Execute(ctx, nftContractAddr, moduleAddr, mintMsgBz, sdk.NewCoins(types.ZeroFund))
 	if err != nil {
 		return 0, sdkerrors.Wrapf(err, "failed to mint curator NFT")
 	}
 
-	poolName := "pool_" + strconv.FormatUint(newPool.GetPoolId(), 10)
+	poolName := "data_pool_" + strconv.FormatUint(newPool.GetPoolId(), 10)
 	symbol := "DATA" + strconv.FormatUint(newPool.GetPoolId(), 10)
 
 	instantiateMsg := types.NewInstantiateNFTMsg(poolName, symbol, newPoolAddr)
 	instantiateMsgBz, err := json.Marshal(instantiateMsg)
 	if err != nil {
-		return 0, sdkerrors.Wrapf(err, "failed to marshal instantiateMsg")
+		return 0, sdkerrors.Wrapf(err, "failed to marshal instantiate contract Msg")
 	}
 
 	codeID := k.GetParams(ctx).DataPoolCodeId
@@ -327,4 +321,73 @@ func (k Keeper) DeployAndRegisterNFTContract(ctx sdk.Context, wasmCode []byte) (
 	}
 
 	return contractAddr, nil
+}
+
+func (k Keeper) BuyDataAccessNFT(ctx sdk.Context, buyer sdk.AccAddress, poolID, round uint64, payment sdk.Coin) error {
+	pool, err := k.GetPool(ctx, poolID)
+	if err != nil {
+		return sdkerrors.Wrapf(err, "failed to get pool %d", poolID)
+	}
+
+	if pool.GetNumIssuedNfts() == pool.GetPoolParams().GetMaxNftSupply() {
+		return types.ErrNFTAllIssued
+	}
+
+	if pool.GetRound() != round {
+		return types.ErrRoundNotMatched
+	}
+
+	if !payment.Equal(pool.GetPoolParams().GetNftPrice()) {
+		return types.ErrPaymentNotMatched
+	}
+
+	poolAcc, err := sdk.AccAddressFromBech32(pool.GetPoolAddress())
+	if err != nil {
+		return sdkerrors.Wrapf(err, "invalid pool address")
+	}
+
+	err = k.bankKeeper.SendCoins(ctx, buyer, poolAcc, sdk.NewCoins(payment))
+	if err != nil {
+		return sdkerrors.Wrapf(err, "failed to pay")
+	}
+
+	//mint data access NFT when pool is activated
+	if pool.GetStatus() == types.ACTIVE {
+		contractAddr := pool.GetNftContractAddr()
+
+		contractAcc, err := sdk.AccAddressFromBech32(contractAddr)
+		if err != nil {
+			return sdkerrors.Wrapf(err, "invalid NFT contract address")
+		}
+
+		mintMsg := types.NewMsgMintDataAccessNFT(pool.GetNumIssuedNfts()+1, buyer.String())
+		mintMsgBz, err := json.Marshal(mintMsg)
+		if err != nil {
+			return sdkerrors.Wrapf(err, "failed to marshal mint NFT Msg")
+		}
+
+		_, err = k.wasmKeeper.Execute(ctx, contractAcc, poolAcc, mintMsgBz, sdk.NewCoins(types.ZeroFund))
+		if err != nil {
+			return sdkerrors.Wrapf(err, "failed to mint NFT")
+		}
+	} else {
+		// if pool is PENDING state, add buyer to white list
+		k.addToWhiteList(ctx, poolID, buyer)
+	}
+
+	k.increaseIssuedNFT(ctx, pool)
+
+	return nil
+}
+
+func (k Keeper) increaseIssuedNFT(ctx sdk.Context, pool *types.Pool) {
+	pool.NumIssuedNfts += 1
+
+	k.SetPool(ctx, pool)
+}
+
+func (k Keeper) addToWhiteList(ctx sdk.Context, poolID uint64, addr sdk.AccAddress) {
+	store := ctx.KVStore(k.storeKey)
+	whiteListKey := types.GetKeyWhiteList(poolID, addr)
+	store.Set(whiteListKey, addr)
 }

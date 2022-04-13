@@ -61,7 +61,19 @@ func (m msgServer) SellData(goCtx context.Context, msg *types.MsgSellData) (*typ
 }
 
 func (m msgServer) BuyDataAccessNFT(goCtx context.Context, msg *types.MsgBuyDataAccessNFT) (*types.MsgBuyDataAccessNFTResponse, error) {
-	return &types.MsgBuyDataAccessNFTResponse{}, nil
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	buyer, err := sdk.AccAddressFromBech32(msg.Buyer)
+	if err != nil {
+		return nil, err
+	}
+
+	err = m.Keeper.BuyDataAccessNFT(ctx, buyer, msg.PoolId, msg.Round, *msg.Payment)
+	if err != nil {
+		return nil, err
+	}
+
+	return &types.MsgBuyDataAccessNFTResponse{PoolId: msg.PoolId, Round: msg.Round}, nil
 }
 
 func (m msgServer) RedeemDataAccessNFT(goCtx context.Context, msg *types.MsgRedeemDataAccessNFT) (*types.MsgRedeemDataAccessNFTResponse, error) {

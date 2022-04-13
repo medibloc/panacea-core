@@ -208,6 +208,11 @@ func (msg *MsgBuyDataAccessNFT) ValidateBasic() error {
 	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid buyer address (%s)", err)
 	}
+
+	if !msg.Payment.IsValid() {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidCoins, "invalid payment")
+	}
+
 	return nil
 }
 

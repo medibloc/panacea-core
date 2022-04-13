@@ -30,6 +30,9 @@ var (
 
 	// KeyPrefixPools defines key to store Pools
 	KeyPrefixPools = []byte{0x03}
+
+	// KeyPrefixPoolWhiteList defines key to store white list of data access NFT
+	KeyPrefixPoolWhiteList = []byte{0x04}
 )
 
 func GetKeyPrefixDataValidator(dataValidatorAddr sdk.AccAddress) []byte {
@@ -38,4 +41,13 @@ func GetKeyPrefixDataValidator(dataValidatorAddr sdk.AccAddress) []byte {
 
 func GetKeyPrefixPools(poolID uint64) []byte {
 	return append(KeyPrefixPools, sdk.Uint64ToBigEndian(poolID)...)
+}
+
+// GetKeyPoolWhiteList is to get prefix key of white list of the pool
+func GetKeyPoolWhiteList(poolID uint64) []byte {
+	return append(KeyPrefixPoolWhiteList, sdk.Uint64ToBigEndian(poolID)...)
+}
+
+func GetKeyWhiteList(poolID uint64, addr sdk.AccAddress) []byte {
+	return append(GetKeyPoolWhiteList(poolID), addr.Bytes()...)
 }
