@@ -118,88 +118,6 @@ func (m *QueryPoolResponse) GetPool() *Pool {
 	return nil
 }
 
-// QueryNFTContractRequest is the request type for the Query/NFTContract RPC method.
-type QueryNFTContractRequest struct {
-}
-
-func (m *QueryNFTContractRequest) Reset()         { *m = QueryNFTContractRequest{} }
-func (m *QueryNFTContractRequest) String() string { return proto.CompactTextString(m) }
-func (*QueryNFTContractRequest) ProtoMessage()    {}
-func (*QueryNFTContractRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_f3fda93d2b4f4508, []int{2}
-}
-func (m *QueryNFTContractRequest) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *QueryNFTContractRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_QueryNFTContractRequest.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *QueryNFTContractRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_QueryNFTContractRequest.Merge(m, src)
-}
-func (m *QueryNFTContractRequest) XXX_Size() int {
-	return m.Size()
-}
-func (m *QueryNFTContractRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_QueryNFTContractRequest.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_QueryNFTContractRequest proto.InternalMessageInfo
-
-// QueryNFTContractResponse is the response type for the Query/NFTContract RPC method.
-type QueryNFTContractResponse struct {
-	NftContractAddress string `protobuf:"bytes,1,opt,name=nft_contract_address,json=nftContractAddress,proto3" json:"nft_contract_address,omitempty"`
-}
-
-func (m *QueryNFTContractResponse) Reset()         { *m = QueryNFTContractResponse{} }
-func (m *QueryNFTContractResponse) String() string { return proto.CompactTextString(m) }
-func (*QueryNFTContractResponse) ProtoMessage()    {}
-func (*QueryNFTContractResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_f3fda93d2b4f4508, []int{3}
-}
-func (m *QueryNFTContractResponse) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *QueryNFTContractResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_QueryNFTContractResponse.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *QueryNFTContractResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_QueryNFTContractResponse.Merge(m, src)
-}
-func (m *QueryNFTContractResponse) XXX_Size() int {
-	return m.Size()
-}
-func (m *QueryNFTContractResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_QueryNFTContractResponse.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_QueryNFTContractResponse proto.InternalMessageInfo
-
-func (m *QueryNFTContractResponse) GetNftContractAddress() string {
-	if m != nil {
-		return m.NftContractAddress
-	}
-	return ""
-}
-
 // QueryDataValidatorRequest is the request type for the Query/DataValidator RPC method.
 type QueryDataValidatorRequest struct {
 	Address string `protobuf:"bytes,1,opt,name=address,proto3" json:"address,omitempty"`
@@ -209,7 +127,7 @@ func (m *QueryDataValidatorRequest) Reset()         { *m = QueryDataValidatorReq
 func (m *QueryDataValidatorRequest) String() string { return proto.CompactTextString(m) }
 func (*QueryDataValidatorRequest) ProtoMessage()    {}
 func (*QueryDataValidatorRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_f3fda93d2b4f4508, []int{4}
+	return fileDescriptor_f3fda93d2b4f4508, []int{2}
 }
 func (m *QueryDataValidatorRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -254,7 +172,7 @@ func (m *QueryDataValidatorResponse) Reset()         { *m = QueryDataValidatorRe
 func (m *QueryDataValidatorResponse) String() string { return proto.CompactTextString(m) }
 func (*QueryDataValidatorResponse) ProtoMessage()    {}
 func (*QueryDataValidatorResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_f3fda93d2b4f4508, []int{5}
+	return fileDescriptor_f3fda93d2b4f4508, []int{3}
 }
 func (m *QueryDataValidatorResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -290,48 +208,130 @@ func (m *QueryDataValidatorResponse) GetDataValidator() *DataValidator {
 	return nil
 }
 
+// QueryDataPoolParamsRequest is the request type for the Query/DataPoolParamsRequest RPC method.
+type QueryDataPoolParamsRequest struct {
+}
+
+func (m *QueryDataPoolParamsRequest) Reset()         { *m = QueryDataPoolParamsRequest{} }
+func (m *QueryDataPoolParamsRequest) String() string { return proto.CompactTextString(m) }
+func (*QueryDataPoolParamsRequest) ProtoMessage()    {}
+func (*QueryDataPoolParamsRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_f3fda93d2b4f4508, []int{4}
+}
+func (m *QueryDataPoolParamsRequest) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *QueryDataPoolParamsRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_QueryDataPoolParamsRequest.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *QueryDataPoolParamsRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryDataPoolParamsRequest.Merge(m, src)
+}
+func (m *QueryDataPoolParamsRequest) XXX_Size() int {
+	return m.Size()
+}
+func (m *QueryDataPoolParamsRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryDataPoolParamsRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_QueryDataPoolParamsRequest proto.InternalMessageInfo
+
+// QueryDataPoolParamsResponse is the response type for the Query/DataPoolParamsResponse RPC method.
+type QueryDataPoolParamsResponse struct {
+	Params *Params `protobuf:"bytes,1,opt,name=params,proto3" json:"params,omitempty"`
+}
+
+func (m *QueryDataPoolParamsResponse) Reset()         { *m = QueryDataPoolParamsResponse{} }
+func (m *QueryDataPoolParamsResponse) String() string { return proto.CompactTextString(m) }
+func (*QueryDataPoolParamsResponse) ProtoMessage()    {}
+func (*QueryDataPoolParamsResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_f3fda93d2b4f4508, []int{5}
+}
+func (m *QueryDataPoolParamsResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *QueryDataPoolParamsResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_QueryDataPoolParamsResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *QueryDataPoolParamsResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryDataPoolParamsResponse.Merge(m, src)
+}
+func (m *QueryDataPoolParamsResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *QueryDataPoolParamsResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryDataPoolParamsResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_QueryDataPoolParamsResponse proto.InternalMessageInfo
+
+func (m *QueryDataPoolParamsResponse) GetParams() *Params {
+	if m != nil {
+		return m.Params
+	}
+	return nil
+}
+
 func init() {
 	proto.RegisterType((*QueryPoolRequest)(nil), "panacea.datapool.v2.QueryPoolRequest")
 	proto.RegisterType((*QueryPoolResponse)(nil), "panacea.datapool.v2.QueryPoolResponse")
-	proto.RegisterType((*QueryNFTContractRequest)(nil), "panacea.datapool.v2.QueryNFTContractRequest")
-	proto.RegisterType((*QueryNFTContractResponse)(nil), "panacea.datapool.v2.QueryNFTContractResponse")
 	proto.RegisterType((*QueryDataValidatorRequest)(nil), "panacea.datapool.v2.QueryDataValidatorRequest")
 	proto.RegisterType((*QueryDataValidatorResponse)(nil), "panacea.datapool.v2.QueryDataValidatorResponse")
+	proto.RegisterType((*QueryDataPoolParamsRequest)(nil), "panacea.datapool.v2.QueryDataPoolParamsRequest")
+	proto.RegisterType((*QueryDataPoolParamsResponse)(nil), "panacea.datapool.v2.QueryDataPoolParamsResponse")
 }
 
 func init() { proto.RegisterFile("panacea/datapool/v2/query.proto", fileDescriptor_f3fda93d2b4f4508) }
 
 var fileDescriptor_f3fda93d2b4f4508 = []byte{
-	// 462 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x53, 0xd1, 0x6a, 0x13, 0x41,
-	0x14, 0xcd, 0x6a, 0x6c, 0xf1, 0x96, 0x8a, 0x8e, 0x42, 0x93, 0x45, 0x56, 0x9d, 0xda, 0xa2, 0xb4,
-	0xd9, 0xd1, 0x88, 0x1f, 0x60, 0x15, 0xa1, 0x28, 0xa2, 0x41, 0x7c, 0xf0, 0x25, 0x4c, 0x76, 0xa6,
-	0x71, 0x61, 0x3b, 0x77, 0xbb, 0x33, 0x09, 0x16, 0xf1, 0x45, 0x7f, 0x40, 0x10, 0x1f, 0xfd, 0x1c,
-	0xc1, 0xc7, 0x82, 0x2f, 0x3e, 0x4a, 0xe2, 0x87, 0xc8, 0x4e, 0x66, 0x31, 0x6b, 0x27, 0x98, 0xc7,
-	0xbb, 0xf7, 0xdc, 0x73, 0xce, 0xbd, 0x67, 0x16, 0xae, 0xe5, 0x5c, 0xf1, 0x44, 0x72, 0x26, 0xb8,
-	0xe1, 0x39, 0x62, 0xc6, 0xc6, 0x5d, 0x76, 0x34, 0x92, 0xc5, 0x71, 0x9c, 0x17, 0x68, 0x90, 0x5c,
-	0x76, 0x80, 0xb8, 0x02, 0xc4, 0xe3, 0x6e, 0x78, 0x75, 0x88, 0x38, 0xcc, 0x24, 0xe3, 0x79, 0xca,
-	0xb8, 0x52, 0x68, 0xb8, 0x49, 0x51, 0xe9, 0xd9, 0x48, 0x18, 0xf9, 0x38, 0xed, 0xa8, 0xed, 0xd3,
-	0x1d, 0xb8, 0xf8, 0xa2, 0x54, 0x78, 0x8e, 0x98, 0xf5, 0xe4, 0xd1, 0x48, 0x6a, 0x43, 0x36, 0x60,
-	0xb5, 0x44, 0xf4, 0x53, 0xd1, 0x0a, 0xae, 0x07, 0xb7, 0x9a, 0xbd, 0x95, 0xb2, 0xdc, 0x17, 0x74,
-	0x0f, 0x2e, 0xcd, 0x81, 0x75, 0x8e, 0x4a, 0x4b, 0xd2, 0x81, 0x66, 0xd9, 0xb6, 0xd0, 0xb5, 0x6e,
-	0x3b, 0xf6, 0x78, 0x8c, 0xed, 0x80, 0x85, 0xd1, 0x36, 0x6c, 0x58, 0x8e, 0x67, 0x8f, 0x5f, 0x3e,
-	0x44, 0x65, 0x0a, 0x9e, 0x18, 0xa7, 0x4b, 0x9f, 0x42, 0xeb, 0x74, 0xcb, 0xa9, 0xdc, 0x81, 0x2b,
-	0xea, 0xc0, 0xf4, 0x13, 0xf7, 0xbd, 0xcf, 0x85, 0x28, 0xa4, 0xd6, 0x56, 0xf5, 0x7c, 0x8f, 0xa8,
-	0x03, 0x53, 0x8d, 0x3c, 0x98, 0x75, 0xe8, 0x7d, 0x68, 0x5b, 0xb6, 0x47, 0xdc, 0xf0, 0x57, 0x3c,
-	0x4b, 0x05, 0x37, 0x58, 0x54, 0x2b, 0xb6, 0x60, 0xb5, 0xce, 0x50, 0x95, 0x74, 0x08, 0xa1, 0x6f,
-	0xcc, 0xd9, 0xd8, 0x87, 0x0b, 0xe5, 0x5e, 0xfd, 0x71, 0xd5, 0x71, 0x6b, 0x53, 0xef, 0xda, 0x75,
-	0x8e, 0x75, 0x31, 0x5f, 0x76, 0xbf, 0x9d, 0x85, 0x73, 0x56, 0x89, 0x7c, 0x0c, 0xa0, 0x59, 0x5e,
-	0x88, 0x6c, 0x79, 0x59, 0xfe, 0xcd, 0x27, 0xdc, 0xfe, 0x1f, 0x6c, 0x66, 0x96, 0xee, 0x7e, 0xf8,
-	0xf1, 0xfb, 0xf3, 0x99, 0x6d, 0x72, 0x93, 0x2d, 0x7a, 0x04, 0x9a, 0xbd, 0x73, 0x49, 0xbf, 0x27,
-	0x5f, 0x02, 0x58, 0x9b, 0xbb, 0x3c, 0xd9, 0x5d, 0xac, 0x72, 0x3a, 0xbb, 0xb0, 0xb3, 0x24, 0xda,
-	0x59, 0xbb, 0x6d, 0xad, 0x6d, 0x92, 0x1b, 0x5e, 0x6b, 0xf3, 0x49, 0x93, 0xaf, 0x01, 0xac, 0xd7,
-	0x0e, 0x49, 0xe2, 0xc5, 0x5a, 0xbe, 0xb0, 0x43, 0xb6, 0x34, 0xde, 0xb9, 0xdb, 0xb1, 0xee, 0xb6,
-	0xc8, 0xa6, 0xd7, 0x5d, 0xfd, 0x01, 0xec, 0x3d, 0xf9, 0x3e, 0x89, 0x82, 0x93, 0x49, 0x14, 0xfc,
-	0x9a, 0x44, 0xc1, 0xa7, 0x69, 0xd4, 0x38, 0x99, 0x46, 0x8d, 0x9f, 0xd3, 0xa8, 0xf1, 0xfa, 0xee,
-	0x30, 0x35, 0x6f, 0x46, 0x83, 0x38, 0xc1, 0x43, 0x76, 0x28, 0x45, 0x3a, 0xc8, 0x30, 0xa9, 0x18,
-	0x3b, 0x09, 0x16, 0x92, 0xbd, 0xfd, 0x4b, 0x6c, 0x8e, 0x73, 0xa9, 0x07, 0x2b, 0xf6, 0xaf, 0xbc,
-	0xf7, 0x27, 0x00, 0x00, 0xff, 0xff, 0x89, 0x8c, 0x22, 0xf3, 0x0b, 0x04, 0x00, 0x00,
+	// 456 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x93, 0x31, 0x8f, 0xd3, 0x30,
+	0x14, 0xc7, 0x6b, 0x28, 0x3d, 0x61, 0x74, 0x27, 0x30, 0x03, 0x77, 0xe9, 0x11, 0xc0, 0xc7, 0x9d,
+	0x90, 0x4a, 0x63, 0x48, 0xc5, 0x17, 0xa8, 0x58, 0x2a, 0x96, 0x92, 0x81, 0x81, 0xa5, 0x72, 0x63,
+	0x2b, 0x44, 0x4a, 0xe3, 0x34, 0x76, 0x2b, 0x2a, 0xc4, 0x02, 0x5f, 0x00, 0x89, 0x85, 0x85, 0xef,
+	0xd3, 0xb1, 0x12, 0x0b, 0x23, 0x6a, 0xf9, 0x20, 0x28, 0x8e, 0x23, 0x1a, 0x70, 0xd5, 0x8e, 0x2f,
+	0xef, 0xff, 0xff, 0xbf, 0x5f, 0xde, 0x4b, 0xe0, 0x83, 0x8c, 0xa6, 0x34, 0xe4, 0x94, 0x30, 0xaa,
+	0x68, 0x26, 0x44, 0x42, 0xe6, 0x3e, 0x99, 0xce, 0x78, 0xbe, 0xf0, 0xb2, 0x5c, 0x28, 0x81, 0xee,
+	0x1a, 0x81, 0x57, 0x09, 0xbc, 0xb9, 0xef, 0x9c, 0x47, 0x42, 0x44, 0x09, 0x27, 0x34, 0x8b, 0x09,
+	0x4d, 0x53, 0xa1, 0xa8, 0x8a, 0x45, 0x2a, 0x4b, 0x8b, 0xe3, 0xda, 0x32, 0xb5, 0xb5, 0xec, 0x3f,
+	0xb2, 0xf5, 0x23, 0x9e, 0x72, 0x19, 0x9b, 0x08, 0xdc, 0x81, 0xb7, 0x5f, 0x17, 0x10, 0x43, 0x21,
+	0x92, 0x80, 0x4f, 0x67, 0x5c, 0x2a, 0x74, 0x0f, 0x1e, 0x15, 0xe2, 0x51, 0xcc, 0x4e, 0xc1, 0x43,
+	0xf0, 0xa4, 0x19, 0xb4, 0x8a, 0x72, 0xc0, 0x70, 0x1f, 0xde, 0xd9, 0x12, 0xcb, 0x4c, 0xa4, 0x92,
+	0xa3, 0x2e, 0x6c, 0x16, 0x6d, 0x2d, 0xbd, 0xe5, 0x9f, 0x79, 0x96, 0xd7, 0xf0, 0xb4, 0x41, 0xcb,
+	0xf0, 0x0b, 0x78, 0xa6, 0x33, 0x5e, 0x52, 0x45, 0xdf, 0xd0, 0x24, 0x66, 0x54, 0x89, 0xbc, 0x9a,
+	0x7c, 0x0a, 0x8f, 0x28, 0x63, 0x39, 0x97, 0x52, 0xc7, 0xdd, 0x0c, 0xaa, 0x12, 0x47, 0xd0, 0xb1,
+	0xd9, 0x0c, 0xc3, 0x00, 0x9e, 0x14, 0xe3, 0x46, 0xf3, 0xaa, 0x63, 0x68, 0xb0, 0x95, 0xa6, 0x9e,
+	0x71, 0xcc, 0xb6, 0x4b, 0x7c, 0xbe, 0x35, 0xa8, 0xc0, 0x1e, 0xd2, 0x9c, 0x4e, 0xa4, 0x01, 0xc4,
+	0x01, 0x6c, 0x5b, 0xbb, 0x86, 0xa3, 0x07, 0x5b, 0x99, 0x7e, 0x62, 0xe6, 0xb7, 0xed, 0xdb, 0x28,
+	0x4d, 0x46, 0xea, 0x2f, 0xaf, 0xc3, 0x1b, 0x3a, 0x14, 0x7d, 0x06, 0xb0, 0x59, 0xa4, 0xa2, 0x4b,
+	0xab, 0xef, 0xdf, 0x43, 0x39, 0x57, 0xfb, 0x64, 0x25, 0x16, 0x7e, 0xfa, 0xe9, 0xc7, 0xef, 0xaf,
+	0xd7, 0xae, 0xd0, 0x63, 0xb2, 0xeb, 0x83, 0x91, 0xe4, 0x83, 0x39, 0xf9, 0x47, 0xf4, 0x1d, 0xc0,
+	0xe3, 0xda, 0x8a, 0x90, 0xb7, 0x7b, 0x8e, 0xed, 0x8c, 0x0e, 0x39, 0x58, 0x6f, 0x00, 0x3b, 0x1a,
+	0xf0, 0x12, 0x5d, 0x58, 0x01, 0xeb, 0xa7, 0x45, 0xdf, 0x00, 0x3c, 0xa9, 0xef, 0x1f, 0xed, 0x19,
+	0xf8, 0xdf, 0x1d, 0x9d, 0x67, 0x87, 0x1b, 0x0c, 0xe2, 0x85, 0x46, 0xbc, 0x8f, 0xda, 0xf6, 0x1d,
+	0x6a, 0x71, 0xff, 0xd5, 0x72, 0xed, 0x82, 0xd5, 0xda, 0x05, 0xbf, 0xd6, 0x2e, 0xf8, 0xb2, 0x71,
+	0x1b, 0xab, 0x8d, 0xdb, 0xf8, 0xb9, 0x71, 0x1b, 0x6f, 0x9f, 0x47, 0xb1, 0x7a, 0x37, 0x1b, 0x7b,
+	0xa1, 0x98, 0x90, 0x09, 0x67, 0xf1, 0x38, 0x11, 0x61, 0x95, 0xd4, 0x0d, 0x45, 0xce, 0xc9, 0xfb,
+	0xbf, 0x81, 0x6a, 0x91, 0x71, 0x39, 0x6e, 0xe9, 0x3f, 0xb4, 0xf7, 0x27, 0x00, 0x00, 0xff, 0xff,
+	0xc3, 0x89, 0x7c, 0xf9, 0x3a, 0x04, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -348,10 +348,10 @@ const _ = grpc.SupportPackageIsVersion4
 type QueryClient interface {
 	// Pool returns a Pool.
 	Pool(ctx context.Context, in *QueryPoolRequest, opts ...grpc.CallOption) (*QueryPoolResponse, error)
-	// NFTContract returns a NFT contract address registered to x/datapool module
-	NFTContract(ctx context.Context, in *QueryNFTContractRequest, opts ...grpc.CallOption) (*QueryNFTContractResponse, error)
 	// DataValidator returns a DataValidator.
 	DataValidator(ctx context.Context, in *QueryDataValidatorRequest, opts ...grpc.CallOption) (*QueryDataValidatorResponse, error)
+	// DataPoolParams returns params of x/datapool module
+	DataPoolParams(ctx context.Context, in *QueryDataPoolParamsRequest, opts ...grpc.CallOption) (*QueryDataPoolParamsResponse, error)
 }
 
 type queryClient struct {
@@ -371,18 +371,18 @@ func (c *queryClient) Pool(ctx context.Context, in *QueryPoolRequest, opts ...gr
 	return out, nil
 }
 
-func (c *queryClient) NFTContract(ctx context.Context, in *QueryNFTContractRequest, opts ...grpc.CallOption) (*QueryNFTContractResponse, error) {
-	out := new(QueryNFTContractResponse)
-	err := c.cc.Invoke(ctx, "/panacea.datapool.v2.Query/NFTContract", in, out, opts...)
+func (c *queryClient) DataValidator(ctx context.Context, in *QueryDataValidatorRequest, opts ...grpc.CallOption) (*QueryDataValidatorResponse, error) {
+	out := new(QueryDataValidatorResponse)
+	err := c.cc.Invoke(ctx, "/panacea.datapool.v2.Query/DataValidator", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *queryClient) DataValidator(ctx context.Context, in *QueryDataValidatorRequest, opts ...grpc.CallOption) (*QueryDataValidatorResponse, error) {
-	out := new(QueryDataValidatorResponse)
-	err := c.cc.Invoke(ctx, "/panacea.datapool.v2.Query/DataValidator", in, out, opts...)
+func (c *queryClient) DataPoolParams(ctx context.Context, in *QueryDataPoolParamsRequest, opts ...grpc.CallOption) (*QueryDataPoolParamsResponse, error) {
+	out := new(QueryDataPoolParamsResponse)
+	err := c.cc.Invoke(ctx, "/panacea.datapool.v2.Query/DataPoolParams", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -393,10 +393,10 @@ func (c *queryClient) DataValidator(ctx context.Context, in *QueryDataValidatorR
 type QueryServer interface {
 	// Pool returns a Pool.
 	Pool(context.Context, *QueryPoolRequest) (*QueryPoolResponse, error)
-	// NFTContract returns a NFT contract address registered to x/datapool module
-	NFTContract(context.Context, *QueryNFTContractRequest) (*QueryNFTContractResponse, error)
 	// DataValidator returns a DataValidator.
 	DataValidator(context.Context, *QueryDataValidatorRequest) (*QueryDataValidatorResponse, error)
+	// DataPoolParams returns params of x/datapool module
+	DataPoolParams(context.Context, *QueryDataPoolParamsRequest) (*QueryDataPoolParamsResponse, error)
 }
 
 // UnimplementedQueryServer can be embedded to have forward compatible implementations.
@@ -406,11 +406,11 @@ type UnimplementedQueryServer struct {
 func (*UnimplementedQueryServer) Pool(ctx context.Context, req *QueryPoolRequest) (*QueryPoolResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Pool not implemented")
 }
-func (*UnimplementedQueryServer) NFTContract(ctx context.Context, req *QueryNFTContractRequest) (*QueryNFTContractResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method NFTContract not implemented")
-}
 func (*UnimplementedQueryServer) DataValidator(ctx context.Context, req *QueryDataValidatorRequest) (*QueryDataValidatorResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DataValidator not implemented")
+}
+func (*UnimplementedQueryServer) DataPoolParams(ctx context.Context, req *QueryDataPoolParamsRequest) (*QueryDataPoolParamsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DataPoolParams not implemented")
 }
 
 func RegisterQueryServer(s grpc1.Server, srv QueryServer) {
@@ -435,24 +435,6 @@ func _Query_Pool_Handler(srv interface{}, ctx context.Context, dec func(interfac
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Query_NFTContract_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(QueryNFTContractRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(QueryServer).NFTContract(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/panacea.datapool.v2.Query/NFTContract",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(QueryServer).NFTContract(ctx, req.(*QueryNFTContractRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 func _Query_DataValidator_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(QueryDataValidatorRequest)
 	if err := dec(in); err != nil {
@@ -471,6 +453,24 @@ func _Query_DataValidator_Handler(srv interface{}, ctx context.Context, dec func
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Query_DataPoolParams_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryDataPoolParamsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(QueryServer).DataPoolParams(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/panacea.datapool.v2.Query/DataPoolParams",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(QueryServer).DataPoolParams(ctx, req.(*QueryDataPoolParamsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _Query_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "panacea.datapool.v2.Query",
 	HandlerType: (*QueryServer)(nil),
@@ -480,12 +480,12 @@ var _Query_serviceDesc = grpc.ServiceDesc{
 			Handler:    _Query_Pool_Handler,
 		},
 		{
-			MethodName: "NFTContract",
-			Handler:    _Query_NFTContract_Handler,
-		},
-		{
 			MethodName: "DataValidator",
 			Handler:    _Query_DataValidator_Handler,
+		},
+		{
+			MethodName: "DataPoolParams",
+			Handler:    _Query_DataPoolParams_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
@@ -549,59 +549,6 @@ func (m *QueryPoolResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 			i -= size
 			i = encodeVarintQuery(dAtA, i, uint64(size))
 		}
-		i--
-		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *QueryNFTContractRequest) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *QueryNFTContractRequest) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *QueryNFTContractRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	return len(dAtA) - i, nil
-}
-
-func (m *QueryNFTContractResponse) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *QueryNFTContractResponse) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *QueryNFTContractResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if len(m.NftContractAddress) > 0 {
-		i -= len(m.NftContractAddress)
-		copy(dAtA[i:], m.NftContractAddress)
-		i = encodeVarintQuery(dAtA, i, uint64(len(m.NftContractAddress)))
 		i--
 		dAtA[i] = 0xa
 	}
@@ -673,6 +620,64 @@ func (m *QueryDataValidatorResponse) MarshalToSizedBuffer(dAtA []byte) (int, err
 	return len(dAtA) - i, nil
 }
 
+func (m *QueryDataPoolParamsRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *QueryDataPoolParamsRequest) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *QueryDataPoolParamsRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	return len(dAtA) - i, nil
+}
+
+func (m *QueryDataPoolParamsResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *QueryDataPoolParamsResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *QueryDataPoolParamsResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.Params != nil {
+		{
+			size, err := m.Params.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintQuery(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
 func encodeVarintQuery(dAtA []byte, offset int, v uint64) int {
 	offset -= sovQuery(v)
 	base := offset
@@ -709,28 +714,6 @@ func (m *QueryPoolResponse) Size() (n int) {
 	return n
 }
 
-func (m *QueryNFTContractRequest) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	return n
-}
-
-func (m *QueryNFTContractResponse) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	l = len(m.NftContractAddress)
-	if l > 0 {
-		n += 1 + l + sovQuery(uint64(l))
-	}
-	return n
-}
-
 func (m *QueryDataValidatorRequest) Size() (n int) {
 	if m == nil {
 		return 0
@@ -752,6 +735,28 @@ func (m *QueryDataValidatorResponse) Size() (n int) {
 	_ = l
 	if m.DataValidator != nil {
 		l = m.DataValidator.Size()
+		n += 1 + l + sovQuery(uint64(l))
+	}
+	return n
+}
+
+func (m *QueryDataPoolParamsRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	return n
+}
+
+func (m *QueryDataPoolParamsResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.Params != nil {
+		l = m.Params.Size()
 		n += 1 + l + sovQuery(uint64(l))
 	}
 	return n
@@ -918,138 +923,6 @@ func (m *QueryPoolResponse) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *QueryNFTContractRequest) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowQuery
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: QueryNFTContractRequest: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: QueryNFTContractRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		default:
-			iNdEx = preIndex
-			skippy, err := skipQuery(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthQuery
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *QueryNFTContractResponse) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowQuery
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: QueryNFTContractResponse: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: QueryNFTContractResponse: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field NftContractAddress", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowQuery
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthQuery
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthQuery
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.NftContractAddress = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipQuery(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthQuery
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
 func (m *QueryDataValidatorRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -1194,6 +1067,142 @@ func (m *QueryDataValidatorResponse) Unmarshal(dAtA []byte) error {
 				m.DataValidator = &DataValidator{}
 			}
 			if err := m.DataValidator.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipQuery(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *QueryDataPoolParamsRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowQuery
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: QueryDataPoolParamsRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: QueryDataPoolParamsRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		default:
+			iNdEx = preIndex
+			skippy, err := skipQuery(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *QueryDataPoolParamsResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowQuery
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: QueryDataPoolParamsResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: QueryDataPoolParamsResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Params", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Params == nil {
+				m.Params = &Params{}
+			}
+			if err := m.Params.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex

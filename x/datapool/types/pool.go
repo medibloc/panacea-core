@@ -1,15 +1,11 @@
 package types
 
 import (
-	"fmt"
-	"strings"
+	"strconv"
 
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/medibloc/panacea-core/v2/x/datadeal/v044_temp/address"
 )
 
 const (
@@ -33,45 +29,8 @@ func NewPool(poolID uint64, curator sdk.AccAddress, poolParams PoolParams) *Pool
 }
 
 func NewPoolAddress(poolID uint64) sdk.AccAddress {
-	key := append([]byte("pool"), sdk.Uint64ToBigEndian(poolID)...)
-	return address.Module(ModuleName, key)
-}
-
-func AccPoolAddressFromBech32(address string) (sdk.AccAddress, error) {
-	if len(strings.TrimSpace(address)) == 0 {
-		return sdk.AccAddress{}, fmt.Errorf("empty address string is not allowed")
-	}
-
-	bech32PrefixAccAddr := sdk.GetConfig().GetBech32AccountAddrPrefix()
-
-	bz, err := sdk.GetFromBech32(address, bech32PrefixAccAddr)
-	if err != nil {
-		return nil, err
-	}
-
-	err = verifyPoolAddressFormat(bz)
-	if err != nil {
-		return nil, err
-	}
-
-	return sdk.AccAddress(bz), nil
-}
-
-func verifyPoolAddressFormat(bz []byte) error {
-	if len(bz) == 0 {
-		return sdkerrors.Wrap(sdkerrors.ErrUnknownAddress, "address cannot be empty")
-	}
-
-	if len(bz) > address.MaxAddrLen {
-		return sdkerrors.Wrapf(sdkerrors.ErrUnknownAddress, "address max length is %d, got %d", address.MaxAddrLen, len(bz))
-	}
-
-	verifier := sdk.GetConfig().GetAddressVerifier()
-	if verifier != nil {
-		return verifier(bz)
-	}
-
-	return nil
+	poolKey := "pool" + strconv.FormatUint(poolID, 10)
+	return authtypes.NewModuleAddress(poolKey)
 }
 
 func GetModuleAddress() sdk.AccAddress {

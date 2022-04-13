@@ -12,10 +12,6 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 	k.SetParams(ctx, genState.Params)
 	k.SetPoolNumber(ctx, genState.NextPoolNumber)
 
-	if genState.NftContractAddress != nil {
-		k.SetNFTContractAddress(ctx, genState.NftContractAddress)
-	}
-
 	for _, dataValidator := range genState.DataValidators {
 		err := k.SetDataValidator(ctx, *dataValidator)
 		if err != nil {
@@ -57,12 +53,6 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 
 	genesis.Params = k.GetParams(ctx)
 
-	address, err := k.GetNFTContractAddress(ctx)
-	if err != nil {
-		panic(err)
-	}
-
-	genesis.NftContractAddress = address
 	// this line is used by starport scaffolding # genesis/module/export
 
 	// this line is used by starport scaffolding # ibc/genesis/export

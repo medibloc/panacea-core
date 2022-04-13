@@ -27,21 +27,6 @@ func (k Keeper) Pool(goCtx context.Context, req *types.QueryPoolRequest) (*types
 	}, nil
 }
 
-func (k Keeper) NFTContract(goCtx context.Context, req *types.QueryNFTContractRequest) (*types.QueryNFTContractResponse, error) {
-	if req == nil {
-		return nil, status.Error(codes.InvalidArgument, "invalid request")
-	}
-
-	ctx := sdk.UnwrapSDKContext(goCtx)
-
-	contract, err := k.GetNFTContractAddress(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	return &types.QueryNFTContractResponse{NftContractAddress: contract.String()}, nil
-}
-
 func (k Keeper) DataValidator(goCtx context.Context, req *types.QueryDataValidatorRequest) (*types.QueryDataValidatorResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
@@ -60,4 +45,16 @@ func (k Keeper) DataValidator(goCtx context.Context, req *types.QueryDataValidat
 	}
 
 	return &types.QueryDataValidatorResponse{DataValidator: &dataValidator}, nil
+}
+
+func (k Keeper) DataPoolParams(goCtx context.Context, req *types.QueryDataPoolParamsRequest) (*types.QueryDataPoolParamsResponse, error) {
+	if req == nil {
+		return nil, status.Error(codes.InvalidArgument, "invalid request")
+	}
+
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	params := k.GetParams(ctx)
+
+	return &types.QueryDataPoolParamsResponse{Params: &params}, nil
 }

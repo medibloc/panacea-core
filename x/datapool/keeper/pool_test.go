@@ -44,8 +44,17 @@ func (suite poolTestSuite) setupNFTContract() {
 	wasmCode, err := ioutil.ReadFile("./testdata/cw721_test.wasm")
 	suite.Require().NoError(err)
 
-	_, err = suite.DataPoolKeeper.DeployAndRegisterNFTContract(suite.Ctx, wasmCode)
+	addr, err := suite.DataPoolKeeper.DeployAndRegisterNFTContract(suite.Ctx, wasmCode)
 	suite.Require().NoError(err)
+
+	// set datapool parameters
+	params := types.Params{
+		DataPoolNftContractAddress: addr.String(),
+		DataPoolDeposit:            types.DefaultDataPoolDeposit,
+		DataPoolCodeId:             1,
+	}
+
+	suite.DataPoolKeeper.SetParams(suite.Ctx, params)
 }
 
 func (suite *poolTestSuite) TestRegisterDataValidator() {

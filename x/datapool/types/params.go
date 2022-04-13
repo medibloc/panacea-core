@@ -14,7 +14,9 @@ var (
 )
 
 var (
-	KeyDataPoolDeposit = []byte("datapooldeposit")
+	KeyDataPoolDeposit            = []byte("datapooldeposit")
+	KeyDataPoolCodeID             = []byte("datapoolcodeid")
+	KeyDataPoolNFTContractAddress = []byte("datapoolnftcontractaddress")
 )
 
 var _ paramtypes.ParamSet = (*Params)(nil)
@@ -32,11 +34,20 @@ func NewParams(dataPoolDeposit sdk.Coin) Params {
 func DefaultParams() Params {
 	return Params{
 		DataPoolDeposit: DefaultDataPoolDeposit,
+		DataPoolCodeId:  0,
 	}
 }
 
 func (p Params) Validate() error {
 	if err := validateDataPoolDeposit(p.DataPoolDeposit); err != nil {
+		return err
+	}
+
+	if err := validateDataPoolCodeID(p.DataPoolCodeId); err != nil {
+		return err
+	}
+
+	if err := validateDataPoolNFTContractAddress(p.DataPoolNftContractAddress); err != nil {
 		return err
 	}
 
@@ -46,6 +57,8 @@ func (p Params) Validate() error {
 func (p *Params) ParamSetPairs() paramtypes.ParamSetPairs {
 	return paramtypes.ParamSetPairs{
 		paramtypes.NewParamSetPair(KeyDataPoolDeposit, &p.DataPoolDeposit, validateDataPoolDeposit),
+		paramtypes.NewParamSetPair(KeyDataPoolCodeID, &p.DataPoolCodeId, validateDataPoolCodeID),
+		paramtypes.NewParamSetPair(KeyDataPoolNFTContractAddress, &p.DataPoolNftContractAddress, validateDataPoolNFTContractAddress),
 	}
 }
 
@@ -57,6 +70,31 @@ func validateDataPoolDeposit(i interface{}) error {
 
 	if deposit.Validate() != nil {
 		return fmt.Errorf("invalid data pool deposit: %+v", i)
+	}
+
+	return nil
+}
+
+func validateDataPoolCodeID(i interface{}) error {
+	_, ok := i.(uint64)
+	if !ok {
+		return fmt.Errorf("invalid parameter type: %T", i)
+	}
+
+	return nil
+}
+
+func validateDataPoolNFTContractAddress(i interface{}) error {
+	addr, ok := i.(string)
+	if !ok {
+		return fmt.Errorf("invalid parameter type: %T", i)
+	}
+
+	if addr != "" {
+		_, err := sdk.AccAddressFromBech32(addr)
+		if err != nil {
+			return fmt.Errorf("invalid NFT contract address: %s", addr)
+		}
 	}
 
 	return nil

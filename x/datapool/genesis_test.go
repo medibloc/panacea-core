@@ -16,11 +16,10 @@ import (
 )
 
 var (
-	dataVal            = sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address())
-	curator            = sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address())
-	NFTPrice           = sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(10000000))
-	downloadPeriod     = time.Duration(time.Second * 100000000)
-	nftContractAddress = sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address())
+	dataVal        = sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address())
+	curator        = sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address())
+	NFTPrice       = sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(10000000))
+	downloadPeriod = time.Duration(time.Second * 100000000)
 )
 
 type genesisTestSuite struct {
@@ -45,11 +44,10 @@ func (suite genesisTestSuite) TestDataPoolInitGenesis() {
 	params := types.DefaultParams()
 
 	genState := &types.GenesisState{
-		DataValidators:     dataValidators,
-		NextPoolNumber:     2,
-		Pools:              pools,
-		Params:             params,
-		NftContractAddress: nftContractAddress,
+		DataValidators: dataValidators,
+		NextPoolNumber: 2,
+		Pools:          pools,
+		Params:         params,
 	}
 
 	datapool.InitGenesis(suite.Ctx, suite.DataPoolKeeper, *genState)
@@ -70,11 +68,6 @@ func (suite genesisTestSuite) TestDataPoolInitGenesis() {
 	// check params
 	paramsFromKeeper := suite.DataPoolKeeper.GetParams(suite.Ctx)
 	suite.Require().Equal(params, paramsFromKeeper)
-
-	// check NFT contract address
-	NFTContractAddressFromKeeper, err := suite.DataPoolKeeper.GetNFTContractAddress(suite.Ctx)
-	suite.Require().NoError(err)
-	suite.Require().Equal(nftContractAddress, NFTContractAddressFromKeeper)
 }
 
 func (suite genesisTestSuite) TestDataPoolExportGenesis() {
@@ -91,15 +84,11 @@ func (suite genesisTestSuite) TestDataPoolExportGenesis() {
 	// set params
 	suite.DataPoolKeeper.SetParams(suite.Ctx, types.DefaultParams())
 
-	// set NFT contract address
-	suite.DataPoolKeeper.SetNFTContractAddress(suite.Ctx, nftContractAddress)
-
 	genesisState := datapool.ExportGenesis(suite.Ctx, suite.DataPoolKeeper)
 	suite.Require().Equal(uint64(2), genesisState.NextPoolNumber)
 	suite.Require().Len(genesisState.Pools, 1)
 	suite.Require().Equal(types.DefaultParams(), genesisState.Params)
 	suite.Require().Len(genesisState.DataValidators, 1)
-	suite.Require().Equal(sdk.AccAddress(genesisState.NftContractAddress), nftContractAddress)
 }
 
 func makeSampleDataValidator() *types.DataValidator {

@@ -7,10 +7,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func CmdGetNFTContract() *cobra.Command {
+func CmdGetParams() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "get-nft-contract",
-		Short: "Query registered NFT contract address",
+		Use:   "params",
+		Short: "Query params of datapool module",
 		Args:  cobra.ExactArgs(0),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientQueryContext(cmd)
@@ -20,7 +20,7 @@ func CmdGetNFTContract() *cobra.Command {
 
 			queryClient := types.NewQueryClient(clientCtx)
 
-			res, err := queryClient.NFTContract(cmd.Context(), &types.QueryNFTContractRequest{})
+			res, err := queryClient.DataPoolParams(cmd.Context(), &types.QueryDataPoolParamsRequest{})
 			if err != nil {
 				return err
 			}
@@ -30,5 +30,6 @@ func CmdGetNFTContract() *cobra.Command {
 	}
 
 	flags.AddQueryFlagsToCmd(cmd)
+
 	return cmd
 }

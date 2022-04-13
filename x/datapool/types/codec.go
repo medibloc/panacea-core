@@ -16,8 +16,6 @@ func RegisterCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&MsgSellData{}, "datapool/SellData", nil)
 	cdc.RegisterConcrete(&MsgBuyDataAccessNFT{}, "datapool/BuyDataAccessNFT", nil)
 	cdc.RegisterConcrete(&MsgRedeemDataAccessNFT{}, "datapool/RedeemDataAccessNFT", nil)
-	cdc.RegisterConcrete(&MsgRegisterNFTContract{}, "datapool/RegisterNFTContract", nil)
-	cdc.RegisterConcrete(&MsgUpgradeNFTContract{}, "datapool/UpgradeNFTContract", nil)
 }
 
 func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
@@ -28,8 +26,6 @@ func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 		&MsgSellData{},
 		&MsgBuyDataAccessNFT{},
 		&MsgRedeemDataAccessNFT{},
-		&MsgRegisterNFTContract{},
-		&MsgUpgradeNFTContract{},
 	)
 	msgservice.RegisterMsgServiceDesc(registry, &_Msg_serviceDesc)
 }
