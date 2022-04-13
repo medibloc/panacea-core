@@ -5,6 +5,7 @@ option go_package = "github.com/medibloc/panacea-core/x/datapool/types";
 
 import "google/api/annotations.proto";
 import "panacea/datapool/v2/pool.proto";
+import "panacea/datapool/v2/genesis.proto";
 
 // Query defines the gRPC querier service.
 service Query {
@@ -16,6 +17,11 @@ service Query {
   // DataValidator returns a DataValidator.
   rpc DataValidator(QueryDataValidatorRequest) returns (QueryDataValidatorResponse) {
     option (google.api.http).get = "/panacea/datapool/v2/data_validator";
+  }
+
+  // DataPoolParams returns params of x/datapool module
+  rpc DataPoolParams(QueryDataPoolParamsRequest) returns (QueryDataPoolParamsResponse) {
+    option (google.api.http).get = "/panacea/datapool/v2/params";
   }
 }
 
@@ -37,4 +43,12 @@ message QueryDataValidatorRequest {
 // QueryDataValidatorResponse is the response type for the Query/DataValidator RPC method.
 message QueryDataValidatorResponse {
   DataValidator data_validator = 1;
+}
+
+// QueryDataPoolParamsRequest is the request type for the Query/DataPoolParamsRequest RPC method.
+message QueryDataPoolParamsRequest {}
+
+// QueryDataPoolParamsResponse is the response type for the Query/DataPoolParamsResponse RPC method.
+message QueryDataPoolParamsResponse {
+  Params params = 1;
 }
