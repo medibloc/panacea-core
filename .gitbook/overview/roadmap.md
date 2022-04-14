@@ -8,12 +8,12 @@
 
 ### 2021 Q4: Designing the new phase
 
-- Design the draft model of data market
+- Design the draft model of data exchange protocol
 - List MED on DEX (Osmosis)
 
-### 2022 Q1~2: The First Step for Data Market
+### 2022 Q1~2: The First Step for Data Exchange
 
-- Define/develop data market protocol v0 specification (proof-of-concept)
+- Define/develop data exchange protocol v0 specification (proof-of-concept)
   - Data pool model
   - Data quality validation
   - Data privacy
@@ -22,22 +22,22 @@
 - Enhance long-term sustainability of validator ecosystem
 - Improve governance process
 
-### 2022 Q3: Data Market Protocol v0 on Testnet
+### 2022 Q3: Data Exchange Protocol v0 on Testnet
 
-- Evaluate data market protocol v0 on Panacea Testnet
+- Evaluate data exchange protocol v0 on Panacea Testnet
   - Technical evaluation
   - Product-wise evaluation
-- Revise whitepaper
+- Update and release new version of whitepaper
 
 ### 2022 Q4: Data Marketplace Service
 
-- Release data market protocol v0 on Panacea Mainnet
-- Release data market web service based on data market protocol
+- Release data exchange protocol v0 on Panacea Mainnet
+- Release data marketplace service based on data exchange protocol
   - Early corporate participants joined
 
-### 2023 Q1~2: Carving Data Market Protocol
+### 2023 Q1~2: Carving Data Exchange Protocol
 
-- Define/develop data market protocol v1
+- Define/develop data exchange protocol v1
   - Improved data quality validation and privacy
     - W3C Verifiable Credentials
     - Zero-knowledge Proof
@@ -46,19 +46,19 @@
   - DAO
   - Cross-chain NFT (compatible with NFT marketplaces)
 
-### 2023 Q3: Healthcare Services on Data Market Protocol
+### 2023 Q3: Healthcare Services on Data Exchange Protocol
 
-- Release data market protocol v1 on Panacea mainnet
-- Integrate MediBloc healthcare services with data market
-- Revise whitepaper
+- Release data exchange protocol v1 on Panacea mainnet
+- Integrate MediBloc healthcare services with data exchange protocol
+- Update and release new version of whitepaper
 
-### 2023 Q4: Data Market DAO
+### 2023 Q4: Data Exchange DAO
 
-- Launch data market DAO
+- Launch data exchange DAO
 - Expand community
 
-### 2024~: Services on Data Market Protocol
+### 2024~: Services on Data Exchange Protocol
 
-- Integrate more services with data market protocol
+- Integrate more services with data exchange protocol
 - Enhance 3rd-party developer experiences
 - Interoperability with other chain ecosystems
