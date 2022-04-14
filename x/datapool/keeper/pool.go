@@ -211,6 +211,7 @@ func (k Keeper) CreatePool(ctx sdk.Context, curator sdk.AccAddress, poolParams t
 	k.SetPool(ctx, newPool)
 
 	// mint tokens as many as targetNumData
+	k.setInitialSupply(ctx, poolID)
 	err = k.mintPoolShareToken(ctx, poolID, poolParams.TargetNumData)
 	if err != nil {
 		return 0, sdkerrors.Wrapf(err, "failed to mint share token")
@@ -455,8 +456,6 @@ func (k Keeper) increaseCurNumAndUpdatePool(ctx sdk.Context, pool *types.Pool) {
 }
 
 func (k Keeper) mintPoolShareToken(ctx sdk.Context, poolID, amount uint64) error {
-	k.setInitialSupply(ctx, poolID)
-
 	shareToken := types.GetAccumPoolShareToken(poolID, amount)
 	shareTokens := sdk.NewCoins(shareToken)
 	err := k.bankKeeper.MintCoins(ctx, types.ModuleName, shareTokens)
