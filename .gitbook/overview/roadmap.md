@@ -27,7 +27,7 @@
 - Evaluate data exchange protocol v0 on Panacea Testnet
   - Technical evaluation
   - Product-wise evaluation
-- Revise whitepaper
+- Update and release new version of whitepaper
 
 ### 2022 Q4: Data Marketplace Service
 
