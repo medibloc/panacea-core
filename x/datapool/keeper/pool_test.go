@@ -362,7 +362,7 @@ func (suite *poolTestSuite) TestSellData() {
 	supply := suite.BankKeeper.GetSupply(suite.Ctx)
 	suite.Require().Equal(1, len(supply.GetTotal()))
 	suite.Require().Equal("DP/1", supply.GetTotal()[0].Denom)
-	suite.Require().Equal(sdk.NewInt(1), supply.GetTotal()[0].Amount)
+	suite.Require().Equal(sdk.NewInt(100), supply.GetTotal()[0].Amount)
 }
 
 func (suite *poolTestSuite) TestSellData_change_status_activity() {
@@ -403,7 +403,7 @@ func (suite *poolTestSuite) TestSellData_change_status_activity() {
 	supply := suite.BankKeeper.GetSupply(suite.Ctx)
 	suite.Require().Equal(1, len(supply.GetTotal()))
 	suite.Require().Equal("DP/1", supply.GetTotal()[0].Denom)
-	suite.Require().Equal(sdk.NewInt(1), supply.GetTotal()[0].Amount)
+	suite.Require().Equal(sdk.NewInt(100), supply.GetTotal()[0].Amount)
 }
 
 func (suite *poolTestSuite) TestSellData_not_same_seller() {

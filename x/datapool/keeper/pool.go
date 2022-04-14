@@ -210,8 +210,11 @@ func (k Keeper) CreatePool(ctx sdk.Context, curator sdk.AccAddress, poolParams t
 	// store pool
 	k.SetPool(ctx, newPool)
 
-	// Initialize shareToken supply
-	k.setInitialSupply(ctx, poolID)
+	// mint tokens as many as targetNumData
+	err = k.mintPoolShareToken(ctx, poolID, poolParams.TargetNumData)
+	if err != nil {
+		return 0, sdkerrors.Wrapf(err, "failed to mint share token")
+	}
 
 	return newPool.GetPoolId(), nil
 }
@@ -368,12 +371,13 @@ func (k Keeper) SellData(ctx sdk.Context, seller sdk.AccAddress, cert types.Data
 
 	k.increaseCurNumAndUpdatePool(ctx, pool)
 
-	shareToken, err := k.mintPoolShareToAccount(ctx, pool.PoolId, 1, seller)
+	shareToken := types.GetAccumPoolShareToken(pool.PoolId, 1)
+	err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, seller, sdk.NewCoins(shareToken))
 	if err != nil {
 		return nil, err
 	}
 
-	return shareToken, nil
+	return &shareToken, nil
 }
 
 // verifySignature verifies that the signature of the dataValidator is correct
@@ -450,20 +454,17 @@ func (k Keeper) increaseCurNumAndUpdatePool(ctx sdk.Context, pool *types.Pool) {
 	k.SetPool(ctx, pool)
 }
 
-func (k Keeper) mintPoolShareToAccount(ctx sdk.Context, poolID, amount uint64, addr sdk.AccAddress) (*sdk.Coin, error) {
-	shareToken := types.GetAccumPoolShareToken(poolID, amount)
+func (k Keeper) mintPoolShareToken(ctx sdk.Context, poolID, amount uint64) error {
+	k.setInitialSupply(ctx, poolID)
 
-	shareTokens := sdk.Coins{shareToken}
+	shareToken := types.GetAccumPoolShareToken(poolID, amount)
+	shareTokens := sdk.NewCoins(shareToken)
 	err := k.bankKeeper.MintCoins(ctx, types.ModuleName, shareTokens)
 	if err != nil {
-		return nil, sdkerrors.Wrap(types.ErrFailedMintShareToken, err.Error())
+		return sdkerrors.Wrap(types.ErrFailedMintShareToken, err.Error())
 	}
 
-	err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, addr, shareTokens)
-	if err != nil {
-		return nil, sdkerrors.Wrap(types.ErrFailedMintShareToken, err.Error())
-	}
-	return &shareToken, nil
+	return nil
 }
 
 func contains(validators []string, validator string) bool {
