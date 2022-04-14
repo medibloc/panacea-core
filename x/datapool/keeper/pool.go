@@ -9,6 +9,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	gogotypes "github.com/gogo/protobuf/types"
 	"github.com/medibloc/panacea-core/v2/x/datapool/types"
 )
@@ -209,7 +210,23 @@ func (k Keeper) CreatePool(ctx sdk.Context, curator sdk.AccAddress, poolParams t
 	// store pool
 	k.SetPool(ctx, newPool)
 
+	// mint tokens as many as targetNumData
+	k.setInitialSupply(ctx, poolID)
+	err = k.mintPoolShareToken(ctx, poolID, poolParams.TargetNumData)
+	if err != nil {
+		return 0, sdkerrors.Wrapf(err, "failed to mint share token")
+	}
+
 	return newPool.GetPoolId(), nil
+}
+
+// setInitialSupply defines supply to be initialized for tokens to be minted.
+func (k Keeper) setInitialSupply(ctx sdk.Context, poolID uint64) {
+	supply := banktypes.Supply{
+		Total: sdk.NewCoins(types.GetAccumPoolShareToken(poolID, 0)),
+	}
+
+	k.bankKeeper.SetSupply(ctx, &supply)
 }
 
 func (k Keeper) GetNextPoolNumberAndIncrement(ctx sdk.Context) uint64 {
@@ -356,8 +373,10 @@ func (k Keeper) SellData(ctx sdk.Context, seller sdk.AccAddress, cert types.Data
 	k.increaseCurNumAndUpdatePool(ctx, pool)
 
 	shareToken := types.GetAccumPoolShareToken(pool.PoolId, 1)
-	// TODO We need to send the token to the seller.
-	// We now need to consider using the current 'x/token' or looking for another way.(ex. cw20)
+	err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, seller, sdk.NewCoins(shareToken))
+	if err != nil {
+		return nil, err
+	}
 
 	return &shareToken, nil
 }
@@ -434,6 +453,17 @@ func (k Keeper) increaseCurNumAndUpdatePool(ctx sdk.Context, pool *types.Pool) {
 	}
 
 	k.SetPool(ctx, pool)
+}
+
+func (k Keeper) mintPoolShareToken(ctx sdk.Context, poolID, amount uint64) error {
+	shareToken := types.GetAccumPoolShareToken(poolID, amount)
+	shareTokens := sdk.NewCoins(shareToken)
+	err := k.bankKeeper.MintCoins(ctx, types.ModuleName, shareTokens)
+	if err != nil {
+		return sdkerrors.Wrap(types.ErrFailedMintShareToken, err.Error())
+	}
+
+	return nil
 }
 
 func contains(validators []string, validator string) bool {
