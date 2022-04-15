@@ -54,6 +54,7 @@ type TestSuite struct {
 	suite.Suite
 
 	Ctx sdk.Context
+	Cdc params.EncodingConfig
 
 	AccountKeeper     authkeeper.AccountKeeper
 	StakingKeeper     stakingkeeper.Keeper
@@ -117,7 +118,7 @@ func (suite *TestSuite) SetupTest() {
 		govtypes.ModuleName:            {authtypes.Burner},
 		ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
 		wasm.ModuleName:                {authtypes.Burner},
-		datapooltypes.ModuleName:       nil,
+		datapooltypes.ModuleName:       {authtypes.Minter},
 	}
 
 	modAccAddrs := make(map[string]bool)
@@ -136,6 +137,7 @@ func (suite *TestSuite) SetupTest() {
 	scopedIBCKeeper := suite.CapabilityKeeper.ScopeToModule(ibchost.ModuleName)
 
 	suite.Ctx = ctx
+	suite.Cdc = cdc
 	suite.AccountKeeper = authkeeper.NewAccountKeeper(
 		cdc.Marshaler,
 		keyParams[authtypes.StoreKey],

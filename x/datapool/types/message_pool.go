@@ -177,6 +177,26 @@ func (msg *MsgSellData) ValidateBasic() error {
 	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid seller address (%s)", err)
 	}
+	if msg.Cert == nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "certificate is nil")
+	}
+
+	cert := msg.Cert
+	if cert.UnsignedCert == nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "unsignedCertificate is nil")
+	} else if cert.Signature == nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "signature is nil")
+	}
+
+	unsignedCert := cert.UnsignedCert
+	if unsignedCert.DataHash == nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "dataHash is nil")
+	} else if unsignedCert.DataValidator == "" {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "empty data validator address")
+	} else if unsignedCert.Requester == "" {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "empty requester address")
+	}
+
 	return nil
 }
 
