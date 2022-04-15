@@ -1,5 +1,4 @@
 ## Deploy and instantiate NFT smart contract
-## Deploy and instantiate NFT smart contract
 
 ### Submit proposal (1): store NFT contract
 ```shell

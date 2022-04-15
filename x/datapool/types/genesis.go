@@ -7,7 +7,7 @@ func DefaultGenesis() *GenesisState {
 		NextPoolNumber: uint64(1),
 		Pools:          []Pool{},
 		Params:         DefaultParams(),
-		WhiteList:      []WhiteList{},
+		WhiteLists:     []WhiteList{},
 		// this line is used by starport scaffolding # ibc/genesistype/default
 		// this line is used by starport scaffolding # genesis/types/default
 	}

@@ -13,7 +13,7 @@ message GenesisState {
   uint64                 next_pool_number = 2;
   repeated Pool          pools = 3 [(gogoproto.nullable) = false];
   Params                 params = 4 [(gogoproto.nullable) = false];
-  repeated WhiteList     white_list = 5 [(gogoproto.nullable) = false];
+  repeated WhiteList     white_lists = 5 [(gogoproto.nullable) = false];
 }
 
 // Params define parameters of datapool module

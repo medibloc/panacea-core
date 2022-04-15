@@ -53,7 +53,7 @@ func (suite genesisTestSuite) TestDataPoolInitGenesis() {
 		NextPoolNumber: 2,
 		Pools:          pools,
 		Params:         params,
-		WhiteList:      whiteList,
+		WhiteLists:     whiteList,
 	}
 
 	datapool.InitGenesis(suite.Ctx, suite.DataPoolKeeper, *genState)
@@ -108,9 +108,9 @@ func (suite genesisTestSuite) TestDataPoolExportGenesis() {
 	suite.Require().Len(genesisState.Pools, 1)
 	suite.Require().Equal(types.DefaultParams(), genesisState.Params)
 	suite.Require().Len(genesisState.DataValidators, 1)
-	suite.Require().Len(genesisState.WhiteList, 2)
-	suite.Require().Contains(genesisState.WhiteList, whiteList[0])
-	suite.Require().Contains(genesisState.WhiteList, whiteList[1])
+	suite.Require().Len(genesisState.WhiteLists, 2)
+	suite.Require().Contains(genesisState.WhiteLists, whiteList[0])
+	suite.Require().Contains(genesisState.WhiteLists, whiteList[1])
 }
 
 func makeSampleDataValidator() types.DataValidator {

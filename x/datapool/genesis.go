@@ -23,7 +23,7 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 		k.SetPool(ctx, &pool)
 	}
 
-	for _, whiteList := range genState.WhiteList {
+	for _, whiteList := range genState.WhiteLists {
 		addr, err := sdk.AccAddressFromBech32(whiteList.Address)
 		if err != nil {
 			panic(err)
@@ -62,7 +62,7 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 		panic(err)
 	}
 
-	genesis.WhiteList = append(genesis.WhiteList, whiteLists...)
+	genesis.WhiteLists = append(genesis.WhiteLists, whiteLists...)
 
 	// this line is used by starport scaffolding # genesis/module/export
 
