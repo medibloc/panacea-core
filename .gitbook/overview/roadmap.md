@@ -12,6 +12,7 @@ Our data market protocol has the concept of data Pool, so that anyone can specif
 
 This data market protocol is being developed to be as general as possible, so that not only the healthcare data but also all the other types of data can be handled by the protocol. Since Panacea and data market protocol is publicly opened, any service providers can build their own services on the top of the data market protocol, so that their users can exchange their data securely and get proper rewards. As the first use case, MediBloc is going to build a healthcare data marketplace service based on this protocol.
 Well, it sounds like the protocol should work well, right? However, there are so many issues that we have to resolve. For privacy and security, data sellers should be able to expose only a small part of their data that is really desired by data buyers. Data transmission must be secure, so that anyone cannot steal data. In order to guarantee the right of data buyers, all criteria that data buyers specified has to be validated clearly before the payment is finalized. In addition, the ecosystem should be attractive enough for many data sellers and buyers to join. 
+
 In order to resolve these challenges, the team is developing this data market protocol with several latest technologies. 
 
 ### Data quality validation in Secure Enclaves
@@ -27,6 +28,7 @@ In addition to these technologies above, the data market protocol is going to pr
 ### NFT and DAO
 
 The protocol is going to adopt the power of NFT. The data pool access vouchers are going to be minted as NFTs, so that data buyers and investors can join easily. This will also increase the financial liquidity of a given pool. In addition, the protocol will be designed to be governed by DAO. Any DAO participants can improve the protocol by changing parameters and developing new features.
+
 
 
 There will be more details that we have to solve, and we know that all of them cannot be achieved in one step. Hence, we will complete this big task step by step. In 2022, MediBloc will release the v0 of data market protocol as a proof of concept that includes only essential features. Also, a data marketplace web service will be introduced as a simple example service based on the protocol. Based on this proof of concepts, the data market protocol will be improved as v1 from 2023 with enhanced security and interoperability. MediBloc has already opened all source codes and progresses publicly on GitHub. We encourage anyone to join the project and share your insights. 
