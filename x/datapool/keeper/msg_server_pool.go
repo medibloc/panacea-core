@@ -57,7 +57,21 @@ func (m msgServer) CreatePool(goCtx context.Context, msg *types.MsgCreatePool) (
 }
 
 func (m msgServer) SellData(goCtx context.Context, msg *types.MsgSellData) (*types.MsgSellDataResponse, error) {
-	return &types.MsgSellDataResponse{}, nil
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	seller, err := sdk.AccAddressFromBech32(msg.Seller)
+	if err != nil {
+		return nil, err
+	}
+
+	accumPoolShareToken, err := m.Keeper.SellData(ctx, seller, *msg.Cert)
+	if err != nil {
+		return nil, err
+	}
+
+	return &types.MsgSellDataResponse{
+		AccumPoolShareToken: accumPoolShareToken,
+	}, nil
 }
 
 func (m msgServer) BuyDataAccessNFT(goCtx context.Context, msg *types.MsgBuyDataAccessNFT) (*types.MsgBuyDataAccessNFTResponse, error) {
