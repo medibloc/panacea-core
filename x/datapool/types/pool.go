@@ -4,15 +4,16 @@ import (
 	"github.com/medibloc/panacea-core/v2/types/assets"
 
 	"fmt"
-	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	"strconv"
+
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 const (
-	PENDING          = "PENDING"
-	ACTIVE           = "ACTIVE"
+	PENDING = "PENDING"
+	ACTIVE  = "ACTIVE"
 
 	ShareTokenPrefix = "DP"
 )
