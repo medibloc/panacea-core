@@ -1,16 +1,18 @@
 package types
 
 import (
-	"strconv"
-
+	"fmt"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	"strconv"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 const (
-	PENDING = "PENDING"
-	ACTIVE  = "ACTIVE"
+	PENDING          = "PENDING"
+	ACTIVE           = "ACTIVE"
+
+	ShareTokenPrefix = "DP"
 )
 
 func NewPool(poolID uint64, curator sdk.AccAddress, poolParams PoolParams) *Pool {
@@ -35,4 +37,8 @@ func NewPoolAddress(poolID uint64) sdk.AccAddress {
 
 func GetModuleAddress() sdk.AccAddress {
 	return authtypes.NewModuleAddress(ModuleName)
+}
+
+func GetAccumPoolShareToken(poolID, amount uint64) sdk.Coin {
+	return sdk.NewCoin(fmt.Sprintf(ShareTokenPrefix+"/%v", poolID), sdk.NewIntFromUint64(amount))
 }
