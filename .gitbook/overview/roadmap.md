@@ -50,7 +50,6 @@
 
 - Release data exchange protocol v1 on Panacea mainnet
 - Integrate MediBloc healthcare services with data exchange protocol
-- Update and release new version of whitepaper
 
 ### 2023 Q4: Data Exchange DAO
 
