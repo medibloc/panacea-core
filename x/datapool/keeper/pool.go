@@ -374,6 +374,9 @@ func (k Keeper) SellData(ctx sdk.Context, seller sdk.AccAddress, cert types.Data
 	k.increaseCurNumAndUpdatePool(ctx, pool)
 
 	err = k.appendDistributeRevenuePools(ctx, pool)
+	if err != nil {
+		return nil, err
+	}
 
 	shareToken := types.GetAccumPoolShareToken(poolID, 1)
 	err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, seller, sdk.NewCoins(shareToken))
