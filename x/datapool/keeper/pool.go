@@ -482,8 +482,9 @@ func contains(validators []string, validator string) bool {
 }
 
 func (k Keeper) GetDataValidationCertificate(ctx sdk.Context, poolID, round uint64, dataHash []byte) (types.DataValidationCertificate, error) {
-	store := ctx.KVStore(k.storeKey)
 	key := types.GetKeyPrefixDataValidateCert(poolID, round, dataHash)
+	store := ctx.KVStore(k.storeKey)
+
 	if !store.Has(key) {
 		return types.DataValidationCertificate{}, sdkerrors.Wrap(types.ErrGetDataValidationCert, "certification is not exist")
 	}
