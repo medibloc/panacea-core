@@ -25,7 +25,7 @@ Data provided by sellers should be validated according to criteria that buyers s
 
 The protocol should support various ways for data buyers to specify what types of data they want to buy. We believe that W3C Verifiable Credential may be one of the solutions. Based on this standard, selective disclosure can also be achieved by zero-knowledge proof. 
 
-In addition to these technologies above, the data market protocol is going to provide rich feature sets for service providers who build services on the top of the data market protocol in various legal countries and industries. It will be helpful for them to build their service in compliance with their law for handling personal data. For example, the protocol is going to provide features for making consents to data sharing/exchange signed cryptographically.
+In addition to these technologies above, the data exchange protocol is going to provide rich feature sets for service providers who build services on the top of the data exchange protocol in various legal countries and industries. It will be helpful for them to build their service in compliance with their law for handling personal data. For example, the protocol is going to provide features for making consents to data sharing/exchange signed cryptographically.
 
 ### NFT and DAO
 
