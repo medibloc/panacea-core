@@ -33,3 +33,29 @@ func CmdGetParams() *cobra.Command {
 
 	return cmd
 }
+
+func CmdGetModuleAddr() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "module-addr",
+		Short: "query module address",
+		Args:  cobra.ExactArgs(0),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientQueryContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			queryClient := types.NewQueryClient(clientCtx)
+			res, err := queryClient.DataPoolModuleAddr(cmd.Context(), &types.QueryDataPoolModuleAddrRequest{})
+			if err != nil {
+				return err
+			}
+
+			return clientCtx.PrintProto(res)
+		},
+	}
+
+	flags.AddQueryFlagsToCmd(cmd)
+
+	return cmd
+}

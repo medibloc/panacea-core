@@ -58,3 +58,13 @@ func (k Keeper) DataPoolParams(goCtx context.Context, req *types.QueryDataPoolPa
 
 	return &types.QueryDataPoolParamsResponse{Params: &params}, nil
 }
+
+func (k Keeper) DataPoolModuleAddr(goCtx context.Context, req *types.QueryDataPoolModuleAddrRequest) (*types.QueryDataPoolModuleAddrResponse, error) {
+	if req == nil {
+		return nil, status.Error(codes.InvalidArgument, "invalid request")
+	}
+
+	moduleAddr := types.GetModuleAddress()
+
+	return &types.QueryDataPoolModuleAddrResponse{Address: moduleAddr.String()}, nil
+}
