@@ -51,9 +51,10 @@ func (k Keeper) DistributeRevenuePools(ctx sdk.Context) error {
 				sdk.NewCoin(assets.MicroMedDenom, eachDistributionAmount.Mul(balance.Amount)),
 			)
 
-			poolAddress, err := sdk.AccAddressFromBech32(pool.GetPoolAddress())
+			poolAddress, innerErr := sdk.AccAddressFromBech32(pool.GetPoolAddress())
 			// stop distribute when an error occurs
-			if err != nil {
+			if innerErr != nil {
+				err = innerErr
 				return true
 			}
 
