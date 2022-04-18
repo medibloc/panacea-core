@@ -58,7 +58,7 @@ func (k Keeper) DistributeRevenuePools(ctx sdk.Context) error {
 			}
 
 			// excluding moduleAccount
-			if k.accountKeeper.GetModuleAddress(types.ModuleName).Equals(addr) {
+			if types.GetModuleAddress().Equals(addr) {
 				return false
 			}
 
@@ -97,6 +97,7 @@ func (k Keeper) getEachDistributionAmount(ctx sdk.Context, pool *types.Pool) (sd
 		return sdk.NewInt(0), err
 	}
 	poolSalesBalance := k.bankKeeper.GetBalance(ctx, poolAddress, assets.MicroMedDenom)
+	// TODO Our deposit can be changed by governance, so we need to put the amount of our deposit in the pool.
 	deposit := k.GetParams(ctx).DataPoolDeposit
 	totalSalesBalance := poolSalesBalance.Sub(deposit)
 
@@ -104,12 +105,13 @@ func (k Keeper) getEachDistributionAmount(ctx sdk.Context, pool *types.Pool) (sd
 	if totalSalesBalance.Amount.Equal(sdk.NewInt(0)) {
 		return sdk.NewInt(0), nil
 	}
-	eachDistributionAmount := totalShareTokenAmount.Quo(totalSalesBalance.Amount)
+	eachDistributionAmount := totalSalesBalance.Amount.Quo(totalShareTokenAmount)
 
 	return eachDistributionAmount, nil
 }
 
 func (k Keeper) sendDepositToCurator(ctx sdk.Context, pool *types.Pool) error {
+	// TODO Our deposits can be changed by governance, so we need to get our deposit information from the pool.
 	deposit := k.GetParams(ctx).DataPoolDeposit
 	curatorAddr, err := sdk.AccAddressFromBech32(pool.Curator)
 	if err != nil {

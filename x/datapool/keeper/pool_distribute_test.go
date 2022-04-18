@@ -65,9 +65,13 @@ func (suite poolTestSuite) TestDistributeSalesRevenueNotSoldNFTs() {
 	pool, err := suite.DataPoolKeeper.GetPool(suite.Ctx, poolID)
 	suite.Require().NoError(err)
 	suite.Require().Equal(types.PENDING, pool.Status)
+	poolAddr, err := sdk.AccAddressFromBech32(pool.PoolAddress)
+	suite.Require().NoError(err)
 	secondPool, err := suite.DataPoolKeeper.GetPool(suite.Ctx, secondPoolID)
 	suite.Require().NoError(err)
 	suite.Require().Equal(types.ACTIVE, secondPool.Status)
+	secondPoolAddr, err := sdk.AccAddressFromBech32(secondPool.PoolAddress)
+	suite.Require().NoError(err)
 
 	// check balances of curator and sellers
 	depositAmount := suite.DataPoolKeeper.GetParams(suite.Ctx).DataPoolDeposit.Amount
@@ -80,6 +84,11 @@ func (suite poolTestSuite) TestDistributeSalesRevenueNotSoldNFTs() {
 		coin := suite.BankKeeper.GetBalance(suite.Ctx, sellerAddr, assets.MicroMedDenom)
 		suite.Require().Equal(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(0)), coin)
 	}
+
+	// Because we don't have any NFT selling logic yet, we temporarily send money to the pool account.
+	boughtFund := sdk.NewCoins(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(1000000000)))
+	err = suite.BankKeeper.AddCoins(suite.Ctx, secondPoolAddr, boughtFund)
+	suite.Require().NoError(err)
 
 	// execute a distribute sales revenue
 	err = suite.DataPoolKeeper.DistributeRevenuePools(suite.Ctx)
@@ -94,14 +103,10 @@ func (suite poolTestSuite) TestDistributeSalesRevenueNotSoldNFTs() {
 	suite.Require().NoError(err)
 	for _, sellerAddr := range sellers {
 		coin := suite.BankKeeper.GetBalance(suite.Ctx, sellerAddr, assets.MicroMedDenom)
-		// Since no NFTs have been sold, the seller's balance is zero.
-		suite.Require().Equal(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(0)), coin)
+		// There is a total of 1000,000,000 umed of sales revenue, and there are 1,000 sellers, so you need to earn 1,000,000 umed per person.
+		suite.Require().Equal(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(1000000)), coin)
 	}
 
-	poolAddr, err := sdk.AccAddressFromBech32(pool.PoolAddress)
-	suite.Require().NoError(err)
-	secondPoolAddr, err := sdk.AccAddressFromBech32(secondPool.PoolAddress)
-	suite.Require().NoError(err)
 	// The first pool amount only requires a deposit
 	deposit := suite.DataPoolKeeper.GetParams(suite.Ctx).DataPoolDeposit
 	suite.Require().Equal(deposit, suite.BankKeeper.GetBalance(suite.Ctx, poolAddr, assets.MicroMedDenom))
