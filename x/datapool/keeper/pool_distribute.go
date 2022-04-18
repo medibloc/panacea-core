@@ -78,7 +78,7 @@ func (k Keeper) DistributeRevenuePools(ctx sdk.Context) error {
 		}
 	}
 	// delete this pool from revenuePools
-	revenuePools.RemovePeviousIndex(lastIndex)
+	revenuePools.RemovePreviousIndex(lastIndex)
 	err = k.setDistributePoolsRevenue(ctx, revenuePools)
 	if err != nil {
 		return err
