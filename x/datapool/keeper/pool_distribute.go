@@ -92,10 +92,12 @@ func (k Keeper) getEachDistributionAmount(ctx sdk.Context, pool *types.Pool) (sd
 	shareTokenDenom := types.GetDenomOfShareToken(pool.PoolId)
 	totalShareTokenAmount := k.bankKeeper.GetSupply(ctx).GetTotal().AmountOf(shareTokenDenom)
 
+	zeroAmount := sdk.NewInt(0)
+
 	// get the pool's total sales revenue
 	poolAddress, err := sdk.AccAddressFromBech32(pool.GetPoolAddress())
 	if err != nil {
-		return sdk.NewInt(0), err
+		return zeroAmount, err
 	}
 	poolSalesBalance := k.bankKeeper.GetBalance(ctx, poolAddress, assets.MicroMedDenom)
 	// TODO Our deposit can be changed by governance, so we need to put the amount of our deposit in the pool.
@@ -103,8 +105,8 @@ func (k Keeper) getEachDistributionAmount(ctx sdk.Context, pool *types.Pool) (sd
 	totalSalesBalance := poolSalesBalance.Sub(deposit)
 
 	// calculator the amount to be distributed to each seller
-	if totalSalesBalance.Amount.Equal(sdk.NewInt(0)) {
-		return sdk.NewInt(0), nil
+	if totalSalesBalance.Amount.Equal(zeroAmount) {
+		return zeroAmount, nil
 	}
 	eachDistributionAmount := totalSalesBalance.Amount.Quo(totalShareTokenAmount)
 
