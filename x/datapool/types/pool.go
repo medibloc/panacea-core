@@ -55,7 +55,7 @@ func (d *DistributeRevenuePools) IsEmpty() bool {
 	return d.PoolIds == nil || len(d.PoolIds) == 0
 }
 
-func (d *DistributeRevenuePools) RemovePeviousIndex(idx int) {
+func (d *DistributeRevenuePools) RemovePreviousIndex(idx int) {
 	if d.IsEmpty() {
 		return
 	}
