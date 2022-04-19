@@ -23,6 +23,11 @@ service Query {
   rpc DataPoolParams(QueryDataPoolParamsRequest) returns (QueryDataPoolParamsResponse) {
     option (google.api.http).get = "/panacea/datapool/v2/params";
   }
+
+  // DataPoolModuleAddr returns x/datapool module address
+  rpc DataPoolModuleAddr(QueryDataPoolModuleAddrRequest) returns (QueryDataPoolModuleAddrResponse) {
+    option (google.api.http).get = "/panacea/datapool/v2/module_addr";
+  }
 }
 
 // QueryPoolRequest is the request type for the Query/Pool RPC method.
@@ -51,4 +56,12 @@ message QueryDataPoolParamsRequest {}
 // QueryDataPoolParamsResponse is the response type for the Query/DataPoolParamsResponse RPC method.
 message QueryDataPoolParamsResponse {
   Params params = 1;
+}
+
+// QueryDataPoolModuleAddrRequest is the request type for the Query/DataPoolModuleAddrRequest RPC method.
+message QueryDataPoolModuleAddrRequest {}
+
+// QueryDataPoolModuleAddrResponse is the response type for the Query/DataPoolModuleAddrResponse RPC method.
+message QueryDataPoolModuleAddrResponse {
+  string address = 1;
 }
