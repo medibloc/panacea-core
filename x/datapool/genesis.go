@@ -23,12 +23,12 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 		k.SetPool(ctx, &pool)
 	}
 
-	for _, whiteList := range genState.WhiteLists {
-		addr, err := sdk.AccAddressFromBech32(whiteList.Address)
+	for _, delayedNftTransfer := range genState.DelayedNftTransfer {
+		addr, err := sdk.AccAddressFromBech32(delayedNftTransfer.Address)
 		if err != nil {
 			panic(err)
 		}
-		k.AddToWhiteList(ctx, whiteList.PoolId, addr)
+		k.AddToDelayedNftTransfer(ctx, delayedNftTransfer.PoolId, addr)
 	}
 	// this line is used by starport scaffolding # genesis/module/init
 
@@ -57,12 +57,12 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 
 	genesis.Params = k.GetParams(ctx)
 
-	whiteLists, err := k.GetAllWhiteLists(ctx)
+	delayedNftTransfers, err := k.GetAllDelayedNftTransfers(ctx)
 	if err != nil {
 		panic(err)
 	}
 
-	genesis.WhiteLists = append(genesis.WhiteLists, whiteLists...)
+	genesis.DelayedNftTransfer = append(genesis.DelayedNftTransfer, delayedNftTransfers...)
 
 	// this line is used by starport scaffolding # genesis/module/export
 

@@ -536,7 +536,7 @@ func (k Keeper) BuyDataAccessNFT(ctx sdk.Context, buyer sdk.AccAddress, poolID, 
 		}
 	} else {
 		// if pool is PENDING state, add buyer to white list
-		k.AddToWhiteList(ctx, poolID, buyer)
+		k.AddToDelayedNftTransfer(ctx, poolID, buyer)
 	}
 
 	k.increaseIssuedNFT(ctx, pool)
@@ -550,57 +550,57 @@ func (k Keeper) increaseIssuedNFT(ctx sdk.Context, pool *types.Pool) {
 	k.SetPool(ctx, pool)
 }
 
-func (k Keeper) AddToWhiteList(ctx sdk.Context, poolID uint64, addr sdk.AccAddress) {
+func (k Keeper) AddToDelayedNftTransfer(ctx sdk.Context, poolID uint64, addr sdk.AccAddress) {
 	store := ctx.KVStore(k.storeKey)
-	key := types.GetKeyWhiteList(poolID, addr)
-	whiteList := &types.WhiteList{
+	key := types.GetKeyDelayedNftTransfer(poolID, addr)
+	delayedNftTransfer := &types.DelayedNftTransfer{
 		PoolId:  poolID,
 		Address: addr.String(),
 	}
 
-	store.Set(key, k.cdc.MustMarshalBinaryLengthPrefixed(whiteList))
+	store.Set(key, k.cdc.MustMarshalBinaryLengthPrefixed(delayedNftTransfer))
 }
 
-func (k Keeper) GetAllWhiteLists(ctx sdk.Context) ([]types.WhiteList, error) {
+func (k Keeper) GetAllDelayedNftTransfers(ctx sdk.Context) ([]types.DelayedNftTransfer, error) {
 	store := ctx.KVStore(k.storeKey)
-	iterator := sdk.KVStorePrefixIterator(store, types.KeyPrefixPoolWhiteList)
+	iterator := sdk.KVStorePrefixIterator(store, types.KeyPrefixDelayedNftTransfer)
 	defer iterator.Close()
 
-	whiteLists := make([]types.WhiteList, 0)
+	delayedNftTransfers := make([]types.DelayedNftTransfer, 0)
 
 	for ; iterator.Valid(); iterator.Next() {
 		bz := iterator.Value()
-		var list types.WhiteList
+		var list types.DelayedNftTransfer
 
 		err := k.cdc.UnmarshalBinaryLengthPrefixed(bz, &list)
 		if err != nil {
-			return []types.WhiteList{}, err
+			return []types.DelayedNftTransfer{}, err
 		}
 
-		whiteLists = append(whiteLists, list)
+		delayedNftTransfers = append(delayedNftTransfers, list)
 	}
 
-	return whiteLists, nil
+	return delayedNftTransfers, nil
 }
 
-func (k Keeper) GetWhiteList(ctx sdk.Context, poolID uint64) ([]types.WhiteList, error) {
+func (k Keeper) GetDelayedNftTransfer(ctx sdk.Context, poolID uint64) ([]types.DelayedNftTransfer, error) {
 	store := ctx.KVStore(k.storeKey)
-	iterator := sdk.KVStorePrefixIterator(store, types.GetKeyPoolWhiteList(poolID))
+	iterator := sdk.KVStorePrefixIterator(store, types.GetKeyPoolDelayedNftTransfer(poolID))
 	defer iterator.Close()
 
-	whiteLists := make([]types.WhiteList, 0)
+	delayedNftTransfers := make([]types.DelayedNftTransfer, 0)
 
 	for ; iterator.Valid(); iterator.Next() {
 		bz := iterator.Value()
-		var list types.WhiteList
+		var list types.DelayedNftTransfer
 
 		err := k.cdc.UnmarshalBinaryLengthPrefixed(bz, &list)
 		if err != nil {
-			return []types.WhiteList{}, err
+			return []types.DelayedNftTransfer{}, err
 		}
 
-		whiteLists = append(whiteLists, list)
+		delayedNftTransfers = append(delayedNftTransfers, list)
 	}
 
-	return whiteLists, nil
+	return delayedNftTransfers, nil
 }
