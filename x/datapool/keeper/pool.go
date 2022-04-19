@@ -43,6 +43,7 @@ func (k Keeper) RegisterDataValidator(ctx sdk.Context, dataValidator types.DataV
 }
 
 func (k Keeper) GetAllDataValidators(ctx sdk.Context) ([]types.DataValidator, error) {
+	// TODO: add pagination
 	store := ctx.KVStore(k.storeKey)
 	iterator := sdk.KVStorePrefixIterator(store, types.KeyPrefixDataValidators)
 	defer iterator.Close()
@@ -263,6 +264,7 @@ func (k Keeper) SetPool(ctx sdk.Context, pool *types.Pool) {
 }
 
 func (k Keeper) GetAllPools(ctx sdk.Context) ([]types.Pool, error) {
+	// TODO: add pagination
 	store := ctx.KVStore(k.storeKey)
 	iterator := sdk.KVStorePrefixIterator(store, types.KeyPrefixPools)
 	defer iterator.Close()
@@ -562,6 +564,7 @@ func (k Keeper) AddToDelayedNftTransfer(ctx sdk.Context, poolID uint64, addr sdk
 }
 
 func (k Keeper) GetAllDelayedNftTransfers(ctx sdk.Context) ([]types.DelayedNftTransfer, error) {
+	// TODO: add pagination
 	store := ctx.KVStore(k.storeKey)
 	iterator := sdk.KVStorePrefixIterator(store, types.KeyPrefixDelayedNftTransfer)
 	defer iterator.Close()
