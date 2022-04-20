@@ -293,7 +293,7 @@ func (suite poolTestSuite) TestBuyDataAccessNFTPending() {
 	err := suite.BankKeeper.AddCoins(suite.Ctx, buyerAddr, fundForBuyer)
 	suite.Require().NoError(err)
 
-	err = suite.DataPoolKeeper.BuyDataAccessNFT(suite.Ctx, buyerAddr, poolID, 1, NFTPrice)
+	err = suite.DataPoolKeeper.BuyDataPass(suite.Ctx, buyerAddr, poolID, 1, NFTPrice)
 	suite.Require().NoError(err)
 
 	pool, err := suite.DataPoolKeeper.GetPool(suite.Ctx, poolID)
@@ -312,7 +312,7 @@ func (suite poolTestSuite) TestBuyDataAccessNFTPoolNotFound() {
 	suite.Require().NoError(err)
 
 	// buy NFT other data pool
-	err = suite.DataPoolKeeper.BuyDataAccessNFT(suite.Ctx, buyerAddr, 2, 1, NFTPrice)
+	err = suite.DataPoolKeeper.BuyDataPass(suite.Ctx, buyerAddr, 2, 1, NFTPrice)
 	suite.Require().Error(err, types.ErrPoolNotFound)
 }
 
@@ -324,11 +324,11 @@ func (suite poolTestSuite) TestBuyDataAccessNFTSoldOut() {
 	suite.Require().NoError(err)
 
 	// buy 1 NFT
-	err = suite.DataPoolKeeper.BuyDataAccessNFT(suite.Ctx, buyerAddr, poolID, 1, NFTPrice)
+	err = suite.DataPoolKeeper.BuyDataPass(suite.Ctx, buyerAddr, poolID, 1, NFTPrice)
 	suite.Require().NoError(err)
 
 	// buy 1 NFT more
-	err = suite.DataPoolKeeper.BuyDataAccessNFT(suite.Ctx, buyerAddr, poolID, 1, NFTPrice)
+	err = suite.DataPoolKeeper.BuyDataPass(suite.Ctx, buyerAddr, poolID, 1, NFTPrice)
 	suite.Require().Error(err, types.ErrNFTAllIssued)
 }
 
@@ -340,7 +340,7 @@ func (suite poolTestSuite) TestBuyDataAccessNFTRoundNotMatched() {
 	suite.Require().NoError(err)
 
 	// different round
-	err = suite.DataPoolKeeper.BuyDataAccessNFT(suite.Ctx, buyerAddr, poolID, 2, NFTPrice)
+	err = suite.DataPoolKeeper.BuyDataPass(suite.Ctx, buyerAddr, poolID, 2, NFTPrice)
 	suite.Require().Error(err, types.ErrRoundNotMatched)
 }
 
@@ -352,7 +352,7 @@ func (suite poolTestSuite) TestBuyDataAccessNFTPaymentNotMatched() {
 	suite.Require().NoError(err)
 
 	// buy NFT with different payment
-	err = suite.DataPoolKeeper.BuyDataAccessNFT(suite.Ctx, buyerAddr, poolID, 1, sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(5000000)))
+	err = suite.DataPoolKeeper.BuyDataPass(suite.Ctx, buyerAddr, poolID, 1, sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(5000000)))
 	suite.Require().Error(err, types.ErrPaymentNotMatched)
 }
 
@@ -364,7 +364,7 @@ func (suite poolTestSuite) TestBuyDataAccessNFTInsufficientBalance() {
 	err := suite.BankKeeper.AddCoins(suite.Ctx, buyerAddr, sdk.NewCoins(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(1000))))
 	suite.Require().NoError(err)
 
-	err = suite.DataPoolKeeper.BuyDataAccessNFT(suite.Ctx, buyerAddr, poolID, 1, NFTPrice)
+	err = suite.DataPoolKeeper.BuyDataPass(suite.Ctx, buyerAddr, poolID, 1, NFTPrice)
 	suite.Require().Error(err, sdkerrors.ErrInsufficientFunds)
 }
 

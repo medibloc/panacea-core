@@ -206,7 +206,7 @@ func CmdBuyDataAccessNFT() *cobra.Command {
 				return err
 			}
 
-			msg := &types.MsgBuyDataAccessNFT{
+			msg := &types.MsgBuyDataPass{
 				PoolId:  poolID,
 				Round:   round,
 				Payment: &payment,

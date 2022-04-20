@@ -485,7 +485,7 @@ func (k Keeper) GetDataValidationCertificate(ctx sdk.Context, poolID, round uint
 	return cert, nil
 }
 
-func (k Keeper) BuyDataAccessNFT(ctx sdk.Context, buyer sdk.AccAddress, poolID, round uint64, payment sdk.Coin) error {
+func (k Keeper) BuyDataPass(ctx sdk.Context, buyer sdk.AccAddress, poolID, round uint64, payment sdk.Coin) error {
 	pool, err := k.GetPool(ctx, poolID)
 	if err != nil {
 		return sdkerrors.Wrapf(types.ErrBuyDataPass, err.Error())
