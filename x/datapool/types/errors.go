@@ -21,4 +21,8 @@ var (
 	ErrNFTAllIssued               = sdkerrors.Register(ModuleName, 13, "all NFTs issued")
 	ErrRoundNotMatched            = sdkerrors.Register(ModuleName, 14, "data pool sales round not matched")
 	ErrPaymentNotMatched          = sdkerrors.Register(ModuleName, 15, "payment not matched")
+	ErrCreatePool                 = sdkerrors.Register(ModuleName, 16, "failed to create data pool")
+	ErrMintNFT                    = sdkerrors.Register(ModuleName, 17, "failed to mint NFT")
+	ErrInstantiateContract        = sdkerrors.Register(ModuleName, 18, "failed to instantiate contract")
+	ErrBuyDataPass                = sdkerrors.Register(ModuleName, 19, "failed to buy data pass")
 )
