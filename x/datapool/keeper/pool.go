@@ -518,92 +518,31 @@ func (k Keeper) BuyDataAccessNFT(ctx sdk.Context, buyer sdk.AccAddress, poolID, 
 	}
 
 	//mint data access NFT when pool is activated
-	if pool.GetStatus() == types.ACTIVE {
-		contractAddr := pool.GetNftContractAddr()
+	contractAddr := pool.GetNftContractAddr()
 
-		contractAcc, err := sdk.AccAddressFromBech32(contractAddr)
-		if err != nil {
-			return sdkerrors.Wrapf(err, "invalid NFT contract address")
-		}
-
-		mintMsg := types.NewMsgMintDataAccessNFT(pool.GetNumIssuedNfts()+1, buyer.String())
-		mintMsgBz, err := json.Marshal(mintMsg)
-		if err != nil {
-			return sdkerrors.Wrapf(err, "failed to marshal mint NFT Msg")
-		}
-
-		_, err = k.wasmKeeper.Execute(ctx, contractAcc, poolAcc, mintMsgBz, sdk.NewCoins(types.ZeroFund))
-		if err != nil {
-			return sdkerrors.Wrapf(err, "failed to mint NFT")
-		}
-	} else {
-		// if pool is PENDING state, add buyer to white list
-		k.AddToDelayedNftTransfer(ctx, poolID, buyer)
+	contractAcc, err := sdk.AccAddressFromBech32(contractAddr)
+	if err != nil {
+		return sdkerrors.Wrapf(err, "invalid NFT contract address")
 	}
 
-	k.increaseIssuedNFT(ctx, pool)
+	mintMsg := types.NewMsgMintDataAccessNFT(pool.GetNumIssuedNfts()+1, buyer.String())
+	mintMsgBz, err := json.Marshal(mintMsg)
+	if err != nil {
+		return sdkerrors.Wrapf(err, "failed to marshal mint NFT Msg")
+	}
+
+	_, err = k.wasmKeeper.Execute(ctx, contractAcc, poolAcc, mintMsgBz, sdk.NewCoins(types.ZeroFund))
+	if err != nil {
+		return sdkerrors.Wrapf(err, "failed to mint NFT")
+	}
+
+	k.increaseNumIssuedNFT(ctx, pool)
 
 	return nil
 }
 
-func (k Keeper) increaseIssuedNFT(ctx sdk.Context, pool *types.Pool) {
+func (k Keeper) increaseNumIssuedNFT(ctx sdk.Context, pool *types.Pool) {
 	pool.NumIssuedNfts += 1
 
 	k.SetPool(ctx, pool)
-}
-
-func (k Keeper) AddToDelayedNftTransfer(ctx sdk.Context, poolID uint64, addr sdk.AccAddress) {
-	store := ctx.KVStore(k.storeKey)
-	key := types.GetKeyDelayedNftTransfer(poolID, addr)
-	delayedNftTransfer := &types.DelayedNftTransfer{
-		PoolId:  poolID,
-		Address: addr.String(),
-	}
-
-	store.Set(key, k.cdc.MustMarshalBinaryLengthPrefixed(delayedNftTransfer))
-}
-
-func (k Keeper) GetAllDelayedNftTransfers(ctx sdk.Context) ([]types.DelayedNftTransfer, error) {
-	// TODO: add pagination
-	store := ctx.KVStore(k.storeKey)
-	iterator := sdk.KVStorePrefixIterator(store, types.KeyPrefixDelayedNftTransfer)
-	defer iterator.Close()
-
-	delayedNftTransfers := make([]types.DelayedNftTransfer, 0)
-
-	for ; iterator.Valid(); iterator.Next() {
-		bz := iterator.Value()
-		var list types.DelayedNftTransfer
-
-		err := k.cdc.UnmarshalBinaryLengthPrefixed(bz, &list)
-		if err != nil {
-			return []types.DelayedNftTransfer{}, err
-		}
-
-		delayedNftTransfers = append(delayedNftTransfers, list)
-	}
-
-	return delayedNftTransfers, nil
-}
-
-func (k Keeper) GetDelayedNftTransfer(ctx sdk.Context, poolID uint64) ([]types.DelayedNftTransfer, error) {
-	store := ctx.KVStore(k.storeKey)
-	iterator := sdk.KVStorePrefixIterator(store, types.GetKeyPoolDelayedNftTransfer(poolID))
-	defer iterator.Close()
-
-	delayedNftTransfers := make([]types.DelayedNftTransfer, 0)
-
-	for ; iterator.Valid(); iterator.Next() {
-		bz := iterator.Value()
-		var list types.DelayedNftTransfer
-
-		err := k.cdc.UnmarshalBinaryLengthPrefixed(bz, &list)
-		if err != nil {
-			return []types.DelayedNftTransfer{}, err
-		}
-
-		delayedNftTransfers = append(delayedNftTransfers, list)
-	}
-
-	return delayedNftTransfers, nil
 }

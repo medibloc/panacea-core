@@ -10,10 +10,9 @@ import "panacea/datapool/v2/pool.proto";
 // GenesisState defines the datapool module's genesis state.
 message GenesisState {
   repeated DataValidator data_validators = 1 [(gogoproto.nullable) = false];
-  uint64                      next_pool_number = 2;
-  repeated Pool               pools = 3 [(gogoproto.nullable) = false];
-  Params                      params = 4 [(gogoproto.nullable) = false];
-  repeated DelayedNftTransfer delayed_nft_transfer = 5 [(gogoproto.nullable) = false];
+  uint64                 next_pool_number = 2;
+  repeated Pool          pools = 3 [(gogoproto.nullable) = false];
+  Params                 params = 4 [(gogoproto.nullable) = false];
 }
 
 // Params define parameters of datapool module
@@ -24,10 +23,4 @@ message Params {
   ];
   uint64 data_pool_code_id = 2;
   string data_pool_nft_contract_address = 3;
-}
-
-// DelayedNftTransfer define white list of data pool
-message DelayedNftTransfer {
-  uint64 pool_id = 1;
-  string address = 2;
 }

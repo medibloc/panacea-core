@@ -18,8 +18,6 @@ import (
 var (
 	dataVal        = sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address())
 	curator        = sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address())
-	buyer          = sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address())
-	buyer2         = sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address())
 	NFTPrice       = sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(10000000))
 	downloadPeriod = time.Duration(time.Second * 100000000)
 	poolID         = uint64(1)
@@ -46,14 +44,11 @@ func (suite genesisTestSuite) TestDataPoolInitGenesis() {
 
 	params := types.DefaultParams()
 
-	delayedNftTransfer := makeSampleDelayedNftTransfer()
-
 	genState := &types.GenesisState{
-		DataValidators:     dataValidators,
-		NextPoolNumber:     2,
-		Pools:              pools,
-		Params:             params,
-		DelayedNftTransfer: delayedNftTransfer,
+		DataValidators: dataValidators,
+		NextPoolNumber: 2,
+		Pools:          pools,
+		Params:         params,
 	}
 
 	datapool.InitGenesis(suite.Ctx, suite.DataPoolKeeper, *genState)
@@ -74,11 +69,6 @@ func (suite genesisTestSuite) TestDataPoolInitGenesis() {
 	// check params
 	paramsFromKeeper := suite.DataPoolKeeper.GetParams(suite.Ctx)
 	suite.Require().Equal(params, paramsFromKeeper)
-
-	// check delayed NFT transfer
-	delayedNftTransferFromKeeper, err := suite.DataPoolKeeper.GetAllDelayedNftTransfers(suite.Ctx)
-	suite.Require().NoError(err)
-	suite.Require().Len(delayedNftTransferFromKeeper, 2)
 }
 
 func (suite genesisTestSuite) TestDataPoolExportGenesis() {
@@ -95,22 +85,11 @@ func (suite genesisTestSuite) TestDataPoolExportGenesis() {
 	// set params
 	suite.DataPoolKeeper.SetParams(suite.Ctx, types.DefaultParams())
 
-	// set white list
-	delayedNftTransfer := makeSampleDelayedNftTransfer()
-	for _, list := range delayedNftTransfer {
-		addr, err := sdk.AccAddressFromBech32(list.Address)
-		suite.Require().NoError(err)
-		suite.DataPoolKeeper.AddToDelayedNftTransfer(suite.Ctx, list.PoolId, addr)
-	}
-
 	genesisState := datapool.ExportGenesis(suite.Ctx, suite.DataPoolKeeper)
 	suite.Require().Equal(uint64(2), genesisState.NextPoolNumber)
 	suite.Require().Len(genesisState.Pools, 1)
 	suite.Require().Equal(types.DefaultParams(), genesisState.Params)
 	suite.Require().Len(genesisState.DataValidators, 1)
-	suite.Require().Len(genesisState.DelayedNftTransfer, 2)
-	suite.Require().Contains(genesisState.DelayedNftTransfer, delayedNftTransfer[0])
-	suite.Require().Contains(genesisState.DelayedNftTransfer, delayedNftTransfer[1])
 }
 
 func makeSampleDataValidator() types.DataValidator {
@@ -143,18 +122,4 @@ func makeSamplePoolParams() *types.PoolParams {
 		TrustedDataIssuers:    []string(nil),
 		DownloadPeriod:        &downloadPeriod,
 	}
-}
-
-func makeSampleDelayedNftTransfer() []types.DelayedNftTransfer {
-	delayedNftTransfer1 := types.DelayedNftTransfer{
-		PoolId:  poolID,
-		Address: buyer.String(),
-	}
-
-	delayedNftTransfer2 := types.DelayedNftTransfer{
-		PoolId:  poolID,
-		Address: buyer2.String(),
-	}
-
-	return []types.DelayedNftTransfer{delayedNftTransfer1, delayedNftTransfer2}
 }

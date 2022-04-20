@@ -31,9 +31,6 @@ var (
 	// KeyPrefixPools defines key to store Pools
 	KeyPrefixPools = []byte{0x03}
 
-	// KeyPrefixDelayedNftTransfer defines key to store white list of data access NFT
-	KeyPrefixDelayedNftTransfer = []byte{0x04}
-
 	// KeyPrefixDataValidatorCerts defines key to store dataValidator certs
 	KeyPrefixDataValidatorCerts = []byte{0x05}
 )
@@ -50,13 +47,4 @@ func GetKeyPrefixDataValidateCert(poolID, round uint64, dataHash []byte) []byte 
 	poolAppend := append(KeyPrefixDataValidatorCerts, sdk.Uint64ToBigEndian(poolID)...)
 	roundAppend := append(poolAppend, sdk.Uint64ToBigEndian(round)...)
 	return append(roundAppend, dataHash...)
-}
-
-// GetKeyPoolDelayedNftTransfer is to get prefix key of white list of the pool
-func GetKeyPoolDelayedNftTransfer(poolID uint64) []byte {
-	return append(KeyPrefixDelayedNftTransfer, sdk.Uint64ToBigEndian(poolID)...)
-}
-
-func GetKeyDelayedNftTransfer(poolID uint64, addr sdk.AccAddress) []byte {
-	return append(GetKeyPoolDelayedNftTransfer(poolID), addr.Bytes()...)
 }

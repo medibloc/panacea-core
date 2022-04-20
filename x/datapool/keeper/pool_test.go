@@ -296,10 +296,6 @@ func (suite poolTestSuite) TestBuyDataAccessNFTPending() {
 	err = suite.DataPoolKeeper.BuyDataAccessNFT(suite.Ctx, buyerAddr, poolID, 1, NFTPrice)
 	suite.Require().NoError(err)
 
-	delayedNftTransfer, err := suite.DataPoolKeeper.GetDelayedNftTransfer(suite.Ctx, poolID)
-	suite.Require().NoError(err)
-	suite.Require().Len(delayedNftTransfer, 1)
-
 	pool, err := suite.DataPoolKeeper.GetPool(suite.Ctx, poolID)
 	suite.Require().NoError(err)
 
