@@ -492,3 +492,36 @@ func (k Keeper) GetDataValidationCertificate(ctx sdk.Context, poolID, round uint
 
 	return cert, nil
 }
+
+func (k Keeper) RedeemDataAccessNFT(ctx sdk.Context, redeemNFT types.MsgRedeemDataAccessNFT) (*types.DataAccessNFTRedeemReceipt, error) {
+	return nil, nil
+}
+
+func (k Keeper) GetNFTRedeemReceipt(ctx sdk.Context, poolID, round uint64, redeemer sdk.AccAddress) (types.DataAccessNFTRedeemReceipt, error) {
+	key := types.GetKeyPrefixNFTRedeemReceipt(poolID, round, redeemer)
+	store := ctx.KVStore(k.storeKey)
+
+	bz := store.Get(key)
+
+	var receipt types.DataAccessNFTRedeemReceipt
+	err := k.cdc.UnmarshalBinaryLengthPrefixed(bz, &receipt)
+	if err != nil {
+		return types.DataAccessNFTRedeemReceipt{}, sdkerrors.Wrap(types.ErrGetDataAccessNFTReceipt, err.Error())
+	}
+
+	return receipt, nil
+}
+
+func (k Keeper) SetNFTRedeemReceipt(ctx sdk.Context, redeemReceipt types.DataAccessNFTRedeemReceipt) error {
+	redeemer, err := sdk.AccAddressFromBech32(redeemReceipt.Redeemer)
+	if err != nil {
+		return err
+	}
+
+	store := ctx.KVStore(k.storeKey)
+	receiptKey := types.GetKeyPrefixNFTRedeemReceipt(redeemReceipt.PoolId, redeemReceipt.Round, redeemer)
+	bz := k.cdc.MustMarshalBinaryLengthPrefixed(&redeemReceipt)
+	store.Set(receiptKey, bz)
+
+	return nil
+}

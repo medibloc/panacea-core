@@ -246,6 +246,15 @@ func (msg *MsgBuyDataAccessNFT) GetSigners() []sdk.AccAddress {
 
 var _ sdk.Msg = &MsgRedeemDataAccessNFT{}
 
+func NewMsgRedeemDataAccessNFT(poolID, round, nftID uint64, redeemer string) *MsgRedeemDataAccessNFT {
+	return &MsgRedeemDataAccessNFT{
+		PoolId:   poolID,
+		Round:    round,
+		NftId:    nftID,
+		Redeemer: redeemer,
+	}
+}
+
 func (msg *MsgRedeemDataAccessNFT) Route() string {
 	return RouterKey
 }

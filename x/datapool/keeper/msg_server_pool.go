@@ -79,5 +79,12 @@ func (m msgServer) BuyDataAccessNFT(goCtx context.Context, msg *types.MsgBuyData
 }
 
 func (m msgServer) RedeemDataAccessNFT(goCtx context.Context, msg *types.MsgRedeemDataAccessNFT) (*types.MsgRedeemDataAccessNFTResponse, error) {
-	return &types.MsgRedeemDataAccessNFTResponse{}, nil
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	nftRedeemReceipt, err := m.Keeper.RedeemDataAccessNFT(ctx, *msg)
+	if err != nil {
+		return nil, err
+	}
+
+	return &types.MsgRedeemDataAccessNFTResponse{Receipt: nftRedeemReceipt}, nil
 }

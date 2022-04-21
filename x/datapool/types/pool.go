@@ -2,15 +2,16 @@ package types
 
 import (
 	"fmt"
-	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	"strconv"
+
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 const (
-	PENDING          = "PENDING"
-	ACTIVE           = "ACTIVE"
+	PENDING = "PENDING"
+	ACTIVE  = "ACTIVE"
 
 	ShareTokenPrefix = "DP"
 )
@@ -41,4 +42,14 @@ func GetModuleAddress() sdk.AccAddress {
 
 func GetAccumPoolShareToken(poolID, amount uint64) sdk.Coin {
 	return sdk.NewCoin(fmt.Sprintf(ShareTokenPrefix+"/%v", poolID), sdk.NewIntFromUint64(amount))
+}
+
+func NewDataAccessNFTRedeemReceipt(poolID, round, nftID, blockHeight uint64, redeemer string) *DataAccessNFTRedeemReceipt {
+	return &DataAccessNFTRedeemReceipt{
+		PoolId:      poolID,
+		Round:       round,
+		NftId:       nftID,
+		BlockHeight: blockHeight,
+		Redeemer:    redeemer,
+	}
 }

@@ -36,6 +36,8 @@ var (
 
 	// KeyPrefixDataValidatorCerts defines key to store dataValidator certs
 	KeyPrefixDataValidatorCerts = []byte{0x05}
+
+	KeyPrefixNFTRedeemReceipts = []byte{0x06}
 )
 
 func GetKeyPrefixDataValidator(dataValidatorAddr sdk.AccAddress) []byte {
@@ -50,4 +52,10 @@ func GetKeyPrefixDataValidateCert(poolID, round uint64, dataHash []byte) []byte 
 	poolAppend := append(KeyPrefixDataValidatorCerts, sdk.Uint64ToBigEndian(poolID)...)
 	roundAppend := append(poolAppend, sdk.Uint64ToBigEndian(round)...)
 	return append(roundAppend, dataHash...)
+}
+
+func GetKeyPrefixNFTRedeemReceipt(poolID, round uint64, redeemer sdk.AccAddress) []byte {
+	poolAppend := append(KeyPrefixNFTRedeemReceipts, sdk.Uint64ToBigEndian(poolID)...)
+	roundAppend := append(poolAppend, sdk.Uint64ToBigEndian(round)...)
+	return append(roundAppend, redeemer.Bytes()...)
 }
