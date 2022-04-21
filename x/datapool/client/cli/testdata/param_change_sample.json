@@ -4,12 +4,12 @@
   "changes": [
     {
       "subspace": "datapool",
-      "key": "datapoolcodeid",
+      "key": "DataPoolCodeId",
       "value": "1"
     },
     {
       "subspace": "datapool",
-      "key": "datapoolnftcontractaddress",
+      "key": "DataPoolNftContractAddress",
       "value": "panacea14hj2tavq8fpesdwxxcu44rty3hh90vhu4mda6e"
     }
   ],

@@ -47,7 +47,7 @@ func (m msgServer) CreatePool(goCtx context.Context, msg *types.MsgCreatePool) (
 		return nil, err
 	}
 
-	newPoolId, err := m.Keeper.CreatePool(ctx, curator, *msg.PoolParams)
+	newPoolId, err := m.Keeper.CreatePool(ctx, curator, msg.Deposit, *msg.PoolParams)
 	if err != nil {
 		return nil, err
 	}

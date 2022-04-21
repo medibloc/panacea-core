@@ -28,7 +28,6 @@ import (
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
-	"github.com/medibloc/panacea-core/v2/types/assets"
 	aolkeeper "github.com/medibloc/panacea-core/v2/x/aol/keeper"
 	aoltypes "github.com/medibloc/panacea-core/v2/x/aol/types"
 	burnkeeper "github.com/medibloc/panacea-core/v2/x/burn/keeper"
@@ -243,13 +242,8 @@ func (suite *TestSuite) SetupTest() {
 	)
 	suite.DataPoolMsgServer = datapoolkeeper.NewMsgServerImpl(suite.DataPoolKeeper)
 
-	dataPoolGenState := datapooltypes.GenesisState{
-		DataValidators: []*datapooltypes.DataValidator{},
-		NextPoolNumber: 1,
-		Pools:          []*datapooltypes.Pool{},
-		Params:         datapooltypes.Params{DataPoolDeposit: sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(1000000))},
-	}
-	datapool.InitGenesis(suite.Ctx, suite.DataPoolKeeper, dataPoolGenState)
+	dataPoolGenState := datapooltypes.DefaultGenesis()
+	datapool.InitGenesis(suite.Ctx, suite.DataPoolKeeper, *dataPoolGenState)
 }
 
 func (suite *TestSuite) BeforeTest(suiteName, testName string) {

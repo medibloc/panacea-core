@@ -116,7 +116,7 @@ func (k Keeper) UpdateDataValidator(ctx sdk.Context, address sdk.AccAddress, end
 	return nil
 }
 
-func (k Keeper) CreatePool(ctx sdk.Context, curator sdk.AccAddress, poolParams types.PoolParams) (uint64, error) {
+func (k Keeper) CreatePool(ctx sdk.Context, curator sdk.AccAddress, deposit sdk.Coin, poolParams types.PoolParams) (uint64, error) {
 	// Get the next pool id
 	poolID := k.GetNextPoolNumberAndIncrement(ctx)
 
@@ -146,10 +146,21 @@ func (k Keeper) CreatePool(ctx sdk.Context, curator sdk.AccAddress, poolParams t
 		}
 	}
 
-	// curator send deposit to pool for creation of pool
+	// curator deposit check.
 	params := k.GetParams(ctx)
 
-	err = k.bankKeeper.SendCoins(ctx, curator, poolAddress, sdk.NewCoins(params.DataPoolDeposit))
+	NFTPriceDec := poolParams.GetNftPrice().Amount.ToDec()
+	NFTTotalSupplyDec := sdk.NewDecFromInt(sdk.NewIntFromUint64(poolParams.GetMaxNftSupply()))
+	expectedTotalSalesDec := NFTPriceDec.Mul(NFTTotalSupplyDec)
+	requiredDeposit := expectedTotalSalesDec.Mul(params.DepositRate)
+	if deposit.Amount.ToDec().LT(requiredDeposit) {
+		return 0, types.ErrNotEnoughPoolDeposit
+	}
+
+	newPool.Deposit = deposit
+
+	// send deposit to pool
+	err = k.bankKeeper.SendCoins(ctx, curator, poolAddress, sdk.NewCoins(deposit))
 	if err != nil {
 		return 0, sdkerrors.Wrapf(types.ErrNotEnoughPoolDeposit, "The curator's balance is not enough to make a data pool")
 	}
