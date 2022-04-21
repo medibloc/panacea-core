@@ -46,8 +46,11 @@ func GetKeyPrefixPools(poolID uint64) []byte {
 	return append(KeyPrefixPools, sdk.Uint64ToBigEndian(poolID)...)
 }
 
+func GetKeyPrefixDataValidateCertByRound(poolID, round uint64) []byte {
+	keyPoolAppended := append(KeyPrefixDataValidatorCerts, sdk.Uint64ToBigEndian(poolID)...)
+	return append(keyPoolAppended, sdk.Uint64ToBigEndian(round)...)
+}
+
 func GetKeyPrefixDataValidateCert(poolID, round uint64, dataHash []byte) []byte {
-	poolAppend := append(KeyPrefixDataValidatorCerts, sdk.Uint64ToBigEndian(poolID)...)
-	roundAppend := append(poolAppend, sdk.Uint64ToBigEndian(round)...)
-	return append(roundAppend, dataHash...)
+	return append(GetKeyPrefixDataValidateCertByRound(poolID, round), dataHash...)
 }

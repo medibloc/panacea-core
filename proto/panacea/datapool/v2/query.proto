@@ -3,6 +3,7 @@ package panacea.datapool.v2;
 
 option go_package = "github.com/medibloc/panacea-core/x/datapool/types";
 
+import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 import "panacea/datapool/v2/pool.proto";
 import "panacea/datapool/v2/genesis.proto";
@@ -19,14 +20,19 @@ service Query {
     option (google.api.http).get = "/panacea/datapool/v2/data_validator";
   }
 
-  // DataPoolParams returns params of x/datapool module
+  // DataPoolParams returns params of x/datapool module.
   rpc DataPoolParams(QueryDataPoolParamsRequest) returns (QueryDataPoolParamsResponse) {
     option (google.api.http).get = "/panacea/datapool/v2/params";
   }
 
-  // DataPoolModuleAddr returns x/datapool module address
+  // DataPoolModuleAddr returns x/datapool module address.
   rpc DataPoolModuleAddr(QueryDataPoolModuleAddrRequest) returns (QueryDataPoolModuleAddrResponse) {
     option (google.api.http).get = "/panacea/datapool/v2/module_addr";
+  }
+
+  // DataValidationCertificates returns DataValidationCertificates
+  rpc DataValidationCertificates(QueryDataValidationCertificatesRequest) returns (QueryDataValidationCertificatesResponse) {
+    option (google.api.http).get = "/panacea/datapool/v2/data_validation_certificates/pool/{pool_id}/round/{round}";
   }
 }
 
@@ -50,18 +56,31 @@ message QueryDataValidatorResponse {
   DataValidator data_validator = 1;
 }
 
-// QueryDataPoolParamsRequest is the request type for the Query/DataPoolParamsRequest RPC method.
+// QueryDataPoolParamsRequest is the request type for the Query/DataPoolParams RPC method.
 message QueryDataPoolParamsRequest {}
 
-// QueryDataPoolParamsResponse is the response type for the Query/DataPoolParamsResponse RPC method.
+// QueryDataPoolParamsResponse is the response type for the Query/DataPoolParams RPC method.
 message QueryDataPoolParamsResponse {
   Params params = 1;
 }
 
-// QueryDataPoolModuleAddrRequest is the request type for the Query/DataPoolModuleAddrRequest RPC method.
+// QueryDataPoolModuleAddrRequest is the request type for the Query/DataPoolModuleAddr RPC method.
 message QueryDataPoolModuleAddrRequest {}
 
-// QueryDataPoolModuleAddrResponse is the response type for the Query/DataPoolModuleAddrResponse RPC method.
+// QueryDataPoolModuleAddrResponse is the response type for the Query/DataPoolModuleAddr RPC method.
 message QueryDataPoolModuleAddrResponse {
   string address = 1;
+}
+
+// QueryDataValidationCertificatesRequest is the request type for the Query/DataValidationCertificates RPC method.
+message QueryDataValidationCertificatesRequest {
+  uint64 pool_id = 1;
+  uint64 round = 2;
+}
+
+// QueryDataValidationCertificatesResponse is the response type for the QueryDataValidationCertificates RPC method.
+message QueryDataValidationCertificatesResponse {
+  repeated DataValidationCertificate data_validation_certificates = 1 [
+    (gogoproto.nullable) = false
+  ];
 }

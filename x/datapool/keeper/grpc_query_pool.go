@@ -68,3 +68,18 @@ func (k Keeper) DataPoolModuleAddr(goCtx context.Context, req *types.QueryDataPo
 
 	return &types.QueryDataPoolModuleAddrResponse{Address: moduleAddr.String()}, nil
 }
+
+func (k Keeper) DataValidationCertificates(goCtx context.Context, req *types.QueryDataValidationCertificatesRequest) (*types.QueryDataValidationCertificatesResponse, error) {
+	if req == nil {
+		return nil, status.Error(codes.InvalidArgument, "invalid request")
+	}
+
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	certs, err := k.GetDataValidationCertificatesByRound(ctx, req.PoolId, req.Round)
+	if err != nil {
+		return nil, err
+	}
+
+	return &types.QueryDataValidationCertificatesResponse{DataValidationCertificates: certs}, nil
+}
