@@ -8,11 +8,11 @@ import (
 )
 
 var (
-	DefaultDepositRate = sdk.NewDecWithPrec(1, 1) // default 10%
+	DefaultDataPoolDepositRate = sdk.NewDecWithPrec(1, 1) // default 10%
 )
 
 var (
-	KeyDepositRate                = []byte("DepositRate")
+	KeyDataPoolDepositRate        = []byte("DataPoolDepositRate")
 	KeyDataPoolCodeID             = []byte("DataPoolCodeId")
 	KeyDataPoolNFTContractAddress = []byte("DataPoolNftContractAddress")
 )
@@ -23,21 +23,21 @@ func ParamKeyTable() paramtypes.KeyTable {
 	return paramtypes.NewKeyTable().RegisterParamSet(&Params{})
 }
 
-func NewParams(depositRate sdk.Dec) Params {
+func NewParams(dataPoolDepositRate sdk.Dec) Params {
 	return Params{
-		DepositRate: depositRate,
+		DataPoolDepositRate: dataPoolDepositRate,
 	}
 }
 
 func DefaultParams() Params {
 	return Params{
-		DepositRate:    DefaultDepositRate,
-		DataPoolCodeId: 0,
+		DataPoolDepositRate: DefaultDataPoolDepositRate,
+		DataPoolCodeId:      0,
 	}
 }
 
 func (p Params) Validate() error {
-	if err := validateDepositRate(p.DepositRate); err != nil {
+	if err := validateDataPoolDepositRate(p.DataPoolDepositRate); err != nil {
 		return err
 	}
 
@@ -54,7 +54,7 @@ func (p Params) Validate() error {
 
 func (p *Params) ParamSetPairs() paramtypes.ParamSetPairs {
 	return paramtypes.ParamSetPairs{
-		paramtypes.NewParamSetPair(KeyDepositRate, &p.DepositRate, validateDepositRate),
+		paramtypes.NewParamSetPair(KeyDataPoolDepositRate, &p.DataPoolDepositRate, validateDataPoolDepositRate),
 		paramtypes.NewParamSetPair(KeyDataPoolCodeID, &p.DataPoolCodeId, validateDataPoolCodeID),
 		paramtypes.NewParamSetPair(KeyDataPoolNFTContractAddress, &p.DataPoolNftContractAddress, validateDataPoolNFTContractAddress),
 	}
@@ -85,7 +85,7 @@ func validateDataPoolNFTContractAddress(i interface{}) error {
 	return nil
 }
 
-func validateDepositRate(i interface{}) error {
+func validateDataPoolDepositRate(i interface{}) error {
 	v, ok := i.(sdk.Dec)
 	if !ok {
 		return fmt.Errorf("invalid parameter type: %T", i)

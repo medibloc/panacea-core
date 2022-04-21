@@ -59,7 +59,7 @@ func (suite poolTestSuite) setupNFTContract() {
 
 	// set datapool parameters
 	params := types.Params{
-		DepositRate:                types.DefaultDepositRate,
+		DataPoolDepositRate:        types.DefaultDataPoolDepositRate,
 		DataPoolNftContractAddress: addr.String(),
 		DataPoolCodeId:             1,
 	}

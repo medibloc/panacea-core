@@ -152,7 +152,7 @@ func (k Keeper) CreatePool(ctx sdk.Context, curator sdk.AccAddress, deposit sdk.
 	NFTPriceDec := poolParams.GetNftPrice().Amount.ToDec()
 	NFTTotalSupplyDec := sdk.NewDecFromInt(sdk.NewIntFromUint64(poolParams.GetMaxNftSupply()))
 	expectedTotalSalesDec := NFTPriceDec.Mul(NFTTotalSupplyDec)
-	requiredDeposit := expectedTotalSalesDec.Mul(params.DepositRate)
+	requiredDeposit := expectedTotalSalesDec.Mul(params.DataPoolDepositRate)
 	if deposit.Amount.ToDec().LT(requiredDeposit) {
 		return 0, types.ErrNotEnoughPoolDeposit
 	}

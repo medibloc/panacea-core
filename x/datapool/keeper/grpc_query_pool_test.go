@@ -28,7 +28,7 @@ var (
 func (suite queryPoolTestSuite) TestQueryDataPoolParams() {
 	// set datapool module params
 	params := &types.Params{
-		DepositRate:                types.DefaultDepositRate,
+		DataPoolDepositRate:        types.DefaultDataPoolDepositRate,
 		DataPoolNftContractAddress: nftContractAddr.String(),
 		DataPoolCodeId:             2,
 	}
