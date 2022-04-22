@@ -56,7 +56,7 @@ func (k Keeper) GetAllDataValidators(ctx sdk.Context) ([]types.DataValidator, er
 
 		err := k.cdc.UnmarshalBinaryLengthPrefixed(bz, &dataValidator)
 		if err != nil {
-			return []types.DataValidator{}, err
+			return nil, err
 		}
 
 		dataValidators = append(dataValidators, dataValidator)
