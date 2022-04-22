@@ -4,6 +4,7 @@ package panacea.datapool.v2;
 option go_package = "github.com/medibloc/panacea-core/x/datapool/types";
 
 import "gogoproto/gogo.proto";
+import "cosmos/base/query/v1beta1/pagination.proto";
 import "google/api/annotations.proto";
 import "panacea/datapool/v2/pool.proto";
 import "panacea/datapool/v2/genesis.proto";
@@ -76,6 +77,7 @@ message QueryDataPoolModuleAddrResponse {
 message QueryDataValidationCertificatesRequest {
   uint64 pool_id = 1;
   uint64 round = 2;
+  cosmos.base.query.v1beta1.PageRequest pagination = 3;
 }
 
 // QueryDataValidationCertificatesResponse is the response type for the QueryDataValidationCertificates RPC method.
@@ -83,4 +85,5 @@ message QueryDataValidationCertificatesResponse {
   repeated DataValidationCertificate data_validation_certificates = 1 [
     (gogoproto.nullable) = false
   ];
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }

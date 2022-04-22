@@ -3,6 +3,9 @@ package keeper
 import (
 	"context"
 
+	"github.com/cosmos/cosmos-sdk/store/prefix"
+	"github.com/cosmos/cosmos-sdk/types/query"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -76,10 +79,26 @@ func (k Keeper) DataValidationCertificates(goCtx context.Context, req *types.Que
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	certs, err := k.GetDataValidationCertificatesByRound(ctx, req.PoolId, req.Round)
+	store := ctx.KVStore(k.storeKey)
+	certsStore := prefix.NewStore(store, types.GetKeyPrefixDataValidateCertByRound(req.PoolId, req.Round))
+
+	var certs []types.DataValidationCertificate
+	pageRes, err := query.Paginate(certsStore, req.Pagination, func(_ []byte, value []byte) error {
+		var cert types.DataValidationCertificate
+		err := k.cdc.UnmarshalBinaryLengthPrefixed(value, &cert)
+		if err != nil {
+			return err
+		}
+		certs = append(certs, cert)
+		return nil
+	})
+
 	if err != nil {
-		return nil, err
+		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	return &types.QueryDataValidationCertificatesResponse{DataValidationCertificates: certs}, nil
+	return &types.QueryDataValidationCertificatesResponse{
+		DataValidationCertificates: certs,
+		Pagination:                 pageRes,
+	}, nil
 }

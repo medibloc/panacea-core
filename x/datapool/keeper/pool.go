@@ -492,27 +492,3 @@ func (k Keeper) GetDataValidationCertificate(ctx sdk.Context, poolID, round uint
 
 	return cert, nil
 }
-
-// GetDataValidationCertificatesByRound returns all data validation certificates of the round
-func (k Keeper) GetDataValidationCertificatesByRound(ctx sdk.Context, poolID, round uint64) ([]types.DataValidationCertificate, error) {
-	store := ctx.KVStore(k.storeKey)
-	prefix := types.GetKeyPrefixDataValidateCertByRound(poolID, round)
-	iterator := sdk.KVStorePrefixIterator(store, prefix)
-	defer iterator.Close()
-
-	certs := make([]types.DataValidationCertificate, 0)
-
-	for ; iterator.Valid(); iterator.Next() {
-		bz := iterator.Value()
-		var cert types.DataValidationCertificate
-
-		err := k.cdc.UnmarshalBinaryLengthPrefixed(bz, &cert)
-		if err != nil {
-			return []types.DataValidationCertificate{}, err
-		}
-
-		certs = append(certs, cert)
-	}
-
-	return certs, nil
-}
