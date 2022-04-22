@@ -86,6 +86,11 @@ func CmdGetDataValidationCertificates() *cobra.Command {
 
 			queryClient := types.NewQueryClient(clientCtx)
 
+			pageReq, err := client.ReadPageRequest(cmd.Flags())
+			if err != nil {
+				return err
+			}
+
 			poolID, err := strconv.ParseUint(args[0], 10, 64)
 			if err != nil {
 				return err
@@ -97,8 +102,9 @@ func CmdGetDataValidationCertificates() *cobra.Command {
 			}
 
 			res, err := queryClient.DataValidationCertificates(cmd.Context(), &types.QueryDataValidationCertificatesRequest{
-				PoolId: poolID,
-				Round:  round,
+				PoolId:     poolID,
+				Round:      round,
+				Pagination: pageReq,
 			})
 
 			if err != nil {
