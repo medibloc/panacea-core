@@ -72,3 +72,50 @@ func CmdGetPool() *cobra.Command {
 
 	return cmd
 }
+
+func CmdGetDataValidationCertificates() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "data-validation-certs [poolID] [round]",
+		Short: "Query data validation certificates by pool and round",
+		Args:  cobra.ExactArgs(2),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientQueryContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			queryClient := types.NewQueryClient(clientCtx)
+
+			pageReq, err := client.ReadPageRequest(cmd.Flags())
+			if err != nil {
+				return err
+			}
+
+			poolID, err := strconv.ParseUint(args[0], 10, 64)
+			if err != nil {
+				return err
+			}
+
+			round, err := strconv.ParseUint(args[1], 10, 64)
+			if err != nil {
+				return err
+			}
+
+			res, err := queryClient.DataValidationCertificates(cmd.Context(), &types.QueryDataValidationCertificatesRequest{
+				PoolId:     poolID,
+				Round:      round,
+				Pagination: pageReq,
+			})
+
+			if err != nil {
+				return err
+			}
+
+			return clientCtx.PrintProto(res)
+		},
+	}
+
+	flags.AddQueryFlagsToCmd(cmd)
+
+	return cmd
+}
