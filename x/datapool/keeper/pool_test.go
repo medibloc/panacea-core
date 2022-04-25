@@ -2,11 +2,12 @@ package keeper_test
 
 import (
 	"fmt"
-	"github.com/cosmos/cosmos-sdk/codec"
 	"io/ioutil"
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/cosmos/cosmos-sdk/codec"
 
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
@@ -35,14 +36,19 @@ var (
 	curatorPrivKey = secp256k1.GenPrivKey()
 	curatorPubKey  = curatorPrivKey.PubKey()
 	curatorAddr    = sdk.AccAddress(curatorPubKey.Address())
+	buyerPrivKey   = secp256k1.GenPrivKey()
+	buyerPubKey    = buyerPrivKey.PubKey()
+	buyerAddr      = sdk.AccAddress(buyerPubKey.Address())
 
 	requesterPrivKey = secp256k1.GenPrivKey()
 	requesterPubKey  = requesterPrivKey.PubKey()
 	requesterAddr    = sdk.AccAddress(requesterPubKey.Address())
 
 	fundForDataVal = sdk.NewCoins(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(10000000000)))
-	fundForCurator = sdk.NewCoins(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(100000000000)))
-	NFTPrice       = sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(10000000))
+	fundForCurator = sdk.NewCoins(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(10000000000)))
+	fundForBuyer   = sdk.NewCoins(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(10000000000)))
+	NFTPrice       = sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(10000000)) // 10 MED
+	enoughDeposit  = sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(20000000)) // 20 MED
 
 	downloadPeriod = time.Second * 100000000
 )
@@ -57,12 +63,27 @@ func (suite poolTestSuite) setupNFTContract() {
 
 	// set datapool parameters
 	params := types.Params{
+		DataPoolDepositRate:        types.DefaultDataPoolDepositRate,
 		DataPoolNftContractAddress: addr.String(),
-		DataPoolDeposit:            types.DefaultDataPoolDeposit,
 		DataPoolCodeId:             1,
 	}
 
 	suite.DataPoolKeeper.SetParams(suite.Ctx, params)
+}
+
+func (suite poolTestSuite) setupCreatePool(maxNftSupply uint64) uint64 {
+	suite.setupNFTContract()
+
+	err := suite.BankKeeper.AddCoins(suite.Ctx, curatorAddr, fundForCurator)
+	suite.Require().NoError(err)
+
+	newPoolParams := makePoolParamsNoDataValidator(maxNftSupply)
+
+	poolID, err := suite.DataPoolKeeper.CreatePool(suite.Ctx, curatorAddr, enoughDeposit, newPoolParams)
+	suite.Require().NoError(err)
+	suite.Require().Equal(poolID, uint64(1))
+
+	return poolID
 }
 
 func (suite *poolTestSuite) TestRegisterDataValidator() {
@@ -199,7 +220,7 @@ func (suite poolTestSuite) TestCreatePool() {
 
 	newPoolParams := makePoolParamsWithDataValidator(100, 10)
 
-	poolID, err := suite.DataPoolKeeper.CreatePool(suite.Ctx, curatorAddr, newPoolParams)
+	poolID, err := suite.DataPoolKeeper.CreatePool(suite.Ctx, curatorAddr, enoughDeposit, newPoolParams)
 	suite.Require().NoError(err)
 	suite.Require().Equal(poolID, uint64(1))
 
@@ -224,7 +245,7 @@ func (suite poolTestSuite) TestNotRegisteredDataValidator() {
 
 	newPoolParams := makePoolParamsWithDataValidator(100, 10)
 
-	_, err = suite.DataPoolKeeper.CreatePool(suite.Ctx, curatorAddr, newPoolParams)
+	_, err = suite.DataPoolKeeper.CreatePool(suite.Ctx, curatorAddr, enoughDeposit, newPoolParams)
 	suite.Require().Error(err, types.ErrNotRegisteredDataValidator)
 }
 
@@ -232,9 +253,9 @@ func (suite poolTestSuite) TestNotEnoughBalanceForDeposit() {
 	// create and instantiate NFT contract
 	suite.setupNFTContract()
 
-	newPoolParams := makePoolParamsNoDataValidator()
+	newPoolParams := makePoolParamsNoDataValidator(10)
 
-	_, err := suite.DataPoolKeeper.CreatePool(suite.Ctx, curatorAddr, newPoolParams)
+	_, err := suite.DataPoolKeeper.CreatePool(suite.Ctx, curatorAddr, enoughDeposit, newPoolParams)
 	suite.Require().Error(err, types.ErrNotEnoughPoolDeposit)
 }
 
@@ -242,10 +263,105 @@ func (suite poolTestSuite) TestNotRegisteredNFTContract() {
 	err := suite.BankKeeper.AddCoins(suite.Ctx, curatorAddr, fundForCurator)
 	suite.Require().NoError(err)
 
-	newPoolParams := makePoolParamsNoDataValidator()
+	newPoolParams := makePoolParamsNoDataValidator(10)
 
-	_, err = suite.DataPoolKeeper.CreatePool(suite.Ctx, curatorAddr, newPoolParams)
+	_, err = suite.DataPoolKeeper.CreatePool(suite.Ctx, curatorAddr, enoughDeposit, newPoolParams)
 	suite.Require().Error(err, types.ErrNoRegisteredNFTContract)
+}
+
+func (suite poolTestSuite) TestBuyDataAccessNFTPending() {
+	// create pool
+	poolID := suite.setupCreatePool(10)
+
+	err := suite.BankKeeper.AddCoins(suite.Ctx, buyerAddr, fundForBuyer)
+	suite.Require().NoError(err)
+
+	err = suite.DataPoolKeeper.BuyDataPass(suite.Ctx, buyerAddr, poolID, 1, NFTPrice)
+	suite.Require().NoError(err)
+
+	pool, err := suite.DataPoolKeeper.GetPool(suite.Ctx, poolID)
+	suite.Require().NoError(err)
+
+	suite.Require().Equal(pool.GetNumIssuedNfts(), uint64(1))
+}
+
+// TODO: TestBuyDataAccessNFTActive - check if data access NFT is mintes successfully
+
+func (suite poolTestSuite) TestBuyDataAccessNFTPoolNotFound() {
+	// create pool
+	suite.setupCreatePool(10)
+
+	err := suite.BankKeeper.AddCoins(suite.Ctx, buyerAddr, fundForBuyer)
+	suite.Require().NoError(err)
+
+	// buy NFT other data pool
+	err = suite.DataPoolKeeper.BuyDataPass(suite.Ctx, buyerAddr, 2, 1, NFTPrice)
+	suite.Require().Error(err, types.ErrPoolNotFound)
+}
+
+func (suite poolTestSuite) TestBuyDataAccessNFTSoldOut() {
+	// create pool w/ NFT max supply of 1
+	poolID := suite.setupCreatePool(1)
+
+	err := suite.BankKeeper.AddCoins(suite.Ctx, buyerAddr, fundForBuyer)
+	suite.Require().NoError(err)
+
+	// buy 1 NFT
+	err = suite.DataPoolKeeper.BuyDataPass(suite.Ctx, buyerAddr, poolID, 1, NFTPrice)
+	suite.Require().NoError(err)
+
+	// buy 1 NFT more
+	err = suite.DataPoolKeeper.BuyDataPass(suite.Ctx, buyerAddr, poolID, 1, NFTPrice)
+	suite.Require().Error(err, types.ErrNFTAllIssued)
+}
+
+func (suite poolTestSuite) TestBuyDataAccessNFTRoundNotMatched() {
+	// create pool
+	poolID := suite.setupCreatePool(10)
+
+	err := suite.BankKeeper.AddCoins(suite.Ctx, buyerAddr, fundForBuyer)
+	suite.Require().NoError(err)
+
+	// different round
+	err = suite.DataPoolKeeper.BuyDataPass(suite.Ctx, buyerAddr, poolID, 2, NFTPrice)
+	suite.Require().Error(err, types.ErrRoundNotMatched)
+}
+
+func (suite poolTestSuite) TestBuyDataAccessNFTPaymentNotMatched() {
+	// create pool
+	poolID := suite.setupCreatePool(10)
+
+	err := suite.BankKeeper.AddCoins(suite.Ctx, buyerAddr, fundForBuyer)
+	suite.Require().NoError(err)
+
+	// buy NFT with different payment
+	err = suite.DataPoolKeeper.BuyDataPass(suite.Ctx, buyerAddr, poolID, 1, sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(5000000)))
+	suite.Require().Error(err, types.ErrPaymentNotMatched)
+}
+
+func (suite poolTestSuite) TestBuyDataAccessNFTInsufficientBalance() {
+	// create pool
+	poolID := suite.setupCreatePool(10)
+
+	// buyer with small balance
+	err := suite.BankKeeper.AddCoins(suite.Ctx, buyerAddr, sdk.NewCoins(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(1000))))
+	suite.Require().NoError(err)
+
+	err = suite.DataPoolKeeper.BuyDataPass(suite.Ctx, buyerAddr, poolID, 1, NFTPrice)
+	suite.Require().Error(err, sdkerrors.ErrInsufficientFunds)
+}
+
+func (suite poolTestSuite) TestNotEnoughDeposit() {
+	err := suite.BankKeeper.AddCoins(suite.Ctx, curatorAddr, fundForCurator)
+	suite.Require().NoError(err)
+
+	newPoolParams := makePoolParamsNoDataValidator(10)
+
+	// 10 MED is required to create pool. but 5 MED for deposit
+	deposit := sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(500000))
+
+	_, err = suite.DataPoolKeeper.CreatePool(suite.Ctx, curatorAddr, deposit, newPoolParams)
+	suite.Require().Error(err, types.ErrNotEnoughPoolDeposit)
 }
 
 func makePoolParamsWithDataValidator(targetNumData, MaxNftSupply uint64) types.PoolParams {
@@ -260,11 +376,11 @@ func makePoolParamsWithDataValidator(targetNumData, MaxNftSupply uint64) types.P
 	}
 }
 
-func makePoolParamsNoDataValidator() types.PoolParams {
+func makePoolParamsNoDataValidator(maxNftSupply uint64) types.PoolParams {
 	return types.PoolParams{
 		DataSchema:            []string{"https://www.json.ld"},
 		TargetNumData:         100,
-		MaxNftSupply:          10,
+		MaxNftSupply:          maxNftSupply,
 		NftPrice:              &NFTPrice,
 		TrustedDataValidators: []string(nil),
 		TrustedDataIssuers:    []string(nil),

@@ -4,7 +4,7 @@
 ```shell
 VALIDATOR=$(panacead keys show {your validator} -a)
 
-MODULE_ADDR="panacea1xacc5pqnn00vf4mf8qvhe3y7k0xj4ky2hxgzvz"  // TODO: add GetParam query to get module address
+MODULE_ADDR=$(panacead q datapool module-addr -o json | jq -r '.address')
 
 panacead tx gov submit-proposal wasm-store cw721_base.wasm \
 --title "store NFT contract wasm code" \

@@ -47,7 +47,7 @@ func (m msgServer) CreatePool(goCtx context.Context, msg *types.MsgCreatePool) (
 		return nil, err
 	}
 
-	newPoolId, err := m.Keeper.CreatePool(ctx, curator, *msg.PoolParams)
+	newPoolId, err := m.Keeper.CreatePool(ctx, curator, msg.Deposit, *msg.PoolParams)
 	if err != nil {
 		return nil, err
 	}
@@ -74,8 +74,20 @@ func (m msgServer) SellData(goCtx context.Context, msg *types.MsgSellData) (*typ
 	}, nil
 }
 
-func (m msgServer) BuyDataAccessNFT(goCtx context.Context, msg *types.MsgBuyDataAccessNFT) (*types.MsgBuyDataAccessNFTResponse, error) {
-	return &types.MsgBuyDataAccessNFTResponse{}, nil
+func (m msgServer) BuyDataPass(goCtx context.Context, msg *types.MsgBuyDataPass) (*types.MsgBuyDataPassResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	buyer, err := sdk.AccAddressFromBech32(msg.Buyer)
+	if err != nil {
+		return nil, err
+	}
+
+	err = m.Keeper.BuyDataPass(ctx, buyer, msg.PoolId, msg.Round, *msg.Payment)
+	if err != nil {
+		return nil, err
+	}
+
+	return &types.MsgBuyDataPassResponse{PoolId: msg.PoolId, Round: msg.Round}, nil
 }
 
 func (m msgServer) RedeemDataAccessNFT(goCtx context.Context, msg *types.MsgRedeemDataAccessNFT) (*types.MsgRedeemDataAccessNFTResponse, error) {

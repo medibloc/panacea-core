@@ -20,6 +20,7 @@ var (
 	curator        = sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address())
 	NFTPrice       = sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(10000000))
 	downloadPeriod = time.Duration(time.Second * 100000000)
+	poolID         = uint64(1)
 )
 
 type genesisTestSuite struct {
@@ -31,7 +32,7 @@ func TestGenesisTestSuite(t *testing.T) {
 }
 
 func (suite genesisTestSuite) TestDataPoolInitGenesis() {
-	var dataValidators []*types.DataValidator
+	var dataValidators []types.DataValidator
 
 	dataValidator := makeSampleDataValidator()
 
@@ -39,7 +40,7 @@ func (suite genesisTestSuite) TestDataPoolInitGenesis() {
 
 	pool := makeSamplePool()
 
-	pools := []*types.Pool{pool}
+	pools := []types.Pool{pool}
 
 	params := types.DefaultParams()
 
@@ -55,7 +56,7 @@ func (suite genesisTestSuite) TestDataPoolInitGenesis() {
 	// check data validator
 	dataValidatorFromKeeper, err := suite.DataPoolKeeper.GetDataValidator(suite.Ctx, dataVal)
 	suite.Require().NoError(err)
-	suite.Require().Equal(*dataValidator, dataValidatorFromKeeper)
+	suite.Require().Equal(dataValidator, dataValidatorFromKeeper)
 
 	// check the next pool number
 	suite.Require().Equal(uint64(2), suite.DataPoolKeeper.GetNextPoolNumber(suite.Ctx))
@@ -63,7 +64,7 @@ func (suite genesisTestSuite) TestDataPoolInitGenesis() {
 	// check pool
 	poolFromKeeper, err := suite.DataPoolKeeper.GetPool(suite.Ctx, uint64(1))
 	suite.Require().NoError(err)
-	suite.Require().Equal(pool, poolFromKeeper)
+	suite.Require().Equal(pool, *poolFromKeeper)
 
 	// check params
 	paramsFromKeeper := suite.DataPoolKeeper.GetParams(suite.Ctx)
@@ -73,12 +74,12 @@ func (suite genesisTestSuite) TestDataPoolInitGenesis() {
 func (suite genesisTestSuite) TestDataPoolExportGenesis() {
 	// register data validator
 	dataValidator := makeSampleDataValidator()
-	err := suite.DataPoolKeeper.SetDataValidator(suite.Ctx, *dataValidator)
+	err := suite.DataPoolKeeper.SetDataValidator(suite.Ctx, dataValidator)
 	suite.Require().NoError(err)
 
 	// create pool
 	pool := makeSamplePool()
-	suite.DataPoolKeeper.SetPool(suite.Ctx, pool)
+	suite.DataPoolKeeper.SetPool(suite.Ctx, &pool)
 	suite.DataPoolKeeper.SetPoolNumber(suite.Ctx, uint64(2))
 
 	// set params
@@ -91,23 +92,24 @@ func (suite genesisTestSuite) TestDataPoolExportGenesis() {
 	suite.Require().Len(genesisState.DataValidators, 1)
 }
 
-func makeSampleDataValidator() *types.DataValidator {
-	return &types.DataValidator{
+func makeSampleDataValidator() types.DataValidator {
+	return types.DataValidator{
 		Address:  dataVal.String(),
 		Endpoint: "https://my-validator.org",
 	}
 }
 
-func makeSamplePool() *types.Pool {
-	return &types.Pool{
-		PoolId:        1,
+func makeSamplePool() types.Pool {
+	return types.Pool{
+		PoolId:        poolID,
 		PoolAddress:   types.NewPoolAddress(uint64(1)).String(),
 		Round:         1,
 		PoolParams:    makeSamplePoolParams(),
 		CurNumData:    0,
-		NumIssuedNfts: 0,
+		NumIssuedNfts: 1,
 		Status:        types.PENDING,
 		Curator:       curator.String(),
+		Deposit:       types.ZeroFund,
 	}
 }
 

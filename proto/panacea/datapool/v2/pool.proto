@@ -9,16 +9,17 @@ import "google/protobuf/duration.proto";
 
 // Pool defines a data pool
 message Pool {
-  uint64     pool_id = 1;
-  string     pool_address = 2;
-  uint64     round = 3;
-  PoolParams pool_params = 4;
-  uint64     cur_num_data = 5;     // current number of data
-  uint64     num_issued_nfts = 6;  // current issued NFTs
-  string     status = 7;
-  string     curator = 8;
-  string     nft_contract_addr = 9; // NFT contract address of pool
-  bool       is_paid_deposit = 10;
+  uint64                   pool_id = 1;
+  string                   pool_address = 2;
+  uint64                   round = 3;
+  PoolParams               pool_params = 4;
+  uint64                   cur_num_data = 5;                            // current number of data
+  uint64                   num_issued_nfts = 6;                         // current issued NFTs
+  string                   status = 7;
+  string                   curator = 8;
+  cosmos.base.v1beta1.Coin deposit = 9 [(gogoproto.nullable) = false]; // deposit
+  string                   nft_contract_addr = 10;                     // NFT contract address of pool
+  bool                     is_paid_deposit = 11;
 }
 
 // DataValidationCertificate defines the certificate for data validation w/ data validator signature.

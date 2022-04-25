@@ -1,8 +1,12 @@
 package types
 
 import (
+	"github.com/medibloc/panacea-core/v2/types/assets"
+
 	"fmt"
 	"strconv"
+
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
@@ -14,6 +18,8 @@ const (
 
 	ShareTokenPrefix = "DP"
 )
+
+var ZeroFund = sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(0))
 
 func NewPool(poolID uint64, curator sdk.AccAddress, poolParams PoolParams) *Pool {
 	poolAddress := NewPoolAddress(poolID)
