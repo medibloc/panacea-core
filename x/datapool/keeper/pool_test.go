@@ -79,7 +79,7 @@ func (suite poolTestSuite) setupCreatePool(maxNftSupply uint64) uint64 {
 
 	newPoolParams := makePoolParamsNoDataValidator(maxNftSupply)
 
-	poolID, err := suite.DataPoolKeeper.CreatePool(suite.Ctx, curatorAddr, newPoolParams)
+	poolID, err := suite.DataPoolKeeper.CreatePool(suite.Ctx, curatorAddr, enoughDeposit, newPoolParams)
 	suite.Require().NoError(err)
 	suite.Require().Equal(poolID, uint64(1))
 
