@@ -24,8 +24,8 @@ service Msg {
   // SellData defines a method for selling data
   rpc SellData(MsgSellData) returns (MsgSellDataResponse);
 
-  // BuyDataAccessNFT defines a method for buying data access NFT
-  rpc BuyDataAccessNFT(MsgBuyDataAccessNFT) returns (MsgBuyDataAccessNFTResponse);
+  // BuyDataPass defines a method for buying data access NFT
+  rpc BuyDataPass(MsgBuyDataPass) returns (MsgBuyDataPassResponse);
 
   // RedeemDataAccessNFT defines a method for redeeming data access NFT to get data
   rpc RedeemDataAccessNFT(MsgRedeemDataAccessNFT) returns (MsgRedeemDataAccessNFTResponse);
@@ -75,16 +75,16 @@ message MsgSellDataResponse {
   cosmos.base.v1beta1.Coin accum_pool_share_token = 1;  // denom: DP-{pood-id}
 }
 
-// MsgBuyDataAccessNFT defines the Msg/BuyDataAccessNFT request type.
-message MsgBuyDataAccessNFT {
+// MsgBuyDataPass defines the Msg/BuyDataPass request type.
+message MsgBuyDataPass {
   uint64                   pool_id = 1;
   uint64                   round = 2;
   cosmos.base.v1beta1.Coin payment = 3;
   string                   buyer = 4;   // 'panacea1' address of buyer
 }
 
-// MsgBuyDataAccessNFTResponse defines the Msg/BuyDataAccessNFT response type.
-message MsgBuyDataAccessNFTResponse {
+// MsgBuyDataPassResponse defines the Msg/BuyDataAccessNFT response type.
+message MsgBuyDataPassResponse {
   uint64 pool_id = 1;
   uint64 round = 2;
   uint64 nft_id = 3;

@@ -31,9 +31,6 @@ var (
 	// KeyPrefixPools defines key to store Pools
 	KeyPrefixPools = []byte{0x03}
 
-	// KeyNFTContractAddress defines key to contract address
-	KeyNFTContractAddress = []byte{0x04}
-
 	// KeyPrefixDataValidatorCerts defines key to store dataValidator certs
 	KeyPrefixDataValidatorCerts = []byte{0x05}
 
