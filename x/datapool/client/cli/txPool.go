@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"strconv"
 	"time"
 
 	"github.com/cosmos/cosmos-sdk/client"
@@ -69,16 +70,16 @@ func CmdUpdateDataValidator() *cobra.Command {
 
 func CmdCreatePool() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "create-pool [pool params file]",
+		Use:   "create-pool [deposit] [pool params file]",
 		Short: "create a new data pool",
-		Args:  cobra.ExactArgs(1),
+		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
 
-			msg, err := newCreatePoolMsg(clientCtx, args[0])
+			msg, err := newCreatePoolMsg(clientCtx, args[0], args[1])
 			if err != nil {
 				return err
 			}
@@ -95,7 +96,7 @@ func CmdCreatePool() *cobra.Command {
 	return cmd
 }
 
-func newCreatePoolMsg(clientCtx client.Context, file string) (sdk.Msg, error) {
+func newCreatePoolMsg(clientCtx client.Context, depositCoin, file string) (sdk.Msg, error) {
 	var poolParamsInput CreatePoolInput
 
 	contents, err := ioutil.ReadFile(file)
@@ -127,7 +128,12 @@ func newCreatePoolMsg(clientCtx client.Context, file string) (sdk.Msg, error) {
 		DownloadPeriod:        &downloadPeriod,
 	}
 
-	msg := types.NewMsgCreatePool(poolParams, clientCtx.GetFromAddress().String())
+	deposit, err := sdk.ParseCoinNormalized(depositCoin)
+	if err != nil {
+		return nil, err
+	}
+
+	msg := types.NewMsgCreatePool(poolParams, deposit, clientCtx.GetFromAddress().String())
 	return msg, nil
 }
 
@@ -176,4 +182,49 @@ func readCertificateFromFile(file string) (*types.DataValidationCertificate, err
 	}
 
 	return &cert, nil
+}
+func CmdBuyDataAccessNFT() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "buy-data-access-nft [pool ID] [round] [payment]",
+		Short: "buy data access NFT",
+		Args:  cobra.ExactArgs(3),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			buyer := clientCtx.GetFromAddress()
+
+			poolID, err := strconv.ParseUint(args[0], 10, 64)
+			if err != nil {
+				return err
+			}
+
+			round, err := strconv.ParseUint(args[1], 10, 64)
+			if err != nil {
+				return err
+			}
+
+			payment, err := sdk.ParseCoinNormalized(args[2])
+			if err != nil {
+				return err
+			}
+
+			msg := &types.MsgBuyDataPass{
+				PoolId:  poolID,
+				Round:   round,
+				Payment: &payment,
+				Buyer:   buyer.String(),
+			}
+
+			if err := msg.ValidateBasic(); err != nil {
+				return err
+			}
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
+		},
+	}
+
+	flags.AddTxFlagsToCmd(cmd)
+	return cmd
 }

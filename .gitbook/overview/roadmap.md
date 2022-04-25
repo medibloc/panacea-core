@@ -15,7 +15,7 @@ Well, it sounds like the protocol should work well, right? However, there are so
 
 ---
 
-In order to resolve these challenges, the team is developing this data market protocol with several latest technologies. 
+In order to resolve these challenges, the team is developing this data exchange protocol with several latest technologies. 
 
 ### Data quality validation in Secure Enclaves
 

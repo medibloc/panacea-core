@@ -90,9 +90,10 @@ func (msg *MsgUpdateDataValidator) GetSigners() []sdk.AccAddress {
 
 var _ sdk.Msg = &MsgCreatePool{}
 
-func NewMsgCreatePool(poolParams *PoolParams, curator string) *MsgCreatePool {
+func NewMsgCreatePool(poolParams *PoolParams, deposit sdk.Coin, curator string) *MsgCreatePool {
 	return &MsgCreatePool{
 		Curator:    curator,
+		Deposit:    deposit,
 		PoolParams: poolParams,
 	}
 }
@@ -213,30 +214,35 @@ func (msg *MsgSellData) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{seller}
 }
 
-var _ sdk.Msg = &MsgBuyDataAccessNFT{}
+var _ sdk.Msg = &MsgBuyDataPass{}
 
-func (msg *MsgBuyDataAccessNFT) Route() string {
+func (msg *MsgBuyDataPass) Route() string {
 	return RouterKey
 }
 
-func (msg *MsgBuyDataAccessNFT) Type() string {
-	return "BuyDataAccessNFT"
+func (msg *MsgBuyDataPass) Type() string {
+	return "BuyDataPass"
 }
 
-func (msg *MsgBuyDataAccessNFT) ValidateBasic() error {
+func (msg *MsgBuyDataPass) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.Buyer)
 	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid buyer address (%s)", err)
 	}
+
+	if !msg.Payment.IsValid() {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidCoins, "invalid payment")
+	}
+
 	return nil
 }
 
-func (msg *MsgBuyDataAccessNFT) GetSignBytes() []byte {
+func (msg *MsgBuyDataPass) GetSignBytes() []byte {
 	bz := ModuleCdc.MustMarshalJSON(msg)
 	return sdk.MustSortJSON(bz)
 }
 
-func (msg *MsgBuyDataAccessNFT) GetSigners() []sdk.AccAddress {
+func (msg *MsgBuyDataPass) GetSigners() []sdk.AccAddress {
 	buyer, err := sdk.AccAddressFromBech32(msg.Buyer)
 	if err != nil {
 		panic(err)

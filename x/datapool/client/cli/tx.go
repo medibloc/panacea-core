@@ -24,5 +24,7 @@ func GetTxCmd() *cobra.Command {
 	cmd.AddCommand(CmdUpdateDataValidator())
 	cmd.AddCommand(CmdCreatePool())
 	cmd.AddCommand(CmdSellData())
+	cmd.AddCommand(CmdBuyDataAccessNFT())
+
 	return cmd
 }
