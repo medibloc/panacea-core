@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"strconv"
 	"time"
 
 	"github.com/cosmos/cosmos-sdk/client"
@@ -176,4 +177,49 @@ func readCertificateFromFile(file string) (*types.DataValidationCertificate, err
 	}
 
 	return &cert, nil
+}
+func CmdBuyDataAccessNFT() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "buy-data-access-nft [pool ID] [round] [payment]",
+		Short: "buy data access NFT",
+		Args:  cobra.ExactArgs(3),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			buyer := clientCtx.GetFromAddress()
+
+			poolID, err := strconv.ParseUint(args[0], 10, 64)
+			if err != nil {
+				return err
+			}
+
+			round, err := strconv.ParseUint(args[1], 10, 64)
+			if err != nil {
+				return err
+			}
+
+			payment, err := sdk.ParseCoinNormalized(args[2])
+			if err != nil {
+				return err
+			}
+
+			msg := &types.MsgBuyDataPass{
+				PoolId:  poolID,
+				Round:   round,
+				Payment: &payment,
+				Buyer:   buyer.String(),
+			}
+
+			if err := msg.ValidateBasic(); err != nil {
+				return err
+			}
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
+		},
+	}
+
+	flags.AddTxFlagsToCmd(cmd)
+	return cmd
 }
