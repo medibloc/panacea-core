@@ -469,15 +469,6 @@ func (k Keeper) mintPoolShareToken(ctx sdk.Context, poolID, amount uint64) error
 	return nil
 }
 
-func contains(validators []string, validator string) bool {
-	for _, v := range validators {
-		if validator == v {
-			return true
-		}
-	}
-	return false
-}
-
 func (k Keeper) GetDataValidationCertificate(ctx sdk.Context, poolID, round uint64, dataHash []byte) (types.DataValidationCertificate, error) {
 	key := types.GetKeyPrefixDataValidateCert(poolID, round, dataHash)
 	store := ctx.KVStore(k.storeKey)
@@ -578,6 +569,15 @@ func (k Keeper) RedeemDataPass(ctx sdk.Context, redeemNFT types.MsgRedeemDataPas
 		return nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, err.Error())
 	}
 
+	redeemTokenId, err := k.GetRedeemerDataPass(ctx, pool.PoolId, redeemerAcc)
+	if err != nil {
+		return nil, sdkerrors.Wrapf(types.ErrRedeemDataPass, err.Error())
+	}
+
+	if !contains(redeemTokenId, strconv.FormatUint(redeemNFT.NftId, 10)) {
+		return nil, sdkerrors.Wrapf(types.ErrInvalidTokenId, err.Error())
+	}
+
 	zeroFund, err := sdk.ParseCoinsNormalized("0umed")
 	if err != nil {
 		return nil, sdkerrors.Wrapf(err, "error in parsing coin")
@@ -627,11 +627,15 @@ func (k Keeper) SetDataPassRedeemReceipt(ctx sdk.Context, redeemReceipt types.Da
 	return nil
 }
 
-func (k Keeper) GetRedeemerDataPass(ctx sdk.Context, redeemer sdk.AccAddress) ([]string, error) {
-	contractAddress := k.GetParams(ctx).DataPoolNftContractAddress
-	acc, err := sdk.AccAddressFromBech32(contractAddress)
+func (k Keeper) GetRedeemerDataPass(ctx sdk.Context, poolID uint64, redeemer sdk.AccAddress) ([]string, error) {
+	pool, err := k.GetPool(ctx, poolID)
 	if err != nil {
-		return []string{}, err
+		return nil, sdkerrors.Wrapf(types.ErrPoolNotFound, err.Error())
+	}
+
+	acc, err := sdk.AccAddressFromBech32(pool.NftContractAddr)
+	if err != nil {
+		return nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, err.Error())
 	}
 
 	query := types.NewQueryTokensRequest(redeemer.String())
@@ -652,4 +656,13 @@ func (k Keeper) GetRedeemerDataPass(ctx sdk.Context, redeemer sdk.AccAddress) ([
 	}
 
 	return res.Tokens, nil
+}
+
+func contains(slices []string, component string) bool {
+	for _, c := range slices {
+		if component == c {
+			return true
+		}
+	}
+	return false
 }

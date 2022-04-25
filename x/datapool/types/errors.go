@@ -27,4 +27,5 @@ var (
 	ErrBuyDataPass                = sdkerrors.Register(ModuleName, 19, "failed to buy data pass")
 	ErrGetDataPassRedeemReceipt   = sdkerrors.Register(ModuleName, 20, "failed get data access nft receipt.")
 	ErrRedeemDataPass             = sdkerrors.Register(ModuleName, 21, "failed redeem data access nft.")
+	ErrInvalidTokenId             = sdkerrors.Register(ModuleName, 22, "invalid nft id")
 )

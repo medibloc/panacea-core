@@ -3,6 +3,7 @@ package keeper_test
 import (
 	"fmt"
 	"io/ioutil"
+	"strconv"
 	"strings"
 	"testing"
 	"time"
@@ -391,11 +392,6 @@ func (suite poolTestSuite) TestRedeemDataPass() {
 	err = suite.DataPoolKeeper.BuyDataPass(suite.Ctx, buyerAddr, poolID, 1, NFTPrice)
 	suite.Require().NoError(err)
 
-	pass, err := suite.DataPoolKeeper.GetRedeemerDataPass(suite.Ctx, buyerAddr)
-	suite.Require().NoError(err)
-
-	fmt.Println(pass)
-
 	pool, err := suite.DataPoolKeeper.GetPool(suite.Ctx, poolID)
 	suite.Require().NoError(err)
 
@@ -409,8 +405,24 @@ func (suite poolTestSuite) TestRedeemDataPass() {
 	suite.Require().Equal(redeemReceipt.NftId, redeemNFT.NftId)
 	suite.Require().Equal(redeemReceipt.Round, redeemNFT.Round)
 	suite.Require().Equal(redeemReceipt.BlockHeight, uint64(suite.Ctx.BlockHeight()))
-
 }
+
+func (suite poolTestSuite) TestGetRedeemerDataPass() {
+	poolID := suite.setupCreatePool(1)
+
+	err := suite.BankKeeper.AddCoins(suite.Ctx, buyerAddr, fundForBuyer)
+	suite.Require().NoError(err)
+
+	err = suite.DataPoolKeeper.BuyDataPass(suite.Ctx, buyerAddr, poolID, 1, NFTPrice)
+	suite.Require().NoError(err)
+
+	redeemerTokenId, err := suite.DataPoolKeeper.GetRedeemerDataPass(suite.Ctx, poolID, buyerAddr)
+	suite.Require().NoError(err)
+
+	suite.Require().Equal(redeemerTokenId[0], strconv.FormatUint(1, 10))
+}
+
+//TODO: Failure Test of Redeem Data Pass
 
 func makePoolParamsWithDataValidator() types.PoolParams {
 	return types.PoolParams{
