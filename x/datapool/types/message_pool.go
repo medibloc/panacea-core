@@ -250,10 +250,10 @@ func (msg *MsgBuyDataPass) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{buyer}
 }
 
-var _ sdk.Msg = &MsgRedeemDataAccessNFT{}
+var _ sdk.Msg = &MsgRedeemDataPass{}
 
-func NewMsgRedeemDataAccessNFT(poolID, round, nftID uint64, redeemer string) *MsgRedeemDataAccessNFT {
-	return &MsgRedeemDataAccessNFT{
+func NewMsgRedeemDataPass(poolID, round, nftID uint64, redeemer string) *MsgRedeemDataPass {
+	return &MsgRedeemDataPass{
 		PoolId:   poolID,
 		Round:    round,
 		NftId:    nftID,
@@ -261,15 +261,15 @@ func NewMsgRedeemDataAccessNFT(poolID, round, nftID uint64, redeemer string) *Ms
 	}
 }
 
-func (msg *MsgRedeemDataAccessNFT) Route() string {
+func (msg *MsgRedeemDataPass) Route() string {
 	return RouterKey
 }
 
-func (msg *MsgRedeemDataAccessNFT) Type() string {
-	return "RedeemDataAccessNFT"
+func (msg *MsgRedeemDataPass) Type() string {
+	return "RedeemDataPass"
 }
 
-func (msg *MsgRedeemDataAccessNFT) ValidateBasic() error {
+func (msg *MsgRedeemDataPass) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.Redeemer)
 	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid redeemer address (%s)", err)
@@ -277,12 +277,12 @@ func (msg *MsgRedeemDataAccessNFT) ValidateBasic() error {
 	return nil
 }
 
-func (msg *MsgRedeemDataAccessNFT) GetSignBytes() []byte {
+func (msg *MsgRedeemDataPass) GetSignBytes() []byte {
 	bz := ModuleCdc.MustMarshalJSON(msg)
 	return sdk.MustSortJSON(bz)
 }
 
-func (msg *MsgRedeemDataAccessNFT) GetSigners() []sdk.AccAddress {
+func (msg *MsgRedeemDataPass) GetSigners() []sdk.AccAddress {
 	redeemer, err := sdk.AccAddressFromBech32(msg.Redeemer)
 	if err != nil {
 		panic(err)

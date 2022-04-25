@@ -382,6 +382,26 @@ func (suite poolTestSuite) TestNotEnoughDeposit() {
 	suite.Require().Error(err, types.ErrNotEnoughPoolDeposit)
 }
 
+func (suite poolTestSuite) TestRedeemDataPass() {
+	poolID := suite.setupCreatePool(5)
+
+	err := suite.BankKeeper.AddCoins(suite.Ctx, buyerAddr, fundForBuyer)
+	suite.Require().NoError(err)
+
+	err = suite.DataPoolKeeper.BuyDataPass(suite.Ctx, buyerAddr, poolID, 1, NFTPrice)
+	suite.Require().NoError(err)
+
+	pool, err := suite.DataPoolKeeper.GetPool(suite.Ctx, poolID)
+	suite.Require().NoError(err)
+
+	redeemNFT := types.NewMsgRedeemDataPass(poolID, 1, pool.GetNumIssuedNfts()+1, buyerAddr.String())
+
+	redeemReceipt, err := suite.DataPoolKeeper.RedeemDataPass(suite.Ctx, *redeemNFT)
+	suite.Require().NoError(err)
+
+	fmt.Println(redeemReceipt)
+}
+
 func makePoolParamsWithDataValidator() types.PoolParams {
 	return types.PoolParams{
 		DataSchema:            []string{"https://www.json.ld"},

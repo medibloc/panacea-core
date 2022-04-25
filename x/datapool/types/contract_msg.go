@@ -53,24 +53,40 @@ func NewInstantiateNFTMsg(name, symbol, minterAddress string) *InstantiateNFTMsg
 	}
 }
 
-type MigrateContractMsg struct {
-	Payout sdk.AccAddress `json:"payout"`
-}
-
-func NewMigrateContractMsg(payout sdk.AccAddress) *MigrateContractMsg {
-	return &MigrateContractMsg{
-		Payout: payout,
-	}
-}
-
-type TransferNFTMsg struct {
+type transferNFT struct {
 	Recipient string `json:"recipient"`
 	TokenId   string `json:"token_id"`
 }
 
-func NewTransferNFTMsg(recipient, tokenID string) *TransferNFTMsg {
-	return &TransferNFTMsg{
-		Recipient: recipient,
-		TokenId:   tokenID,
+type MsgTransferNFT struct {
+	transferNFT `json:"transfer_nft"`
+}
+
+func NewTransferNFTMsg(recipient, tokenID string) *MsgTransferNFT {
+	return &MsgTransferNFT{
+		transferNFT{
+			Recipient: recipient,
+			TokenId:   tokenID,
+		},
 	}
+}
+
+type tokensMsg struct {
+	Owner string `json:"owner"`
+}
+
+type QueryTokensRequest struct {
+	tokensMsg `json:"tokens"`
+}
+
+func NewQueryTokensRequest(owner string) *QueryTokensRequest {
+	return &QueryTokensRequest{
+		tokensMsg{
+			Owner: owner,
+		},
+	}
+}
+
+type QueryTokensResponse struct {
+	Tokens []string `json:"tokens"`
 }

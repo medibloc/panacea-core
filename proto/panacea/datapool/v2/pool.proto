@@ -37,7 +37,7 @@ message UnsignedDataValidationCertificate {
 }
 
 // DataAccessNFTRedeemReceipt defines a receipt for redeeming data access NFT to get data.
-message DataAccessNFTRedeemReceipt {
+message DataPassRedeemReceipt {
   uint64 pool_id = 1;
   uint64 round = 2;
   uint64 nft_id = 3;

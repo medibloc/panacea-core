@@ -15,7 +15,7 @@ func RegisterCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&MsgCreatePool{}, "datapool/CreatePool", nil)
 	cdc.RegisterConcrete(&MsgSellData{}, "datapool/SellData", nil)
 	cdc.RegisterConcrete(&MsgBuyDataPass{}, "datapool/BuyDataPass", nil)
-	cdc.RegisterConcrete(&MsgRedeemDataAccessNFT{}, "datapool/RedeemDataAccessNFT", nil)
+	cdc.RegisterConcrete(&MsgRedeemDataPass{}, "datapool/RedeemDataPass", nil)
 }
 
 func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
@@ -25,7 +25,7 @@ func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 		&MsgCreatePool{},
 		&MsgSellData{},
 		&MsgBuyDataPass{},
-		&MsgRedeemDataAccessNFT{},
+		&MsgRedeemDataPass{},
 	)
 	msgservice.RegisterMsgServiceDesc(registry, &_Msg_serviceDesc)
 }

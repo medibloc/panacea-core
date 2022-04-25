@@ -496,79 +496,6 @@ func (k Keeper) GetDataValidationCertificate(ctx sdk.Context, poolID, round uint
 	return cert, nil
 }
 
-func (k Keeper) RedeemDataAccessNFT(ctx sdk.Context, redeemNFT types.MsgRedeemDataAccessNFT) (*types.DataAccessNFTRedeemReceipt, error) {
-	pool, err := k.GetPool(ctx, redeemNFT.PoolId)
-	if err != nil {
-		return nil, sdkerrors.Wrapf(types.ErrRedeemDataAccessNFT, err.Error())
-	}
-
-	nftContractAcc, err := sdk.AccAddressFromBech32(pool.NftContractAddr)
-	if err != nil {
-		return nil, sdkerrors.Wrapf(types.ErrRedeemDataAccessNFT, err.Error())
-	}
-
-	moduleAddr := types.GetModuleAddress()
-	transferNFTMsg := types.NewTransferNFTMsg(moduleAddr.String(), strconv.FormatUint(redeemNFT.NftId, 10))
-
-	transferNFTMsgBz, err := json.Marshal(transferNFTMsg)
-	if err != nil {
-		return nil, sdkerrors.Wrapf(types.ErrRedeemDataAccessNFT, err.Error())
-	}
-
-	redeemerAcc, err := sdk.AccAddressFromBech32(redeemNFT.Redeemer)
-	if err != nil {
-		return nil, sdkerrors.Wrapf(types.ErrRedeemDataAccessNFT, err.Error())
-	}
-
-	zeroFund, err := sdk.ParseCoinsNormalized("0umed")
-	if err != nil {
-		return nil, sdkerrors.Wrapf(err, "error in parsing coin")
-	}
-
-	_, err = k.wasmKeeper.Execute(ctx, nftContractAcc, redeemerAcc, transferNFTMsgBz, zeroFund)
-	if err != nil {
-		return nil, sdkerrors.Wrapf(types.ErrRedeemDataAccessNFT, err.Error())
-	}
-
-	nftRedeemReceipt := types.NewDataAccessNFTRedeemReceipt(redeemNFT.PoolId, redeemNFT.Round, redeemNFT.NftId, uint64(ctx.BlockHeight()), redeemNFT.Redeemer)
-
-	err = k.SetNFTRedeemReceipt(ctx, *nftRedeemReceipt)
-	if err != nil {
-		return nil, sdkerrors.Wrapf(types.ErrRedeemDataAccessNFT, err.Error())
-	}
-
-	return nftRedeemReceipt, nil
-}
-
-func (k Keeper) GetNFTRedeemReceipt(ctx sdk.Context, poolID, round uint64, redeemer sdk.AccAddress) (types.DataAccessNFTRedeemReceipt, error) {
-	key := types.GetKeyPrefixNFTRedeemReceipt(poolID, round, redeemer)
-	store := ctx.KVStore(k.storeKey)
-
-	bz := store.Get(key)
-
-	var receipt types.DataAccessNFTRedeemReceipt
-	err := k.cdc.UnmarshalBinaryLengthPrefixed(bz, &receipt)
-	if err != nil {
-		return types.DataAccessNFTRedeemReceipt{}, sdkerrors.Wrap(types.ErrGetDataAccessNFTReceipt, err.Error())
-	}
-
-	return receipt, nil
-}
-
-func (k Keeper) SetNFTRedeemReceipt(ctx sdk.Context, redeemReceipt types.DataAccessNFTRedeemReceipt) error {
-	redeemer, err := sdk.AccAddressFromBech32(redeemReceipt.Redeemer)
-	if err != nil {
-		return err
-	}
-
-	store := ctx.KVStore(k.storeKey)
-	receiptKey := types.GetKeyPrefixNFTRedeemReceipt(redeemReceipt.PoolId, redeemReceipt.Round, redeemer)
-	bz := k.cdc.MustMarshalBinaryLengthPrefixed(&redeemReceipt)
-	store.Set(receiptKey, bz)
-
-	return nil
-}
-
 func (k Keeper) BuyDataPass(ctx sdk.Context, buyer sdk.AccAddress, poolID, round uint64, payment sdk.Coin) error {
 	pool, err := k.GetPool(ctx, poolID)
 	if err != nil {
@@ -625,4 +552,109 @@ func (k Keeper) increaseNumIssuedNFT(ctx sdk.Context, pool *types.Pool) {
 	pool.NumIssuedNfts += 1
 
 	k.SetPool(ctx, pool)
+}
+
+func (k Keeper) RedeemDataPass(ctx sdk.Context, redeemNFT types.MsgRedeemDataPass) (*types.DataPassRedeemReceipt, error) {
+	pool, err := k.GetPool(ctx, redeemNFT.PoolId)
+	if err != nil {
+		return nil, sdkerrors.Wrapf(types.ErrRedeemDataPass, err.Error())
+	}
+
+	nftContractAcc, err := sdk.AccAddressFromBech32(pool.NftContractAddr)
+	if err != nil {
+		return nil, sdkerrors.Wrapf(types.ErrRedeemDataPass, err.Error())
+	}
+
+	moduleAddr := types.GetModuleAddress()
+	transferNFTMsg := types.NewTransferNFTMsg(moduleAddr.String(), strconv.FormatUint(redeemNFT.NftId, 10))
+
+	transferNFTMsgBz, err := json.Marshal(transferNFTMsg)
+	if err != nil {
+		return nil, sdkerrors.Wrapf(types.ErrRedeemDataPass, err.Error())
+	}
+
+	redeemerAcc, err := sdk.AccAddressFromBech32(redeemNFT.Redeemer)
+	if err != nil {
+		return nil, sdkerrors.Wrapf(types.ErrRedeemDataPass, err.Error())
+	}
+
+	//getRedeemerNFTs, err := k.GetRedeemerNFTs(ctx, redeemerAcc)
+	//if err != nil {
+	//	return nil, err
+	//}
+
+	zeroFund, err := sdk.ParseCoinsNormalized("0umed")
+	if err != nil {
+		return nil, sdkerrors.Wrapf(err, "error in parsing coin")
+	}
+
+	_, err = k.wasmKeeper.Execute(ctx, nftContractAcc, redeemerAcc, transferNFTMsgBz, zeroFund)
+	if err != nil {
+		return nil, sdkerrors.Wrapf(types.ErrRedeemDataPass, err.Error())
+	}
+
+	nftRedeemReceipt := types.NewDataAccessNFTRedeemReceipt(redeemNFT.PoolId, redeemNFT.Round, redeemNFT.NftId, uint64(ctx.BlockHeight()), redeemNFT.Redeemer)
+
+	err = k.SetDataPassRedeemReceipt(ctx, *nftRedeemReceipt)
+	if err != nil {
+		return nil, sdkerrors.Wrapf(types.ErrRedeemDataPass, err.Error())
+	}
+
+	return nftRedeemReceipt, nil
+}
+
+func (k Keeper) GetDataPassRedeemReceipt(ctx sdk.Context, poolID, round uint64, redeemer sdk.AccAddress) (types.DataPassRedeemReceipt, error) {
+	key := types.GetKeyPrefixNFTRedeemReceipt(poolID, round, redeemer)
+	store := ctx.KVStore(k.storeKey)
+
+	bz := store.Get(key)
+
+	var receipt types.DataPassRedeemReceipt
+	err := k.cdc.UnmarshalBinaryLengthPrefixed(bz, &receipt)
+	if err != nil {
+		return types.DataPassRedeemReceipt{}, sdkerrors.Wrap(types.ErrGetDataPassRedeemReceipt, err.Error())
+	}
+
+	return receipt, nil
+}
+
+func (k Keeper) SetDataPassRedeemReceipt(ctx sdk.Context, redeemReceipt types.DataPassRedeemReceipt) error {
+	redeemer, err := sdk.AccAddressFromBech32(redeemReceipt.Redeemer)
+	if err != nil {
+		return err
+	}
+
+	store := ctx.KVStore(k.storeKey)
+	receiptKey := types.GetKeyPrefixNFTRedeemReceipt(redeemReceipt.PoolId, redeemReceipt.Round, redeemer)
+	bz := k.cdc.MustMarshalBinaryLengthPrefixed(&redeemReceipt)
+	store.Set(receiptKey, bz)
+
+	return nil
+}
+
+func (k Keeper) GetRedeemerDataPass(ctx sdk.Context, redeemer sdk.AccAddress) ([]string, error) {
+	contractAddress := k.GetParams(ctx).DataPoolNftContractAddress
+	acc, err := sdk.AccAddressFromBech32(contractAddress)
+	if err != nil {
+		return []string{}, err
+	}
+
+	query := types.NewQueryTokensRequest(redeemer.String())
+	queryBz, err := json.Marshal(query)
+	if err != nil {
+		return []string{}, err
+	}
+
+	data, err := k.viewKeeper.QuerySmart(ctx, acc, queryBz)
+	if err != nil {
+		return []string{}, err
+	}
+
+	var res types.QueryTokensResponse
+	err = json.Unmarshal(data, &res)
+	if err != nil {
+		return []string{}, err
+	}
+
+	return res.Tokens, nil
 }
