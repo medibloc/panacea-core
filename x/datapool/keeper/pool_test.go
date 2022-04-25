@@ -47,7 +47,8 @@ var (
 	fundForDataVal = sdk.NewCoins(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(10000000000)))
 	fundForCurator = sdk.NewCoins(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(10000000000)))
 	fundForBuyer   = sdk.NewCoins(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(10000000000)))
-	NFTPrice       = sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(10000000))
+	NFTPrice       = sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(10000000)) // 10 MED
+	enoughDeposit  = sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(20000000)) // 20 MED
 
 	downloadPeriod = time.Duration(time.Second * 100000000)
 )
@@ -62,8 +63,8 @@ func (suite poolTestSuite) setupNFTContract() {
 
 	// set datapool parameters
 	params := types.Params{
+		DataPoolDepositRate:        types.DefaultDataPoolDepositRate,
 		DataPoolNftContractAddress: addr.String(),
-		DataPoolDeposit:            types.DefaultDataPoolDeposit,
 		DataPoolCodeId:             1,
 	}
 
@@ -78,7 +79,7 @@ func (suite poolTestSuite) setupCreatePool(maxNftSupply uint64) uint64 {
 
 	newPoolParams := makePoolParamsNoDataValidator(maxNftSupply)
 
-	poolID, err := suite.DataPoolKeeper.CreatePool(suite.Ctx, curatorAddr, newPoolParams)
+	poolID, err := suite.DataPoolKeeper.CreatePool(suite.Ctx, curatorAddr, enoughDeposit, newPoolParams)
 	suite.Require().NoError(err)
 	suite.Require().Equal(poolID, uint64(1))
 
@@ -237,7 +238,7 @@ func (suite poolTestSuite) TestCreatePool() {
 
 	newPoolParams := makePoolParamsWithDataValidator()
 
-	poolID, err := suite.DataPoolKeeper.CreatePool(suite.Ctx, curatorAddr, newPoolParams)
+	poolID, err := suite.DataPoolKeeper.CreatePool(suite.Ctx, curatorAddr, enoughDeposit, newPoolParams)
 	suite.Require().NoError(err)
 	suite.Require().Equal(poolID, uint64(1))
 
@@ -262,7 +263,7 @@ func (suite poolTestSuite) TestNotRegisteredDataValidator() {
 
 	newPoolParams := makePoolParamsWithDataValidator()
 
-	_, err = suite.DataPoolKeeper.CreatePool(suite.Ctx, curatorAddr, newPoolParams)
+	_, err = suite.DataPoolKeeper.CreatePool(suite.Ctx, curatorAddr, enoughDeposit, newPoolParams)
 	suite.Require().Error(err, types.ErrNotRegisteredDataValidator)
 }
 
@@ -272,7 +273,7 @@ func (suite poolTestSuite) TestNotEnoughBalanceForDeposit() {
 
 	newPoolParams := makePoolParamsNoDataValidator(10)
 
-	_, err := suite.DataPoolKeeper.CreatePool(suite.Ctx, curatorAddr, newPoolParams)
+	_, err := suite.DataPoolKeeper.CreatePool(suite.Ctx, curatorAddr, enoughDeposit, newPoolParams)
 	suite.Require().Error(err, types.ErrNotEnoughPoolDeposit)
 }
 
@@ -282,7 +283,7 @@ func (suite poolTestSuite) TestNotRegisteredNFTContract() {
 
 	newPoolParams := makePoolParamsNoDataValidator(10)
 
-	_, err = suite.DataPoolKeeper.CreatePool(suite.Ctx, curatorAddr, newPoolParams)
+	_, err = suite.DataPoolKeeper.CreatePool(suite.Ctx, curatorAddr, enoughDeposit, newPoolParams)
 	suite.Require().Error(err, types.ErrNoRegisteredNFTContract)
 }
 
@@ -366,6 +367,19 @@ func (suite poolTestSuite) TestBuyDataAccessNFTInsufficientBalance() {
 
 	err = suite.DataPoolKeeper.BuyDataPass(suite.Ctx, buyerAddr, poolID, 1, NFTPrice)
 	suite.Require().Error(err, sdkerrors.ErrInsufficientFunds)
+}
+
+func (suite poolTestSuite) TestNotEnoughDeposit() {
+	err := suite.BankKeeper.AddCoins(suite.Ctx, curatorAddr, fundForCurator)
+	suite.Require().NoError(err)
+
+	newPoolParams := makePoolParamsNoDataValidator(10)
+
+	// 10 MED is required to create pool. but 5 MED for deposit
+	deposit := sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(500000))
+
+	_, err = suite.DataPoolKeeper.CreatePool(suite.Ctx, curatorAddr, deposit, newPoolParams)
+	suite.Require().Error(err, types.ErrNotEnoughPoolDeposit)
 }
 
 func makePoolParamsWithDataValidator() types.PoolParams {

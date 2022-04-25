@@ -70,16 +70,16 @@ func CmdUpdateDataValidator() *cobra.Command {
 
 func CmdCreatePool() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "create-pool [pool params file]",
+		Use:   "create-pool [deposit] [pool params file]",
 		Short: "create a new data pool",
-		Args:  cobra.ExactArgs(1),
+		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
 
-			msg, err := newCreatePoolMsg(clientCtx, args[0])
+			msg, err := newCreatePoolMsg(clientCtx, args[0], args[1])
 			if err != nil {
 				return err
 			}
@@ -96,7 +96,7 @@ func CmdCreatePool() *cobra.Command {
 	return cmd
 }
 
-func newCreatePoolMsg(clientCtx client.Context, file string) (sdk.Msg, error) {
+func newCreatePoolMsg(clientCtx client.Context, depositCoin, file string) (sdk.Msg, error) {
 	var poolParamsInput CreatePoolInput
 
 	contents, err := ioutil.ReadFile(file)
@@ -128,7 +128,12 @@ func newCreatePoolMsg(clientCtx client.Context, file string) (sdk.Msg, error) {
 		DownloadPeriod:        &downloadPeriod,
 	}
 
-	msg := types.NewMsgCreatePool(poolParams, clientCtx.GetFromAddress().String())
+	deposit, err := sdk.ParseCoinNormalized(depositCoin)
+	if err != nil {
+		return nil, err
+	}
+
+	msg := types.NewMsgCreatePool(poolParams, deposit, clientCtx.GetFromAddress().String())
 	return msg, nil
 }
 

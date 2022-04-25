@@ -3,20 +3,18 @@ package types
 import (
 	"fmt"
 
-	"github.com/medibloc/panacea-core/v2/types/assets"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
 )
 
 var (
-	DefaultDataPoolDeposit = sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(10000000000))
+	DefaultDataPoolDepositRate = sdk.NewDecWithPrec(1, 1) // default 10%
 )
 
 var (
-	KeyDataPoolDeposit            = []byte("datapooldeposit")
-	KeyDataPoolCodeID             = []byte("datapoolcodeid")
-	KeyDataPoolNFTContractAddress = []byte("datapoolnftcontractaddress")
+	KeyDataPoolDepositRate        = []byte("DataPoolDepositRate")
+	KeyDataPoolCodeID             = []byte("DataPoolCodeId")
+	KeyDataPoolNFTContractAddress = []byte("DataPoolNftContractAddress")
 )
 
 var _ paramtypes.ParamSet = (*Params)(nil)
@@ -25,21 +23,21 @@ func ParamKeyTable() paramtypes.KeyTable {
 	return paramtypes.NewKeyTable().RegisterParamSet(&Params{})
 }
 
-func NewParams(dataPoolDeposit sdk.Coin) Params {
+func NewParams(dataPoolDepositRate sdk.Dec) Params {
 	return Params{
-		DataPoolDeposit: dataPoolDeposit,
+		DataPoolDepositRate: dataPoolDepositRate,
 	}
 }
 
 func DefaultParams() Params {
 	return Params{
-		DataPoolDeposit: DefaultDataPoolDeposit,
-		DataPoolCodeId:  0,
+		DataPoolDepositRate: DefaultDataPoolDepositRate,
+		DataPoolCodeId:      0,
 	}
 }
 
 func (p Params) Validate() error {
-	if err := validateDataPoolDeposit(p.DataPoolDeposit); err != nil {
+	if err := validateDataPoolDepositRate(p.DataPoolDepositRate); err != nil {
 		return err
 	}
 
@@ -56,23 +54,10 @@ func (p Params) Validate() error {
 
 func (p *Params) ParamSetPairs() paramtypes.ParamSetPairs {
 	return paramtypes.ParamSetPairs{
-		paramtypes.NewParamSetPair(KeyDataPoolDeposit, &p.DataPoolDeposit, validateDataPoolDeposit),
+		paramtypes.NewParamSetPair(KeyDataPoolDepositRate, &p.DataPoolDepositRate, validateDataPoolDepositRate),
 		paramtypes.NewParamSetPair(KeyDataPoolCodeID, &p.DataPoolCodeId, validateDataPoolCodeID),
 		paramtypes.NewParamSetPair(KeyDataPoolNFTContractAddress, &p.DataPoolNftContractAddress, validateDataPoolNFTContractAddress),
 	}
-}
-
-func validateDataPoolDeposit(i interface{}) error {
-	deposit, ok := i.(sdk.Coin)
-	if !ok {
-		return fmt.Errorf("invalid parameter type: %T", i)
-	}
-
-	if deposit.Validate() != nil {
-		return fmt.Errorf("invalid data pool deposit: %+v", i)
-	}
-
-	return nil
 }
 
 func validateDataPoolCodeID(i interface{}) error {
@@ -95,6 +80,23 @@ func validateDataPoolNFTContractAddress(i interface{}) error {
 		if err != nil {
 			return fmt.Errorf("invalid NFT contract address: %s", addr)
 		}
+	}
+
+	return nil
+}
+
+func validateDataPoolDepositRate(i interface{}) error {
+	v, ok := i.(sdk.Dec)
+	if !ok {
+		return fmt.Errorf("invalid parameter type: %T", i)
+	}
+
+	if v.IsNegative() {
+		return fmt.Errorf("deposit rate cannot be negative: %s", v)
+	}
+
+	if v.GT(sdk.OneDec()) {
+		return fmt.Errorf("deposit rate cannot be greater than 100%%: %s", v)
 	}
 
 	return nil
