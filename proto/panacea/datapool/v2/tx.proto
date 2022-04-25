@@ -53,8 +53,9 @@ message MsgUpdateDataValidatorResponse {
 
 // MsgCreatePool defines the Msg/CreatePool request type.
 message MsgCreatePool {
-  string      curator = 1;        // 'panacea1' address
-  PoolParams  pool_params = 2;    // pool parameters
+  string                   curator = 1;                                // 'panacea1' address
+  cosmos.base.v1beta1.Coin deposit = 2 [(gogoproto.nullable) = false]; // deposit
+  PoolParams               pool_params = 3;                            // pool parameters
 }
 
 // MsgCreatePoolResponse defines the Msg/CreatePool response type.

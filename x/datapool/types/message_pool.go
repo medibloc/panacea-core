@@ -90,9 +90,10 @@ func (msg *MsgUpdateDataValidator) GetSigners() []sdk.AccAddress {
 
 var _ sdk.Msg = &MsgCreatePool{}
 
-func NewMsgCreatePool(poolParams *PoolParams, curator string) *MsgCreatePool {
+func NewMsgCreatePool(poolParams *PoolParams, deposit sdk.Coin, curator string) *MsgCreatePool {
 	return &MsgCreatePool{
 		Curator:    curator,
+		Deposit:    deposit,
 		PoolParams: poolParams,
 	}
 }

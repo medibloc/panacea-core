@@ -1,0 +1,12 @@
+{
+  "title": "parameter change of datapool deposit rate",
+  "description": "change deposit rate",
+  "changes": [
+    {
+      "subspace": "datapool",
+      "key": "DataPoolDepositRate",
+      "value": "0.05"
+    }
+  ],
+  "deposit": "1000000umed"
+}

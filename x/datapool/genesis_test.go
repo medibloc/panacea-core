@@ -109,6 +109,7 @@ func makeSamplePool() types.Pool {
 		NumIssuedNfts: 1,
 		Status:        types.PENDING,
 		Curator:       curator.String(),
+		Deposit:       types.ZeroFund,
 	}
 }
 
