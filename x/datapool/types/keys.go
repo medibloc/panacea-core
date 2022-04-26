@@ -54,8 +54,11 @@ func GetKeyPrefixDataValidateCert(poolID, round uint64, dataHash []byte) []byte 
 	return append(GetKeyPrefixDataValidateCertByRound(poolID, round), dataHash...)
 }
 
+func GetKeyPrefixNFTRedeemReceiptByPoolID(poolID uint64, redeemer sdk.AccAddress) []byte {
+	keyPoolAppended := append(KeyPrefixNFTRedeemReceipts, sdk.Uint64ToBigEndian(poolID)...)
+	return append(keyPoolAppended, redeemer.Bytes()...)
+}
+
 func GetKeyPrefixNFTRedeemReceipt(poolID, round uint64, redeemer sdk.AccAddress) []byte {
-	poolAppend := append(KeyPrefixNFTRedeemReceipts, sdk.Uint64ToBigEndian(poolID)...)
-	roundAppend := append(poolAppend, sdk.Uint64ToBigEndian(round)...)
-	return append(roundAppend, redeemer.Bytes()...)
+	return append(GetKeyPrefixNFTRedeemReceiptByPoolID(poolID, redeemer), sdk.Uint64ToBigEndian(round)...)
 }

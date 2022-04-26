@@ -31,6 +31,7 @@ func GetQueryCmd(queryRoute string) *cobra.Command {
 	cmd.AddCommand(CmdGetParams())
 	cmd.AddCommand(CmdGetModuleAddr())
 	cmd.AddCommand(CmdGetDataValidationCertificates())
+	cmd.AddCommand(CmdGetDataPassRedeemReceipts())
 
 	return cmd
 }

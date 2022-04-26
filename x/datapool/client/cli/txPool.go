@@ -183,6 +183,7 @@ func readCertificateFromFile(file string) (*types.DataValidationCertificate, err
 
 	return &cert, nil
 }
+
 func CmdBuyDataAccessNFT() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "buy-data-access-nft [pool ID] [round] [payment]",
@@ -216,6 +217,52 @@ func CmdBuyDataAccessNFT() *cobra.Command {
 				Round:   round,
 				Payment: &payment,
 				Buyer:   buyer.String(),
+			}
+
+			if err := msg.ValidateBasic(); err != nil {
+				return err
+			}
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
+		},
+	}
+
+	flags.AddTxFlagsToCmd(cmd)
+	return cmd
+}
+
+func CmdRedeemDataPass() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "redeem-data-pass [poolID] [round] [nftID]",
+		Short: "redeem data pass",
+		Args:  cobra.ExactArgs(3),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			redeemer := clientCtx.GetFromAddress()
+
+			poolID, err := strconv.ParseUint(args[0], 10, 64)
+			if err != nil {
+				return err
+			}
+
+			round, err := strconv.ParseUint(args[1], 10, 64)
+			if err != nil {
+				return err
+			}
+
+			nftID, err := strconv.ParseUint(args[2], 10, 64)
+			if err != nil {
+				return err
+			}
+
+			msg := &types.MsgRedeemDataPass{
+				PoolId:   poolID,
+				Round:    round,
+				NftId:    nftID,
+				Redeemer: redeemer.String(),
 			}
 
 			if err := msg.ValidateBasic(); err != nil {
