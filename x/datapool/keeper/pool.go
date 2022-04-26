@@ -551,9 +551,13 @@ func (k Keeper) RedeemDataPass(ctx sdk.Context, redeemNFT types.MsgRedeemDataPas
 		return nil, sdkerrors.Wrapf(types.ErrRedeemDataPass, err.Error())
 	}
 
+	if pool.GetRound() != redeemNFT.Round {
+		return nil, types.ErrRoundNotMatched
+	}
+
 	nftContractAcc, err := sdk.AccAddressFromBech32(pool.NftContractAddr)
 	if err != nil {
-		return nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, err.Error())
+		return nil, sdkerrors.ErrInvalidAddress
 	}
 
 	moduleAddr := types.GetModuleAddress()
@@ -566,7 +570,7 @@ func (k Keeper) RedeemDataPass(ctx sdk.Context, redeemNFT types.MsgRedeemDataPas
 
 	redeemerAcc, err := sdk.AccAddressFromBech32(redeemNFT.Redeemer)
 	if err != nil {
-		return nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, err.Error())
+		return nil, sdkerrors.Wrapf(types.ErrRedeemDataPass, err.Error())
 	}
 
 	redeemTokenId, err := k.GetRedeemerDataPass(ctx, pool.PoolId, redeemerAcc)
@@ -575,7 +579,7 @@ func (k Keeper) RedeemDataPass(ctx sdk.Context, redeemNFT types.MsgRedeemDataPas
 	}
 
 	if !contains(redeemTokenId, strconv.FormatUint(redeemNFT.NftId, 10)) {
-		return nil, sdkerrors.Wrapf(types.ErrInvalidTokenId, err.Error())
+		return nil, types.ErrInvalidTokenId
 	}
 
 	zeroFund, err := sdk.ParseCoinsNormalized("0umed")

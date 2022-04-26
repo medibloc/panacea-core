@@ -407,6 +407,21 @@ func (suite poolTestSuite) TestRedeemDataPass() {
 	suite.Require().Equal(redeemReceipt.BlockHeight, uint64(suite.Ctx.BlockHeight()))
 }
 
+func (suite poolTestSuite) TestNotContainedNftId() {
+	poolID := suite.setupCreatePool(1)
+
+	err := suite.BankKeeper.AddCoins(suite.Ctx, buyerAddr, fundForBuyer)
+	suite.Require().NoError(err)
+
+	err = suite.DataPoolKeeper.BuyDataPass(suite.Ctx, buyerAddr, poolID, 1, NFTPrice)
+	suite.Require().NoError(err)
+
+	redeemNFT := types.NewMsgRedeemDataPass(poolID, 1, 2, buyerAddr.String())
+
+	_, err = suite.DataPoolKeeper.RedeemDataPass(suite.Ctx, *redeemNFT)
+	suite.Require().Error(err, types.ErrInvalidTokenId)
+}
+
 func (suite poolTestSuite) TestGetRedeemerDataPass() {
 	poolID := suite.setupCreatePool(1)
 
