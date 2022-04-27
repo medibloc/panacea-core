@@ -157,7 +157,7 @@ func (k Keeper) executeRevenueDistribute(ctx sdk.Context, pool *types.Pool) erro
 		return err
 	}
 
-	// calculate the revenue to be sent to each seller(totalSalesBalance / totalShareTokenAmount)
+	// calculate the revenue to be sent to each seller
 	eachDistributionAmount := k.getEachDistributionAmount(pool)
 
 	poolAddress, err := sdk.AccAddressFromBech32(pool.GetPoolAddress())
