@@ -65,7 +65,7 @@ message PoolParams {
   ];                                                    // A download period after redeeming NFT
 }
 
-// DistributeRevenuePools defines poolID information to distribute revenue.
+// InstantRevenueDistribute defines poolID information to distribute revenue.
 message InstantRevenueDistribute {
   repeated uint64 pool_ids = 1;  // Execute information for pool reward distribution
 }
@@ -79,6 +79,7 @@ message SalesInfo {
   cosmos.base.v1beta1.Coin paid_coin = 5; // Proceeds distributed in the round
 }
 
+// SalesHistory defines the sales info history.
 message SalesHistory {
   repeated SalesInfo salesInfos = 1;
 }

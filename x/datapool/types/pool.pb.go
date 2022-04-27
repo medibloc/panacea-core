@@ -506,7 +506,7 @@ func (m *PoolParams) GetDownloadPeriod() *time.Duration {
 	return nil
 }
 
-// DistributeRevenuePools defines poolID information to distribute revenue.
+// InstantRevenueDistribute defines poolID information to distribute revenue.
 type InstantRevenueDistribute struct {
 	PoolIds []uint64 `protobuf:"varint,1,rep,packed,name=pool_ids,json=poolIds,proto3" json:"pool_ids,omitempty"`
 }
@@ -628,6 +628,7 @@ func (m *SalesInfo) GetPaidCoin() *types.Coin {
 	return nil
 }
 
+// SalesHistory defines the sales info history.
 type SalesHistory struct {
 	SalesInfos []*SalesInfo `protobuf:"bytes,1,rep,name=salesInfos,proto3" json:"salesInfos,omitempty"`
 }
