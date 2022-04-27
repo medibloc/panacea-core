@@ -64,14 +64,12 @@ func (m msgServer) SellData(goCtx context.Context, msg *types.MsgSellData) (*typ
 		return nil, err
 	}
 
-	accumPoolShareToken, err := m.Keeper.SellData(ctx, seller, *msg.Cert)
+	err = m.Keeper.SellData(ctx, seller, *msg.Cert)
 	if err != nil {
 		return nil, err
 	}
 
-	return &types.MsgSellDataResponse{
-		AccumPoolShareToken: accumPoolShareToken,
-	}, nil
+	return &types.MsgSellDataResponse{}, nil
 }
 
 func (m msgServer) BuyDataPass(goCtx context.Context, msg *types.MsgBuyDataPass) (*types.MsgBuyDataPassResponse, error) {

@@ -17,7 +17,7 @@ var (
 	ErrInvalidDataValidationCert  = sdkerrors.Register(ModuleName, 9, "certificate is not valid")
 	ErrExistSameDataHash          = sdkerrors.Register(ModuleName, 10, "data already exists in the pool")
 	ErrGetDataValidationCert      = sdkerrors.Register(ModuleName, 11, "failed get certificate.")
-	ErrFailedMintShareToken       = sdkerrors.Register(ModuleName, 12, "failed mint share token.")
+	ErrRevenueDistribute          = sdkerrors.Register(ModuleName, 12, "failed to revenue distribute")
 	ErrNFTAllIssued               = sdkerrors.Register(ModuleName, 13, "all NFTs issued")
 	ErrRoundNotMatched            = sdkerrors.Register(ModuleName, 14, "data pool sales round not matched")
 	ErrPaymentNotMatched          = sdkerrors.Register(ModuleName, 15, "payment not matched")

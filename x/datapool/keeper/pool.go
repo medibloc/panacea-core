@@ -9,7 +9,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
-	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	gogotypes "github.com/gogo/protobuf/types"
 	"github.com/medibloc/panacea-core/v2/x/datapool/types"
 )
@@ -212,23 +211,7 @@ func (k Keeper) CreatePool(ctx sdk.Context, curator sdk.AccAddress, deposit sdk.
 	// store pool
 	k.SetPool(ctx, newPool)
 
-	// mint tokens as many as targetNumData
-	k.setInitialSupply(ctx, poolID)
-	err = k.mintPoolShareToken(ctx, poolID, poolParams.TargetNumData)
-	if err != nil {
-		return 0, sdkerrors.Wrapf(err, "failed to mint share token")
-	}
-
 	return newPool.GetPoolId(), nil
-}
-
-// setInitialSupply defines supply to be initialized for tokens to be minted.
-func (k Keeper) setInitialSupply(ctx sdk.Context, poolID uint64) {
-	supply := banktypes.Supply{
-		Total: sdk.NewCoins(types.GetAccumPoolShareToken(poolID, 0)),
-	}
-
-	k.bankKeeper.SetSupply(ctx, &supply)
 }
 
 func (k Keeper) GetNextPoolNumberAndIncrement(ctx sdk.Context) uint64 {
@@ -349,47 +332,41 @@ func (k Keeper) DeployAndRegisterNFTContract(ctx sdk.Context, wasmCode []byte) (
 
 // SellData verifies the certificate against the pool information and stores it using a key combined with poolID, dataHash, and round.
 // Seller is paid shareToken.
-func (k Keeper) SellData(ctx sdk.Context, seller sdk.AccAddress, cert types.DataValidationCertificate) (*sdk.Coin, error) {
+func (k Keeper) SellData(ctx sdk.Context, seller sdk.AccAddress, cert types.DataValidationCertificate) error {
 	if cert.UnsignedCert.Requester != seller.String() {
-		return nil, types.ErrNotEqualsSeller
+		return types.ErrNotEqualsSeller
 	}
 
 	if err := k.verifySignature(ctx, cert); err != nil {
-		return nil, err
+		return err
 	}
 
 	if k.isDuplicatedCertificate(ctx, cert) {
-		return nil, types.ErrExistSameDataHash
+		return types.ErrExistSameDataHash
 	}
 
 	poolID := cert.UnsignedCert.PoolId
 	pool, err := k.GetPool(ctx, poolID)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	if err := k.validateCertificateByPool(cert, pool); err != nil {
-		return nil, err
+		return err
 	}
 
 	k.SetDataValidationCertificate(ctx, cert)
 
 	k.increaseCurNumAndUpdatePool(ctx, pool)
 
-	err = k.appendDistributeRevenuePools(ctx, pool)
+	err = k.addInstantRevenueDistribute(ctx, poolID)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	k.initRevenueDistributeTarget(ctx, pool.PoolId, pool.Round, seller)
+	k.addSalesHistory(ctx, pool.PoolId, pool.Round, seller, cert.UnsignedCert.DataHash)
 
-	shareToken := types.GetAccumPoolShareToken(poolID, 1)
-	err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, seller, sdk.NewCoins(shareToken))
-	if err != nil {
-		return nil, err
-	}
-
-	return &shareToken, nil
+	return nil
 }
 
 // verifySignature verifies that the signature of the dataValidator is correct
@@ -464,17 +441,6 @@ func (k Keeper) increaseCurNumAndUpdatePool(ctx sdk.Context, pool *types.Pool) {
 	}
 
 	k.SetPool(ctx, pool)
-}
-
-func (k Keeper) mintPoolShareToken(ctx sdk.Context, poolID, amount uint64) error {
-	shareToken := types.GetAccumPoolShareToken(poolID, amount)
-	shareTokens := sdk.NewCoins(shareToken)
-	err := k.bankKeeper.MintCoins(ctx, types.ModuleName, shareTokens)
-	if err != nil {
-		return sdkerrors.Wrap(types.ErrFailedMintShareToken, err.Error())
-	}
-
-	return nil
 }
 
 func contains(validators []string, validator string) bool {
@@ -553,6 +519,11 @@ func (k Keeper) BuyDataPass(ctx sdk.Context, buyer sdk.AccAddress, poolID, round
 	}
 
 	k.increaseNumIssuedNFT(ctx, pool)
+
+	err = k.addInstantRevenueDistribute(ctx, poolID)
+	if err != nil {
+		return sdkerrors.Wrapf(types.ErrBuyDataPass, err.Error())
+	}
 
 	return nil
 }

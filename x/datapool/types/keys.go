@@ -34,18 +34,15 @@ var (
 	// KeyPrefixPools defines key to store Pools
 	KeyPrefixPools = []byte{0x03}
 
-	// KeyNFTContractAddress defines key to contract address
-	KeyNFTContractAddress = []byte{0x04}
+	// KeyPrefixDataValidatorCerts defines key to store dataValidator certs
+	KeyPrefixDataValidatorCerts = []byte{0x04}
 
-	// KeyPrefixDataValidatorCert defines key to store dataValidator certs
-	KeyPrefixDataValidatorCert = []byte{0x05}
+	KeyPrefixRevenueDistribute = []byte{0x05}
 
-	KeyPrefixDistributeRevenueTarget = []byte{0x06}
+	// KeyPrefixInstantRevenueDistribute defines key to distribute reward pool
+	KeyPrefixInstantRevenueDistribute = []byte{0x06}
 
-	// KeyPrefixDelayedRevenueDistribute defines key to distribute reward pool
-	KeyPrefixDelayedRevenueDistribute = []byte{0x07}
-
-	KeyIndexSeparator = []byte{0x08}
+	KeyIndexSeparator = []byte{0x07}
 )
 
 func GetKeyPrefixDataValidator(dataValidatorAddr sdk.AccAddress) []byte {
@@ -57,7 +54,7 @@ func GetKeyPrefixPools(poolID uint64) []byte {
 }
 
 func GetKeyPrefixDataValidateCerts(poolID, round *uint64) []byte {
-	prefixOfPoolID := append(KeyPrefixDataValidatorCert, sdk.Uint64ToBigEndian(*poolID)...)
+	prefixOfPoolID := append(KeyPrefixDataValidatorCerts, sdk.Uint64ToBigEndian(*poolID)...)
 	if round != nil {
 		return append(prefixOfPoolID, sdk.Uint64ToBigEndian(*round)...)
 	}
@@ -68,12 +65,13 @@ func GetKeyPrefixDataValidateCert(poolID, round uint64, dataHash []byte) []byte 
 	return append(GetKeyPrefixDataValidateCerts(&poolID, &round), dataHash...)
 }
 
-func GetKeyPrefixDistributeRevenueTarget(poolID, round uint64, addr string) []byte {
-	return append(KeyPrefixDistributeRevenueTarget, CombineKeys(sdk.Uint64ToBigEndian(poolID), sdk.Uint64ToBigEndian(round), []byte(addr))...)
+func GetKeyPrefixDataValidateCertByRound(poolID, round uint64) []byte {
+	keyPoolAppended := append(KeyPrefixDataValidatorCerts, sdk.Uint64ToBigEndian(poolID)...)
+	return append(keyPoolAppended, sdk.Uint64ToBigEndian(round)...)
 }
 
-func GetKeyPrefixDistributeRevenueTargetByRound(poolID, round uint64) []byte {
-	return append(KeyPrefixDistributeRevenueTarget, CombineKeys(sdk.Uint64ToBigEndian(poolID), sdk.Uint64ToBigEndian(round))...)
+func GetKeyPrefixSalesHistory(poolID, round uint64) []byte {
+	return append(KeyPrefixRevenueDistribute, CombineKeys(sdk.Uint64ToBigEndian(poolID), sdk.Uint64ToBigEndian(round))...)
 }
 
 // CombineKeys function defines combines deal_id with data_hash.

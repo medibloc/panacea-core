@@ -3,20 +3,16 @@ package types
 import (
 	"github.com/medibloc/panacea-core/v2/types/assets"
 
-	"fmt"
 	"strconv"
 
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 )
 
 const (
 	PENDING = "PENDING"
 	ACTIVE  = "ACTIVE"
-
-	ShareTokenPrefix = "DP"
 )
 
 var ZeroFund = sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(0))
@@ -45,23 +41,22 @@ func GetModuleAddress() sdk.AccAddress {
 	return authtypes.NewModuleAddress(ModuleName)
 }
 
-func GetDenomOfShareToken(poolID uint64) string {
-	return fmt.Sprintf(ShareTokenPrefix+"/%v", poolID)
-}
-
-func GetAccumPoolShareToken(poolID, amount uint64) sdk.Coin {
-	return sdk.NewCoin(GetDenomOfShareToken(poolID), sdk.NewIntFromUint64(amount))
-}
-
-func (d *DelayedRevenueDistribute) AppendPoolID(poolID uint64) {
+// AppendPoolID adds the poolID.
+func (d *InstantRevenueDistribute) AppendPoolID(poolID uint64) {
+	// Check duplicate
+	for _, existPoolID := range d.PoolIds {
+		if existPoolID == poolID {
+			return
+		}
+	}
 	d.PoolIds = append(d.PoolIds, poolID)
 }
 
-func (d *DelayedRevenueDistribute) IsEmpty() bool {
+func (d *InstantRevenueDistribute) IsEmpty() bool {
 	return d.PoolIds == nil || len(d.PoolIds) == 0
 }
 
-func (d *DelayedRevenueDistribute) RemovePreviousIndex(idx int) {
+func (d *InstantRevenueDistribute) RemovePreviousIndex(idx int) {
 	if d.IsEmpty() {
 		return
 	}

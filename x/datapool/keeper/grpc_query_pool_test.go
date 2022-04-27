@@ -91,13 +91,13 @@ func (suite queryPoolTestSuite) TestQueryDataValidationCertificates() {
 	suite.Require().Len(res.DataValidationCertificates, 0)
 
 	dataHash1 := []byte("data1")
-	cert1, err := makeTestDataCertificate(suite.Cdc.Marshaler, pool.GetPoolId(), pool.GetRound(), dataHash1)
+	cert1, err := makeTestDataCertificate(suite.Cdc.Marshaler, pool.GetPoolId(), pool.GetRound(), dataHash1, requesterAddr.String())
 	suite.Require().NoError(err)
 
 	suite.DataPoolKeeper.SetDataValidationCertificate(suite.Ctx, *cert1)
 
 	dataHash2 := []byte("data2")
-	cert2, err := makeTestDataCertificate(suite.Cdc.Marshaler, pool.GetPoolId(), pool.GetRound(), dataHash2)
+	cert2, err := makeTestDataCertificate(suite.Cdc.Marshaler, pool.GetPoolId(), pool.GetRound(), dataHash2, requesterAddr.String())
 	suite.Require().NoError(err)
 
 	suite.DataPoolKeeper.SetDataValidationCertificate(suite.Ctx, *cert2)

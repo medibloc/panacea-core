@@ -73,7 +73,7 @@ message MsgSellData {
 
 // MsgSellDataResponse defines the Msg/SellData response type.
 message MsgSellDataResponse {
-  cosmos.base.v1beta1.Coin accum_pool_share_token = 1;  // denom: DP-{pood-id}
+
 }
 
 // MsgBuyDataPass defines the Msg/BuyDataPass request type.

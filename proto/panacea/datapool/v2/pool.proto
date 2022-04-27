@@ -66,14 +66,19 @@ message PoolParams {
 }
 
 // DistributeRevenuePools defines poolID information to distribute revenue.
-message DelayedRevenueDistribute {
+message InstantRevenueDistribute {
   repeated uint64 pool_ids = 1;  // Execute information for pool reward distribution
 }
 
-// RevenueDistributeTarget defines the rounds of each pool and the distribution of proceeds by address.
-message RevenueDistributeTarget {
+// SalesInfo defines sales information
+message SalesInfo {
   uint64 pool_id = 1;                     // pool Id for selling data
   uint64 round = 2;                       // Always 1 for v0
   string address = 3;                     // address to be distributed
-  cosmos.base.v1beta1.Coin paid_coin = 4; // Proceeds distributed in the round
+  bytes data_hash = 4;
+  cosmos.base.v1beta1.Coin paid_coin = 5; // Proceeds distributed in the round
+}
+
+message SalesHistory {
+  repeated SalesInfo salesInfos = 1;
 }
