@@ -45,9 +45,7 @@ func (k Keeper) GetSalesHistory(ctx sdk.Context, poolID, round uint64) *types.Sa
 	store := ctx.KVStore(k.storeKey)
 	bz := store.Get(key)
 	if bz == nil {
-		return &types.SalesHistory{
-			SalesInfos: []*types.SalesInfo{},
-		}
+		return &types.SalesHistory{}
 	}
 	var salesHistory types.SalesHistory
 	k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &salesHistory)
