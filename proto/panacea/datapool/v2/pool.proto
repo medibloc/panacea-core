@@ -81,5 +81,5 @@ message SalesInfo {
 
 // SalesHistory defines the sales info history.
 message SalesHistory {
-  repeated SalesInfo salesInfos = 1;
+  repeated SalesInfo sales_infos = 1;
 }
