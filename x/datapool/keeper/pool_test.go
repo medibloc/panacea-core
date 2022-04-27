@@ -665,25 +665,3 @@ func makeTestDataPool(poolID uint64) *types.Pool {
 
 	return types.NewPool(poolID, curatorAddr, poolParams)
 }
-
-func (suite poolTestSuite) initCreatePool() {
-	// create and instantiate NFT contract
-	suite.setupNFTContract()
-
-	err := suite.BankKeeper.AddCoins(suite.Ctx, curatorAddr, fundForCurator)
-	suite.Require().NoError(err)
-
-	// register data validator
-	err = suite.BankKeeper.AddCoins(suite.Ctx, dataVal1, fundForDataVal)
-	suite.Require().NoError(err)
-
-	suite.setDataValidatorAccount()
-
-	dataValidator := types.DataValidator{
-		Address:  dataVal1.String(),
-		Endpoint: "https://my-validator.org",
-	}
-
-	err = suite.DataPoolKeeper.RegisterDataValidator(suite.Ctx, dataValidator)
-	suite.Require().NoError(err)
-}
