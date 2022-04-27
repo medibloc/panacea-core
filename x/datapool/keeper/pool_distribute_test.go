@@ -82,8 +82,6 @@ func (suite poolTestSuite) TestExecuteRevenueDistributePoolActive() {
 	// check balances of curator and sellers after distribution
 	curatorAmount = suite.BankKeeper.GetBalance(suite.Ctx, curatorAddr, assets.MicroMedDenom).Amount
 	suite.Require().Equal(fundForCurator.AmountOf(assets.MicroMedDenom), curatorAmount)
-	pool, err = suite.DataPoolKeeper.GetPool(suite.Ctx, poolID)
-	suite.Require().NoError(err)
 
 	for i, sellerAddr := range sellers {
 		coin := suite.BankKeeper.GetBalance(suite.Ctx, sellerAddr, assets.MicroMedDenom)
@@ -100,9 +98,6 @@ func (suite poolTestSuite) TestExecuteRevenueDistributePoolActive() {
 
 	// execute a distribute sales revenue
 	err = suite.DataPoolKeeper.DistributeRevenuePools(suite.Ctx)
-	suite.Require().NoError(err)
-
-	pool, err = suite.DataPoolKeeper.GetPool(suite.Ctx, poolID)
 	suite.Require().NoError(err)
 
 	for i, sellerAddr := range sellers {
@@ -163,8 +158,6 @@ func (suite poolTestSuite) TestExecuteRevenueDistributeDataPassSoldOut() {
 	// check balances of curator and sellers after distribution
 	curatorAmount = suite.BankKeeper.GetBalance(suite.Ctx, curatorAddr, assets.MicroMedDenom).Amount
 	suite.Require().Equal(fundForCurator.AmountOf(assets.MicroMedDenom), curatorAmount)
-	pool, err = suite.DataPoolKeeper.GetPool(suite.Ctx, poolID)
-	suite.Require().NoError(err)
 
 	for _, sellerAddr := range sellers {
 		coin := suite.BankKeeper.GetBalance(suite.Ctx, sellerAddr, assets.MicroMedDenom)
