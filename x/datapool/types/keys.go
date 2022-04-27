@@ -37,7 +37,7 @@ var (
 	// KeyPrefixDataValidatorCerts defines key to store dataValidator certs
 	KeyPrefixDataValidatorCerts = []byte{0x04}
 
-	KeyPrefixRevenueDistribute = []byte{0x05}
+	KeyPrefixSalesHistory = []byte{0x05}
 
 	// KeyPrefixInstantRevenueDistribute defines key to distribute reward pool
 	KeyPrefixInstantRevenueDistribute = []byte{0x06}
@@ -71,7 +71,7 @@ func GetKeyPrefixDataValidateCertByRound(poolID, round uint64) []byte {
 }
 
 func GetKeyPrefixSalesHistory(poolID, round uint64) []byte {
-	return append(KeyPrefixRevenueDistribute, CombineKeys(sdk.Uint64ToBigEndian(poolID), sdk.Uint64ToBigEndian(round))...)
+	return append(KeyPrefixSalesHistory, CombineKeys(sdk.Uint64ToBigEndian(poolID), sdk.Uint64ToBigEndian(round))...)
 }
 
 // CombineKeys function defines combines deal_id with data_hash.
