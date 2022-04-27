@@ -17,8 +17,6 @@ type BankKeeper interface {
 
 	GetSupply(ctx sdk.Context) exported.SupplyI
 	SetSupply(ctx sdk.Context, supply exported.SupplyI)
-
-	IterateAllBalances(ctx sdk.Context, cb func(address sdk.AccAddress, coin sdk.Coin) (stop bool))
 }
 
 type AccountKeeper interface {
@@ -27,6 +25,4 @@ type AccountKeeper interface {
 	SetAccount(ctx sdk.Context, acc authtypes.AccountI)
 	GetAccount(ctx sdk.Context, addr sdk.AccAddress) authtypes.AccountI
 	GetPubKey(sdk.Context, sdk.AccAddress) (cryptotypes.PubKey, error)
-
-	GetModuleAddress(moduleName string) sdk.AccAddress
 }
