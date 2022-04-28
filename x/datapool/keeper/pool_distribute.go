@@ -156,7 +156,7 @@ func (k Keeper) executeRevenueDistribute(ctx sdk.Context, pool *types.Pool) erro
 	}
 
 	// calculate the revenue to be sent to each seller
-	eachDistributionAmount := k.getEachDistributionAmount(pool)
+	eachDistributionAmount := k.getEachDistributionAmount(ctx, pool)
 
 	poolAddress, err := sdk.AccAddressFromBech32(pool.GetPoolAddress())
 	if err != nil {
@@ -201,10 +201,68 @@ func (k Keeper) executeRevenueDistribute(ctx sdk.Context, pool *types.Pool) erro
 		*availablePoolCoinAmount = availablePoolCoinAmount.Sub(paymentAmount)
 	}
 	k.SetSalesHistory(ctx, pool.PoolId, pool.Round, salesHistory)
+
+	err = k.sendCommissionToCurator(ctx, pool, salesHistory.SalesInfos)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
-func (k Keeper) getEachDistributionAmount(pool *types.Pool) sdk.Int {
-	totalNftPriceAmount := pool.PoolParams.MaxNftSupply * pool.PoolParams.NftPrice.Amount.Uint64()
-	return sdk.NewIntFromUint64(totalNftPriceAmount / pool.PoolParams.TargetNumData)
+func (k Keeper) getEachDistributionAmount(ctx sdk.Context, pool *types.Pool) sdk.Int {
+	maxNftSupply := sdk.NewDecFromInt(sdk.NewIntFromUint64(pool.PoolParams.MaxNftSupply))
+	nftPrice := pool.PoolParams.NftPrice.Amount.ToDec()
+	// maxNftSupply * nftPrice
+	totalAmount := maxNftSupply.Mul(nftPrice)
+	curatorCommissionRate := k.GetParams(ctx).DataPoolCuratorCommissionRate
+
+	// totalAmount * (1 - curatorCommissionRate)
+	totalAmount = totalAmount.Mul(sdk.NewDec(1).Sub(curatorCommissionRate))
+	targetNumData := sdk.NewDecFromInt(sdk.NewIntFromUint64(pool.PoolParams.TargetNumData))
+
+	// totalAmount / targetNumData
+	// drop the decimal point
+	return totalAmount.Quo(targetNumData).TruncateInt()
+}
+
+// sendCommissionToCurator sends a commission to the curator when compensation is distributed to all sellers.
+func (k Keeper) sendCommissionToCurator(ctx sdk.Context, pool *types.Pool, infos []*types.SalesInfo) error {
+	if k.isCompletedDistributeAllSeller(ctx, pool, infos) {
+		maxNftSupply := sdk.NewDecFromInt(sdk.NewIntFromUint64(pool.PoolParams.MaxNftSupply))
+		nftPrice := pool.PoolParams.NftPrice.Amount.ToDec()
+		// maxNftSupply * nftPrice
+		totalAmount := maxNftSupply.Mul(nftPrice)
+		curatorCommissionRate := k.GetParams(ctx).DataPoolCuratorCommissionRate
+
+		// totalAmount * curatorCommissionRate
+		curatorCommissionAmount := totalAmount.Mul(curatorCommissionRate).TruncateInt()
+
+		poolAddress, err := sdk.AccAddressFromBech32(pool.PoolAddress)
+		if err != nil {
+			return sdkerrors.Wrap(types.ErrRevenueDistribute, err.Error())
+		}
+		curatorAddress, err := sdk.AccAddressFromBech32(pool.Curator)
+		if err != nil {
+			return sdkerrors.Wrap(types.ErrRevenueDistribute, err.Error())
+		}
+		err = k.bankKeeper.SendCoins(ctx, poolAddress, curatorAddress, sdk.NewCoins(sdk.NewCoin(assets.MicroMedDenom, curatorCommissionAmount)))
+		if err != nil {
+			return sdkerrors.Wrap(types.ErrRevenueDistribute, err.Error())
+		}
+	}
+	return nil
+}
+
+func (k Keeper) isCompletedDistributeAllSeller(ctx sdk.Context, pool *types.Pool, salesInfos []*types.SalesInfo) bool {
+	if pool.PoolParams.TargetNumData != uint64(len(salesInfos)) {
+		return false
+	}
+
+	eachDistributionAmount := k.getEachDistributionAmount(ctx, pool)
+	for _, info := range salesInfos {
+		if !eachDistributionAmount.Equal(info.PaidCoin.Amount) {
+			return false
+		}
+	}
+	return true
 }
