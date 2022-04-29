@@ -63,3 +63,11 @@ func (d *InstantRevenueDistribute) RemovePreviousIndex(idx int) {
 
 	d.PoolIds = d.PoolIds[idx:]
 }
+
+func (m *SalesHistory) AddDataHash(dataHash []byte) {
+	m.DataHashes = append(m.DataHashes, dataHash)
+}
+
+func (m *SalesHistory) DataCount() int {
+	return len(m.DataHashes)
+}

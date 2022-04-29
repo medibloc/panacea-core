@@ -71,15 +71,10 @@ message InstantRevenueDistribute {
 }
 
 // SalesInfo defines sales information
-message SalesInfo {
+message SalesHistory {
   uint64 pool_id = 1;                     // pool Id for selling data
   uint64 round = 2;                       // Always 1 for v0
-  string address = 3;                     // address to be distributed
-  bytes data_hash = 4;
+  string seller_address = 3;                     // address to be distributed
+  repeated bytes data_hashes = 4;
   cosmos.base.v1beta1.Coin paid_coin = 5; // Proceeds distributed in the round
-}
-
-// SalesHistory defines the sales info history.
-message SalesHistory {
-  repeated SalesInfo sales_infos = 1;
 }
