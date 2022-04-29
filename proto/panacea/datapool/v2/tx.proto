@@ -91,7 +91,7 @@ message MsgBuyDataPassResponse {
   uint64 nft_id = 3;
 }
 
-// MsgRedeemDataPass defines the Msg/RedeemDataAccessNFT request type.
+// MsgRedeemDataPass defines the Msg/RedeemDataPass request type.
 message MsgRedeemDataPass {
   uint64 pool_id = 1;
   uint64 round = 2;
@@ -99,7 +99,7 @@ message MsgRedeemDataPass {
   string redeemer = 4;  // 'panacea1' address
 }
 
-// MsgRedeemDataPassResponse defines the Msg/RedeemDataAccessNFT response type.
+// MsgRedeemDataPassResponse defines the Msg/RedeemDataPass response type.
 message MsgRedeemDataPassResponse {
   DataPassRedeemReceipt receipt = 1;
 }

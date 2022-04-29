@@ -431,7 +431,7 @@ func (suite poolTestSuite) TestGetRedeemerDataPass() {
 	err = suite.DataPoolKeeper.BuyDataPass(suite.Ctx, buyerAddr, poolID, 1, NFTPrice)
 	suite.Require().NoError(err)
 
-	redeemerTokenId, err := suite.DataPoolKeeper.GetRedeemerDataPass(suite.Ctx, poolID, buyerAddr)
+	redeemerTokenId, err := suite.DataPoolKeeper.GetRedeemerDataPassByAddr(suite.Ctx, poolID, buyerAddr)
 	suite.Require().NoError(err)
 
 	suite.Require().Equal(redeemerTokenId[0], strconv.FormatUint(1, 10))

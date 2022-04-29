@@ -573,26 +573,23 @@ func (k Keeper) RedeemDataPass(ctx sdk.Context, redeemNFT types.MsgRedeemDataPas
 		return nil, sdkerrors.Wrapf(types.ErrRedeemDataPass, err.Error())
 	}
 
-	redeemTokenId, err := k.GetRedeemerDataPass(ctx, pool.PoolId, redeemerAcc)
+	redeemTokenIds, err := k.GetRedeemerDataPassByAddr(ctx, pool.PoolId, redeemerAcc)
 	if err != nil {
 		return nil, sdkerrors.Wrapf(types.ErrRedeemDataPass, err.Error())
 	}
 
-	if !contains(redeemTokenId, strconv.FormatUint(redeemNFT.NftId, 10)) {
+	if !contains(redeemTokenIds, strconv.FormatUint(redeemNFT.NftId, 10)) {
 		return nil, types.ErrInvalidTokenId
 	}
 
-	zeroFund, err := sdk.ParseCoinsNormalized("0umed")
-	if err != nil {
-		return nil, sdkerrors.Wrapf(err, "error in parsing coin")
-	}
+	zeroFund := sdk.NewCoins(types.ZeroFund)
 
 	_, err = k.wasmKeeper.Execute(ctx, nftContractAcc, redeemerAcc, transferNFTMsgBz, zeroFund)
 	if err != nil {
 		return nil, sdkerrors.Wrapf(types.ErrRedeemDataPass, err.Error())
 	}
 
-	nftRedeemReceipt := types.NewDataAccessNFTRedeemReceipt(redeemNFT.PoolId, redeemNFT.Round, redeemNFT.NftId, uint64(ctx.BlockHeight()), redeemNFT.Redeemer)
+	nftRedeemReceipt := types.NewDataPassRedeemReceipt(redeemNFT.PoolId, redeemNFT.Round, redeemNFT.NftId, uint64(ctx.BlockHeight()), redeemNFT.Redeemer)
 
 	err = k.SetDataPassRedeemReceipt(ctx, *nftRedeemReceipt)
 	if err != nil {
@@ -631,7 +628,7 @@ func (k Keeper) SetDataPassRedeemReceipt(ctx sdk.Context, redeemReceipt types.Da
 	return nil
 }
 
-func (k Keeper) GetRedeemerDataPass(ctx sdk.Context, poolID uint64, redeemer sdk.AccAddress) ([]string, error) {
+func (k Keeper) GetRedeemerDataPassByAddr(ctx sdk.Context, poolID uint64, redeemer sdk.AccAddress) ([]string, error) {
 	pool, err := k.GetPool(ctx, poolID)
 	if err != nil {
 		return nil, sdkerrors.Wrapf(types.ErrPoolNotFound, err.Error())
