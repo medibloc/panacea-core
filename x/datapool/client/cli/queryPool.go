@@ -159,7 +159,7 @@ func CmdGetDataPassRedeemReceipts() *cobra.Command {
 		},
 	}
 
-	flags.AddQueryFlagsToCmd(cmd)
+	flags.AddPaginationFlagsToCmd(cmd, "all data pass")
 
 	return cmd
 }

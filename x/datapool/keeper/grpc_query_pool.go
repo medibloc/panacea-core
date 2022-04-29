@@ -119,7 +119,7 @@ func (k Keeper) DataPassRedeemReceipts(goCtx context.Context, req *types.QueryDa
 	redeemReceiptStore := prefix.NewStore(store, types.GetKeyPrefixNFTRedeemReceiptByPoolID(req.PoolId, redeemer))
 
 	var redeemReceipts []types.DataPassRedeemReceipt
-	pageRes, err := query.Paginate(redeemReceiptStore, req.Pagination, func(_ []byte, value []byte) error {
+	pageRes, err := query.Paginate(redeemReceiptStore, req.Pagination, func(_, value []byte) error {
 		var redeemReceipt types.DataPassRedeemReceipt
 		err := k.cdc.UnmarshalBinaryLengthPrefixed(value, &redeemReceipt)
 		if err != nil {
