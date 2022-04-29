@@ -392,10 +392,8 @@ func (suite poolTestSuite) TestRedeemDataPass() {
 	err = suite.DataPoolKeeper.BuyDataPass(suite.Ctx, buyerAddr, poolID, 1, NFTPrice)
 	suite.Require().NoError(err)
 
-	pool, err := suite.DataPoolKeeper.GetPool(suite.Ctx, poolID)
-	suite.Require().NoError(err)
-
-	redeemNFT := types.NewMsgRedeemDataPass(poolID, 1, pool.GetNumIssuedNfts(), buyerAddr.String())
+	// NFT id is hard-coded.
+	redeemNFT := types.NewMsgRedeemDataPass(poolID, 1, 1, buyerAddr.String())
 
 	redeemReceipt, err := suite.DataPoolKeeper.RedeemDataPass(suite.Ctx, *redeemNFT)
 	suite.Require().NoError(err)
