@@ -42,8 +42,6 @@ var (
 	// KeyPrefixInstantRevenueDistribute defines key to distribute reward pool
 	KeyPrefixInstantRevenueDistribute = []byte{0x06}
 
-	KeyPrefixCuratorCommission = []byte{0x07}
-
 	KeyIndexSeparator = []byte{0xFF}
 )
 
@@ -69,10 +67,6 @@ func GetKeyPrefixSalesHistories(poolID, round uint64) []byte {
 
 func GetKeyPrefixSalesHistory(poolID, round uint64, seller string) []byte {
 	return CombineKeys(GetKeyPrefixSalesHistories(poolID, round), []byte(seller))
-}
-
-func GetKeyPrefixCuratorCommission(poolID, round uint64, curator string) []byte {
-	return append(KeyPrefixCuratorCommission, CombineKeys(sdk.Uint64ToBigEndian(poolID), sdk.Uint64ToBigEndian(round), []byte(curator))...)
 }
 
 // CombineKeys function defines combines deal_id with data_hash.
