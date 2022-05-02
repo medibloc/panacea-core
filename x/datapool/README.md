@@ -110,7 +110,7 @@ proposal_example.json
   "changes": [
     {
       "subspace": "datapool",
-      "key": "DataPoolCuratorCommissionRate",
+      "key": "DataPoolCommissionRate",
       "value": "0.05"
     }
   ],
