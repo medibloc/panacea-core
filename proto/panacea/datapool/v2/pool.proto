@@ -9,17 +9,18 @@ import "google/protobuf/duration.proto";
 
 // Pool defines a data pool
 message Pool {
-  uint64                   pool_id = 1;
-  string                   pool_address = 2;
-  uint64                   round = 3;
-  PoolParams               pool_params = 4;
-  uint64                   cur_num_data = 5;                            // current number of data
-  uint64                   num_issued_nfts = 6;                         // current issued NFTs
-  string                   status = 7;
-  string                   curator = 8;
-  cosmos.base.v1beta1.Coin deposit = 9 [(gogoproto.nullable) = false]; // deposit
-  string                   nft_contract_addr = 10;                     // NFT contract address of pool
-  bool                     is_paid_deposit = 11;
+  uint64                                pool_id = 1;
+  string                                pool_address = 2;
+  uint64                                round = 3;
+  PoolParams                            pool_params = 4;
+  uint64                                cur_num_data = 5;                                        // current number of data
+  uint64                                num_issued_nfts = 6;                                     // current issued NFTs
+  string                                status = 7;
+  string                                curator = 8;
+  cosmos.base.v1beta1.Coin              deposit = 9 [(gogoproto.nullable) = false];             // deposit
+  string                                nft_contract_addr = 10;                                 // NFT contract address of pool
+  bool                                  is_paid_deposit = 11;
+  map<uint64, cosmos.base.v1beta1.Coin> curator_commission = 12 [(gogoproto.nullable) = false]; // key: round, value: paid curator commission balance
 }
 
 // DataValidationCertificate defines the certificate for data validation w/ data validator signature.
@@ -60,9 +61,11 @@ message PoolParams {
   cosmos.base.v1beta1.Coin nft_price = 4;               // A price of a NFT
   repeated string          trusted_data_validators = 5; // Trusted data validators' addresses
   repeated string          trusted_data_issuers = 6;    // Optional. Data issuers that is trusted by the curator
-  google.protobuf.Duration download_period = 7 [
-    (gogoproto.stdduration) = true
-  ];                                                    // A download period after redeeming NFT
+  string                   curator_commission_rate = 7 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.moretags) = "yaml:\"curator_commission_rate\"",
+    (gogoproto.nullable) = false
+  ]; // curator commission rate
 }
 
 // InstantRevenueDistribute defines poolID information to distribute revenue.
@@ -71,15 +74,10 @@ message InstantRevenueDistribute {
 }
 
 // SalesInfo defines sales information
-message SalesInfo {
+message SalesHistory {
   uint64 pool_id = 1;                     // pool Id for selling data
   uint64 round = 2;                       // Always 1 for v0
-  string address = 3;                     // address to be distributed
-  bytes data_hash = 4;
+  string seller_address = 3;                     // address to be distributed
+  repeated bytes data_hashes = 4;
   cosmos.base.v1beta1.Coin paid_coin = 5; // Proceeds distributed in the round
-}
-
-// SalesHistory defines the sales info history.
-message SalesHistory {
-  repeated SalesInfo sales_infos = 1;
 }

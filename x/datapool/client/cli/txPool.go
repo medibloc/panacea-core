@@ -3,16 +3,14 @@ package cli
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
-	"strconv"
-	"time"
-
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/medibloc/panacea-core/v2/x/datapool/types"
 	"github.com/spf13/cobra"
+	"io/ioutil"
+	"strconv"
 )
 
 func CmdRegisterDataValidator() *cobra.Command {
@@ -113,11 +111,6 @@ func newCreatePoolMsg(clientCtx client.Context, depositCoin, file string) (sdk.M
 		return nil, err
 	}
 
-	downloadPeriod, err := time.ParseDuration(poolParamsInput.DownloadPeriod)
-	if err != nil {
-		return nil, err
-	}
-
 	poolParams := &types.PoolParams{
 		DataSchema:            poolParamsInput.DataSchema,
 		TargetNumData:         poolParamsInput.TargetNumData,
@@ -125,7 +118,6 @@ func newCreatePoolMsg(clientCtx client.Context, depositCoin, file string) (sdk.M
 		NftPrice:              &nftPrice,
 		TrustedDataValidators: poolParamsInput.TrustedDataValidators,
 		TrustedDataIssuers:    poolParamsInput.TrustedDataIssuers,
-		DownloadPeriod:        &downloadPeriod,
 	}
 
 	deposit, err := sdk.ParseCoinNormalized(depositCoin)

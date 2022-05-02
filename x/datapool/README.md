@@ -54,18 +54,20 @@ param_change_sample.json (when codeID=1, contractAddress=panacea14hj2tavq8fpesdw
   "changes": [
     {
       "subspace": "datapool",
-      "key": "datapoolcodeid",
+      "key": "DataPoolCodeId",
       "value": "1"
     },
     {
       "subspace": "datapool",
-      "key": "datapoolnftcontractaddress",
+      "key": "DataPoolNftContractAddress",
       "value": "panacea14hj2tavq8fpesdwxxcu44rty3hh90vhu4mda6e"
     }
   ],
   "deposit": "1000000umed"
 }
 ```
+
+TODO: contract address is hardcoded now.
 
 ```shell
 panacead tx gov submit-proposal param-change param_change_sample.json --from $VALIDATOR $TX_FLAG -y
@@ -80,7 +82,7 @@ panacead tx gov vote {param-change proposal id} yes --from $VALIDATOR $TX_FLAG -
 
 ```shell
 CURATOR=$(panacead keys show {your address or key of curator} -a)
-panacead tx datapool create-pool create_pool_sample.json --from $CURATOR $TX_FLAG -y
+panacead tx datapool create-pool {your deposit} create_pool_sample.json --from $CURATOR $TX_FLAG -y
 ```
 
 ### Query curator NFT
@@ -98,7 +100,7 @@ result
 }
 ```
 
-## Change parameter of data pool deposit by proposal
+## Change parameter of data pool commossion by proposal
 
 proposal_example.json
 ```json
@@ -108,8 +110,8 @@ proposal_example.json
   "changes": [
     {
       "subspace": "datapool",
-      "key": "datapooldeposit",
-      "value": { "denom": "umed", "amount": "20000000" }
+      "key": "DataPoolCuratorCommissionRate",
+      "value": "0.05"
     }
   ],
   "deposit": "1000000umed"

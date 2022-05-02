@@ -2,12 +2,10 @@ package keeper_test
 
 import (
 	"fmt"
+	"github.com/cosmos/cosmos-sdk/codec"
 	"io/ioutil"
 	"strings"
 	"testing"
-	"time"
-
-	"github.com/cosmos/cosmos-sdk/codec"
 
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
@@ -54,8 +52,6 @@ var (
 	fundForBuyer   = sdk.NewCoins(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(10000000000)))
 	NFTPrice       = sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(10000000)) // 10 MED
 	enoughDeposit  = sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(20000000)) // 20 MED
-
-	downloadPeriod = time.Second * 100000000
 )
 
 func (suite poolTestSuite) setupNFTContract() {
@@ -68,10 +64,9 @@ func (suite poolTestSuite) setupNFTContract() {
 
 	// set datapool parameters
 	params := types.Params{
-		DataPoolDepositRate:           types.DefaultDataPoolDepositRate,
-		DataPoolNftContractAddress:    addr.String(),
-		DataPoolCodeId:                1,
-		DataPoolCuratorCommissionRate: types.DefaultDataPoolCuratorCommissionRate,
+		DataPoolCommissionRate:     types.DefaultDataPoolCommissionRate,
+		DataPoolNftContractAddress: addr.String(),
+		DataPoolCodeId:             1,
 	}
 
 	suite.DataPoolKeeper.SetParams(suite.Ctx, params)
@@ -208,14 +203,12 @@ func (suite *poolTestSuite) TestUpdateDataValidator() {
 
 func (suite *poolTestSuite) TestGetPool() {
 	poolID := uint64(1)
-	downloadPeriod := time.Hour
 	poolParams := types.PoolParams{
 		DataSchema:            []string{"https://json.schemastore.org/github-issue-forms.json"},
 		TargetNumData:         defaultTargetNumData,
 		MaxNftSupply:          defaultMaxNfySupply,
 		NftPrice:              &NFTPrice,
 		TrustedDataValidators: []string{dataVal1.String()},
-		DownloadPeriod:        &downloadPeriod,
 	}
 
 	pool := types.NewPool(poolID, curatorAddr, poolParams)
@@ -389,7 +382,7 @@ func makePoolParamsWithDataValidator(TargetNumData, MaxNftSupply uint64) types.P
 		NftPrice:              &NFTPrice,
 		TrustedDataValidators: []string{dataVal1.String()},
 		TrustedDataIssuers:    []string(nil),
-		DownloadPeriod:        &downloadPeriod,
+		CuratorCommissionRate: types.DefaultDataPoolCommissionRate,
 	}
 }
 
@@ -401,7 +394,6 @@ func makePoolParamsNoDataValidator(maxNftSupply uint64) types.PoolParams {
 		NftPrice:              &NFTPrice,
 		TrustedDataValidators: []string(nil),
 		TrustedDataIssuers:    []string(nil),
-		DownloadPeriod:        &downloadPeriod,
 	}
 }
 
@@ -654,14 +646,12 @@ func makeTestDataCertificate(marshaler codec.Marshaler, poolID, round uint64, da
 }
 
 func makeTestDataPool(poolID uint64) *types.Pool {
-	downloadPeriod := time.Hour
 	poolParams := types.PoolParams{
 		DataSchema:            []string{"https://json.schemastore.org/github-issue-forms.json"},
 		TargetNumData:         defaultTargetNumData,
 		MaxNftSupply:          defaultMaxNfySupply,
 		NftPrice:              &NFTPrice,
 		TrustedDataValidators: []string{dataVal1.String()},
-		DownloadPeriod:        &downloadPeriod,
 	}
 
 	return types.NewPool(poolID, curatorAddr, poolParams)

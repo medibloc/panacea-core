@@ -1,10 +1,8 @@
 package datapool_test
 
 import (
-	"testing"
-	"time"
-
 	"github.com/medibloc/panacea-core/v2/x/datapool"
+	"testing"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/medibloc/panacea-core/v2/types/assets"
@@ -16,11 +14,10 @@ import (
 )
 
 var (
-	dataVal        = sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address())
-	curator        = sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address())
-	NFTPrice       = sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(10000000))
-	downloadPeriod = time.Duration(time.Second * 100000000)
-	poolID         = uint64(1)
+	dataVal  = sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address())
+	curator  = sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address())
+	NFTPrice = sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(10000000))
+	poolID   = uint64(1)
 )
 
 type genesisTestSuite struct {
@@ -121,6 +118,5 @@ func makeSamplePoolParams() *types.PoolParams {
 		NftPrice:              &NFTPrice,
 		TrustedDataValidators: []string{dataVal.String()},
 		TrustedDataIssuers:    []string(nil),
-		DownloadPeriod:        &downloadPeriod,
 	}
 }

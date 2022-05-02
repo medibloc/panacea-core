@@ -152,12 +152,14 @@ func (k Keeper) CreatePool(ctx sdk.Context, curator sdk.AccAddress, deposit sdk.
 	NFTPriceDec := poolParams.GetNftPrice().Amount.ToDec()
 	NFTTotalSupplyDec := sdk.NewDecFromInt(sdk.NewIntFromUint64(poolParams.GetMaxNftSupply()))
 	expectedTotalSalesDec := NFTPriceDec.Mul(NFTTotalSupplyDec)
-	requiredDeposit := expectedTotalSalesDec.Mul(params.DataPoolDepositRate)
+	requiredDeposit := expectedTotalSalesDec.Mul(params.DataPoolCommissionRate)
 	if deposit.Amount.ToDec().LT(requiredDeposit) {
 		return 0, types.ErrNotEnoughPoolDeposit
 	}
 
 	newPool.Deposit = deposit
+	newPool.PoolParams.CuratorCommissionRate = params.DataPoolCommissionRate
+	newPool.CuratorCommission[newPool.Round] = types.ZeroFund
 
 	// send deposit to pool
 	err = k.bankKeeper.SendCoins(ctx, curator, poolAddress, sdk.NewCoins(deposit))

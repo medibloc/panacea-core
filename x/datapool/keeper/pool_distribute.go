@@ -9,42 +9,58 @@ import (
 
 // addSalesHistory stores sales information in history.
 func (k Keeper) addSalesHistory(ctx sdk.Context, poolID, round uint64, addr sdk.AccAddress, dataHash []byte) {
-	zeroFund := sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(0))
-	info := types.SalesInfo{
-		PoolId:   poolID,
-		Round:    round,
-		Address:  addr.String(),
-		DataHash: dataHash,
-		PaidCoin: &zeroFund,
+	salesHistory := k.GetSalesHistory(ctx, poolID, round, addr.String())
+	if salesHistory == nil {
+		salesHistory = &types.SalesHistory{
+			PoolId:        poolID,
+			Round:         round,
+			SellerAddress: addr.String(),
+			DataHashes:    [][]byte{dataHash},
+			PaidCoin:      &types.ZeroFund,
+		}
+	} else {
+		salesHistory.AddDataHash(dataHash)
 	}
 
-	salesHistory := k.GetSalesHistory(ctx, poolID, round)
-	salesHistory.SalesInfos = append(salesHistory.SalesInfos, &info)
-
-	k.SetSalesHistory(ctx, poolID, round, salesHistory)
+	k.SetSalesHistory(ctx, salesHistory)
 }
 
 // SetSalesHistory stores sales history.
-func (k Keeper) SetSalesHistory(ctx sdk.Context, poolID, round uint64, salesHistory *types.SalesHistory) {
+func (k Keeper) SetSalesHistory(ctx sdk.Context, salesHistory *types.SalesHistory) {
 	key := types.GetKeyPrefixSalesHistory(
-		poolID,
-		round,
+		salesHistory.PoolId,
+		salesHistory.Round,
+		salesHistory.SellerAddress,
 	)
 	store := ctx.KVStore(k.storeKey)
 	store.Set(key, k.cdc.MustMarshalBinaryLengthPrefixed(salesHistory))
 }
 
-// GetSalesHistory returns the sales history. If there is no value, it responds by initializing it.
-func (k Keeper) GetSalesHistory(ctx sdk.Context, poolID, round uint64) *types.SalesHistory {
-	key := types.GetKeyPrefixSalesHistory(poolID, round)
+// GetSalesHistory returns the sales history. If there is no value, it responds nil.
+func (k Keeper) GetSalesHistory(ctx sdk.Context, poolID, round uint64, sellerAddress string) *types.SalesHistory {
+	key := types.GetKeyPrefixSalesHistory(poolID, round, sellerAddress)
 	store := ctx.KVStore(k.storeKey)
-	bz := store.Get(key)
-	if bz == nil {
-		return &types.SalesHistory{}
+	if !store.Has(key) {
+		return nil
 	}
+	bz := store.Get(key)
 	var salesHistory types.SalesHistory
 	k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &salesHistory)
 	return &salesHistory
+}
+
+func (k Keeper) ListSalesHistory(ctx sdk.Context, poolID, round uint64) []*types.SalesHistory {
+	key := types.GetKeyPrefixSalesHistories(poolID, round)
+	store := ctx.KVStore(k.storeKey)
+	iter := sdk.KVStorePrefixIterator(store, key)
+	var histories []*types.SalesHistory
+	for ; iter.Valid(); iter.Next() {
+		history := &types.SalesHistory{}
+		bz := iter.Value()
+		k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, history)
+		histories = append(histories, history)
+	}
+	return histories
 }
 
 // SetInstantRevenueDistribute stores the poolID to which the revenue should be distributed immediately.
@@ -155,34 +171,32 @@ func (k Keeper) executeRevenueDistribute(ctx sdk.Context, pool *types.Pool) erro
 		return err
 	}
 
+	// if there is no coin available, proceed no further.
+	if availablePoolCoinAmount.Equal(sdk.NewInt(0)) {
+		return nil
+	}
+
 	// calculate the revenue to be sent to each seller
-	eachDistributionAmount := k.getEachDistributionAmount(ctx, pool)
+	eachDistributionAmount := k.getEachDistributionAmount(pool)
 
 	poolAddress, err := sdk.AccAddressFromBech32(pool.GetPoolAddress())
 	if err != nil {
 		return sdkerrors.Wrap(types.ErrRevenueDistribute, err.Error())
 	}
 
-	salesHistory := k.GetSalesHistory(ctx, pool.PoolId, pool.Round)
-	for _, salesInfo := range salesHistory.GetSalesInfos() {
-		// if there is no coin available, proceed no further.
-		if availablePoolCoinAmount.Equal(sdk.NewInt(0)) {
-			break
-		}
-
-		paidCoin := salesInfo.PaidCoin
+	salesHistories := k.ListSalesHistory(ctx, pool.PoolId, pool.Round)
+	for _, history := range salesHistories {
+		paidCoinAmount := history.PaidCoin.Amount
+		dataCount := sdk.NewInt(int64(history.DataCount()))
+		distributedAmount := eachDistributionAmount.Mul(dataCount)
 
 		// if it has already been distributed, pass it.
-		if eachDistributionAmount.Equal(paidCoin.Amount) {
+		if distributedAmount.Equal(paidCoinAmount) {
 			continue
 		}
 
-		paymentAmount := eachDistributionAmount.Sub(paidCoin.Amount)
-		// If the transferable amount is less than the payable amount, it is replaced with the transferable amount.
-		if availablePoolCoinAmount.LT(paymentAmount) {
-			paymentAmount = *availablePoolCoinAmount
-		}
-		sellerAddr, err := sdk.AccAddressFromBech32(salesInfo.Address)
+		paymentAmount := distributedAmount.Sub(paidCoinAmount)
+		sellerAddr, err := sdk.AccAddressFromBech32(history.SellerAddress)
 		if err != nil {
 			return sdkerrors.Wrap(types.ErrRevenueDistribute, err.Error())
 		}
@@ -195,74 +209,67 @@ func (k Keeper) executeRevenueDistribute(ctx sdk.Context, pool *types.Pool) erro
 		if err != nil {
 			return sdkerrors.Wrap(types.ErrRevenueDistribute, err.Error())
 		}
-		*salesInfo.PaidCoin = salesInfo.PaidCoin.Add(paymentCoin)
+		*history.PaidCoin = history.PaidCoin.Add(paymentCoin)
 
 		// Subtract the amount paid from the transferable amount.
 		*availablePoolCoinAmount = availablePoolCoinAmount.Sub(paymentAmount)
-	}
-	k.SetSalesHistory(ctx, pool.PoolId, pool.Round, salesHistory)
 
-	err = k.sendCommissionToCurator(ctx, pool, salesHistory.SalesInfos)
+		k.SetSalesHistory(ctx, history)
+	}
+
+	err = k.sendCommissionToCurator(ctx, pool)
 	if err != nil {
 		return err
 	}
+
 	return nil
 }
 
-func (k Keeper) getEachDistributionAmount(ctx sdk.Context, pool *types.Pool) sdk.Int {
-	maxNftSupply := sdk.NewDecFromInt(sdk.NewIntFromUint64(pool.PoolParams.MaxNftSupply))
-	nftPrice := pool.PoolParams.NftPrice.Amount.ToDec()
-	// maxNftSupply * nftPrice
-	totalAmount := maxNftSupply.Mul(nftPrice)
-	curatorCommissionRate := k.GetParams(ctx).DataPoolCuratorCommissionRate
+func (k Keeper) getEachDistributionAmount(pool *types.Pool) sdk.Int {
+	nftPriceAmount := pool.PoolParams.NftPrice.Amount.ToDec()
+	numIssuedNFTs := sdk.NewIntFromUint64(pool.NumIssuedNfts).ToDec()
+	targetNumData := sdk.NewIntFromUint64(pool.PoolParams.TargetNumData).ToDec()
+	curatorCommissionRate := pool.PoolParams.CuratorCommissionRate
 
-	// totalAmount * (1 - curatorCommissionRate)
-	totalAmount = totalAmount.Mul(sdk.NewDec(1).Sub(curatorCommissionRate))
-	targetNumData := sdk.NewDecFromInt(sdk.NewIntFromUint64(pool.PoolParams.TargetNumData))
-
-	// totalAmount / targetNumData
-	// drop the decimal point
-	return totalAmount.Quo(targetNumData).TruncateInt()
+	// ((nftPriceAmount * numIssuedNFTs) / targetNumData) * (1 - curatorCommissionRate)
+	return nftPriceAmount.Mul(numIssuedNFTs).Quo(targetNumData).Mul(sdk.NewDec(1).Sub(curatorCommissionRate)).TruncateInt()
 }
 
-// sendCommissionToCurator sends a commission to the curator when compensation is distributed to all sellers.
-func (k Keeper) sendCommissionToCurator(ctx sdk.Context, pool *types.Pool, infos []*types.SalesInfo) error {
-	if k.isCompletedDistributeAllSeller(ctx, pool, infos) {
-		maxNftSupply := sdk.NewDecFromInt(sdk.NewIntFromUint64(pool.PoolParams.MaxNftSupply))
-		nftPrice := pool.PoolParams.NftPrice.Amount.ToDec()
-		// maxNftSupply * nftPrice
-		totalAmount := maxNftSupply.Mul(nftPrice)
-		curatorCommissionRate := k.GetParams(ctx).DataPoolCuratorCommissionRate
+// sendCommissionToCurator sends a commission to the curator
+func (k Keeper) sendCommissionToCurator(ctx sdk.Context, pool *types.Pool) error {
+	nftPriceAmount := pool.PoolParams.NftPrice.Amount.ToDec()
+	numIssuedNFTs := sdk.NewIntFromUint64(pool.NumIssuedNfts).ToDec()
+	curatorCommissionRate := pool.PoolParams.CuratorCommissionRate
 
-		// totalAmount * curatorCommissionRate
-		curatorCommissionAmount := totalAmount.Mul(curatorCommissionRate).TruncateInt()
+	// nftPriceAmount * numIssuedNFTs * curatorCommissionRate
+	curatorCommissionAmount := nftPriceAmount.Mul(numIssuedNFTs).Mul(curatorCommissionRate)
 
-		poolAddress, err := sdk.AccAddressFromBech32(pool.PoolAddress)
-		if err != nil {
-			return sdkerrors.Wrap(types.ErrRevenueDistribute, err.Error())
-		}
-		curatorAddress, err := sdk.AccAddressFromBech32(pool.Curator)
-		if err != nil {
-			return sdkerrors.Wrap(types.ErrRevenueDistribute, err.Error())
-		}
-		err = k.bankKeeper.SendCoins(ctx, poolAddress, curatorAddress, sdk.NewCoins(sdk.NewCoin(assets.MicroMedDenom, curatorCommissionAmount)))
-		if err != nil {
-			return sdkerrors.Wrap(types.ErrRevenueDistribute, err.Error())
-		}
+	paidCuratorCommissionAmount := pool.CuratorCommission[pool.Round].Amount.ToDec()
+
+	paymentAmount := curatorCommissionAmount.Sub(paidCuratorCommissionAmount)
+	paymentCoin := sdk.NewCoin(assets.MicroMedDenom, paymentAmount.TruncateInt())
+	poolAddress, err := sdk.AccAddressFromBech32(pool.GetPoolAddress())
+	if err != nil {
+		return sdkerrors.Wrap(types.ErrRevenueDistribute, err.Error())
 	}
+	curatorAddr, err := sdk.AccAddressFromBech32(pool.Curator)
+	if err != nil {
+		return sdkerrors.Wrap(types.ErrRevenueDistribute, err.Error())
+	}
+
+	err = k.bankKeeper.SendCoins(
+		ctx,
+		poolAddress,
+		curatorAddr,
+		sdk.NewCoins(paymentCoin))
+
+	if err != nil {
+		return sdkerrors.Wrap(types.ErrRevenueDistribute, err.Error())
+	}
+
+	// paymentAmount + paidCuratorCommissionAmount => Current total paid curator commission
+	pool.CuratorCommission[pool.Round] = paymentCoin.Add(sdk.NewCoin(assets.MicroMedDenom, paidCuratorCommissionAmount.TruncateInt()))
+	k.SetPool(ctx, pool)
+
 	return nil
-}
-
-func (k Keeper) isCompletedDistributeAllSeller(ctx sdk.Context, pool *types.Pool, salesInfos []*types.SalesInfo) bool {
-	if pool.PoolParams.TargetNumData != uint64(len(salesInfos)) {
-		return false
-	}
-
-	eachDistributionAmount := k.getEachDistributionAmount(ctx, pool)
-	for _, info := range salesInfos {
-		if !eachDistributionAmount.Equal(info.PaidCoin.Amount) {
-			return false
-		}
-	}
-	return true
 }

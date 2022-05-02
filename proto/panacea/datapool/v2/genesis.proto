@@ -16,16 +16,11 @@ message GenesisState {
 
 // Params define parameters of datapool module
 message Params {
-  string data_pool_deposit_rate = 1 [
+  string data_pool_commission_rate = 1 [
     (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
-    (gogoproto.moretags) = "yaml:\"data_pool_deposit_rate\"",
+    (gogoproto.moretags) = "yaml:\"data_pool_commission_rate\"",
     (gogoproto.nullable) = false
   ];
   uint64 data_pool_code_id = 2;
   string data_pool_nft_contract_address = 3;
-  string data_pool_curator_commission_rate = 4 [
-    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
-    (gogoproto.moretags) = "yaml:\"data_pool_curator_commission_rate\"",
-    (gogoproto.nullable) = false
-  ];
 }
