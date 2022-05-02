@@ -87,7 +87,7 @@ func (suite genesisTestSuite) TestDataPoolInitGenesis() {
 	instantRevenueDistributeFromKeeper := suite.DataPoolKeeper.GetInstantRevenueDistribute(suite.Ctx)
 	suite.Require().Equal(poolIDs, instantRevenueDistributeFromKeeper.PoolIds)
 
-	salesHistoryFromKeeper := suite.DataPoolKeeper.ListSalesHistory(suite.Ctx, poolID, round)
+	salesHistoryFromKeeper := suite.DataPoolKeeper.GetSalesHistories(suite.Ctx, poolID, round)
 	suite.Require().Equal(2, len(salesHistoryFromKeeper))
 	suite.Require().Equal(poolID, salesHistoryFromKeeper[0].PoolId)
 	suite.Require().Equal(round, salesHistoryFromKeeper[0].Round)
@@ -100,7 +100,7 @@ func (suite genesisTestSuite) TestDataPoolInitGenesis() {
 	suite.Require().Equal([]byte("data2"), salesHistoryFromKeeper[1].DataHashes[0])
 	suite.Require().Equal("1000000umed", salesHistoryFromKeeper[1].PaidCoin.String())
 
-	secondSalesHistoryFromKeeper := suite.DataPoolKeeper.ListSalesHistory(suite.Ctx, secondPoolID, round)
+	secondSalesHistoryFromKeeper := suite.DataPoolKeeper.GetSalesHistories(suite.Ctx, secondPoolID, round)
 	suite.Require().Equal(2, len(secondSalesHistoryFromKeeper))
 	suite.Require().Equal(secondPoolID, secondSalesHistoryFromKeeper[0].PoolId)
 	suite.Require().Equal(round, secondSalesHistoryFromKeeper[0].Round)

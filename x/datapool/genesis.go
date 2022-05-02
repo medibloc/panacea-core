@@ -62,7 +62,7 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 		k.GetInstantRevenueDistribute(ctx).PoolIds...,
 	)
 
-	genesis.SalesHistories = k.ListAllSalesHistory(ctx)
+	genesis.SalesHistories = k.GetAllSalesHistories(ctx)
 	// this line is used by starport scaffolding # genesis/module/export
 
 	// this line is used by starport scaffolding # ibc/genesis/export
