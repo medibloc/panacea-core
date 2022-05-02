@@ -103,6 +103,29 @@ func (k Keeper) DataValidationCertificates(goCtx context.Context, req *types.Que
 	}, nil
 }
 
+func (k Keeper) DataPassRedeemReceipt(goCtx context.Context, req *types.QueryDataPassRedeemReceiptRequest) (*types.QueryDataPassRedeemReceiptResponse, error) {
+	if req == nil {
+		return nil, status.Error(codes.InvalidArgument, "invalid request")
+	}
+
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	redeemer, err := sdk.AccAddressFromBech32(req.Redeemer)
+	if err != nil {
+		return nil, err
+	}
+
+	redeemReceipt, err := k.GetDataPassRedeemReceipt(ctx, req.PoolId, req.Round, req.NftId, redeemer)
+	if err != nil {
+		return nil, err
+	}
+
+	return &types.QueryDataPassRedeemReceiptResponse{
+		DataPassRedeemReceipt: redeemReceipt,
+	}, nil
+
+}
+
 func (k Keeper) DataPassRedeemReceipts(goCtx context.Context, req *types.QueryDataPassRedeemReceiptsRequest) (*types.QueryDataPassRedeemReceiptsResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")

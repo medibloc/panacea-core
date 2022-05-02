@@ -36,6 +36,11 @@ service Query {
     option (google.api.http).get = "/panacea/datapool/v2/data_validation_certificates/pool/{pool_id}/round/{round}";
   }
 
+  // DataPassRedeemReceipt returns DataPassRedeemReceipt
+  rpc DataPassRedeemReceipt(QueryDataPassRedeemReceiptRequest) returns (QueryDataPassRedeemReceiptResponse) {
+    option (google.api.http).get = "/panacea/datapool/v2/data_pass_redeem_receipt/pool/{pool_id}/round/{round}/nft/{nft_id}";
+  }
+
   // DataPassRedeemReceipts returns DataPassRedeemReceipts
   rpc DataPassRedeemReceipts(QueryDataPassRedeemReceiptsRequest) returns (QueryDataPassRedeemReceiptsResponse) {
     option (google.api.http).get = "/panacea/datapool/v2/data_pass_redeem_receipts/pool/{pool_id}";
@@ -91,6 +96,21 @@ message QueryDataValidationCertificatesResponse {
     (gogoproto.nullable) = false
   ];
   cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+// QueryDataPassRedeemReceiptRequest is the request type for the Query/DataPassRedeemReceipt RPC method.
+message QueryDataPassRedeemReceiptRequest {
+  uint64 pool_id = 1;
+  uint64 round = 2;
+  uint64 nft_id = 3;
+  string redeemer = 4;
+}
+
+// QueryDataPassRedeemReceiptResponse is the response type for the Query/DataPassRedeemReceipt RPC method.
+message QueryDataPassRedeemReceiptResponse {
+  DataPassRedeemReceipt data_pass_redeem_receipt = 1 [
+    (gogoproto.nullable) = false
+  ];
 }
 
 // QueryDataPassRedeemReceiptsRequest is the request type for the Query/DataPassRedeemReceipts RPC method.

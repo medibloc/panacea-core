@@ -59,6 +59,7 @@ func GetKeyPrefixNFTRedeemReceiptByPoolID(poolID uint64, redeemer sdk.AccAddress
 	return append(keyPoolAppended, redeemer.Bytes()...)
 }
 
-func GetKeyPrefixNFTRedeemReceipt(poolID, round uint64, redeemer sdk.AccAddress) []byte {
-	return append(GetKeyPrefixNFTRedeemReceiptByPoolID(poolID, redeemer), sdk.Uint64ToBigEndian(round)...)
+func GetKeyPrefixNFTRedeemReceipt(poolID, round, nftID uint64, redeemer sdk.AccAddress) []byte {
+	keyRoundAppended := append(GetKeyPrefixNFTRedeemReceiptByPoolID(poolID, redeemer), sdk.Uint64ToBigEndian(round)...)
+	return append(keyRoundAppended, sdk.Uint64ToBigEndian(nftID)...)
 }

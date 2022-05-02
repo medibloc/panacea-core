@@ -120,6 +120,54 @@ func CmdGetDataValidationCertificates() *cobra.Command {
 	return cmd
 }
 
+func CmdGetDataPassRedeemReceipt() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "get-data-pass-receipt [poolID] [round] [nftID]",
+		Short: "Query a data pass redeem receipt",
+		Args:  cobra.ExactArgs(3),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientQueryContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			queryClient := types.NewQueryClient(clientCtx)
+
+			poolID, err := strconv.ParseUint(args[0], 10, 64)
+			if err != nil {
+				return err
+			}
+
+			round, err := strconv.ParseUint(args[1], 10, 64)
+			if err != nil {
+				return err
+			}
+
+			nftID, err := strconv.ParseUint(args[2], 10, 64)
+			if err != nil {
+				return err
+			}
+
+			res, err := queryClient.DataPassRedeemReceipt(cmd.Context(), &types.QueryDataPassRedeemReceiptRequest{
+				PoolId:   poolID,
+				Round:    round,
+				NftId:    nftID,
+				Redeemer: clientCtx.GetFromAddress().String(),
+			})
+
+			if err != nil {
+				return err
+			}
+
+			return clientCtx.PrintProto(res)
+		},
+	}
+
+	flags.AddQueryFlagsToCmd(cmd)
+
+	return cmd
+}
+
 func CmdGetDataPassRedeemReceipts() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "data-pass-redeem-receipts [poolID] [redeemer]",
