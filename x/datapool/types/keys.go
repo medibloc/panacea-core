@@ -53,25 +53,20 @@ func GetKeyPrefixPools(poolID uint64) []byte {
 	return append(KeyPrefixPools, sdk.Uint64ToBigEndian(poolID)...)
 }
 
-func GetKeyPrefixDataValidateCerts(poolID, round *uint64) []byte {
-	prefixOfPoolID := append(KeyPrefixDataValidatorCerts, sdk.Uint64ToBigEndian(*poolID)...)
-	if round != nil {
-		return append(prefixOfPoolID, sdk.Uint64ToBigEndian(*round)...)
-	}
-	return prefixOfPoolID
+func GetKeyPrefixDataValidateCerts(poolID, round uint64) []byte {
+	return append(KeyPrefixDataValidatorCerts, CombineKeys(sdk.Uint64ToBigEndian(poolID), sdk.Uint64ToBigEndian(round))...)
 }
 
 func GetKeyPrefixDataValidateCert(poolID, round uint64, dataHash []byte) []byte {
-	return append(GetKeyPrefixDataValidateCerts(&poolID, &round), dataHash...)
+	return CombineKeys(GetKeyPrefixDataValidateCerts(poolID, round), dataHash)
 }
 
-func GetKeyPrefixDataValidateCertByRound(poolID, round uint64) []byte {
-	keyPoolAppended := append(KeyPrefixDataValidatorCerts, sdk.Uint64ToBigEndian(poolID)...)
-	return append(keyPoolAppended, sdk.Uint64ToBigEndian(round)...)
-}
-
-func GetKeyPrefixSalesHistory(poolID, round uint64) []byte {
+func GetKeyPrefixSalesHistories(poolID, round uint64) []byte {
 	return append(KeyPrefixSalesHistory, CombineKeys(sdk.Uint64ToBigEndian(poolID), sdk.Uint64ToBigEndian(round))...)
+}
+
+func GetKeyPrefixSalesHistory(poolID, round uint64, seller string) []byte {
+	return CombineKeys(GetKeyPrefixSalesHistories(poolID, round), []byte(seller))
 }
 
 // CombineKeys function defines combines deal_id with data_hash.

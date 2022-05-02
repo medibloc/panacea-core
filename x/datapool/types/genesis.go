@@ -8,7 +8,7 @@ func DefaultGenesis() *GenesisState {
 		Pools:                    []Pool{},
 		Params:                   DefaultParams(),
 		InstantRevenueDistribute: InstantRevenueDistribute{},
-		SalesHistory:             map[string]SalesHistory{},
+		SalesHistories:           []*SalesHistory{},
 		// this line is used by starport scaffolding # ibc/genesistype/default
 		// this line is used by starport scaffolding # genesis/types/default
 	}

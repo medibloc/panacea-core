@@ -13,7 +13,7 @@ message GenesisState {
   repeated Pool             pools = 3 [(gogoproto.nullable) = false];
   Params                    params = 4 [(gogoproto.nullable) = false];
   InstantRevenueDistribute  instant_revenue_distribute = 5 [(gogoproto.nullable) = false];
-  map<string, SalesHistory> sales_history = 6 [(gogoproto.nullable) = false];
+  repeated SalesHistory sales_histories = 6;
 }
 
 // Params define parameters of datapool module

@@ -54,7 +54,7 @@ func (suite genesisTestSuite) TestDataPoolInitGenesis() {
 		PoolIds: poolIDs,
 	}
 
-	salesHistoryMap := makeSampleSalesHistory()
+	salesHistoryMap := makeSampleSalesHistories()
 
 	genState := &types.GenesisState{
 		DataValidators:           dataValidators,
@@ -62,7 +62,7 @@ func (suite genesisTestSuite) TestDataPoolInitGenesis() {
 		Pools:                    pools,
 		Params:                   params,
 		InstantRevenueDistribute: instantRevenueDistribute,
-		SalesHistory:             salesHistoryMap,
+		SalesHistories:           salesHistoryMap,
 	}
 
 	datapool.InitGenesis(suite.Ctx, suite.DataPoolKeeper, *genState)
@@ -87,31 +87,31 @@ func (suite genesisTestSuite) TestDataPoolInitGenesis() {
 	instantRevenueDistributeFromKeeper := suite.DataPoolKeeper.GetInstantRevenueDistribute(suite.Ctx)
 	suite.Require().Equal(poolIDs, instantRevenueDistributeFromKeeper.PoolIds)
 
-	salesHistoryFromKeeper := suite.DataPoolKeeper.GetSalesHistory(suite.Ctx, poolID, round)
-	suite.Require().Equal(2, len(salesHistoryFromKeeper.SalesInfos))
-	suite.Require().Equal(poolID, salesHistoryFromKeeper.SalesInfos[0].PoolId)
-	suite.Require().Equal(round, salesHistoryFromKeeper.SalesInfos[0].Round)
-	suite.Require().Equal(seller.String(), salesHistoryFromKeeper.SalesInfos[0].Address)
-	suite.Require().Equal([]byte("data"), salesHistoryFromKeeper.SalesInfos[0].DataHash)
-	suite.Require().Equal("1000000umed", salesHistoryFromKeeper.SalesInfos[0].PaidCoin.String())
-	suite.Require().Equal(poolID, salesHistoryFromKeeper.SalesInfos[1].PoolId)
-	suite.Require().Equal(round, salesHistoryFromKeeper.SalesInfos[1].Round)
-	suite.Require().Equal(seller2.String(), salesHistoryFromKeeper.SalesInfos[1].Address)
-	suite.Require().Equal([]byte("data2"), salesHistoryFromKeeper.SalesInfos[1].DataHash)
-	suite.Require().Equal("1000000umed", salesHistoryFromKeeper.SalesInfos[1].PaidCoin.String())
+	salesHistoryFromKeeper := suite.DataPoolKeeper.ListSalesHistory(suite.Ctx, poolID, round)
+	suite.Require().Equal(2, len(salesHistoryFromKeeper))
+	suite.Require().Equal(poolID, salesHistoryFromKeeper[0].PoolId)
+	suite.Require().Equal(round, salesHistoryFromKeeper[0].Round)
+	suite.Require().Equal(seller.String(), salesHistoryFromKeeper[0].SellerAddress)
+	suite.Require().Equal([]byte("data"), salesHistoryFromKeeper[0].DataHashes[0])
+	suite.Require().Equal("1000000umed", salesHistoryFromKeeper[0].PaidCoin.String())
+	suite.Require().Equal(poolID, salesHistoryFromKeeper[1].PoolId)
+	suite.Require().Equal(round, salesHistoryFromKeeper[1].Round)
+	suite.Require().Equal(seller2.String(), salesHistoryFromKeeper[1].SellerAddress)
+	suite.Require().Equal([]byte("data2"), salesHistoryFromKeeper[1].DataHashes[0])
+	suite.Require().Equal("1000000umed", salesHistoryFromKeeper[1].PaidCoin.String())
 
-	secondSalesHistoryFromKeeper := suite.DataPoolKeeper.GetSalesHistory(suite.Ctx, secondPoolID, round)
-	suite.Require().Equal(2, len(secondSalesHistoryFromKeeper.SalesInfos))
-	suite.Require().Equal(secondPoolID, secondSalesHistoryFromKeeper.SalesInfos[0].PoolId)
-	suite.Require().Equal(round, secondSalesHistoryFromKeeper.SalesInfos[0].Round)
-	suite.Require().Equal(seller.String(), secondSalesHistoryFromKeeper.SalesInfos[0].Address)
-	suite.Require().Equal([]byte("data3"), secondSalesHistoryFromKeeper.SalesInfos[0].DataHash)
-	suite.Require().Equal("1000000umed", secondSalesHistoryFromKeeper.SalesInfos[0].PaidCoin.String())
-	suite.Require().Equal(secondPoolID, secondSalesHistoryFromKeeper.SalesInfos[1].PoolId)
-	suite.Require().Equal(round, secondSalesHistoryFromKeeper.SalesInfos[1].Round)
-	suite.Require().Equal(seller2.String(), secondSalesHistoryFromKeeper.SalesInfos[1].Address)
-	suite.Require().Equal([]byte("data4"), secondSalesHistoryFromKeeper.SalesInfos[1].DataHash)
-	suite.Require().Equal("1000000umed", secondSalesHistoryFromKeeper.SalesInfos[1].PaidCoin.String())
+	secondSalesHistoryFromKeeper := suite.DataPoolKeeper.ListSalesHistory(suite.Ctx, secondPoolID, round)
+	suite.Require().Equal(2, len(secondSalesHistoryFromKeeper))
+	suite.Require().Equal(secondPoolID, secondSalesHistoryFromKeeper[0].PoolId)
+	suite.Require().Equal(round, secondSalesHistoryFromKeeper[0].Round)
+	suite.Require().Equal(seller.String(), secondSalesHistoryFromKeeper[0].SellerAddress)
+	suite.Require().Equal([]byte("data3"), secondSalesHistoryFromKeeper[0].DataHashes[0])
+	suite.Require().Equal("1000000umed", secondSalesHistoryFromKeeper[0].PaidCoin.String())
+	suite.Require().Equal(secondPoolID, secondSalesHistoryFromKeeper[1].PoolId)
+	suite.Require().Equal(round, secondSalesHistoryFromKeeper[1].Round)
+	suite.Require().Equal(seller2.String(), secondSalesHistoryFromKeeper[1].SellerAddress)
+	suite.Require().Equal([]byte("data4"), secondSalesHistoryFromKeeper[1].DataHashes[0])
+	suite.Require().Equal("1000000umed", secondSalesHistoryFromKeeper[1].PaidCoin.String())
 
 }
 
@@ -135,9 +135,10 @@ func (suite genesisTestSuite) TestDataPoolExportGenesis() {
 			PoolIds: poolIDs,
 		})
 
-	salesHistoryMap := makeSampleSalesHistory()
-	for key, salesHistory := range salesHistoryMap {
-		suite.DataPoolKeeper.SetSalesHistoryByKey(suite.Ctx, []byte(key), &salesHistory)
+	salesHistories := makeSampleSalesHistories()
+	for _, salesHistory := range salesHistories {
+		key := types.GetKeyPrefixSalesHistory(salesHistory.PoolId, salesHistory.Round, salesHistory.SellerAddress)
+		suite.DataPoolKeeper.SetSalesHistoryByKey(suite.Ctx, key, salesHistory)
 	}
 
 	genesisState := datapool.ExportGenesis(suite.Ctx, suite.DataPoolKeeper)
@@ -146,7 +147,7 @@ func (suite genesisTestSuite) TestDataPoolExportGenesis() {
 	suite.Require().Equal(types.DefaultParams(), genesisState.Params)
 	suite.Require().Len(genesisState.DataValidators, 1)
 	suite.Require().Equal(poolIDs, genesisState.InstantRevenueDistribute.PoolIds)
-	suite.Require().Equal(salesHistoryMap, genesisState.SalesHistory)
+	suite.Require().Equal(salesHistories, genesisState.SalesHistories)
 }
 
 func makeSampleDataValidator() types.DataValidator {
@@ -182,47 +183,35 @@ func makeSamplePoolParams() *types.PoolParams {
 	}
 }
 
-func makeSampleSalesHistory() map[string]types.SalesHistory {
-	salesHistoryMap := map[string]types.SalesHistory{}
-
-	salesKey1 := string(types.GetKeyPrefixSalesHistory(poolID, round))
-	salesHistoryMap[salesKey1] = types.SalesHistory{
-		SalesInfos: []*types.SalesInfo{
-			{
-				PoolId:   poolID,
-				Round:    round,
-				Address:  seller.String(),
-				DataHash: []byte("data"),
-				PaidCoin: &paidCoin,
-			},
-			{
-				PoolId:   poolID,
-				Round:    round,
-				Address:  seller2.String(),
-				DataHash: []byte("data2"),
-				PaidCoin: &paidCoin,
-			},
+func makeSampleSalesHistories() []*types.SalesHistory {
+	return []*types.SalesHistory{
+		{
+			PoolId:        poolID,
+			Round:         round,
+			SellerAddress: seller.String(),
+			DataHashes:    [][]byte{[]byte("data")},
+			PaidCoin:      &paidCoin,
+		},
+		{
+			PoolId:        poolID,
+			Round:         round,
+			SellerAddress: seller2.String(),
+			DataHashes:    [][]byte{[]byte("data2")},
+			PaidCoin:      &paidCoin,
+		},
+		{
+			PoolId:        secondPoolID,
+			Round:         round,
+			SellerAddress: seller.String(),
+			DataHashes:    [][]byte{[]byte("data3")},
+			PaidCoin:      &paidCoin,
+		},
+		{
+			PoolId:        secondPoolID,
+			Round:         round,
+			SellerAddress: seller2.String(),
+			DataHashes:    [][]byte{[]byte("data4")},
+			PaidCoin:      &paidCoin,
 		},
 	}
-
-	salesKey2 := string(types.GetKeyPrefixSalesHistory(secondPoolID, round))
-	salesHistoryMap[salesKey2] = types.SalesHistory{
-		SalesInfos: []*types.SalesInfo{
-			{
-				PoolId:   secondPoolID,
-				Round:    round,
-				Address:  seller.String(),
-				DataHash: []byte("data3"),
-				PaidCoin: &paidCoin,
-			},
-			{
-				PoolId:   secondPoolID,
-				Round:    round,
-				Address:  seller2.String(),
-				DataHash: []byte("data4"),
-				PaidCoin: &paidCoin,
-			},
-		},
-	}
-	return salesHistoryMap
 }

@@ -9,26 +9,28 @@ import (
 
 // addSalesHistory stores sales information in history.
 func (k Keeper) addSalesHistory(ctx sdk.Context, poolID, round uint64, addr sdk.AccAddress, dataHash []byte) {
-	zeroFund := sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(0))
-	info := types.SalesInfo{
-		PoolId:   poolID,
-		Round:    round,
-		Address:  addr.String(),
-		DataHash: dataHash,
-		PaidCoin: &zeroFund,
+	salesHistory := k.GetSalesHistory(ctx, poolID, round, addr.String())
+	if salesHistory == nil {
+		salesHistory = &types.SalesHistory{
+			PoolId:        poolID,
+			Round:         round,
+			SellerAddress: addr.String(),
+			DataHashes:    [][]byte{dataHash},
+			PaidCoin:      &types.ZeroFund,
+		}
+	} else {
+		salesHistory.AddDataHash(dataHash)
 	}
 
-	salesHistory := k.GetSalesHistory(ctx, poolID, round)
-	salesHistory.SalesInfos = append(salesHistory.SalesInfos, &info)
-
-	k.SetSalesHistory(ctx, poolID, round, salesHistory)
+	k.SetSalesHistory(ctx, salesHistory)
 }
 
 // SetSalesHistory stores sales history.
-func (k Keeper) SetSalesHistory(ctx sdk.Context, poolID, round uint64, salesHistory *types.SalesHistory) {
+func (k Keeper) SetSalesHistory(ctx sdk.Context, salesHistory *types.SalesHistory) {
 	key := types.GetKeyPrefixSalesHistory(
-		poolID,
-		round,
+		salesHistory.PoolId,
+		salesHistory.Round,
+		salesHistory.SellerAddress,
 	)
 	k.SetSalesHistoryByKey(ctx, key, salesHistory)
 }
@@ -39,33 +41,44 @@ func (k Keeper) SetSalesHistoryByKey(ctx sdk.Context, key []byte, salesHistory *
 	store.Set(key, k.cdc.MustMarshalBinaryLengthPrefixed(salesHistory))
 }
 
-// GetSalesHistory returns the sales history. If there is no value, it responds by initializing it.
-func (k Keeper) GetSalesHistory(ctx sdk.Context, poolID, round uint64) *types.SalesHistory {
-	key := types.GetKeyPrefixSalesHistory(poolID, round)
+// GetSalesHistory returns the sales history. If there is no value, it responds nil.
+func (k Keeper) GetSalesHistory(ctx sdk.Context, poolID, round uint64, sellerAddress string) *types.SalesHistory {
+	key := types.GetKeyPrefixSalesHistory(poolID, round, sellerAddress)
 	store := ctx.KVStore(k.storeKey)
-	bz := store.Get(key)
-	if bz == nil {
-		return &types.SalesHistory{}
+	if !store.Has(key) {
+		return nil
 	}
+	bz := store.Get(key)
 	var salesHistory types.SalesHistory
 	k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &salesHistory)
 	return &salesHistory
 }
 
-func (k Keeper) GetSalesHistoryMap(ctx sdk.Context) map[string]types.SalesHistory {
+func (k Keeper) ListSalesHistory(ctx sdk.Context, poolID, round uint64) []*types.SalesHistory {
+	key := types.GetKeyPrefixSalesHistories(poolID, round)
+	store := ctx.KVStore(k.storeKey)
+	iter := sdk.KVStorePrefixIterator(store, key)
+	var histories []*types.SalesHistory
+	for ; iter.Valid(); iter.Next() {
+		history := &types.SalesHistory{}
+		bz := iter.Value()
+		k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, history)
+		histories = append(histories, history)
+	}
+	return histories
+}
+
+func (k Keeper) ListAllSalesHistory(ctx sdk.Context) []*types.SalesHistory {
 	store := ctx.KVStore(k.storeKey)
 	iter := sdk.KVStorePrefixIterator(store, types.KeyPrefixSalesHistory)
-	defer iter.Close()
-
-	salesHistoryMap := map[string]types.SalesHistory{}
+	var histories []*types.SalesHistory
 	for ; iter.Valid(); iter.Next() {
+		history := &types.SalesHistory{}
 		bz := iter.Value()
-		var salesHistory types.SalesHistory
-		k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &salesHistory)
-		salesHistoryMap[string(iter.Key())] = salesHistory
+		k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, history)
+		histories = append(histories, history)
 	}
-
-	return salesHistoryMap
+	return histories
 }
 
 // SetInstantRevenueDistribute stores the poolID to which the revenue should be distributed immediately.
@@ -176,6 +189,11 @@ func (k Keeper) executeRevenueDistribute(ctx sdk.Context, pool *types.Pool) erro
 		return err
 	}
 
+	// if there is no coin available, proceed no further.
+	if availablePoolCoinAmount.Equal(sdk.NewInt(0)) {
+		return nil
+	}
+
 	// calculate the revenue to be sent to each seller
 	eachDistributionAmount := k.getEachDistributionAmount(pool)
 
@@ -184,26 +202,19 @@ func (k Keeper) executeRevenueDistribute(ctx sdk.Context, pool *types.Pool) erro
 		return sdkerrors.Wrap(types.ErrRevenueDistribute, err.Error())
 	}
 
-	salesHistory := k.GetSalesHistory(ctx, pool.PoolId, pool.Round)
-	for _, salesInfo := range salesHistory.GetSalesInfos() {
-		// if there is no coin available, proceed no further.
-		if availablePoolCoinAmount.Equal(sdk.NewInt(0)) {
-			break
-		}
-
-		paidCoin := salesInfo.PaidCoin
+	salesHistories := k.ListSalesHistory(ctx, pool.PoolId, pool.Round)
+	for _, history := range salesHistories {
+		paidCoinAmount := history.PaidCoin.Amount
+		dataCount := sdk.NewInt(int64(history.DataCount()))
+		distributedAmount := eachDistributionAmount.Mul(dataCount)
 
 		// if it has already been distributed, pass it.
-		if eachDistributionAmount.Equal(paidCoin.Amount) {
+		if distributedAmount.Equal(paidCoinAmount) {
 			continue
 		}
 
-		paymentAmount := eachDistributionAmount.Sub(paidCoin.Amount)
-		// If the transferable amount is less than the payable amount, it is replaced with the transferable amount.
-		if availablePoolCoinAmount.LT(paymentAmount) {
-			paymentAmount = *availablePoolCoinAmount
-		}
-		sellerAddr, err := sdk.AccAddressFromBech32(salesInfo.Address)
+		paymentAmount := distributedAmount.Sub(paidCoinAmount)
+		sellerAddr, err := sdk.AccAddressFromBech32(history.SellerAddress)
 		if err != nil {
 			return sdkerrors.Wrap(types.ErrRevenueDistribute, err.Error())
 		}
@@ -216,16 +227,19 @@ func (k Keeper) executeRevenueDistribute(ctx sdk.Context, pool *types.Pool) erro
 		if err != nil {
 			return sdkerrors.Wrap(types.ErrRevenueDistribute, err.Error())
 		}
-		*salesInfo.PaidCoin = salesInfo.PaidCoin.Add(paymentCoin)
+		*history.PaidCoin = history.PaidCoin.Add(paymentCoin)
 
 		// Subtract the amount paid from the transferable amount.
 		*availablePoolCoinAmount = availablePoolCoinAmount.Sub(paymentAmount)
+
+		k.SetSalesHistory(ctx, history)
 	}
-	k.SetSalesHistory(ctx, pool.PoolId, pool.Round, salesHistory)
 	return nil
 }
 
 func (k Keeper) getEachDistributionAmount(pool *types.Pool) sdk.Int {
-	totalNftPriceAmount := pool.PoolParams.MaxNftSupply * pool.PoolParams.NftPrice.Amount.Uint64()
-	return sdk.NewIntFromUint64(totalNftPriceAmount / pool.PoolParams.TargetNumData)
+	nftPriceAmount := pool.PoolParams.NftPrice.Amount
+	numIssuedNFTs := sdk.NewIntFromUint64(pool.NumIssuedNfts)
+	targetNumData := sdk.NewIntFromUint64(pool.PoolParams.TargetNumData)
+	return nftPriceAmount.Mul(numIssuedNFTs).Quo(targetNumData)
 }
