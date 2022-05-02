@@ -4,7 +4,7 @@
   "changes": [
     {
       "subspace": "datapool",
-      "key": "DataPoolCuratorCommissionRate",
+      "key": "DataPoolCommissionRate",
       "value": "0.05"
     }
   ],
