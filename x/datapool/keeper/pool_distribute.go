@@ -12,11 +12,11 @@ func (k Keeper) addSalesHistory(ctx sdk.Context, poolID, round uint64, addr sdk.
 	salesHistory := k.GetSalesHistory(ctx, poolID, round, addr.String())
 	if salesHistory == nil {
 		salesHistory = &types.SalesHistory{
-			PoolId: poolID,
-			Round: round,
+			PoolId:        poolID,
+			Round:         round,
 			SellerAddress: addr.String(),
-			DataHashes: [][]byte{dataHash},
-			PaidCoin: &types.ZeroFund,
+			DataHashes:    [][]byte{dataHash},
+			PaidCoin:      &types.ZeroFund,
 		}
 	} else {
 		salesHistory.AddDataHash(dataHash)
@@ -171,6 +171,11 @@ func (k Keeper) executeRevenueDistribute(ctx sdk.Context, pool *types.Pool) erro
 		return err
 	}
 
+	// if there is no coin available, proceed no further.
+	if availablePoolCoinAmount.Equal(sdk.NewInt(0)) {
+		return nil
+	}
+
 	// calculate the revenue to be sent to each seller
 	eachDistributionAmount := k.getEachDistributionAmount(pool)
 
@@ -181,11 +186,6 @@ func (k Keeper) executeRevenueDistribute(ctx sdk.Context, pool *types.Pool) erro
 
 	salesHistories := k.ListSalesHistory(ctx, pool.PoolId, pool.Round)
 	for _, history := range salesHistories {
-		// if there is no coin available, proceed no further.
-		if availablePoolCoinAmount.Equal(sdk.NewInt(0)) {
-			break
-		}
-
 		paidCoinAmount := history.PaidCoin.Amount
 		dataCount := sdk.NewInt(int64(history.DataCount()))
 		distributedAmount := eachDistributionAmount.Mul(dataCount)
@@ -196,10 +196,6 @@ func (k Keeper) executeRevenueDistribute(ctx sdk.Context, pool *types.Pool) erro
 		}
 
 		paymentAmount := distributedAmount.Sub(paidCoinAmount)
-		// If the transferable amount is less than the payable amount, it is replaced with the transferable amount.
-		if availablePoolCoinAmount.LT(paymentAmount) {
-			paymentAmount = *availablePoolCoinAmount
-		}
 		sellerAddr, err := sdk.AccAddressFromBech32(history.SellerAddress)
 		if err != nil {
 			return sdkerrors.Wrap(types.ErrRevenueDistribute, err.Error())
@@ -224,15 +220,8 @@ func (k Keeper) executeRevenueDistribute(ctx sdk.Context, pool *types.Pool) erro
 }
 
 func (k Keeper) getEachDistributionAmount(pool *types.Pool) sdk.Int {
-	maxNftSupply := sdk.NewIntFromUint64(pool.PoolParams.MaxNftSupply).ToDec()
-	nftPriceAmount := pool.PoolParams.NftPrice.Amount.ToDec()
-	totalNftPriceAmount := maxNftSupply.Mul(nftPriceAmount)
-
-	numIssuedNFTs := sdk.NewIntFromUint64(pool.NumIssuedNfts).ToDec()
-	targetNumData := sdk.NewIntFromUint64(pool.PoolParams.TargetNumData).ToDec()
-
-	distributeRate := numIssuedNFTs.Quo(maxNftSupply)
-	totalNftPriceAmount = totalNftPriceAmount.Mul(distributeRate)
-
-	return totalNftPriceAmount.Quo(targetNumData).TruncateInt()
+	nftPriceAmount := pool.PoolParams.NftPrice.Amount
+	numIssuedNFTs := sdk.NewIntFromUint64(pool.NumIssuedNfts)
+	targetNumData := sdk.NewIntFromUint64(pool.PoolParams.TargetNumData)
+	return nftPriceAmount.Mul(numIssuedNFTs).Quo(targetNumData)
 }
