@@ -49,7 +49,7 @@ func (k Keeper) GetSalesHistory(ctx sdk.Context, poolID, round uint64, sellerAdd
 	return &salesHistory
 }
 
-func (k Keeper) ListSalesHistory(ctx sdk.Context, poolID, round uint64) []*types.SalesHistory {
+func (k Keeper) GetSalesHistories(ctx sdk.Context, poolID, round uint64) []*types.SalesHistory {
 	key := types.GetKeyPrefixSalesHistories(poolID, round)
 	store := ctx.KVStore(k.storeKey)
 	iter := sdk.KVStorePrefixIterator(store, key)
@@ -184,7 +184,7 @@ func (k Keeper) executeRevenueDistribute(ctx sdk.Context, pool *types.Pool) erro
 		return sdkerrors.Wrap(types.ErrRevenueDistribute, err.Error())
 	}
 
-	salesHistories := k.ListSalesHistory(ctx, pool.PoolId, pool.Round)
+	salesHistories := k.GetSalesHistories(ctx, pool.PoolId, pool.Round)
 	for _, history := range salesHistories {
 		paidCoinAmount := history.PaidCoin.Amount
 		dataCount := sdk.NewInt(int64(history.DataCount()))
