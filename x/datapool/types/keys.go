@@ -1,8 +1,9 @@
 package types
 
 import (
+	"bytes"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/medibloc/panacea-core/v2/x/datadeal/types"
 )
 
 const (
@@ -39,6 +40,8 @@ var (
 
 	// KeyPrefixNFTRedeemReceipts define key to store redeemed receipts
 	KeyPrefixNFTRedeemReceipts = []byte{0x06}
+
+	KeyIndexSeparator = []byte{0xFF}
 )
 
 func GetKeyPrefixDataValidator(dataValidatorAddr sdk.AccAddress) []byte {
@@ -59,12 +62,16 @@ func GetKeyPrefixDataValidateCert(poolID, round uint64, dataHash []byte) []byte 
 }
 
 func GetKeyPrefixNFTRedeemReceiptByPoolID(poolID uint64, redeemer sdk.AccAddress) []byte {
-	combineKeys := types.CombineKeys(sdk.Uint64ToBigEndian(poolID), redeemer)
+	combineKeys := CombineKeys(sdk.Uint64ToBigEndian(poolID), redeemer)
 	return append(KeyPrefixNFTRedeemReceipts, combineKeys...)
 }
 
 func GetKeyPrefixNFTRedeemReceipt(poolID, round, nftID uint64, redeemer sdk.AccAddress) []byte {
-	combineKeys := types.CombineKeys(GetKeyPrefixNFTRedeemReceiptByPoolID(poolID, redeemer), sdk.Uint64ToBigEndian(round))
-	keys := types.CombineKeys(combineKeys, sdk.Uint64ToBigEndian(nftID))
+	combineKeys := CombineKeys(GetKeyPrefixNFTRedeemReceiptByPoolID(poolID, redeemer), sdk.Uint64ToBigEndian(round))
+	keys := CombineKeys(combineKeys, sdk.Uint64ToBigEndian(nftID))
 	return keys
+}
+
+func CombineKeys(keys ...[]byte) []byte {
+	return bytes.Join(keys, KeyIndexSeparator)
 }
