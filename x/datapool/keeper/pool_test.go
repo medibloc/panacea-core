@@ -429,7 +429,13 @@ func (suite poolTestSuite) TestGetRedeemerDataPass() {
 	err = suite.DataPoolKeeper.BuyDataPass(suite.Ctx, buyerAddr, poolID, 1, NFTPrice)
 	suite.Require().NoError(err)
 
-	redeemerTokenId, err := suite.DataPoolKeeper.GetRedeemerDataPassByAddr(suite.Ctx, poolID, buyerAddr)
+	pool, err := suite.DataPoolKeeper.GetPool(suite.Ctx, poolID)
+	suite.Require().NoError(err)
+
+	nftContractAcc, err := sdk.AccAddressFromBech32(pool.NftContractAddr)
+	suite.Require().NoError(err)
+
+	redeemerTokenId, err := suite.DataPoolKeeper.GetRedeemerDataPassWithNFTContractAcc(suite.Ctx, poolID, nftContractAcc, buyerAddr)
 	suite.Require().NoError(err)
 
 	suite.Require().Equal(redeemerTokenId[0], strconv.FormatUint(1, 10))

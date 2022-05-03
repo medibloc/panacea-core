@@ -659,6 +659,27 @@ func (k Keeper) GetRedeemerDataPassByAddr(ctx sdk.Context, poolID uint64, redeem
 	return res.Tokens, nil
 }
 
+func (k Keeper) GetRedeemerDataPassWithNFTContractAcc(ctx sdk.Context, poolID uint64, nftContractAcc, redeemer sdk.AccAddress) ([]string, error) {
+	query := types.NewQueryTokensRequest(redeemer.String())
+	queryBz, err := json.Marshal(query)
+	if err != nil {
+		return nil, err
+	}
+
+	data, err := k.viewKeeper.QuerySmart(ctx, nftContractAcc, queryBz)
+	if err != nil {
+		return nil, err
+	}
+
+	var res types.QueryTokensResponse
+	err = json.Unmarshal(data, &res)
+	if err != nil {
+		return nil, err
+	}
+
+	return res.Tokens, nil
+}
+
 func contains(slices []string, component string) bool {
 	for _, c := range slices {
 		if component == c {
