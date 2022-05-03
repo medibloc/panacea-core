@@ -109,6 +109,27 @@ func (suite queryPoolTestSuite) TestQueryDataValidationCertificates() {
 	suite.Require().Contains(res.DataValidationCertificates, *cert2)
 }
 
+func (suite *queryPoolTestSuite) TestQueryDataPassRedeemReceipt() {
+	pool := suite.setPool()
+
+	dataPassRedeemReceipt := makeTestDataPassRedeemReceipt(pool.GetPoolId(), pool.GetRound(), uint64(suite.Ctx.BlockHeight()), dataVal1.String())
+
+	err := suite.DataPoolKeeper.SetDataPassRedeemReceipt(suite.Ctx, *dataPassRedeemReceipt)
+	suite.Require().NoError(err)
+
+	req := &types.QueryDataPassRedeemReceiptRequest{
+		PoolId:   pool.GetPoolId(),
+		Round:    pool.GetRound(),
+		NftId:    1,
+		Redeemer: dataVal1.String(),
+	}
+
+	res, err := suite.DataPoolKeeper.DataPassRedeemReceipt(sdk.WrapSDKContext(suite.Ctx), req)
+	suite.Require().NoError(err)
+	suite.Require().NotNil(res)
+	suite.Require().Equal(*dataPassRedeemReceipt, res.DataPassRedeemReceipt)
+}
+
 func (suite *queryPoolTestSuite) setDataValidatorAccount() {
 	validatorAccount := suite.AccountKeeper.NewAccountWithAddress(suite.Ctx, dataVal1)
 	err := validatorAccount.SetPubKey(dataValPubKey)
