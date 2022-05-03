@@ -122,9 +122,9 @@ func CmdGetDataValidationCertificates() *cobra.Command {
 
 func CmdGetDataPassRedeemReceipt() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "get-data-pass-receipt [poolID] [round] [nftID]",
+		Use:   "get-data-pass-receipt [poolID] [round] [nftID] [redeemer]",
 		Short: "Query a data pass redeem receipt",
-		Args:  cobra.ExactArgs(3),
+		Args:  cobra.ExactArgs(4),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientQueryContext(cmd)
 			if err != nil {
@@ -148,11 +148,13 @@ func CmdGetDataPassRedeemReceipt() *cobra.Command {
 				return err
 			}
 
+			redeemer := args[1]
+
 			res, err := queryClient.DataPassRedeemReceipt(cmd.Context(), &types.QueryDataPassRedeemReceiptRequest{
 				PoolId:   poolID,
 				Round:    round,
 				NftId:    nftID,
-				Redeemer: clientCtx.GetFromAddress().String(),
+				Redeemer: redeemer,
 			})
 
 			if err != nil {
