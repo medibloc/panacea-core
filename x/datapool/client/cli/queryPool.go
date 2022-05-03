@@ -209,7 +209,7 @@ func CmdGetDataPassRedeemReceipts() *cobra.Command {
 		},
 	}
 
-	flags.AddPaginationFlagsToCmd(cmd, "all data pass")
+	flags.AddPaginationFlagsToCmd(cmd, "all data pass by pool ID and redeemer")
 
 	return cmd
 }
