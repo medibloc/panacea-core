@@ -579,7 +579,7 @@ func (k Keeper) RedeemDataPass(ctx sdk.Context, redeemNFT types.MsgRedeemDataPas
 	}
 
 	if !contains(redeemTokenIds, strconv.FormatUint(redeemNFT.NftId, 10)) {
-		return nil, types.ErrInvalidTokenId
+		return nil, types.ErrNotOwnedRedeemerNft
 	}
 
 	zeroFund := sdk.NewCoins(types.ZeroFund)

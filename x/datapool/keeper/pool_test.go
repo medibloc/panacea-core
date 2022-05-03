@@ -417,7 +417,7 @@ func (suite poolTestSuite) TestNotContainedNftId() {
 	redeemNFT := types.NewMsgRedeemDataPass(poolID, 1, 2, buyerAddr.String())
 
 	_, err = suite.DataPoolKeeper.RedeemDataPass(suite.Ctx, *redeemNFT)
-	suite.Require().Error(err, types.ErrInvalidTokenId)
+	suite.Require().Error(err, types.ErrNotOwnedRedeemerNft)
 }
 
 func (suite poolTestSuite) TestGetRedeemerDataPass() {
