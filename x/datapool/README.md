@@ -6,6 +6,8 @@ VALIDATOR=$(panacead keys show {your validator} -a)
 
 MODULE_ADDR=$(panacead q datapool module-addr -o json | jq -r '.address')
 
+TX_FLAG=(--gas auto --gas-adjustment 1.3 --chain-id {your chain ID} --yes)
+
 panacead tx gov submit-proposal wasm-store cw721_base.wasm \
 --title "store NFT contract wasm code" \
 --description "store wasm code for x/datapool module" \
@@ -33,8 +35,8 @@ panacead tx gov submit-proposal instantiate-contract {code id} "$INST_MSG" \
 --label "curator NFT" \
 --title "instantiate NFT contract" \
 --description "instantiate NFT contract for x/datapool module" \
---run-as MODULE_ADDR \
---admin MODULE_ADDR \
+--run-as $MODULE_ADDR \
+--admin $MODULE_ADDR \
 --deposit "100000000umed" \
 --from $VALIDATOR $TX_FLAG -y
 ```
@@ -87,7 +89,7 @@ panacead tx datapool create-pool {your deposit} create_pool_sample.json --from $
 
 ### Query curator NFT
 ```shell
-CONTRACT=$(panacead q datapool params -o json | jq -r '.data_pool_nft_contract_address')
+CONTRACT=$(panacead q datapool params -o json | jq -r '.params.data_pool_nft_contract_address')
 QUERY_TOKEN_INFO=$(jq -n --arg owner $CURATOR '{"tokens":{"owner":$owner}}')
 panacead q wasm contract-state smart $CONTRACT $QUERY_TOKEN_INFO -o json
 ```
@@ -95,7 +97,7 @@ result
 ```json
 {
   "data": {
-    "tokens":["data_pool_1"]
+    "tokens":["1"]
   }
 }
 ```
