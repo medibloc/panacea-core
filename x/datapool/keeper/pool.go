@@ -602,7 +602,7 @@ func (k Keeper) RedeemDataPass(ctx sdk.Context, redeemNFT types.MsgRedeemDataPas
 	return nftRedeemReceipt, nil
 }
 
-func (k Keeper) GetDataPassRedeemReceipt(ctx sdk.Context, poolID, round, nftID uint64, redeemer sdk.AccAddress) (types.DataPassRedeemReceipt, error) {
+func (k Keeper) GetDataPassRedeemReceipt(ctx sdk.Context, poolID, round, nftID uint64) (types.DataPassRedeemReceipt, error) {
 	key := types.GetKeyPrefixNFTRedeemReceipt(poolID, round, nftID)
 	store := ctx.KVStore(k.storeKey)
 
