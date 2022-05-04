@@ -79,9 +79,9 @@ func (suite genesisTestSuite) TestDataPoolInitGenesis() {
 	suite.Require().Equal(params, paramsFromKeeper)
 
 	// check all data pass redeem receipts
-	allDataPassRedeemReceipts, err := suite.DataPoolKeeper.GetAllDataPassRedeemReceipts(suite.Ctx)
+	dataPassRedeemReceiptsFromKeeper, err := suite.DataPoolKeeper.GetAllDataPassRedeemReceipts(suite.Ctx)
 	suite.Require().NoError(err)
-	suite.Require().Equal(dataPassRedeemReceipts, allDataPassRedeemReceipts)
+	suite.Require().Equal(dataPassRedeemReceipts, dataPassRedeemReceiptsFromKeeper)
 }
 
 func (suite genesisTestSuite) TestDataPoolExportGenesis() {
