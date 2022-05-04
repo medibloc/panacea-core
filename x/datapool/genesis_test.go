@@ -78,10 +78,10 @@ func (suite genesisTestSuite) TestDataPoolInitGenesis() {
 	paramsFromKeeper := suite.DataPoolKeeper.GetParams(suite.Ctx)
 	suite.Require().Equal(params, paramsFromKeeper)
 
-	// check data pass redeem receipt
-	redeemReceiptFromKeeper, err := suite.DataPoolKeeper.GetDataPassRedeemReceipt(suite.Ctx, poolID, 1, redeemer)
+	// check all data pass redeem receipts
+	allDataPassRedeemReceipts, err := suite.DataPoolKeeper.GetAllDataPassRedeemReceipts(suite.Ctx)
 	suite.Require().NoError(err)
-	suite.Require().Equal(dataPassRedeemReceipt, redeemReceiptFromKeeper)
+	suite.Require().Equal(dataPassRedeemReceipts, allDataPassRedeemReceipts)
 }
 
 func (suite genesisTestSuite) TestDataPoolExportGenesis() {
@@ -148,7 +148,7 @@ func makeSampleDataPassRedeemReceipt() types.DataPassRedeemReceipt {
 	return types.DataPassRedeemReceipt{
 		PoolId:      poolID,
 		Round:       1,
-		NftId:       0,
+		NftId:       1,
 		Redeemer:    redeemer.String(),
 		BlockHeight: 0,
 	}
