@@ -116,8 +116,7 @@ message QueryDataPassRedeemReceiptResponse {
 // QueryDataPassRedeemReceiptsRequest is the request type for the Query/DataPassRedeemReceipts RPC method.
 message QueryDataPassRedeemReceiptsRequest {
   uint64 pool_id = 1;
-  string redeemer = 3;
-  cosmos.base.query.v1beta1.PageRequest pagination = 4;
+  cosmos.base.query.v1beta1.PageRequest pagination = 2;
 }
 
 // QueryDataPassRedeemReceiptsResponse is the response type for the Query/DataPassRedeemReceipts RPC method.

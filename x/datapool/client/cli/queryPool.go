@@ -122,7 +122,7 @@ func CmdGetDataValidationCertificates() *cobra.Command {
 
 func CmdGetDataPassRedeemReceipt() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "get-data-pass-receipt [poolID] [round] [nftID] [redeemer]",
+		Use:   "get-data-pass-receipt [poolID] [round] [nftID]",
 		Short: "Query a data pass redeem receipt",
 		Args:  cobra.ExactArgs(4),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -148,13 +148,10 @@ func CmdGetDataPassRedeemReceipt() *cobra.Command {
 				return err
 			}
 
-			redeemer := args[1]
-
 			res, err := queryClient.DataPassRedeemReceipt(cmd.Context(), &types.QueryDataPassRedeemReceiptRequest{
-				PoolId:   poolID,
-				Round:    round,
-				NftId:    nftID,
-				Redeemer: redeemer,
+				PoolId: poolID,
+				Round:  round,
+				NftId:  nftID,
 			})
 
 			if err != nil {
@@ -172,8 +169,8 @@ func CmdGetDataPassRedeemReceipt() *cobra.Command {
 
 func CmdGetDataPassRedeemReceipts() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "data-pass-redeem-receipts [poolID] [redeemer]",
-		Short: "Query data pass redeem receipts by pool and redeemer",
+		Use:   "data-pass-redeem-receipts [poolID]",
+		Short: "Query data pass redeem receipts by pool",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientQueryContext(cmd)
@@ -193,11 +190,8 @@ func CmdGetDataPassRedeemReceipts() *cobra.Command {
 				return err
 			}
 
-			redeemer := args[1]
-
 			res, err := queryClient.DataPassRedeemReceipts(cmd.Context(), &types.QueryDataPassRedeemReceiptsRequest{
 				PoolId:     poolID,
-				Redeemer:   redeemer,
 				Pagination: pageReq,
 			})
 
@@ -209,7 +203,8 @@ func CmdGetDataPassRedeemReceipts() *cobra.Command {
 		},
 	}
 
-	flags.AddPaginationFlagsToCmd(cmd, "all data pass by pool ID and redeemer")
+	flags.AddPaginationFlagsToCmd(cmd, "all data pass by pool ID")
+	flags.AddQueryFlagsToCmd(cmd)
 
 	return cmd
 }

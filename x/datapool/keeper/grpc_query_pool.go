@@ -133,13 +133,8 @@ func (k Keeper) DataPassRedeemReceipts(goCtx context.Context, req *types.QueryDa
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	redeemer, err := sdk.AccAddressFromBech32(req.Redeemer)
-	if err != nil {
-		return nil, err
-	}
-
 	store := ctx.KVStore(k.storeKey)
-	redeemReceiptStore := prefix.NewStore(store, types.GetKeyPrefixNFTRedeemReceiptByPoolID(req.PoolId, redeemer))
+	redeemReceiptStore := prefix.NewStore(store, types.GetKeyPrefixNFTRedeemReceiptByPoolID(req.PoolId))
 
 	var redeemReceipts []types.DataPassRedeemReceipt
 	pageRes, err := query.Paginate(redeemReceiptStore, req.Pagination, func(_, value []byte) error {
