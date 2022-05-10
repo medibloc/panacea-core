@@ -1,6 +1,10 @@
 package types
 
-import sdk "github.com/cosmos/cosmos-sdk/types"
+import (
+	"bytes"
+
+	sdk "github.com/cosmos/cosmos-sdk/types"
+)
 
 const (
 	// ModuleName defines the module name
@@ -34,7 +38,10 @@ var (
 	// KeyPrefixDataValidatorCerts defines key to store dataValidator certs
 	KeyPrefixDataValidatorCerts = []byte{0x05}
 
+	// KeyPrefixNFTRedeemReceipts define key to store redeemed receipts
 	KeyPrefixNFTRedeemReceipts = []byte{0x06}
+
+	KeyIndexSeparator = []byte{0xFF}
 )
 
 func GetKeyPrefixDataValidator(dataValidatorAddr sdk.AccAddress) []byte {
@@ -54,11 +61,14 @@ func GetKeyPrefixDataValidateCert(poolID, round uint64, dataHash []byte) []byte 
 	return append(GetKeyPrefixDataValidateCertByRound(poolID, round), dataHash...)
 }
 
-func GetKeyPrefixNFTRedeemReceiptByPoolID(poolID uint64, redeemer sdk.AccAddress) []byte {
-	keyPoolAppended := append(KeyPrefixNFTRedeemReceipts, sdk.Uint64ToBigEndian(poolID)...)
-	return append(keyPoolAppended, redeemer.Bytes()...)
+func GetKeyPrefixNFTRedeemReceiptByPoolID(poolID uint64) []byte {
+	return append(KeyPrefixNFTRedeemReceipts, sdk.Uint64ToBigEndian(poolID)...)
 }
 
-func GetKeyPrefixNFTRedeemReceipt(poolID, round uint64, redeemer sdk.AccAddress) []byte {
-	return append(GetKeyPrefixNFTRedeemReceiptByPoolID(poolID, redeemer), sdk.Uint64ToBigEndian(round)...)
+func GetKeyPrefixNFTRedeemReceipt(poolID, round, nftID uint64) []byte {
+	return CombineKeys(GetKeyPrefixNFTRedeemReceiptByPoolID(poolID), sdk.Uint64ToBigEndian(round), sdk.Uint64ToBigEndian(nftID))
+}
+
+func CombineKeys(keys ...[]byte) []byte {
+	return bytes.Join(keys, KeyIndexSeparator)
 }
