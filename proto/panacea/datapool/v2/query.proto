@@ -38,7 +38,7 @@ service Query {
 
   // DataPassRedeemReceipt returns DataPassRedeemReceipt
   rpc DataPassRedeemReceipt(QueryDataPassRedeemReceiptRequest) returns (QueryDataPassRedeemReceiptResponse) {
-    option (google.api.http).get = "/panacea/datapool/v2/data_pass_redeem_receipt/pool/{pool_id}/round/{round}/nft/{nft_id}";
+    option (google.api.http).get = "/panacea/datapool/v2/pools/{pool_id}/rounds/{round}/data_passes/{nft_id}/redeem_receipt";
   }
 
   // DataPassRedeemReceipts returns DataPassRedeemReceipts
