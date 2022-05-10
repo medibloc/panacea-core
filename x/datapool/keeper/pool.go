@@ -602,6 +602,28 @@ func (k Keeper) RedeemDataPass(ctx sdk.Context, redeemNFT types.MsgRedeemDataPas
 	return nftRedeemReceipt, nil
 }
 
+func (k Keeper) GetAllDataPassRedeemReceipts(ctx sdk.Context) ([]types.DataPassRedeemReceipt, error) {
+	store := ctx.KVStore(k.storeKey)
+	iterator := sdk.KVStorePrefixIterator(store, types.KeyPrefixNFTRedeemReceipts)
+	defer iterator.Close()
+
+	dataPassRedeemReceipts := make([]types.DataPassRedeemReceipt, 0)
+
+	for ; iterator.Valid(); iterator.Next() {
+		bz := iterator.Value()
+		var dataPassRedeemReceipt types.DataPassRedeemReceipt
+
+		err := k.cdc.UnmarshalBinaryLengthPrefixed(bz, &dataPassRedeemReceipt)
+		if err != nil {
+			return nil, err
+		}
+
+		dataPassRedeemReceipts = append(dataPassRedeemReceipts, dataPassRedeemReceipt)
+	}
+
+	return dataPassRedeemReceipts, nil
+}
+
 func (k Keeper) GetDataPassRedeemReceipt(ctx sdk.Context, poolID, round, nftID uint64) (types.DataPassRedeemReceipt, error) {
 	key := types.GetKeyPrefixNFTRedeemReceipt(poolID, round, nftID)
 	store := ctx.KVStore(k.storeKey)
