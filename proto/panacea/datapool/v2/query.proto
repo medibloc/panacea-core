@@ -43,7 +43,7 @@ service Query {
 
   // DataPassRedeemReceipts returns DataPassRedeemReceipts
   rpc DataPassRedeemReceipts(QueryDataPassRedeemReceiptsRequest) returns (QueryDataPassRedeemReceiptsResponse) {
-    option (google.api.http).get = "/panacea/datapool/v2/data_pass_redeem_receipts/pool/{pool_id}";
+    option (google.api.http).get = "/panacea/datapool/v2/pools/{pool_id}/data_passes/redeem_receipt";
   }
 }
 

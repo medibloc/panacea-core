@@ -764,7 +764,7 @@ var (
 
 	pattern_Query_DataPassRedeemReceipt_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6, 2, 7, 1, 0, 4, 1, 5, 8, 2, 9}, []string{"panacea", "datapool", "v2", "pools", "pool_id", "rounds", "round", "data_passes", "nft_id", "redeem_receipt"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_DataPassRedeemReceipts_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5}, []string{"panacea", "datapool", "v2", "data_pass_redeem_receipts", "pool", "pool_id"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_DataPassRedeemReceipts_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 2, 6}, []string{"panacea", "datapool", "v2", "pools", "pool_id", "data_passes", "redeem_receipt"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (
