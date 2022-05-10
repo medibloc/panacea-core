@@ -492,6 +492,218 @@ func (m *QueryDataValidationCertificatesResponse) GetPagination() *query.PageRes
 	return nil
 }
 
+// QueryDataPassRedeemReceiptRequest is the request type for the Query/DataPassRedeemReceipt RPC method.
+type QueryDataPassRedeemReceiptRequest struct {
+	PoolId uint64 `protobuf:"varint,1,opt,name=pool_id,json=poolId,proto3" json:"pool_id,omitempty"`
+	Round  uint64 `protobuf:"varint,2,opt,name=round,proto3" json:"round,omitempty"`
+	NftId  uint64 `protobuf:"varint,3,opt,name=nft_id,json=nftId,proto3" json:"nft_id,omitempty"`
+}
+
+func (m *QueryDataPassRedeemReceiptRequest) Reset()         { *m = QueryDataPassRedeemReceiptRequest{} }
+func (m *QueryDataPassRedeemReceiptRequest) String() string { return proto.CompactTextString(m) }
+func (*QueryDataPassRedeemReceiptRequest) ProtoMessage()    {}
+func (*QueryDataPassRedeemReceiptRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_f3fda93d2b4f4508, []int{10}
+}
+func (m *QueryDataPassRedeemReceiptRequest) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *QueryDataPassRedeemReceiptRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_QueryDataPassRedeemReceiptRequest.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *QueryDataPassRedeemReceiptRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryDataPassRedeemReceiptRequest.Merge(m, src)
+}
+func (m *QueryDataPassRedeemReceiptRequest) XXX_Size() int {
+	return m.Size()
+}
+func (m *QueryDataPassRedeemReceiptRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryDataPassRedeemReceiptRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_QueryDataPassRedeemReceiptRequest proto.InternalMessageInfo
+
+func (m *QueryDataPassRedeemReceiptRequest) GetPoolId() uint64 {
+	if m != nil {
+		return m.PoolId
+	}
+	return 0
+}
+
+func (m *QueryDataPassRedeemReceiptRequest) GetRound() uint64 {
+	if m != nil {
+		return m.Round
+	}
+	return 0
+}
+
+func (m *QueryDataPassRedeemReceiptRequest) GetNftId() uint64 {
+	if m != nil {
+		return m.NftId
+	}
+	return 0
+}
+
+// QueryDataPassRedeemReceiptResponse is the response type for the Query/DataPassRedeemReceipt RPC method.
+type QueryDataPassRedeemReceiptResponse struct {
+	DataPassRedeemReceipt DataPassRedeemReceipt `protobuf:"bytes,1,opt,name=data_pass_redeem_receipt,json=dataPassRedeemReceipt,proto3" json:"data_pass_redeem_receipt"`
+}
+
+func (m *QueryDataPassRedeemReceiptResponse) Reset()         { *m = QueryDataPassRedeemReceiptResponse{} }
+func (m *QueryDataPassRedeemReceiptResponse) String() string { return proto.CompactTextString(m) }
+func (*QueryDataPassRedeemReceiptResponse) ProtoMessage()    {}
+func (*QueryDataPassRedeemReceiptResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_f3fda93d2b4f4508, []int{11}
+}
+func (m *QueryDataPassRedeemReceiptResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *QueryDataPassRedeemReceiptResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_QueryDataPassRedeemReceiptResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *QueryDataPassRedeemReceiptResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryDataPassRedeemReceiptResponse.Merge(m, src)
+}
+func (m *QueryDataPassRedeemReceiptResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *QueryDataPassRedeemReceiptResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryDataPassRedeemReceiptResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_QueryDataPassRedeemReceiptResponse proto.InternalMessageInfo
+
+func (m *QueryDataPassRedeemReceiptResponse) GetDataPassRedeemReceipt() DataPassRedeemReceipt {
+	if m != nil {
+		return m.DataPassRedeemReceipt
+	}
+	return DataPassRedeemReceipt{}
+}
+
+// QueryDataPassRedeemReceiptsRequest is the request type for the Query/DataPassRedeemReceipts RPC method.
+type QueryDataPassRedeemReceiptsRequest struct {
+	PoolId     uint64             `protobuf:"varint,1,opt,name=pool_id,json=poolId,proto3" json:"pool_id,omitempty"`
+	Pagination *query.PageRequest `protobuf:"bytes,2,opt,name=pagination,proto3" json:"pagination,omitempty"`
+}
+
+func (m *QueryDataPassRedeemReceiptsRequest) Reset()         { *m = QueryDataPassRedeemReceiptsRequest{} }
+func (m *QueryDataPassRedeemReceiptsRequest) String() string { return proto.CompactTextString(m) }
+func (*QueryDataPassRedeemReceiptsRequest) ProtoMessage()    {}
+func (*QueryDataPassRedeemReceiptsRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_f3fda93d2b4f4508, []int{12}
+}
+func (m *QueryDataPassRedeemReceiptsRequest) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *QueryDataPassRedeemReceiptsRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_QueryDataPassRedeemReceiptsRequest.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *QueryDataPassRedeemReceiptsRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryDataPassRedeemReceiptsRequest.Merge(m, src)
+}
+func (m *QueryDataPassRedeemReceiptsRequest) XXX_Size() int {
+	return m.Size()
+}
+func (m *QueryDataPassRedeemReceiptsRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryDataPassRedeemReceiptsRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_QueryDataPassRedeemReceiptsRequest proto.InternalMessageInfo
+
+func (m *QueryDataPassRedeemReceiptsRequest) GetPoolId() uint64 {
+	if m != nil {
+		return m.PoolId
+	}
+	return 0
+}
+
+func (m *QueryDataPassRedeemReceiptsRequest) GetPagination() *query.PageRequest {
+	if m != nil {
+		return m.Pagination
+	}
+	return nil
+}
+
+// QueryDataPassRedeemReceiptsResponse is the response type for the Query/DataPassRedeemReceipts RPC method.
+type QueryDataPassRedeemReceiptsResponse struct {
+	DataPassRedeemReceipts []DataPassRedeemReceipt `protobuf:"bytes,1,rep,name=data_pass_redeem_receipts,json=dataPassRedeemReceipts,proto3" json:"data_pass_redeem_receipts"`
+	Pagination             *query.PageResponse     `protobuf:"bytes,2,opt,name=pagination,proto3" json:"pagination,omitempty"`
+}
+
+func (m *QueryDataPassRedeemReceiptsResponse) Reset()         { *m = QueryDataPassRedeemReceiptsResponse{} }
+func (m *QueryDataPassRedeemReceiptsResponse) String() string { return proto.CompactTextString(m) }
+func (*QueryDataPassRedeemReceiptsResponse) ProtoMessage()    {}
+func (*QueryDataPassRedeemReceiptsResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_f3fda93d2b4f4508, []int{13}
+}
+func (m *QueryDataPassRedeemReceiptsResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *QueryDataPassRedeemReceiptsResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_QueryDataPassRedeemReceiptsResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *QueryDataPassRedeemReceiptsResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryDataPassRedeemReceiptsResponse.Merge(m, src)
+}
+func (m *QueryDataPassRedeemReceiptsResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *QueryDataPassRedeemReceiptsResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryDataPassRedeemReceiptsResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_QueryDataPassRedeemReceiptsResponse proto.InternalMessageInfo
+
+func (m *QueryDataPassRedeemReceiptsResponse) GetDataPassRedeemReceipts() []DataPassRedeemReceipt {
+	if m != nil {
+		return m.DataPassRedeemReceipts
+	}
+	return nil
+}
+
+func (m *QueryDataPassRedeemReceiptsResponse) GetPagination() *query.PageResponse {
+	if m != nil {
+		return m.Pagination
+	}
+	return nil
+}
+
 func init() {
 	proto.RegisterType((*QueryPoolRequest)(nil), "panacea.datapool.v2.QueryPoolRequest")
 	proto.RegisterType((*QueryPoolResponse)(nil), "panacea.datapool.v2.QueryPoolResponse")
@@ -503,57 +715,74 @@ func init() {
 	proto.RegisterType((*QueryDataPoolModuleAddrResponse)(nil), "panacea.datapool.v2.QueryDataPoolModuleAddrResponse")
 	proto.RegisterType((*QueryDataValidationCertificatesRequest)(nil), "panacea.datapool.v2.QueryDataValidationCertificatesRequest")
 	proto.RegisterType((*QueryDataValidationCertificatesResponse)(nil), "panacea.datapool.v2.QueryDataValidationCertificatesResponse")
+	proto.RegisterType((*QueryDataPassRedeemReceiptRequest)(nil), "panacea.datapool.v2.QueryDataPassRedeemReceiptRequest")
+	proto.RegisterType((*QueryDataPassRedeemReceiptResponse)(nil), "panacea.datapool.v2.QueryDataPassRedeemReceiptResponse")
+	proto.RegisterType((*QueryDataPassRedeemReceiptsRequest)(nil), "panacea.datapool.v2.QueryDataPassRedeemReceiptsRequest")
+	proto.RegisterType((*QueryDataPassRedeemReceiptsResponse)(nil), "panacea.datapool.v2.QueryDataPassRedeemReceiptsResponse")
 }
 
 func init() { proto.RegisterFile("panacea/datapool/v2/query.proto", fileDescriptor_f3fda93d2b4f4508) }
 
 var fileDescriptor_f3fda93d2b4f4508 = []byte{
-	// 719 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x9c, 0x55, 0x41, 0x4f, 0x13, 0x41,
-	0x14, 0xee, 0x40, 0x29, 0x71, 0x08, 0x44, 0x47, 0x12, 0xcb, 0x82, 0x4b, 0x5d, 0xa4, 0x10, 0x91,
-	0x1d, 0x29, 0x7a, 0xc2, 0x8b, 0x68, 0x34, 0xc4, 0x68, 0x6a, 0x0f, 0x1c, 0xbc, 0x34, 0xd3, 0x9d,
-	0x71, 0xdd, 0xa4, 0xdd, 0x59, 0x76, 0xb6, 0x8d, 0x84, 0x70, 0xd1, 0x3f, 0x60, 0xe2, 0xc5, 0x8b,
-	0xf1, 0xec, 0x3f, 0xe1, 0x48, 0xe2, 0xc5, 0x93, 0x31, 0x60, 0x3c, 0x78, 0xf1, 0x2f, 0x98, 0x9d,
-	0x9d, 0x86, 0x5d, 0x98, 0xcd, 0x56, 0x4f, 0x30, 0xfb, 0xbe, 0xf7, 0xbe, 0xef, 0xcd, 0x7b, 0xdf,
-	0x14, 0x2e, 0x06, 0xc4, 0x27, 0x0e, 0x23, 0x98, 0x92, 0x88, 0x04, 0x9c, 0x77, 0xf1, 0xa0, 0x81,
-	0xf7, 0xfa, 0x2c, 0xdc, 0xb7, 0x83, 0x90, 0x47, 0x1c, 0x5d, 0x55, 0x00, 0x7b, 0x08, 0xb0, 0x07,
-	0x0d, 0x63, 0xd6, 0xe5, 0x2e, 0x97, 0x71, 0x1c, 0xff, 0x97, 0x40, 0x8d, 0x5b, 0x0e, 0x17, 0x3d,
-	0x2e, 0x70, 0x87, 0x08, 0x96, 0xd4, 0xc0, 0x83, 0x8d, 0x0e, 0x8b, 0xc8, 0x06, 0x0e, 0x88, 0xeb,
-	0xf9, 0x24, 0xf2, 0xb8, 0xaf, 0xb0, 0x0b, 0x2e, 0xe7, 0x6e, 0x97, 0x61, 0x12, 0x78, 0x98, 0xf8,
-	0x3e, 0x8f, 0x64, 0x50, 0xa8, 0xa8, 0xa9, 0x53, 0x25, 0xc9, 0x93, 0xf8, 0x0d, 0x5d, 0xdc, 0x65,
-	0x3e, 0x13, 0x9e, 0x2a, 0x61, 0xad, 0xc1, 0xcb, 0x2f, 0x62, 0x09, 0x4d, 0xce, 0xbb, 0x2d, 0xb6,
-	0xd7, 0x67, 0x22, 0x42, 0xd7, 0xe0, 0x64, 0x0c, 0x6e, 0x7b, 0xb4, 0x0a, 0x6a, 0x60, 0xb5, 0xdc,
-	0xaa, 0xc4, 0xc7, 0x1d, 0x6a, 0x6d, 0xc3, 0x2b, 0x29, 0xb0, 0x08, 0xb8, 0x2f, 0x18, 0x5a, 0x87,
-	0xe5, 0x38, 0x2c, 0xa1, 0x53, 0x8d, 0x39, 0x5b, 0x73, 0x11, 0xb6, 0x4c, 0x90, 0x30, 0xeb, 0x1e,
-	0x9c, 0x93, 0x35, 0x1e, 0x91, 0x88, 0xec, 0x92, 0xae, 0x47, 0x49, 0xc4, 0xc3, 0x21, 0x73, 0x15,
-	0x4e, 0x12, 0x4a, 0x43, 0x26, 0x84, 0x2c, 0x77, 0xa9, 0x35, 0x3c, 0x5a, 0x2e, 0x34, 0x74, 0x69,
-	0x4a, 0xc3, 0x0e, 0x9c, 0x89, 0xe9, 0xda, 0x83, 0x61, 0x44, 0xa9, 0xb1, 0xb4, 0x6a, 0xb2, 0x35,
-	0xa6, 0x69, 0xfa, 0x68, 0x2d, 0xa4, 0x88, 0x62, 0xd9, 0x4d, 0x12, 0x92, 0x9e, 0x50, 0x02, 0xad,
-	0x16, 0x9c, 0xd7, 0x46, 0x95, 0x8e, 0x4d, 0x58, 0x09, 0xe4, 0x17, 0xc5, 0x3f, 0xaf, 0xbf, 0x8d,
-	0x24, 0x49, 0x41, 0xad, 0x1a, 0x34, 0x33, 0x35, 0x9f, 0x71, 0xda, 0xef, 0xb2, 0x07, 0x94, 0x0e,
-	0xaf, 0xc5, 0xda, 0x82, 0x8b, 0xb9, 0x08, 0xc5, 0x9c, 0x7f, 0x73, 0x9f, 0x01, 0xac, 0x9f, 0xbf,
-	0x3a, 0x8f, 0xfb, 0x0f, 0x59, 0x18, 0x79, 0xaf, 0x3c, 0x87, 0x44, 0x4c, 0x14, 0x0d, 0x1e, 0xcd,
-	0xc2, 0x89, 0x90, 0xf7, 0x7d, 0x5a, 0x1d, 0x93, 0x9f, 0x93, 0x03, 0x7a, 0x0c, 0xe1, 0xd9, 0xc2,
-	0x56, 0xc7, 0x65, 0xc7, 0x75, 0x3b, 0xd9, 0x6e, 0x3b, 0xde, 0x6e, 0x3b, 0x71, 0x88, 0xda, 0x6e,
-	0xbb, 0x49, 0x5c, 0xa6, 0xa8, 0x5a, 0xa9, 0x4c, 0xeb, 0x37, 0x80, 0x2b, 0x85, 0x0a, 0x55, 0x9f,
-	0x03, 0xb8, 0x90, 0x9e, 0xb4, 0xc7, 0xfd, 0xb6, 0x93, 0xc2, 0x55, 0x41, 0x6d, 0x7c, 0x75, 0xaa,
-	0x61, 0x17, 0xcd, 0x3d, 0x5b, 0x7e, 0xbb, 0x7c, 0xf4, 0x7d, 0xb1, 0xd4, 0x32, 0x68, 0x2e, 0x3f,
-	0x7a, 0x92, 0xe9, 0x75, 0x4c, 0xf6, 0xba, 0x52, 0xd8, 0x6b, 0x22, 0x3a, 0xdd, 0x6c, 0xe3, 0x57,
-	0x05, 0x4e, 0xc8, 0x66, 0xd1, 0x3b, 0x00, 0xcb, 0xf1, 0x34, 0xd1, 0xb2, 0x56, 0xed, 0x79, 0x5b,
-	0x1a, 0xf5, 0x22, 0x58, 0xc2, 0x66, 0xdd, 0x7e, 0xfb, 0xf5, 0xe7, 0x87, 0xb1, 0x3a, 0xba, 0x89,
-	0xf3, 0x9e, 0x07, 0x81, 0x0f, 0xd4, 0x9c, 0x0f, 0xd1, 0x27, 0x00, 0xa7, 0x33, 0x86, 0x40, 0x76,
-	0x3e, 0x8f, 0xce, 0xb4, 0x06, 0x1e, 0x19, 0xaf, 0x04, 0xae, 0x49, 0x81, 0xcb, 0x68, 0x49, 0x2b,
-	0x30, 0x6b, 0x64, 0xf4, 0x11, 0xc0, 0x99, 0xac, 0xdb, 0x50, 0x01, 0xe1, 0x05, 0xd7, 0x1a, 0x77,
-	0x46, 0x4f, 0x50, 0x12, 0x97, 0xa4, 0xc4, 0xeb, 0x68, 0x5e, 0x7f, 0x87, 0x89, 0x8e, 0x2f, 0x00,
-	0xa2, 0x8b, 0x96, 0x44, 0x9b, 0xc5, 0x6c, 0x17, 0x2c, 0x6e, 0xdc, 0xfd, 0xb7, 0x24, 0x25, 0x73,
-	0x55, 0xca, 0xb4, 0x50, 0x4d, 0x2b, 0xb3, 0x27, 0x13, 0xda, 0xf1, 0x43, 0x80, 0xfe, 0x00, 0x68,
-	0xe4, 0xdb, 0x0b, 0x6d, 0x8d, 0x34, 0x43, 0xfd, 0xb3, 0x61, 0xdc, 0xff, 0xbf, 0x64, 0xd5, 0xc3,
-	0xae, 0xec, 0xa1, 0x89, 0x9e, 0x17, 0x6e, 0xc3, 0x79, 0xb3, 0xcb, 0x5d, 0x3e, 0x5b, 0x65, 0x2c,
-	0x5f, 0x25, 0x7c, 0x20, 0xff, 0x1c, 0x6e, 0x3f, 0x3d, 0x3a, 0x31, 0xc1, 0xf1, 0x89, 0x09, 0x7e,
-	0x9c, 0x98, 0xe0, 0xfd, 0xa9, 0x59, 0x3a, 0x3e, 0x35, 0x4b, 0xdf, 0x4e, 0xcd, 0xd2, 0xcb, 0x0d,
-	0xd7, 0x8b, 0x5e, 0xf7, 0x3b, 0xb6, 0xc3, 0x7b, 0xb8, 0xc7, 0xa8, 0xd7, 0xe9, 0x72, 0x67, 0x48,
-	0xbe, 0xee, 0xf0, 0x90, 0xe1, 0x37, 0x67, 0x1a, 0xa2, 0xfd, 0x80, 0x89, 0x4e, 0x45, 0xfe, 0x5a,
-	0x6e, 0xfe, 0x0d, 0x00, 0x00, 0xff, 0xff, 0x8b, 0x0e, 0xd6, 0x52, 0x08, 0x08, 0x00, 0x00,
+	// 915 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x56, 0xcf, 0x6f, 0xdc, 0x44,
+	0x14, 0xce, 0x24, 0x69, 0x2a, 0x5e, 0xd5, 0x0a, 0x86, 0xa6, 0x6c, 0x9c, 0xe0, 0xa4, 0x0e, 0xdd,
+	0x46, 0x2d, 0xf5, 0x90, 0x0d, 0xbf, 0xa4, 0x22, 0xa1, 0x06, 0xd4, 0x2a, 0x42, 0xa0, 0xc5, 0x87,
+	0x22, 0xb8, 0xac, 0x66, 0x3d, 0x13, 0x63, 0xb1, 0xeb, 0x71, 0x3d, 0xde, 0x15, 0x55, 0x94, 0x0b,
+	0x88, 0x33, 0x48, 0x5c, 0xb8, 0x20, 0xce, 0xfd, 0x4f, 0x7a, 0xac, 0x04, 0x07, 0x24, 0x24, 0x84,
+	0x12, 0x2e, 0x70, 0xe1, 0x5f, 0x40, 0x1e, 0x8f, 0xb3, 0xeb, 0xec, 0x38, 0xde, 0x8d, 0x7a, 0x4a,
+	0xec, 0xf7, 0xbd, 0xf7, 0xbe, 0xef, 0xbd, 0xe7, 0xf7, 0x16, 0xd6, 0x63, 0x1a, 0x51, 0x9f, 0x53,
+	0xc2, 0x68, 0x4a, 0x63, 0x21, 0x7a, 0x64, 0xd8, 0x22, 0x8f, 0x06, 0x3c, 0x79, 0xec, 0xc6, 0x89,
+	0x48, 0x05, 0x7e, 0x59, 0x03, 0xdc, 0x02, 0xe0, 0x0e, 0x5b, 0xd6, 0xd5, 0x40, 0x04, 0x42, 0xd9,
+	0x49, 0xf6, 0x5f, 0x0e, 0xb5, 0x6e, 0xf9, 0x42, 0xf6, 0x85, 0x24, 0x5d, 0x2a, 0x79, 0x1e, 0x83,
+	0x0c, 0xb7, 0xbb, 0x3c, 0xa5, 0xdb, 0x24, 0xa6, 0x41, 0x18, 0xd1, 0x34, 0x14, 0x91, 0xc6, 0xae,
+	0x05, 0x42, 0x04, 0x3d, 0x4e, 0x68, 0x1c, 0x12, 0x1a, 0x45, 0x22, 0x55, 0x46, 0xa9, 0xad, 0xb6,
+	0x89, 0x95, 0x4a, 0x9e, 0xdb, 0xaf, 0x9b, 0xec, 0x01, 0x8f, 0xb8, 0x0c, 0x75, 0x08, 0xe7, 0x36,
+	0xbc, 0xf8, 0x69, 0x46, 0xa1, 0x2d, 0x44, 0xcf, 0xe3, 0x8f, 0x06, 0x5c, 0xa6, 0xf8, 0x15, 0xb8,
+	0x98, 0x81, 0x3b, 0x21, 0x6b, 0xa0, 0x0d, 0xb4, 0xb5, 0xe8, 0x2d, 0x65, 0x8f, 0x7b, 0xcc, 0xd9,
+	0x85, 0x97, 0xc6, 0xc0, 0x32, 0x16, 0x91, 0xe4, 0xf8, 0x0e, 0x2c, 0x66, 0x66, 0x05, 0xbd, 0xd4,
+	0x5a, 0x71, 0x0d, 0x85, 0x70, 0x95, 0x83, 0x82, 0x39, 0x6f, 0xc1, 0x8a, 0x8a, 0xf1, 0x21, 0x4d,
+	0xe9, 0x43, 0xda, 0x0b, 0x19, 0x4d, 0x45, 0x52, 0x64, 0x6e, 0xc0, 0x45, 0xca, 0x58, 0xc2, 0xa5,
+	0x54, 0xe1, 0x5e, 0xf0, 0x8a, 0x47, 0x27, 0x00, 0xcb, 0xe4, 0xa6, 0x39, 0xec, 0xc1, 0x95, 0x2c,
+	0x5d, 0x67, 0x58, 0x58, 0x34, 0x1b, 0xc7, 0xc8, 0xa6, 0x1c, 0xe3, 0x32, 0x1b, 0x7f, 0x74, 0xd6,
+	0xc6, 0x12, 0x65, 0xb4, 0xdb, 0x34, 0xa1, 0x7d, 0xa9, 0x09, 0x3a, 0x1e, 0xac, 0x1a, 0xad, 0x9a,
+	0xc7, 0x0e, 0x2c, 0xc5, 0xea, 0x8d, 0xce, 0xbf, 0x6a, 0xae, 0x46, 0xee, 0xa4, 0xa1, 0xce, 0x06,
+	0xd8, 0xa5, 0x98, 0x1f, 0x0b, 0x36, 0xe8, 0xf1, 0x7b, 0x8c, 0x15, 0x65, 0x71, 0xee, 0xc2, 0x7a,
+	0x25, 0x42, 0x67, 0xae, 0xae, 0xdc, 0x2f, 0x08, 0x9a, 0xa7, 0x4b, 0x17, 0x8a, 0xe8, 0x03, 0x9e,
+	0xa4, 0xe1, 0x7e, 0xe8, 0xd3, 0x94, 0xcb, 0xba, 0xc6, 0xe3, 0xab, 0x70, 0x21, 0x11, 0x83, 0x88,
+	0x35, 0xe6, 0xd5, 0xeb, 0xfc, 0x01, 0xdf, 0x07, 0x18, 0x0d, 0x6c, 0x63, 0x41, 0x29, 0x6e, 0xba,
+	0xf9, 0x74, 0xbb, 0xd9, 0x74, 0xbb, 0xf9, 0x17, 0xa2, 0xa7, 0xdb, 0x6d, 0xd3, 0x80, 0xeb, 0x54,
+	0xde, 0x98, 0xa7, 0xf3, 0x2f, 0x82, 0x9b, 0xb5, 0x0c, 0xb5, 0xce, 0x21, 0xac, 0x8d, 0x77, 0x3a,
+	0x14, 0x51, 0xc7, 0x1f, 0xc3, 0x35, 0xd0, 0xc6, 0xc2, 0xd6, 0xa5, 0x96, 0x5b, 0xd7, 0xf7, 0x72,
+	0xf8, 0xdd, 0xc5, 0xa7, 0x7f, 0xae, 0xcf, 0x79, 0x16, 0xab, 0xcc, 0x8f, 0x1f, 0x94, 0xb4, 0xce,
+	0x2b, 0xad, 0x37, 0x6b, 0xb5, 0xe6, 0xa4, 0x4b, 0x62, 0x43, 0xb8, 0x3e, 0xea, 0x25, 0x95, 0xd2,
+	0xe3, 0x8c, 0xf3, 0xbe, 0xc7, 0x7d, 0x1e, 0xc6, 0xe9, 0x39, 0x1b, 0xb1, 0x0c, 0x4b, 0xd1, 0x7e,
+	0x9a, 0xa1, 0x17, 0xf2, 0xd7, 0xd1, 0x7e, 0xba, 0xc7, 0x9c, 0xef, 0x11, 0x38, 0x67, 0xe5, 0xd2,
+	0x25, 0x0d, 0xa1, 0xa1, 0x4a, 0x1a, 0x53, 0x29, 0x3b, 0x89, 0x82, 0x74, 0x92, 0x1c, 0xa3, 0xc7,
+	0xf8, 0x56, 0x65, 0x39, 0x27, 0xa2, 0xea, 0x52, 0x2e, 0x33, 0x93, 0xd1, 0xf9, 0xee, 0x4c, 0x46,
+	0xf5, 0x73, 0x78, 0xdf, 0xd0, 0x85, 0xf3, 0x4c, 0xdc, 0x1f, 0x08, 0x36, 0xcf, 0xe4, 0xa1, 0x4b,
+	0xf3, 0x15, 0xac, 0x54, 0x95, 0xa6, 0x18, 0xb5, 0xd9, 0x6b, 0x73, 0xcd, 0x58, 0x9b, 0xe7, 0x37,
+	0x62, 0xad, 0x27, 0x00, 0x17, 0x94, 0x3a, 0xfc, 0x2d, 0x82, 0xc5, 0x6c, 0x61, 0xe0, 0x1b, 0x46,
+	0x96, 0xa7, 0x37, 0xbf, 0xd5, 0xac, 0x83, 0xe5, 0xd9, 0x9c, 0xd7, 0xbf, 0xf9, 0xf5, 0xef, 0x1f,
+	0xe7, 0x9b, 0xf8, 0x35, 0x52, 0x75, 0x81, 0x24, 0x39, 0xd0, 0x2d, 0x3c, 0xc4, 0x3f, 0x23, 0xb8,
+	0x5c, 0xda, 0xb9, 0xd8, 0xad, 0xce, 0x63, 0xba, 0x0b, 0x16, 0x99, 0x1a, 0xaf, 0x09, 0xde, 0x56,
+	0x04, 0x6f, 0xe0, 0x4d, 0x23, 0xc1, 0xf2, 0xad, 0xc0, 0x3f, 0x21, 0xb8, 0x52, 0x5e, 0xe8, 0xb8,
+	0x26, 0xe1, 0xc4, 0x61, 0xb0, 0xde, 0x98, 0xde, 0x41, 0x53, 0xdc, 0x54, 0x14, 0x5f, 0xc5, 0xab,
+	0xe6, 0x1a, 0xe6, 0x3c, 0x9e, 0x20, 0xc0, 0x93, 0x5b, 0x1f, 0xef, 0xd4, 0x67, 0x9b, 0xb8, 0x22,
+	0xd6, 0x9b, 0xb3, 0x39, 0x69, 0x9a, 0x5b, 0x8a, 0xa6, 0x83, 0x37, 0x8c, 0x34, 0xfb, 0xca, 0xa1,
+	0x93, 0xdd, 0x1a, 0xfc, 0x1f, 0x02, 0xab, 0x7a, 0x83, 0xe3, 0xbb, 0x53, 0xf5, 0xd0, 0x7c, 0x99,
+	0xac, 0xf7, 0xce, 0xe7, 0xac, 0x35, 0x3c, 0x54, 0x1a, 0xda, 0xf8, 0x93, 0xda, 0x69, 0x38, 0x7d,
+	0x4f, 0xd4, 0x2c, 0x8f, 0x46, 0x99, 0xa8, 0x7d, 0x4b, 0x0e, 0xd4, 0x9f, 0x43, 0xfc, 0x0f, 0x82,
+	0x65, 0xe3, 0x97, 0x8e, 0xdf, 0xae, 0xa9, 0x75, 0xc5, 0xe2, 0xb7, 0xde, 0x99, 0xd9, 0x4f, 0x4b,
+	0xec, 0x28, 0x89, 0x9f, 0xe3, 0xcf, 0xa6, 0xf9, 0x22, 0x73, 0x19, 0xb2, 0xd0, 0x41, 0x4e, 0x76,
+	0x1c, 0x97, 0xe4, 0x20, 0xbf, 0x24, 0x87, 0xa4, 0xbc, 0xee, 0xf0, 0x6f, 0x08, 0xae, 0x99, 0xb7,
+	0x25, 0x9e, 0x95, 0xf4, 0x49, 0x57, 0xdf, 0x9d, 0xdd, 0x51, 0xcb, 0x7d, 0xa0, 0xe4, 0xde, 0xc3,
+	0xef, 0x4f, 0x25, 0x77, 0x5c, 0x5f, 0x59, 0xd6, 0xee, 0x47, 0x4f, 0x8f, 0x6c, 0xf4, 0xec, 0xc8,
+	0x46, 0x7f, 0x1d, 0xd9, 0xe8, 0x87, 0x63, 0x7b, 0xee, 0xd9, 0xb1, 0x3d, 0xf7, 0xfb, 0xb1, 0x3d,
+	0xf7, 0xc5, 0x76, 0x10, 0xa6, 0x5f, 0x0e, 0xba, 0xae, 0x2f, 0xfa, 0xa4, 0xcf, 0x59, 0xd8, 0xed,
+	0x09, 0xbf, 0xc8, 0x76, 0xc7, 0x17, 0x09, 0x27, 0x5f, 0x8f, 0x92, 0xa6, 0x8f, 0x63, 0x2e, 0xbb,
+	0x4b, 0xea, 0x37, 0xf5, 0xce, 0xff, 0x01, 0x00, 0x00, 0xff, 0xff, 0x72, 0xcc, 0xe8, 0xdc, 0x2e,
+	0x0c, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -578,6 +807,10 @@ type QueryClient interface {
 	DataPoolModuleAddr(ctx context.Context, in *QueryDataPoolModuleAddrRequest, opts ...grpc.CallOption) (*QueryDataPoolModuleAddrResponse, error)
 	// DataValidationCertificates returns DataValidationCertificates
 	DataValidationCertificates(ctx context.Context, in *QueryDataValidationCertificatesRequest, opts ...grpc.CallOption) (*QueryDataValidationCertificatesResponse, error)
+	// DataPassRedeemReceipt returns DataPassRedeemReceipt
+	DataPassRedeemReceipt(ctx context.Context, in *QueryDataPassRedeemReceiptRequest, opts ...grpc.CallOption) (*QueryDataPassRedeemReceiptResponse, error)
+	// DataPassRedeemReceipts returns DataPassRedeemReceipts
+	DataPassRedeemReceipts(ctx context.Context, in *QueryDataPassRedeemReceiptsRequest, opts ...grpc.CallOption) (*QueryDataPassRedeemReceiptsResponse, error)
 }
 
 type queryClient struct {
@@ -633,6 +866,24 @@ func (c *queryClient) DataValidationCertificates(ctx context.Context, in *QueryD
 	return out, nil
 }
 
+func (c *queryClient) DataPassRedeemReceipt(ctx context.Context, in *QueryDataPassRedeemReceiptRequest, opts ...grpc.CallOption) (*QueryDataPassRedeemReceiptResponse, error) {
+	out := new(QueryDataPassRedeemReceiptResponse)
+	err := c.cc.Invoke(ctx, "/panacea.datapool.v2.Query/DataPassRedeemReceipt", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *queryClient) DataPassRedeemReceipts(ctx context.Context, in *QueryDataPassRedeemReceiptsRequest, opts ...grpc.CallOption) (*QueryDataPassRedeemReceiptsResponse, error) {
+	out := new(QueryDataPassRedeemReceiptsResponse)
+	err := c.cc.Invoke(ctx, "/panacea.datapool.v2.Query/DataPassRedeemReceipts", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // QueryServer is the server API for Query service.
 type QueryServer interface {
 	// Pool returns a Pool.
@@ -645,6 +896,10 @@ type QueryServer interface {
 	DataPoolModuleAddr(context.Context, *QueryDataPoolModuleAddrRequest) (*QueryDataPoolModuleAddrResponse, error)
 	// DataValidationCertificates returns DataValidationCertificates
 	DataValidationCertificates(context.Context, *QueryDataValidationCertificatesRequest) (*QueryDataValidationCertificatesResponse, error)
+	// DataPassRedeemReceipt returns DataPassRedeemReceipt
+	DataPassRedeemReceipt(context.Context, *QueryDataPassRedeemReceiptRequest) (*QueryDataPassRedeemReceiptResponse, error)
+	// DataPassRedeemReceipts returns DataPassRedeemReceipts
+	DataPassRedeemReceipts(context.Context, *QueryDataPassRedeemReceiptsRequest) (*QueryDataPassRedeemReceiptsResponse, error)
 }
 
 // UnimplementedQueryServer can be embedded to have forward compatible implementations.
@@ -665,6 +920,12 @@ func (*UnimplementedQueryServer) DataPoolModuleAddr(ctx context.Context, req *Qu
 }
 func (*UnimplementedQueryServer) DataValidationCertificates(ctx context.Context, req *QueryDataValidationCertificatesRequest) (*QueryDataValidationCertificatesResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DataValidationCertificates not implemented")
+}
+func (*UnimplementedQueryServer) DataPassRedeemReceipt(ctx context.Context, req *QueryDataPassRedeemReceiptRequest) (*QueryDataPassRedeemReceiptResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DataPassRedeemReceipt not implemented")
+}
+func (*UnimplementedQueryServer) DataPassRedeemReceipts(ctx context.Context, req *QueryDataPassRedeemReceiptsRequest) (*QueryDataPassRedeemReceiptsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DataPassRedeemReceipts not implemented")
 }
 
 func RegisterQueryServer(s grpc1.Server, srv QueryServer) {
@@ -761,6 +1022,42 @@ func _Query_DataValidationCertificates_Handler(srv interface{}, ctx context.Cont
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Query_DataPassRedeemReceipt_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryDataPassRedeemReceiptRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(QueryServer).DataPassRedeemReceipt(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/panacea.datapool.v2.Query/DataPassRedeemReceipt",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(QueryServer).DataPassRedeemReceipt(ctx, req.(*QueryDataPassRedeemReceiptRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Query_DataPassRedeemReceipts_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryDataPassRedeemReceiptsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(QueryServer).DataPassRedeemReceipts(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/panacea.datapool.v2.Query/DataPassRedeemReceipts",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(QueryServer).DataPassRedeemReceipts(ctx, req.(*QueryDataPassRedeemReceiptsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _Query_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "panacea.datapool.v2.Query",
 	HandlerType: (*QueryServer)(nil),
@@ -784,6 +1081,14 @@ var _Query_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DataValidationCertificates",
 			Handler:    _Query_DataValidationCertificates_Handler,
+		},
+		{
+			MethodName: "DataPassRedeemReceipt",
+			Handler:    _Query_DataPassRedeemReceipt_Handler,
+		},
+		{
+			MethodName: "DataPassRedeemReceipts",
+			Handler:    _Query_DataPassRedeemReceipts_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
@@ -1123,6 +1428,166 @@ func (m *QueryDataValidationCertificatesResponse) MarshalToSizedBuffer(dAtA []by
 	return len(dAtA) - i, nil
 }
 
+func (m *QueryDataPassRedeemReceiptRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *QueryDataPassRedeemReceiptRequest) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *QueryDataPassRedeemReceiptRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.NftId != 0 {
+		i = encodeVarintQuery(dAtA, i, uint64(m.NftId))
+		i--
+		dAtA[i] = 0x18
+	}
+	if m.Round != 0 {
+		i = encodeVarintQuery(dAtA, i, uint64(m.Round))
+		i--
+		dAtA[i] = 0x10
+	}
+	if m.PoolId != 0 {
+		i = encodeVarintQuery(dAtA, i, uint64(m.PoolId))
+		i--
+		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *QueryDataPassRedeemReceiptResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *QueryDataPassRedeemReceiptResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *QueryDataPassRedeemReceiptResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	{
+		size, err := m.DataPassRedeemReceipt.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintQuery(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
+}
+
+func (m *QueryDataPassRedeemReceiptsRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *QueryDataPassRedeemReceiptsRequest) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *QueryDataPassRedeemReceiptsRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.Pagination != nil {
+		{
+			size, err := m.Pagination.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintQuery(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x12
+	}
+	if m.PoolId != 0 {
+		i = encodeVarintQuery(dAtA, i, uint64(m.PoolId))
+		i--
+		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *QueryDataPassRedeemReceiptsResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *QueryDataPassRedeemReceiptsResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *QueryDataPassRedeemReceiptsResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.Pagination != nil {
+		{
+			size, err := m.Pagination.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintQuery(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.DataPassRedeemReceipts) > 0 {
+		for iNdEx := len(m.DataPassRedeemReceipts) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.DataPassRedeemReceipts[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintQuery(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0xa
+		}
+	}
+	return len(dAtA) - i, nil
+}
+
 func encodeVarintQuery(dAtA []byte, offset int, v uint64) int {
 	offset -= sovQuery(v)
 	base := offset
@@ -1256,6 +1721,70 @@ func (m *QueryDataValidationCertificatesResponse) Size() (n int) {
 	_ = l
 	if len(m.DataValidationCertificates) > 0 {
 		for _, e := range m.DataValidationCertificates {
+			l = e.Size()
+			n += 1 + l + sovQuery(uint64(l))
+		}
+	}
+	if m.Pagination != nil {
+		l = m.Pagination.Size()
+		n += 1 + l + sovQuery(uint64(l))
+	}
+	return n
+}
+
+func (m *QueryDataPassRedeemReceiptRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.PoolId != 0 {
+		n += 1 + sovQuery(uint64(m.PoolId))
+	}
+	if m.Round != 0 {
+		n += 1 + sovQuery(uint64(m.Round))
+	}
+	if m.NftId != 0 {
+		n += 1 + sovQuery(uint64(m.NftId))
+	}
+	return n
+}
+
+func (m *QueryDataPassRedeemReceiptResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = m.DataPassRedeemReceipt.Size()
+	n += 1 + l + sovQuery(uint64(l))
+	return n
+}
+
+func (m *QueryDataPassRedeemReceiptsRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.PoolId != 0 {
+		n += 1 + sovQuery(uint64(m.PoolId))
+	}
+	if m.Pagination != nil {
+		l = m.Pagination.Size()
+		n += 1 + l + sovQuery(uint64(l))
+	}
+	return n
+}
+
+func (m *QueryDataPassRedeemReceiptsResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if len(m.DataPassRedeemReceipts) > 0 {
+		for _, e := range m.DataPassRedeemReceipts {
 			l = e.Size()
 			n += 1 + l + sovQuery(uint64(l))
 		}
@@ -2048,6 +2577,421 @@ func (m *QueryDataValidationCertificatesResponse) Unmarshal(dAtA []byte) error {
 			}
 			m.DataValidationCertificates = append(m.DataValidationCertificates, DataValidationCertificate{})
 			if err := m.DataValidationCertificates[len(m.DataValidationCertificates)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Pagination", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Pagination == nil {
+				m.Pagination = &query.PageResponse{}
+			}
+			if err := m.Pagination.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipQuery(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *QueryDataPassRedeemReceiptRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowQuery
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: QueryDataPassRedeemReceiptRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: QueryDataPassRedeemReceiptRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field PoolId", wireType)
+			}
+			m.PoolId = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.PoolId |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 2:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Round", wireType)
+			}
+			m.Round = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Round |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 3:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field NftId", wireType)
+			}
+			m.NftId = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.NftId |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipQuery(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *QueryDataPassRedeemReceiptResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowQuery
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: QueryDataPassRedeemReceiptResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: QueryDataPassRedeemReceiptResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field DataPassRedeemReceipt", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.DataPassRedeemReceipt.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipQuery(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *QueryDataPassRedeemReceiptsRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowQuery
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: QueryDataPassRedeemReceiptsRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: QueryDataPassRedeemReceiptsRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field PoolId", wireType)
+			}
+			m.PoolId = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.PoolId |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Pagination", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Pagination == nil {
+				m.Pagination = &query.PageRequest{}
+			}
+			if err := m.Pagination.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipQuery(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *QueryDataPassRedeemReceiptsResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowQuery
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: QueryDataPassRedeemReceiptsResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: QueryDataPassRedeemReceiptsResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field DataPassRedeemReceipts", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.DataPassRedeemReceipts = append(m.DataPassRedeemReceipts, DataPassRedeemReceipt{})
+			if err := m.DataPassRedeemReceipts[len(m.DataPassRedeemReceipts)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex

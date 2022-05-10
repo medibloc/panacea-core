@@ -787,3 +787,15 @@ func makeTestDataPool(poolID uint64) *types.Pool {
 
 	return types.NewPool(poolID, curatorAddr, poolParams)
 }
+
+func makeTestDataPassRedeemReceipt(poolID, round, blockHeight uint64, redeemer string) *types.DataPassRedeemReceipt {
+	dataPassRedeemReceipt := types.DataPassRedeemReceipt{
+		PoolId:      poolID,
+		Round:       round,
+		NftId:       1,
+		Redeemer:    redeemer,
+		BlockHeight: blockHeight,
+	}
+
+	return &dataPassRedeemReceipt
+}

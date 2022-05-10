@@ -274,6 +274,19 @@ func (msg *MsgRedeemDataPass) ValidateBasic() error {
 	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid redeemer address (%s)", err)
 	}
+
+	if msg.PoolId <= 0 {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid pool ID (%s)", err)
+	}
+
+	if msg.Round <= 0 {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid round (%s)", err)
+	}
+
+	if msg.NftId <= 0 {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid NFT ID (%s)", err)
+	}
+
 	return nil
 }
 
