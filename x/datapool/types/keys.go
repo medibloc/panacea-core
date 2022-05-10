@@ -66,7 +66,7 @@ func GetKeyPrefixNFTRedeemReceiptByPoolID(poolID uint64) []byte {
 }
 
 func GetKeyPrefixNFTRedeemReceipt(poolID, round, nftID uint64) []byte {
-	return CombineKeys(CombineKeys(GetKeyPrefixNFTRedeemReceiptByPoolID(poolID), sdk.Uint64ToBigEndian(round)), sdk.Uint64ToBigEndian(nftID))
+	return CombineKeys(GetKeyPrefixNFTRedeemReceiptByPoolID(poolID), sdk.Uint64ToBigEndian(round), sdk.Uint64ToBigEndian(nftID))
 }
 
 func CombineKeys(keys ...[]byte) []byte {
