@@ -304,7 +304,7 @@ func (suite poolTestSuite) TestBuyDataPassPending() {
 	suite.Require().Equal(pool.GetNumIssuedNfts(), uint64(1))
 }
 
-// TODO: TestBuyDataPassTActive - check if data pass is minted successfully
+// TODO: TestBuyDataPassActive - check if data pass is minted successfully
 
 func (suite poolTestSuite) TestBuyDataPassPoolNotFound() {
 	// create pool
@@ -346,7 +346,7 @@ func (suite poolTestSuite) TestBuyDataPassRoundNotMatched() {
 	suite.Require().Error(err, types.ErrRoundNotMatched)
 }
 
-func (suite poolTestSuite) TestBuyDataPassTPaymentNotMatched() {
+func (suite poolTestSuite) TestBuyDataPassPaymentNotMatched() {
 	// create pool
 	poolID := suite.setupCreatePool(10)
 
