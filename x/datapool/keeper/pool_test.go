@@ -3,6 +3,7 @@ package keeper_test
 import (
 	"fmt"
 	"io/ioutil"
+	"strconv"
 	"strings"
 	"testing"
 	"time"
@@ -382,6 +383,79 @@ func (suite poolTestSuite) TestNotEnoughDeposit() {
 	suite.Require().Error(err, types.ErrNotEnoughPoolDeposit)
 }
 
+func (suite poolTestSuite) TestRedeemDataPass() {
+	poolID := suite.setupCreatePool(1)
+
+	err := suite.BankKeeper.AddCoins(suite.Ctx, buyerAddr, fundForBuyer)
+	suite.Require().NoError(err)
+
+	err = suite.DataPoolKeeper.BuyDataPass(suite.Ctx, buyerAddr, poolID, 1, NFTPrice)
+	suite.Require().NoError(err)
+
+	// NFT id is hard-coded.
+	redeemNFT := types.NewMsgRedeemDataPass(poolID, 1, 1, buyerAddr.String())
+
+	redeemReceipt, err := suite.DataPoolKeeper.RedeemDataPass(suite.Ctx, *redeemNFT)
+	suite.Require().NoError(err)
+
+	suite.Require().Equal(redeemReceipt.Redeemer, redeemNFT.Redeemer)
+	suite.Require().Equal(redeemReceipt.PoolId, redeemNFT.PoolId)
+	suite.Require().Equal(redeemReceipt.NftId, redeemNFT.NftId)
+	suite.Require().Equal(redeemReceipt.Round, redeemNFT.Round)
+}
+
+func (suite poolTestSuite) TestGetRedeemerDataPass() {
+	poolID := suite.setupCreatePool(1)
+
+	err := suite.BankKeeper.AddCoins(suite.Ctx, buyerAddr, fundForBuyer)
+	suite.Require().NoError(err)
+
+	err = suite.DataPoolKeeper.BuyDataPass(suite.Ctx, buyerAddr, poolID, 1, NFTPrice)
+	suite.Require().NoError(err)
+
+	pool, err := suite.DataPoolKeeper.GetPool(suite.Ctx, poolID)
+	suite.Require().NoError(err)
+
+	nftContractAcc, err := sdk.AccAddressFromBech32(pool.NftContractAddr)
+	suite.Require().NoError(err)
+
+	redeemerTokenId, err := suite.DataPoolKeeper.GetRedeemerDataPassWithNFTContractAcc(suite.Ctx, nftContractAcc, buyerAddr)
+	suite.Require().NoError(err)
+
+	suite.Require().Equal(redeemerTokenId[0], strconv.FormatUint(1, 10))
+}
+
+//TODO: Failure Test of Redeem Data Pass
+func (suite poolTestSuite) TestRedeemDataPassRoundNotMatched() {
+	poolID := suite.setupCreatePool(1)
+
+	err := suite.BankKeeper.AddCoins(suite.Ctx, buyerAddr, fundForBuyer)
+	suite.Require().NoError(err)
+
+	err = suite.DataPoolKeeper.BuyDataPass(suite.Ctx, buyerAddr, poolID, 1, NFTPrice)
+	suite.Require().NoError(err)
+
+	redeemNFT := types.NewMsgRedeemDataPass(poolID, 2, 1, buyerAddr.String())
+
+	_, err = suite.DataPoolKeeper.RedeemDataPass(suite.Ctx, *redeemNFT)
+	suite.Require().Error(err, types.ErrRoundNotMatched)
+}
+
+func (suite poolTestSuite) TestNotOwnedRedeemerNFT() {
+	poolID := suite.setupCreatePool(1)
+
+	err := suite.BankKeeper.AddCoins(suite.Ctx, buyerAddr, fundForBuyer)
+	suite.Require().NoError(err)
+
+	err = suite.DataPoolKeeper.BuyDataPass(suite.Ctx, buyerAddr, poolID, 1, NFTPrice)
+	suite.Require().NoError(err)
+
+	redeemNFT := types.NewMsgRedeemDataPass(poolID, 1, 2, buyerAddr.String())
+
+	_, err = suite.DataPoolKeeper.RedeemDataPass(suite.Ctx, *redeemNFT)
+	suite.Require().Error(err, types.ErrNotOwnedRedeemerNft)
+}
+
 func makePoolParamsWithDataValidator() types.PoolParams {
 	return types.PoolParams{
 		DataSchema:            []string{"https://www.json.ld"},
@@ -711,4 +785,15 @@ func makeTestDataPool(poolID uint64) *types.Pool {
 	}
 
 	return types.NewPool(poolID, curatorAddr, poolParams)
+}
+
+func makeTestDataPassRedeemReceipt(poolID, round, blockHeight uint64, redeemer string) *types.DataPassRedeemReceipt {
+	dataPassRedeemReceipt := types.DataPassRedeemReceipt{
+		PoolId:   poolID,
+		Round:    round,
+		NftId:    1,
+		Redeemer: redeemer,
+	}
+
+	return &dataPassRedeemReceipt
 }

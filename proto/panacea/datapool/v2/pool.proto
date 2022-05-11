@@ -36,13 +36,12 @@ message UnsignedDataValidationCertificate {
   string requester = 5;         // 'panacea1' address of seller
 }
 
-// DataAccessNFTRedeemReceipt defines a receipt for redeeming data access NFT to get data.
-message DataAccessNFTRedeemReceipt {
+// DataPassRedeemReceipt defines a receipt for redeeming data pass to get data.
+message DataPassRedeemReceipt {
   uint64 pool_id = 1;
   uint64 round = 2;
   uint64 nft_id = 3;
   string redeemer = 4;      // 'panacea1' address of redeemer
-  uint64 block_height = 5;  // The block height at which NFT redeemed
 }
 
 // DataValidator defines a detail of data validator.

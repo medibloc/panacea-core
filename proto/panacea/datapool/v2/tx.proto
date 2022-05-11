@@ -27,8 +27,8 @@ service Msg {
   // BuyDataPass defines a method for buying data access NFT
   rpc BuyDataPass(MsgBuyDataPass) returns (MsgBuyDataPassResponse);
 
-  // RedeemDataAccessNFT defines a method for redeeming data access NFT to get data
-  rpc RedeemDataAccessNFT(MsgRedeemDataAccessNFT) returns (MsgRedeemDataAccessNFTResponse);
+  // RedeemDataPass defines a method for redeeming data pass to get data
+  rpc RedeemDataPass(MsgRedeemDataPass) returns (MsgRedeemDataPassResponse);
 }
 
 // MsgRegisterDataValidator defines the Msg/RegisterDataValidator request type.
@@ -91,15 +91,15 @@ message MsgBuyDataPassResponse {
   uint64 nft_id = 3;
 }
 
-// MsgRedeemDataAccessNFT defines the Msg/RedeemDataAccessNFT request type.
-message MsgRedeemDataAccessNFT {
+// MsgRedeemDataPass defines the Msg/RedeemDataPass request type.
+message MsgRedeemDataPass {
   uint64 pool_id = 1;
   uint64 round = 2;
   uint64 nft_id = 3;
   string redeemer = 4;  // 'panacea1' address
 }
 
-// MsgRedeemDataAccessNFTResponse defines the Msg/RedeemDataAccessNFT response type.
-message MsgRedeemDataAccessNFTResponse {
-  DataAccessNFTRedeemReceipt receipt = 1;
+// MsgRedeemDataPassResponse defines the Msg/RedeemDataPass response type.
+message MsgRedeemDataPassResponse {
+  DataPassRedeemReceipt receipt = 1;
 }

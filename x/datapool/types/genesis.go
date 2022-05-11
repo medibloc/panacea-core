@@ -3,10 +3,11 @@ package types
 // DefaultGenesis returns the default Capability genesis state
 func DefaultGenesis() *GenesisState {
 	return &GenesisState{
-		DataValidators: []DataValidator{},
-		NextPoolNumber: uint64(1),
-		Pools:          []Pool{},
-		Params:         DefaultParams(),
+		DataValidators:         []DataValidator{},
+		NextPoolNumber:         uint64(1),
+		Pools:                  []Pool{},
+		Params:                 DefaultParams(),
+		DataPassRedeemReceipts: []DataPassRedeemReceipt{},
 		// this line is used by starport scaffolding # ibc/genesistype/default
 		// this line is used by starport scaffolding # genesis/types/default
 	}
