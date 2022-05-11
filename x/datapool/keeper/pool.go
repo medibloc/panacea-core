@@ -589,7 +589,7 @@ func (k Keeper) RedeemDataPass(ctx sdk.Context, redeemNFT types.MsgRedeemDataPas
 		return nil, sdkerrors.Wrapf(types.ErrRedeemDataPass, err.Error())
 	}
 
-	nftRedeemReceipt := types.NewDataPassRedeemReceipt(redeemNFT.PoolId, redeemNFT.Round, redeemNFT.NftId, uint64(ctx.BlockHeight()), redeemNFT.Redeemer)
+	nftRedeemReceipt := types.NewDataPassRedeemReceipt(redeemNFT.PoolId, redeemNFT.Round, redeemNFT.NftId, redeemNFT.Redeemer)
 
 	err = k.SetDataPassRedeemReceipt(ctx, *nftRedeemReceipt)
 	if err != nil {

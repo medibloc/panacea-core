@@ -48,12 +48,11 @@ func GetAccumPoolShareToken(poolID, amount uint64) sdk.Coin {
 	return sdk.NewCoin(fmt.Sprintf(ShareTokenPrefix+"/%v", poolID), sdk.NewIntFromUint64(amount))
 }
 
-func NewDataPassRedeemReceipt(poolID, round, nftID, blockHeight uint64, redeemer string) *DataPassRedeemReceipt {
+func NewDataPassRedeemReceipt(poolID, round, nftID uint64, redeemer string) *DataPassRedeemReceipt {
 	return &DataPassRedeemReceipt{
-		PoolId:      poolID,
-		Round:       round,
-		NftId:       nftID,
-		BlockHeight: blockHeight,
-		Redeemer:    redeemer,
+		PoolId:   poolID,
+		Round:    round,
+		NftId:    nftID,
+		Redeemer: redeemer,
 	}
 }
