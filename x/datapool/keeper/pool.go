@@ -639,6 +639,10 @@ func (k Keeper) GetDataPassRedeemReceipt(ctx sdk.Context, poolID, round, nftID u
 func (k Keeper) SetDataPassRedeemReceipt(ctx sdk.Context, redeemReceipt types.DataPassRedeemReceipt) error {
 	store := ctx.KVStore(k.storeKey)
 	receiptKey := types.GetKeyPrefixNFTRedeemReceipt(redeemReceipt.PoolId, redeemReceipt.Round, redeemReceipt.NftId)
+	if !store.Has(receiptKey) {
+		return sdkerrors.Wrapf(types.ErrRedeemDataPassNotFound, "the data validator %s is not found", redeemReceipt)
+	}
+
 	bz := k.cdc.MustMarshalBinaryLengthPrefixed(&redeemReceipt)
 	store.Set(receiptKey, bz)
 
@@ -648,35 +652,23 @@ func (k Keeper) SetDataPassRedeemReceipt(ctx sdk.Context, redeemReceipt types.Da
 func (k Keeper) GetRedeemerDataPassByAddr(ctx sdk.Context, poolID uint64, redeemer sdk.AccAddress) ([]string, error) {
 	pool, err := k.GetPool(ctx, poolID)
 	if err != nil {
-		return nil, sdkerrors.Wrapf(types.ErrPoolNotFound, err.Error())
+		return nil, err
 	}
 
 	acc, err := sdk.AccAddressFromBech32(pool.NftContractAddr)
 	if err != nil {
-		return nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, err.Error())
+		return nil, err
 	}
 
-	query := types.NewQueryTokensRequest(redeemer.String())
-	queryBz, err := json.Marshal(query)
+	tokens, err := k.GetRedeemerDataPassWithNFTContractAcc(ctx, acc, redeemer)
 	if err != nil {
 		return nil, err
 	}
 
-	data, err := k.viewKeeper.QuerySmart(ctx, acc, queryBz)
-	if err != nil {
-		return nil, err
-	}
-
-	var res types.QueryTokensResponse
-	err = json.Unmarshal(data, &res)
-	if err != nil {
-		return nil, err
-	}
-
-	return res.Tokens, nil
+	return tokens, nil
 }
 
-func (k Keeper) GetRedeemerDataPassWithNFTContractAcc(ctx sdk.Context, poolID uint64, nftContractAcc, redeemer sdk.AccAddress) ([]string, error) {
+func (k Keeper) GetRedeemerDataPassWithNFTContractAcc(ctx sdk.Context, nftContractAcc, redeemer sdk.AccAddress) ([]string, error) {
 	query := types.NewQueryTokensRequest(redeemer.String())
 	queryBz, err := json.Marshal(query)
 	if err != nil {

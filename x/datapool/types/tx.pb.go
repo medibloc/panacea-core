@@ -552,7 +552,7 @@ func (m *MsgBuyDataPassResponse) GetNftId() uint64 {
 	return 0
 }
 
-// MsgRedeemDataPass defines the Msg/RedeemDataAccessNFT request type.
+// MsgRedeemDataPass defines the Msg/RedeemDataPass request type.
 type MsgRedeemDataPass struct {
 	PoolId   uint64 `protobuf:"varint,1,opt,name=pool_id,json=poolId,proto3" json:"pool_id,omitempty"`
 	Round    uint64 `protobuf:"varint,2,opt,name=round,proto3" json:"round,omitempty"`
@@ -621,7 +621,7 @@ func (m *MsgRedeemDataPass) GetRedeemer() string {
 	return ""
 }
 
-// MsgRedeemDataPassResponse defines the Msg/RedeemDataAccessNFT response type.
+// MsgRedeemDataPassResponse defines the Msg/RedeemDataPass response type.
 type MsgRedeemDataPassResponse struct {
 	Receipt *DataPassRedeemReceipt `protobuf:"bytes,1,opt,name=receipt,proto3" json:"receipt,omitempty"`
 }
@@ -758,7 +758,7 @@ type MsgClient interface {
 	SellData(ctx context.Context, in *MsgSellData, opts ...grpc.CallOption) (*MsgSellDataResponse, error)
 	// BuyDataPass defines a method for buying data access NFT
 	BuyDataPass(ctx context.Context, in *MsgBuyDataPass, opts ...grpc.CallOption) (*MsgBuyDataPassResponse, error)
-	// RedeemDataPass defines a method for redeeming data access NFT to get data
+	// RedeemDataPass defines a method for redeeming data pass to get data
 	RedeemDataPass(ctx context.Context, in *MsgRedeemDataPass, opts ...grpc.CallOption) (*MsgRedeemDataPassResponse, error)
 }
 
@@ -836,7 +836,7 @@ type MsgServer interface {
 	SellData(context.Context, *MsgSellData) (*MsgSellDataResponse, error)
 	// BuyDataPass defines a method for buying data access NFT
 	BuyDataPass(context.Context, *MsgBuyDataPass) (*MsgBuyDataPassResponse, error)
-	// RedeemDataPass defines a method for redeeming data access NFT to get data
+	// RedeemDataPass defines a method for redeeming data pass to get data
 	RedeemDataPass(context.Context, *MsgRedeemDataPass) (*MsgRedeemDataPassResponse, error)
 }
 

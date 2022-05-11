@@ -27,7 +27,7 @@ service Msg {
   // BuyDataPass defines a method for buying data access NFT
   rpc BuyDataPass(MsgBuyDataPass) returns (MsgBuyDataPassResponse);
 
-  // RedeemDataPass defines a method for redeeming data access NFT to get data
+  // RedeemDataPass defines a method for redeeming data pass to get data
   rpc RedeemDataPass(MsgRedeemDataPass) returns (MsgRedeemDataPassResponse);
 }
 

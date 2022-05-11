@@ -275,7 +275,7 @@ func (m *UnsignedDataValidationCertificate) GetRequester() string {
 	return ""
 }
 
-// DataAccessNFTRedeemReceipt defines a receipt for redeeming data access NFT to get data.
+// DataPassRedeemReceipt defines a receipt for redeeming data pass to get data.
 type DataPassRedeemReceipt struct {
 	PoolId      uint64 `protobuf:"varint,1,opt,name=pool_id,json=poolId,proto3" json:"pool_id,omitempty"`
 	Round       uint64 `protobuf:"varint,2,opt,name=round,proto3" json:"round,omitempty"`
