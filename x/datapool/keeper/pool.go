@@ -624,6 +624,9 @@ func (k Keeper) GetAllDataPassRedeemReceipts(ctx sdk.Context) ([]types.DataPassR
 func (k Keeper) GetDataPassRedeemReceipt(ctx sdk.Context, poolID, round, nftID uint64) (types.DataPassRedeemReceipt, error) {
 	key := types.GetKeyPrefixNFTRedeemReceipt(poolID, round, nftID)
 	store := ctx.KVStore(k.storeKey)
+	if !store.Has(key) {
+		return types.DataPassRedeemReceipt{}, types.ErrRedeemDataPassNotFound
+	}
 
 	bz := store.Get(key)
 
@@ -639,10 +642,6 @@ func (k Keeper) GetDataPassRedeemReceipt(ctx sdk.Context, poolID, round, nftID u
 func (k Keeper) SetDataPassRedeemReceipt(ctx sdk.Context, redeemReceipt types.DataPassRedeemReceipt) error {
 	store := ctx.KVStore(k.storeKey)
 	receiptKey := types.GetKeyPrefixNFTRedeemReceipt(redeemReceipt.PoolId, redeemReceipt.Round, redeemReceipt.NftId)
-	if !store.Has(receiptKey) {
-		return sdkerrors.Wrapf(types.ErrRedeemDataPassNotFound, "the data validator %s is not found", redeemReceipt)
-	}
-
 	bz := k.cdc.MustMarshalBinaryLengthPrefixed(&redeemReceipt)
 	store.Set(receiptKey, bz)
 
