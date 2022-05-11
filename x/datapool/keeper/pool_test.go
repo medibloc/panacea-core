@@ -304,7 +304,7 @@ func (suite poolTestSuite) TestBuyDataAccessNFTPending() {
 	suite.Require().Equal(pool.GetNumIssuedNfts(), uint64(1))
 }
 
-// TODO: TestBuyDataAccessNFTActive - check if data access NFT is mintes successfully
+// TODO: TestBuyDataAccessNFTActive - check if data pass is minted successfully
 
 func (suite poolTestSuite) TestBuyDataAccessNFTPoolNotFound() {
 	// create pool

@@ -28,7 +28,7 @@ func NewMsgMintCuratorNFT(poolID uint64, owner string) *MsgMintNFT {
 	return &MsgMintNFT{mint: *mint}
 }
 
-func NewMsgMintDataAccessNFT(numNFT uint64, owner string) *MsgMintNFT {
+func NewMsgMintDataPass(numNFT uint64, owner string) *MsgMintNFT {
 	mint := &mint{
 		TokenId: strconv.FormatUint(numNFT, 10),
 		Owner:   owner,
@@ -53,18 +53,18 @@ func NewInstantiateNFTMsg(name, symbol, minterAddress string) *InstantiateNFTMsg
 	}
 }
 
-type transferNFT struct {
+type transferDataPass struct {
 	Recipient string `json:"recipient"`
 	TokenId   string `json:"token_id"`
 }
 
-type MsgTransferNFT struct {
-	transferNFT `json:"transfer_nft"`
+type MsgTransferDataPass struct {
+	transferDataPass `json:"transfer_nft"`
 }
 
-func NewTransferNFTMsg(recipient, tokenID string) *MsgTransferNFT {
-	return &MsgTransferNFT{
-		transferNFT{
+func NewTransferNFTMsg(recipient, tokenID string) *MsgTransferDataPass {
+	return &MsgTransferDataPass{
+		transferDataPass{
 			Recipient: recipient,
 			TokenId:   tokenID,
 		},

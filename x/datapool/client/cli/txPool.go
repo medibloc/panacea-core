@@ -184,10 +184,10 @@ func readCertificateFromFile(file string) (*types.DataValidationCertificate, err
 	return &cert, nil
 }
 
-func CmdBuyDataAccessNFT() *cobra.Command {
+func CmdBuyDataPass() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "buy-data-access-nft [pool ID] [round] [payment]",
-		Short: "buy data access NFT",
+		Use:   "buy-data-pass [pool ID] [round] [payment]",
+		Short: "buy data pass",
 		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
