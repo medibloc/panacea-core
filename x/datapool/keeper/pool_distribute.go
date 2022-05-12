@@ -100,11 +100,10 @@ func (k Keeper) GetInstantRevenueDistribute(ctx sdk.Context) *types.InstantReven
 }
 
 // addInstantRevenueDistribute adds the poolID to distribute. If there are duplicate poolIDs, they are not added.
-func (k Keeper) addInstantRevenueDistribute(ctx sdk.Context, poolID uint64) error {
+func (k Keeper) addInstantRevenueDistribute(ctx sdk.Context, poolID uint64) {
 	instantRevenueDistribute := k.GetInstantRevenueDistribute(ctx)
 	instantRevenueDistribute.AppendPoolID(poolID)
 	k.SetInstantRevenueDistribute(ctx, instantRevenueDistribute)
-	return nil
 }
 
 func (k Keeper) DistributeRevenuePools(ctx sdk.Context) error {

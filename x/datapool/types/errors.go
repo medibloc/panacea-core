@@ -25,4 +25,8 @@ var (
 	ErrMintNFT                    = sdkerrors.Register(ModuleName, 17, "failed to mint NFT")
 	ErrInstantiateContract        = sdkerrors.Register(ModuleName, 18, "failed to instantiate contract")
 	ErrBuyDataPass                = sdkerrors.Register(ModuleName, 19, "failed to buy data pass")
+	ErrGetDataPassRedeemReceipt   = sdkerrors.Register(ModuleName, 20, "failed to get data pass receipt")
+	ErrRedeemDataPass             = sdkerrors.Register(ModuleName, 21, "failed to redeem data pass")
+	ErrNotOwnedRedeemerNft        = sdkerrors.Register(ModuleName, 22, "invalid nft id")
+	ErrRedeemDataPassNotFound     = sdkerrors.Register(ModuleName, 23, "redeem data pass not found")
 )

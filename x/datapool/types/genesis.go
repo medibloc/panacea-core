@@ -7,6 +7,7 @@ func DefaultGenesis() *GenesisState {
 		NextPoolNumber:           uint64(1),
 		Pools:                    []Pool{},
 		Params:                   DefaultParams(),
+		DataPassRedeemReceipts: []DataPassRedeemReceipt{},
 		InstantRevenueDistribute: InstantRevenueDistribute{},
 		SalesHistories:           []*SalesHistory{},
 		// this line is used by starport scaffolding # ibc/genesistype/default

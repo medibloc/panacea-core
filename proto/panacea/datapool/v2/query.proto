@@ -35,6 +35,16 @@ service Query {
   rpc DataValidationCertificates(QueryDataValidationCertificatesRequest) returns (QueryDataValidationCertificatesResponse) {
     option (google.api.http).get = "/panacea/datapool/v2/data_validation_certificates/pool/{pool_id}/round/{round}";
   }
+
+  // DataPassRedeemReceipt returns DataPassRedeemReceipt
+  rpc DataPassRedeemReceipt(QueryDataPassRedeemReceiptRequest) returns (QueryDataPassRedeemReceiptResponse) {
+    option (google.api.http).get = "/panacea/datapool/v2/pools/{pool_id}/rounds/{round}/data_passes/{nft_id}/redeem_receipt";
+  }
+
+  // DataPassRedeemReceipts returns DataPassRedeemReceipts
+  rpc DataPassRedeemReceipts(QueryDataPassRedeemReceiptsRequest) returns (QueryDataPassRedeemReceiptsResponse) {
+    option (google.api.http).get = "/panacea/datapool/v2/pools/{pool_id}/data_passes/redeem_receipt";
+  }
 }
 
 // QueryPoolRequest is the request type for the Query/Pool RPC method.
@@ -83,6 +93,34 @@ message QueryDataValidationCertificatesRequest {
 // QueryDataValidationCertificatesResponse is the response type for the QueryDataValidationCertificates RPC method.
 message QueryDataValidationCertificatesResponse {
   repeated DataValidationCertificate data_validation_certificates = 1 [
+    (gogoproto.nullable) = false
+  ];
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+// QueryDataPassRedeemReceiptRequest is the request type for the Query/DataPassRedeemReceipt RPC method.
+message QueryDataPassRedeemReceiptRequest {
+  uint64 pool_id = 1;
+  uint64 round = 2;
+  uint64 nft_id = 3;
+}
+
+// QueryDataPassRedeemReceiptResponse is the response type for the Query/DataPassRedeemReceipt RPC method.
+message QueryDataPassRedeemReceiptResponse {
+  DataPassRedeemReceipt data_pass_redeem_receipt = 1 [
+    (gogoproto.nullable) = false
+  ];
+}
+
+// QueryDataPassRedeemReceiptsRequest is the request type for the Query/DataPassRedeemReceipts RPC method.
+message QueryDataPassRedeemReceiptsRequest {
+  uint64 pool_id = 1;
+  cosmos.base.query.v1beta1.PageRequest pagination = 2;
+}
+
+// QueryDataPassRedeemReceiptsResponse is the response type for the Query/DataPassRedeemReceipts RPC method.
+message QueryDataPassRedeemReceiptsResponse {
+  repeated DataPassRedeemReceipt data_pass_redeem_receipts = 1 [
     (gogoproto.nullable) = false
   ];
   cosmos.base.query.v1beta1.PageResponse pagination = 2;
