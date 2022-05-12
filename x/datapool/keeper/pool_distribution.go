@@ -126,7 +126,7 @@ func (k Keeper) DistributionRevenuePools(ctx sdk.Context) error {
 	return nil
 }
 
-// sendDepositToCurator returns to the Curator if the pool status is ACTIVE but the deposit has not yet been returned.
+// sendDepositToCurator returns the deposit if the pool status is ACTIVE but the deposit has not yet been returned.
 func (k Keeper) sendDepositToCurator(ctx sdk.Context, pool *types.Pool) error {
 	if pool.Status != types.ACTIVE || pool.IsPaidDeposit {
 		return nil
