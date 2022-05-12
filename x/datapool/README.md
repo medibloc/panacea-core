@@ -102,7 +102,7 @@ result
 }
 ```
 
-## Change parameter of data pool commossion by proposal
+## Change parameter of data pool commission by proposal
 
 proposal_example.json
 ```json

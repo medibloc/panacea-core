@@ -29,7 +29,7 @@ func TestPoolTestSuite(t *testing.T) {
 
 const (
 	defaultTargetNumData = 100
-	defaultMaxNfySupply  = 10
+	defaultMaxNftSupply  = 10
 )
 
 var (
@@ -207,7 +207,7 @@ func (suite *poolTestSuite) TestGetPool() {
 	poolParams := types.PoolParams{
 		DataSchema:            []string{"https://json.schemastore.org/github-issue-forms.json"},
 		TargetNumData:         defaultTargetNumData,
-		MaxNftSupply:          defaultMaxNfySupply,
+		MaxNftSupply:          defaultMaxNftSupply,
 		NftPrice:              &NFTPrice,
 		TrustedDataValidators: []string{dataVal1.String()},
 	}
@@ -229,11 +229,11 @@ func (suite *poolTestSuite) TestGetPool() {
 }
 
 func (suite poolTestSuite) TestCreatePool() {
-	poolID := suite.setupCreatePool(defaultTargetNumData, defaultMaxNfySupply)
+	poolID := suite.setupCreatePool(defaultTargetNumData, defaultMaxNftSupply)
 
 	suite.Require().Equal(poolID, uint64(1))
 
-	newPoolParams := makePoolParamsWithDataValidator(defaultTargetNumData, defaultMaxNfySupply)
+	newPoolParams := makePoolParamsWithDataValidator(defaultTargetNumData, defaultMaxNftSupply)
 
 	pool, err := suite.DataPoolKeeper.GetPool(suite.Ctx, poolID)
 	suite.Require().NoError(err)
@@ -254,7 +254,7 @@ func (suite poolTestSuite) TestNotRegisteredDataValidator() {
 	err := suite.BankKeeper.AddCoins(suite.Ctx, curatorAddr, fundForCurator)
 	suite.Require().NoError(err)
 
-	newPoolParams := makePoolParamsWithDataValidator(defaultTargetNumData, defaultMaxNfySupply)
+	newPoolParams := makePoolParamsWithDataValidator(defaultTargetNumData, defaultMaxNftSupply)
 
 	_, err = suite.DataPoolKeeper.CreatePool(suite.Ctx, curatorAddr, enoughDeposit, newPoolParams)
 	suite.Require().Error(err, types.ErrNotRegisteredDataValidator)
@@ -264,7 +264,7 @@ func (suite poolTestSuite) TestNotEnoughBalanceForDeposit() {
 	// create and instantiate NFT contract
 	suite.setupNFTContract()
 
-	newPoolParams := makePoolParamsNoDataValidator(defaultMaxNfySupply)
+	newPoolParams := makePoolParamsNoDataValidator(defaultMaxNftSupply)
 
 	_, err := suite.DataPoolKeeper.CreatePool(suite.Ctx, curatorAddr, enoughDeposit, newPoolParams)
 	suite.Require().Error(err, types.ErrNotEnoughPoolDeposit)
@@ -274,7 +274,7 @@ func (suite poolTestSuite) TestNotRegisteredNFTContract() {
 	err := suite.BankKeeper.AddCoins(suite.Ctx, curatorAddr, fundForCurator)
 	suite.Require().NoError(err)
 
-	newPoolParams := makePoolParamsNoDataValidator(defaultMaxNfySupply)
+	newPoolParams := makePoolParamsNoDataValidator(defaultMaxNftSupply)
 
 	_, err = suite.DataPoolKeeper.CreatePool(suite.Ctx, curatorAddr, enoughDeposit, newPoolParams)
 	suite.Require().Error(err, types.ErrNoRegisteredNFTContract)
@@ -282,7 +282,7 @@ func (suite poolTestSuite) TestNotRegisteredNFTContract() {
 
 func (suite poolTestSuite) TestBuyDataPassPending() {
 	// create pool
-	poolID := suite.setupCreatePool(defaultTargetNumData, defaultMaxNfySupply)
+	poolID := suite.setupCreatePool(defaultTargetNumData, defaultMaxNftSupply)
 
 	err := suite.BankKeeper.AddCoins(suite.Ctx, buyerAddr, fundForBuyer)
 	suite.Require().NoError(err)
@@ -300,7 +300,7 @@ func (suite poolTestSuite) TestBuyDataPassPending() {
 
 func (suite poolTestSuite) TestBuyDataPassPoolNotFound() {
 	// create pool
-	suite.setupCreatePool(defaultTargetNumData, defaultMaxNfySupply)
+	suite.setupCreatePool(defaultTargetNumData, defaultMaxNftSupply)
 
 	err := suite.BankKeeper.AddCoins(suite.Ctx, buyerAddr, fundForBuyer)
 	suite.Require().NoError(err)
@@ -328,7 +328,7 @@ func (suite poolTestSuite) TestBuyDataPassSoldOut() {
 
 func (suite poolTestSuite) TestBuyDataPassRoundNotMatched() {
 	// create pool
-	poolID := suite.setupCreatePool(defaultTargetNumData, defaultMaxNfySupply)
+	poolID := suite.setupCreatePool(defaultTargetNumData, defaultMaxNftSupply)
 
 	err := suite.BankKeeper.AddCoins(suite.Ctx, buyerAddr, fundForBuyer)
 	suite.Require().NoError(err)
@@ -340,7 +340,7 @@ func (suite poolTestSuite) TestBuyDataPassRoundNotMatched() {
 
 func (suite poolTestSuite) TestBuyDataPassPaymentNotMatched() {
 	// create pool
-	poolID := suite.setupCreatePool(defaultTargetNumData, defaultMaxNfySupply)
+	poolID := suite.setupCreatePool(defaultTargetNumData, defaultMaxNftSupply)
 
 	err := suite.BankKeeper.AddCoins(suite.Ctx, buyerAddr, fundForBuyer)
 	suite.Require().NoError(err)
@@ -352,7 +352,7 @@ func (suite poolTestSuite) TestBuyDataPassPaymentNotMatched() {
 
 func (suite poolTestSuite) TestBuyDataPassInsufficientBalance() {
 	// create pool
-	poolID := suite.setupCreatePool(defaultTargetNumData, defaultMaxNfySupply)
+	poolID := suite.setupCreatePool(defaultTargetNumData, defaultMaxNftSupply)
 
 	// buyer with small balance
 	err := suite.BankKeeper.AddCoins(suite.Ctx, buyerAddr, sdk.NewCoins(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(1000))))
@@ -366,7 +366,7 @@ func (suite poolTestSuite) TestNotEnoughDeposit() {
 	err := suite.BankKeeper.AddCoins(suite.Ctx, curatorAddr, fundForCurator)
 	suite.Require().NoError(err)
 
-	newPoolParams := makePoolParamsNoDataValidator(defaultMaxNfySupply)
+	newPoolParams := makePoolParamsNoDataValidator(defaultMaxNftSupply)
 
 	// 10 MED is required to create pool. but 5 MED for deposit
 	deposit := sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(500000))
@@ -376,7 +376,7 @@ func (suite poolTestSuite) TestNotEnoughDeposit() {
 }
 
 func (suite poolTestSuite) TestRedeemDataPass() {
-	poolID := suite.setupCreatePool(1, defaultMaxNfySupply)
+	poolID := suite.setupCreatePool(1, defaultMaxNftSupply)
 
 	err := suite.BankKeeper.AddCoins(suite.Ctx, buyerAddr, fundForBuyer)
 	suite.Require().NoError(err)
@@ -397,7 +397,7 @@ func (suite poolTestSuite) TestRedeemDataPass() {
 }
 
 func (suite poolTestSuite) TestGetRedeemerDataPass() {
-	poolID := suite.setupCreatePool(1, defaultMaxNfySupply)
+	poolID := suite.setupCreatePool(1, defaultMaxNftSupply)
 
 	err := suite.BankKeeper.AddCoins(suite.Ctx, buyerAddr, fundForBuyer)
 	suite.Require().NoError(err)
@@ -419,7 +419,7 @@ func (suite poolTestSuite) TestGetRedeemerDataPass() {
 
 //TODO: Failure Test of Redeem Data Pass
 func (suite poolTestSuite) TestRedeemDataPassRoundNotMatched() {
-	poolID := suite.setupCreatePool(1, defaultMaxNfySupply)
+	poolID := suite.setupCreatePool(1, defaultMaxNftSupply)
 
 	err := suite.BankKeeper.AddCoins(suite.Ctx, buyerAddr, fundForBuyer)
 	suite.Require().NoError(err)
@@ -434,7 +434,7 @@ func (suite poolTestSuite) TestRedeemDataPassRoundNotMatched() {
 }
 
 func (suite poolTestSuite) TestNotOwnedRedeemerNFT() {
-	poolID := suite.setupCreatePool(1, defaultMaxNfySupply)
+	poolID := suite.setupCreatePool(1, defaultMaxNftSupply)
 
 	err := suite.BankKeeper.AddCoins(suite.Ctx, buyerAddr, fundForBuyer)
 	suite.Require().NoError(err)
@@ -508,7 +508,7 @@ func (suite *poolTestSuite) TestSetDataCertificate() {
 }
 
 func (suite *poolTestSuite) TestSellData() {
-	poolID := suite.setupCreatePool(defaultTargetNumData, defaultMaxNfySupply)
+	poolID := suite.setupCreatePool(defaultTargetNumData, defaultMaxNftSupply)
 
 	pool, err := suite.DataPoolKeeper.GetPool(suite.Ctx, poolID)
 	suite.Require().NoError(err)
@@ -529,7 +529,7 @@ func (suite *poolTestSuite) TestSellData() {
 }
 
 func (suite *poolTestSuite) TestSellData_change_status_activity() {
-	poolID := suite.setupCreatePool(defaultTargetNumData, defaultMaxNfySupply)
+	poolID := suite.setupCreatePool(defaultTargetNumData, defaultMaxNftSupply)
 
 	pool, err := suite.DataPoolKeeper.GetPool(suite.Ctx, poolID)
 	suite.Require().NoError(err)
@@ -615,7 +615,7 @@ func (suite *poolTestSuite) TestSellData_invalid_signature() {
 }
 
 func (suite *poolTestSuite) TestSellData_duplicate_data() {
-	poolID := suite.setupCreatePool(defaultTargetNumData, defaultMaxNfySupply)
+	poolID := suite.setupCreatePool(defaultTargetNumData, defaultMaxNftSupply)
 
 	pool, err := suite.DataPoolKeeper.GetPool(suite.Ctx, poolID)
 	suite.Require().NoError(err)
@@ -721,7 +721,7 @@ func makeTestDataPool(poolID uint64) *types.Pool {
 	poolParams := types.PoolParams{
 		DataSchema:            []string{"https://json.schemastore.org/github-issue-forms.json"},
 		TargetNumData:         defaultTargetNumData,
-		MaxNftSupply:          defaultMaxNfySupply,
+		MaxNftSupply:          defaultMaxNftSupply,
 		NftPrice:              &NFTPrice,
 		TrustedDataValidators: []string{dataVal1.String()},
 	}
