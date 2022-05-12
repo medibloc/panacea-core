@@ -126,6 +126,7 @@ func makeSamplePool() types.Pool {
 		Status:        types.PENDING,
 		Curator:       curator.String(),
 		Deposit:       types.ZeroFund,
+		CuratorCommissionRate: types.DefaultDataPoolCommissionRate,
 	}
 }
 

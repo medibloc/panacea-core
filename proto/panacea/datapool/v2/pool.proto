@@ -5,7 +5,6 @@ option go_package = "github.com/medibloc/panacea-core/x/datapool/types";
 
 import "gogoproto/gogo.proto";
 import "cosmos/base/v1beta1/coin.proto";
-import "google/protobuf/duration.proto";
 
 // Pool defines a data pool
 message Pool {
@@ -21,6 +20,11 @@ message Pool {
   string                                nft_contract_addr = 10;                                 // NFT contract address of pool
   bool                                  is_paid_deposit = 11;
   map<uint64, cosmos.base.v1beta1.Coin> curator_commission = 12 [(gogoproto.nullable) = false]; // key: round, value: paid curator commission balance
+  string                                curator_commission_rate = 13 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.moretags) = "yaml:\"curator_commission_rate\"",
+    (gogoproto.nullable) = false
+  ]; // curator commission rate
 }
 
 // DataValidationCertificate defines the certificate for data validation w/ data validator signature.
@@ -60,11 +64,6 @@ message PoolParams {
   cosmos.base.v1beta1.Coin nft_price = 4;               // A price of a NFT
   repeated string          trusted_data_validators = 5; // Trusted data validators' addresses
   repeated string          trusted_data_issuers = 6;    // Optional. Data issuers that is trusted by the curator
-  string                   curator_commission_rate = 7 [
-    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
-    (gogoproto.moretags) = "yaml:\"curator_commission_rate\"",
-    (gogoproto.nullable) = false
-  ]; // curator commission rate
 }
 
 // InstantRevenueDistribute defines poolID information to distribute revenue.

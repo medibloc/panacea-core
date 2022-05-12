@@ -455,7 +455,6 @@ func makePoolParamsWithDataValidator(TargetNumData, MaxNftSupply uint64) types.P
 		NftPrice:              &NFTPrice,
 		TrustedDataValidators: []string{dataVal1.String()},
 		TrustedDataIssuers:    []string(nil),
-		CuratorCommissionRate: types.DefaultDataPoolCommissionRate,
 	}
 }
 

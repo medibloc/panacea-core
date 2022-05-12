@@ -158,7 +158,7 @@ func (k Keeper) CreatePool(ctx sdk.Context, curator sdk.AccAddress, deposit sdk.
 	}
 
 	newPool.Deposit = deposit
-	newPool.PoolParams.CuratorCommissionRate = params.DataPoolCommissionRate
+	newPool.CuratorCommissionRate = params.DataPoolCommissionRate
 	newPool.CuratorCommission[newPool.Round] = types.ZeroFund
 
 	// send deposit to pool

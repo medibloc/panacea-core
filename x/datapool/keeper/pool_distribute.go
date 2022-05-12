@@ -228,7 +228,7 @@ func (k Keeper) getEachDistributionAmount(pool *types.Pool) sdk.Int {
 	nftPriceAmount := pool.PoolParams.NftPrice.Amount.ToDec()
 	numIssuedNFTs := sdk.NewIntFromUint64(pool.NumIssuedNfts).ToDec()
 	targetNumData := sdk.NewIntFromUint64(pool.PoolParams.TargetNumData).ToDec()
-	curatorCommissionRate := pool.PoolParams.CuratorCommissionRate
+	curatorCommissionRate := pool.CuratorCommissionRate
 
 	// ((nftPriceAmount * numIssuedNFTs) / targetNumData) * (1 - curatorCommissionRate)
 	return nftPriceAmount.Mul(numIssuedNFTs).Quo(targetNumData).Mul(sdk.NewDec(1).Sub(curatorCommissionRate)).TruncateInt()
@@ -238,7 +238,7 @@ func (k Keeper) getEachDistributionAmount(pool *types.Pool) sdk.Int {
 func (k Keeper) sendCommissionToCurator(ctx sdk.Context, pool *types.Pool) error {
 	nftPriceAmount := pool.PoolParams.NftPrice.Amount.ToDec()
 	numIssuedNFTs := sdk.NewIntFromUint64(pool.NumIssuedNfts).ToDec()
-	curatorCommissionRate := pool.PoolParams.CuratorCommissionRate
+	curatorCommissionRate := pool.CuratorCommissionRate
 
 	// nftPriceAmount * numIssuedNFTs * curatorCommissionRate
 	curatorCommissionAmount := nftPriceAmount.Mul(numIssuedNFTs).Mul(curatorCommissionRate)
