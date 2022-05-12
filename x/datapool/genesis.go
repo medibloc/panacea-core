@@ -33,8 +33,7 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 	k.SetInstantRevenueDistribute(ctx, &genState.InstantRevenueDistribute)
 
 	for _, history := range genState.SalesHistories {
-		key := types.GetKeyPrefixSalesHistory(history.PoolId, history.Round, history.SellerAddress)
-		k.SetSalesHistoryByKey(ctx, key, history)
+		k.SetSalesHistory(ctx, history)
 	}
 	// this line is used by starport scaffolding # genesis/module/init
 

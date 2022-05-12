@@ -32,11 +32,6 @@ func (k Keeper) SetSalesHistory(ctx sdk.Context, salesHistory *types.SalesHistor
 		salesHistory.Round,
 		salesHistory.SellerAddress,
 	)
-	k.SetSalesHistoryByKey(ctx, key, salesHistory)
-}
-
-// SetSalesHistoryByKey stores sales history.
-func (k Keeper) SetSalesHistoryByKey(ctx sdk.Context, key []byte, salesHistory *types.SalesHistory) {
 	store := ctx.KVStore(k.storeKey)
 	store.Set(key, k.cdc.MustMarshalBinaryLengthPrefixed(salesHistory))
 }

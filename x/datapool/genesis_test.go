@@ -164,8 +164,7 @@ func (suite genesisTestSuite) TestDataPoolExportGenesis() {
 
 	salesHistories := makeSampleSalesHistories()
 	for _, salesHistory := range salesHistories {
-		key := types.GetKeyPrefixSalesHistory(salesHistory.PoolId, salesHistory.Round, salesHistory.SellerAddress)
-		suite.DataPoolKeeper.SetSalesHistoryByKey(suite.Ctx, key, salesHistory)
+		suite.DataPoolKeeper.SetSalesHistory(suite.Ctx, salesHistory)
 	}
 
 	genesisState := datapool.ExportGenesis(suite.Ctx, suite.DataPoolKeeper)
