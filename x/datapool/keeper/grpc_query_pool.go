@@ -102,3 +102,52 @@ func (k Keeper) DataValidationCertificates(goCtx context.Context, req *types.Que
 		Pagination:                 pageRes,
 	}, nil
 }
+
+func (k Keeper) DataPassRedeemReceipt(goCtx context.Context, req *types.QueryDataPassRedeemReceiptRequest) (*types.QueryDataPassRedeemReceiptResponse, error) {
+	if req == nil {
+		return nil, status.Error(codes.InvalidArgument, "invalid request")
+	}
+
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	redeemReceipt, err := k.GetDataPassRedeemReceipt(ctx, req.PoolId, req.Round, req.NftId)
+	if err != nil {
+		return nil, err
+	}
+
+	return &types.QueryDataPassRedeemReceiptResponse{
+		DataPassRedeemReceipt: redeemReceipt,
+	}, nil
+
+}
+
+func (k Keeper) DataPassRedeemReceipts(goCtx context.Context, req *types.QueryDataPassRedeemReceiptsRequest) (*types.QueryDataPassRedeemReceiptsResponse, error) {
+	if req == nil {
+		return nil, status.Error(codes.InvalidArgument, "invalid request")
+	}
+
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	store := ctx.KVStore(k.storeKey)
+	redeemReceiptStore := prefix.NewStore(store, types.GetKeyPrefixNFTRedeemReceiptByPoolID(req.PoolId))
+
+	var redeemReceipts []types.DataPassRedeemReceipt
+	pageRes, err := query.Paginate(redeemReceiptStore, req.Pagination, func(_, value []byte) error {
+		var redeemReceipt types.DataPassRedeemReceipt
+		err := k.cdc.UnmarshalBinaryLengthPrefixed(value, &redeemReceipt)
+		if err != nil {
+			return err
+		}
+		redeemReceipts = append(redeemReceipts, redeemReceipt)
+		return nil
+	})
+
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	return &types.QueryDataPassRedeemReceiptsResponse{
+		DataPassRedeemReceipts: redeemReceipts,
+		Pagination:             pageRes,
+	}, nil
+}

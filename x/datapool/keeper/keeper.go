@@ -32,8 +32,11 @@ type (
 		bankKeeper    types.BankKeeper
 		accountKeeper types.AccountKeeper
 		wasmKeeper    wasmtypes.ContractOpsKeeper
+		viewKeeper    wasmtypes.ViewKeeper
 	}
 )
+
+var _ wasmtypes.ViewKeeper = (*wasm.Keeper)(nil)
 
 func NewKeeper(
 	cdc codec.Marshaler,
@@ -56,6 +59,7 @@ func NewKeeper(
 		bankKeeper:    bankKeeper,
 		accountKeeper: accountKeeper,
 		wasmKeeper:    wasmkeeper.NewDefaultPermissionKeeper(wasmKeeper),
+		viewKeeper:    wasmKeeper,
 	}
 }
 

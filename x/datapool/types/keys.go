@@ -2,6 +2,7 @@ package types
 
 import (
 	"bytes"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -37,12 +38,15 @@ var (
 	// KeyPrefixDataValidatorCerts defines key to store dataValidator certs
 	KeyPrefixDataValidatorCerts = []byte{0x04}
 
-	KeyPrefixRevenueDistribute = []byte{0x05}
+	// KeyPrefixNFTRedeemReceipts define key to store redeemed receipts
+	KeyPrefixNFTRedeemReceipts = []byte{0x05}
+
+	KeyPrefixRevenueDistribute = []byte{0x06}
 
 	// KeyPrefixInstantRevenueDistribute defines key to distribute reward pool
-	KeyPrefixInstantRevenueDistribute = []byte{0x06}
+	KeyPrefixInstantRevenueDistribute = []byte{0x07}
 
-	KeyIndexSeparator = []byte{0x07}
+	KeyIndexSeparator = []byte{0xFF}
 )
 
 func GetKeyPrefixDataValidator(dataValidatorAddr sdk.AccAddress) []byte {
@@ -69,7 +73,14 @@ func GetKeyPrefixSalesHistory(poolID, round uint64, seller string) []byte {
 	return CombineKeys(GetKeyPrefixSalesHistories(poolID, round), []byte(seller))
 }
 
-// CombineKeys function defines combines deal_id with data_hash.
+func GetKeyPrefixNFTRedeemReceiptByPoolID(poolID uint64) []byte {
+	return append(KeyPrefixNFTRedeemReceipts, sdk.Uint64ToBigEndian(poolID)...)
+}
+
+func GetKeyPrefixNFTRedeemReceipt(poolID, round, nftID uint64) []byte {
+	return CombineKeys(GetKeyPrefixNFTRedeemReceiptByPoolID(poolID), sdk.Uint64ToBigEndian(round), sdk.Uint64ToBigEndian(nftID))
+}
+
 func CombineKeys(keys ...[]byte) []byte {
 	return bytes.Join(keys, KeyIndexSeparator)
 }
