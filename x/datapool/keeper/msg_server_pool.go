@@ -88,6 +88,13 @@ func (m msgServer) BuyDataPass(goCtx context.Context, msg *types.MsgBuyDataPass)
 	return &types.MsgBuyDataPassResponse{PoolId: msg.PoolId, Round: msg.Round}, nil
 }
 
-func (m msgServer) RedeemDataAccessNFT(goCtx context.Context, msg *types.MsgRedeemDataAccessNFT) (*types.MsgRedeemDataAccessNFTResponse, error) {
-	return &types.MsgRedeemDataAccessNFTResponse{}, nil
+func (m msgServer) RedeemDataPass(goCtx context.Context, msg *types.MsgRedeemDataPass) (*types.MsgRedeemDataPassResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	nftRedeemReceipt, err := m.Keeper.RedeemDataPass(ctx, *msg)
+	if err != nil {
+		return nil, err
+	}
+
+	return &types.MsgRedeemDataPassResponse{Receipt: nftRedeemReceipt}, nil
 }

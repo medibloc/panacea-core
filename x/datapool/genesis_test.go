@@ -16,6 +16,7 @@ import (
 var (
 	dataVal  = sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address())
 	curator  = sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address())
+	redeemer = sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address())
 	NFTPrice = sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(10000000))
 	poolID   = uint64(1)
 )
@@ -41,11 +42,18 @@ func (suite genesisTestSuite) TestDataPoolInitGenesis() {
 
 	params := types.DefaultParams()
 
+	var dataPassRedeemReceipts []types.DataPassRedeemReceipt
+
+	dataPassRedeemReceipt := makeSampleDataPassRedeemReceipt()
+
+	dataPassRedeemReceipts = append(dataPassRedeemReceipts, dataPassRedeemReceipt)
+
 	genState := &types.GenesisState{
-		DataValidators: dataValidators,
-		NextPoolNumber: 2,
-		Pools:          pools,
-		Params:         params,
+		DataValidators:         dataValidators,
+		NextPoolNumber:         2,
+		Pools:                  pools,
+		Params:                 params,
+		DataPassRedeemReceipts: dataPassRedeemReceipts,
 	}
 
 	datapool.InitGenesis(suite.Ctx, suite.DataPoolKeeper, *genState)
@@ -66,6 +74,11 @@ func (suite genesisTestSuite) TestDataPoolInitGenesis() {
 	// check params
 	paramsFromKeeper := suite.DataPoolKeeper.GetParams(suite.Ctx)
 	suite.Require().Equal(params, paramsFromKeeper)
+
+	// check all data pass redeem receipts
+	dataPassRedeemReceiptsFromKeeper, err := suite.DataPoolKeeper.GetAllDataPassRedeemReceipts(suite.Ctx)
+	suite.Require().NoError(err)
+	suite.Require().Equal(dataPassRedeemReceipts, dataPassRedeemReceiptsFromKeeper)
 }
 
 func (suite genesisTestSuite) TestDataPoolExportGenesis() {
@@ -82,11 +95,17 @@ func (suite genesisTestSuite) TestDataPoolExportGenesis() {
 	// set params
 	suite.DataPoolKeeper.SetParams(suite.Ctx, types.DefaultParams())
 
+	// set data pass redeem receipt
+	dataPassRedeemReceipt := makeSampleDataPassRedeemReceipt()
+	err = suite.DataPoolKeeper.SetDataPassRedeemReceipt(suite.Ctx, dataPassRedeemReceipt)
+	suite.Require().NoError(err)
+
 	genesisState := datapool.ExportGenesis(suite.Ctx, suite.DataPoolKeeper)
 	suite.Require().Equal(uint64(2), genesisState.NextPoolNumber)
 	suite.Require().Len(genesisState.Pools, 1)
 	suite.Require().Equal(types.DefaultParams(), genesisState.Params)
 	suite.Require().Len(genesisState.DataValidators, 1)
+	suite.Require().Len(genesisState.DataPassRedeemReceipts, 1)
 }
 
 func makeSampleDataValidator() types.DataValidator {
@@ -118,5 +137,14 @@ func makeSamplePoolParams() *types.PoolParams {
 		NftPrice:              &NFTPrice,
 		TrustedDataValidators: []string{dataVal.String()},
 		TrustedDataIssuers:    []string(nil),
+	}
+}
+
+func makeSampleDataPassRedeemReceipt() types.DataPassRedeemReceipt {
+	return types.DataPassRedeemReceipt{
+		PoolId:   poolID,
+		Round:    1,
+		NftId:    1,
+		Redeemer: redeemer.String(),
 	}
 }

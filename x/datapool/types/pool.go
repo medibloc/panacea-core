@@ -72,3 +72,12 @@ func (m *SalesHistory) AddDataHash(dataHash []byte) {
 func (m *SalesHistory) DataCount() int {
 	return len(m.DataHashes)
 }
+
+func NewDataPassRedeemReceipt(poolID, round, nftID uint64, redeemer string) *DataPassRedeemReceipt {
+	return &DataPassRedeemReceipt{
+		PoolId:   poolID,
+		Round:    round,
+		NftId:    nftID,
+		Redeemer: redeemer,
+	}
+}
