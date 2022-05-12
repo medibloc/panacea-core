@@ -41,10 +41,10 @@ var (
 	// KeyPrefixNFTRedeemReceipts define key to store redeemed receipts
 	KeyPrefixNFTRedeemReceipts = []byte{0x05}
 
-	KeyPrefixRevenueDistribute = []byte{0x06}
+	KeyPrefixRevenueDistribution = []byte{0x06}
 
-	// KeyPrefixInstantRevenueDistribute defines key to distribute reward pool
-	KeyPrefixInstantRevenueDistribute = []byte{0x07}
+	// KeyPrefixInstantRevenueDistribution defines key to distribution reward pool
+	KeyPrefixInstantRevenueDistribution = []byte{0x07}
 
 	KeyIndexSeparator = []byte{0xFF}
 )
@@ -66,7 +66,7 @@ func GetKeyPrefixDataValidateCert(poolID, round uint64, dataHash []byte) []byte 
 }
 
 func GetKeyPrefixSalesHistories(poolID, round uint64) []byte {
-	return append(KeyPrefixRevenueDistribute, CombineKeys(sdk.Uint64ToBigEndian(poolID), sdk.Uint64ToBigEndian(round))...)
+	return append(KeyPrefixRevenueDistribution, CombineKeys(sdk.Uint64ToBigEndian(poolID), sdk.Uint64ToBigEndian(round))...)
 }
 
 func GetKeyPrefixSalesHistory(poolID, round uint64, seller string) []byte {

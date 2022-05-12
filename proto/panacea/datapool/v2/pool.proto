@@ -64,8 +64,8 @@ message PoolParams {
   ];                                                    // A download period after redeeming NFT
 }
 
-// InstantRevenueDistribute defines poolID information to distribute revenue.
-message InstantRevenueDistribute {
+// InstantRevenueDistribution defines poolID information to distribution revenue.
+message InstantRevenueDistribution {
   repeated uint64 pool_ids = 1;  // Execute information for pool reward distribution
 }
 

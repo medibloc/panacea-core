@@ -12,7 +12,7 @@ const (
 	defaultSellerCount = defaultTargetNumData
 )
 
-func setupRevenueDistributeTest(suite poolTestSuite, targetNumData, poolMaxNftSupply uint64, sellerCount int) (uint64, []sdk.AccAddress) {
+func setupRevenueDistributionTest(suite poolTestSuite, targetNumData, poolMaxNftSupply uint64, sellerCount int) (uint64, []sdk.AccAddress) {
 	poolID := suite.setupCreatePool(targetNumData, poolMaxNftSupply)
 
 	// create sellers
@@ -36,9 +36,9 @@ func buyDataPass(suite poolTestSuite, poolID, count uint64) {
 	}
 }
 
-func (suite poolTestSuite) TestExecuteRevenueDistributePoolActive() {
+func (suite poolTestSuite) TestExecuteRevenueDistributionPoolActive() {
 	// create and instantiate NFT contract
-	poolID, sellers := setupRevenueDistributeTest(suite, defaultTargetNumData, defaultMaxNfySupply, defaultSellerCount)
+	poolID, sellers := setupRevenueDistributionTest(suite, defaultTargetNumData, defaultMaxNfySupply, defaultSellerCount)
 	// create a pool where data sales are not complete.
 	suite.Require().Equal(poolID, uint64(1))
 
@@ -75,8 +75,8 @@ func (suite poolTestSuite) TestExecuteRevenueDistributePoolActive() {
 	// Buyer buys DataPass.
 	buyDataPass(suite, poolID, 1)
 
-	// execute a distribute sales revenue
-	err = suite.DataPoolKeeper.DistributeRevenuePools(suite.Ctx)
+	// execute a distribution sales revenue
+	err = suite.DataPoolKeeper.DistributionRevenuePools(suite.Ctx)
 	suite.Require().NoError(err)
 
 	// check balances of curator and sellers after distribution
@@ -92,8 +92,8 @@ func (suite poolTestSuite) TestExecuteRevenueDistributePoolActive() {
 	err = suite.DataPoolKeeper.BuyDataPass(suite.Ctx, buyerAddr, poolID, 1, NFTPrice)
 	suite.Require().NoError(err)
 
-	// execute a distribute sales revenue
-	err = suite.DataPoolKeeper.DistributeRevenuePools(suite.Ctx)
+	// execute a distribution sales revenue
+	err = suite.DataPoolKeeper.DistributionRevenuePools(suite.Ctx)
 	suite.Require().NoError(err)
 
 	for _, sellerAddr := range sellers {
@@ -102,10 +102,10 @@ func (suite poolTestSuite) TestExecuteRevenueDistributePoolActive() {
 	}
 }
 
-func (suite poolTestSuite) TestExecuteRevenueDistributeDataPassSoldOut() {
+func (suite poolTestSuite) TestExecuteRevenueDistributionDataPassSoldOut() {
 	// create and instantiate NFT contract
 	// create and instantiate NFT contract
-	poolID, sellers := setupRevenueDistributeTest(suite, defaultTargetNumData, defaultMaxNfySupply, defaultSellerCount)
+	poolID, sellers := setupRevenueDistributionTest(suite, defaultTargetNumData, defaultMaxNfySupply, defaultSellerCount)
 
 	// create a pool where data sales are not complete.
 	suite.Require().Equal(poolID, uint64(1))
@@ -143,8 +143,8 @@ func (suite poolTestSuite) TestExecuteRevenueDistributeDataPassSoldOut() {
 	// Buyer buys all DataPass.
 	buyDataPass(suite, poolID, defaultMaxNfySupply)
 
-	// execute a distribute sales revenue
-	err = suite.DataPoolKeeper.DistributeRevenuePools(suite.Ctx)
+	// execute a distribution sales revenue
+	err = suite.DataPoolKeeper.DistributionRevenuePools(suite.Ctx)
 	suite.Require().NoError(err)
 
 	// check balances of curator and sellers after distribution
@@ -157,9 +157,9 @@ func (suite poolTestSuite) TestExecuteRevenueDistributeDataPassSoldOut() {
 	}
 }
 
-func (suite poolTestSuite) TestExecuteRevenueDistributePoolPending() {
+func (suite poolTestSuite) TestExecuteRevenueDistributionPoolPending() {
 	// create and instantiate NFT contract
-	poolID, sellers := setupRevenueDistributeTest(suite, defaultTargetNumData, defaultMaxNfySupply, 50)
+	poolID, sellers := setupRevenueDistributionTest(suite, defaultTargetNumData, defaultMaxNfySupply, 50)
 
 	// create a pool where data sales are not complete.
 	suite.Require().Equal(poolID, uint64(1))
@@ -197,8 +197,8 @@ func (suite poolTestSuite) TestExecuteRevenueDistributePoolPending() {
 	// Buyer buys DataPass.
 	buyDataPass(suite, poolID, 1)
 
-	// execute a distribute sales revenue
-	err = suite.DataPoolKeeper.DistributeRevenuePools(suite.Ctx)
+	// execute a distribution sales revenue
+	err = suite.DataPoolKeeper.DistributionRevenuePools(suite.Ctx)
 	suite.Require().NoError(err)
 
 	// check balances of curator and sellers after distribution
@@ -214,8 +214,8 @@ func (suite poolTestSuite) TestExecuteRevenueDistributePoolPending() {
 	err = suite.DataPoolKeeper.BuyDataPass(suite.Ctx, buyerAddr, poolID, 1, NFTPrice)
 	suite.Require().NoError(err)
 
-	// execute a distribute sales revenue
-	err = suite.DataPoolKeeper.DistributeRevenuePools(suite.Ctx)
+	// execute a distribution sales revenue
+	err = suite.DataPoolKeeper.DistributionRevenuePools(suite.Ctx)
 	suite.Require().NoError(err)
 
 	for _, sellerAddr := range sellers {
@@ -224,9 +224,9 @@ func (suite poolTestSuite) TestExecuteRevenueDistributePoolPending() {
 	}
 }
 
-func (suite poolTestSuite) TestExecuteRevenueDistributePoolPendingDataPassSoldOut() {
+func (suite poolTestSuite) TestExecuteRevenueDistributionPoolPendingDataPassSoldOut() {
 	// create and instantiate NFT contract
-	poolID, sellers := setupRevenueDistributeTest(suite, defaultTargetNumData, defaultMaxNfySupply, 5)
+	poolID, sellers := setupRevenueDistributionTest(suite, defaultTargetNumData, defaultMaxNfySupply, 5)
 
 	// create a pool where data sales are not complete.
 	suite.Require().Equal(poolID, uint64(1))
@@ -264,8 +264,8 @@ func (suite poolTestSuite) TestExecuteRevenueDistributePoolPendingDataPassSoldOu
 	// Buyer buys all DataPass.
 	buyDataPass(suite, poolID, defaultMaxNfySupply)
 
-	// execute a distribute sales revenue
-	err = suite.DataPoolKeeper.DistributeRevenuePools(suite.Ctx)
+	// execute a distribution sales revenue
+	err = suite.DataPoolKeeper.DistributionRevenuePools(suite.Ctx)
 	suite.Require().NoError(err)
 
 	// check balances of curator and sellers after distribution
@@ -285,9 +285,9 @@ func (suite poolTestSuite) TestExecuteRevenueDistributePoolPendingDataPassSoldOu
 	suite.Require().Equal(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(115000000)), poolBalance)
 }
 
-func (suite poolTestSuite) TestExecuteRevenueDistributeDuplicateSeller() {
+func (suite poolTestSuite) TestExecuteRevenueDistributionDuplicateSeller() {
 	// create and instantiate NFT contract
-	poolID, sellers := setupRevenueDistributeTest(suite, defaultTargetNumData, defaultMaxNfySupply, 50)
+	poolID, sellers := setupRevenueDistributionTest(suite, defaultTargetNumData, defaultMaxNfySupply, 50)
 
 	// create a pool where data sales are not complete.
 	suite.Require().Equal(poolID, uint64(1))
@@ -339,8 +339,8 @@ func (suite poolTestSuite) TestExecuteRevenueDistributeDuplicateSeller() {
 	// Buyer buys DataPass.
 	buyDataPass(suite, poolID, 1)
 
-	// execute a distribute sales revenue
-	err = suite.DataPoolKeeper.DistributeRevenuePools(suite.Ctx)
+	// execute a distribution sales revenue
+	err = suite.DataPoolKeeper.DistributionRevenuePools(suite.Ctx)
 	suite.Require().NoError(err)
 
 	// check balances of curator and sellers after distribution
@@ -360,8 +360,8 @@ func (suite poolTestSuite) TestExecuteRevenueDistributeDuplicateSeller() {
 	err = suite.DataPoolKeeper.BuyDataPass(suite.Ctx, buyerAddr, poolID, 1, NFTPrice)
 	suite.Require().NoError(err)
 
-	// execute a distribute sales revenue
-	err = suite.DataPoolKeeper.DistributeRevenuePools(suite.Ctx)
+	// execute a distribution sales revenue
+	err = suite.DataPoolKeeper.DistributionRevenuePools(suite.Ctx)
 	suite.Require().NoError(err)
 
 	for i, sellerAddr := range sellers {
@@ -374,9 +374,9 @@ func (suite poolTestSuite) TestExecuteRevenueDistributeDuplicateSeller() {
 	}
 }
 
-func (suite poolTestSuite) TestExecuteRevenueDistributeTarget101() {
+func (suite poolTestSuite) TestExecuteRevenueionTarget101() {
 	// create and instantiate NFT contract
-	poolID, sellers := setupRevenueDistributeTest(suite, defaultTargetNumData+1, defaultMaxNfySupply, defaultSellerCount+1)
+	poolID, sellers := setupRevenueDistributionTest(suite, defaultTargetNumData+1, defaultMaxNfySupply, defaultSellerCount+1)
 
 	// create a pool where data sales are not complete.
 	suite.Require().Equal(poolID, uint64(1))
@@ -414,8 +414,8 @@ func (suite poolTestSuite) TestExecuteRevenueDistributeTarget101() {
 	// Buyer buys all DataPass.
 	buyDataPass(suite, poolID, 10)
 
-	// execute a distribute sales revenue
-	err = suite.DataPoolKeeper.DistributeRevenuePools(suite.Ctx)
+	// execute a distribution sales revenue
+	err = suite.DataPoolKeeper.DistributionRevenuePools(suite.Ctx)
 	suite.Require().NoError(err)
 
 	// check balances of curator and sellers after distribution

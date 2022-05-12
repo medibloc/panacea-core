@@ -63,35 +63,35 @@ func (k Keeper) ListSalesHistory(ctx sdk.Context, poolID, round uint64) []*types
 	return histories
 }
 
-// SetInstantRevenueDistribute stores the poolID to which the revenue should be distributed immediately.
-func (k Keeper) SetInstantRevenueDistribute(ctx sdk.Context, instantRevenueDistribute *types.InstantRevenueDistribute) {
-	bz := k.cdc.MustMarshalBinaryLengthPrefixed(instantRevenueDistribute)
+// SetInstantRevenueDistribution stores the poolID to which the revenue should be distributed immediately.
+func (k Keeper) SetInstantRevenueDistribution(ctx sdk.Context, instantRevenueDistribution *types.InstantRevenueDistribution) {
+	bz := k.cdc.MustMarshalBinaryLengthPrefixed(instantRevenueDistribution)
 	store := ctx.KVStore(k.storeKey)
-	store.Set(types.KeyPrefixInstantRevenueDistribute, bz)
+	store.Set(types.KeyPrefixInstantRevenueDistribution, bz)
 }
 
-func (k Keeper) GetInstantRevenueDistribute(ctx sdk.Context) *types.InstantRevenueDistribute {
+func (k Keeper) GetInstantRevenueDistribution(ctx sdk.Context) *types.InstantRevenueDistribution {
 	store := ctx.KVStore(k.storeKey)
-	if !store.Has(types.KeyPrefixInstantRevenueDistribute) {
-		return &types.InstantRevenueDistribute{}
+	if !store.Has(types.KeyPrefixInstantRevenueDistribution) {
+		return &types.InstantRevenueDistribution{}
 	}
-	bz := store.Get(types.KeyPrefixInstantRevenueDistribute)
-	var delayedRevenueDistribute types.InstantRevenueDistribute
-	k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &delayedRevenueDistribute)
-	return &delayedRevenueDistribute
+	bz := store.Get(types.KeyPrefixInstantRevenueDistribution)
+	var delayedRevenueDistribution types.InstantRevenueDistribution
+	k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &delayedRevenueDistribution)
+	return &delayedRevenueDistribution
 }
 
-// addInstantRevenueDistribute adds the poolID to distribute. If there are duplicate poolIDs, they are not added.
-func (k Keeper) addInstantRevenueDistribute(ctx sdk.Context, poolID uint64) {
-	instantRevenueDistribute := k.GetInstantRevenueDistribute(ctx)
-	instantRevenueDistribute.AppendPoolID(poolID)
-	k.SetInstantRevenueDistribute(ctx, instantRevenueDistribute)
+// addInstantRevenueDistribution adds the poolID to distribution. If there are duplicate poolIDs, they are not added.
+func (k Keeper) addInstantRevenueDistribution(ctx sdk.Context, poolID uint64) {
+	instantRevenueDistribution := k.GetInstantRevenueDistribution(ctx)
+	instantRevenueDistribution.AppendPoolID(poolID)
+	k.SetInstantRevenueDistribution(ctx, instantRevenueDistribution)
 }
 
-func (k Keeper) DistributeRevenuePools(ctx sdk.Context) error {
-	instantRevenueDistribute := k.GetInstantRevenueDistribute(ctx)
+func (k Keeper) DistributionRevenuePools(ctx sdk.Context) error {
+	instantRevenueDistribution := k.GetInstantRevenueDistribution(ctx)
 
-	if instantRevenueDistribute.IsEmpty() {
+	if instantRevenueDistribution.IsEmpty() {
 		return nil
 	}
 
@@ -99,12 +99,12 @@ func (k Keeper) DistributeRevenuePools(ctx sdk.Context) error {
 	// But We're currently processing it all in one block. :)
 	lastIndex := 0
 	// TODO We need to think about how to deal with the pool where distribution has failed.
-	for i, poolID := range instantRevenueDistribute.PoolIds {
+	for i, poolID := range instantRevenueDistribution.PoolIds {
 		lastIndex = i
 		// search current pool info
 		pool, err := k.GetPool(ctx, poolID)
 		if err != nil {
-			return sdkerrors.Wrap(types.ErrRevenueDistribute, err.Error())
+			return sdkerrors.Wrap(types.ErrRevenueDistribution, err.Error())
 		}
 
 		// send deposit to curator
@@ -113,15 +113,15 @@ func (k Keeper) DistributeRevenuePools(ctx sdk.Context) error {
 			return err
 		}
 
-		// distribute of revenue to each seller
-		err = k.executeRevenueDistribute(ctx, pool)
+		// distribution of revenue to each seller
+		err = k.executeRevenueDistribution(ctx, pool)
 		if err != nil {
 			return err
 		}
 	}
-	// delete this pool from instantRevenueDistribute
-	instantRevenueDistribute.RemovePreviousIndex(lastIndex)
-	k.SetInstantRevenueDistribute(ctx, instantRevenueDistribute)
+	// delete this pool from instantRevenueDistribution
+	instantRevenueDistribution.TruncateFromBeginning(lastIndex)
+	k.SetInstantRevenueDistribution(ctx, instantRevenueDistribution)
 
 	return nil
 }
@@ -134,15 +134,15 @@ func (k Keeper) sendDepositToCurator(ctx sdk.Context, pool *types.Pool) error {
 
 	curatorAddr, err := sdk.AccAddressFromBech32(pool.Curator)
 	if err != nil {
-		return sdkerrors.Wrap(types.ErrRevenueDistribute, err.Error())
+		return sdkerrors.Wrap(types.ErrRevenueDistribution, err.Error())
 	}
 	poolAddr, err := sdk.AccAddressFromBech32(pool.PoolAddress)
 	if err != nil {
-		return sdkerrors.Wrap(types.ErrRevenueDistribute, err.Error())
+		return sdkerrors.Wrap(types.ErrRevenueDistribution, err.Error())
 	}
 	err = k.bankKeeper.SendCoins(ctx, poolAddr, curatorAddr, sdk.NewCoins(pool.Deposit))
 	if err != nil {
-		return sdkerrors.Wrap(types.ErrRevenueDistribute, err.Error())
+		return sdkerrors.Wrap(types.ErrRevenueDistribution, err.Error())
 	}
 	pool.IsPaidDeposit = true
 	k.SetPool(ctx, pool)
@@ -153,7 +153,7 @@ func (k Keeper) sendDepositToCurator(ctx sdk.Context, pool *types.Pool) error {
 func (k Keeper) getAvailablePoolCoinAmount(ctx sdk.Context, pool *types.Pool) (*sdk.Int, error) {
 	poolAddr, err := sdk.AccAddressFromBech32(pool.PoolAddress)
 	if err != nil {
-		return nil, sdkerrors.Wrap(types.ErrRevenueDistribute, err.Error())
+		return nil, sdkerrors.Wrap(types.ErrRevenueDistribution, err.Error())
 	}
 	poolBalance := k.bankKeeper.GetBalance(ctx, poolAddr, assets.MicroMedDenom)
 	if pool.IsPaidDeposit {
@@ -164,7 +164,7 @@ func (k Keeper) getAvailablePoolCoinAmount(ctx sdk.Context, pool *types.Pool) (*
 	}
 }
 
-func (k Keeper) executeRevenueDistribute(ctx sdk.Context, pool *types.Pool) error {
+func (k Keeper) executeRevenueDistribution(ctx sdk.Context, pool *types.Pool) error {
 	availablePoolCoinAmount, err := k.getAvailablePoolCoinAmount(ctx, pool)
 	if err != nil {
 		return err
@@ -180,7 +180,7 @@ func (k Keeper) executeRevenueDistribute(ctx sdk.Context, pool *types.Pool) erro
 
 	poolAddress, err := sdk.AccAddressFromBech32(pool.GetPoolAddress())
 	if err != nil {
-		return sdkerrors.Wrap(types.ErrRevenueDistribute, err.Error())
+		return sdkerrors.Wrap(types.ErrRevenueDistribution, err.Error())
 	}
 
 	salesHistories := k.ListSalesHistory(ctx, pool.PoolId, pool.Round)
@@ -197,7 +197,7 @@ func (k Keeper) executeRevenueDistribute(ctx sdk.Context, pool *types.Pool) erro
 		paymentAmount := distributedAmount.Sub(paidCoinAmount)
 		sellerAddr, err := sdk.AccAddressFromBech32(history.SellerAddress)
 		if err != nil {
-			return sdkerrors.Wrap(types.ErrRevenueDistribute, err.Error())
+			return sdkerrors.Wrap(types.ErrRevenueDistribution, err.Error())
 		}
 		paymentCoin := sdk.NewCoin(assets.MicroMedDenom, paymentAmount)
 		err = k.bankKeeper.SendCoins(
@@ -206,7 +206,7 @@ func (k Keeper) executeRevenueDistribute(ctx sdk.Context, pool *types.Pool) erro
 			sellerAddr,
 			sdk.NewCoins(paymentCoin))
 		if err != nil {
-			return sdkerrors.Wrap(types.ErrRevenueDistribute, err.Error())
+			return sdkerrors.Wrap(types.ErrRevenueDistribution, err.Error())
 		}
 		*history.PaidCoin = history.PaidCoin.Add(paymentCoin)
 
