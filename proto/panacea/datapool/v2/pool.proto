@@ -19,7 +19,7 @@ message Pool {
   string                   curator = 8;
   cosmos.base.v1beta1.Coin deposit = 9 [(gogoproto.nullable) = false]; // deposit
   string                   nft_contract_addr = 10;                     // NFT contract address of pool
-  bool                     is_paid_deposit = 11;
+  bool                     was_deposit_returned = 11;
 }
 
 // DataValidationCertificate defines the certificate for data validation w/ data validator signature.

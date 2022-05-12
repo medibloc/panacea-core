@@ -128,7 +128,7 @@ func (k Keeper) DistributionRevenuePools(ctx sdk.Context) error {
 
 // sendDepositToCurator returns the deposit if the pool status is ACTIVE but the deposit has not yet been returned.
 func (k Keeper) sendDepositToCurator(ctx sdk.Context, pool *types.Pool) error {
-	if pool.Status != types.ACTIVE || pool.IsPaidDeposit {
+	if pool.Status != types.ACTIVE || pool.WasDepositReturned {
 		return nil
 	}
 
@@ -144,7 +144,7 @@ func (k Keeper) sendDepositToCurator(ctx sdk.Context, pool *types.Pool) error {
 	if err != nil {
 		return sdkerrors.Wrap(types.ErrRevenueDistribution, err.Error())
 	}
-	pool.IsPaidDeposit = true
+	pool.WasDepositReturned = true
 	k.SetPool(ctx, pool)
 
 	return nil
@@ -156,7 +156,7 @@ func (k Keeper) getAvailablePoolCoinAmount(ctx sdk.Context, pool *types.Pool) (*
 		return nil, sdkerrors.Wrap(types.ErrRevenueDistribution, err.Error())
 	}
 	poolBalance := k.bankKeeper.GetBalance(ctx, poolAddr, assets.MicroMedDenom)
-	if pool.IsPaidDeposit {
+	if pool.WasDepositReturned {
 		return &poolBalance.Amount, nil
 	} else {
 		amount := poolBalance.Amount.Sub(pool.Deposit.Amount)
