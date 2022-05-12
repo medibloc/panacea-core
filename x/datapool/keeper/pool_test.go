@@ -288,7 +288,7 @@ func (suite poolTestSuite) TestNotRegisteredNFTContract() {
 	suite.Require().Error(err, types.ErrNoRegisteredNFTContract)
 }
 
-func (suite poolTestSuite) TestBuyDataAccessNFTPending() {
+func (suite poolTestSuite) TestBuyDataPassPending() {
 	// create pool
 	poolID := suite.setupCreatePool(10)
 
@@ -304,9 +304,9 @@ func (suite poolTestSuite) TestBuyDataAccessNFTPending() {
 	suite.Require().Equal(pool.GetNumIssuedNfts(), uint64(1))
 }
 
-// TODO: TestBuyDataAccessNFTActive - check if data access NFT is mintes successfully
+// TODO: TestBuyDataPassActive - check if data pass is minted successfully
 
-func (suite poolTestSuite) TestBuyDataAccessNFTPoolNotFound() {
+func (suite poolTestSuite) TestBuyDataPassPoolNotFound() {
 	// create pool
 	suite.setupCreatePool(10)
 
@@ -318,7 +318,7 @@ func (suite poolTestSuite) TestBuyDataAccessNFTPoolNotFound() {
 	suite.Require().Error(err, types.ErrPoolNotFound)
 }
 
-func (suite poolTestSuite) TestBuyDataAccessNFTSoldOut() {
+func (suite poolTestSuite) TestBuyDataPassSoldOut() {
 	// create pool w/ NFT max supply of 1
 	poolID := suite.setupCreatePool(1)
 
@@ -334,7 +334,7 @@ func (suite poolTestSuite) TestBuyDataAccessNFTSoldOut() {
 	suite.Require().Error(err, types.ErrNFTAllIssued)
 }
 
-func (suite poolTestSuite) TestBuyDataAccessNFTRoundNotMatched() {
+func (suite poolTestSuite) TestBuyDataPassRoundNotMatched() {
 	// create pool
 	poolID := suite.setupCreatePool(10)
 
@@ -346,7 +346,7 @@ func (suite poolTestSuite) TestBuyDataAccessNFTRoundNotMatched() {
 	suite.Require().Error(err, types.ErrRoundNotMatched)
 }
 
-func (suite poolTestSuite) TestBuyDataAccessNFTPaymentNotMatched() {
+func (suite poolTestSuite) TestBuyDataPassPaymentNotMatched() {
 	// create pool
 	poolID := suite.setupCreatePool(10)
 
@@ -358,7 +358,7 @@ func (suite poolTestSuite) TestBuyDataAccessNFTPaymentNotMatched() {
 	suite.Require().Error(err, types.ErrPaymentNotMatched)
 }
 
-func (suite poolTestSuite) TestBuyDataAccessNFTInsufficientBalance() {
+func (suite poolTestSuite) TestBuyDataPassInsufficientBalance() {
 	// create pool
 	poolID := suite.setupCreatePool(10)
 

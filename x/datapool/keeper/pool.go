@@ -201,8 +201,8 @@ func (k Keeper) CreatePool(ctx sdk.Context, curator sdk.AccAddress, deposit sdk.
 
 	codeID := k.GetParams(ctx).DataPoolCodeId
 
-	// instantiate NFT contract for minting data access NFT (set admin to module)
-	poolNFTContractAddr, _, err := k.wasmKeeper.Instantiate(ctx, codeID, moduleAddr, poolAddress, instantiateMsgBz, "data access NFT", nil)
+	// instantiate NFT contract for minting data pass (set admin to module)
+	poolNFTContractAddr, _, err := k.wasmKeeper.Instantiate(ctx, codeID, moduleAddr, poolAddress, instantiateMsgBz, "data pass", nil)
 	if err != nil {
 		return 0, sdkerrors.Wrapf(types.ErrInstantiateContract, err.Error())
 	}
@@ -515,7 +515,7 @@ func (k Keeper) BuyDataPass(ctx sdk.Context, buyer sdk.AccAddress, poolID, round
 		return sdkerrors.Wrapf(types.ErrBuyDataPass, err.Error())
 	}
 
-	//mint data access NFT when pool is activated
+	//mint data pass when pool is activated
 	contractAddr := pool.GetNftContractAddr()
 
 	contractAcc, err := sdk.AccAddressFromBech32(contractAddr)
@@ -523,7 +523,7 @@ func (k Keeper) BuyDataPass(ctx sdk.Context, buyer sdk.AccAddress, poolID, round
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, err.Error())
 	}
 
-	mintMsg := types.NewMsgMintDataAccessNFT(pool.GetNumIssuedNfts()+1, buyer.String())
+	mintMsg := types.NewMsgMintDataPass(pool.GetNumIssuedNfts()+1, buyer.String())
 	mintMsgBz, err := json.Marshal(mintMsg)
 	if err != nil {
 		return sdkerrors.Wrapf(types.ErrMintNFT, err.Error())

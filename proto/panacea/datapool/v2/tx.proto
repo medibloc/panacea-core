@@ -24,7 +24,7 @@ service Msg {
   // SellData defines a method for selling data
   rpc SellData(MsgSellData) returns (MsgSellDataResponse);
 
-  // BuyDataPass defines a method for buying data access NFT
+  // BuyDataPass defines a method for buying data pass
   rpc BuyDataPass(MsgBuyDataPass) returns (MsgBuyDataPassResponse);
 
   // RedeemDataPass defines a method for redeeming data pass to get data
@@ -84,7 +84,7 @@ message MsgBuyDataPass {
   string                   buyer = 4;   // 'panacea1' address of buyer
 }
 
-// MsgBuyDataPassResponse defines the Msg/BuyDataAccessNFT response type.
+// MsgBuyDataPassResponse defines the Msg/BuyDataPass response type.
 message MsgBuyDataPassResponse {
   uint64 pool_id = 1;
   uint64 round = 2;
