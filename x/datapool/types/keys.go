@@ -43,8 +43,8 @@ var (
 
 	KeyPrefixSalesHistory = []byte{0x06}
 
-	// KeyPrefixInstantRevenueDistribute defines key to distribute reward pool
-	KeyPrefixInstantRevenueDistribute = []byte{0x07}
+	// KeyPrefixInstantRevenueDistribution defines key to distribution reward pool
+	KeyPrefixInstantRevenueDistribution = []byte{0x07}
 
 	KeyIndexSeparator = []byte{0xFF}
 )
