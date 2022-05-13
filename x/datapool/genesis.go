@@ -30,7 +30,7 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 		}
 	}
 
-	k.SetInstantRevenueDistribute(ctx, &genState.InstantRevenueDistribute)
+	k.SetInstantRevenueDistribution(ctx, &genState.InstantRevenueDistribution)
 
 	for _, history := range genState.SalesHistories {
 		k.SetSalesHistory(ctx, history)
@@ -69,9 +69,9 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 
 	genesis.DataPassRedeemReceipts = append(genesis.DataPassRedeemReceipts, dataPassRedeemReceipts...)
 
-	genesis.InstantRevenueDistribute.PoolIds = append(
-		genesis.InstantRevenueDistribute.PoolIds,
-		k.GetInstantRevenueDistribute(ctx).PoolIds...,
+	genesis.InstantRevenueDistribution.PoolIds = append(
+		genesis.InstantRevenueDistribution.PoolIds,
+		k.GetInstantRevenueDistribution(ctx).PoolIds...,
 	)
 
 	genesis.SalesHistories = k.GetAllSalesHistories(ctx)

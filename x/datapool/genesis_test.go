@@ -58,7 +58,7 @@ func (suite genesisTestSuite) TestDataPoolInitGenesis() {
 
 	dataPassRedeemReceipts = append(dataPassRedeemReceipts, dataPassRedeemReceipt)
 
-	instantRevenueDistribute := types.InstantRevenueDistribute{
+	instantRevenueDistribution := types.InstantRevenueDistribution{
 		PoolIds: poolIDs,
 	}
 
@@ -70,7 +70,7 @@ func (suite genesisTestSuite) TestDataPoolInitGenesis() {
 		Pools:                    pools,
 		Params:                   params,
 		DataPassRedeemReceipts:   dataPassRedeemReceipts,
-		InstantRevenueDistribute: instantRevenueDistribute,
+		InstantRevenueDistribution: instantRevenueDistribution,
 		SalesHistories:           salesHistoryMap,
 	}
 
@@ -97,8 +97,8 @@ func (suite genesisTestSuite) TestDataPoolInitGenesis() {
 	dataPassRedeemReceiptsFromKeeper, err := suite.DataPoolKeeper.GetAllDataPassRedeemReceipts(suite.Ctx)
 	suite.Require().NoError(err)
 	suite.Require().Equal(dataPassRedeemReceipts, dataPassRedeemReceiptsFromKeeper)
-	instantRevenueDistributeFromKeeper := suite.DataPoolKeeper.GetInstantRevenueDistribute(suite.Ctx)
-	suite.Require().Equal(poolIDs, instantRevenueDistributeFromKeeper.PoolIds)
+	instantRevenueDistributionFromKeeper := suite.DataPoolKeeper.GetInstantRevenueDistribution(suite.Ctx)
+	suite.Require().Equal(poolIDs, instantRevenueDistributionFromKeeper.PoolIds)
 
 	salesHistoryFromKeeper := suite.DataPoolKeeper.GetSalesHistories(suite.Ctx, poolID, round)
 	suite.Require().Equal(2, len(salesHistoryFromKeeper))
@@ -156,9 +156,9 @@ func (suite genesisTestSuite) TestDataPoolExportGenesis() {
 	err = suite.DataPoolKeeper.SetDataPassRedeemReceipt(suite.Ctx, dataPassRedeemReceipt)
 	suite.Require().NoError(err)
 
-	suite.DataPoolKeeper.SetInstantRevenueDistribute(
+	suite.DataPoolKeeper.SetInstantRevenueDistribution(
 		suite.Ctx,
-		&types.InstantRevenueDistribute{
+		&types.InstantRevenueDistribution{
 			PoolIds: poolIDs,
 		})
 
@@ -173,7 +173,7 @@ func (suite genesisTestSuite) TestDataPoolExportGenesis() {
 	suite.Require().Equal(types.DefaultParams(), genesisState.Params)
 	suite.Require().Len(genesisState.DataValidators, 1)
 	suite.Require().Len(genesisState.DataPassRedeemReceipts, 1)
-	suite.Require().Equal(poolIDs, genesisState.InstantRevenueDistribute.PoolIds)
+	suite.Require().Equal(poolIDs, genesisState.InstantRevenueDistribution.PoolIds)
 	fmt.Println(genesisState.SalesHistories)
 	suite.Require().True(len(genesisState.SalesHistories) == 4)
 }
