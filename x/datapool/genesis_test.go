@@ -1,6 +1,7 @@
 package datapool_test
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
@@ -18,10 +19,16 @@ import (
 var (
 	dataVal        = sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address())
 	curator        = sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address())
+	seller         = sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address())
+	seller2        = sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address())
+	paidCoin       = sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(1000000))
 	redeemer       = sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address())
 	NFTPrice       = sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(10000000))
-	downloadPeriod = time.Duration(time.Second * 100000000)
+	downloadPeriod = time.Second * 100000000
 	poolID         = uint64(1)
+	secondPoolID   = uint64(2)
+	round          = uint64(1)
+	poolIDs        = []uint64{uint64(1), uint64(3), uint64(2), uint64(4)}
 )
 
 type genesisTestSuite struct {
@@ -51,12 +58,20 @@ func (suite genesisTestSuite) TestDataPoolInitGenesis() {
 
 	dataPassRedeemReceipts = append(dataPassRedeemReceipts, dataPassRedeemReceipt)
 
+	instantRevenueDistribution := types.InstantRevenueDistribution{
+		PoolIds: poolIDs,
+	}
+
+	salesHistoryMap := makeSampleSalesHistories()
+
 	genState := &types.GenesisState{
-		DataValidators:         dataValidators,
-		NextPoolNumber:         2,
-		Pools:                  pools,
-		Params:                 params,
-		DataPassRedeemReceipts: dataPassRedeemReceipts,
+		DataValidators:           dataValidators,
+		NextPoolNumber:           2,
+		Pools:                    pools,
+		Params:                   params,
+		DataPassRedeemReceipts:   dataPassRedeemReceipts,
+		InstantRevenueDistribution: instantRevenueDistribution,
+		SalesHistories:           salesHistoryMap,
 	}
 
 	datapool.InitGenesis(suite.Ctx, suite.DataPoolKeeper, *genState)
@@ -82,6 +97,44 @@ func (suite genesisTestSuite) TestDataPoolInitGenesis() {
 	dataPassRedeemReceiptsFromKeeper, err := suite.DataPoolKeeper.GetAllDataPassRedeemReceipts(suite.Ctx)
 	suite.Require().NoError(err)
 	suite.Require().Equal(dataPassRedeemReceipts, dataPassRedeemReceiptsFromKeeper)
+	instantRevenueDistributionFromKeeper := suite.DataPoolKeeper.GetInstantRevenueDistribution(suite.Ctx)
+	suite.Require().Equal(poolIDs, instantRevenueDistributionFromKeeper.PoolIds)
+
+	salesHistoryFromKeeper := suite.DataPoolKeeper.GetSalesHistories(suite.Ctx, poolID, round)
+	suite.Require().Equal(2, len(salesHistoryFromKeeper))
+
+	for _, history := range salesHistoryFromKeeper {
+		if history.SellerAddress == seller.String() {
+			suite.Require().Equal(poolID, history.PoolId)
+			suite.Require().Equal(round, history.Round)
+			suite.Require().Equal(seller.String(), history.SellerAddress)
+			suite.Require().Equal([]byte("data"), history.DataHashes[0])
+			suite.Require().Equal("1000000umed", history.PaidCoin.String())
+		} else if history.SellerAddress == seller2.String() {
+			suite.Require().Equal(poolID, history.PoolId)
+			suite.Require().Equal(round, history.Round)
+			suite.Require().Equal(seller2.String(), history.SellerAddress)
+			suite.Require().Equal([]byte("data2"), history.DataHashes[0])
+			suite.Require().Equal("1000000umed", history.PaidCoin.String())
+		}
+	}
+
+	secondSalesHistoryFromKeeper := suite.DataPoolKeeper.GetSalesHistories(suite.Ctx, secondPoolID, round)
+	for _, history := range secondSalesHistoryFromKeeper {
+		if history.SellerAddress == seller.String() {
+			suite.Require().Equal(secondPoolID, history.PoolId)
+			suite.Require().Equal(round, history.Round)
+			suite.Require().Equal(seller.String(), history.SellerAddress)
+			suite.Require().Equal([]byte("data3"), history.DataHashes[0])
+			suite.Require().Equal("1000000umed", history.PaidCoin.String())
+		} else if history.SellerAddress == seller2.String() {
+			suite.Require().Equal(secondPoolID, history.PoolId)
+			suite.Require().Equal(round, history.Round)
+			suite.Require().Equal(seller2.String(), history.SellerAddress)
+			suite.Require().Equal([]byte("data4"), history.DataHashes[0])
+			suite.Require().Equal("1000000umed", history.PaidCoin.String())
+		}
+	}
 }
 
 func (suite genesisTestSuite) TestDataPoolExportGenesis() {
@@ -103,12 +156,26 @@ func (suite genesisTestSuite) TestDataPoolExportGenesis() {
 	err = suite.DataPoolKeeper.SetDataPassRedeemReceipt(suite.Ctx, dataPassRedeemReceipt)
 	suite.Require().NoError(err)
 
+	suite.DataPoolKeeper.SetInstantRevenueDistribution(
+		suite.Ctx,
+		&types.InstantRevenueDistribution{
+			PoolIds: poolIDs,
+		})
+
+	salesHistories := makeSampleSalesHistories()
+	for _, salesHistory := range salesHistories {
+		suite.DataPoolKeeper.SetSalesHistory(suite.Ctx, salesHistory)
+	}
+
 	genesisState := datapool.ExportGenesis(suite.Ctx, suite.DataPoolKeeper)
 	suite.Require().Equal(uint64(2), genesisState.NextPoolNumber)
 	suite.Require().Len(genesisState.Pools, 1)
 	suite.Require().Equal(types.DefaultParams(), genesisState.Params)
 	suite.Require().Len(genesisState.DataValidators, 1)
 	suite.Require().Len(genesisState.DataPassRedeemReceipts, 1)
+	suite.Require().Equal(poolIDs, genesisState.InstantRevenueDistribution.PoolIds)
+	fmt.Println(genesisState.SalesHistories)
+	suite.Require().True(len(genesisState.SalesHistories) == 4)
 }
 
 func makeSampleDataValidator() types.DataValidator {
@@ -141,6 +208,39 @@ func makeSamplePoolParams() *types.PoolParams {
 		TrustedDataValidators: []string{dataVal.String()},
 		TrustedDataIssuers:    []string(nil),
 		DownloadPeriod:        &downloadPeriod,
+	}
+}
+
+func makeSampleSalesHistories() []*types.SalesHistory {
+	return []*types.SalesHistory{
+		{
+			PoolId:        poolID,
+			Round:         round,
+			SellerAddress: seller.String(),
+			DataHashes:    [][]byte{[]byte("data")},
+			PaidCoin:      &paidCoin,
+		},
+		{
+			PoolId:        poolID,
+			Round:         round,
+			SellerAddress: seller2.String(),
+			DataHashes:    [][]byte{[]byte("data2")},
+			PaidCoin:      &paidCoin,
+		},
+		{
+			PoolId:        secondPoolID,
+			Round:         round,
+			SellerAddress: seller.String(),
+			DataHashes:    [][]byte{[]byte("data3")},
+			PaidCoin:      &paidCoin,
+		},
+		{
+			PoolId:        secondPoolID,
+			Round:         round,
+			SellerAddress: seller2.String(),
+			DataHashes:    [][]byte{[]byte("data4")},
+			PaidCoin:      &paidCoin,
+		},
 	}
 }
 

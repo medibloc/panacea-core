@@ -49,10 +49,23 @@ func (k Keeper) GetSalesHistory(ctx sdk.Context, poolID, round uint64, sellerAdd
 	return &salesHistory
 }
 
-func (k Keeper) ListSalesHistory(ctx sdk.Context, poolID, round uint64) []*types.SalesHistory {
+func (k Keeper) GetSalesHistories(ctx sdk.Context, poolID, round uint64) []*types.SalesHistory {
 	key := types.GetKeyPrefixSalesHistories(poolID, round)
 	store := ctx.KVStore(k.storeKey)
 	iter := sdk.KVStorePrefixIterator(store, key)
+	var histories []*types.SalesHistory
+	for ; iter.Valid(); iter.Next() {
+		history := &types.SalesHistory{}
+		bz := iter.Value()
+		k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, history)
+		histories = append(histories, history)
+	}
+	return histories
+}
+
+func (k Keeper) GetAllSalesHistories(ctx sdk.Context) []*types.SalesHistory {
+	store := ctx.KVStore(k.storeKey)
+	iter := sdk.KVStorePrefixIterator(store, types.KeyPrefixSalesHistory)
 	var histories []*types.SalesHistory
 	for ; iter.Valid(); iter.Next() {
 		history := &types.SalesHistory{}
@@ -183,7 +196,7 @@ func (k Keeper) executeRevenueDistribution(ctx sdk.Context, pool *types.Pool) er
 		return sdkerrors.Wrap(types.ErrRevenueDistribution, err.Error())
 	}
 
-	salesHistories := k.ListSalesHistory(ctx, pool.PoolId, pool.Round)
+	salesHistories := k.GetSalesHistories(ctx, pool.PoolId, pool.Round)
 	for _, history := range salesHistories {
 		paidCoinAmount := history.PaidCoin.Amount
 		dataCount := sdk.NewInt(int64(history.DataCount()))
