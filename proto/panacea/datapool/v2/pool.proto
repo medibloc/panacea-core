@@ -18,7 +18,7 @@ message Pool {
   string                                curator = 8;
   cosmos.base.v1beta1.Coin              deposit = 9 [(gogoproto.nullable) = false];             // deposit
   string                                nft_contract_addr = 10;                                 // NFT contract address of pool
-  bool                                  is_paid_deposit = 11;
+  bool                                  was_deposit_returned = 11;
   map<uint64, cosmos.base.v1beta1.Coin> curator_commission = 12 [(gogoproto.nullable) = false]; // key: round, value: paid curator commission balance
   string                                curator_commission_rate = 13 [
     (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
@@ -66,8 +66,8 @@ message PoolParams {
   repeated string          trusted_data_issuers = 6;    // Optional. Data issuers that is trusted by the curator
 }
 
-// InstantRevenueDistribute defines poolID information to distribute revenue.
-message InstantRevenueDistribute {
+// InstantRevenueDistribution defines poolID information to distribution revenue.
+message InstantRevenueDistribution {
   repeated uint64 pool_ids = 1;  // Execute information for pool reward distribution
 }
 

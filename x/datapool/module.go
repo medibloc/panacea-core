@@ -162,7 +162,7 @@ func (am AppModule) ExportGenesis(ctx sdk.Context, cdc codec.JSONMarshaler) json
 
 // BeginBlock executes all ABCI BeginBlock logic respective to the capability module.
 func (am AppModule) BeginBlock(ctx sdk.Context, _ abci.RequestBeginBlock) {
-	err := am.keeper.DistributeRevenuePools(ctx)
+	err := am.keeper.DistributionRevenuePools(ctx)
 	if err != nil {
 		panic(err)
 	}

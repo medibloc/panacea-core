@@ -43,7 +43,7 @@ func GetModuleAddress() sdk.AccAddress {
 }
 
 // AppendPoolID adds the poolID.
-func (d *InstantRevenueDistribute) AppendPoolID(poolID uint64) {
+func (d *InstantRevenueDistribution) AppendPoolID(poolID uint64) {
 	// Check duplicate
 	for _, existPoolID := range d.PoolIds {
 		if existPoolID == poolID {
@@ -53,11 +53,11 @@ func (d *InstantRevenueDistribute) AppendPoolID(poolID uint64) {
 	d.PoolIds = append(d.PoolIds, poolID)
 }
 
-func (d *InstantRevenueDistribute) IsEmpty() bool {
+func (d *InstantRevenueDistribution) IsEmpty() bool {
 	return d.PoolIds == nil || len(d.PoolIds) == 0
 }
 
-func (d *InstantRevenueDistribute) RemovePreviousIndex(idx int) {
+func (d *InstantRevenueDistribution) TruncateFromBeginning(idx int) {
 	if d.IsEmpty() {
 		return
 	}

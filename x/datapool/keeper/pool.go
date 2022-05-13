@@ -361,7 +361,7 @@ func (k Keeper) SellData(ctx sdk.Context, seller sdk.AccAddress, cert types.Data
 
 	k.increaseCurNumAndUpdatePool(ctx, pool)
 
-	k.addInstantRevenueDistribute(ctx, poolID)
+	k.addInstantRevenueDistribution(ctx, poolID)
 
 	k.addSalesHistory(ctx, pool.PoolId, pool.Round, seller, cert.UnsignedCert.DataHash)
 
@@ -510,7 +510,7 @@ func (k Keeper) BuyDataPass(ctx sdk.Context, buyer sdk.AccAddress, poolID, round
 
 	k.increaseNumIssuedNFT(ctx, pool)
 
-	k.addInstantRevenueDistribute(ctx, poolID)
+	k.addInstantRevenueDistribution(ctx, poolID)
 
 	return nil
 }
