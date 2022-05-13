@@ -163,6 +163,33 @@ func (k Keeper) sendDepositToCurator(ctx sdk.Context, pool *types.Pool) error {
 	return nil
 }
 
+func (k Keeper) executeRevenueDistribution(ctx sdk.Context, pool *types.Pool) error {
+	availablePoolCoinAmount, err := k.getAvailablePoolCoinAmount(ctx, pool)
+	if err != nil {
+		return err
+	}
+
+	// if there is no coin available, proceed no further.
+	if availablePoolCoinAmount.Equal(sdk.NewInt(0)) {
+		return nil
+	}
+
+	// calculate the revenue to be sent to each seller and curator
+	eachSellerDistributionAmount, curatorCommissionAmount := k.getEachDistributionAmount(pool)
+
+	err = k.distributionToEachSeller(ctx, pool, eachSellerDistributionAmount, availablePoolCoinAmount)
+	if err != nil {
+		return err
+	}
+
+	err = k.sendCommissionToCurator(ctx, pool, curatorCommissionAmount)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (k Keeper) getAvailablePoolCoinAmount(ctx sdk.Context, pool *types.Pool) (*sdk.Int, error) {
 	poolAddr, err := sdk.AccAddressFromBech32(pool.PoolAddress)
 	if err != nil {
@@ -177,20 +204,7 @@ func (k Keeper) getAvailablePoolCoinAmount(ctx sdk.Context, pool *types.Pool) (*
 	}
 }
 
-func (k Keeper) executeRevenueDistribution(ctx sdk.Context, pool *types.Pool) error {
-	availablePoolCoinAmount, err := k.getAvailablePoolCoinAmount(ctx, pool)
-	if err != nil {
-		return err
-	}
-
-	// if there is no coin available, proceed no further.
-	if availablePoolCoinAmount.Equal(sdk.NewInt(0)) {
-		return nil
-	}
-
-	// calculate the revenue to be sent to each seller
-	eachDistributionAmount := k.getEachDistributionAmount(pool)
-
+func (k Keeper) distributionToEachSeller(ctx sdk.Context, pool *types.Pool, eachSellerDistributionAmount sdk.Int, availablePoolCoinAmount *sdk.Int) error {
 	poolAddress, err := sdk.AccAddressFromBech32(pool.GetPoolAddress())
 	if err != nil {
 		return sdkerrors.Wrap(types.ErrRevenueDistribution, err.Error())
@@ -198,21 +212,14 @@ func (k Keeper) executeRevenueDistribution(ctx sdk.Context, pool *types.Pool) er
 
 	salesHistories := k.GetSalesHistories(ctx, pool.PoolId, pool.Round)
 	for _, history := range salesHistories {
-		paidCoinAmount := history.PaidCoin.Amount
-		dataCount := sdk.NewInt(int64(history.DataCount()))
-		distributedAmount := eachDistributionAmount.Mul(dataCount)
+		paymentAmount := calculatePaymentAmountToSeller(history, eachSellerDistributionAmount)
+		paymentCoin := sdk.NewCoin(assets.MicroMedDenom, paymentAmount)
 
-		// if it has already been distributed, pass it.
-		if distributedAmount.Equal(paidCoinAmount) {
-			continue
-		}
-
-		paymentAmount := distributedAmount.Sub(paidCoinAmount)
 		sellerAddr, err := sdk.AccAddressFromBech32(history.SellerAddress)
 		if err != nil {
 			return sdkerrors.Wrap(types.ErrRevenueDistribution, err.Error())
 		}
-		paymentCoin := sdk.NewCoin(assets.MicroMedDenom, paymentAmount)
+
 		err = k.bankKeeper.SendCoins(
 			ctx,
 			poolAddress,
@@ -228,42 +235,46 @@ func (k Keeper) executeRevenueDistribution(ctx sdk.Context, pool *types.Pool) er
 
 		k.SetSalesHistory(ctx, history)
 	}
-
-	err = k.sendCommissionToCurator(ctx, pool)
-	if err != nil {
-		return err
-	}
-
 	return nil
 }
 
-func (k Keeper) getEachDistributionAmount(pool *types.Pool) sdk.Int {
+// calculatePaymentAmountToSeller calculates the amount to be paid to the seller.
+func calculatePaymentAmountToSeller(history *types.SalesHistory, eachSellerDistributionAmount sdk.Int) sdk.Int {
+	paidCoinAmount := history.PaidCoin.Amount
+	dataCount := sdk.NewInt(int64(history.DataCount()))
+	distributedAmount := eachSellerDistributionAmount.Mul(dataCount)
+	paymentAmount := distributedAmount.Sub(paidCoinAmount)
+	return paymentAmount
+}
+
+// getEachDistributionAmount returns the amount to be distributed to each seller and curator.
+func (k Keeper) getEachDistributionAmount(pool *types.Pool) (sdk.Int, sdk.Int) {
 	nftPriceAmount := pool.PoolParams.NftPrice.Amount.ToDec()
 	numIssuedNFTs := sdk.NewIntFromUint64(pool.NumIssuedNfts).ToDec()
 	targetNumData := sdk.NewIntFromUint64(pool.PoolParams.TargetNumData).ToDec()
 	curatorCommissionRate := pool.CuratorCommissionRate
 
 	// ((nftPriceAmount * numIssuedNFTs) / targetNumData) * (1 - curatorCommissionRate)
-	return nftPriceAmount.Mul(numIssuedNFTs).Quo(targetNumData).Mul(sdk.NewDec(1).Sub(curatorCommissionRate)).TruncateInt()
+	sellerAmount := nftPriceAmount.Mul(numIssuedNFTs).Quo(targetNumData).Mul(sdk.NewDec(1).Sub(curatorCommissionRate)).TruncateInt()
+	// nftPriceAmount * numIssuedNFTs * curatorCommissionRate
+	curatorCommissionAmount := nftPriceAmount.Mul(numIssuedNFTs).Mul(curatorCommissionRate).TruncateInt()
+	
+	return sellerAmount, curatorCommissionAmount
 }
 
+
+
 // sendCommissionToCurator sends a commission to the curator
-func (k Keeper) sendCommissionToCurator(ctx sdk.Context, pool *types.Pool) error {
-	nftPriceAmount := pool.PoolParams.NftPrice.Amount.ToDec()
-	numIssuedNFTs := sdk.NewIntFromUint64(pool.NumIssuedNfts).ToDec()
-	curatorCommissionRate := pool.CuratorCommissionRate
-
-	// nftPriceAmount * numIssuedNFTs * curatorCommissionRate
-	curatorCommissionAmount := nftPriceAmount.Mul(numIssuedNFTs).Mul(curatorCommissionRate)
-
-	paidCuratorCommissionAmount := pool.CuratorCommission[pool.Round].Amount.ToDec()
-
-	paymentAmount := curatorCommissionAmount.Sub(paidCuratorCommissionAmount)
-	paymentCoin := sdk.NewCoin(assets.MicroMedDenom, paymentAmount.TruncateInt())
+func (k Keeper) sendCommissionToCurator(ctx sdk.Context, pool *types.Pool, curatorCommissionAmount sdk.Int, ) error {
 	poolAddress, err := sdk.AccAddressFromBech32(pool.GetPoolAddress())
 	if err != nil {
 		return sdkerrors.Wrap(types.ErrRevenueDistribution, err.Error())
 	}
+
+	paidCuratorCommissionAmount := pool.CuratorCommission[pool.Round].Amount
+	paymentAmount := curatorCommissionAmount.Sub(paidCuratorCommissionAmount)
+	paymentCoin := sdk.NewCoin(assets.MicroMedDenom, paymentAmount)
+
 	curatorAddr, err := sdk.AccAddressFromBech32(pool.Curator)
 	if err != nil {
 		return sdkerrors.Wrap(types.ErrRevenueDistribution, err.Error())
@@ -274,13 +285,11 @@ func (k Keeper) sendCommissionToCurator(ctx sdk.Context, pool *types.Pool) error
 		poolAddress,
 		curatorAddr,
 		sdk.NewCoins(paymentCoin))
-
 	if err != nil {
 		return sdkerrors.Wrap(types.ErrRevenueDistribution, err.Error())
 	}
 
-	// paymentAmount + paidCuratorCommissionAmount => Current total paid curator commission
-	pool.CuratorCommission[pool.Round] = paymentCoin.Add(sdk.NewCoin(assets.MicroMedDenom, paidCuratorCommissionAmount.TruncateInt()))
+	pool.CuratorCommission[pool.Round] = paymentCoin.Add(sdk.NewCoin(assets.MicroMedDenom, paidCuratorCommissionAmount))
 	k.SetPool(ctx, pool)
 
 	return nil
