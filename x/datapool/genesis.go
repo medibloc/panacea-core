@@ -30,6 +30,11 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 		}
 	}
 
+	k.SetInstantRevenueDistribution(ctx, &genState.InstantRevenueDistribution)
+
+	for _, history := range genState.SalesHistories {
+		k.SetSalesHistory(ctx, history)
+	}
 	// this line is used by starport scaffolding # genesis/module/init
 
 	// this line is used by starport scaffolding # ibc/genesis/init
@@ -64,6 +69,12 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 
 	genesis.DataPassRedeemReceipts = append(genesis.DataPassRedeemReceipts, dataPassRedeemReceipts...)
 
+	genesis.InstantRevenueDistribution.PoolIds = append(
+		genesis.InstantRevenueDistribution.PoolIds,
+		k.GetInstantRevenueDistribution(ctx).PoolIds...,
+	)
+
+	genesis.SalesHistories = k.GetAllSalesHistories(ctx)
 	// this line is used by starport scaffolding # genesis/module/export
 
 	// this line is used by starport scaffolding # ibc/genesis/export

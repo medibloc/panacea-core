@@ -63,6 +63,19 @@ func (k Keeper) GetSalesHistories(ctx sdk.Context, poolID, round uint64) []*type
 	return histories
 }
 
+func (k Keeper) GetAllSalesHistories(ctx sdk.Context) []*types.SalesHistory {
+	store := ctx.KVStore(k.storeKey)
+	iter := sdk.KVStorePrefixIterator(store, types.KeyPrefixSalesHistory)
+	var histories []*types.SalesHistory
+	for ; iter.Valid(); iter.Next() {
+		history := &types.SalesHistory{}
+		bz := iter.Value()
+		k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, history)
+		histories = append(histories, history)
+	}
+	return histories
+}
+
 // SetInstantRevenueDistribution stores the poolID to which the revenue should be distributed immediately.
 func (k Keeper) SetInstantRevenueDistribution(ctx sdk.Context, instantRevenueDistribution *types.InstantRevenueDistribution) {
 	bz := k.cdc.MustMarshalBinaryLengthPrefixed(instantRevenueDistribution)
