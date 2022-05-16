@@ -265,7 +265,7 @@ func (k Keeper) getEachDistributionAmount(pool *types.Pool) (sdk.Int, sdk.Int) {
 
 
 // sendCommissionToCurator sends a commission to the curator
-func (k Keeper) sendCommissionToCurator(ctx sdk.Context, pool *types.Pool, curatorCommissionAmount sdk.Int, ) error {
+func (k Keeper) sendCommissionToCurator(ctx sdk.Context, pool *types.Pool, curatorCommissionAmount sdk.Int) error {
 	poolAddress, err := sdk.AccAddressFromBech32(pool.GetPoolAddress())
 	if err != nil {
 		return sdkerrors.Wrap(types.ErrRevenueDistribution, err.Error())
