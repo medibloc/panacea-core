@@ -177,7 +177,7 @@ func (k Keeper) executeRevenueDistribution(ctx sdk.Context, pool *types.Pool) er
 	// calculate the revenue to be sent to each seller and curator
 	eachSellerDistributionAmount, curatorCommissionAmount := k.getEachDistributionAmount(pool)
 
-	err = k.distributionToEachSeller(ctx, pool, eachSellerDistributionAmount, availablePoolCoinAmount)
+	err = k.distributionToEachSeller(ctx, pool, eachSellerDistributionAmount)
 	if err != nil {
 		return err
 	}
@@ -204,7 +204,7 @@ func (k Keeper) getAvailablePoolCoinAmount(ctx sdk.Context, pool *types.Pool) (*
 	}
 }
 
-func (k Keeper) distributionToEachSeller(ctx sdk.Context, pool *types.Pool, eachSellerDistributionAmount sdk.Int, availablePoolCoinAmount *sdk.Int) error {
+func (k Keeper) distributionToEachSeller(ctx sdk.Context, pool *types.Pool, eachSellerDistributionAmount sdk.Int) error {
 	poolAddress, err := sdk.AccAddressFromBech32(pool.GetPoolAddress())
 	if err != nil {
 		return sdkerrors.Wrap(types.ErrRevenueDistribution, err.Error())
@@ -229,9 +229,6 @@ func (k Keeper) distributionToEachSeller(ctx sdk.Context, pool *types.Pool, each
 			return sdkerrors.Wrap(types.ErrRevenueDistribution, err.Error())
 		}
 		*history.PaidCoin = history.PaidCoin.Add(paymentCoin)
-
-		// Subtract the amount paid from the transferable amount.
-		*availablePoolCoinAmount = availablePoolCoinAmount.Sub(paymentAmount)
 
 		k.SetSalesHistory(ctx, history)
 	}
