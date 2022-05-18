@@ -124,7 +124,7 @@ func CmdGetDataPassRedeemReceipt() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "get-data-pass-receipt [poolID] [round] [dataPassID]",
 		Short: "Query a data pass redeem receipt",
-		Args:  cobra.ExactArgs(4),
+		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientQueryContext(cmd)
 			if err != nil {
