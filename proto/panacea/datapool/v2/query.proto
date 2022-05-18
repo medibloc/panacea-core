@@ -38,7 +38,7 @@ service Query {
 
   // DataPassRedeemReceipt returns DataPassRedeemReceipt
   rpc DataPassRedeemReceipt(QueryDataPassRedeemReceiptRequest) returns (QueryDataPassRedeemReceiptResponse) {
-    option (google.api.http).get = "/panacea/datapool/v2/pools/{pool_id}/rounds/{round}/data_passes/{nft_id}/redeem_receipt";
+    option (google.api.http).get = "/panacea/datapool/v2/pools/{pool_id}/rounds/{round}/data_passes/{data_pass_id}/redeem_receipt";
   }
 
   // DataPassRedeemReceipts returns DataPassRedeemReceipts
@@ -102,7 +102,7 @@ message QueryDataValidationCertificatesResponse {
 message QueryDataPassRedeemReceiptRequest {
   uint64 pool_id = 1;
   uint64 round = 2;
-  uint64 nft_id = 3;
+  uint64 data_pass_id = 3;
 }
 
 // QueryDataPassRedeemReceiptResponse is the response type for the Query/DataPassRedeemReceipt RPC method.

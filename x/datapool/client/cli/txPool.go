@@ -232,7 +232,7 @@ func CmdBuyDataPass() *cobra.Command {
 
 func CmdRedeemDataPass() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "redeem-data-pass [poolID] [round] [nftID]",
+		Use:   "redeem-data-pass [poolID] [round] [dataPassID]",
 		Short: "redeem data pass",
 		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -253,16 +253,16 @@ func CmdRedeemDataPass() *cobra.Command {
 				return err
 			}
 
-			nftID, err := strconv.ParseUint(args[2], 10, 64)
+			dataPassID, err := strconv.ParseUint(args[2], 10, 64)
 			if err != nil {
 				return err
 			}
 
 			msg := &types.MsgRedeemDataPass{
-				PoolId:   poolID,
-				Round:    round,
-				NftId:    nftID,
-				Redeemer: redeemer.String(),
+				PoolId:     poolID,
+				Round:      round,
+				DataPassId: dataPassID,
+				Redeemer:   redeemer.String(),
 			}
 
 			if err := msg.ValidateBasic(); err != nil {

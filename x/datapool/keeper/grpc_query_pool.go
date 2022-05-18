@@ -110,7 +110,7 @@ func (k Keeper) DataPassRedeemReceipt(goCtx context.Context, req *types.QueryDat
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	redeemReceipt, err := k.GetDataPassRedeemReceipt(ctx, req.PoolId, req.Round, req.NftId)
+	redeemReceipt, err := k.GetDataPassRedeemReceipt(ctx, req.PoolId, req.Round, req.DataPassId)
 	if err != nil {
 		return nil, err
 	}
