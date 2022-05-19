@@ -21,14 +21,15 @@ func NewPool(poolID uint64, curator sdk.AccAddress, poolParams PoolParams) *Pool
 	poolAddress := NewPoolAddress(poolID)
 
 	return &Pool{
-		PoolId:        poolID,
-		PoolAddress:   poolAddress.String(),
-		Round:         1,
-		PoolParams:    &poolParams,
-		CurNumData:    0,
-		NumIssuedNfts: 0,
-		Curator:       curator.String(),
-		Status:        PENDING,
+		PoolId:            poolID,
+		PoolAddress:       poolAddress.String(),
+		Round:             1,
+		PoolParams:        &poolParams,
+		CurNumData:        0,
+		NumIssuedNfts:     0,
+		Curator:           curator.String(),
+		Status:            PENDING,
+		CuratorCommission: make(map[uint64]sdk.Coin),
 	}
 }
 

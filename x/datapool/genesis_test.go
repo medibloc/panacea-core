@@ -2,14 +2,11 @@ package datapool_test
 
 import (
 	"fmt"
-	"testing"
-	"time"
-
-	"github.com/medibloc/panacea-core/v2/x/datapool"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/medibloc/panacea-core/v2/types/assets"
+	"github.com/medibloc/panacea-core/v2/x/datapool"
 	"github.com/medibloc/panacea-core/v2/x/datapool/types"
+	"testing"
 
 	"github.com/medibloc/panacea-core/v2/types/testsuite"
 	"github.com/stretchr/testify/suite"
@@ -17,18 +14,17 @@ import (
 )
 
 var (
-	dataVal        = sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address())
-	curator        = sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address())
-	seller         = sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address())
-	seller2        = sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address())
-	paidCoin       = sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(1000000))
-	redeemer       = sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address())
-	NFTPrice       = sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(10000000))
-	downloadPeriod = time.Second * 100000000
-	poolID         = uint64(1)
-	secondPoolID   = uint64(2)
-	round          = uint64(1)
-	poolIDs        = []uint64{uint64(1), uint64(3), uint64(2), uint64(4)}
+	dataVal      = sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address())
+	curator      = sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address())
+	seller       = sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address())
+	seller2      = sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address())
+	paidCoin     = sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(1000000))
+	redeemer     = sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address())
+	NFTPrice     = sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(10000000))
+	poolID       = uint64(1)
+	secondPoolID = uint64(2)
+	round        = uint64(1)
+	poolIDs      = []uint64{uint64(1), uint64(3), uint64(2), uint64(4)}
 )
 
 type genesisTestSuite struct {
@@ -65,13 +61,13 @@ func (suite genesisTestSuite) TestDataPoolInitGenesis() {
 	salesHistoryMap := makeSampleSalesHistories()
 
 	genState := &types.GenesisState{
-		DataValidators:           dataValidators,
-		NextPoolNumber:           2,
-		Pools:                    pools,
-		Params:                   params,
-		DataPassRedeemReceipts:   dataPassRedeemReceipts,
+		DataValidators:             dataValidators,
+		NextPoolNumber:             2,
+		Pools:                      pools,
+		Params:                     params,
+		DataPassRedeemReceipts:     dataPassRedeemReceipts,
 		InstantRevenueDistribution: instantRevenueDistribution,
-		SalesHistories:           salesHistoryMap,
+		SalesHistories:             salesHistoryMap,
 	}
 
 	datapool.InitGenesis(suite.Ctx, suite.DataPoolKeeper, *genState)
@@ -187,15 +183,16 @@ func makeSampleDataValidator() types.DataValidator {
 
 func makeSamplePool() types.Pool {
 	return types.Pool{
-		PoolId:        poolID,
-		PoolAddress:   types.NewPoolAddress(uint64(1)).String(),
-		Round:         1,
-		PoolParams:    makeSamplePoolParams(),
-		CurNumData:    0,
-		NumIssuedNfts: 1,
-		Status:        types.PENDING,
-		Curator:       curator.String(),
-		Deposit:       types.ZeroFund,
+		PoolId:                poolID,
+		PoolAddress:           types.NewPoolAddress(uint64(1)).String(),
+		Round:                 1,
+		PoolParams:            makeSamplePoolParams(),
+		CurNumData:            0,
+		NumIssuedNfts:         1,
+		Status:                types.PENDING,
+		Curator:               curator.String(),
+		Deposit:               types.ZeroFund,
+		CuratorCommissionRate: types.DefaultDataPoolCommissionRate,
 	}
 }
 
@@ -207,7 +204,6 @@ func makeSamplePoolParams() *types.PoolParams {
 		NftPrice:              &NFTPrice,
 		TrustedDataValidators: []string{dataVal.String()},
 		TrustedDataIssuers:    []string(nil),
-		DownloadPeriod:        &downloadPeriod,
 	}
 }
 

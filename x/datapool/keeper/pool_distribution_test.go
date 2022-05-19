@@ -12,6 +12,10 @@ const (
 	defaultSellerCount = defaultTargetNumData
 )
 
+var (
+	curatorCommissionPerSalesDataPass = sdk.NewInt(100000)
+)
+
 func setupRevenueDistributionTest(suite poolTestSuite, targetNumData, poolMaxNftSupply uint64, sellerCount int) (uint64, []sdk.AccAddress) {
 	poolID := suite.setupCreatePool(targetNumData, poolMaxNftSupply)
 
@@ -38,7 +42,7 @@ func buyDataPass(suite poolTestSuite, poolID, count uint64) {
 
 func (suite poolTestSuite) TestExecuteRevenueDistributionPoolActive() {
 	// create and instantiate NFT contract
-	poolID, sellers := setupRevenueDistributionTest(suite, defaultTargetNumData, defaultMaxNfySupply, defaultSellerCount)
+	poolID, sellers := setupRevenueDistributionTest(suite, defaultTargetNumData, defaultMaxNftSupply, defaultSellerCount)
 	// create a pool where data sales are not complete.
 	suite.Require().Equal(poolID, uint64(1))
 
@@ -81,11 +85,11 @@ func (suite poolTestSuite) TestExecuteRevenueDistributionPoolActive() {
 
 	// check balances of curator and sellers after distribution
 	curatorAmount = suite.BankKeeper.GetBalance(suite.Ctx, curatorAddr, assets.MicroMedDenom).Amount
-	suite.Require().Equal(fundForCurator.AmountOf(assets.MicroMedDenom), curatorAmount)
+	suite.Require().Equal(fundForCurator.AmountOf(assets.MicroMedDenom).Add(curatorCommissionPerSalesDataPass), curatorAmount)
 
 	for _, sellerAddr := range sellers {
 		coin := suite.BankKeeper.GetBalance(suite.Ctx, sellerAddr, assets.MicroMedDenom)
-		suite.Require().Equal(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(100000)), coin)
+		suite.Require().Equal(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(99000)), coin)
 	}
 
 	// 2nd purchase
@@ -96,16 +100,19 @@ func (suite poolTestSuite) TestExecuteRevenueDistributionPoolActive() {
 	err = suite.DataPoolKeeper.DistributionRevenuePools(suite.Ctx)
 	suite.Require().NoError(err)
 
+	curatorAmount = suite.BankKeeper.GetBalance(suite.Ctx, curatorAddr, assets.MicroMedDenom).Amount
+	suite.Require().Equal(fundForCurator.AmountOf(assets.MicroMedDenom).Add(curatorCommissionPerSalesDataPass.Mul(sdk.NewInt(2))), curatorAmount)
+
 	for _, sellerAddr := range sellers {
 		coin := suite.BankKeeper.GetBalance(suite.Ctx, sellerAddr, assets.MicroMedDenom)
-		suite.Require().Equal(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(200000)), coin)
+		suite.Require().Equal(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(198000)), coin)
 	}
 }
 
 func (suite poolTestSuite) TestExecuteRevenueDistributionDataPassSoldOut() {
 	// create and instantiate NFT contract
 	// create and instantiate NFT contract
-	poolID, sellers := setupRevenueDistributionTest(suite, defaultTargetNumData, defaultMaxNfySupply, defaultSellerCount)
+	poolID, sellers := setupRevenueDistributionTest(suite, defaultTargetNumData, defaultMaxNftSupply, defaultSellerCount)
 
 	// create a pool where data sales are not complete.
 	suite.Require().Equal(poolID, uint64(1))
@@ -141,7 +148,7 @@ func (suite poolTestSuite) TestExecuteRevenueDistributionDataPassSoldOut() {
 	}
 
 	// Buyer buys all DataPass.
-	buyDataPass(suite, poolID, defaultMaxNfySupply)
+	buyDataPass(suite, poolID, defaultMaxNftSupply)
 
 	// execute a distribution sales revenue
 	err = suite.DataPoolKeeper.DistributionRevenuePools(suite.Ctx)
@@ -149,17 +156,19 @@ func (suite poolTestSuite) TestExecuteRevenueDistributionDataPassSoldOut() {
 
 	// check balances of curator and sellers after distribution
 	curatorAmount = suite.BankKeeper.GetBalance(suite.Ctx, curatorAddr, assets.MicroMedDenom).Amount
-	suite.Require().Equal(fundForCurator.AmountOf(assets.MicroMedDenom), curatorAmount)
+	// Add as much as Curator's commission
+	totalCuratorCommissionAmount := curatorCommissionPerSalesDataPass.Mul(sdk.NewInt(defaultMaxNftSupply))
+	suite.Require().Equal(fundForCurator.AmountOf(assets.MicroMedDenom).Add(totalCuratorCommissionAmount), curatorAmount)
 
 	for _, sellerAddr := range sellers {
 		coin := suite.BankKeeper.GetBalance(suite.Ctx, sellerAddr, assets.MicroMedDenom)
-		suite.Require().Equal(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(1000000)), coin)
+		suite.Require().Equal(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(990000)), coin)
 	}
 }
 
 func (suite poolTestSuite) TestExecuteRevenueDistributionPoolPending() {
 	// create and instantiate NFT contract
-	poolID, sellers := setupRevenueDistributionTest(suite, defaultTargetNumData, defaultMaxNfySupply, 50)
+	poolID, sellers := setupRevenueDistributionTest(suite, defaultTargetNumData, defaultMaxNftSupply, 50)
 
 	// create a pool where data sales are not complete.
 	suite.Require().Equal(poolID, uint64(1))
@@ -203,11 +212,13 @@ func (suite poolTestSuite) TestExecuteRevenueDistributionPoolPending() {
 
 	// check balances of curator and sellers after distribution
 	curatorAmount = suite.BankKeeper.GetBalance(suite.Ctx, curatorAddr, assets.MicroMedDenom).Amount
-	suite.Require().Equal(fundForCurator.AmountOf(assets.MicroMedDenom).Sub(enoughDeposit.Amount), curatorAmount)
+	// (fundForCurator - deposit) + commissionPerSalesDataPass
+	expectedCuratorAmount = fundForCurator.AmountOf(assets.MicroMedDenom).Sub(enoughDeposit.Amount).Add(curatorCommissionPerSalesDataPass)
+	suite.Require().Equal(expectedCuratorAmount, curatorAmount)
 
 	for _, sellerAddr := range sellers {
 		coin := suite.BankKeeper.GetBalance(suite.Ctx, sellerAddr, assets.MicroMedDenom)
-		suite.Require().Equal(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(100000)), coin)
+		suite.Require().Equal(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(99000)), coin)
 	}
 
 	// 2nd purchase
@@ -218,15 +229,21 @@ func (suite poolTestSuite) TestExecuteRevenueDistributionPoolPending() {
 	err = suite.DataPoolKeeper.DistributionRevenuePools(suite.Ctx)
 	suite.Require().NoError(err)
 
+	// check balances of curator and sellers after distribution
+	curatorAmount = suite.BankKeeper.GetBalance(suite.Ctx, curatorAddr, assets.MicroMedDenom).Amount
+	// (fundForCurator - deposit) + (commissionPerSalesDataPass * 2)
+	expectedCuratorAmount = expectedCuratorAmount.Add(curatorCommissionPerSalesDataPass)
+	suite.Require().Equal(expectedCuratorAmount, curatorAmount)
+
 	for _, sellerAddr := range sellers {
 		coin := suite.BankKeeper.GetBalance(suite.Ctx, sellerAddr, assets.MicroMedDenom)
-		suite.Require().Equal(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(200000)), coin)
+		suite.Require().Equal(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(198000)), coin)
 	}
 }
 
 func (suite poolTestSuite) TestExecuteRevenueDistributionPoolPendingDataPassSoldOut() {
 	// create and instantiate NFT contract
-	poolID, sellers := setupRevenueDistributionTest(suite, defaultTargetNumData, defaultMaxNfySupply, 5)
+	poolID, sellers := setupRevenueDistributionTest(suite, defaultTargetNumData, defaultMaxNftSupply, 5)
 
 	// create a pool where data sales are not complete.
 	suite.Require().Equal(poolID, uint64(1))
@@ -251,7 +268,6 @@ func (suite poolTestSuite) TestExecuteRevenueDistributionPoolPendingDataPassSold
 	suite.Require().Equal(types.PENDING, pool.Status)
 
 	// check balances of curator and sellers
-	// minus two times deposit
 	expectedCuratorAmount := fundForCurator.AmountOf(assets.MicroMedDenom).Sub(enoughDeposit.Amount)
 	curatorAmount := suite.BankKeeper.GetBalance(suite.Ctx, curatorAddr, assets.MicroMedDenom).Amount
 	suite.Require().Equal(expectedCuratorAmount, curatorAmount)
@@ -262,7 +278,7 @@ func (suite poolTestSuite) TestExecuteRevenueDistributionPoolPendingDataPassSold
 	}
 
 	// Buyer buys all DataPass.
-	buyDataPass(suite, poolID, defaultMaxNfySupply)
+	buyDataPass(suite, poolID, defaultMaxNftSupply)
 
 	// execute a distribution sales revenue
 	err = suite.DataPoolKeeper.DistributionRevenuePools(suite.Ctx)
@@ -270,24 +286,26 @@ func (suite poolTestSuite) TestExecuteRevenueDistributionPoolPendingDataPassSold
 
 	// check balances of curator and sellers after distribution
 	curatorAmount = suite.BankKeeper.GetBalance(suite.Ctx, curatorAddr, assets.MicroMedDenom).Amount
-	suite.Require().Equal(fundForCurator.AmountOf(assets.MicroMedDenom).Sub(enoughDeposit.Amount), curatorAmount)
+	// (fundForCurator - deposit) + (commissionPerSalesDataPass * defaultMaxNftSupply)
+	expectedCuratorAmount = expectedCuratorAmount.Add(curatorCommissionPerSalesDataPass.Mul(sdk.NewInt(defaultMaxNftSupply)))
+	suite.Require().Equal(expectedCuratorAmount, curatorAmount)
 	pool, err = suite.DataPoolKeeper.GetPool(suite.Ctx, poolID)
 	suite.Require().NoError(err)
 
 	for _, sellerAddr := range sellers {
 		coin := suite.BankKeeper.GetBalance(suite.Ctx, sellerAddr, assets.MicroMedDenom)
-		suite.Require().Equal(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(1000000)), coin)
+		suite.Require().Equal(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(990000)), coin)
 	}
 
 	poolAddr, err := sdk.AccAddressFromBech32(pool.PoolAddress)
 	suite.Require().NoError(err)
 	poolBalance := suite.BankKeeper.GetBalance(suite.Ctx, poolAddr, assets.MicroMedDenom)
-	suite.Require().Equal(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(115000000)), poolBalance)
+	suite.Require().Equal(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(114050000)), poolBalance)
 }
 
 func (suite poolTestSuite) TestExecuteRevenueDistributionDuplicateSeller() {
 	// create and instantiate NFT contract
-	poolID, sellers := setupRevenueDistributionTest(suite, defaultTargetNumData, defaultMaxNfySupply, 50)
+	poolID, sellers := setupRevenueDistributionTest(suite, defaultTargetNumData, defaultMaxNftSupply, 50)
 
 	// create a pool where data sales are not complete.
 	suite.Require().Equal(poolID, uint64(1))
@@ -345,38 +363,45 @@ func (suite poolTestSuite) TestExecuteRevenueDistributionDuplicateSeller() {
 
 	// check balances of curator and sellers after distribution
 	curatorAmount = suite.BankKeeper.GetBalance(suite.Ctx, curatorAddr, assets.MicroMedDenom).Amount
-	suite.Require().Equal(fundForCurator.AmountOf(assets.MicroMedDenom).Sub(enoughDeposit.Amount), curatorAmount)
+	// (fundForCurator - deposit) + commissionPerSalesDataPass
+	expectedCuratorAmount = expectedCuratorAmount.Add(curatorCommissionPerSalesDataPass)
+	suite.Require().Equal(expectedCuratorAmount, curatorAmount)
 
 	for i, sellerAddr := range sellers {
 		coin := suite.BankKeeper.GetBalance(suite.Ctx, sellerAddr, assets.MicroMedDenom)
 		if i < 5 {
-			suite.Require().Equal(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(200000)), coin)
+			suite.Require().Equal(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(198000)), coin)
 		} else {
-			suite.Require().Equal(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(100000)), coin)
+			suite.Require().Equal(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(99000)), coin)
 		}
 	}
 
 	// 2nd purchase
-	err = suite.DataPoolKeeper.BuyDataPass(suite.Ctx, buyerAddr, poolID, 1, NFTPrice)
-	suite.Require().NoError(err)
+	buyDataPass(suite, poolID, 1)
 
 	// execute a distribution sales revenue
 	err = suite.DataPoolKeeper.DistributionRevenuePools(suite.Ctx)
 	suite.Require().NoError(err)
 
+	// check balances of curator and sellers after distribution
+	curatorAmount = suite.BankKeeper.GetBalance(suite.Ctx, curatorAddr, assets.MicroMedDenom).Amount
+	// (fundForCurator - deposit) + (commissionPerSalesDataPass * 2)
+	expectedCuratorAmount = expectedCuratorAmount.Add(curatorCommissionPerSalesDataPass)
+	suite.Require().Equal(expectedCuratorAmount, curatorAmount)
+
 	for i, sellerAddr := range sellers {
 		coin := suite.BankKeeper.GetBalance(suite.Ctx, sellerAddr, assets.MicroMedDenom)
 		if i < 5 {
-			suite.Require().Equal(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(400000)), coin)
+			suite.Require().Equal(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(396000)), coin)
 		} else {
-			suite.Require().Equal(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(200000)), coin)
+			suite.Require().Equal(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(198000)), coin)
 		}
 	}
 }
 
 func (suite poolTestSuite) TestExecuteRevenueionTarget101() {
 	// create and instantiate NFT contract
-	poolID, sellers := setupRevenueDistributionTest(suite, defaultTargetNumData+1, defaultMaxNfySupply, defaultSellerCount+1)
+	poolID, sellers := setupRevenueDistributionTest(suite, defaultTargetNumData+1, defaultMaxNftSupply, defaultSellerCount+1)
 
 	// create a pool where data sales are not complete.
 	suite.Require().Equal(poolID, uint64(1))
@@ -412,7 +437,7 @@ func (suite poolTestSuite) TestExecuteRevenueionTarget101() {
 	}
 
 	// Buyer buys all DataPass.
-	buyDataPass(suite, poolID, 10)
+	buyDataPass(suite, poolID, defaultMaxNftSupply)
 
 	// execute a distribution sales revenue
 	err = suite.DataPoolKeeper.DistributionRevenuePools(suite.Ctx)
@@ -420,10 +445,18 @@ func (suite poolTestSuite) TestExecuteRevenueionTarget101() {
 
 	// check balances of curator and sellers after distribution
 	curatorAmount = suite.BankKeeper.GetBalance(suite.Ctx, curatorAddr, assets.MicroMedDenom).Amount
-	suite.Require().Equal(fundForCurator.AmountOf(assets.MicroMedDenom), curatorAmount)
+	expectedCuratorAmount = fundForCurator.AmountOf(assets.MicroMedDenom).Add(curatorCommissionPerSalesDataPass.Mul(sdk.NewInt(defaultMaxNftSupply)))
+	suite.Require().Equal(expectedCuratorAmount, curatorAmount)
 
 	for _, sellerAddr := range sellers {
 		coin := suite.BankKeeper.GetBalance(suite.Ctx, sellerAddr, assets.MicroMedDenom)
-		suite.Require().Equal(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(990099)), coin)
+		suite.Require().Equal(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(980198)), coin)
 	}
+
+	//
+	poolAddr, err := sdk.AccAddressFromBech32(pool.PoolAddress)
+	suite.Require().NoError(err)
+	poolBalance := suite.BankKeeper.GetBalance(suite.Ctx, poolAddr, assets.MicroMedDenom)
+	// After dividing revenue, there is a remainder.
+	suite.Require().Equal(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(2)), poolBalance)
 }
