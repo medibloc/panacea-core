@@ -102,7 +102,7 @@ result
 }
 ```
 
-## Change parameter of data pool deposit by proposal
+## Change parameter of data pool commission by proposal
 
 proposal_example.json
 ```json
@@ -112,8 +112,8 @@ proposal_example.json
   "changes": [
     {
       "subspace": "datapool",
-      "key": "datapooldeposit",
-      "value": { "denom": "umed", "amount": "20000000" }
+      "key": "DataPoolCommissionRate",
+      "value": "0.05"
     }
   ],
   "deposit": "1000000umed"

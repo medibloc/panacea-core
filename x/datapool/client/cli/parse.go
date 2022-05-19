@@ -7,5 +7,4 @@ type CreatePoolInput struct {
 	NFTPrice              string   `json:"nft_price"`
 	TrustedDataValidators []string `json:"trusted_data_validators"`
 	TrustedDataIssuers    []string `json:"trusted_data_issuers"`
-	DownloadPeriod        string   `json:"download_period"`
 }

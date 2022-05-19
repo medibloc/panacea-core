@@ -13,13 +13,15 @@ message GenesisState {
   repeated Pool                  pools = 3 [(gogoproto.nullable) = false];
   Params                         params = 4 [(gogoproto.nullable) = false];
   repeated DataPassRedeemReceipt data_pass_redeem_receipts = 5 [(gogoproto.nullable) = false];
+  InstantRevenueDistribution     instant_revenue_distribution = 6 [(gogoproto.nullable) = false];
+  repeated SalesHistory          sales_histories = 7;
 }
 
 // Params define parameters of datapool module
 message Params {
-  string data_pool_deposit_rate = 1 [
+  string data_pool_commission_rate = 1 [
     (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
-    (gogoproto.moretags) = "yaml:\"data_pool_deposit_rate\"",
+    (gogoproto.moretags) = "yaml:\"data_pool_commission_rate\"",
     (gogoproto.nullable) = false
   ];
   uint64 data_pool_code_id = 2;

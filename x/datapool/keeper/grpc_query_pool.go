@@ -80,7 +80,7 @@ func (k Keeper) DataValidationCertificates(goCtx context.Context, req *types.Que
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	store := ctx.KVStore(k.storeKey)
-	certsStore := prefix.NewStore(store, types.GetKeyPrefixDataValidateCertByRound(req.PoolId, req.Round))
+	certsStore := prefix.NewStore(store, types.GetKeyPrefixDataValidateCerts(req.PoolId, req.Round))
 
 	var certs []types.DataValidationCertificate
 	pageRes, err := query.Paginate(certsStore, req.Pagination, func(_ []byte, value []byte) error {

@@ -1,11 +1,9 @@
 package keeper_test
 
 import (
-	"testing"
-	"time"
-
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 	"github.com/medibloc/panacea-core/v2/types/assets"
+	"testing"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/medibloc/panacea-core/v2/types/testsuite"
@@ -28,7 +26,7 @@ var (
 func (suite queryPoolTestSuite) TestQueryDataPoolParams() {
 	// set datapool module params
 	params := &types.Params{
-		DataPoolDepositRate:        types.DefaultDataPoolDepositRate,
+		DataPoolCommissionRate:     types.DefaultDataPoolCommissionRate,
 		DataPoolNftContractAddress: nftContractAddr.String(),
 		DataPoolCodeId:             2,
 	}
@@ -91,13 +89,13 @@ func (suite queryPoolTestSuite) TestQueryDataValidationCertificates() {
 	suite.Require().Len(res.DataValidationCertificates, 0)
 
 	dataHash1 := []byte("data1")
-	cert1, err := makeTestDataCertificate(suite.Cdc.Marshaler, pool.GetPoolId(), pool.GetRound(), dataHash1)
+	cert1, err := makeTestDataCertificate(suite.Cdc.Marshaler, pool.GetPoolId(), pool.GetRound(), dataHash1, requesterAddr.String())
 	suite.Require().NoError(err)
 
 	suite.DataPoolKeeper.SetDataValidationCertificate(suite.Ctx, *cert1)
 
 	dataHash2 := []byte("data2")
-	cert2, err := makeTestDataCertificate(suite.Cdc.Marshaler, pool.GetPoolId(), pool.GetRound(), dataHash2)
+	cert2, err := makeTestDataCertificate(suite.Cdc.Marshaler, pool.GetPoolId(), pool.GetRound(), dataHash2, requesterAddr.String())
 	suite.Require().NoError(err)
 
 	suite.DataPoolKeeper.SetDataValidationCertificate(suite.Ctx, *cert2)
@@ -139,14 +137,12 @@ func (suite *queryPoolTestSuite) setDataValidatorAccount() {
 func (suite *queryPoolTestSuite) setPool() *types.Pool {
 	poolID := uint64(1)
 	nftPrice := sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(1000000))
-	downloadPeriod := time.Hour
 	poolParams := types.PoolParams{
 		DataSchema:            []string{"https://json.schemastore.org/github-issue-forms.json"},
 		TargetNumData:         100,
 		MaxNftSupply:          10,
 		NftPrice:              &nftPrice,
 		TrustedDataValidators: []string{dataVal1.String()},
-		DownloadPeriod:        &downloadPeriod,
 	}
 
 	pool := types.NewPool(poolID, curatorAddr, poolParams)
