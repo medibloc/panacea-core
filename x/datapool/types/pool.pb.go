@@ -5,22 +5,19 @@ package types
 
 import (
 	fmt "fmt"
+	github_com_cosmos_cosmos_sdk_types "github.com/cosmos/cosmos-sdk/types"
 	types "github.com/cosmos/cosmos-sdk/types"
 	_ "github.com/gogo/protobuf/gogoproto"
 	proto "github.com/gogo/protobuf/proto"
-	github_com_gogo_protobuf_types "github.com/gogo/protobuf/types"
-	_ "google.golang.org/protobuf/types/known/durationpb"
 	io "io"
 	math "math"
 	math_bits "math/bits"
-	time "time"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal
 var _ = fmt.Errorf
 var _ = math.Inf
-var _ = time.Kitchen
 
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the proto package it is being compiled against.
@@ -30,16 +27,19 @@ const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 // Pool defines a data pool
 type Pool struct {
-	PoolId          uint64      `protobuf:"varint,1,opt,name=pool_id,json=poolId,proto3" json:"pool_id,omitempty"`
-	PoolAddress     string      `protobuf:"bytes,2,opt,name=pool_address,json=poolAddress,proto3" json:"pool_address,omitempty"`
-	Round           uint64      `protobuf:"varint,3,opt,name=round,proto3" json:"round,omitempty"`
-	PoolParams      *PoolParams `protobuf:"bytes,4,opt,name=pool_params,json=poolParams,proto3" json:"pool_params,omitempty"`
-	CurNumData      uint64      `protobuf:"varint,5,opt,name=cur_num_data,json=curNumData,proto3" json:"cur_num_data,omitempty"`
-	NumIssuedNfts   uint64      `protobuf:"varint,6,opt,name=num_issued_nfts,json=numIssuedNfts,proto3" json:"num_issued_nfts,omitempty"`
-	Status          string      `protobuf:"bytes,7,opt,name=status,proto3" json:"status,omitempty"`
-	Curator         string      `protobuf:"bytes,8,opt,name=curator,proto3" json:"curator,omitempty"`
-	Deposit         types.Coin  `protobuf:"bytes,9,opt,name=deposit,proto3" json:"deposit"`
-	NftContractAddr string      `protobuf:"bytes,10,opt,name=nft_contract_addr,json=nftContractAddr,proto3" json:"nft_contract_addr,omitempty"`
+	PoolId                uint64                                 `protobuf:"varint,1,opt,name=pool_id,json=poolId,proto3" json:"pool_id,omitempty"`
+	PoolAddress           string                                 `protobuf:"bytes,2,opt,name=pool_address,json=poolAddress,proto3" json:"pool_address,omitempty"`
+	Round                 uint64                                 `protobuf:"varint,3,opt,name=round,proto3" json:"round,omitempty"`
+	PoolParams            *PoolParams                            `protobuf:"bytes,4,opt,name=pool_params,json=poolParams,proto3" json:"pool_params,omitempty"`
+	CurNumData            uint64                                 `protobuf:"varint,5,opt,name=cur_num_data,json=curNumData,proto3" json:"cur_num_data,omitempty"`
+	NumIssuedNfts         uint64                                 `protobuf:"varint,6,opt,name=num_issued_nfts,json=numIssuedNfts,proto3" json:"num_issued_nfts,omitempty"`
+	Status                string                                 `protobuf:"bytes,7,opt,name=status,proto3" json:"status,omitempty"`
+	Curator               string                                 `protobuf:"bytes,8,opt,name=curator,proto3" json:"curator,omitempty"`
+	Deposit               types.Coin                             `protobuf:"bytes,9,opt,name=deposit,proto3" json:"deposit"`
+	NftContractAddr       string                                 `protobuf:"bytes,10,opt,name=nft_contract_addr,json=nftContractAddr,proto3" json:"nft_contract_addr,omitempty"`
+	WasDepositReturned    bool                                   `protobuf:"varint,11,opt,name=was_deposit_returned,json=wasDepositReturned,proto3" json:"was_deposit_returned,omitempty"`
+	CuratorCommission     map[uint64]types.Coin                  `protobuf:"bytes,12,rep,name=curator_commission,json=curatorCommission,proto3" json:"curator_commission" protobuf_key:"varint,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	CuratorCommissionRate github_com_cosmos_cosmos_sdk_types.Dec `protobuf:"bytes,13,opt,name=curator_commission_rate,json=curatorCommissionRate,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Dec" json:"curator_commission_rate" yaml:"curator_commission_rate"`
 }
 
 func (m *Pool) Reset()         { *m = Pool{} }
@@ -143,6 +143,20 @@ func (m *Pool) GetNftContractAddr() string {
 		return m.NftContractAddr
 	}
 	return ""
+}
+
+func (m *Pool) GetWasDepositReturned() bool {
+	if m != nil {
+		return m.WasDepositReturned
+	}
+	return false
+}
+
+func (m *Pool) GetCuratorCommission() map[uint64]types.Coin {
+	if m != nil {
+		return m.CuratorCommission
+	}
+	return nil
 }
 
 // DataValidationCertificate defines the certificate for data validation w/ data validator signature.
@@ -277,10 +291,10 @@ func (m *UnsignedDataValidationCertificate) GetRequester() string {
 
 // DataPassRedeemReceipt defines a receipt for redeeming data pass to get data.
 type DataPassRedeemReceipt struct {
-	PoolId     uint64 `protobuf:"varint,1,opt,name=pool_id,json=poolId,proto3" json:"pool_id,omitempty"`
-	Round      uint64 `protobuf:"varint,2,opt,name=round,proto3" json:"round,omitempty"`
-	DataPassId uint64 `protobuf:"varint,3,opt,name=data_pass_id,json=dataPassId,proto3" json:"data_pass_id,omitempty"`
-	Redeemer   string `protobuf:"bytes,4,opt,name=redeemer,proto3" json:"redeemer,omitempty"`
+	PoolId   uint64 `protobuf:"varint,1,opt,name=pool_id,json=poolId,proto3" json:"pool_id,omitempty"`
+	Round    uint64 `protobuf:"varint,2,opt,name=round,proto3" json:"round,omitempty"`
+	NftId    uint64 `protobuf:"varint,3,opt,name=nft_id,json=nftId,proto3" json:"nft_id,omitempty"`
+	Redeemer string `protobuf:"bytes,4,opt,name=redeemer,proto3" json:"redeemer,omitempty"`
 }
 
 func (m *DataPassRedeemReceipt) Reset()         { *m = DataPassRedeemReceipt{} }
@@ -330,9 +344,9 @@ func (m *DataPassRedeemReceipt) GetRound() uint64 {
 	return 0
 }
 
-func (m *DataPassRedeemReceipt) GetDataPassId() uint64 {
+func (m *DataPassRedeemReceipt) GetNftId() uint64 {
 	if m != nil {
-		return m.DataPassId
+		return m.NftId
 	}
 	return 0
 }
@@ -399,13 +413,12 @@ func (m *DataValidator) GetAddress() string {
 
 // PoolParams defines parameters for data pool
 type PoolParams struct {
-	DataSchema            []string       `protobuf:"bytes,1,rep,name=data_schema,json=dataSchema,proto3" json:"data_schema,omitempty"`
-	TargetNumData         uint64         `protobuf:"varint,2,opt,name=target_num_data,json=targetNumData,proto3" json:"target_num_data,omitempty"`
-	MaxNftSupply          uint64         `protobuf:"varint,3,opt,name=max_nft_supply,json=maxNftSupply,proto3" json:"max_nft_supply,omitempty"`
-	NftPrice              *types.Coin    `protobuf:"bytes,4,opt,name=nft_price,json=nftPrice,proto3" json:"nft_price,omitempty"`
-	TrustedDataValidators []string       `protobuf:"bytes,5,rep,name=trusted_data_validators,json=trustedDataValidators,proto3" json:"trusted_data_validators,omitempty"`
-	TrustedDataIssuers    []string       `protobuf:"bytes,6,rep,name=trusted_data_issuers,json=trustedDataIssuers,proto3" json:"trusted_data_issuers,omitempty"`
-	DownloadPeriod        *time.Duration `protobuf:"bytes,7,opt,name=download_period,json=downloadPeriod,proto3,stdduration" json:"download_period,omitempty"`
+	DataSchema            []string    `protobuf:"bytes,1,rep,name=data_schema,json=dataSchema,proto3" json:"data_schema,omitempty"`
+	TargetNumData         uint64      `protobuf:"varint,2,opt,name=target_num_data,json=targetNumData,proto3" json:"target_num_data,omitempty"`
+	MaxNftSupply          uint64      `protobuf:"varint,3,opt,name=max_nft_supply,json=maxNftSupply,proto3" json:"max_nft_supply,omitempty"`
+	NftPrice              *types.Coin `protobuf:"bytes,4,opt,name=nft_price,json=nftPrice,proto3" json:"nft_price,omitempty"`
+	TrustedDataValidators []string    `protobuf:"bytes,5,rep,name=trusted_data_validators,json=trustedDataValidators,proto3" json:"trusted_data_validators,omitempty"`
+	TrustedDataIssuers    []string    `protobuf:"bytes,6,rep,name=trusted_data_issuers,json=trustedDataIssuers,proto3" json:"trusted_data_issuers,omitempty"`
 }
 
 func (m *PoolParams) Reset()         { *m = PoolParams{} }
@@ -483,77 +496,208 @@ func (m *PoolParams) GetTrustedDataIssuers() []string {
 	return nil
 }
 
-func (m *PoolParams) GetDownloadPeriod() *time.Duration {
+// InstantRevenueDistribution defines poolID information to distribution revenue.
+type InstantRevenueDistribution struct {
+	PoolIds []uint64 `protobuf:"varint,1,rep,packed,name=pool_ids,json=poolIds,proto3" json:"pool_ids,omitempty"`
+}
+
+func (m *InstantRevenueDistribution) Reset()         { *m = InstantRevenueDistribution{} }
+func (m *InstantRevenueDistribution) String() string { return proto.CompactTextString(m) }
+func (*InstantRevenueDistribution) ProtoMessage()    {}
+func (*InstantRevenueDistribution) Descriptor() ([]byte, []int) {
+	return fileDescriptor_4ffa39381925211c, []int{6}
+}
+func (m *InstantRevenueDistribution) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *InstantRevenueDistribution) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_InstantRevenueDistribution.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *InstantRevenueDistribution) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_InstantRevenueDistribution.Merge(m, src)
+}
+func (m *InstantRevenueDistribution) XXX_Size() int {
+	return m.Size()
+}
+func (m *InstantRevenueDistribution) XXX_DiscardUnknown() {
+	xxx_messageInfo_InstantRevenueDistribution.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_InstantRevenueDistribution proto.InternalMessageInfo
+
+func (m *InstantRevenueDistribution) GetPoolIds() []uint64 {
 	if m != nil {
-		return m.DownloadPeriod
+		return m.PoolIds
+	}
+	return nil
+}
+
+// SalesInfo defines sales information
+type SalesHistory struct {
+	PoolId        uint64      `protobuf:"varint,1,opt,name=pool_id,json=poolId,proto3" json:"pool_id,omitempty"`
+	Round         uint64      `protobuf:"varint,2,opt,name=round,proto3" json:"round,omitempty"`
+	SellerAddress string      `protobuf:"bytes,3,opt,name=seller_address,json=sellerAddress,proto3" json:"seller_address,omitempty"`
+	DataHashes    [][]byte    `protobuf:"bytes,4,rep,name=data_hashes,json=dataHashes,proto3" json:"data_hashes,omitempty"`
+	PaidCoin      *types.Coin `protobuf:"bytes,5,opt,name=paid_coin,json=paidCoin,proto3" json:"paid_coin,omitempty"`
+}
+
+func (m *SalesHistory) Reset()         { *m = SalesHistory{} }
+func (m *SalesHistory) String() string { return proto.CompactTextString(m) }
+func (*SalesHistory) ProtoMessage()    {}
+func (*SalesHistory) Descriptor() ([]byte, []int) {
+	return fileDescriptor_4ffa39381925211c, []int{7}
+}
+func (m *SalesHistory) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *SalesHistory) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_SalesHistory.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *SalesHistory) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_SalesHistory.Merge(m, src)
+}
+func (m *SalesHistory) XXX_Size() int {
+	return m.Size()
+}
+func (m *SalesHistory) XXX_DiscardUnknown() {
+	xxx_messageInfo_SalesHistory.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_SalesHistory proto.InternalMessageInfo
+
+func (m *SalesHistory) GetPoolId() uint64 {
+	if m != nil {
+		return m.PoolId
+	}
+	return 0
+}
+
+func (m *SalesHistory) GetRound() uint64 {
+	if m != nil {
+		return m.Round
+	}
+	return 0
+}
+
+func (m *SalesHistory) GetSellerAddress() string {
+	if m != nil {
+		return m.SellerAddress
+	}
+	return ""
+}
+
+func (m *SalesHistory) GetDataHashes() [][]byte {
+	if m != nil {
+		return m.DataHashes
+	}
+	return nil
+}
+
+func (m *SalesHistory) GetPaidCoin() *types.Coin {
+	if m != nil {
+		return m.PaidCoin
 	}
 	return nil
 }
 
 func init() {
 	proto.RegisterType((*Pool)(nil), "panacea.datapool.v2.Pool")
+	proto.RegisterMapType((map[uint64]types.Coin)(nil), "panacea.datapool.v2.Pool.CuratorCommissionEntry")
 	proto.RegisterType((*DataValidationCertificate)(nil), "panacea.datapool.v2.DataValidationCertificate")
 	proto.RegisterType((*UnsignedDataValidationCertificate)(nil), "panacea.datapool.v2.UnsignedDataValidationCertificate")
 	proto.RegisterType((*DataPassRedeemReceipt)(nil), "panacea.datapool.v2.DataPassRedeemReceipt")
 	proto.RegisterType((*DataValidator)(nil), "panacea.datapool.v2.DataValidator")
 	proto.RegisterType((*PoolParams)(nil), "panacea.datapool.v2.PoolParams")
+	proto.RegisterType((*InstantRevenueDistribution)(nil), "panacea.datapool.v2.InstantRevenueDistribution")
+	proto.RegisterType((*SalesHistory)(nil), "panacea.datapool.v2.SalesHistory")
 }
 
 func init() { proto.RegisterFile("panacea/datapool/v2/pool.proto", fileDescriptor_4ffa39381925211c) }
 
 var fileDescriptor_4ffa39381925211c = []byte{
-	// 810 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x54, 0x4f, 0x6f, 0xe3, 0x44,
-	0x14, 0xaf, 0xbb, 0x69, 0x1b, 0xbf, 0x26, 0xad, 0x18, 0xba, 0xac, 0xb7, 0x20, 0x37, 0x1b, 0x01,
-	0xaa, 0x90, 0xb0, 0x69, 0x90, 0x2a, 0x71, 0x83, 0xb6, 0x48, 0x1b, 0x21, 0x55, 0x91, 0x57, 0x70,
-	0x80, 0x83, 0x35, 0x99, 0x19, 0x27, 0x23, 0xc5, 0x33, 0x66, 0xfe, 0x84, 0xee, 0x9d, 0x0f, 0xc0,
-	0x09, 0xf1, 0x41, 0xf8, 0x10, 0x7b, 0xdc, 0x23, 0x27, 0x40, 0xed, 0x81, 0x4f, 0x81, 0x84, 0x66,
-	0x6c, 0x27, 0x1b, 0xa9, 0x15, 0xda, 0x93, 0xfd, 0x7e, 0xbf, 0xf7, 0x66, 0x7e, 0xf3, 0xe6, 0xfd,
-	0x06, 0xe2, 0x0a, 0x0b, 0x4c, 0x18, 0x4e, 0x29, 0x36, 0xb8, 0x92, 0x72, 0x91, 0x2e, 0x47, 0xa9,
-	0xfb, 0x26, 0x95, 0x92, 0x46, 0xa2, 0x77, 0x1b, 0x3e, 0x69, 0xf9, 0x64, 0x39, 0x3a, 0x3e, 0x9a,
-	0xc9, 0x99, 0xf4, 0x7c, 0xea, 0xfe, 0xea, 0xd4, 0xe3, 0x98, 0x48, 0x5d, 0x4a, 0x9d, 0x4e, 0xb1,
-	0x66, 0xe9, 0xf2, 0x6c, 0xca, 0x0c, 0x3e, 0x4b, 0x89, 0xe4, 0xa2, 0xe5, 0x67, 0x52, 0xce, 0x16,
-	0x2c, 0xf5, 0xd1, 0xd4, 0x16, 0x29, 0xb5, 0x0a, 0x1b, 0x2e, 0x1b, 0x7e, 0xf8, 0xef, 0x36, 0x74,
-	0x26, 0x52, 0x2e, 0xd0, 0x13, 0xd8, 0x73, 0x3b, 0xe5, 0x9c, 0x46, 0xc1, 0x20, 0x38, 0xed, 0x64,
-	0xbb, 0x2e, 0x1c, 0x53, 0xf4, 0x0c, 0x7a, 0x9e, 0xc0, 0x94, 0x2a, 0xa6, 0x75, 0xb4, 0x3d, 0x08,
-	0x4e, 0xc3, 0x6c, 0xdf, 0x61, 0x5f, 0xd5, 0x10, 0x3a, 0x82, 0x1d, 0x25, 0xad, 0xa0, 0xd1, 0x23,
-	0x5f, 0x59, 0x07, 0xe8, 0x4b, 0xf0, 0x49, 0x79, 0x85, 0x15, 0x2e, 0x75, 0xd4, 0x19, 0x04, 0xa7,
-	0xfb, 0xa3, 0x93, 0xe4, 0x9e, 0xb3, 0x25, 0x4e, 0xc1, 0xc4, 0xa7, 0x65, 0x50, 0xad, 0xfe, 0xd1,
-	0x00, 0x7a, 0xc4, 0xaa, 0x5c, 0xd8, 0x32, 0x77, 0xd9, 0xd1, 0x8e, 0x5f, 0x1e, 0x88, 0x55, 0xd7,
-	0xb6, 0xbc, 0xc2, 0x06, 0xa3, 0x8f, 0xe1, 0xd0, 0xb1, 0x5c, 0x6b, 0xcb, 0x68, 0x2e, 0x0a, 0xa3,
-	0xa3, 0x5d, 0x9f, 0xd4, 0x17, 0xb6, 0x1c, 0x7b, 0xf4, 0xba, 0x30, 0x1a, 0xbd, 0x07, 0xbb, 0xda,
-	0x60, 0x63, 0x75, 0xb4, 0xe7, 0xe5, 0x37, 0x11, 0x8a, 0x60, 0x8f, 0xb8, 0x86, 0x48, 0x15, 0x75,
-	0x3d, 0xd1, 0x86, 0xe8, 0x0b, 0xd8, 0xa3, 0xac, 0x92, 0x9a, 0x9b, 0x28, 0xf4, 0xca, 0x9f, 0x26,
-	0x75, 0xab, 0x13, 0xd7, 0xea, 0xa4, 0x69, 0x75, 0x72, 0x29, 0xb9, 0xb8, 0xe8, 0xbc, 0xfa, 0xf3,
-	0x64, 0x2b, 0x6b, 0xf3, 0xd1, 0x27, 0xf0, 0x8e, 0x28, 0x4c, 0x4e, 0xa4, 0x30, 0x0a, 0x13, 0xe3,
-	0x3b, 0x17, 0x81, 0x5f, 0xfe, 0x50, 0x14, 0xe6, 0xb2, 0xc1, 0x5d, 0xf7, 0x86, 0xbf, 0x06, 0xf0,
-	0xd4, 0x9d, 0xe4, 0x3b, 0xbc, 0xe0, 0xd4, 0x5f, 0xcc, 0x25, 0x53, 0x86, 0x17, 0x9c, 0x60, 0xc3,
-	0xd0, 0x0f, 0xd0, 0xb7, 0x42, 0xf3, 0x99, 0x60, 0x34, 0x27, 0x4c, 0x19, 0x7f, 0x35, 0xfb, 0xa3,
-	0xf3, 0x7b, 0x9b, 0xf8, 0x6d, 0x93, 0xf9, 0xe0, 0x72, 0x59, 0xaf, 0x5d, 0xcc, 0x81, 0xe8, 0x03,
-	0x08, 0x5d, 0x84, 0x8d, 0x55, 0xcc, 0xdf, 0x6a, 0x2f, 0x5b, 0x03, 0xc3, 0xdf, 0x03, 0x78, 0xf6,
-	0xbf, 0x2b, 0x3e, 0x3c, 0x35, 0xab, 0x91, 0xd8, 0x7e, 0x73, 0x24, 0xde, 0x87, 0xd0, 0x29, 0xce,
-	0xe7, 0x58, 0xcf, 0xfd, 0xb0, 0xf4, 0xb2, 0xae, 0x03, 0x9e, 0x63, 0x3d, 0x47, 0x1f, 0xc1, 0x81,
-	0x27, 0x97, 0xf5, 0x4e, 0x52, 0xf9, 0x91, 0x09, 0xb3, 0x3e, 0x5d, 0x6f, 0x2f, 0x95, 0x93, 0xad,
-	0xd8, 0x8f, 0x96, 0x69, 0xc3, 0x94, 0x9f, 0x88, 0x30, 0x5b, 0x03, 0xc3, 0x9f, 0x03, 0x78, 0xec,
-	0xe4, 0x4e, 0xb0, 0xd6, 0x19, 0xa3, 0x8c, 0x95, 0x19, 0x23, 0x8c, 0x57, 0xe6, 0x6d, 0xa5, 0x0e,
-	0xa0, 0xe7, 0xd5, 0x54, 0x58, 0x6b, 0x57, 0x53, 0x8f, 0x36, 0xd0, 0x66, 0xed, 0x31, 0x45, 0xc7,
-	0xd0, 0x55, 0x7e, 0x07, 0xd6, 0x2a, 0x5d, 0xc5, 0xc3, 0xaf, 0xa1, 0x7f, 0xb5, 0xa1, 0xfa, 0x18,
-	0xba, 0x4c, 0xd0, 0x4a, 0x72, 0x51, 0x5f, 0x62, 0x98, 0xad, 0x62, 0x37, 0x84, 0x9b, 0xe6, 0x6a,
-	0xc3, 0xe1, 0x3f, 0xdb, 0x00, 0x6b, 0x6f, 0xa0, 0x13, 0xd8, 0xf7, 0x9a, 0x34, 0x99, 0xb3, 0x12,
-	0x47, 0xc1, 0xe0, 0xd1, 0x69, 0x58, 0x4b, 0x7a, 0xe1, 0x11, 0x67, 0x07, 0x83, 0xd5, 0x8c, 0x99,
-	0xb5, 0x67, 0xea, 0x43, 0xf5, 0x6b, 0xb8, 0xb5, 0xcd, 0x87, 0x70, 0x50, 0xe2, 0x1b, 0xe7, 0x97,
-	0x5c, 0xdb, 0xaa, 0x5a, 0xbc, 0x6c, 0x8e, 0xd7, 0x2b, 0xf1, 0xcd, 0x75, 0x61, 0x5e, 0x78, 0x0c,
-	0x9d, 0x43, 0xe8, 0x32, 0x2a, 0xc5, 0x09, 0x6b, 0xec, 0xfb, 0xb0, 0x09, 0xb2, 0xae, 0x28, 0xcc,
-	0xc4, 0xa5, 0xa2, 0x73, 0x78, 0x62, 0x94, 0xd5, 0x86, 0xd1, 0x7c, 0xf3, 0x42, 0x75, 0xb4, 0xe3,
-	0x25, 0x3f, 0x6e, 0xe8, 0x8d, 0x16, 0x69, 0xf4, 0x19, 0x1c, 0x6d, 0xd4, 0x79, 0x57, 0x2b, 0xe7,
-	0x68, 0x57, 0x84, 0xde, 0x28, 0x1a, 0xd7, 0x0c, 0x7a, 0x0e, 0x87, 0x54, 0xfe, 0x24, 0x16, 0x12,
-	0xd3, 0xbc, 0x62, 0x8a, 0x4b, 0xea, 0xfd, 0xed, 0x74, 0xd6, 0xef, 0x5e, 0xd2, 0xbe, 0x7b, 0xc9,
-	0x55, 0xf3, 0xee, 0x5d, 0x74, 0x7e, 0xfb, 0xeb, 0x24, 0xc8, 0x0e, 0xda, 0xba, 0x89, 0x2f, 0xbb,
-	0xf8, 0xe6, 0xd5, 0x6d, 0x1c, 0xbc, 0xbe, 0x8d, 0x83, 0xbf, 0x6f, 0xe3, 0xe0, 0x97, 0xbb, 0x78,
-	0xeb, 0xf5, 0x5d, 0xbc, 0xf5, 0xc7, 0x5d, 0xbc, 0xf5, 0xfd, 0xd9, 0x8c, 0x9b, 0xb9, 0x9d, 0x26,
-	0x44, 0x96, 0x69, 0xc9, 0x28, 0x9f, 0x2e, 0x24, 0x49, 0x1b, 0xff, 0x7d, 0x4a, 0xa4, 0x62, 0xe9,
-	0xcd, 0xfa, 0x1d, 0x37, 0x2f, 0x2b, 0xa6, 0xa7, 0xbb, 0x7e, 0xd7, 0xcf, 0xff, 0x0b, 0x00, 0x00,
-	0xff, 0xff, 0x62, 0xe3, 0x26, 0x7e, 0xe8, 0x05, 0x00, 0x00,
+	// 1010 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x55, 0x4f, 0x6f, 0x1b, 0x45,
+	0x14, 0xcf, 0xc6, 0x89, 0x63, 0x3f, 0xdb, 0x2d, 0x1d, 0x92, 0x66, 0x63, 0x90, 0xe3, 0x5a, 0xb4,
+	0xb2, 0x90, 0xba, 0xdb, 0x04, 0x29, 0x40, 0x4f, 0xd0, 0xa4, 0x52, 0x22, 0xa4, 0x28, 0x9a, 0x08,
+	0x0e, 0x70, 0x58, 0x8d, 0x77, 0x9f, 0x93, 0x51, 0xbd, 0x33, 0xcb, 0xcc, 0xac, 0x1b, 0x5f, 0x39,
+	0x71, 0xe4, 0xc4, 0x8d, 0x6f, 0xc1, 0x95, 0x7b, 0x8f, 0x3d, 0x22, 0x0e, 0x11, 0x4a, 0xbe, 0x01,
+	0x9f, 0x00, 0xcd, 0xec, 0xda, 0x4e, 0x68, 0x12, 0xd4, 0xd3, 0xee, 0xfb, 0xbd, 0x3f, 0xfb, 0xdb,
+	0x37, 0xef, 0xfd, 0x06, 0x3a, 0x19, 0x13, 0x2c, 0x46, 0x16, 0x26, 0xcc, 0xb0, 0x4c, 0xca, 0x51,
+	0x38, 0xde, 0x0e, 0xed, 0x33, 0xc8, 0x94, 0x34, 0x92, 0x7c, 0x58, 0xfa, 0x83, 0xa9, 0x3f, 0x18,
+	0x6f, 0xb7, 0x57, 0x4f, 0xe4, 0x89, 0x74, 0xfe, 0xd0, 0xbe, 0x15, 0xa1, 0xed, 0x4e, 0x2c, 0x75,
+	0x2a, 0x75, 0x38, 0x60, 0x1a, 0xc3, 0xf1, 0xd6, 0x00, 0x0d, 0xdb, 0x0a, 0x63, 0xc9, 0x45, 0xe1,
+	0xef, 0xfd, 0x54, 0x85, 0xa5, 0x23, 0x29, 0x47, 0x64, 0x1d, 0x56, 0x6c, 0xa5, 0x88, 0x27, 0xbe,
+	0xd7, 0xf5, 0xfa, 0x4b, 0xb4, 0x6a, 0xcd, 0x83, 0x84, 0x3c, 0x82, 0xa6, 0x73, 0xb0, 0x24, 0x51,
+	0xa8, 0xb5, 0xbf, 0xd8, 0xf5, 0xfa, 0x75, 0xda, 0xb0, 0xd8, 0xd7, 0x05, 0x44, 0x56, 0x61, 0x59,
+	0xc9, 0x5c, 0x24, 0x7e, 0xc5, 0x65, 0x16, 0x06, 0xf9, 0x0a, 0x5c, 0x50, 0x94, 0x31, 0xc5, 0x52,
+	0xed, 0x2f, 0x75, 0xbd, 0x7e, 0x63, 0x7b, 0x33, 0xb8, 0x81, 0x7b, 0x60, 0x19, 0x1c, 0xb9, 0x30,
+	0x0a, 0xd9, 0xec, 0x9d, 0x74, 0xa1, 0x19, 0xe7, 0x2a, 0x12, 0x79, 0x1a, 0xd9, 0x68, 0x7f, 0xd9,
+	0x95, 0x87, 0x38, 0x57, 0x87, 0x79, 0xba, 0xc7, 0x0c, 0x23, 0x4f, 0xe0, 0xbe, 0xf5, 0x72, 0xad,
+	0x73, 0x4c, 0x22, 0x31, 0x34, 0xda, 0xaf, 0xba, 0xa0, 0x96, 0xc8, 0xd3, 0x03, 0x87, 0x1e, 0x0e,
+	0x8d, 0x26, 0x0f, 0xa1, 0xaa, 0x0d, 0x33, 0xb9, 0xf6, 0x57, 0x1c, 0xfd, 0xd2, 0x22, 0x3e, 0xac,
+	0xc4, 0xb9, 0x62, 0x46, 0x2a, 0xbf, 0xe6, 0x1c, 0x53, 0x93, 0x7c, 0x09, 0x2b, 0x09, 0x66, 0x52,
+	0x73, 0xe3, 0xd7, 0x1d, 0xf3, 0x8d, 0xa0, 0x68, 0x65, 0x60, 0x5b, 0x19, 0x94, 0xad, 0x0c, 0x76,
+	0x25, 0x17, 0x2f, 0x96, 0xde, 0x9c, 0x6f, 0x2e, 0xd0, 0x69, 0x3c, 0xf9, 0x14, 0x1e, 0x88, 0xa1,
+	0x89, 0x62, 0x29, 0x8c, 0x62, 0xb1, 0x71, 0x9d, 0xf3, 0xc1, 0x95, 0xbf, 0x2f, 0x86, 0x66, 0xb7,
+	0xc4, 0x6d, 0xf7, 0xc8, 0x33, 0x58, 0x7d, 0xcd, 0x74, 0x54, 0xa6, 0x46, 0x0a, 0x4d, 0xae, 0x04,
+	0x26, 0x7e, 0xa3, 0xeb, 0xf5, 0x6b, 0x94, 0xbc, 0x66, 0x7a, 0xaf, 0x70, 0xd1, 0xd2, 0x43, 0x10,
+	0x48, 0xc9, 0x31, 0x8a, 0x65, 0x9a, 0x72, 0xad, 0xb9, 0x14, 0x7e, 0xb3, 0x5b, 0xe9, 0x37, 0xb6,
+	0x9f, 0xdd, 0xda, 0xdd, 0x60, 0xb7, 0xc8, 0xd9, 0x9d, 0xa5, 0xbc, 0x14, 0x46, 0x4d, 0x4a, 0xea,
+	0x0f, 0xe2, 0xff, 0x7a, 0xc9, 0xcf, 0x1e, 0xac, 0xbf, 0xfb, 0x9d, 0x48, 0x31, 0x83, 0x7e, 0xcb,
+	0xfe, 0xcb, 0x8b, 0x23, 0x9b, 0xfa, 0xd7, 0xf9, 0xe6, 0x93, 0x13, 0x6e, 0x4e, 0xf3, 0x41, 0x10,
+	0xcb, 0x34, 0x2c, 0xa7, 0xad, 0x78, 0x3c, 0xd5, 0xc9, 0xab, 0xd0, 0x4c, 0x32, 0xd4, 0xc1, 0x1e,
+	0xc6, 0xff, 0x9c, 0x6f, 0x76, 0x26, 0x2c, 0x1d, 0x3d, 0xef, 0xdd, 0x52, 0xb6, 0x47, 0xd7, 0xde,
+	0xa1, 0x41, 0x99, 0xc1, 0x76, 0x04, 0x0f, 0x6f, 0x66, 0x4f, 0x3e, 0x80, 0xca, 0x2b, 0x9c, 0x94,
+	0x03, 0x6b, 0x5f, 0x49, 0x08, 0xcb, 0x63, 0x36, 0xca, 0xd1, 0x8d, 0xe9, 0x5d, 0x87, 0x46, 0x8b,
+	0xb8, 0xe7, 0x8b, 0x5f, 0x78, 0xbd, 0x5f, 0x3d, 0xd8, 0xb0, 0xe3, 0xf4, 0x1d, 0x1b, 0xf1, 0x84,
+	0x19, 0x2e, 0xc5, 0x2e, 0x2a, 0xc3, 0x87, 0x3c, 0x66, 0x06, 0xc9, 0x0f, 0xd0, 0xca, 0x85, 0xe6,
+	0x27, 0x02, 0x93, 0x28, 0x46, 0x65, 0xdc, 0xe7, 0x1a, 0xdb, 0x3b, 0x37, 0xf6, 0xfa, 0xdb, 0x32,
+	0xf2, 0xd6, 0x72, 0xb4, 0x39, 0x2d, 0x66, 0x41, 0xf2, 0x31, 0xd4, 0xad, 0xc5, 0x4c, 0xae, 0x0a,
+	0xce, 0x4d, 0x3a, 0x07, 0x7a, 0xbf, 0x7b, 0xf0, 0xe8, 0x7f, 0x2b, 0xde, 0xbe, 0xba, 0xb3, 0xbd,
+	0x5c, 0xbc, 0xba, 0x97, 0x1f, 0x41, 0xdd, 0x32, 0x8e, 0x4e, 0x99, 0x3e, 0x75, 0x1b, 0xdb, 0xa4,
+	0x35, 0x0b, 0xec, 0x33, 0x7d, 0x4a, 0x1e, 0xc3, 0x3d, 0xe7, 0x1c, 0x17, 0x5f, 0x92, 0xca, 0xed,
+	0x6d, 0x9d, 0xb6, 0x92, 0xf9, 0xe7, 0xa5, 0xb2, 0xb4, 0x15, 0xfe, 0x98, 0xa3, 0x36, 0xa8, 0xdc,
+	0x5a, 0xd6, 0xe9, 0x1c, 0xe8, 0x4d, 0x60, 0xcd, 0xb2, 0x3d, 0x62, 0x5a, 0x53, 0x4c, 0x10, 0x53,
+	0x8a, 0x31, 0xf2, 0xcc, 0xbc, 0x2f, 0xd3, 0x35, 0xa8, 0xda, 0x45, 0xe2, 0x33, 0x61, 0x11, 0x43,
+	0x73, 0x90, 0x90, 0x36, 0xd4, 0x94, 0x2b, 0x8b, 0x53, 0x76, 0x33, 0xbb, 0xf7, 0x12, 0x5a, 0x7b,
+	0xd7, 0x98, 0xb6, 0xa1, 0x86, 0x22, 0xc9, 0x24, 0x17, 0xc5, 0xc1, 0xd5, 0xe9, 0xcc, 0xb6, 0xdb,
+	0x7f, 0x5d, 0xd5, 0xa6, 0x66, 0xef, 0xb7, 0x45, 0x80, 0xb9, 0x28, 0x91, 0x4d, 0x68, 0xb8, 0xae,
+	0xe8, 0xf8, 0x14, 0x53, 0xe6, 0x7b, 0xdd, 0x4a, 0xbf, 0x4e, 0xc1, 0x42, 0xc7, 0x0e, 0xb1, 0x3a,
+	0x64, 0x98, 0x3a, 0x41, 0x33, 0x17, 0xab, 0xe2, 0x4f, 0x5a, 0x05, 0x3c, 0xd5, 0xab, 0x4f, 0xe0,
+	0x5e, 0xca, 0xce, 0xac, 0x50, 0x45, 0x3a, 0xcf, 0xb2, 0xd1, 0xa4, 0xfc, 0xb3, 0x66, 0xca, 0xce,
+	0x0e, 0x87, 0xe6, 0xd8, 0x61, 0x64, 0x07, 0xea, 0x36, 0x22, 0x53, 0x3c, 0xc6, 0x52, 0x37, 0xef,
+	0x18, 0xe4, 0x9a, 0x18, 0x9a, 0x23, 0x1b, 0x4a, 0x76, 0x60, 0xdd, 0xa8, 0x5c, 0x1b, 0x4c, 0xa2,
+	0xeb, 0x87, 0xa8, 0xfd, 0x65, 0x47, 0x79, 0xad, 0x74, 0x5f, 0x6b, 0x91, 0xb6, 0x22, 0x74, 0x2d,
+	0xcf, 0xc9, 0xa9, 0xb2, 0x52, 0x6a, 0x93, 0xc8, 0x95, 0xa4, 0x83, 0xc2, 0xd3, 0xfb, 0x1c, 0xda,
+	0x07, 0x42, 0x1b, 0x26, 0x0c, 0xc5, 0x31, 0x8a, 0x1c, 0xf7, 0xb8, 0x36, 0x8a, 0x0f, 0x72, 0x3b,
+	0x9b, 0x64, 0x03, 0x6a, 0xe5, 0x31, 0x6b, 0xd7, 0xab, 0x25, 0xba, 0x52, 0x9c, 0xb3, 0xee, 0xfd,
+	0xe1, 0x41, 0xf3, 0x98, 0x8d, 0x50, 0xef, 0x73, 0x6d, 0xa4, 0x9a, 0xbc, 0xef, 0x48, 0x3c, 0x86,
+	0x7b, 0x1a, 0x47, 0x23, 0x54, 0xb3, 0xfb, 0xa8, 0x52, 0xcc, 0x67, 0x81, 0x4e, 0x6f, 0xa4, 0xe9,
+	0x81, 0xd9, 0x19, 0x47, 0x7b, 0xf7, 0x54, 0xfa, 0xcd, 0xe2, 0xc0, 0xf6, 0x1d, 0x62, 0x5b, 0x9c,
+	0x31, 0x9e, 0x44, 0xf6, 0x2a, 0x74, 0x03, 0x7c, 0x77, 0x8b, 0x6d, 0xac, 0x93, 0xfa, 0x6f, 0xde,
+	0x5c, 0x74, 0xbc, 0xb7, 0x17, 0x1d, 0xef, 0xef, 0x8b, 0x8e, 0xf7, 0xcb, 0x65, 0x67, 0xe1, 0xed,
+	0x65, 0x67, 0xe1, 0xcf, 0xcb, 0xce, 0xc2, 0xf7, 0x5b, 0x57, 0x64, 0x30, 0xc5, 0x84, 0x0f, 0x46,
+	0x32, 0x0e, 0x4b, 0x89, 0x78, 0x1a, 0x4b, 0x85, 0xe1, 0xd9, 0xfc, 0x3e, 0x77, 0xaa, 0x38, 0xa8,
+	0xba, 0x3b, 0xf8, 0xb3, 0x7f, 0x03, 0x00, 0x00, 0xff, 0xff, 0x11, 0xf0, 0x6b, 0xf8, 0xf0, 0x07,
+	0x00, 0x00,
 }
 
 func (m *Pool) Marshal() (dAtA []byte, err error) {
@@ -576,6 +720,48 @@ func (m *Pool) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
+	{
+		size := m.CuratorCommissionRate.Size()
+		i -= size
+		if _, err := m.CuratorCommissionRate.MarshalTo(dAtA[i:]); err != nil {
+			return 0, err
+		}
+		i = encodeVarintPool(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x6a
+	if len(m.CuratorCommission) > 0 {
+		for k := range m.CuratorCommission {
+			v := m.CuratorCommission[k]
+			baseI := i
+			{
+				size, err := (&v).MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintPool(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x12
+			i = encodeVarintPool(dAtA, i, uint64(k))
+			i--
+			dAtA[i] = 0x8
+			i = encodeVarintPool(dAtA, i, uint64(baseI-i))
+			i--
+			dAtA[i] = 0x62
+		}
+	}
+	if m.WasDepositReturned {
+		i--
+		if m.WasDepositReturned {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x58
+	}
 	if len(m.NftContractAddr) > 0 {
 		i -= len(m.NftContractAddr)
 		copy(dAtA[i:], m.NftContractAddr)
@@ -772,8 +958,8 @@ func (m *DataPassRedeemReceipt) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x22
 	}
-	if m.DataPassId != 0 {
-		i = encodeVarintPool(dAtA, i, uint64(m.DataPassId))
+	if m.NftId != 0 {
+		i = encodeVarintPool(dAtA, i, uint64(m.NftId))
 		i--
 		dAtA[i] = 0x18
 	}
@@ -847,16 +1033,6 @@ func (m *PoolParams) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if m.DownloadPeriod != nil {
-		n4, err4 := github_com_gogo_protobuf_types.StdDurationMarshalTo(*m.DownloadPeriod, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdDuration(*m.DownloadPeriod):])
-		if err4 != nil {
-			return 0, err4
-		}
-		i -= n4
-		i = encodeVarintPool(dAtA, i, uint64(n4))
-		i--
-		dAtA[i] = 0x3a
-	}
 	if len(m.TrustedDataIssuers) > 0 {
 		for iNdEx := len(m.TrustedDataIssuers) - 1; iNdEx >= 0; iNdEx-- {
 			i -= len(m.TrustedDataIssuers[iNdEx])
@@ -905,6 +1081,108 @@ func (m *PoolParams) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 			i--
 			dAtA[i] = 0xa
 		}
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *InstantRevenueDistribution) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *InstantRevenueDistribution) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *InstantRevenueDistribution) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.PoolIds) > 0 {
+		dAtA7 := make([]byte, len(m.PoolIds)*10)
+		var j6 int
+		for _, num := range m.PoolIds {
+			for num >= 1<<7 {
+				dAtA7[j6] = uint8(uint64(num)&0x7f | 0x80)
+				num >>= 7
+				j6++
+			}
+			dAtA7[j6] = uint8(num)
+			j6++
+		}
+		i -= j6
+		copy(dAtA[i:], dAtA7[:j6])
+		i = encodeVarintPool(dAtA, i, uint64(j6))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *SalesHistory) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *SalesHistory) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *SalesHistory) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.PaidCoin != nil {
+		{
+			size, err := m.PaidCoin.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintPool(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x2a
+	}
+	if len(m.DataHashes) > 0 {
+		for iNdEx := len(m.DataHashes) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.DataHashes[iNdEx])
+			copy(dAtA[i:], m.DataHashes[iNdEx])
+			i = encodeVarintPool(dAtA, i, uint64(len(m.DataHashes[iNdEx])))
+			i--
+			dAtA[i] = 0x22
+		}
+	}
+	if len(m.SellerAddress) > 0 {
+		i -= len(m.SellerAddress)
+		copy(dAtA[i:], m.SellerAddress)
+		i = encodeVarintPool(dAtA, i, uint64(len(m.SellerAddress)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if m.Round != 0 {
+		i = encodeVarintPool(dAtA, i, uint64(m.Round))
+		i--
+		dAtA[i] = 0x10
+	}
+	if m.PoolId != 0 {
+		i = encodeVarintPool(dAtA, i, uint64(m.PoolId))
+		i--
+		dAtA[i] = 0x8
 	}
 	return len(dAtA) - i, nil
 }
@@ -960,6 +1238,20 @@ func (m *Pool) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovPool(uint64(l))
 	}
+	if m.WasDepositReturned {
+		n += 2
+	}
+	if len(m.CuratorCommission) > 0 {
+		for k, v := range m.CuratorCommission {
+			_ = k
+			_ = v
+			l = v.Size()
+			mapEntrySize := 1 + sovPool(uint64(k)) + 1 + l + sovPool(uint64(l))
+			n += mapEntrySize + 1 + sovPool(uint64(mapEntrySize))
+		}
+	}
+	l = m.CuratorCommissionRate.Size()
+	n += 1 + l + sovPool(uint64(l))
 	return n
 }
 
@@ -1019,8 +1311,8 @@ func (m *DataPassRedeemReceipt) Size() (n int) {
 	if m.Round != 0 {
 		n += 1 + sovPool(uint64(m.Round))
 	}
-	if m.DataPassId != 0 {
-		n += 1 + sovPool(uint64(m.DataPassId))
+	if m.NftId != 0 {
+		n += 1 + sovPool(uint64(m.NftId))
 	}
 	l = len(m.Redeemer)
 	if l > 0 {
@@ -1080,8 +1372,49 @@ func (m *PoolParams) Size() (n int) {
 			n += 1 + l + sovPool(uint64(l))
 		}
 	}
-	if m.DownloadPeriod != nil {
-		l = github_com_gogo_protobuf_types.SizeOfStdDuration(*m.DownloadPeriod)
+	return n
+}
+
+func (m *InstantRevenueDistribution) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if len(m.PoolIds) > 0 {
+		l = 0
+		for _, e := range m.PoolIds {
+			l += sovPool(uint64(e))
+		}
+		n += 1 + sovPool(uint64(l)) + l
+	}
+	return n
+}
+
+func (m *SalesHistory) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.PoolId != 0 {
+		n += 1 + sovPool(uint64(m.PoolId))
+	}
+	if m.Round != 0 {
+		n += 1 + sovPool(uint64(m.Round))
+	}
+	l = len(m.SellerAddress)
+	if l > 0 {
+		n += 1 + l + sovPool(uint64(l))
+	}
+	if len(m.DataHashes) > 0 {
+		for _, b := range m.DataHashes {
+			l = len(b)
+			n += 1 + l + sovPool(uint64(l))
+		}
+	}
+	if m.PaidCoin != nil {
+		l = m.PaidCoin.Size()
 		n += 1 + l + sovPool(uint64(l))
 	}
 	return n
@@ -1394,6 +1727,175 @@ func (m *Pool) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			m.NftContractAddr = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 11:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field WasDepositReturned", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowPool
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				v |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.WasDepositReturned = bool(v != 0)
+		case 12:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field CuratorCommission", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowPool
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthPool
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthPool
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.CuratorCommission == nil {
+				m.CuratorCommission = make(map[uint64]types.Coin)
+			}
+			var mapkey uint64
+			mapvalue := &types.Coin{}
+			for iNdEx < postIndex {
+				entryPreIndex := iNdEx
+				var wire uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return ErrIntOverflowPool
+					}
+					if iNdEx >= l {
+						return io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					wire |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				fieldNum := int32(wire >> 3)
+				if fieldNum == 1 {
+					for shift := uint(0); ; shift += 7 {
+						if shift >= 64 {
+							return ErrIntOverflowPool
+						}
+						if iNdEx >= l {
+							return io.ErrUnexpectedEOF
+						}
+						b := dAtA[iNdEx]
+						iNdEx++
+						mapkey |= uint64(b&0x7F) << shift
+						if b < 0x80 {
+							break
+						}
+					}
+				} else if fieldNum == 2 {
+					var mapmsglen int
+					for shift := uint(0); ; shift += 7 {
+						if shift >= 64 {
+							return ErrIntOverflowPool
+						}
+						if iNdEx >= l {
+							return io.ErrUnexpectedEOF
+						}
+						b := dAtA[iNdEx]
+						iNdEx++
+						mapmsglen |= int(b&0x7F) << shift
+						if b < 0x80 {
+							break
+						}
+					}
+					if mapmsglen < 0 {
+						return ErrInvalidLengthPool
+					}
+					postmsgIndex := iNdEx + mapmsglen
+					if postmsgIndex < 0 {
+						return ErrInvalidLengthPool
+					}
+					if postmsgIndex > l {
+						return io.ErrUnexpectedEOF
+					}
+					mapvalue = &types.Coin{}
+					if err := mapvalue.Unmarshal(dAtA[iNdEx:postmsgIndex]); err != nil {
+						return err
+					}
+					iNdEx = postmsgIndex
+				} else {
+					iNdEx = entryPreIndex
+					skippy, err := skipPool(dAtA[iNdEx:])
+					if err != nil {
+						return err
+					}
+					if (skippy < 0) || (iNdEx+skippy) < 0 {
+						return ErrInvalidLengthPool
+					}
+					if (iNdEx + skippy) > postIndex {
+						return io.ErrUnexpectedEOF
+					}
+					iNdEx += skippy
+				}
+			}
+			m.CuratorCommission[mapkey] = *mapvalue
+			iNdEx = postIndex
+		case 13:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field CuratorCommissionRate", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowPool
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthPool
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthPool
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.CuratorCommissionRate.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -1791,9 +2293,9 @@ func (m *DataPassRedeemReceipt) Unmarshal(dAtA []byte) error {
 			}
 		case 3:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field DataPassId", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field NftId", wireType)
 			}
-			m.DataPassId = 0
+			m.NftId = 0
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowPool
@@ -1803,7 +2305,7 @@ func (m *DataPassRedeemReceipt) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.DataPassId |= uint64(b&0x7F) << shift
+				m.NftId |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -2174,9 +2676,287 @@ func (m *PoolParams) Unmarshal(dAtA []byte) error {
 			}
 			m.TrustedDataIssuers = append(m.TrustedDataIssuers, string(dAtA[iNdEx:postIndex]))
 			iNdEx = postIndex
-		case 7:
+		default:
+			iNdEx = preIndex
+			skippy, err := skipPool(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthPool
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *InstantRevenueDistribution) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowPool
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: InstantRevenueDistribution: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: InstantRevenueDistribution: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType == 0 {
+				var v uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return ErrIntOverflowPool
+					}
+					if iNdEx >= l {
+						return io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					v |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				m.PoolIds = append(m.PoolIds, v)
+			} else if wireType == 2 {
+				var packedLen int
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return ErrIntOverflowPool
+					}
+					if iNdEx >= l {
+						return io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					packedLen |= int(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				if packedLen < 0 {
+					return ErrInvalidLengthPool
+				}
+				postIndex := iNdEx + packedLen
+				if postIndex < 0 {
+					return ErrInvalidLengthPool
+				}
+				if postIndex > l {
+					return io.ErrUnexpectedEOF
+				}
+				var elementCount int
+				var count int
+				for _, integer := range dAtA[iNdEx:postIndex] {
+					if integer < 128 {
+						count++
+					}
+				}
+				elementCount = count
+				if elementCount != 0 && len(m.PoolIds) == 0 {
+					m.PoolIds = make([]uint64, 0, elementCount)
+				}
+				for iNdEx < postIndex {
+					var v uint64
+					for shift := uint(0); ; shift += 7 {
+						if shift >= 64 {
+							return ErrIntOverflowPool
+						}
+						if iNdEx >= l {
+							return io.ErrUnexpectedEOF
+						}
+						b := dAtA[iNdEx]
+						iNdEx++
+						v |= uint64(b&0x7F) << shift
+						if b < 0x80 {
+							break
+						}
+					}
+					m.PoolIds = append(m.PoolIds, v)
+				}
+			} else {
+				return fmt.Errorf("proto: wrong wireType = %d for field PoolIds", wireType)
+			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipPool(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthPool
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *SalesHistory) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowPool
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: SalesHistory: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: SalesHistory: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field PoolId", wireType)
+			}
+			m.PoolId = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowPool
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.PoolId |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 2:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Round", wireType)
+			}
+			m.Round = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowPool
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Round |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 3:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field DownloadPeriod", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field SellerAddress", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowPool
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthPool
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthPool
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.SellerAddress = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field DataHashes", wireType)
+			}
+			var byteLen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowPool
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				byteLen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if byteLen < 0 {
+				return ErrInvalidLengthPool
+			}
+			postIndex := iNdEx + byteLen
+			if postIndex < 0 {
+				return ErrInvalidLengthPool
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.DataHashes = append(m.DataHashes, make([]byte, postIndex-iNdEx))
+			copy(m.DataHashes[len(m.DataHashes)-1], dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 5:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field PaidCoin", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -2203,10 +2983,10 @@ func (m *PoolParams) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if m.DownloadPeriod == nil {
-				m.DownloadPeriod = new(time.Duration)
+			if m.PaidCoin == nil {
+				m.PaidCoin = &types.Coin{}
 			}
-			if err := github_com_gogo_protobuf_types.StdDurationUnmarshal(m.DownloadPeriod, dAtA[iNdEx:postIndex]); err != nil {
+			if err := m.PaidCoin.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex

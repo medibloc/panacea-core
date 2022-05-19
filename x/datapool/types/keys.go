@@ -36,10 +36,15 @@ var (
 	KeyPrefixPools = []byte{0x03}
 
 	// KeyPrefixDataValidatorCerts defines key to store dataValidator certs
-	KeyPrefixDataValidatorCerts = []byte{0x05}
+	KeyPrefixDataValidatorCerts = []byte{0x04}
 
 	// KeyPrefixNFTRedeemReceipts define key to store redeemed receipts
-	KeyPrefixNFTRedeemReceipts = []byte{0x06}
+	KeyPrefixNFTRedeemReceipts = []byte{0x05}
+
+	KeyPrefixSalesHistory = []byte{0x06}
+
+	// KeyPrefixInstantRevenueDistribution defines key to distribution reward pool
+	KeyPrefixInstantRevenueDistribution = []byte{0x07}
 
 	KeyIndexSeparator = []byte{0xFF}
 )
@@ -52,13 +57,20 @@ func GetKeyPrefixPools(poolID uint64) []byte {
 	return append(KeyPrefixPools, sdk.Uint64ToBigEndian(poolID)...)
 }
 
-func GetKeyPrefixDataValidateCertByRound(poolID, round uint64) []byte {
-	keyPoolAppended := append(KeyPrefixDataValidatorCerts, sdk.Uint64ToBigEndian(poolID)...)
-	return append(keyPoolAppended, sdk.Uint64ToBigEndian(round)...)
+func GetKeyPrefixDataValidateCerts(poolID, round uint64) []byte {
+	return append(KeyPrefixDataValidatorCerts, CombineKeys(sdk.Uint64ToBigEndian(poolID), sdk.Uint64ToBigEndian(round))...)
 }
 
 func GetKeyPrefixDataValidateCert(poolID, round uint64, dataHash []byte) []byte {
-	return append(GetKeyPrefixDataValidateCertByRound(poolID, round), dataHash...)
+	return CombineKeys(GetKeyPrefixDataValidateCerts(poolID, round), dataHash)
+}
+
+func GetKeyPrefixSalesHistories(poolID, round uint64) []byte {
+	return append(KeyPrefixSalesHistory, CombineKeys(sdk.Uint64ToBigEndian(poolID), sdk.Uint64ToBigEndian(round))...)
+}
+
+func GetKeyPrefixSalesHistory(poolID, round uint64, seller string) []byte {
+	return CombineKeys(GetKeyPrefixSalesHistories(poolID, round), []byte(seller))
 }
 
 func GetKeyPrefixNFTRedeemReceiptByPoolID(poolID uint64) []byte {
