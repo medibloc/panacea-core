@@ -10,6 +10,7 @@ func DefaultGenesis() *GenesisState {
 		DataPassRedeemReceipts:     []DataPassRedeemReceipt{},
 		InstantRevenueDistribution: InstantRevenueDistribution{},
 		SalesHistories:             []*SalesHistory{},
+		DataPassRedeemHistories:    []DataPassRedeemHistory{},
 		// this line is used by starport scaffolding # ibc/genesistype/default
 		// this line is used by starport scaffolding # genesis/types/default
 	}

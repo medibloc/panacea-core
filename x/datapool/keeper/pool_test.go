@@ -2,11 +2,12 @@ package keeper_test
 
 import (
 	"fmt"
-	"github.com/cosmos/cosmos-sdk/codec"
 	"io/ioutil"
 	"strconv"
 	"strings"
 	"testing"
+
+	"github.com/cosmos/cosmos-sdk/codec"
 
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
@@ -394,6 +395,11 @@ func (suite poolTestSuite) TestRedeemDataPass() {
 	suite.Require().Equal(redeemReceipt.PoolId, redeemNFT.PoolId)
 	suite.Require().Equal(redeemReceipt.NftId, redeemNFT.NftId)
 	suite.Require().Equal(redeemReceipt.Round, redeemNFT.Round)
+
+	dataPassRedeemHistories, err := suite.DataPoolKeeper.GetAllDataPassRedeemHistory(suite.Ctx)
+	suite.Require().NoError(err)
+	suite.Require().Len(dataPassRedeemHistories, 1)
+	suite.Require().Equal(*redeemReceipt, dataPassRedeemHistories[0].DataPassRedeemReceipts[0])
 }
 
 func (suite poolTestSuite) TestGetRedeemerDataPass() {
@@ -729,7 +735,7 @@ func makeTestDataPool(poolID uint64) *types.Pool {
 	return types.NewPool(poolID, curatorAddr, poolParams)
 }
 
-func makeTestDataPassRedeemReceipt(poolID, round, blockHeight uint64, redeemer string) *types.DataPassRedeemReceipt {
+func makeTestDataPassRedeemReceipt(poolID, round uint64, redeemer string) *types.DataPassRedeemReceipt {
 	dataPassRedeemReceipt := types.DataPassRedeemReceipt{
 		PoolId:   poolID,
 		Round:    round,
@@ -738,4 +744,14 @@ func makeTestDataPassRedeemReceipt(poolID, round, blockHeight uint64, redeemer s
 	}
 
 	return &dataPassRedeemReceipt
+}
+
+func makeTestDataPassRedeemHistory(poolID, round uint64, redeemer string) *types.DataPassRedeemHistory {
+	dataPassRedeemReceipt := makeTestDataPassRedeemReceipt(poolID, round, redeemer)
+
+	return &types.DataPassRedeemHistory{
+		Redeemer:               redeemer,
+		PoolId:                 poolID,
+		DataPassRedeemReceipts: []types.DataPassRedeemReceipt{*dataPassRedeemReceipt},
+	}
 }

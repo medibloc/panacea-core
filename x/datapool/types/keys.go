@@ -46,6 +46,9 @@ var (
 	// KeyPrefixInstantRevenueDistribution defines key to distribution reward pool
 	KeyPrefixInstantRevenueDistribution = []byte{0x07}
 
+	// KeyPrefixDataPassRedeemHistory defines key to store redeem receipts by address
+	KeyPrefixDataPassRedeemHistory = []byte{0x08}
+
 	KeyIndexSeparator = []byte{0xFF}
 )
 
@@ -79,6 +82,14 @@ func GetKeyPrefixNFTRedeemReceiptByPoolID(poolID uint64) []byte {
 
 func GetKeyPrefixNFTRedeemReceipt(poolID, round, nftID uint64) []byte {
 	return CombineKeys(GetKeyPrefixNFTRedeemReceiptByPoolID(poolID), sdk.Uint64ToBigEndian(round), sdk.Uint64ToBigEndian(nftID))
+}
+
+func GetKeyPrefixDataPassRedeemHistory(redeemer string) []byte {
+	return append(KeyPrefixDataPassRedeemHistory, []byte(redeemer)...)
+}
+
+func GetKeyPrefixDataPassRedeemHistoryByPool(redeemer string, poolID uint64) []byte {
+	return CombineKeys(GetKeyPrefixDataPassRedeemHistory(redeemer), sdk.Uint64ToBigEndian(poolID))
 }
 
 func CombineKeys(keys ...[]byte) []byte {

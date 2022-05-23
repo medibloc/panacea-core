@@ -151,3 +151,20 @@ func (k Keeper) DataPassRedeemReceipts(goCtx context.Context, req *types.QueryDa
 		Pagination:             pageRes,
 	}, nil
 }
+
+func (k Keeper) DataPassRedeemHistory(goCtx context.Context, req *types.QueryDataPassRedeemHistoryRequest) (*types.QueryDataPassRedeemHistoryResponse, error) {
+	if req == nil {
+		return nil, status.Error(codes.InvalidArgument, "invalid request")
+	}
+
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	redeemHistories, err := k.GetDataPassRedeemHistory(ctx, req.Redeemer, req.PoolId)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	return &types.QueryDataPassRedeemHistoryResponse{
+		DataPassRedeemHistories: redeemHistories,
+	}, nil
+}

@@ -171,7 +171,7 @@ func CmdGetDataPassRedeemReceipts() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "data-pass-redeem-receipts [poolID]",
 		Short: "Query data pass redeem receipts by pool",
-		Args:  cobra.ExactArgs(2),
+		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientQueryContext(cmd)
 			if err != nil {
@@ -204,6 +204,42 @@ func CmdGetDataPassRedeemReceipts() *cobra.Command {
 	}
 
 	flags.AddPaginationFlagsToCmd(cmd, "all data pass by pool ID")
+	flags.AddQueryFlagsToCmd(cmd)
+
+	return cmd
+}
+
+func CmdGetDataPassRedeemHistory() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "data-pass-redeem-history [redeemer-addr] [pool-id]",
+		Short: "Query data pass redeem history",
+		Args:  cobra.ExactArgs(2),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientQueryContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			queryClient := types.NewQueryClient(clientCtx)
+
+			poolID, err := strconv.ParseUint(args[1], 10, 64)
+			if err != nil {
+				return err
+			}
+
+			res, err := queryClient.DataPassRedeemHistory(cmd.Context(), &types.QueryDataPassRedeemHistoryRequest{
+				Redeemer: args[0],
+				PoolId:   poolID,
+			})
+
+			if err != nil {
+				return err
+			}
+
+			return clientCtx.PrintProto(res)
+		},
+	}
+
 	flags.AddQueryFlagsToCmd(cmd)
 
 	return cmd
