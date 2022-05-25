@@ -83,7 +83,7 @@ func NewDataPassRedeemReceipt(poolID, round, dataPassID uint64, redeemer string)
 }
 func (r *DataPassRedeemHistory) AppendRedeemReceipt(redeemReceipt DataPassRedeemReceipt) {
 	for _, existReceipt := range r.DataPassRedeemReceipts {
-		if existReceipt.NftId == redeemReceipt.NftId {
+		if existReceipt.DataPassId == redeemReceipt.DataPassId {
 			return
 		}
 	}
