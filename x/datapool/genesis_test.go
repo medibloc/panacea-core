@@ -1,12 +1,12 @@
 package datapool_test
 
 import (
-	"fmt"
+	"testing"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/medibloc/panacea-core/v2/types/assets"
 	"github.com/medibloc/panacea-core/v2/x/datapool"
 	"github.com/medibloc/panacea-core/v2/x/datapool/types"
-	"testing"
 
 	"github.com/medibloc/panacea-core/v2/types/testsuite"
 	"github.com/stretchr/testify/suite"
@@ -60,6 +60,8 @@ func (suite genesisTestSuite) TestDataPoolInitGenesis() {
 
 	salesHistoryMap := makeSampleSalesHistories()
 
+	dataPassRedeemHistories := makeSampleDataPassRedeemHistory()
+
 	genState := &types.GenesisState{
 		DataValidators:             dataValidators,
 		NextPoolNumber:             2,
@@ -68,6 +70,7 @@ func (suite genesisTestSuite) TestDataPoolInitGenesis() {
 		DataPassRedeemReceipts:     dataPassRedeemReceipts,
 		InstantRevenueDistribution: instantRevenueDistribution,
 		SalesHistories:             salesHistoryMap,
+		DataPassRedeemHistories:    dataPassRedeemHistories,
 	}
 
 	datapool.InitGenesis(suite.Ctx, suite.DataPoolKeeper, *genState)
@@ -131,6 +134,11 @@ func (suite genesisTestSuite) TestDataPoolInitGenesis() {
 			suite.Require().Equal("1000000umed", history.PaidCoin.String())
 		}
 	}
+
+	dataPassRedeemHistoriesFromKeeper, err := suite.DataPoolKeeper.GetAllDataPassRedeemHistory(suite.Ctx)
+	suite.Require().NoError(err)
+	suite.Require().Equal(dataPassRedeemHistories, dataPassRedeemHistoriesFromKeeper)
+	suite.Require().Len(dataPassRedeemHistoriesFromKeeper, 1)
 }
 
 func (suite genesisTestSuite) TestDataPoolExportGenesis() {
@@ -149,8 +157,7 @@ func (suite genesisTestSuite) TestDataPoolExportGenesis() {
 
 	// set data pass redeem receipt
 	dataPassRedeemReceipt := makeSampleDataPassRedeemReceipt()
-	err = suite.DataPoolKeeper.SetDataPassRedeemReceipt(suite.Ctx, dataPassRedeemReceipt)
-	suite.Require().NoError(err)
+	suite.DataPoolKeeper.SetDataPassRedeemReceipt(suite.Ctx, dataPassRedeemReceipt)
 
 	suite.DataPoolKeeper.SetInstantRevenueDistribution(
 		suite.Ctx,
@@ -163,6 +170,11 @@ func (suite genesisTestSuite) TestDataPoolExportGenesis() {
 		suite.DataPoolKeeper.SetSalesHistory(suite.Ctx, salesHistory)
 	}
 
+	redeemHistory := makeSampleDataPassRedeemHistory()
+	for _, history := range redeemHistory {
+		suite.DataPoolKeeper.SetDataPassRedeemHistory(suite.Ctx, history)
+	}
+
 	genesisState := datapool.ExportGenesis(suite.Ctx, suite.DataPoolKeeper)
 	suite.Require().Equal(uint64(2), genesisState.NextPoolNumber)
 	suite.Require().Len(genesisState.Pools, 1)
@@ -170,8 +182,9 @@ func (suite genesisTestSuite) TestDataPoolExportGenesis() {
 	suite.Require().Len(genesisState.DataValidators, 1)
 	suite.Require().Len(genesisState.DataPassRedeemReceipts, 1)
 	suite.Require().Equal(poolIDs, genesisState.InstantRevenueDistribution.PoolIds)
-	fmt.Println(genesisState.SalesHistories)
 	suite.Require().True(len(genesisState.SalesHistories) == 4)
+	suite.Require().Len(genesisState.DataPassRedeemHistories, 1)
+	suite.Require().Equal(redeemHistory, genesisState.DataPassRedeemHistories)
 }
 
 func makeSampleDataValidator() types.DataValidator {
@@ -246,5 +259,15 @@ func makeSampleDataPassRedeemReceipt() types.DataPassRedeemReceipt {
 		Round:      1,
 		DataPassId: 1,
 		Redeemer:   redeemer.String(),
+	}
+}
+
+func makeSampleDataPassRedeemHistory() []types.DataPassRedeemHistory {
+	return []types.DataPassRedeemHistory{
+		{
+			Redeemer:               redeemer.String(),
+			PoolId:                 poolID,
+			DataPassRedeemReceipts: []types.DataPassRedeemReceipt{makeSampleDataPassRedeemReceipt()},
+		},
 	}
 }

@@ -45,6 +45,11 @@ service Query {
   rpc DataPassRedeemReceipts(QueryDataPassRedeemReceiptsRequest) returns (QueryDataPassRedeemReceiptsResponse) {
     option (google.api.http).get = "/panacea/datapool/v2/pools/{pool_id}/data_passes/redeem_receipt";
   }
+
+  // DataPassRedeemHistory returns a list of DataPassRedeemHistories
+  rpc DataPassRedeemHistory(QueryDataPassRedeemHistoryRequest) returns (QueryDataPassRedeemHistoryResponse) {
+    option (google.api.http).get = "/panacea/datapool/v2/redeemers/{redeemer}/pools/{pool_id}/redeem_history";
+  }
 }
 
 // QueryPoolRequest is the request type for the Query/Pool RPC method.
@@ -124,4 +129,15 @@ message QueryDataPassRedeemReceiptsResponse {
     (gogoproto.nullable) = false
   ];
   cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+// QueryDataPassRedeemHistoryRequest is the request type for the Query/DataPassRedeemHistory RPC method.
+message QueryDataPassRedeemHistoryRequest {
+  string redeemer = 1;
+  uint64 pool_id = 2;
+}
+
+// QueryDataPassRedeemHistoryResponse is the response type for the Query/DataPassRedeemHistory RPC method.
+message QueryDataPassRedeemHistoryResponse {
+  DataPassRedeemHistory data_pass_redeem_histories = 1 [(gogoproto.nullable) = false];
 }

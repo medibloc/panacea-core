@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"strconv"
 
@@ -567,7 +568,8 @@ func (k Keeper) RedeemDataPass(ctx sdk.Context, redeemNFT types.MsgRedeemDataPas
 
 	nftRedeemReceipt := types.NewDataPassRedeemReceipt(redeemNFT.PoolId, redeemNFT.Round, redeemNFT.DataPassId, redeemNFT.Redeemer)
 
-	err = k.SetDataPassRedeemReceipt(ctx, *nftRedeemReceipt)
+	k.SetDataPassRedeemReceipt(ctx, *nftRedeemReceipt)
+	err = k.appendDataPassRedeemHistory(ctx, *nftRedeemReceipt)
 	if err != nil {
 		return nil, sdkerrors.Wrapf(types.ErrRedeemDataPass, err.Error())
 	}
@@ -615,13 +617,84 @@ func (k Keeper) GetDataPassRedeemReceipt(ctx sdk.Context, poolID, round, dataPas
 	return receipt, nil
 }
 
-func (k Keeper) SetDataPassRedeemReceipt(ctx sdk.Context, redeemReceipt types.DataPassRedeemReceipt) error {
+func (k Keeper) SetDataPassRedeemReceipt(ctx sdk.Context, redeemReceipt types.DataPassRedeemReceipt) {
 	store := ctx.KVStore(k.storeKey)
 	receiptKey := types.GetKeyPrefixNFTRedeemReceipt(redeemReceipt.PoolId, redeemReceipt.Round, redeemReceipt.DataPassId)
 	bz := k.cdc.MustMarshalBinaryLengthPrefixed(&redeemReceipt)
 	store.Set(receiptKey, bz)
+}
+
+func (k Keeper) GetDataPassRedeemHistory(ctx sdk.Context, redeemer string, poolID uint64) (types.DataPassRedeemHistory, error) {
+	store := ctx.KVStore(k.storeKey)
+
+	key := types.GetKeyPrefixDataPassRedeemHistoryByPool(redeemer, poolID)
+
+	if !store.Has(key) {
+		return types.DataPassRedeemHistory{}, types.ErrRedeemHistoryNotFound
+	}
+
+	bz := store.Get(key)
+
+	var history types.DataPassRedeemHistory
+	err := k.cdc.UnmarshalBinaryLengthPrefixed(bz, &history)
+	if err != nil {
+		return types.DataPassRedeemHistory{}, err
+	}
+
+	return history, nil
+}
+
+func (k Keeper) SetDataPassRedeemHistory(ctx sdk.Context, redeemHistory types.DataPassRedeemHistory) {
+	store := ctx.KVStore(k.storeKey)
+	key := types.GetKeyPrefixDataPassRedeemHistoryByPool(redeemHistory.Redeemer, redeemHistory.PoolId)
+	bz := k.cdc.MustMarshalBinaryLengthPrefixed(&redeemHistory)
+	store.Set(key, bz)
+}
+
+func (k Keeper) appendDataPassRedeemHistory(ctx sdk.Context, redeemReceipt types.DataPassRedeemReceipt) error {
+	redeemer := redeemReceipt.Redeemer
+	poolID := redeemReceipt.PoolId
+
+	redeemHistory, err := k.GetDataPassRedeemHistory(ctx, redeemer, poolID)
+	if err != nil && !errors.Is(err, types.ErrRedeemHistoryNotFound) {
+		return err
+	}
+
+	if errors.Is(err, types.ErrRedeemHistoryNotFound) {
+		redeemHistory = types.DataPassRedeemHistory{
+			Redeemer:               redeemer,
+			PoolId:                 poolID,
+			DataPassRedeemReceipts: []types.DataPassRedeemReceipt{redeemReceipt},
+		}
+	} else {
+		redeemHistory.AppendRedeemReceipt(redeemReceipt)
+	}
+
+	k.SetDataPassRedeemHistory(ctx, redeemHistory)
 
 	return nil
+}
+
+func (k Keeper) GetAllDataPassRedeemHistory(ctx sdk.Context) ([]types.DataPassRedeemHistory, error) {
+	store := ctx.KVStore(k.storeKey)
+	iterator := sdk.KVStorePrefixIterator(store, types.KeyPrefixDataPassRedeemHistory)
+	defer iterator.Close()
+
+	redeemHistory := make([]types.DataPassRedeemHistory, 0)
+
+	for ; iterator.Valid(); iterator.Next() {
+		bz := iterator.Value()
+		var history types.DataPassRedeemHistory
+
+		err := k.cdc.UnmarshalBinaryLengthPrefixed(bz, &history)
+		if err != nil {
+			return nil, err
+		}
+
+		redeemHistory = append(redeemHistory, history)
+	}
+
+	return redeemHistory, nil
 }
 
 func (k Keeper) GetRedeemerDataPassByAddr(ctx sdk.Context, poolID uint64, redeemer sdk.AccAddress) ([]string, error) {

@@ -1,9 +1,10 @@
 package keeper_test
 
 import (
+	"testing"
+
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 	"github.com/medibloc/panacea-core/v2/types/assets"
-	"testing"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/medibloc/panacea-core/v2/types/testsuite"
@@ -110,10 +111,9 @@ func (suite queryPoolTestSuite) TestQueryDataValidationCertificates() {
 func (suite *queryPoolTestSuite) TestQueryDataPassRedeemReceipt() {
 	pool := suite.setPool()
 
-	dataPassRedeemReceipt := makeTestDataPassRedeemReceipt(pool.GetPoolId(), pool.GetRound(), uint64(suite.Ctx.BlockHeight()), dataVal1.String())
+	dataPassRedeemReceipt := makeTestDataPassRedeemReceipt(pool.GetPoolId(), pool.GetRound(), dataVal1.String())
 
-	err := suite.DataPoolKeeper.SetDataPassRedeemReceipt(suite.Ctx, *dataPassRedeemReceipt)
-	suite.Require().NoError(err)
+	suite.DataPoolKeeper.SetDataPassRedeemReceipt(suite.Ctx, *dataPassRedeemReceipt)
 
 	req := &types.QueryDataPassRedeemReceiptRequest{
 		PoolId:     pool.GetPoolId(),
@@ -125,6 +125,27 @@ func (suite *queryPoolTestSuite) TestQueryDataPassRedeemReceipt() {
 	suite.Require().NoError(err)
 	suite.Require().NotNil(res)
 	suite.Require().Equal(*dataPassRedeemReceipt, res.DataPassRedeemReceipt)
+}
+
+func (suite *queryPoolTestSuite) TestQueryRedeemReceiptsList() {
+	pool := suite.setPool()
+
+	redeemer := dataVal1.String()
+	poolID := pool.GetPoolId()
+
+	redeemHistory := makeTestDataPassRedeemHistory(poolID, pool.GetRound(), redeemer)
+
+	suite.DataPoolKeeper.SetDataPassRedeemHistory(suite.Ctx, *redeemHistory)
+
+	req := &types.QueryDataPassRedeemHistoryRequest{
+		Redeemer: redeemer,
+		PoolId:   poolID,
+	}
+
+	res, err := suite.DataPoolKeeper.DataPassRedeemHistory(sdk.WrapSDKContext(suite.Ctx), req)
+	suite.Require().NoError(err)
+	suite.Require().NotNil(res)
+	suite.Require().Equal(*redeemHistory, res.DataPassRedeemHistories)
 }
 
 func (suite *queryPoolTestSuite) setDataValidatorAccount() {

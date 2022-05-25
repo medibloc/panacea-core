@@ -79,3 +79,12 @@ message SalesHistory {
   repeated bytes data_hashes = 4;
   cosmos.base.v1beta1.Coin paid_coin = 5; // Proceeds distributed in the round
 }
+
+// DataPassRedeemHistory defines a list of redeem histories
+message DataPassRedeemHistory {
+  string redeemer = 1;
+  uint64 pool_id = 2;
+  repeated DataPassRedeemReceipt data_pass_redeem_receipts = 3 [
+    (gogoproto.nullable) = false
+  ]; // list of redeem receipts
+}
