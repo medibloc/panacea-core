@@ -88,6 +88,10 @@ func (suite genesisTestSuite) TestDataPoolInitGenesis() {
 	suite.Require().NoError(err)
 	suite.Require().Equal(pool, *poolFromKeeper)
 
+	poolsFromKeeper, err := suite.DataPoolKeeper.GetAllPools(suite.Ctx)
+	suite.Require().NoError(err)
+	suite.Require().Equal(pools, poolsFromKeeper)
+
 	// check params
 	paramsFromKeeper := suite.DataPoolKeeper.GetParams(suite.Ctx)
 	suite.Require().Equal(params, paramsFromKeeper)

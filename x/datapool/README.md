@@ -6,7 +6,11 @@ VALIDATOR=$(panacead keys show {your validator} -a)
 
 MODULE_ADDR=$(panacead q datapool module-addr -o json | jq -r '.address')
 
+# In MacOS
 TX_FLAG=(--gas auto --gas-adjustment 1.3 --chain-id {your chain ID} --yes)
+
+# In Linux OS,
+TX_FLAG="--gas auto --gas-adjustment 1.3 --chain-id {your chain ID} --yes"
 
 panacead tx gov submit-proposal wasm-store cw721_base.wasm \
 --title "store NFT contract wasm code" \
