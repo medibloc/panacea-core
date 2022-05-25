@@ -537,7 +537,7 @@ func (k Keeper) RedeemDataPass(ctx sdk.Context, redeemNFT types.MsgRedeemDataPas
 	}
 
 	moduleAddr := types.GetModuleAddress()
-	transferNFTMsg := types.NewTransferNFTMsg(moduleAddr.String(), strconv.FormatUint(redeemNFT.NftId, 10))
+	transferNFTMsg := types.NewTransferNFTMsg(moduleAddr.String(), strconv.FormatUint(redeemNFT.DataPassId, 10))
 
 	transferNFTMsgBz, err := json.Marshal(transferNFTMsg)
 	if err != nil {
@@ -554,7 +554,7 @@ func (k Keeper) RedeemDataPass(ctx sdk.Context, redeemNFT types.MsgRedeemDataPas
 		return nil, sdkerrors.Wrapf(types.ErrRedeemDataPass, err.Error())
 	}
 
-	if !contains(redeemTokenIds, strconv.FormatUint(redeemNFT.NftId, 10)) {
+	if !contains(redeemTokenIds, strconv.FormatUint(redeemNFT.DataPassId, 10)) {
 		return nil, types.ErrNotOwnedRedeemerNft
 	}
 
@@ -565,7 +565,7 @@ func (k Keeper) RedeemDataPass(ctx sdk.Context, redeemNFT types.MsgRedeemDataPas
 		return nil, sdkerrors.Wrapf(types.ErrRedeemDataPass, err.Error())
 	}
 
-	nftRedeemReceipt := types.NewDataPassRedeemReceipt(redeemNFT.PoolId, redeemNFT.Round, redeemNFT.NftId, redeemNFT.Redeemer)
+	nftRedeemReceipt := types.NewDataPassRedeemReceipt(redeemNFT.PoolId, redeemNFT.Round, redeemNFT.DataPassId, redeemNFT.Redeemer)
 
 	err = k.SetDataPassRedeemReceipt(ctx, *nftRedeemReceipt)
 	if err != nil {
@@ -597,8 +597,8 @@ func (k Keeper) GetAllDataPassRedeemReceipts(ctx sdk.Context) ([]types.DataPassR
 	return dataPassRedeemReceipts, nil
 }
 
-func (k Keeper) GetDataPassRedeemReceipt(ctx sdk.Context, poolID, round, nftID uint64) (types.DataPassRedeemReceipt, error) {
-	key := types.GetKeyPrefixNFTRedeemReceipt(poolID, round, nftID)
+func (k Keeper) GetDataPassRedeemReceipt(ctx sdk.Context, poolID, round, dataPassID uint64) (types.DataPassRedeemReceipt, error) {
+	key := types.GetKeyPrefixNFTRedeemReceipt(poolID, round, dataPassID)
 	store := ctx.KVStore(k.storeKey)
 	if !store.Has(key) {
 		return types.DataPassRedeemReceipt{}, types.ErrRedeemDataPassNotFound
@@ -617,7 +617,7 @@ func (k Keeper) GetDataPassRedeemReceipt(ctx sdk.Context, poolID, round, nftID u
 
 func (k Keeper) SetDataPassRedeemReceipt(ctx sdk.Context, redeemReceipt types.DataPassRedeemReceipt) error {
 	store := ctx.KVStore(k.storeKey)
-	receiptKey := types.GetKeyPrefixNFTRedeemReceipt(redeemReceipt.PoolId, redeemReceipt.Round, redeemReceipt.NftId)
+	receiptKey := types.GetKeyPrefixNFTRedeemReceipt(redeemReceipt.PoolId, redeemReceipt.Round, redeemReceipt.DataPassId)
 	bz := k.cdc.MustMarshalBinaryLengthPrefixed(&redeemReceipt)
 	store.Set(receiptKey, bz)
 

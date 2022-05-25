@@ -284,15 +284,15 @@ func request_Query_DataPassRedeemReceipt_0(ctx context.Context, marshaler runtim
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "round", err)
 	}
 
-	val, ok = pathParams["nft_id"]
+	val, ok = pathParams["data_pass_id"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "nft_id")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "data_pass_id")
 	}
 
-	protoReq.NftId, err = runtime.Uint64(val)
+	protoReq.DataPassId, err = runtime.Uint64(val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "nft_id", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "data_pass_id", err)
 	}
 
 	msg, err := client.DataPassRedeemReceipt(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -333,15 +333,15 @@ func local_request_Query_DataPassRedeemReceipt_0(ctx context.Context, marshaler 
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "round", err)
 	}
 
-	val, ok = pathParams["nft_id"]
+	val, ok = pathParams["data_pass_id"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "nft_id")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "data_pass_id")
 	}
 
-	protoReq.NftId, err = runtime.Uint64(val)
+	protoReq.DataPassId, err = runtime.Uint64(val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "nft_id", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "data_pass_id", err)
 	}
 
 	msg, err := server.DataPassRedeemReceipt(ctx, &protoReq)
@@ -762,7 +762,7 @@ var (
 
 	pattern_Query_DataValidationCertificates_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 2, 6, 1, 0, 4, 1, 5, 6}, []string{"panacea", "datapool", "v2", "data_validation_certificates", "pool", "pool_id", "round"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_DataPassRedeemReceipt_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6, 2, 7, 1, 0, 4, 1, 5, 8, 2, 9}, []string{"panacea", "datapool", "v2", "pools", "pool_id", "rounds", "round", "data_passes", "nft_id", "redeem_receipt"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_DataPassRedeemReceipt_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6, 2, 7, 1, 0, 4, 1, 5, 8, 2, 9}, []string{"panacea", "datapool", "v2", "pools", "pool_id", "rounds", "round", "data_passes", "data_pass_id", "redeem_receipt"}, "", runtime.AssumeColonVerbOpt(true)))
 
 	pattern_Query_DataPassRedeemReceipts_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 2, 6}, []string{"panacea", "datapool", "v2", "pools", "pool_id", "data_passes", "redeem_receipt"}, "", runtime.AssumeColonVerbOpt(true)))
 )

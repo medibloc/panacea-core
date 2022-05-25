@@ -116,9 +116,9 @@ func (suite *queryPoolTestSuite) TestQueryDataPassRedeemReceipt() {
 	suite.Require().NoError(err)
 
 	req := &types.QueryDataPassRedeemReceiptRequest{
-		PoolId: pool.GetPoolId(),
-		Round:  pool.GetRound(),
-		NftId:  1,
+		PoolId:     pool.GetPoolId(),
+		Round:      pool.GetRound(),
+		DataPassId: 1,
 	}
 
 	res, err := suite.DataPoolKeeper.DataPassRedeemReceipt(sdk.WrapSDKContext(suite.Ctx), req)

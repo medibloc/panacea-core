@@ -3,19 +3,20 @@ package cli
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"strconv"
+
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/medibloc/panacea-core/v2/x/datapool/types"
 	"github.com/spf13/cobra"
-	"io/ioutil"
-	"strconv"
 )
 
 func CmdRegisterDataValidator() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "register-data-validator [endpoint URL]",
+		Use:   "register-data-validator [endpoint-URL]",
 		Short: "register data validator",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -43,7 +44,7 @@ func CmdRegisterDataValidator() *cobra.Command {
 
 func CmdUpdateDataValidator() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "update-data-validator [endpoint URL]",
+		Use:   "update-data-validator [endpoint-URL]",
 		Short: "update data validator endpoint",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -68,7 +69,7 @@ func CmdUpdateDataValidator() *cobra.Command {
 
 func CmdCreatePool() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "create-pool [deposit] [pool params file]",
+		Use:   "create-pool [deposit] [pool-params-file]",
 		Short: "create a new data pool",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -131,7 +132,7 @@ func newCreatePoolMsg(clientCtx client.Context, depositCoin, file string) (sdk.M
 
 func CmdSellData() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "sell-data [sell data file]",
+		Use:   "sell-data [sell-data-file]",
 		Short: "sell data",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -178,7 +179,7 @@ func readCertificateFromFile(file string) (*types.DataValidationCertificate, err
 
 func CmdBuyDataPass() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "buy-data-pass [pool ID] [round] [payment]",
+		Use:   "buy-data-pass [pool-id] [round] [payment]",
 		Short: "buy data pass",
 		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -224,7 +225,7 @@ func CmdBuyDataPass() *cobra.Command {
 
 func CmdRedeemDataPass() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "redeem-data-pass [poolID] [round] [nftID]",
+		Use:   "redeem-data-pass [pool-id] [round] [data-pass-id]",
 		Short: "redeem data pass",
 		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -245,16 +246,16 @@ func CmdRedeemDataPass() *cobra.Command {
 				return err
 			}
 
-			nftID, err := strconv.ParseUint(args[2], 10, 64)
+			dataPassID, err := strconv.ParseUint(args[2], 10, 64)
 			if err != nil {
 				return err
 			}
 
 			msg := &types.MsgRedeemDataPass{
-				PoolId:   poolID,
-				Round:    round,
-				NftId:    nftID,
-				Redeemer: redeemer.String(),
+				PoolId:     poolID,
+				Round:      round,
+				DataPassId: dataPassID,
+				Redeemer:   redeemer.String(),
 			}
 
 			if err := msg.ValidateBasic(); err != nil {

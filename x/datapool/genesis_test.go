@@ -242,9 +242,9 @@ func makeSampleSalesHistories() []*types.SalesHistory {
 
 func makeSampleDataPassRedeemReceipt() types.DataPassRedeemReceipt {
 	return types.DataPassRedeemReceipt{
-		PoolId:   poolID,
-		Round:    1,
-		NftId:    1,
-		Redeemer: redeemer.String(),
+		PoolId:     poolID,
+		Round:      1,
+		DataPassId: 1,
+		Redeemer:   redeemer.String(),
 	}
 }

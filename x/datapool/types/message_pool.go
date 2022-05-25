@@ -252,12 +252,12 @@ func (msg *MsgBuyDataPass) GetSigners() []sdk.AccAddress {
 
 var _ sdk.Msg = &MsgRedeemDataPass{}
 
-func NewMsgRedeemDataPass(poolID, round, nftID uint64, redeemer string) *MsgRedeemDataPass {
+func NewMsgRedeemDataPass(poolID, round, dataPassID uint64, redeemer string) *MsgRedeemDataPass {
 	return &MsgRedeemDataPass{
-		PoolId:   poolID,
-		Round:    round,
-		NftId:    nftID,
-		Redeemer: redeemer,
+		PoolId:     poolID,
+		Round:      round,
+		DataPassId: dataPassID,
+		Redeemer:   redeemer,
 	}
 }
 
@@ -283,7 +283,7 @@ func (msg *MsgRedeemDataPass) ValidateBasic() error {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid round (%s)", err)
 	}
 
-	if msg.NftId <= 0 {
+	if msg.DataPassId <= 0 {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid NFT ID (%s)", err)
 	}
 
