@@ -115,6 +115,7 @@ func CmdGetDataValidationCertificates() *cobra.Command {
 		},
 	}
 
+	flags.AddPaginationFlagsToCmd(cmd, "all data certificate by pool ID and round")
 	flags.AddQueryFlagsToCmd(cmd)
 
 	return cmd

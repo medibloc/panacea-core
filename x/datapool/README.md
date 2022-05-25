@@ -6,7 +6,11 @@ VALIDATOR=$(panacead keys show {your validator} -a)
 
 MODULE_ADDR=$(panacead q datapool module-addr -o json | jq -r '.address')
 
+# In MacOS
 TX_FLAG=(--gas auto --gas-adjustment 1.3 --chain-id {your chain ID} --yes)
+
+# In Linux OS,
+# TX_FLAG="--gas auto --gas-adjustment 1.3 --chain-id {your chain ID} --yes"
 
 panacead tx gov submit-proposal wasm-store cw721_base.wasm \
 --title "store NFT contract wasm code" \
@@ -14,7 +18,7 @@ panacead tx gov submit-proposal wasm-store cw721_base.wasm \
 --instantiate-only-address $MODULE_ADDR \
 --run-as $MODULE_ADDR \
 --deposit "10000000000umed" \
---from $VALIDATOR $TX_FLAG -y
+--from {your validator name} $TX_FLAG -y
 ```
 
 The module is the only allowed address to instantiate the contract
@@ -38,12 +42,12 @@ panacead tx gov submit-proposal instantiate-contract {code id} "$INST_MSG" \
 --run-as $MODULE_ADDR \
 --admin $MODULE_ADDR \
 --deposit "100000000umed" \
---from $VALIDATOR $TX_FLAG -y
+--from {your validator name} $TX_FLAG -y
 ```
 
 ### Vote yes
 ```shell
-panacead tx gov vote {instantiation proposal id} yes --from $VALIDATOR $TX_FLAG -y
+panacead tx gov vote {instantiation proposal id} yes --from {your validator name} $TX_FLAG -y
 ```
 
 ### Submit proposal (3): change parameter of code ID & NFT contract address
@@ -72,19 +76,19 @@ param_change_sample.json (when codeID=1, contractAddress=panacea14hj2tavq8fpesdw
 TODO: contract address is hardcoded now.
 
 ```shell
-panacead tx gov submit-proposal param-change param_change_sample.json --from $VALIDATOR $TX_FLAG -y
+panacead tx gov submit-proposal param-change param_change_sample.json --from {your validator name} $TX_FLAG -y
 ```
 
 ### Vote yes
 ```shell
-panacead tx gov vote {param-change proposal id} yes --from $VALIDATOR $TX_FLAG -y
+panacead tx gov vote {param-change proposal id} yes --from {your validator name} $TX_FLAG -y
 ```
 
 ### Create data pool
 
 ```shell
 CURATOR=$(panacead keys show {your address or key of curator} -a)
-panacead tx datapool create-pool {your deposit} create_pool_sample.json --from $CURATOR $TX_FLAG -y
+panacead tx datapool create-pool {your deposit} create_pool_sample.json --from {your curator name} $TX_FLAG -y
 ```
 
 ### Query curator NFT
@@ -121,5 +125,5 @@ proposal_example.json
 ```
 
 ```shell
-panacead tx gov submit-proposal param-change param_example.json --from $VALIDATOR $TX_FLAG -y
+panacead tx gov submit-proposal param-change param_example.json --from {your validator name} $TX_FLAG -y
 ```

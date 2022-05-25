@@ -2,11 +2,12 @@ package datapool_test
 
 import (
 	"fmt"
+	"testing"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/medibloc/panacea-core/v2/types/assets"
 	"github.com/medibloc/panacea-core/v2/x/datapool"
 	"github.com/medibloc/panacea-core/v2/x/datapool/types"
-	"testing"
 
 	"github.com/medibloc/panacea-core/v2/types/testsuite"
 	"github.com/stretchr/testify/suite"
@@ -84,6 +85,10 @@ func (suite genesisTestSuite) TestDataPoolInitGenesis() {
 	poolFromKeeper, err := suite.DataPoolKeeper.GetPool(suite.Ctx, uint64(1))
 	suite.Require().NoError(err)
 	suite.Require().Equal(pool, *poolFromKeeper)
+
+	poolsFromKeeper, err := suite.DataPoolKeeper.GetAllPools(suite.Ctx)
+	suite.Require().NoError(err)
+	suite.Require().Equal(pools, poolsFromKeeper)
 
 	// check params
 	paramsFromKeeper := suite.DataPoolKeeper.GetParams(suite.Ctx)
