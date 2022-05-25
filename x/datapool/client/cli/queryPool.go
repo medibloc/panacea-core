@@ -11,7 +11,7 @@ import (
 
 func CmdGetDataValidator() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "get-data-validator [data validator address]",
+		Use:   "data-validator [data-validator-address]",
 		Short: "Query a data validator",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -41,7 +41,7 @@ func CmdGetDataValidator() *cobra.Command {
 
 func CmdGetPool() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "get-pool [poolID]",
+		Use:   "pool [pool-id]",
 		Short: "Query a pool",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -75,7 +75,7 @@ func CmdGetPool() *cobra.Command {
 
 func CmdGetDataValidationCertificates() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "data-validation-certs [poolID] [round]",
+		Use:   "data-validation-certs [pool-id] [round]",
 		Short: "Query data validation certificates by pool and round",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -122,9 +122,9 @@ func CmdGetDataValidationCertificates() *cobra.Command {
 
 func CmdGetDataPassRedeemReceipt() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "get-data-pass-receipt [poolID] [round] [nftID]",
+		Use:   "data-pass-redeem-receipt [pool-id] [round] [data-pass-id]",
 		Short: "Query a data pass redeem receipt",
-		Args:  cobra.ExactArgs(4),
+		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientQueryContext(cmd)
 			if err != nil {
@@ -143,15 +143,15 @@ func CmdGetDataPassRedeemReceipt() *cobra.Command {
 				return err
 			}
 
-			nftID, err := strconv.ParseUint(args[2], 10, 64)
+			dataPassID, err := strconv.ParseUint(args[2], 10, 64)
 			if err != nil {
 				return err
 			}
 
 			res, err := queryClient.DataPassRedeemReceipt(cmd.Context(), &types.QueryDataPassRedeemReceiptRequest{
-				PoolId: poolID,
-				Round:  round,
-				NftId:  nftID,
+				PoolId:     poolID,
+				Round:      round,
+				DataPassId: dataPassID,
 			})
 
 			if err != nil {
@@ -169,7 +169,7 @@ func CmdGetDataPassRedeemReceipt() *cobra.Command {
 
 func CmdGetDataPassRedeemReceipts() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "data-pass-redeem-receipts [poolID]",
+		Use:   "data-pass-redeem-receipts [pool-id]",
 		Short: "Query data pass redeem receipts by pool",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {

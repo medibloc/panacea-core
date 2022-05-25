@@ -393,7 +393,7 @@ func (suite poolTestSuite) TestRedeemDataPass() {
 
 	suite.Require().Equal(redeemReceipt.Redeemer, redeemNFT.Redeemer)
 	suite.Require().Equal(redeemReceipt.PoolId, redeemNFT.PoolId)
-	suite.Require().Equal(redeemReceipt.NftId, redeemNFT.NftId)
+	suite.Require().Equal(redeemReceipt.DataPassId, redeemNFT.DataPassId)
 	suite.Require().Equal(redeemReceipt.Round, redeemNFT.Round)
 
 	dataPassRedeemHistories, err := suite.DataPoolKeeper.GetAllDataPassRedeemHistory(suite.Ctx)
@@ -737,10 +737,10 @@ func makeTestDataPool(poolID uint64) *types.Pool {
 
 func makeTestDataPassRedeemReceipt(poolID, round uint64, redeemer string) *types.DataPassRedeemReceipt {
 	dataPassRedeemReceipt := types.DataPassRedeemReceipt{
-		PoolId:   poolID,
-		Round:    round,
-		NftId:    1,
-		Redeemer: redeemer,
+		PoolId:     poolID,
+		Round:      round,
+		DataPassId: 1,
+		Redeemer:   redeemer,
 	}
 
 	return &dataPassRedeemReceipt
