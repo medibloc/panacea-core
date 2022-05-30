@@ -1,16 +1,17 @@
 package cli
 
 import (
+	"strconv"
+
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/medibloc/panacea-core/v2/x/datadeal/types"
 	"github.com/spf13/cobra"
-	"strconv"
 )
 
 func CmdGetDeal() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "get-deal [dealId]",
+		Use:   "deal [deal-id]",
 		Short: "Query a deal",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -20,13 +21,13 @@ func CmdGetDeal() *cobra.Command {
 			}
 
 			queryClient := types.NewQueryClient(clientCtx)
-			dealId, err := strconv.Atoi(args[0])
+			dealID, err := strconv.ParseUint(args[0], 10, 64)
 			if err != nil {
 				return err
 			}
 
 			res, err := queryClient.Deal(cmd.Context(), &types.QueryDealRequest{
-				DealId: uint64(dealId),
+				DealId: dealID,
 			})
 			if err != nil {
 				return err

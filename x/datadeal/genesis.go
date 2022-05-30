@@ -12,11 +12,11 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 	k.SetNextDealNumber(ctx, genState.NextDealNumber)
 
 	for _, deal := range genState.Deals {
-		k.SetDeal(ctx, *deal)
+		k.SetDeal(ctx, deal)
 	}
 
 	for _, dataCertificate := range genState.DataCertificates {
-		k.SetDataCertificate(ctx, dataCertificate.UnsignedCert.DealId, *dataCertificate)
+		k.SetDataCertificate(ctx, dataCertificate.UnsignedCert.DealId, dataCertificate)
 	}
 }
 
@@ -27,9 +27,9 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 		panic(err)
 	}
 
-	dealsMap := make(map[uint64]*types.Deal)
+	dealsMap := make(map[uint64]types.Deal)
 	for _, deal := range deals {
-		dealsMap[deal.DealId] = &deal
+		dealsMap[deal.DealId] = deal
 	}
 
 	dataCertificates, err := k.ListDataCertificates(ctx)
@@ -37,15 +37,20 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 		panic(err)
 	}
 
-	dataCertificateMap := make(map[string]*types.DataValidationCertificate)
+	dataCertificateMap := make(map[string]types.DataValidationCertificate)
 	for _, dataCertificate := range dataCertificates {
-		dataKey := types.CombineKeys(sdk.Uint64ToBigEndian(dataCertificate.UnsignedCert.DealId), dataCertificate.UnsignedCert.DataHash)
-		dataCertificateMap[string(dataKey)] = &dataCertificate
+		dataKey := types.GetKeyPrefixDataCertificate(dataCertificate.UnsignedCert.DealId, dataCertificate.UnsignedCert.DataHash)
+		dataCertificateMap[string(dataKey)] = dataCertificate
+	}
+
+	nextDealNum, err := k.GetNextDealNumber(ctx)
+	if err != nil {
+		panic(err)
 	}
 
 	return &types.GenesisState{
 		Deals:            dealsMap,
 		DataCertificates: dataCertificateMap,
-		NextDealNumber:   k.GetNextDealNumber(ctx),
+		NextDealNumber:   nextDealNum,
 	}
 }

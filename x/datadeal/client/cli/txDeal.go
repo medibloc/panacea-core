@@ -4,6 +4,9 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"strconv"
+
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
@@ -12,8 +15,6 @@ import (
 	"github.com/medibloc/panacea-core/v2/x/datadeal/types"
 	"github.com/spf13/cobra"
 	flag "github.com/spf13/pflag"
-	"io/ioutil"
-	"strconv"
 )
 
 func CmdCreateDeal() *cobra.Command {
@@ -73,8 +74,8 @@ func CmdSellData() *cobra.Command {
 
 func CmdDeactivateDeal() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "deactivate-deal [dealId]",
-		Short: "deactivate-deal",
+		Use:   "deactivate-deal [deal-id]",
+		Short: "deactivate deal",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
@@ -82,13 +83,13 @@ func CmdDeactivateDeal() *cobra.Command {
 				return err
 			}
 
-			dealId, err := strconv.ParseUint(args[0], 10, 64)
+			dealID, err := strconv.ParseUint(args[0], 10, 64)
 			if err != nil {
 				return err
 			}
 
 			requesterAddress := clientCtx.GetFromAddress()
-			msg := types.NewMsgDeactivateDeal(dealId, requesterAddress.String())
+			msg := types.NewMsgDeactivateDeal(dealID, requesterAddress.String())
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}

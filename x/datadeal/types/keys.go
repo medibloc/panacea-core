@@ -2,6 +2,7 @@ package types
 
 import (
 	"bytes"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -32,16 +33,15 @@ var (
 	// KeyPrefixDataCertificateStore defines key to store data certificate
 	KeyPrefixDataCertificateStore = []byte{0x03}
 
-	KeyIndexSeparator = []byte{0x07}
+	KeyIndexSeparator = []byte{0xFF}
 )
 
-func GetKeyPrefixDeals(dealId uint64) []byte {
-	return append(KeyPrefixDeals, sdk.Uint64ToBigEndian(dealId)...)
+func GetKeyPrefixDeals(dealID uint64) []byte {
+	return append(KeyPrefixDeals, sdk.Uint64ToBigEndian(dealID)...)
 }
 
-func GetKeyPrefixDataCertificate(dealId uint64, dataHash []byte) []byte {
-	beDealId := sdk.Uint64ToBigEndian(dealId)
-	keys := CombineKeys(beDealId, dataHash)
+func GetKeyPrefixDataCertificate(dealID uint64, dataHash []byte) []byte {
+	keys := CombineKeys(sdk.Uint64ToBigEndian(dealID), dataHash)
 	return append(KeyPrefixDataCertificateStore, keys...)
 }
 

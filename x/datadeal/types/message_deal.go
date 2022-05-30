@@ -158,9 +158,9 @@ func (msg *MsgSellData) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{seller}
 }
 
-func NewMsgDeactivateDeal(dealId uint64, deactivateRequester string) *MsgDeactivateDeal {
+func NewMsgDeactivateDeal(dealID uint64, deactivateRequester string) *MsgDeactivateDeal {
 	return &MsgDeactivateDeal{
-		DealId:              dealId,
+		DealId:              dealID,
 		DeactivateRequester: deactivateRequester,
 	}
 }
