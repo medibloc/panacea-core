@@ -2,10 +2,11 @@ package types
 
 import (
 	"fmt"
+	"strings"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/medibloc/panacea-core/v2/x/datadeal/v044_temp/address"
-	"strings"
 )
 
 func NewDealAddress(dealId uint64) sdk.AccAddress {

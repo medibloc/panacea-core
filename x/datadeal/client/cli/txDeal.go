@@ -4,6 +4,9 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"strconv"
+
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
@@ -12,8 +15,6 @@ import (
 	"github.com/medibloc/panacea-core/v2/x/datadeal/types"
 	"github.com/spf13/cobra"
 	flag "github.com/spf13/pflag"
-	"io/ioutil"
-	"strconv"
 )
 
 func CmdCreateDeal() *cobra.Command {
@@ -73,7 +74,7 @@ func CmdSellData() *cobra.Command {
 
 func CmdDeactivateDeal() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "deactivate-deal [dealId]",
+		Use:   "deactivate-deal [deal-id]",
 		Short: "deactivate-deal",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
