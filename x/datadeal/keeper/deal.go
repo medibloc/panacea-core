@@ -175,10 +175,8 @@ func (k Keeper) SellOwnData(ctx sdk.Context, seller sdk.AccAddress, cert types.D
 		return sdk.Coin{}, err
 	}
 
-	//TODO: Fields max_num_data and cur_num_data will be changed in next data datadeal model.
 	totalAmount := findDeal.GetBudget().Amount.Uint64()
 	countOfData := findDeal.GetMaxNumData()
-
 	pricePerData := sdk.NewCoin(assets.MicroMedDenom, sdk.NewIntFromUint64(totalAmount/countOfData))
 
 	dealBalance := k.bankKeeper.GetBalance(ctx, dealAddress, assets.MicroMedDenom)
