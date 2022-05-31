@@ -15,7 +15,7 @@ Deal JSON File Example
   "budget": "10000000umed",
   "max_num_data": 10000,
   "trusted_data_validator": [
-    "panacea153rk89lyqnahmzfygy6ca6gs0n69g9sa8kdght"
+    "...."
   ]
 }
 ```
