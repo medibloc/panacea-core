@@ -1,10 +1,5 @@
 package cli
 
-const (
-	FlagDealFile                    = "deal-file"
-	DataVerificationCertificateFile = "data-verification-certificate-file"
-)
-
 type createDealInputs struct {
 	DataSchema            []string `json:"data_schema"`
 	Budget                string   `json:"budget"`
