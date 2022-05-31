@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestParseSellDataFlags(t *testing.T) {
+func TestReadDataCertFile(t *testing.T) {
 	testCert := makeTestCert()
 	parsedDataCert, err := readDataCertFile("./testdata/data_certificate_file.json")
 	require.NoError(t, err)
