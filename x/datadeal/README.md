@@ -24,7 +24,7 @@ Deal JSON File Example
 ```shell
 SELLER=$(panacead keys show {your seller} -a)
 
-panacead tx datadeal sell-data --data-verification-certificate-file {your data cert json file path} --from $SELLER --chain-id {your chain ID}
+panacead tx datadeal sell-data --data-cert-file {your data cert json file path} --from $SELLER --chain-id {your chain ID}
 ```
 Data Verification Certificate JSON File Example
 ```json
