@@ -6,12 +6,38 @@ CREATOR=$(panacead keys show {your deal creator} -a)
 
 panacead tx datadeal create-deal --deal-file {your deal json file path} --from $CREATOR --chain-id {your chain ID}
 ```
+Deal JSON File Example
+```json
+{
+  "data_schema": [
+    "https://www.json.ld"
+  ],
+  "budget": "10000000umed",
+  "max_num_data": 10000,
+  "trusted_data_validator": [
+    "panacea153rk89lyqnahmzfygy6ca6gs0n69g9sa8kdght"
+  ]
+}
+```
 
 ### Sell Data
 ```shell
 SELLER=$(panacead keys show {your seller} -a)
 
 panacead tx datadeal sell-data --data-verification-certificate-file {your data cert json file path} --from $SELLER --chain-id {your chain ID}
+```
+Data Verification Certificate JSON File Example
+```json
+{
+  "unsigned_cert": {
+    "deal_id": "1",
+    "data_hash": "....",
+    "encrypted_data_url": "....",
+    "data_validator_address": "....",
+    "requester_address": "...."
+  },
+  "signature": "...."
+}
 ```
 
 ### Deactivate Deal
