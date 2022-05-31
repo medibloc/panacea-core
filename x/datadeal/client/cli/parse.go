@@ -2,7 +2,7 @@ package cli
 
 const (
 	FlagDealFile                    = "deal-file"
-	DataVerificationCertificateFile = "data-verification-certificate-file"
+	DataVerificationCertificateFile = "data-cert-file"
 )
 
 type createDealInputs struct {
