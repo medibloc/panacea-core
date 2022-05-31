@@ -14,7 +14,7 @@ Deal JSON File Example
   ],
   "budget": "10000000umed",
   "max_num_data": 10000,
-  "trusted_data_validator": [
+  "trusted_data_validators": [
     "...."
   ]
 }
