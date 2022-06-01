@@ -7,13 +7,13 @@ import (
 
 var _ sdk.Msg = &MsgCreateDeal{}
 
-func NewMsgCreateDeal(dataSchema []string, budget *sdk.Coin, maxNumData uint64, trustedDataValidator []string, owner string) *MsgCreateDeal {
+func NewMsgCreateDeal(dataSchema []string, budget *sdk.Coin, maxNumData uint64, trustedOracle []string, owner string) *MsgCreateDeal {
 	return &MsgCreateDeal{
-		DataSchema:            dataSchema,
-		Budget:                budget,
-		MaxNumData:            maxNumData,
-		TrustedDataValidators: trustedDataValidator,
-		Owner:                 owner,
+		DataSchema:    dataSchema,
+		Budget:        budget,
+		MaxNumData:    maxNumData,
+		TrustedOracle: trustedOracle,
+		Owner:         owner,
 	}
 }
 
@@ -50,10 +50,10 @@ func (msg *MsgCreateDeal) ValidateBasic() error {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "max num of data is negative number")
 	}
 
-	for _, validator := range msg.TrustedDataValidators {
-		_, err = sdk.AccAddressFromBech32(validator)
+	for _, oracle := range msg.TrustedOracle {
+		_, err = sdk.AccAddressFromBech32(oracle)
 		if err != nil {
-			return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid data validator address (%s)", err)
+			return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid oracle address (%s)", err)
 		}
 	}
 	return nil
@@ -122,12 +122,12 @@ func (msg *MsgSellData) ValidateBasic() error {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "empty encrypted data url")
 	}
 
-	if unsignedCert.DataValidatorAddress == "" {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "empty data validator address")
+	if unsignedCert.OracleAddress == "" {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "empty oracle address")
 	}
-	_, err = sdk.AccAddressFromBech32(unsignedCert.DataValidatorAddress)
+	_, err = sdk.AccAddressFromBech32(unsignedCert.OracleAddress)
 	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid data validator address (%s)", err)
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid oracle address (%s)", err)
 	}
 
 	if unsignedCert.RequesterAddress == "" {

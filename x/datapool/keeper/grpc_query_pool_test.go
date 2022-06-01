@@ -39,22 +39,22 @@ func (suite queryPoolTestSuite) TestQueryDataPoolParams() {
 	suite.Require().Equal(params, res.GetParams())
 }
 
-func (suite *queryPoolTestSuite) TestQueryDataValidator() {
-	dataValidator := types.DataValidator{
-		Address:  dataVal1.String(),
-		Endpoint: "https://my-validator-url.org",
+func (suite *queryPoolTestSuite) TestQueryOracle() {
+	oracle := types.Oracle{
+		Address:  oracle1.String(),
+		Endpoint: "https://my-oracle-url.org",
 	}
-	err := suite.DataPoolKeeper.SetDataValidator(suite.Ctx, dataValidator)
+	err := suite.DataPoolKeeper.SetOracle(suite.Ctx, oracle)
 	suite.Require().NoError(err)
 
-	req := types.QueryDataValidatorRequest{
-		Address: dataVal1.String(),
+	req := types.QueryOracleRequest{
+		Address: oracle1.String(),
 	}
 
-	res, err := suite.DataPoolKeeper.DataValidator(sdk.WrapSDKContext(suite.Ctx), &req)
+	res, err := suite.DataPoolKeeper.Oracle(sdk.WrapSDKContext(suite.Ctx), &req)
 	suite.Require().NoError(err)
 	suite.Require().NotNil(res)
-	suite.Require().Equal(dataValidator, *res.DataValidator)
+	suite.Require().Equal(oracle, *res.Oracle)
 }
 
 func (suite *queryPoolTestSuite) TestQueryPool() {
@@ -77,7 +77,7 @@ func (suite *queryPoolTestSuite) TestQueryPool() {
 }
 
 func (suite queryPoolTestSuite) TestQueryDataValidationCertificates() {
-	suite.setDataValidatorAccount()
+	suite.setOracleAccount()
 	pool := suite.setPool()
 
 	req := types.QueryDataValidationCertificatesRequest{
@@ -111,7 +111,7 @@ func (suite queryPoolTestSuite) TestQueryDataValidationCertificates() {
 func (suite *queryPoolTestSuite) TestQueryDataPassRedeemReceipt() {
 	pool := suite.setPool()
 
-	dataPassRedeemReceipt := makeTestDataPassRedeemReceipt(pool.GetPoolId(), pool.GetRound(), dataVal1.String())
+	dataPassRedeemReceipt := makeTestDataPassRedeemReceipt(pool.GetPoolId(), pool.GetRound(), oracle1.String())
 
 	suite.DataPoolKeeper.SetDataPassRedeemReceipt(suite.Ctx, *dataPassRedeemReceipt)
 
@@ -130,7 +130,7 @@ func (suite *queryPoolTestSuite) TestQueryDataPassRedeemReceipt() {
 func (suite *queryPoolTestSuite) TestQueryRedeemReceiptsList() {
 	pool := suite.setPool()
 
-	redeemer := dataVal1.String()
+	redeemer := oracle1.String()
 	poolID := pool.GetPoolId()
 
 	redeemHistory := makeTestDataPassRedeemHistory(poolID, pool.GetRound(), redeemer)
@@ -148,22 +148,22 @@ func (suite *queryPoolTestSuite) TestQueryRedeemReceiptsList() {
 	suite.Require().Equal(*redeemHistory, res.DataPassRedeemHistories)
 }
 
-func (suite *queryPoolTestSuite) setDataValidatorAccount() {
-	validatorAccount := suite.AccountKeeper.NewAccountWithAddress(suite.Ctx, dataVal1)
-	err := validatorAccount.SetPubKey(dataValPubKey)
+func (suite *queryPoolTestSuite) setOracleAccount() {
+	oracleAccount := suite.AccountKeeper.NewAccountWithAddress(suite.Ctx, oracle1)
+	err := oracleAccount.SetPubKey(oraclePubKey)
 	suite.Require().NoError(err)
-	suite.AccountKeeper.SetAccount(suite.Ctx, validatorAccount)
+	suite.AccountKeeper.SetAccount(suite.Ctx, oracleAccount)
 }
 
 func (suite *queryPoolTestSuite) setPool() *types.Pool {
 	poolID := uint64(1)
 	nftPrice := sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(1000000))
 	poolParams := types.PoolParams{
-		DataSchema:            []string{"https://json.schemastore.org/github-issue-forms.json"},
-		TargetNumData:         100,
-		MaxNftSupply:          10,
-		NftPrice:              &nftPrice,
-		TrustedDataValidators: []string{dataVal1.String()},
+		DataSchema:     []string{"https://json.schemastore.org/github-issue-forms.json"},
+		TargetNumData:  100,
+		MaxNftSupply:   10,
+		NftPrice:       &nftPrice,
+		TrustedOracles: []string{oracle1.String()},
 	}
 
 	pool := types.NewPool(poolID, curatorAddr, poolParams)

@@ -6,8 +6,8 @@ const (
 )
 
 type createDealInputs struct {
-	DataSchema            []string `json:"data_schema"`
-	Budget                string   `json:"budget"`
-	MaxNumData            uint64   `json:"max_num_data"`
-	TrustedDataValidators []string `json:"trusted_data_validators"`
+	DataSchema     []string `json:"data_schema"`
+	Budget         string   `json:"budget"`
+	MaxNumData     uint64   `json:"max_num_data"`
+	TrustedOracles []string `json:"trusted_oracles"`
 }

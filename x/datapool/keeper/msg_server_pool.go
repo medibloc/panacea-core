@@ -8,35 +8,35 @@ import (
 	"github.com/medibloc/panacea-core/v2/x/datapool/types"
 )
 
-func (m msgServer) RegisterDataValidator(goCtx context.Context, msg *types.MsgRegisterDataValidator) (*types.MsgRegisterDataValidatorResponse, error) {
+func (m msgServer) RegisterOracle(goCtx context.Context, msg *types.MsgRegisterOracle) (*types.MsgRegisterOracleResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	_, err := sdk.AccAddressFromBech32(msg.ValidatorDetail.Address)
+	_, err := sdk.AccAddressFromBech32(msg.OracleDetail.Address)
 	if err != nil {
 		return nil, err
 	}
 
-	err = m.Keeper.RegisterDataValidator(ctx, *msg.ValidatorDetail)
+	err = m.Keeper.RegisterOracle(ctx, *msg.OracleDetail)
 	if err != nil {
 		return nil, err
 	}
 
-	return &types.MsgRegisterDataValidatorResponse{}, nil
+	return &types.MsgRegisterOracleResponse{}, nil
 }
 
-func (m msgServer) UpdateDataValidator(goCtx context.Context, msg *types.MsgUpdateDataValidator) (*types.MsgUpdateDataValidatorResponse, error) {
+func (m msgServer) UpdateOracle(goCtx context.Context, msg *types.MsgUpdateOracle) (*types.MsgUpdateOracleResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	address, err := sdk.AccAddressFromBech32(msg.DataValidator)
+	address, err := sdk.AccAddressFromBech32(msg.Oracle)
 	if err != nil {
 		return nil, err
 	}
 
-	err = m.Keeper.UpdateDataValidator(ctx, address, msg.Endpoint)
+	err = m.Keeper.UpdateOracle(ctx, address, msg.Endpoint)
 	if err != nil {
 		return nil, err
 	}
-	return &types.MsgUpdateDataValidatorResponse{}, nil
+	return &types.MsgUpdateOracleResponse{}, nil
 }
 
 func (m msgServer) CreatePool(goCtx context.Context, msg *types.MsgCreatePool) (*types.MsgCreatePoolResponse, error) {

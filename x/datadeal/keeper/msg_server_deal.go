@@ -10,11 +10,11 @@ func (m msgServer) CreateDeal(goCtx context.Context, msg *types.MsgCreateDeal) (
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	var deal = types.Deal{
-		DataSchema:            msg.DataSchema,
-		Budget:                msg.Budget,
-		MaxNumData:            msg.MaxNumData,
-		TrustedDataValidators: msg.GetTrustedDataValidators(),
-		Owner:                 msg.Owner,
+		DataSchema:     msg.DataSchema,
+		Budget:         msg.Budget,
+		MaxNumData:     msg.MaxNumData,
+		TrustedOracles: msg.GetTrustedOracle(),
+		Owner:          msg.Owner,
 	}
 
 	owner, err := sdk.AccAddressFromBech32(msg.Owner)
@@ -37,12 +37,12 @@ func (m msgServer) SellData(goCtx context.Context, msg *types.MsgSellData) (*typ
 		return nil, err
 	}
 
-	validatorAddr, err := sdk.AccAddressFromBech32(msg.Cert.UnsignedCert.DataValidatorAddress)
+	oracleAddr, err := sdk.AccAddressFromBech32(msg.Cert.UnsignedCert.OracleAddress)
 	if err != nil {
 		return nil, err
 	}
 
-	_, err = m.Keeper.VerifyDataCertificate(ctx, validatorAddr, *msg.Cert)
+	_, err = m.Keeper.VerifyDataCertificate(ctx, oracleAddr, *msg.Cert)
 	if err != nil {
 		return nil, err
 	}

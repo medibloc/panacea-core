@@ -14,27 +14,27 @@ import (
 	"github.com/medibloc/panacea-core/v2/x/datapool/types"
 )
 
-func (k Keeper) RegisterDataValidator(ctx sdk.Context, dataValidator types.DataValidator) error {
-	validatorAddr, err := sdk.AccAddressFromBech32(dataValidator.Address)
+func (k Keeper) RegisterOracle(ctx sdk.Context, oracle types.Oracle) error {
+	oracleAddr, err := sdk.AccAddressFromBech32(oracle.Address)
 	if err != nil {
 		return err
 	}
 
 	store := ctx.KVStore(k.storeKey)
-	dataValidatorKey := types.GetKeyPrefixDataValidator(validatorAddr)
-	if store.Has(dataValidatorKey) {
-		return sdkerrors.Wrapf(types.ErrDataValidatorAlreadyExist, "the data validator %s is already exists", dataValidator.Address)
+	oracleKey := types.GetKeyPrefixOracle(oracleAddr)
+	if store.Has(oracleKey) {
+		return sdkerrors.Wrapf(types.ErrOracleAlreadyExist, "the oracle %s is already exists", oracle.Address)
 	}
 
-	validatorPubKey, err := k.accountKeeper.GetPubKey(ctx, validatorAddr)
+	oraclePubKey, err := k.accountKeeper.GetPubKey(ctx, oracleAddr)
 	if err != nil {
 		return err
 	}
-	if validatorPubKey == nil {
+	if oraclePubKey == nil {
 		return sdkerrors.ErrKeyNotFound
 	}
 
-	err = k.SetDataValidator(ctx, dataValidator)
+	err = k.SetOracle(ctx, oracle)
 	if err != nil {
 		return err
 	}
@@ -42,74 +42,74 @@ func (k Keeper) RegisterDataValidator(ctx sdk.Context, dataValidator types.DataV
 	return nil
 }
 
-func (k Keeper) GetAllDataValidators(ctx sdk.Context) ([]types.DataValidator, error) {
+func (k Keeper) GetAllOracles(ctx sdk.Context) ([]types.Oracle, error) {
 	// TODO: add pagination
 	store := ctx.KVStore(k.storeKey)
-	iterator := sdk.KVStorePrefixIterator(store, types.KeyPrefixDataValidators)
+	iterator := sdk.KVStorePrefixIterator(store, types.KeyPrefixOracles)
 	defer iterator.Close()
 
-	dataValidators := make([]types.DataValidator, 0)
+	oracles := make([]types.Oracle, 0)
 
 	for ; iterator.Valid(); iterator.Next() {
 		bz := iterator.Value()
-		var dataValidator types.DataValidator
+		var oracle types.Oracle
 
-		err := k.cdc.UnmarshalBinaryLengthPrefixed(bz, &dataValidator)
+		err := k.cdc.UnmarshalBinaryLengthPrefixed(bz, &oracle)
 		if err != nil {
 			return nil, err
 		}
 
-		dataValidators = append(dataValidators, dataValidator)
+		oracles = append(oracles, oracle)
 	}
 
-	return dataValidators, nil
+	return oracles, nil
 }
 
-func (k Keeper) GetDataValidator(ctx sdk.Context, dataValidatorAddress sdk.AccAddress) (types.DataValidator, error) {
+func (k Keeper) GetOracle(ctx sdk.Context, oracleAddress sdk.AccAddress) (types.Oracle, error) {
 	store := ctx.KVStore(k.storeKey)
-	dataValidatorKey := types.GetKeyPrefixDataValidator(dataValidatorAddress)
-	if !store.Has(dataValidatorKey) {
-		return types.DataValidator{}, sdkerrors.Wrapf(types.ErrDataValidatorNotFound, "the data validator %s is not found", dataValidatorAddress)
+	oracleKey := types.GetKeyPrefixOracle(oracleAddress)
+	if !store.Has(oracleKey) {
+		return types.Oracle{}, sdkerrors.Wrapf(types.ErrOracleNotFound, "the oracle %s is not found", oracleAddress)
 	}
-	bz := store.Get(dataValidatorKey)
+	bz := store.Get(oracleKey)
 
-	var dataValidator types.DataValidator
-	err := k.cdc.UnmarshalBinaryLengthPrefixed(bz, &dataValidator)
+	var oracle types.Oracle
+	err := k.cdc.UnmarshalBinaryLengthPrefixed(bz, &oracle)
 	if err != nil {
-		return types.DataValidator{}, err
+		return types.Oracle{}, err
 	}
 
-	return dataValidator, nil
+	return oracle, nil
 }
 
-func (k Keeper) SetDataValidator(ctx sdk.Context, dataValidator types.DataValidator) error {
-	validatorAddr, err := sdk.AccAddressFromBech32(dataValidator.Address)
+func (k Keeper) SetOracle(ctx sdk.Context, oracle types.Oracle) error {
+	oracleAddr, err := sdk.AccAddressFromBech32(oracle.Address)
 	if err != nil {
 		return err
 	}
 
 	store := ctx.KVStore(k.storeKey)
-	dataValidatorKey := types.GetKeyPrefixDataValidator(validatorAddr)
-	bz := k.cdc.MustMarshalBinaryLengthPrefixed(&dataValidator)
-	store.Set(dataValidatorKey, bz)
+	oracleKey := types.GetKeyPrefixOracle(oracleAddr)
+	bz := k.cdc.MustMarshalBinaryLengthPrefixed(&oracle)
+	store.Set(oracleKey, bz)
 	return nil
 }
 
-func (k Keeper) isRegisteredDataValidator(ctx sdk.Context, dataValidatorAddress sdk.AccAddress) bool {
+func (k Keeper) isRegisteredOracle(ctx sdk.Context, oracleAddress sdk.AccAddress) bool {
 	store := ctx.KVStore(k.storeKey)
-	dataValidatorKey := types.GetKeyPrefixDataValidator(dataValidatorAddress)
-	return store.Has(dataValidatorKey)
+	oracleKey := types.GetKeyPrefixOracle(oracleAddress)
+	return store.Has(oracleKey)
 }
 
-func (k Keeper) UpdateDataValidator(ctx sdk.Context, address sdk.AccAddress, endpoint string) error {
-	validator, err := k.GetDataValidator(ctx, address)
+func (k Keeper) UpdateOracle(ctx sdk.Context, address sdk.AccAddress, endpoint string) error {
+	oracle, err := k.GetOracle(ctx, address)
 	if err != nil {
 		return err
 	}
 
-	validator.Endpoint = endpoint
+	oracle.Endpoint = endpoint
 
-	err = k.SetDataValidator(ctx, validator)
+	err = k.SetOracle(ctx, oracle)
 	if err != nil {
 		return err
 	}
@@ -139,11 +139,11 @@ func (k Keeper) CreatePool(ctx sdk.Context, curator sdk.AccAddress, deposit sdk.
 	))
 	k.accountKeeper.SetAccount(ctx, acc)
 
-	// check if the trusted_data_validators are registered
-	for _, dataValidator := range poolParams.TrustedDataValidators {
-		accAddr, _ := sdk.AccAddressFromBech32(dataValidator)
-		if !k.isRegisteredDataValidator(ctx, accAddr) {
-			return 0, types.ErrNotRegisteredDataValidator
+	// check if the trusted_oracles are registered
+	for _, oracle := range poolParams.TrustedOracles {
+		accAddr, _ := sdk.AccAddressFromBech32(oracle)
+		if !k.isRegisteredOracle(ctx, accAddr) {
+			return 0, types.ErrNotRegisteredOracle
 		}
 	}
 
@@ -369,13 +369,13 @@ func (k Keeper) SellData(ctx sdk.Context, seller sdk.AccAddress, cert types.Data
 	return nil
 }
 
-// verifySignature verifies that the signature of the dataValidator is correct
-func (k Keeper) verifySignature(ctx sdk.Context, dataValidatorCert types.DataValidationCertificate) error {
-	dataValidator := dataValidatorCert.UnsignedCert.DataValidator
-	unsignedCert := dataValidatorCert.UnsignedCert
-	sign := dataValidatorCert.Signature
+// verifySignature verifies that the signature of the oracle is correct
+func (k Keeper) verifySignature(ctx sdk.Context, oracleCert types.DataValidationCertificate) error {
+	ora := oracleCert.UnsignedCert.Oracle
+	unsignedCert := oracleCert.UnsignedCert
+	sign := oracleCert.Signature
 
-	valAddr, err := sdk.AccAddressFromBech32(dataValidator)
+	valAddr, err := sdk.AccAddressFromBech32(ora)
 	if err != nil {
 		return sdkerrors.Wrap(types.ErrInvalidSignature, err.Error())
 	}
@@ -408,11 +408,11 @@ func (k Keeper) isDuplicatedCertificate(ctx sdk.Context, cert types.DataValidati
 
 // validateCertificateByPool verifies the pool and certificate data
 func (k Keeper) validateCertificateByPool(cert types.DataValidationCertificate, pool *types.Pool) error {
-	validator := cert.UnsignedCert.DataValidator
-	trustedValidators := pool.PoolParams.TrustedDataValidators
+	oracle := cert.UnsignedCert.Oracle
+	trustedOracles := pool.PoolParams.TrustedOracles
 
-	if !contains(trustedValidators, validator) {
-		return sdkerrors.Wrap(types.ErrInvalidDataValidationCert, "the data validator is not trusted")
+	if !contains(trustedOracles, oracle) {
+		return sdkerrors.Wrap(types.ErrInvalidDataValidationCert, "the oracle is not trusted")
 	}
 
 	if pool.Status != types.PENDING {

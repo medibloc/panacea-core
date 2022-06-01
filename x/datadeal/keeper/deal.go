@@ -57,15 +57,15 @@ func newDeal(dealId uint64, deal types.Deal) types.Deal {
 	dealAddress := types.NewDealAddress(dealId)
 
 	newDeal := &types.Deal{
-		DealId:                dealId,
-		DealAddress:           dealAddress.String(),
-		DataSchema:            deal.GetDataSchema(),
-		Budget:                deal.GetBudget(),
-		TrustedDataValidators: deal.GetTrustedDataValidators(),
-		MaxNumData:            deal.GetMaxNumData(),
-		CurNumData:            0,
-		Owner:                 deal.GetOwner(),
-		Status:                ACTIVE,
+		DealId:         dealId,
+		DealAddress:    dealAddress.String(),
+		DataSchema:     deal.GetDataSchema(),
+		Budget:         deal.GetBudget(),
+		TrustedOracles: deal.GetTrustedOracles(),
+		MaxNumData:     deal.GetMaxNumData(),
+		CurNumData:     0,
+		Owner:          deal.GetOwner(),
+		Status:         ACTIVE,
 	}
 
 	return *newDeal
@@ -170,7 +170,7 @@ func (k Keeper) SellOwnData(ctx sdk.Context, seller sdk.AccAddress, cert types.D
 		return sdk.Coin{}, err
 	}
 
-	err = k.isTrustedValidator(cert, findDeal)
+	err = k.isTrustedOracle(cert, findDeal)
 	if err != nil {
 		return sdk.Coin{}, err
 	}
@@ -213,16 +213,16 @@ func (k Keeper) isDataCertDuplicate(ctx sdk.Context, cert types.DataValidationCe
 	return nil
 }
 
-func (k Keeper) isTrustedValidator(cert types.DataValidationCertificate, findDeal types.Deal) error {
-	validator := cert.UnsignedCert.GetDataValidatorAddress()
-	trustedValidators := findDeal.GetTrustedDataValidators()
+func (k Keeper) isTrustedOracle(cert types.DataValidationCertificate, findDeal types.Deal) error {
+	oracle := cert.UnsignedCert.GetOracleAddress()
+	trustedOracles := findDeal.GetTrustedOracles()
 
-	for _, v := range trustedValidators {
-		if validator == v {
+	for _, v := range trustedOracles {
+		if oracle == v {
 			return nil
 		}
 	}
-	return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "invalid validator address")
+	return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "invalid oracle address")
 }
 
 func (k Keeper) GetDataCertificate(ctx sdk.Context, cert types.DataValidationCertificate) (types.DataValidationCertificate, error) {
@@ -280,14 +280,14 @@ func SetStatusCompleted(deal *types.Deal) {
 	deal.Status = COMPLETED
 }
 
-func (k Keeper) VerifyDataCertificate(ctx sdk.Context, validatorAddr sdk.AccAddress, cert types.DataValidationCertificate) (bool, error) {
-	validatorAcc := k.accountKeeper.GetAccount(ctx, validatorAddr)
-	if validatorAcc == nil {
-		return false, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid validator address")
+func (k Keeper) VerifyDataCertificate(ctx sdk.Context, oracleAddr sdk.AccAddress, cert types.DataValidationCertificate) (bool, error) {
+	oracleAcc := k.accountKeeper.GetAccount(ctx, oracleAddr)
+	if oracleAcc == nil {
+		return false, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid oracle address")
 	}
 
-	if validatorAcc.GetPubKey() == nil {
-		return false, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "the publicKey does not exist in the validator account")
+	if oracleAcc.GetPubKey() == nil {
+		return false, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "the publicKey does not exist in the oracle account")
 	}
 
 	unSignedMarshaled, err := cert.UnsignedCert.Marshal()
@@ -295,12 +295,12 @@ func (k Keeper) VerifyDataCertificate(ctx sdk.Context, validatorAddr sdk.AccAddr
 		return false, sdkerrors.Wrapf(err, "invalid marshaled value")
 	}
 
-	validatorPubKey := validatorAcc.GetPubKey()
-	if validatorPubKey == nil {
-		return false, sdkerrors.Wrapf(err, "validator has no public key")
+	oraclePubKey := oracleAcc.GetPubKey()
+	if oraclePubKey == nil {
+		return false, sdkerrors.Wrapf(err, "oracle has no public key")
 	}
 
-	isValid := validatorPubKey.VerifySignature(unSignedMarshaled, cert.GetSignature())
+	isValid := oraclePubKey.VerifySignature(unSignedMarshaled, cert.GetSignature())
 	if !isValid {
 		return false, sdkerrors.Wrapf(types.ErrInvalidSignature, "%s", cert.GetSignature())
 	}

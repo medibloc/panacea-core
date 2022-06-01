@@ -116,7 +116,7 @@ func NewBuildCreateDealMsg(clientCtx client.Context, txf tx.Factory, fs *flag.Fl
 		deal.DataSchema,
 		&budget,
 		deal.MaxNumData,
-		deal.TrustedDataValidators,
+		deal.TrustedOracles,
 		clientCtx.GetFromAddress().String(),
 	)
 

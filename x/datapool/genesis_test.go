@@ -14,7 +14,7 @@ import (
 )
 
 var (
-	dataVal      = sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address())
+	oracle1      = sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address())
 	curator      = sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address())
 	seller       = sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address())
 	seller2      = sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address())
@@ -36,11 +36,11 @@ func TestGenesisTestSuite(t *testing.T) {
 }
 
 func (suite genesisTestSuite) TestDataPoolInitGenesis() {
-	var dataValidators []types.DataValidator
+	var oracles []types.Oracle
 
-	dataValidator := makeSampleDataValidator()
+	oracle := makeSampleOracle()
 
-	dataValidators = append(dataValidators, dataValidator)
+	oracles = append(oracles, oracle)
 
 	pool := makeSamplePool()
 
@@ -63,7 +63,7 @@ func (suite genesisTestSuite) TestDataPoolInitGenesis() {
 	dataPassRedeemHistories := makeSampleDataPassRedeemHistory()
 
 	genState := &types.GenesisState{
-		DataValidators:             dataValidators,
+		Oracles:                    oracles,
 		NextPoolNumber:             2,
 		Pools:                      pools,
 		Params:                     params,
@@ -75,10 +75,10 @@ func (suite genesisTestSuite) TestDataPoolInitGenesis() {
 
 	datapool.InitGenesis(suite.Ctx, suite.DataPoolKeeper, *genState)
 
-	// check data validator
-	dataValidatorFromKeeper, err := suite.DataPoolKeeper.GetDataValidator(suite.Ctx, dataVal)
+	// check oracle
+	oracleFromKeeper, err := suite.DataPoolKeeper.GetOracle(suite.Ctx, oracle1)
 	suite.Require().NoError(err)
-	suite.Require().Equal(dataValidator, dataValidatorFromKeeper)
+	suite.Require().Equal(oracle, oracleFromKeeper)
 
 	// check the next pool number
 	suite.Require().Equal(uint64(2), suite.DataPoolKeeper.GetNextPoolNumber(suite.Ctx))
@@ -146,9 +146,9 @@ func (suite genesisTestSuite) TestDataPoolInitGenesis() {
 }
 
 func (suite genesisTestSuite) TestDataPoolExportGenesis() {
-	// register data validator
-	dataValidator := makeSampleDataValidator()
-	err := suite.DataPoolKeeper.SetDataValidator(suite.Ctx, dataValidator)
+	// register oracle
+	oracle := makeSampleOracle()
+	err := suite.DataPoolKeeper.SetOracle(suite.Ctx, oracle)
 	suite.Require().NoError(err)
 
 	// create pool
@@ -183,7 +183,7 @@ func (suite genesisTestSuite) TestDataPoolExportGenesis() {
 	suite.Require().Equal(uint64(2), genesisState.NextPoolNumber)
 	suite.Require().Len(genesisState.Pools, 1)
 	suite.Require().Equal(types.DefaultParams(), genesisState.Params)
-	suite.Require().Len(genesisState.DataValidators, 1)
+	suite.Require().Len(genesisState.Oracles, 1)
 	suite.Require().Len(genesisState.DataPassRedeemReceipts, 1)
 	suite.Require().Equal(poolIDs, genesisState.InstantRevenueDistribution.PoolIds)
 	suite.Require().True(len(genesisState.SalesHistories) == 4)
@@ -191,10 +191,10 @@ func (suite genesisTestSuite) TestDataPoolExportGenesis() {
 	suite.Require().Equal(redeemHistory, genesisState.DataPassRedeemHistories)
 }
 
-func makeSampleDataValidator() types.DataValidator {
-	return types.DataValidator{
-		Address:  dataVal.String(),
-		Endpoint: "https://my-validator.org",
+func makeSampleOracle() types.Oracle {
+	return types.Oracle{
+		Address:  oracle1.String(),
+		Endpoint: "https://my-oracle.org",
 	}
 }
 
@@ -215,12 +215,12 @@ func makeSamplePool() types.Pool {
 
 func makeSamplePoolParams() *types.PoolParams {
 	return &types.PoolParams{
-		DataSchema:            []string{"https://www.json.ld"},
-		TargetNumData:         100,
-		MaxNftSupply:          10,
-		NftPrice:              &NFTPrice,
-		TrustedDataValidators: []string{dataVal.String()},
-		TrustedDataIssuers:    []string(nil),
+		DataSchema:         []string{"https://www.json.ld"},
+		TargetNumData:      100,
+		MaxNftSupply:       10,
+		NftPrice:           &NFTPrice,
+		TrustedOracles:     []string{oracle1.String()},
+		TrustedDataIssuers: []string(nil),
 	}
 }
 

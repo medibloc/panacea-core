@@ -51,7 +51,7 @@ func (suite *genesisTestSuite) TestDataDealInitGenesis() {
 	suite.Require().Equal(newDeal.GetDealAddress(), dealStored.GetDealAddress())
 	suite.Require().Equal(newDeal.GetDataSchema(), dealStored.GetDataSchema())
 	suite.Require().Equal(newDeal.GetBudget(), dealStored.GetBudget())
-	suite.Require().Equal(newDeal.GetTrustedDataValidators(), dealStored.GetTrustedDataValidators())
+	suite.Require().Equal(newDeal.GetTrustedOracles(), dealStored.GetTrustedOracles())
 	suite.Require().Equal(newDeal.GetCurNumData(), dealStored.GetCurNumData())
 	suite.Require().Equal(newDeal.GetMaxNumData(), dealStored.GetMaxNumData())
 	suite.Require().Equal(newDeal.GetOwner(), dealStored.GetOwner())
@@ -66,7 +66,7 @@ func (suite *genesisTestSuite) TestDataDealInitGenesis() {
 	suite.Require().Equal(newDataCert.UnsignedCert.GetDealId(), dataCertificateStored.UnsignedCert.GetDealId())
 	suite.Require().Equal(newDataCert.UnsignedCert.GetDataHash(), dataCertificateStored.UnsignedCert.GetDataHash())
 	suite.Require().Equal(newDataCert.UnsignedCert.GetEncryptedDataUrl(), dataCertificateStored.UnsignedCert.GetEncryptedDataUrl())
-	suite.Require().Equal(newDataCert.UnsignedCert.GetDataValidatorAddress(), dataCertificateStored.UnsignedCert.GetDataValidatorAddress())
+	suite.Require().Equal(newDataCert.UnsignedCert.GetOracleAddress(), dataCertificateStored.UnsignedCert.GetOracleAddress())
 	suite.Require().Equal(newDataCert.UnsignedCert.GetRequesterAddress(), dataCertificateStored.UnsignedCert.GetRequesterAddress())
 }
 
@@ -91,11 +91,11 @@ func (suite *genesisTestSuite) TestDataDealExportGenesis() {
 	suite.Require().NoError(err)
 
 	tempDeal := types.Deal{
-		DataSchema:            []string{"http://jsonld.com"},
-		Budget:                &sdk.Coin{Denom: assets.MicroMedDenom, Amount: sdk.NewInt(10000000)},
-		MaxNumData:            10000,
-		TrustedDataValidators: []string{acc1.String()},
-		Owner:                 acc1.String(),
+		DataSchema:     []string{"http://jsonld.com"},
+		Budget:         &sdk.Coin{Denom: assets.MicroMedDenom, Amount: sdk.NewInt(10000000)},
+		MaxNumData:     10000,
+		TrustedOracles: []string{acc1.String()},
+		Owner:          acc1.String(),
 	}
 
 	_, err = suite.DataDealKeeper.CreateNewDeal(suite.Ctx, acc1, tempDeal)
@@ -113,25 +113,25 @@ func (suite *genesisTestSuite) TestDataDealExportGenesis() {
 
 func makeTestDeal() types.Deal {
 	return types.Deal{
-		DealId:                1,
-		DealAddress:           types.NewDealAddress(1).String(),
-		DataSchema:            nil,
-		Budget:                &sdk.Coin{Denom: "umed", Amount: sdk.NewInt(10000000)},
-		TrustedDataValidators: nil,
-		MaxNumData:            10000,
-		CurNumData:            0,
-		Owner:                 acc1.String(),
-		Status:                "ACTIVE",
+		DealId:         1,
+		DealAddress:    types.NewDealAddress(1).String(),
+		DataSchema:     nil,
+		Budget:         &sdk.Coin{Denom: "umed", Amount: sdk.NewInt(10000000)},
+		TrustedOracles: nil,
+		MaxNumData:     10000,
+		CurNumData:     0,
+		Owner:          acc1.String(),
+		Status:         "ACTIVE",
 	}
 }
 
 func makeTestDataCert() types.DataValidationCertificate {
 	uCert := types.UnsignedDataValidationCertificate{
-		DealId:               2,
-		DataHash:             []byte("1a312c123x23"),
-		EncryptedDataUrl:     []byte("https://panacea.org/a/123.json"),
-		DataValidatorAddress: acc1.String(),
-		RequesterAddress:     acc2.String(),
+		DealId:           2,
+		DataHash:         []byte("1a312c123x23"),
+		EncryptedDataUrl: []byte("https://panacea.org/a/123.json"),
+		OracleAddress:    acc1.String(),
+		RequesterAddress: acc2.String(),
 	}
 
 	marshal, err := uCert.Marshal()
@@ -152,11 +152,11 @@ func makeTestDataCert() types.DataValidationCertificate {
 
 func makeTestDataCert2() types.DataValidationCertificate {
 	uCert := types.UnsignedDataValidationCertificate{
-		DealId:               2,
-		DataHash:             []byte("1a312c1223x2fs3"),
-		EncryptedDataUrl:     []byte("https://panacea.org/a/123.json"),
-		DataValidatorAddress: acc1.String(),
-		RequesterAddress:     acc2.String(),
+		DealId:           2,
+		DataHash:         []byte("1a312c1223x2fs3"),
+		EncryptedDataUrl: []byte("https://panacea.org/a/123.json"),
+		OracleAddress:    acc1.String(),
+		RequesterAddress: acc2.String(),
 	}
 
 	marshal, err := uCert.Marshal()
