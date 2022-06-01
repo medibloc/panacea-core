@@ -23,7 +23,7 @@ message MsgCreateDeal {
   repeated string data_schema = 1;
   cosmos.base.v1beta1.Coin budget = 2;
   uint64 max_num_data = 3;
-  repeated string trusted_oracle = 4;
+  repeated string trusted_oracles = 4;
   string owner = 5;
 }
 
