@@ -13,7 +13,7 @@ func (m msgServer) CreateDeal(goCtx context.Context, msg *types.MsgCreateDeal) (
 		DataSchema:     msg.DataSchema,
 		Budget:         msg.Budget,
 		MaxNumData:     msg.MaxNumData,
-		TrustedOracles: msg.GetTrustedOracle(),
+		TrustedOracles: msg.GetTrustedOracles(),
 		Owner:          msg.Owner,
 	}
 

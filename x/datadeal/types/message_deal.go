@@ -9,11 +9,11 @@ var _ sdk.Msg = &MsgCreateDeal{}
 
 func NewMsgCreateDeal(dataSchema []string, budget *sdk.Coin, maxNumData uint64, trustedOracle []string, owner string) *MsgCreateDeal {
 	return &MsgCreateDeal{
-		DataSchema:    dataSchema,
-		Budget:        budget,
-		MaxNumData:    maxNumData,
-		TrustedOracle: trustedOracle,
-		Owner:         owner,
+		DataSchema:     dataSchema,
+		Budget:         budget,
+		MaxNumData:     maxNumData,
+		TrustedOracles: trustedOracle,
+		Owner:          owner,
 	}
 }
 
@@ -50,7 +50,7 @@ func (msg *MsgCreateDeal) ValidateBasic() error {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "max num of data is negative number")
 	}
 
-	for _, oracle := range msg.TrustedOracle {
+	for _, oracle := range msg.TrustedOracles {
 		_, err = sdk.AccAddressFromBech32(oracle)
 		if err != nil {
 			return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid oracle address (%s)", err)
