@@ -14,7 +14,7 @@ Deal JSON File Example
   ],
   "budget": "10000000umed",
   "max_num_data": 10000,
-  "trusted_data_validators": [
+  "trusted_oracles": [
     "...."
   ]
 }
@@ -33,7 +33,7 @@ Data Verification Certificate JSON File Example
     "deal_id": "1",
     "data_hash": "....",
     "encrypted_data_url": "....",
-    "data_validator_address": "....",
+    "oracle_address": "....",
     "requester_address": "...."
   },
   "signature": "...."
