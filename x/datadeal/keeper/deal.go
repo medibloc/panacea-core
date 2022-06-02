@@ -197,7 +197,7 @@ func (k Keeper) isDuplicatedData(ctx sdk.Context, cert types.DataCert) bool {
 	return store.Has(dataCertKey)
 }
 
-func (k Keeper) isTrustedOracle(cert types.DataValidationCertificate, findDeal types.Deal) bool {
+func (k Keeper) isTrustedOracle(cert types.DataCert, findDeal types.Deal) bool {
 	oracle := cert.UnsignedCert.GetOracleAddress()
 	trustedOracles := findDeal.GetTrustedOracles()
 
@@ -269,7 +269,7 @@ func SetStatusCompleted(deal *types.Deal) {
 	deal.Status = types.COMPLETED
 }
 
-func (k Keeper) VerifyDataCertificate(ctx sdk.Context, oracleAddr sdk.AccAddress, cert types.DataValidationCertificate) (bool, error) {
+func (k Keeper) VerifyDataCert(ctx sdk.Context, oracleAddr sdk.AccAddress, cert types.DataCert) (bool, error) {
 	oracleAcc := k.accountKeeper.GetAccount(ctx, oracleAddr)
 	if oracleAcc == nil {
 		return false, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid oracle address")

@@ -876,7 +876,7 @@ var (
 
 	pattern_Query_DataPoolModuleAddr_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"panacea", "datapool", "v2", "module_addr"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_DataCerts_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 2, 6, 1, 0, 4, 1, 5, 6}, []string{"panacea", "datapool", "v2", "data_validation_certificates", "pool", "pool_id", "round"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_DataCerts_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 2, 6, 1, 0, 4, 1, 5, 6}, []string{"panacea", "datapool", "v2", "data_certs", "pool", "pool_id", "round"}, "", runtime.AssumeColonVerbOpt(true)))
 
 	pattern_Query_DataPassRedeemReceipt_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6, 2, 7, 1, 0, 4, 1, 5, 8, 2, 9}, []string{"panacea", "datapool", "v2", "pools", "pool_id", "rounds", "round", "data_passes", "data_pass_id", "redeem_receipt"}, "", runtime.AssumeColonVerbOpt(true)))
 

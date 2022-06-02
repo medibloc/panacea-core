@@ -65,12 +65,12 @@ func (suite *genesisTestSuite) TestDataDealInitGenesis() {
 
 	dataCertStored, err := suite.DataDealKeeper.GetDataCert(suite.Ctx, newDataCert)
 	suite.Require().NoError(err)
-	suite.Require().Equal(newDataCert.GetSignature(), dataCertificateStored.GetSignature())
-	suite.Require().Equal(newDataCert.UnsignedCert.GetDealId(), dataCertificateStored.UnsignedCert.GetDealId())
-	suite.Require().Equal(newDataCert.UnsignedCert.GetDataHash(), dataCertificateStored.UnsignedCert.GetDataHash())
-	suite.Require().Equal(newDataCert.UnsignedCert.GetEncryptedDataUrl(), dataCertificateStored.UnsignedCert.GetEncryptedDataUrl())
-	suite.Require().Equal(newDataCert.UnsignedCert.GetOracleAddress(), dataCertificateStored.UnsignedCert.GetOracleAddress())
-	suite.Require().Equal(newDataCert.UnsignedCert.GetRequesterAddress(), dataCertificateStored.UnsignedCert.GetRequesterAddress())
+	suite.Require().Equal(newDataCert.GetSignature(), dataCertStored.GetSignature())
+	suite.Require().Equal(newDataCert.UnsignedCert.GetDealId(), dataCertStored.UnsignedCert.GetDealId())
+	suite.Require().Equal(newDataCert.UnsignedCert.GetDataHash(), dataCertStored.UnsignedCert.GetDataHash())
+	suite.Require().Equal(newDataCert.UnsignedCert.GetEncryptedDataUrl(), dataCertStored.UnsignedCert.GetEncryptedDataUrl())
+	suite.Require().Equal(newDataCert.UnsignedCert.GetOracleAddress(), dataCertStored.UnsignedCert.GetOracleAddress())
+	suite.Require().Equal(newDataCert.UnsignedCert.GetRequesterAddress(), dataCertStored.UnsignedCert.GetRequesterAddress())
 }
 
 func (suite *genesisTestSuite) TestDataDealExportGenesis() {
@@ -128,8 +128,8 @@ func makeTestDeal() types.Deal {
 	}
 }
 
-func makeTestDataCert() types.DataValidationCertificate {
-	uCert := types.UnsignedDataValidationCertificate{
+func makeTestDataCert() types.DataCert {
+	uCert := types.UnsignedDataCert{
 		DealId:           2,
 		DataHash:         []byte("1a312c123x23"),
 		EncryptedDataUrl: []byte("https://panacea.org/a/123.json"),
@@ -153,8 +153,8 @@ func makeTestDataCert() types.DataValidationCertificate {
 	}
 }
 
-func makeTestDataCert2() types.DataValidationCertificate {
-	uCert := types.UnsignedDataValidationCertificate{
+func makeTestDataCert2() types.DataCert {
+	uCert := types.UnsignedDataCert{
 		DealId:           2,
 		DataHash:         []byte("1a312c1223x2fs3"),
 		EncryptedDataUrl: []byte("https://panacea.org/a/123.json"),

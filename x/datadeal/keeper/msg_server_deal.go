@@ -43,7 +43,7 @@ func (m msgServer) SellData(goCtx context.Context, msg *types.MsgSellData) (*typ
 		return nil, err
 	}
 
-	_, err = m.Keeper.VerifyDataCertificate(ctx, oracleAddr, *msg.Cert)
+	_, err = m.Keeper.VerifyDataCert(ctx, oracleAddr, *msg.Cert)
 	if err != nil {
 		return nil, err
 	}

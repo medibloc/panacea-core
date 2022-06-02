@@ -26,7 +26,7 @@ func makeTestCert() types.DataCert {
 	decodeDataHash, _ := base64.StdEncoding.DecodeString("ZGF0YUhhc2g=")
 	decodeURL, _ := base64.StdEncoding.DecodeString("ZW5jcnlwdGVkRGF0YVVSTA==")
 
-	unsignedDataValidationCertificate := types.UnsignedDataValidationCertificate{
+	unsignedDataCert := types.UnsignedDataCert{
 		DealId:           1,
 		DataHash:         decodeDataHash,
 		EncryptedDataUrl: decodeURL,

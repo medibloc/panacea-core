@@ -698,8 +698,8 @@ func (suite *poolTestSuite) TestSellData_mismatch_cert_and_pool_round() {
 	suite.Require().True(strings.HasSuffix(err.Error(), types.ErrInvalidDataCert.Error()))
 }
 
-func makeTestDataCertificate(marshaler codec.Marshaler, poolID, round uint64, dataHash []byte, requester string) (*types.DataValidationCertificate, error) {
-	unsignedCert := types.UnsignedDataValidationCertificate{
+func makeTestDataCert(marshaler codec.Marshaler, poolID, round uint64, dataHash []byte, requester string) (*types.DataCert, error) {
+	unsignedCert := types.UnsignedDataCert{
 		PoolId:    poolID,
 		Round:     round,
 		DataHash:  dataHash,

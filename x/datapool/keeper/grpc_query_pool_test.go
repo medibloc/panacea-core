@@ -76,7 +76,7 @@ func (suite *queryPoolTestSuite) TestQueryPool() {
 	suite.Require().Equal(pool.Curator, resultPool.Curator)
 }
 
-func (suite queryPoolTestSuite) TestQueryDataValidationCertificates() {
+func (suite queryPoolTestSuite) TestQueryDataCerts() {
 	suite.setOracleAccount()
 	pool := suite.setPool()
 

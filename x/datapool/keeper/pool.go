@@ -370,7 +370,7 @@ func (k Keeper) SellData(ctx sdk.Context, seller sdk.AccAddress, cert types.Data
 }
 
 // verifySignature verifies that the signature of the oracle is correct
-func (k Keeper) verifySignature(ctx sdk.Context, oracleCert types.DataValidationCertificate) error {
+func (k Keeper) verifySignature(ctx sdk.Context, oracleCert types.DataCert) error {
 	ora := oracleCert.UnsignedCert.Oracle
 	unsignedCert := oracleCert.UnsignedCert
 	sign := oracleCert.Signature
@@ -406,13 +406,13 @@ func (k Keeper) isDuplicatedCert(ctx sdk.Context, cert types.DataCert) bool {
 	return false
 }
 
-// validateCertificateByPool verifies the pool and certificate data
-func (k Keeper) validateCertificateByPool(cert types.DataValidationCertificate, pool *types.Pool) error {
+// validateCertByPool verifies the pool and certificate data
+func (k Keeper) validateCertByPool(cert types.DataCert, pool *types.Pool) error {
 	oracle := cert.UnsignedCert.Oracle
 	trustedOracles := pool.PoolParams.TrustedOracles
 
 	if !contains(trustedOracles, oracle) {
-		return sdkerrors.Wrap(types.ErrInvalidDataValidationCert, "the oracle is not trusted")
+		return sdkerrors.Wrap(types.ErrInvalidDataCert, "the oracle is not trusted")
 	}
 
 	if pool.Status != types.PENDING {
