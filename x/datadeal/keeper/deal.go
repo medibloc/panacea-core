@@ -285,8 +285,7 @@ func (k Keeper) VerifyDataCert(ctx sdk.Context, oracleAddr sdk.AccAddress, cert 
 		return false, sdkerrors.Wrapf(err, "oracle has no public key")
 	}
 
-	isValid := oraclePubKey.VerifySignature(unSignedMarshaled, cert.GetSignature())
-	if !isValid {
+	if !oraclePubKey.VerifySignature(unSignedMarshaled, cert.GetSignature()) {
 		return false, sdkerrors.Wrapf(types.ErrInvalidSignature, "%s", cert.GetSignature())
 	}
 
