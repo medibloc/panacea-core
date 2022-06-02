@@ -334,7 +334,6 @@ func (k Keeper) DeployAndRegisterNFTContract(ctx sdk.Context, wasmCode []byte) (
 }
 
 // SellData verifies the certificate against the pool information and stores it using a key combined with poolID, dataHash, and round.
-// Seller is paid shareToken.
 func (k Keeper) SellData(ctx sdk.Context, seller sdk.AccAddress, cert types.DataCert) error {
 	if cert.UnsignedCert.Requester != seller.String() {
 		return types.ErrNotEqualsSeller
