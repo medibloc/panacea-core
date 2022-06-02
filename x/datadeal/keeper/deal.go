@@ -285,8 +285,7 @@ func (k Keeper) VerifyDataCertificate(ctx sdk.Context, validatorAddr sdk.AccAddr
 		return false, sdkerrors.Wrapf(err, "validator has no public key")
 	}
 
-	isValid := validatorPubKey.VerifySignature(unSignedMarshaled, cert.GetSignature())
-	if !isValid {
+	if !validatorPubKey.VerifySignature(unSignedMarshaled, cert.GetSignature()) {
 		return false, sdkerrors.Wrapf(types.ErrInvalidSignature, "%s", cert.GetSignature())
 	}
 
