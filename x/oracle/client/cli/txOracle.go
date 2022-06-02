@@ -11,7 +11,7 @@ import (
 func CmdRegisterOracle() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "register-node [endpoint-URL]",
-		Short: "register oracle node",
+		Short: "register an oracle node",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
