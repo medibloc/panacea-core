@@ -27,10 +27,10 @@ message Pool {
   ]; // curator commission rate
 }
 
-// DataValidationCertificate defines the certificate for data validation w/ data validator signature.
+// DataValidationCertificate defines the certificate for data validation w/ oracle signature.
 message DataValidationCertificate {
   UnsignedDataValidationCertificate unsigned_cert = 1;  // unsigned certificate
-  bytes                             signature = 2;      // signature for data validation by data validator
+  bytes                             signature = 2;      // signature for data validation by oracle
 }
 
 // UnsignedDataValidationCertificate defines the unsigned certificate for data validation.
@@ -38,7 +38,7 @@ message UnsignedDataValidationCertificate {
   uint64 pool_id = 1;           // pool Id for selling data
   uint64 round = 2;             // Always 1 for v0
   bytes  data_hash = 3;         // sha-256 hash of the data
-  string data_validator = 4;    // 'panacea1' address of data validator
+  string oracle = 4;            // 'panacea1' address of oracle
   string requester = 5;         // 'panacea1' address of seller
 }
 
@@ -50,8 +50,8 @@ message DataPassRedeemReceipt {
   string redeemer = 4;      // 'panacea1' address of redeemer
 }
 
-// DataValidator defines a detail of data validator.
-message DataValidator {
+// Oracle defines a detail of oracle.
+message Oracle {
   string endpoint = 1;
   string address = 2;
 }
@@ -62,7 +62,7 @@ message PoolParams {
   uint64                   target_num_data = 2;         // A target num of data to be collected
   uint64                   max_nft_supply = 3;          // A max num of NFTs that can be minted (= A total num of potential buyers)
   cosmos.base.v1beta1.Coin nft_price = 4;               // A price of a NFT
-  repeated string          trusted_data_validators = 5; // Trusted data validators' addresses
+  repeated string          trusted_oracles = 5; // Trusted oracles' addresses
   repeated string          trusted_data_issuers = 6;    // Optional. Data issuers that is trusted by the curator
 }
 

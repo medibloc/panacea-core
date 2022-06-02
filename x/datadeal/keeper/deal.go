@@ -155,7 +155,7 @@ func (k Keeper) SellData(ctx sdk.Context, seller sdk.AccAddress, cert types.Data
 		return sdk.Coin{}, err
 	}
 
-	if !k.isTrustedDataValidator(cert, deal) {
+	if !k.isTrustedOracle(cert, deal) {
 		return sdk.Coin{}, types.ErrInvalidDataVal
 	}
 
@@ -197,16 +197,16 @@ func (k Keeper) isDuplicatedData(ctx sdk.Context, cert types.DataValidationCerti
 	return store.Has(dataCertKey)
 }
 
-func (k Keeper) isTrustedDataValidator(cert types.DataValidationCertificate, deal types.Deal) bool {
-	validator := cert.UnsignedCert.GetDataValidatorAddress()
-	trustedValidators := deal.GetTrustedDataValidators()
+func (k Keeper) isTrustedOracle(cert types.DataValidationCertificate, findDeal types.Deal) bool {
+	oracle := cert.UnsignedCert.GetOracleAddress()
+	trustedOracles := findDeal.GetTrustedOracles()
 
-	if len(trustedValidators) == 0 {
+	if len(trustedOracles) == 0 {
 		return true
 	}
 
-	for _, v := range trustedValidators {
-		if validator == v {
+	for _, v := range trustedOracles {
+		if oracle == v {
 			return true
 		}
 	}
@@ -269,10 +269,10 @@ func SetStatusCompleted(deal *types.Deal) {
 	deal.Status = types.COMPLETED
 }
 
-func (k Keeper) VerifyDataCertificate(ctx sdk.Context, validatorAddr sdk.AccAddress, cert types.DataValidationCertificate) (bool, error) {
-	validatorAcc := k.accountKeeper.GetAccount(ctx, validatorAddr)
-	if validatorAcc == nil {
-		return false, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid validator address")
+func (k Keeper) VerifyDataCertificate(ctx sdk.Context, oracleAddr sdk.AccAddress, cert types.DataValidationCertificate) (bool, error) {
+	oracleAcc := k.accountKeeper.GetAccount(ctx, oracleAddr)
+	if oracleAcc == nil {
+		return false, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid oracle address")
 	}
 
 	unSignedMarshaled, err := cert.UnsignedCert.Marshal()
@@ -280,12 +280,13 @@ func (k Keeper) VerifyDataCertificate(ctx sdk.Context, validatorAddr sdk.AccAddr
 		return false, sdkerrors.Wrapf(err, "invalid marshaled value")
 	}
 
-	validatorPubKey := validatorAcc.GetPubKey()
-	if validatorPubKey == nil {
-		return false, sdkerrors.Wrapf(err, "validator has no public key")
+	oraclePubKey := oracleAcc.GetPubKey()
+	if oraclePubKey == nil {
+		return false, sdkerrors.Wrapf(err, "oracle has no public key")
 	}
 
-	if !validatorPubKey.VerifySignature(unSignedMarshaled, cert.GetSignature()) {
+	isValid := oraclePubKey.VerifySignature(unSignedMarshaled, cert.GetSignature())
+	if !isValid {
 		return false, sdkerrors.Wrapf(types.ErrInvalidSignature, "%s", cert.GetSignature())
 	}
 

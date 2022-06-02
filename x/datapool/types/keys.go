@@ -26,8 +26,8 @@ const (
 )
 
 var (
-	// KeyPrefixDataValidators defines key to store data validator
-	KeyPrefixDataValidators = []byte{0x01}
+	// KeyPrefixOracles defines key to store oracle
+	KeyPrefixOracles = []byte{0x01}
 
 	// KeyPoolNextNumber defines key to store next Pool ID to be used
 	KeyPoolNextNumber = []byte{0x02}
@@ -35,8 +35,8 @@ var (
 	// KeyPrefixPools defines key to store Pools
 	KeyPrefixPools = []byte{0x03}
 
-	// KeyPrefixDataValidatorCerts defines key to store dataValidator certs
-	KeyPrefixDataValidatorCerts = []byte{0x04}
+	// KeyPrefixOracleCerts defines key to store oracle certs
+	KeyPrefixOracleCerts = []byte{0x04}
 
 	// KeyPrefixNFTRedeemReceipts define key to store redeemed receipts
 	KeyPrefixNFTRedeemReceipts = []byte{0x05}
@@ -52,8 +52,8 @@ var (
 	KeyIndexSeparator = []byte{0xFF}
 )
 
-func GetKeyPrefixDataValidator(dataValidatorAddr sdk.AccAddress) []byte {
-	return append(KeyPrefixDataValidators, dataValidatorAddr.Bytes()...)
+func GetKeyPrefixOracle(oracleAddr sdk.AccAddress) []byte {
+	return append(KeyPrefixOracles, oracleAddr.Bytes()...)
 }
 
 func GetKeyPrefixPools(poolID uint64) []byte {
@@ -61,7 +61,7 @@ func GetKeyPrefixPools(poolID uint64) []byte {
 }
 
 func GetKeyPrefixDataValidateCerts(poolID, round uint64) []byte {
-	return append(KeyPrefixDataValidatorCerts, CombineKeys(sdk.Uint64ToBigEndian(poolID), sdk.Uint64ToBigEndian(round))...)
+	return append(KeyPrefixOracleCerts, CombineKeys(sdk.Uint64ToBigEndian(poolID), sdk.Uint64ToBigEndian(round))...)
 }
 
 func GetKeyPrefixDataValidateCert(poolID, round uint64, dataHash []byte) []byte {

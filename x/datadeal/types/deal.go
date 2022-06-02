@@ -19,15 +19,15 @@ func NewDeal(dealID uint64, deal Deal) Deal {
 	dealAddress := NewDealAddress(dealID)
 
 	return Deal{
-		DealId:                dealID,
-		DealAddress:           dealAddress.String(),
-		DataSchema:            deal.GetDataSchema(),
-		Budget:                deal.GetBudget(),
-		TrustedDataValidators: deal.GetTrustedDataValidators(),
-		MaxNumData:            deal.GetMaxNumData(),
-		CurNumData:            0,
-		Owner:                 deal.GetOwner(),
-		Status:                ACTIVE,
+		DealId:         dealID,
+		DealAddress:    dealAddress.String(),
+		DataSchema:     deal.GetDataSchema(),
+		Budget:         deal.GetBudget(),
+		TrustedOracles: deal.GetTrustedOracles(),
+		MaxNumData:     deal.GetMaxNumData(),
+		CurNumData:     0,
+		Owner:          deal.GetOwner(),
+		Status:         ACTIVE,
 	}
 }
 

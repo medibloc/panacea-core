@@ -9,10 +9,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func CmdGetDataValidator() *cobra.Command {
+func CmdGetOracle() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "data-validator [data-validator-address]",
-		Short: "Query a data validator",
+		Use:   "oracle [oracle-address]",
+		Short: "Query a oracle",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientQueryContext(cmd)
@@ -22,7 +22,7 @@ func CmdGetDataValidator() *cobra.Command {
 
 			queryClient := types.NewQueryClient(clientCtx)
 
-			res, err := queryClient.DataValidator(cmd.Context(), &types.QueryDataValidatorRequest{
+			res, err := queryClient.Oracle(cmd.Context(), &types.QueryOracleRequest{
 				Address: args[0],
 			})
 

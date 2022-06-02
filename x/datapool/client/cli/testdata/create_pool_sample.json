@@ -5,6 +5,6 @@
   "target_num_data": 100,
   "max_nft_supply": 10,
   "nft_price": "1000000umed",
-  "trusted_data_validators": [],
+  "trusted_oracles": [],
   "trusted_data_issuers": []
 }

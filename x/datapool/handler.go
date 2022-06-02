@@ -18,11 +18,11 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 		ctx = ctx.WithEventManager(sdk.NewEventManager())
 
 		switch msg := msg.(type) {
-		case *types.MsgRegisterDataValidator:
-			res, err := msgServer.RegisterDataValidator(sdk.WrapSDKContext(ctx), msg)
+		case *types.MsgRegisterOracle:
+			res, err := msgServer.RegisterOracle(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)
-		case *types.MsgUpdateDataValidator:
-			res, err := msgServer.UpdateDataValidator(sdk.WrapSDKContext(ctx), msg)
+		case *types.MsgUpdateOracle:
+			res, err := msgServer.UpdateOracle(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)
 		case *types.MsgCreatePool:
 			res, err := msgServer.CreatePool(sdk.WrapSDKContext(ctx), msg)
