@@ -201,7 +201,7 @@ func (k Keeper) isTrustedDataValidator(cert types.DataValidationCertificate, dea
 	validator := cert.UnsignedCert.GetDataValidatorAddress()
 	trustedValidators := deal.GetTrustedDataValidators()
 
-	if len(trustedValidators) == 0 || trustedValidators == nil {
+	if len(trustedValidators) == 0 {
 		return true
 	}
 
