@@ -88,7 +88,7 @@ func CmdSellData() *cobra.Command {
 				return err
 			}
 
-			cert, err := readCertificateFromFile(args[0])
+			cert, err := readCertFromFile(args[0])
 			if err != nil {
 				return err
 			}
@@ -109,13 +109,13 @@ func CmdSellData() *cobra.Command {
 	return cmd
 }
 
-func readCertificateFromFile(file string) (*types.DataValidationCertificate, error) {
+func readCertFromFile(file string) (*types.DataCert, error) {
 	contents, err := ioutil.ReadFile(file)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read file: %w", err)
 	}
 
-	var cert types.DataValidationCertificate
+	var cert types.DataCert
 
 	if err := json.Unmarshal(contents, &cert); err != nil {
 		return nil, err

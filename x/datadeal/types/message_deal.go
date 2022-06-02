@@ -74,7 +74,7 @@ func (msg *MsgCreateDeal) GetSigners() []sdk.AccAddress {
 
 var _ sdk.Msg = &MsgSellData{}
 
-func NewMsgSellData(cert DataValidationCertificate, seller string) *MsgSellData {
+func NewMsgSellData(cert DataCert, seller string) *MsgSellData {
 	return &MsgSellData{
 		Cert:   &cert,
 		Seller: seller,
