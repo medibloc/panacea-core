@@ -21,12 +21,6 @@ func TestDealTestSuite(t *testing.T) {
 	suite.Run(t, new(dealTestSuite))
 }
 
-const (
-	ACTIVE    = "ACTIVE"    // When deal is activated.
-	INACTIVE  = "INACTIVE"  // When deal is deactivated.
-	COMPLETED = "COMPLETED" // When deal is completed.
-)
-
 var (
 	acc1                   = sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address())
 	acc2                   = sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address())
@@ -73,7 +67,7 @@ func (suite *dealTestSuite) TestCreateNewDeal() {
 	suite.Require().Equal(deal.GetCurNumData(), tempDeal.GetCurNumData())
 	suite.Require().Equal(deal.GetTrustedOracles(), tempDeal.GetTrustedOracles())
 	suite.Require().Equal(deal.GetOwner(), tempDeal.GetOwner())
-	suite.Require().Equal(deal.GetStatus(), ACTIVE)
+	suite.Require().Equal(deal.GetStatus(), types.ACTIVE)
 }
 
 func (suite *dealTestSuite) TestGetDeal() {
@@ -272,14 +266,14 @@ func (suite *dealTestSuite) TestDealStatusInactiveOrCompleted() {
 	findDeal, err := suite.DataDealKeeper.GetDeal(suite.Ctx, dealID)
 	suite.Require().NoError(err)
 
-	findDeal.Status = INACTIVE
+	findDeal.Status = types.INACTIVE
 	suite.DataDealKeeper.SetDeal(suite.Ctx, findDeal)
 
 	testCert1 := makeTestCert("1a312c1223x2fs3", newAddr, acc3)
 	_, err = suite.DataDealKeeper.SellData(suite.Ctx, acc3, testCert1)
 	suite.Require().Error(err, types.ErrInvalidStatus)
 
-	findDeal.Status = COMPLETED
+	findDeal.Status = types.COMPLETED
 	suite.DataDealKeeper.SetDeal(suite.Ctx, findDeal)
 	suite.Require().Error(err, types.ErrInvalidStatus)
 }
@@ -333,7 +327,7 @@ func (suite *dealTestSuite) TestIsDealStatusCompleted() {
 	updatedDeal, err := suite.DataDealKeeper.GetDeal(suite.Ctx, dealID)
 	suite.Require().NoError(err)
 
-	suite.Require().Equal(updatedDeal.GetStatus(), COMPLETED)
+	suite.Require().Equal(updatedDeal.GetStatus(), types.COMPLETED)
 }
 
 func (suite *dealTestSuite) TestGetDataCert() {
@@ -502,14 +496,14 @@ func (suite *dealTestSuite) TestDealIsNotActive() {
 	findDeal, err := suite.DataDealKeeper.GetDeal(suite.Ctx, dealID)
 	suite.Require().NoError(err)
 
-	findDeal.Status = INACTIVE
+	findDeal.Status = types.INACTIVE
 	suite.DataDealKeeper.SetDeal(suite.Ctx, findDeal)
 
 	_, err = suite.DataDealKeeper.DeactivateDeal(suite.Ctx, dealID, acc1)
 	suite.Require().Error(err, types.ErrInvalidStatus)
 	suite.Require().Error(err, "the deal's status is not activated")
 
-	findDeal.Status = ACTIVE
+	findDeal.Status = types.ACTIVE
 	suite.DataDealKeeper.SetDeal(suite.Ctx, findDeal)
 
 	dataHash := "123456"
@@ -524,7 +518,7 @@ func (suite *dealTestSuite) TestDealIsNotActive() {
 
 	_, err = suite.DataDealKeeper.DeactivateDeal(suite.Ctx, dealID, acc1)
 	suite.Require().Error(err, types.ErrInvalidStatus)
-	suite.Require().Equal(completedDeal.GetStatus(), COMPLETED)
+	suite.Require().Equal(completedDeal.GetStatus(), types.COMPLETED)
 	suite.Require().Error(err, "the deal's status is not activated")
 }
 
@@ -538,7 +532,7 @@ func makeTestDeal() types.Deal {
 		CurNumData:     0,
 		TrustedOracles: []string{acc2.String()},
 		Owner:          acc1.String(),
-		Status:         ACTIVE,
+		Status:         types.ACTIVE,
 	}
 }
 
