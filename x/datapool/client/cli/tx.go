@@ -20,8 +20,8 @@ func GetTxCmd() *cobra.Command {
 		RunE:                       client.ValidateCmd,
 	}
 
-	cmd.AddCommand(CmdRegisterDataValidator())
-	cmd.AddCommand(CmdUpdateDataValidator())
+	cmd.AddCommand(CmdRegisterOracle())
+	cmd.AddCommand(CmdUpdateOracle())
 	cmd.AddCommand(CmdCreatePool())
 	cmd.AddCommand(CmdSellData())
 	cmd.AddCommand(CmdBuyDataPass())

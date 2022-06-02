@@ -12,11 +12,11 @@ import "panacea/datapool/v2/pool.proto";
 
 // Msg defines the Msg service.
 service Msg {
-  // RegisterDataValidator defines a method for registration of data validator.
-  rpc RegisterDataValidator(MsgRegisterDataValidator) returns (MsgRegisterDataValidatorResponse);
+  // RegisterOracle defines a method for registration of oracle.
+  rpc RegisterOracle(MsgRegisterOracle) returns (MsgRegisterOracleResponse);
 
-  // UpdateDataValidator defines a method for updating of data validator.
-  rpc UpdateDataValidator(MsgUpdateDataValidator) returns (MsgUpdateDataValidatorResponse);
+  // UpdateOracle defines a method for updating of oracle.
+  rpc UpdateOracle(MsgUpdateOracle) returns (MsgUpdateOracleResponse);
 
   // CreatePool defines a method for creating data pool.
   rpc CreatePool(MsgCreatePool) returns (MsgCreatePoolResponse);
@@ -31,23 +31,23 @@ service Msg {
   rpc RedeemDataPass(MsgRedeemDataPass) returns (MsgRedeemDataPassResponse);
 }
 
-// MsgRegisterDataValidator defines the Msg/RegisterDataValidator request type.
-message MsgRegisterDataValidator {
-  DataValidator validator_detail = 1;      // Detail of data validator
+// MsgRegisterOracle defines the Msg/RegisterOracle request type.
+message MsgRegisterOracle {
+  Oracle oracle_detail = 1;      // Detail of oracle
 }
 
-// MsgRegisterDataValidatorResponse defines the Msg/RegisterDataValidator response type.
-message MsgRegisterDataValidatorResponse {
+// MsgRegisterOracleResponse defines the Msg/RegisterOracle response type.
+message MsgRegisterOracleResponse {
 }
 
-// MsgUpdateDataValidator defines the Msg/UpdateDataValidator request type.
-message MsgUpdateDataValidator {
-  string data_validator = 1;
+// MsgUpdateOracle defines the Msg/UpdateOracle request type.
+message MsgUpdateOracle {
+  string oracle = 1;
   string endpoint = 2;
 }
 
-// MsgUpdateResponse defines the Msg/UpdateDataValidator response type.
-message MsgUpdateDataValidatorResponse {
+// MsgUpdateOracleResponse defines the Msg/UpdateOracle response type.
+message MsgUpdateOracleResponse {
 
 }
 

@@ -16,9 +16,9 @@ service Query {
     option (google.api.http).get = "/panacea/datapool/v2/pools/{pool_id}";
   }
 
-  // DataValidator returns a DataValidator.
-  rpc DataValidator(QueryDataValidatorRequest) returns (QueryDataValidatorResponse) {
-    option (google.api.http).get = "/panacea/datapool/v2/data_validator";
+  // Oracle returns a Oracle.
+  rpc Oracle(QueryOracleRequest) returns (QueryOracleResponse) {
+    option (google.api.http).get = "/panacea/datapool/v2/oracle";
   }
 
   // DataPoolParams returns params of x/datapool module.
@@ -62,14 +62,14 @@ message QueryPoolResponse {
   Pool pool = 1;
 }
 
-// QueryDataValidatorRequest is the request type for the Query/DataValidator RPC method.
-message QueryDataValidatorRequest {
+// QueryOracleRequest is the request type for the Query/Oracle RPC method.
+message QueryOracleRequest {
   string address = 1 ;
 }
 
-// QueryDataValidatorResponse is the response type for the Query/DataValidator RPC method.
-message QueryDataValidatorResponse {
-  DataValidator data_validator = 1;
+// QueryOracleResponse is the response type for the Query/Oracle RPC method.
+message QueryOracleResponse {
+  Oracle oracle = 1;
 }
 
 // QueryDataPoolParamsRequest is the request type for the Query/DataPoolParams RPC method.

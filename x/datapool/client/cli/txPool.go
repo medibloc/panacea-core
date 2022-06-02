@@ -14,10 +14,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func CmdRegisterDataValidator() *cobra.Command {
+func CmdRegisterOracle() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "register-data-validator [endpoint-URL]",
-		Short: "register data validator",
+		Use:   "register-node [endpoint-URL]",
+		Short: "register oracle node",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
@@ -25,12 +25,12 @@ func CmdRegisterDataValidator() *cobra.Command {
 				return err
 			}
 
-			fromDataValidatorAddress := clientCtx.GetFromAddress()
-			dataValidator := types.DataValidator{
-				Address:  fromDataValidatorAddress.String(),
+			fromOracleAddress := clientCtx.GetFromAddress()
+			oracle := types.Oracle{
+				Address:  fromOracleAddress.String(),
 				Endpoint: args[0],
 			}
-			msg := types.NewMsgRegisterDataValidator(&dataValidator)
+			msg := types.NewMsgRegisterOracle(&oracle)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
@@ -42,10 +42,10 @@ func CmdRegisterDataValidator() *cobra.Command {
 	return cmd
 }
 
-func CmdUpdateDataValidator() *cobra.Command {
+func CmdUpdateOracle() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "update-data-validator [endpoint-URL]",
-		Short: "update data validator endpoint",
+		Use:   "update-node [endpoint-URL]",
+		Short: "update oracle node endpoint",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
@@ -55,7 +55,7 @@ func CmdUpdateDataValidator() *cobra.Command {
 
 			fromAddress := clientCtx.GetFromAddress()
 
-			msg := types.NewMsgUpdateDataValidator(fromAddress.String(), args[0])
+			msg := types.NewMsgUpdateOracle(fromAddress.String(), args[0])
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
@@ -113,12 +113,12 @@ func newCreatePoolMsg(clientCtx client.Context, depositCoin, file string) (sdk.M
 	}
 
 	poolParams := &types.PoolParams{
-		DataSchema:            poolParamsInput.DataSchema,
-		TargetNumData:         poolParamsInput.TargetNumData,
-		MaxNftSupply:          poolParamsInput.MaxNFTSupply,
-		NftPrice:              &nftPrice,
-		TrustedDataValidators: poolParamsInput.TrustedDataValidators,
-		TrustedDataIssuers:    poolParamsInput.TrustedDataIssuers,
+		DataSchema:         poolParamsInput.DataSchema,
+		TargetNumData:      poolParamsInput.TargetNumData,
+		MaxNftSupply:       poolParamsInput.MaxNFTSupply,
+		NftPrice:           &nftPrice,
+		TrustedOracles:     poolParamsInput.TrustedOracles,
+		TrustedDataIssuers: poolParamsInput.TrustedDataIssuers,
 	}
 
 	deposit, err := sdk.ParseCoinNormalized(depositCoin)

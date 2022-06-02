@@ -124,7 +124,7 @@ func newCreateDealMsg(clientCtx client.Context, file string) (sdk.Msg, error) {
 		createDeal.DataSchema,
 		&budget,
 		createDeal.MaxNumData,
-		createDeal.TrustedDataValidators,
+		createDeal.TrustedOracles,
 		clientCtx.GetFromAddress().String(),
 	)
 

@@ -120,23 +120,23 @@ func (m *QueryPoolResponse) GetPool() *Pool {
 	return nil
 }
 
-// QueryDataValidatorRequest is the request type for the Query/DataValidator RPC method.
-type QueryDataValidatorRequest struct {
+// QueryOracleRequest is the request type for the Query/Oracle RPC method.
+type QueryOracleRequest struct {
 	Address string `protobuf:"bytes,1,opt,name=address,proto3" json:"address,omitempty"`
 }
 
-func (m *QueryDataValidatorRequest) Reset()         { *m = QueryDataValidatorRequest{} }
-func (m *QueryDataValidatorRequest) String() string { return proto.CompactTextString(m) }
-func (*QueryDataValidatorRequest) ProtoMessage()    {}
-func (*QueryDataValidatorRequest) Descriptor() ([]byte, []int) {
+func (m *QueryOracleRequest) Reset()         { *m = QueryOracleRequest{} }
+func (m *QueryOracleRequest) String() string { return proto.CompactTextString(m) }
+func (*QueryOracleRequest) ProtoMessage()    {}
+func (*QueryOracleRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_f3fda93d2b4f4508, []int{2}
 }
-func (m *QueryDataValidatorRequest) XXX_Unmarshal(b []byte) error {
+func (m *QueryOracleRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *QueryDataValidatorRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *QueryOracleRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_QueryDataValidatorRequest.Marshal(b, m, deterministic)
+		return xxx_messageInfo_QueryOracleRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -146,42 +146,42 @@ func (m *QueryDataValidatorRequest) XXX_Marshal(b []byte, deterministic bool) ([
 		return b[:n], nil
 	}
 }
-func (m *QueryDataValidatorRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_QueryDataValidatorRequest.Merge(m, src)
+func (m *QueryOracleRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryOracleRequest.Merge(m, src)
 }
-func (m *QueryDataValidatorRequest) XXX_Size() int {
+func (m *QueryOracleRequest) XXX_Size() int {
 	return m.Size()
 }
-func (m *QueryDataValidatorRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_QueryDataValidatorRequest.DiscardUnknown(m)
+func (m *QueryOracleRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryOracleRequest.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_QueryDataValidatorRequest proto.InternalMessageInfo
+var xxx_messageInfo_QueryOracleRequest proto.InternalMessageInfo
 
-func (m *QueryDataValidatorRequest) GetAddress() string {
+func (m *QueryOracleRequest) GetAddress() string {
 	if m != nil {
 		return m.Address
 	}
 	return ""
 }
 
-// QueryDataValidatorResponse is the response type for the Query/DataValidator RPC method.
-type QueryDataValidatorResponse struct {
-	DataValidator *DataValidator `protobuf:"bytes,1,opt,name=data_validator,json=dataValidator,proto3" json:"data_validator,omitempty"`
+// QueryOracleResponse is the response type for the Query/Oracle RPC method.
+type QueryOracleResponse struct {
+	Oracle *Oracle `protobuf:"bytes,1,opt,name=oracle,proto3" json:"oracle,omitempty"`
 }
 
-func (m *QueryDataValidatorResponse) Reset()         { *m = QueryDataValidatorResponse{} }
-func (m *QueryDataValidatorResponse) String() string { return proto.CompactTextString(m) }
-func (*QueryDataValidatorResponse) ProtoMessage()    {}
-func (*QueryDataValidatorResponse) Descriptor() ([]byte, []int) {
+func (m *QueryOracleResponse) Reset()         { *m = QueryOracleResponse{} }
+func (m *QueryOracleResponse) String() string { return proto.CompactTextString(m) }
+func (*QueryOracleResponse) ProtoMessage()    {}
+func (*QueryOracleResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_f3fda93d2b4f4508, []int{3}
 }
-func (m *QueryDataValidatorResponse) XXX_Unmarshal(b []byte) error {
+func (m *QueryOracleResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *QueryDataValidatorResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *QueryOracleResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_QueryDataValidatorResponse.Marshal(b, m, deterministic)
+		return xxx_messageInfo_QueryOracleResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -191,21 +191,21 @@ func (m *QueryDataValidatorResponse) XXX_Marshal(b []byte, deterministic bool) (
 		return b[:n], nil
 	}
 }
-func (m *QueryDataValidatorResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_QueryDataValidatorResponse.Merge(m, src)
+func (m *QueryOracleResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryOracleResponse.Merge(m, src)
 }
-func (m *QueryDataValidatorResponse) XXX_Size() int {
+func (m *QueryOracleResponse) XXX_Size() int {
 	return m.Size()
 }
-func (m *QueryDataValidatorResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_QueryDataValidatorResponse.DiscardUnknown(m)
+func (m *QueryOracleResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryOracleResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_QueryDataValidatorResponse proto.InternalMessageInfo
+var xxx_messageInfo_QueryOracleResponse proto.InternalMessageInfo
 
-func (m *QueryDataValidatorResponse) GetDataValidator() *DataValidator {
+func (m *QueryOracleResponse) GetOracle() *Oracle {
 	if m != nil {
-		return m.DataValidator
+		return m.Oracle
 	}
 	return nil
 }
@@ -374,25 +374,27 @@ func (m *QueryDataPoolModuleAddrResponse) GetAddress() string {
 	return ""
 }
 
-// QueryDataCertsRequest is the request type for the Query/DataCerts RPC method.
-type QueryDataCertsRequest struct {
+// QueryDataValidationCertificatesRequest is the request type for the Query/DataValidationCertificates RPC method.
+type QueryDataValidationCertificatesRequest struct {
 	PoolId     uint64             `protobuf:"varint,1,opt,name=pool_id,json=poolId,proto3" json:"pool_id,omitempty"`
 	Round      uint64             `protobuf:"varint,2,opt,name=round,proto3" json:"round,omitempty"`
 	Pagination *query.PageRequest `protobuf:"bytes,3,opt,name=pagination,proto3" json:"pagination,omitempty"`
 }
 
-func (m *QueryDataCertsRequest) Reset()         { *m = QueryDataCertsRequest{} }
-func (m *QueryDataCertsRequest) String() string { return proto.CompactTextString(m) }
-func (*QueryDataCertsRequest) ProtoMessage()    {}
-func (*QueryDataCertsRequest) Descriptor() ([]byte, []int) {
+func (m *QueryDataValidationCertificatesRequest) Reset() {
+	*m = QueryDataValidationCertificatesRequest{}
+}
+func (m *QueryDataValidationCertificatesRequest) String() string { return proto.CompactTextString(m) }
+func (*QueryDataValidationCertificatesRequest) ProtoMessage()    {}
+func (*QueryDataValidationCertificatesRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_f3fda93d2b4f4508, []int{8}
 }
-func (m *QueryDataCertsRequest) XXX_Unmarshal(b []byte) error {
+func (m *QueryDataValidationCertificatesRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *QueryDataCertsRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *QueryDataValidationCertificatesRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_QueryDataCertsRequest.Marshal(b, m, deterministic)
+		return xxx_messageInfo_QueryDataValidationCertificatesRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -402,57 +404,59 @@ func (m *QueryDataCertsRequest) XXX_Marshal(b []byte, deterministic bool) ([]byt
 		return b[:n], nil
 	}
 }
-func (m *QueryDataCertsRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_QueryDataCertsRequest.Merge(m, src)
+func (m *QueryDataValidationCertificatesRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryDataValidationCertificatesRequest.Merge(m, src)
 }
-func (m *QueryDataCertsRequest) XXX_Size() int {
+func (m *QueryDataValidationCertificatesRequest) XXX_Size() int {
 	return m.Size()
 }
-func (m *QueryDataCertsRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_QueryDataCertsRequest.DiscardUnknown(m)
+func (m *QueryDataValidationCertificatesRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryDataValidationCertificatesRequest.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_QueryDataCertsRequest proto.InternalMessageInfo
+var xxx_messageInfo_QueryDataValidationCertificatesRequest proto.InternalMessageInfo
 
-func (m *QueryDataCertsRequest) GetPoolId() uint64 {
+func (m *QueryDataValidationCertificatesRequest) GetPoolId() uint64 {
 	if m != nil {
 		return m.PoolId
 	}
 	return 0
 }
 
-func (m *QueryDataCertsRequest) GetRound() uint64 {
+func (m *QueryDataValidationCertificatesRequest) GetRound() uint64 {
 	if m != nil {
 		return m.Round
 	}
 	return 0
 }
 
-func (m *QueryDataCertsRequest) GetPagination() *query.PageRequest {
+func (m *QueryDataValidationCertificatesRequest) GetPagination() *query.PageRequest {
 	if m != nil {
 		return m.Pagination
 	}
 	return nil
 }
 
-// QueryDataCertsResponse is the response type for the Query/DataCerts RPC method.
-type QueryDataCertsResponse struct {
-	DataCerts  []DataCert          `protobuf:"bytes,1,rep,name=data_certs,json=dataCerts,proto3" json:"data_certs"`
-	Pagination *query.PageResponse `protobuf:"bytes,2,opt,name=pagination,proto3" json:"pagination,omitempty"`
+// QueryDataValidationCertificatesResponse is the response type for the QueryDataValidationCertificates RPC method.
+type QueryDataValidationCertificatesResponse struct {
+	DataValidationCertificates []DataValidationCertificate `protobuf:"bytes,1,rep,name=data_validation_certificates,json=dataValidationCertificates,proto3" json:"data_validation_certificates"`
+	Pagination                 *query.PageResponse         `protobuf:"bytes,2,opt,name=pagination,proto3" json:"pagination,omitempty"`
 }
 
-func (m *QueryDataCertsResponse) Reset()         { *m = QueryDataCertsResponse{} }
-func (m *QueryDataCertsResponse) String() string { return proto.CompactTextString(m) }
-func (*QueryDataCertsResponse) ProtoMessage()    {}
-func (*QueryDataCertsResponse) Descriptor() ([]byte, []int) {
+func (m *QueryDataValidationCertificatesResponse) Reset() {
+	*m = QueryDataValidationCertificatesResponse{}
+}
+func (m *QueryDataValidationCertificatesResponse) String() string { return proto.CompactTextString(m) }
+func (*QueryDataValidationCertificatesResponse) ProtoMessage()    {}
+func (*QueryDataValidationCertificatesResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_f3fda93d2b4f4508, []int{9}
 }
-func (m *QueryDataCertsResponse) XXX_Unmarshal(b []byte) error {
+func (m *QueryDataValidationCertificatesResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *QueryDataCertsResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *QueryDataValidationCertificatesResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_QueryDataCertsResponse.Marshal(b, m, deterministic)
+		return xxx_messageInfo_QueryDataValidationCertificatesResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -462,26 +466,26 @@ func (m *QueryDataCertsResponse) XXX_Marshal(b []byte, deterministic bool) ([]by
 		return b[:n], nil
 	}
 }
-func (m *QueryDataCertsResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_QueryDataCertsResponse.Merge(m, src)
+func (m *QueryDataValidationCertificatesResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryDataValidationCertificatesResponse.Merge(m, src)
 }
-func (m *QueryDataCertsResponse) XXX_Size() int {
+func (m *QueryDataValidationCertificatesResponse) XXX_Size() int {
 	return m.Size()
 }
-func (m *QueryDataCertsResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_QueryDataCertsResponse.DiscardUnknown(m)
+func (m *QueryDataValidationCertificatesResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryDataValidationCertificatesResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_QueryDataCertsResponse proto.InternalMessageInfo
+var xxx_messageInfo_QueryDataValidationCertificatesResponse proto.InternalMessageInfo
 
-func (m *QueryDataCertsResponse) GetDataCerts() []DataCert {
+func (m *QueryDataValidationCertificatesResponse) GetDataValidationCertificates() []DataValidationCertificate {
 	if m != nil {
-		return m.DataCerts
+		return m.DataValidationCertificates
 	}
 	return nil
 }
 
-func (m *QueryDataCertsResponse) GetPagination() *query.PageResponse {
+func (m *QueryDataValidationCertificatesResponse) GetPagination() *query.PageResponse {
 	if m != nil {
 		return m.Pagination
 	}
@@ -801,14 +805,14 @@ func (m *QueryDataPassRedeemHistoryResponse) GetDataPassRedeemHistories() DataPa
 func init() {
 	proto.RegisterType((*QueryPoolRequest)(nil), "panacea.datapool.v2.QueryPoolRequest")
 	proto.RegisterType((*QueryPoolResponse)(nil), "panacea.datapool.v2.QueryPoolResponse")
-	proto.RegisterType((*QueryDataValidatorRequest)(nil), "panacea.datapool.v2.QueryDataValidatorRequest")
-	proto.RegisterType((*QueryDataValidatorResponse)(nil), "panacea.datapool.v2.QueryDataValidatorResponse")
+	proto.RegisterType((*QueryOracleRequest)(nil), "panacea.datapool.v2.QueryOracleRequest")
+	proto.RegisterType((*QueryOracleResponse)(nil), "panacea.datapool.v2.QueryOracleResponse")
 	proto.RegisterType((*QueryDataPoolParamsRequest)(nil), "panacea.datapool.v2.QueryDataPoolParamsRequest")
 	proto.RegisterType((*QueryDataPoolParamsResponse)(nil), "panacea.datapool.v2.QueryDataPoolParamsResponse")
 	proto.RegisterType((*QueryDataPoolModuleAddrRequest)(nil), "panacea.datapool.v2.QueryDataPoolModuleAddrRequest")
 	proto.RegisterType((*QueryDataPoolModuleAddrResponse)(nil), "panacea.datapool.v2.QueryDataPoolModuleAddrResponse")
-	proto.RegisterType((*QueryDataCertsRequest)(nil), "panacea.datapool.v2.QueryDataCertsRequest")
-	proto.RegisterType((*QueryDataCertsResponse)(nil), "panacea.datapool.v2.QueryDataCertsResponse")
+	proto.RegisterType((*QueryDataValidationCertificatesRequest)(nil), "panacea.datapool.v2.QueryDataValidationCertificatesRequest")
+	proto.RegisterType((*QueryDataValidationCertificatesResponse)(nil), "panacea.datapool.v2.QueryDataValidationCertificatesResponse")
 	proto.RegisterType((*QueryDataPassRedeemReceiptRequest)(nil), "panacea.datapool.v2.QueryDataPassRedeemReceiptRequest")
 	proto.RegisterType((*QueryDataPassRedeemReceiptResponse)(nil), "panacea.datapool.v2.QueryDataPassRedeemReceiptResponse")
 	proto.RegisterType((*QueryDataPassRedeemReceiptsRequest)(nil), "panacea.datapool.v2.QueryDataPassRedeemReceiptsRequest")
@@ -820,70 +824,69 @@ func init() {
 func init() { proto.RegisterFile("panacea/datapool/v2/query.proto", fileDescriptor_f3fda93d2b4f4508) }
 
 var fileDescriptor_f3fda93d2b4f4508 = []byte{
-	// 1003 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x57, 0x4d, 0x6f, 0x1b, 0x45,
-	0x18, 0xce, 0x24, 0x69, 0x4a, 0xde, 0xd0, 0x0a, 0x86, 0x26, 0x75, 0x36, 0xad, 0xe3, 0x6e, 0x68,
-	0x88, 0x12, 0xba, 0x43, 0x1c, 0xbe, 0x24, 0x0e, 0xa8, 0x01, 0xb5, 0x0d, 0x08, 0x64, 0x7c, 0xa8,
-	0x10, 0x12, 0xb2, 0xc6, 0x9e, 0x61, 0x3b, 0xc2, 0xde, 0xd9, 0xee, 0xac, 0x23, 0xa2, 0x28, 0x17,
-	0x10, 0x57, 0x40, 0xea, 0x85, 0x0b, 0x47, 0x0e, 0xfc, 0x07, 0x7e, 0x40, 0x8f, 0x95, 0xe0, 0xc0,
-	0x87, 0x84, 0x50, 0xc2, 0x9d, 0xbf, 0x80, 0x76, 0x76, 0xd6, 0xde, 0x8d, 0xc7, 0x5f, 0x15, 0x27,
-	0xef, 0xec, 0xfb, 0xf5, 0xbc, 0xcf, 0xfb, 0xee, 0x3c, 0x32, 0xac, 0x87, 0x34, 0xa0, 0x2d, 0x4e,
-	0x09, 0xa3, 0x31, 0x0d, 0xa5, 0x6c, 0x93, 0xc3, 0x2a, 0x79, 0xd8, 0xe5, 0xd1, 0x91, 0x17, 0x46,
-	0x32, 0x96, 0xf8, 0x05, 0xe3, 0xe0, 0x65, 0x0e, 0xde, 0x61, 0xd5, 0xb9, 0xe2, 0x4b, 0x5f, 0x6a,
-	0x3b, 0x49, 0x9e, 0x52, 0x57, 0x67, 0xbb, 0x25, 0x55, 0x47, 0x2a, 0xd2, 0xa4, 0x8a, 0xa7, 0x39,
-	0xc8, 0xe1, 0x6e, 0x93, 0xc7, 0x74, 0x97, 0x84, 0xd4, 0x17, 0x01, 0x8d, 0x85, 0x0c, 0x8c, 0xef,
-	0x35, 0x5f, 0x4a, 0xbf, 0xcd, 0x09, 0x0d, 0x05, 0xa1, 0x41, 0x20, 0x63, 0x6d, 0x54, 0xc6, 0x5a,
-	0xb6, 0xa1, 0xd2, 0xc5, 0x53, 0xfb, 0x0d, 0x9b, 0xdd, 0xe7, 0x01, 0x57, 0xc2, 0xa4, 0x70, 0x77,
-	0xe0, 0xb9, 0x8f, 0x12, 0x08, 0x35, 0x29, 0xdb, 0x75, 0xfe, 0xb0, 0xcb, 0x55, 0x8c, 0xaf, 0xc2,
-	0xc5, 0xc4, 0xb9, 0x21, 0x58, 0x09, 0x55, 0xd0, 0xd6, 0x7c, 0x7d, 0x21, 0x39, 0x1e, 0x30, 0x77,
-	0x1f, 0x9e, 0xcf, 0x39, 0xab, 0x50, 0x06, 0x8a, 0xe3, 0x5b, 0x30, 0x9f, 0x98, 0xb5, 0xeb, 0x52,
-	0x75, 0xd5, 0xb3, 0x10, 0xe1, 0xe9, 0x00, 0xed, 0xe6, 0xbe, 0x06, 0xab, 0x3a, 0xc7, 0xbb, 0x34,
-	0xa6, 0xf7, 0x69, 0x5b, 0x30, 0x1a, 0xcb, 0x28, 0xab, 0x5c, 0x82, 0x8b, 0x94, 0xb1, 0x88, 0x2b,
-	0xa5, 0xd3, 0x2d, 0xd6, 0xb3, 0xa3, 0xeb, 0x83, 0x63, 0x0b, 0x33, 0x18, 0x0e, 0xe0, 0x72, 0x52,
-	0xae, 0x71, 0x98, 0x59, 0x0c, 0x1a, 0xd7, 0x8a, 0xa6, 0x98, 0xe3, 0x12, 0xcb, 0x1f, 0xdd, 0x6b,
-	0xb9, 0x42, 0x09, 0xec, 0x1a, 0x8d, 0x68, 0x47, 0x19, 0x80, 0x6e, 0x1d, 0xd6, 0xac, 0x56, 0x83,
-	0x63, 0x0f, 0x16, 0x42, 0xfd, 0xc6, 0xd4, 0x5f, 0xb3, 0xb3, 0x91, 0x06, 0x19, 0x57, 0xb7, 0x02,
-	0xe5, 0x42, 0xce, 0x0f, 0x24, 0xeb, 0xb6, 0xf9, 0x6d, 0xc6, 0x32, 0x5a, 0xdc, 0xb7, 0x60, 0x7d,
-	0xa8, 0x87, 0xa9, 0x3c, 0x9c, 0xb9, 0x6f, 0x10, 0x2c, 0xf7, 0xa2, 0xdf, 0xe1, 0x51, 0xac, 0xc6,
-	0xcd, 0x19, 0x5f, 0x81, 0x0b, 0x91, 0xec, 0x06, 0xac, 0x34, 0xab, 0x5f, 0xa7, 0x07, 0x7c, 0x07,
-	0xa0, 0xbf, 0x9f, 0xa5, 0x39, 0xdd, 0xe0, 0xa6, 0x97, 0x2e, 0xb3, 0x97, 0x2c, 0xb3, 0x97, 0x7e,
-	0x10, 0x66, 0x99, 0xbd, 0x1a, 0xf5, 0xb9, 0x29, 0x55, 0xcf, 0x45, 0xba, 0x3f, 0x22, 0x58, 0x39,
-	0x0f, 0xc8, 0x74, 0xb1, 0x0f, 0xa0, 0xe7, 0xd8, 0x4a, 0xde, 0x96, 0x50, 0x65, 0x6e, 0x6b, 0xa9,
-	0x7a, 0x7d, 0xe8, 0x0c, 0x93, 0xd8, 0xfd, 0xf9, 0xc7, 0x7f, 0xad, 0xcf, 0xd4, 0x17, 0x59, 0x96,
-	0x0b, 0xdf, 0x2d, 0xc0, 0x9c, 0xd5, 0x30, 0x5f, 0x1a, 0x0b, 0x33, 0x05, 0x50, 0xc0, 0x19, 0xc3,
-	0x8d, 0x3e, 0xeb, 0x54, 0xa9, 0x3a, 0x67, 0x9c, 0x77, 0xea, 0xbc, 0xc5, 0x45, 0x18, 0x3f, 0x25,
-	0x87, 0x15, 0x78, 0x56, 0x37, 0x18, 0x52, 0xa5, 0x92, 0x98, 0x39, 0x6d, 0xd4, 0x4d, 0x27, 0x25,
-	0x0e, 0x98, 0xfb, 0x2d, 0x02, 0x77, 0x54, 0x59, 0xc3, 0x94, 0x80, 0x52, 0x3f, 0x51, 0xa4, 0x5d,
-	0x1a, 0x51, 0xea, 0x63, 0x76, 0x6f, 0x7b, 0x28, 0x6f, 0x03, 0x59, 0x0d, 0x89, 0xcb, 0xcc, 0x66,
-	0x74, 0xbf, 0x1e, 0x89, 0x68, 0xfc, 0x36, 0xdd, 0xb1, 0x0c, 0xe4, 0x69, 0xf6, 0xe6, 0x4f, 0x04,
-	0x1b, 0x23, 0x71, 0x18, 0x6a, 0x3e, 0x87, 0xd5, 0x61, 0xd4, 0x64, 0x3b, 0x35, 0x3d, 0x37, 0x2b,
-	0x56, 0x6e, 0xfe, 0xc7, 0x6d, 0xfb, 0xd8, 0xba, 0x6d, 0xf7, 0x84, 0x8a, 0x65, 0x74, 0x94, 0x71,
-	0xec, 0xc0, 0x33, 0x69, 0x43, 0x3c, 0x32, 0x9f, 0x79, 0xef, 0x9c, 0xe7, 0x7f, 0xb6, 0x70, 0x6b,
-	0x3f, 0xb2, 0xcf, 0xaf, 0x97, 0xda, 0xd0, 0xd6, 0x01, 0x67, 0x80, 0xb6, 0x07, 0xda, 0x47, 0x70,
-	0x35, 0xc5, 0x4e, 0x99, 0xbc, 0x86, 0xb7, 0xab, 0xcc, 0x62, 0x14, 0x5c, 0x55, 0x7f, 0x5f, 0x82,
-	0x0b, 0x1a, 0x15, 0xfe, 0x0a, 0xc1, 0x7c, 0x72, 0xab, 0xe1, 0x9b, 0xd6, 0xec, 0xe7, 0xe5, 0xc9,
-	0xd9, 0x1c, 0xe7, 0x96, 0x36, 0xe4, 0xbe, 0xfc, 0xe5, 0x2f, 0xff, 0x3c, 0x9a, 0xdd, 0xc4, 0x2f,
-	0x92, 0x61, 0x32, 0xa9, 0xc8, 0xb1, 0xa1, 0xec, 0x04, 0xff, 0x80, 0xe0, 0x52, 0x41, 0x18, 0xb0,
-	0x37, 0xbc, 0x8e, 0x4d, 0xbc, 0x1c, 0x32, 0xb1, 0xbf, 0x01, 0xb8, 0xa3, 0x01, 0xde, 0xc4, 0x1b,
-	0x56, 0x80, 0x45, 0x41, 0xc3, 0xdf, 0x23, 0xb8, 0x5c, 0x54, 0x1d, 0x3c, 0xa6, 0xe0, 0x80, 0x7a,
-	0x39, 0xaf, 0x4c, 0x1e, 0x60, 0x20, 0x6e, 0x68, 0x88, 0xd7, 0xf1, 0x9a, 0x9d, 0xc3, 0x14, 0xc7,
-	0x4f, 0x08, 0xf0, 0xa0, 0x34, 0xe1, 0xbd, 0xf1, 0xd5, 0x06, 0xa4, 0xce, 0x79, 0x75, 0xba, 0x20,
-	0x03, 0x73, 0x4b, 0xc3, 0x74, 0x71, 0xc5, 0x0a, 0xb3, 0xa3, 0x03, 0x1a, 0x89, 0x20, 0xe2, 0x9f,
-	0x11, 0x2c, 0xf6, 0x74, 0x07, 0x6f, 0x8f, 0xae, 0x96, 0x57, 0x4b, 0x67, 0x67, 0x22, 0x5f, 0x03,
-	0xe8, 0xbe, 0x06, 0x54, 0xc3, 0x1f, 0x8e, 0x1d, 0xad, 0x90, 0x81, 0x96, 0x3b, 0xf1, 0x99, 0x68,
-	0xd1, 0x98, 0x2b, 0xbd, 0x98, 0xfd, 0xbd, 0x24, 0x5a, 0x37, 0xc8, 0xb1, 0xfe, 0x39, 0xc1, 0xff,
-	0x22, 0x58, 0xb6, 0x5e, 0x53, 0xf8, 0xf5, 0x31, 0xc4, 0x0d, 0x11, 0x30, 0xe7, 0x8d, 0xa9, 0xe3,
-	0x4c, 0x8b, 0x5c, 0xb7, 0xd8, 0xc0, 0x9f, 0x4e, 0xf2, 0x79, 0xa5, 0x6d, 0xa8, 0xac, 0x0f, 0xd2,
-	0xbb, 0x69, 0xb8, 0x22, 0xc7, 0x79, 0x45, 0x3c, 0x21, 0xc5, 0x1b, 0x1b, 0xff, 0x8a, 0x60, 0xc5,
-	0x7e, 0xe1, 0xe3, 0x69, 0xa1, 0xf7, 0x46, 0xf9, 0xe6, 0xf4, 0x81, 0xa6, 0xe9, 0xbb, 0xba, 0xe9,
-	0xdb, 0xf8, 0xed, 0x89, 0x9a, 0xce, 0x77, 0x79, 0xae, 0xad, 0x3f, 0x06, 0x06, 0x69, 0xee, 0xcd,
-	0xc9, 0x07, 0x59, 0xd4, 0x86, 0xc9, 0x07, 0x79, 0xee, 0xe2, 0x77, 0x6b, 0xba, 0xa7, 0xf7, 0xf0,
-	0x3d, 0x6b, 0x4f, 0x99, 0xbe, 0x24, 0xb3, 0x33, 0x8f, 0x27, 0x83, 0xd3, 0xcd, 0xcb, 0xc5, 0xd1,
-	0xfe, 0xfb, 0x8f, 0x4f, 0xcb, 0xe8, 0xc9, 0x69, 0x19, 0xfd, 0x7d, 0x5a, 0x46, 0xdf, 0x9d, 0x95,
-	0x67, 0x9e, 0x9c, 0x95, 0x67, 0x7e, 0x3b, 0x2b, 0xcf, 0x7c, 0xb2, 0xeb, 0x8b, 0xf8, 0x41, 0xb7,
-	0xe9, 0xb5, 0x64, 0x87, 0x74, 0x38, 0x13, 0xcd, 0xb6, 0x6c, 0x65, 0x65, 0x6f, 0xb5, 0x64, 0xc4,
-	0xc9, 0x17, 0xfd, 0xea, 0xf1, 0x51, 0xc8, 0x55, 0x73, 0x41, 0xff, 0x51, 0xd9, 0xfb, 0x2f, 0x00,
-	0x00, 0xff, 0xff, 0x44, 0x18, 0x18, 0xb9, 0x83, 0x0d, 0x00, 0x00,
+	// 991 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x57, 0x4d, 0x6f, 0xdc, 0x44,
+	0x18, 0xce, 0x24, 0x69, 0x0a, 0x6f, 0x10, 0x82, 0xe9, 0xd7, 0xd6, 0x09, 0x9b, 0xad, 0x0b, 0x49,
+	0x54, 0xa8, 0x87, 0x6c, 0x10, 0x20, 0x15, 0x09, 0x35, 0xa0, 0x7e, 0x21, 0x60, 0xf1, 0xa1, 0x42,
+	0x48, 0x68, 0x35, 0xeb, 0x19, 0x5c, 0x8b, 0x5d, 0x8f, 0xeb, 0xf1, 0xae, 0x88, 0xa2, 0x48, 0x08,
+	0xc4, 0x19, 0xa4, 0x5e, 0xb8, 0x71, 0xe6, 0x9f, 0xf4, 0x58, 0x09, 0x0e, 0x08, 0x24, 0x84, 0x12,
+	0x4e, 0x5c, 0xfa, 0x17, 0x90, 0xc7, 0xe3, 0xdd, 0x75, 0x76, 0xbc, 0xde, 0x8d, 0x7a, 0x8a, 0xed,
+	0x79, 0xde, 0x8f, 0xe7, 0x79, 0xdf, 0xcc, 0xa3, 0x85, 0x8d, 0x88, 0x86, 0xd4, 0xe3, 0x94, 0x30,
+	0x9a, 0xd0, 0x48, 0x88, 0x2e, 0x19, 0x34, 0xc9, 0xc3, 0x3e, 0x8f, 0xf7, 0x9d, 0x28, 0x16, 0x89,
+	0xc0, 0xe7, 0x34, 0xc0, 0xc9, 0x01, 0xce, 0xa0, 0x69, 0x9d, 0xf7, 0x85, 0x2f, 0xd4, 0x39, 0x49,
+	0x9f, 0x32, 0xa8, 0x75, 0xcd, 0x13, 0xb2, 0x27, 0x24, 0xe9, 0x50, 0xc9, 0xb3, 0x1c, 0x64, 0xb0,
+	0xd3, 0xe1, 0x09, 0xdd, 0x21, 0x11, 0xf5, 0x83, 0x90, 0x26, 0x81, 0x08, 0x35, 0x76, 0xdd, 0x17,
+	0xc2, 0xef, 0x72, 0x42, 0xa3, 0x80, 0xd0, 0x30, 0x14, 0x89, 0x3a, 0x94, 0xfa, 0xb4, 0x6e, 0xea,
+	0x4a, 0x15, 0xcf, 0xce, 0xaf, 0x98, 0xce, 0x7d, 0x1e, 0x72, 0x19, 0xe8, 0x14, 0xf6, 0xeb, 0xf0,
+	0xd2, 0x67, 0x69, 0x0b, 0x2d, 0x21, 0xba, 0x2e, 0x7f, 0xd8, 0xe7, 0x32, 0xc1, 0x97, 0xe0, 0x6c,
+	0x0a, 0x6e, 0x07, 0xac, 0x86, 0x1a, 0x68, 0x7b, 0xd9, 0x5d, 0x49, 0x5f, 0xef, 0x32, 0x7b, 0x0f,
+	0x5e, 0x1e, 0x03, 0xcb, 0x48, 0x84, 0x92, 0xe3, 0xeb, 0xb0, 0x9c, 0x1e, 0x2b, 0xe8, 0x6a, 0xf3,
+	0xb2, 0x63, 0x10, 0xc2, 0x51, 0x01, 0x0a, 0x66, 0x3b, 0x80, 0x55, 0x8e, 0x4f, 0x63, 0xea, 0x75,
+	0x79, 0x5e, 0xb2, 0x06, 0x67, 0x29, 0x63, 0x31, 0x97, 0x52, 0xe5, 0x79, 0xde, 0xcd, 0x5f, 0xed,
+	0x7b, 0x70, 0xae, 0x80, 0xd7, 0x55, 0x77, 0x61, 0x45, 0xa8, 0x2f, 0xba, 0xee, 0x9a, 0xb1, 0xae,
+	0x0e, 0xd2, 0x50, 0x7b, 0x1d, 0x2c, 0x95, 0xeb, 0x43, 0x9a, 0xd0, 0xb4, 0xa5, 0x16, 0x8d, 0x69,
+	0x4f, 0xea, 0x1e, 0x6c, 0x17, 0xd6, 0x8c, 0xa7, 0xa3, 0x8a, 0x91, 0xfa, 0x32, 0xb5, 0xa2, 0x0e,
+	0xd2, 0x50, 0xbb, 0x01, 0xf5, 0x42, 0xce, 0x8f, 0x05, 0xeb, 0x77, 0xf9, 0x4d, 0xc6, 0xe2, 0xbc,
+	0xea, 0x0d, 0xd8, 0x28, 0x45, 0xe8, 0xca, 0xe5, 0xe2, 0xfc, 0x82, 0x60, 0x73, 0x18, 0x7d, 0x9f,
+	0x76, 0x03, 0xa6, 0xf6, 0xe3, 0x03, 0x1e, 0x27, 0xc1, 0x57, 0x81, 0x47, 0x13, 0x2e, 0xab, 0x86,
+	0x8a, 0xcf, 0xc3, 0x99, 0x58, 0xf4, 0x43, 0x56, 0x5b, 0x54, 0x9f, 0xb3, 0x17, 0x7c, 0x0b, 0x60,
+	0xb4, 0x8c, 0xb5, 0x25, 0xc5, 0x78, 0xd3, 0xc9, 0x36, 0xd7, 0x49, 0x37, 0xd7, 0xc9, 0xb6, 0x5f,
+	0x6f, 0xae, 0xd3, 0xa2, 0x7e, 0x3e, 0x4c, 0x77, 0x2c, 0xd2, 0xfe, 0x0f, 0xc1, 0x56, 0x65, 0x87,
+	0x9a, 0xe7, 0x00, 0xd6, 0x53, 0x29, 0xdb, 0x83, 0x21, 0xac, 0xed, 0x8d, 0xe1, 0x6a, 0xa8, 0xb1,
+	0xb4, 0xbd, 0xda, 0x74, 0x8c, 0xba, 0x97, 0xa6, 0xdf, 0x5b, 0x7e, 0xfc, 0xf7, 0xc6, 0x82, 0x6b,
+	0xb1, 0xd2, 0xfa, 0xf8, 0x76, 0x81, 0xeb, 0xa2, 0xe2, 0xba, 0x55, 0xc9, 0x35, 0x6b, 0xba, 0x40,
+	0x36, 0x81, 0x2b, 0xa3, 0x59, 0x52, 0x29, 0x5d, 0xce, 0x38, 0xef, 0xb9, 0xdc, 0xe3, 0x41, 0x94,
+	0x9c, 0x72, 0x10, 0x0d, 0x78, 0x41, 0x89, 0x12, 0x51, 0x29, 0xd3, 0x98, 0x25, 0x75, 0x08, 0x4c,
+	0x97, 0xb8, 0xcb, 0xec, 0x1f, 0x11, 0xd8, 0xd3, 0xca, 0x6a, 0x75, 0x03, 0xa8, 0x8d, 0x12, 0xc5,
+	0x0a, 0xd2, 0x8e, 0x33, 0x8c, 0xde, 0xe8, 0x6b, 0xa5, 0xca, 0x4e, 0x64, 0xd5, 0xaa, 0x5e, 0x60,
+	0xa6, 0x43, 0xfb, 0x87, 0xa9, 0x1d, 0x55, 0xaf, 0xe4, 0x2d, 0xc3, 0x40, 0x4e, 0xb3, 0x7c, 0x7f,
+	0x21, 0xb8, 0x3a, 0xb5, 0x0f, 0x2d, 0xcd, 0xd7, 0x70, 0xb9, 0x4c, 0x9a, 0x7c, 0xeb, 0xe6, 0xd7,
+	0xe6, 0xa2, 0x51, 0x9b, 0x67, 0xb8, 0x6d, 0x9f, 0x1b, 0xb7, 0xed, 0x4e, 0x20, 0x13, 0x11, 0xef,
+	0xe7, 0x1a, 0x5b, 0xf0, 0x5c, 0x46, 0x88, 0xc7, 0xfa, 0xf2, 0x18, 0xbe, 0x8f, 0xeb, 0xbf, 0x58,
+	0xb8, 0xe7, 0x1f, 0x99, 0xe7, 0x37, 0x4c, 0xad, 0x65, 0xeb, 0x81, 0x35, 0x21, 0xdb, 0x03, 0x85,
+	0x09, 0xb8, 0x9c, 0x63, 0xa7, 0x74, 0x5e, 0xad, 0xdb, 0x25, 0x66, 0x38, 0x0c, 0xb8, 0x6c, 0x3e,
+	0x5d, 0x85, 0x33, 0xaa, 0x2b, 0xfc, 0x3d, 0x82, 0xe5, 0xf4, 0xae, 0xc4, 0xaf, 0x19, 0xb3, 0x9f,
+	0x34, 0x34, 0x6b, 0xb3, 0x0a, 0x96, 0x11, 0xb2, 0xdf, 0xf8, 0xee, 0xb7, 0x7f, 0x1f, 0x2d, 0x6e,
+	0xe2, 0x57, 0x49, 0x99, 0xb1, 0x4a, 0x72, 0xa0, 0x25, 0x3b, 0xc4, 0xdf, 0x22, 0x58, 0xc9, 0x0c,
+	0x06, 0x6f, 0x95, 0x17, 0x28, 0xf8, 0x9c, 0xb5, 0x5d, 0x0d, 0xd4, 0xbd, 0x5c, 0x55, 0xbd, 0xbc,
+	0x82, 0xd7, 0x8c, 0xbd, 0x64, 0x86, 0x86, 0x7f, 0x46, 0xf0, 0x62, 0xd1, 0xae, 0x30, 0x29, 0xaf,
+	0x60, 0xb4, 0x3d, 0xeb, 0xcd, 0xd9, 0x03, 0x66, 0x6a, 0x2d, 0x73, 0x3e, 0xfc, 0x2b, 0x02, 0x3c,
+	0xe9, 0x69, 0x78, 0xb7, 0xba, 0xda, 0x84, 0x47, 0x5a, 0x6f, 0xcd, 0x17, 0xa4, 0xdb, 0xdc, 0x56,
+	0x6d, 0xda, 0xb8, 0x61, 0x6c, 0xb3, 0xa7, 0x02, 0xda, 0xa9, 0x93, 0xe2, 0xa7, 0x08, 0xac, 0x72,
+	0x7f, 0xc2, 0x37, 0xa6, 0x97, 0x9f, 0xea, 0xbb, 0xd6, 0x7b, 0xa7, 0x0b, 0xd6, 0x1c, 0xee, 0x2b,
+	0x0e, 0x2d, 0xfc, 0x89, 0x91, 0xc3, 0x34, 0xb7, 0x54, 0xeb, 0x3a, 0xda, 0x56, 0xa2, 0xdc, 0x84,
+	0x1c, 0xa8, 0x3f, 0x87, 0x29, 0xe3, 0x0b, 0xc6, 0xcb, 0x0b, 0xbf, 0x5d, 0xa1, 0x75, 0x89, 0xad,
+	0x59, 0xef, 0xcc, 0x1d, 0xa7, 0x29, 0x72, 0x45, 0xb1, 0x8d, 0xbf, 0x9c, 0xe5, 0x9f, 0x2e, 0xa3,
+	0x21, 0x73, 0x1e, 0x64, 0x78, 0xff, 0x70, 0x49, 0x0e, 0xc6, 0x7d, 0xf2, 0x90, 0x14, 0xef, 0x71,
+	0xfc, 0x3b, 0x82, 0x8b, 0x66, 0x1b, 0xc0, 0xf3, 0xb6, 0x3e, 0x9c, 0xed, 0xbb, 0xf3, 0x07, 0x6a,
+	0xd2, 0xb7, 0x15, 0xe9, 0x9b, 0xf8, 0xfd, 0x99, 0x48, 0x8f, 0xb3, 0x3c, 0x41, 0xeb, 0xcf, 0x89,
+	0x41, 0xea, 0xdb, 0x74, 0xf6, 0x41, 0x16, 0x1d, 0x63, 0xf6, 0x41, 0x9e, 0xb0, 0x03, 0xbb, 0xa5,
+	0x38, 0xdd, 0xc3, 0x77, 0x8c, 0x9c, 0x72, 0xd7, 0x49, 0x67, 0xa7, 0x1f, 0x0f, 0x27, 0xa7, 0x3b,
+	0x6e, 0x22, 0xfb, 0x7b, 0x1f, 0x3d, 0x3e, 0xaa, 0xa3, 0x27, 0x47, 0x75, 0xf4, 0xcf, 0x51, 0x1d,
+	0xfd, 0x74, 0x5c, 0x5f, 0x78, 0x72, 0x5c, 0x5f, 0xf8, 0xe3, 0xb8, 0xbe, 0xf0, 0xc5, 0x8e, 0x1f,
+	0x24, 0x0f, 0xfa, 0x1d, 0xc7, 0x13, 0x3d, 0xd2, 0xe3, 0x2c, 0xe8, 0x74, 0x85, 0x97, 0x97, 0xbd,
+	0xee, 0x89, 0x98, 0x93, 0x6f, 0x46, 0xd5, 0x93, 0xfd, 0x88, 0xcb, 0xce, 0x8a, 0xfa, 0xc1, 0xb3,
+	0xfb, 0x7f, 0x00, 0x00, 0x00, 0xff, 0xff, 0x15, 0xcc, 0x77, 0x38, 0xcb, 0x0d, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -900,14 +903,14 @@ const _ = grpc.SupportPackageIsVersion4
 type QueryClient interface {
 	// Pool returns a Pool.
 	Pool(ctx context.Context, in *QueryPoolRequest, opts ...grpc.CallOption) (*QueryPoolResponse, error)
-	// DataValidator returns a DataValidator.
-	DataValidator(ctx context.Context, in *QueryDataValidatorRequest, opts ...grpc.CallOption) (*QueryDataValidatorResponse, error)
+	// Oracle returns a Oracle.
+	Oracle(ctx context.Context, in *QueryOracleRequest, opts ...grpc.CallOption) (*QueryOracleResponse, error)
 	// DataPoolParams returns params of x/datapool module.
 	DataPoolParams(ctx context.Context, in *QueryDataPoolParamsRequest, opts ...grpc.CallOption) (*QueryDataPoolParamsResponse, error)
 	// DataPoolModuleAddr returns x/datapool module address.
 	DataPoolModuleAddr(ctx context.Context, in *QueryDataPoolModuleAddrRequest, opts ...grpc.CallOption) (*QueryDataPoolModuleAddrResponse, error)
-	// DataCert returns DataCerts
-	DataCerts(ctx context.Context, in *QueryDataCertsRequest, opts ...grpc.CallOption) (*QueryDataCertsResponse, error)
+	// DataValidationCertificates returns DataValidationCertificates
+	DataValidationCertificates(ctx context.Context, in *QueryDataValidationCertificatesRequest, opts ...grpc.CallOption) (*QueryDataValidationCertificatesResponse, error)
 	// DataPassRedeemReceipt returns DataPassRedeemReceipt
 	DataPassRedeemReceipt(ctx context.Context, in *QueryDataPassRedeemReceiptRequest, opts ...grpc.CallOption) (*QueryDataPassRedeemReceiptResponse, error)
 	// DataPassRedeemReceipts returns DataPassRedeemReceipts
@@ -933,9 +936,9 @@ func (c *queryClient) Pool(ctx context.Context, in *QueryPoolRequest, opts ...gr
 	return out, nil
 }
 
-func (c *queryClient) DataValidator(ctx context.Context, in *QueryDataValidatorRequest, opts ...grpc.CallOption) (*QueryDataValidatorResponse, error) {
-	out := new(QueryDataValidatorResponse)
-	err := c.cc.Invoke(ctx, "/panacea.datapool.v2.Query/DataValidator", in, out, opts...)
+func (c *queryClient) Oracle(ctx context.Context, in *QueryOracleRequest, opts ...grpc.CallOption) (*QueryOracleResponse, error) {
+	out := new(QueryOracleResponse)
+	err := c.cc.Invoke(ctx, "/panacea.datapool.v2.Query/Oracle", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -960,9 +963,9 @@ func (c *queryClient) DataPoolModuleAddr(ctx context.Context, in *QueryDataPoolM
 	return out, nil
 }
 
-func (c *queryClient) DataCerts(ctx context.Context, in *QueryDataCertsRequest, opts ...grpc.CallOption) (*QueryDataCertsResponse, error) {
-	out := new(QueryDataCertsResponse)
-	err := c.cc.Invoke(ctx, "/panacea.datapool.v2.Query/DataCerts", in, out, opts...)
+func (c *queryClient) DataValidationCertificates(ctx context.Context, in *QueryDataValidationCertificatesRequest, opts ...grpc.CallOption) (*QueryDataValidationCertificatesResponse, error) {
+	out := new(QueryDataValidationCertificatesResponse)
+	err := c.cc.Invoke(ctx, "/panacea.datapool.v2.Query/DataValidationCertificates", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -1000,14 +1003,14 @@ func (c *queryClient) DataPassRedeemHistory(ctx context.Context, in *QueryDataPa
 type QueryServer interface {
 	// Pool returns a Pool.
 	Pool(context.Context, *QueryPoolRequest) (*QueryPoolResponse, error)
-	// DataValidator returns a DataValidator.
-	DataValidator(context.Context, *QueryDataValidatorRequest) (*QueryDataValidatorResponse, error)
+	// Oracle returns a Oracle.
+	Oracle(context.Context, *QueryOracleRequest) (*QueryOracleResponse, error)
 	// DataPoolParams returns params of x/datapool module.
 	DataPoolParams(context.Context, *QueryDataPoolParamsRequest) (*QueryDataPoolParamsResponse, error)
 	// DataPoolModuleAddr returns x/datapool module address.
 	DataPoolModuleAddr(context.Context, *QueryDataPoolModuleAddrRequest) (*QueryDataPoolModuleAddrResponse, error)
-	// DataCert returns DataCerts
-	DataCerts(context.Context, *QueryDataCertsRequest) (*QueryDataCertsResponse, error)
+	// DataValidationCertificates returns DataValidationCertificates
+	DataValidationCertificates(context.Context, *QueryDataValidationCertificatesRequest) (*QueryDataValidationCertificatesResponse, error)
 	// DataPassRedeemReceipt returns DataPassRedeemReceipt
 	DataPassRedeemReceipt(context.Context, *QueryDataPassRedeemReceiptRequest) (*QueryDataPassRedeemReceiptResponse, error)
 	// DataPassRedeemReceipts returns DataPassRedeemReceipts
@@ -1023,8 +1026,8 @@ type UnimplementedQueryServer struct {
 func (*UnimplementedQueryServer) Pool(ctx context.Context, req *QueryPoolRequest) (*QueryPoolResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Pool not implemented")
 }
-func (*UnimplementedQueryServer) DataValidator(ctx context.Context, req *QueryDataValidatorRequest) (*QueryDataValidatorResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method DataValidator not implemented")
+func (*UnimplementedQueryServer) Oracle(ctx context.Context, req *QueryOracleRequest) (*QueryOracleResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Oracle not implemented")
 }
 func (*UnimplementedQueryServer) DataPoolParams(ctx context.Context, req *QueryDataPoolParamsRequest) (*QueryDataPoolParamsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DataPoolParams not implemented")
@@ -1032,8 +1035,8 @@ func (*UnimplementedQueryServer) DataPoolParams(ctx context.Context, req *QueryD
 func (*UnimplementedQueryServer) DataPoolModuleAddr(ctx context.Context, req *QueryDataPoolModuleAddrRequest) (*QueryDataPoolModuleAddrResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DataPoolModuleAddr not implemented")
 }
-func (*UnimplementedQueryServer) DataCerts(ctx context.Context, req *QueryDataCertsRequest) (*QueryDataCertsResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method DataCerts not implemented")
+func (*UnimplementedQueryServer) DataValidationCertificates(ctx context.Context, req *QueryDataValidationCertificatesRequest) (*QueryDataValidationCertificatesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DataValidationCertificates not implemented")
 }
 func (*UnimplementedQueryServer) DataPassRedeemReceipt(ctx context.Context, req *QueryDataPassRedeemReceiptRequest) (*QueryDataPassRedeemReceiptResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DataPassRedeemReceipt not implemented")
@@ -1067,20 +1070,20 @@ func _Query_Pool_Handler(srv interface{}, ctx context.Context, dec func(interfac
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Query_DataValidator_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(QueryDataValidatorRequest)
+func _Query_Oracle_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryOracleRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(QueryServer).DataValidator(ctx, in)
+		return srv.(QueryServer).Oracle(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/panacea.datapool.v2.Query/DataValidator",
+		FullMethod: "/panacea.datapool.v2.Query/Oracle",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(QueryServer).DataValidator(ctx, req.(*QueryDataValidatorRequest))
+		return srv.(QueryServer).Oracle(ctx, req.(*QueryOracleRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1121,20 +1124,20 @@ func _Query_DataPoolModuleAddr_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Query_DataCerts_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(QueryDataCertsRequest)
+func _Query_DataValidationCertificates_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryDataValidationCertificatesRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(QueryServer).DataCerts(ctx, in)
+		return srv.(QueryServer).DataValidationCertificates(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/panacea.datapool.v2.Query/DataCerts",
+		FullMethod: "/panacea.datapool.v2.Query/DataValidationCertificates",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(QueryServer).DataCerts(ctx, req.(*QueryDataCertsRequest))
+		return srv.(QueryServer).DataValidationCertificates(ctx, req.(*QueryDataValidationCertificatesRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1202,8 +1205,8 @@ var _Query_serviceDesc = grpc.ServiceDesc{
 			Handler:    _Query_Pool_Handler,
 		},
 		{
-			MethodName: "DataValidator",
-			Handler:    _Query_DataValidator_Handler,
+			MethodName: "Oracle",
+			Handler:    _Query_Oracle_Handler,
 		},
 		{
 			MethodName: "DataPoolParams",
@@ -1214,8 +1217,8 @@ var _Query_serviceDesc = grpc.ServiceDesc{
 			Handler:    _Query_DataPoolModuleAddr_Handler,
 		},
 		{
-			MethodName: "DataCerts",
-			Handler:    _Query_DataCerts_Handler,
+			MethodName: "DataValidationCertificates",
+			Handler:    _Query_DataValidationCertificates_Handler,
 		},
 		{
 			MethodName: "DataPassRedeemReceipt",
@@ -1297,7 +1300,7 @@ func (m *QueryPoolResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *QueryDataValidatorRequest) Marshal() (dAtA []byte, err error) {
+func (m *QueryOracleRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -1307,12 +1310,12 @@ func (m *QueryDataValidatorRequest) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *QueryDataValidatorRequest) MarshalTo(dAtA []byte) (int, error) {
+func (m *QueryOracleRequest) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *QueryDataValidatorRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *QueryOracleRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -1327,7 +1330,7 @@ func (m *QueryDataValidatorRequest) MarshalToSizedBuffer(dAtA []byte) (int, erro
 	return len(dAtA) - i, nil
 }
 
-func (m *QueryDataValidatorResponse) Marshal() (dAtA []byte, err error) {
+func (m *QueryOracleResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -1337,19 +1340,19 @@ func (m *QueryDataValidatorResponse) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *QueryDataValidatorResponse) MarshalTo(dAtA []byte) (int, error) {
+func (m *QueryOracleResponse) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *QueryDataValidatorResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *QueryOracleResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if m.DataValidator != nil {
+	if m.Oracle != nil {
 		{
-			size, err := m.DataValidator.MarshalToSizedBuffer(dAtA[:i])
+			size, err := m.Oracle.MarshalToSizedBuffer(dAtA[:i])
 			if err != nil {
 				return 0, err
 			}
@@ -1473,7 +1476,7 @@ func (m *QueryDataPoolModuleAddrResponse) MarshalToSizedBuffer(dAtA []byte) (int
 	return len(dAtA) - i, nil
 }
 
-func (m *QueryDataCertsRequest) Marshal() (dAtA []byte, err error) {
+func (m *QueryDataValidationCertificatesRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -1483,12 +1486,12 @@ func (m *QueryDataCertsRequest) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *QueryDataCertsRequest) MarshalTo(dAtA []byte) (int, error) {
+func (m *QueryDataValidationCertificatesRequest) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *QueryDataCertsRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *QueryDataValidationCertificatesRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -1518,7 +1521,7 @@ func (m *QueryDataCertsRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *QueryDataCertsResponse) Marshal() (dAtA []byte, err error) {
+func (m *QueryDataValidationCertificatesResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -1528,12 +1531,12 @@ func (m *QueryDataCertsResponse) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *QueryDataCertsResponse) MarshalTo(dAtA []byte) (int, error) {
+func (m *QueryDataValidationCertificatesResponse) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *QueryDataCertsResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *QueryDataValidationCertificatesResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -1550,10 +1553,10 @@ func (m *QueryDataCertsResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) 
 		i--
 		dAtA[i] = 0x12
 	}
-	if len(m.DataCerts) > 0 {
-		for iNdEx := len(m.DataCerts) - 1; iNdEx >= 0; iNdEx-- {
+	if len(m.DataValidationCertificates) > 0 {
+		for iNdEx := len(m.DataValidationCertificates) - 1; iNdEx >= 0; iNdEx-- {
 			{
-				size, err := m.DataCerts[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				size, err := m.DataValidationCertificates[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -1831,7 +1834,7 @@ func (m *QueryPoolResponse) Size() (n int) {
 	return n
 }
 
-func (m *QueryDataValidatorRequest) Size() (n int) {
+func (m *QueryOracleRequest) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -1844,14 +1847,14 @@ func (m *QueryDataValidatorRequest) Size() (n int) {
 	return n
 }
 
-func (m *QueryDataValidatorResponse) Size() (n int) {
+func (m *QueryOracleResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	if m.DataValidator != nil {
-		l = m.DataValidator.Size()
+	if m.Oracle != nil {
+		l = m.Oracle.Size()
 		n += 1 + l + sovQuery(uint64(l))
 	}
 	return n
@@ -1901,7 +1904,7 @@ func (m *QueryDataPoolModuleAddrResponse) Size() (n int) {
 	return n
 }
 
-func (m *QueryDataCertsRequest) Size() (n int) {
+func (m *QueryDataValidationCertificatesRequest) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -1920,14 +1923,14 @@ func (m *QueryDataCertsRequest) Size() (n int) {
 	return n
 }
 
-func (m *QueryDataCertsResponse) Size() (n int) {
+func (m *QueryDataValidationCertificatesResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	if len(m.DataCerts) > 0 {
-		for _, e := range m.DataCerts {
+	if len(m.DataValidationCertificates) > 0 {
+		for _, e := range m.DataValidationCertificates {
 			l = e.Size()
 			n += 1 + l + sovQuery(uint64(l))
 		}
@@ -2191,7 +2194,7 @@ func (m *QueryPoolResponse) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *QueryDataValidatorRequest) Unmarshal(dAtA []byte) error {
+func (m *QueryOracleRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -2214,10 +2217,10 @@ func (m *QueryDataValidatorRequest) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: QueryDataValidatorRequest: wiretype end group for non-group")
+			return fmt.Errorf("proto: QueryOracleRequest: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: QueryDataValidatorRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: QueryOracleRequest: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -2273,7 +2276,7 @@ func (m *QueryDataValidatorRequest) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *QueryDataValidatorResponse) Unmarshal(dAtA []byte) error {
+func (m *QueryOracleResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -2296,15 +2299,15 @@ func (m *QueryDataValidatorResponse) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: QueryDataValidatorResponse: wiretype end group for non-group")
+			return fmt.Errorf("proto: QueryOracleResponse: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: QueryDataValidatorResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: QueryOracleResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field DataValidator", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Oracle", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -2331,10 +2334,10 @@ func (m *QueryDataValidatorResponse) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if m.DataValidator == nil {
-				m.DataValidator = &DataValidator{}
+			if m.Oracle == nil {
+				m.Oracle = &Oracle{}
 			}
-			if err := m.DataValidator.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			if err := m.Oracle.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -2627,7 +2630,7 @@ func (m *QueryDataPoolModuleAddrResponse) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *QueryDataCertsRequest) Unmarshal(dAtA []byte) error {
+func (m *QueryDataValidationCertificatesRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -2650,10 +2653,10 @@ func (m *QueryDataCertsRequest) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: QueryDataCertsRequest: wiretype end group for non-group")
+			return fmt.Errorf("proto: QueryDataValidationCertificatesRequest: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: QueryDataCertsRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: QueryDataValidationCertificatesRequest: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -2751,7 +2754,7 @@ func (m *QueryDataCertsRequest) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *QueryDataCertsResponse) Unmarshal(dAtA []byte) error {
+func (m *QueryDataValidationCertificatesResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -2774,15 +2777,15 @@ func (m *QueryDataCertsResponse) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: QueryDataCertsResponse: wiretype end group for non-group")
+			return fmt.Errorf("proto: QueryDataValidationCertificatesResponse: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: QueryDataCertsResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: QueryDataValidationCertificatesResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field DataCerts", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field DataValidationCertificates", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -2809,8 +2812,8 @@ func (m *QueryDataCertsResponse) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.DataCerts = append(m.DataCerts, DataCert{})
-			if err := m.DataCerts[len(m.DataCerts)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			m.DataValidationCertificates = append(m.DataValidationCertificates, DataValidationCertificate{})
+			if err := m.DataValidationCertificates[len(m.DataValidationCertificates)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex

@@ -10,8 +10,8 @@ import (
 )
 
 func RegisterCodec(cdc *codec.LegacyAmino) {
-	cdc.RegisterConcrete(&MsgRegisterDataValidator{}, "datapool/RegisterDataValidator", nil)
-	cdc.RegisterConcrete(&MsgUpdateDataValidator{}, "datapool/UpdateDataValidator", nil)
+	cdc.RegisterConcrete(&MsgRegisterOracle{}, "datapool/RegisterOracle", nil)
+	cdc.RegisterConcrete(&MsgUpdateOracle{}, "datapool/UpdateOracle", nil)
 	cdc.RegisterConcrete(&MsgCreatePool{}, "datapool/CreatePool", nil)
 	cdc.RegisterConcrete(&MsgSellData{}, "datapool/SellData", nil)
 	cdc.RegisterConcrete(&MsgBuyDataPass{}, "datapool/BuyDataPass", nil)
@@ -20,8 +20,8 @@ func RegisterCodec(cdc *codec.LegacyAmino) {
 
 func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 	registry.RegisterImplementations((*sdk.Msg)(nil),
-		&MsgRegisterDataValidator{},
-		&MsgUpdateDataValidator{},
+		&MsgRegisterOracle{},
+		&MsgUpdateOracle{},
 		&MsgCreatePool{},
 		&MsgSellData{},
 		&MsgBuyDataPass{},

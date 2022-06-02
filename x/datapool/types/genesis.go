@@ -3,7 +3,7 @@ package types
 // DefaultGenesis returns the default Capability genesis state
 func DefaultGenesis() *GenesisState {
 	return &GenesisState{
-		DataValidators:             []DataValidator{},
+		Oracles:                    []Oracle{},
 		NextPoolNumber:             uint64(1),
 		Pools:                      []Pool{},
 		Params:                     DefaultParams(),

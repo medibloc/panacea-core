@@ -34,9 +34,9 @@ const (
 )
 
 var (
-	dataValPrivKey = secp256k1.GenPrivKey()
-	dataValPubKey  = dataValPrivKey.PubKey()
-	dataVal1       = sdk.AccAddress(dataValPubKey.Address())
+	oraclePrivKey = secp256k1.GenPrivKey()
+	oraclePubKey  = oraclePrivKey.PubKey()
+	oracle1       = sdk.AccAddress(oraclePubKey.Address())
 
 	curatorPrivKey = secp256k1.GenPrivKey()
 	curatorPubKey  = curatorPrivKey.PubKey()
@@ -49,7 +49,7 @@ var (
 	requesterPubKey  = requesterPrivKey.PubKey()
 	requesterAddr    = sdk.AccAddress(requesterPubKey.Address())
 
-	fundForDataVal = sdk.NewCoins(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(10000000000)))
+	fundForOracle  = sdk.NewCoins(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(10000000000)))
 	fundForCurator = sdk.NewCoins(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(1000000000000)))
 	fundForBuyer   = sdk.NewCoins(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(10000000000)))
 	NFTPrice       = sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(10000000)) // 10 MED
@@ -80,21 +80,21 @@ func (suite poolTestSuite) setupCreatePool(targetNumData, maxNftSupply uint64) u
 	err := suite.BankKeeper.AddCoins(suite.Ctx, curatorAddr, fundForCurator)
 	suite.Require().NoError(err)
 
-	// register data validator
-	err = suite.BankKeeper.AddCoins(suite.Ctx, dataVal1, fundForDataVal)
+	// register oracle
+	err = suite.BankKeeper.AddCoins(suite.Ctx, oracle1, fundForOracle)
 	suite.Require().NoError(err)
 
-	suite.setDataValidatorAccount()
+	suite.setOracleAccount()
 
-	dataValidator := types.DataValidator{
-		Address:  dataVal1.String(),
-		Endpoint: "https://my-validator.org",
+	oracle := types.Oracle{
+		Address:  oracle1.String(),
+		Endpoint: "https://my-oracle.org",
 	}
 
-	err = suite.DataPoolKeeper.RegisterDataValidator(suite.Ctx, dataValidator)
+	err = suite.DataPoolKeeper.RegisterOracle(suite.Ctx, oracle)
 	suite.Require().NoError(err)
 
-	newPoolParams := makePoolParamsWithDataValidator(targetNumData, maxNftSupply)
+	newPoolParams := makePoolParamsWithOracle(targetNumData, maxNftSupply)
 
 	poolID, err := suite.DataPoolKeeper.CreatePool(suite.Ctx, curatorAddr, enoughDeposit, newPoolParams)
 	suite.Require().NoError(err)
@@ -102,115 +102,115 @@ func (suite poolTestSuite) setupCreatePool(targetNumData, maxNftSupply uint64) u
 	return poolID
 }
 
-func (suite *poolTestSuite) TestRegisterDataValidator() {
-	err := suite.BankKeeper.AddCoins(suite.Ctx, dataVal1, fundForDataVal)
+func (suite *poolTestSuite) TestRegisterOracle() {
+	err := suite.BankKeeper.AddCoins(suite.Ctx, oracle1, fundForOracle)
 	suite.Require().NoError(err)
 
-	suite.setDataValidatorAccount()
+	suite.setOracleAccount()
 
-	tempDataValidator := types.DataValidator{
-		Address:  dataVal1.String(),
-		Endpoint: "https://my-validator.org",
+	tempOracle := types.Oracle{
+		Address:  oracle1.String(),
+		Endpoint: "https://my-oracle.org",
 	}
 
-	err = suite.DataPoolKeeper.RegisterDataValidator(suite.Ctx, tempDataValidator)
+	err = suite.DataPoolKeeper.RegisterOracle(suite.Ctx, tempOracle)
 	suite.Require().NoError(err)
 }
 
-func (suite *poolTestSuite) setDataValidatorAccount() {
-	validatorAccount := suite.AccountKeeper.NewAccountWithAddress(suite.Ctx, dataVal1)
-	err := validatorAccount.SetPubKey(dataValPubKey)
+func (suite *poolTestSuite) setOracleAccount() {
+	oracleAccount := suite.AccountKeeper.NewAccountWithAddress(suite.Ctx, oracle1)
+	err := oracleAccount.SetPubKey(oraclePubKey)
 	suite.Require().NoError(err)
-	suite.AccountKeeper.SetAccount(suite.Ctx, validatorAccount)
+	suite.AccountKeeper.SetAccount(suite.Ctx, oracleAccount)
 }
 
-func (suite *poolTestSuite) TestGetRegisterDataValidator() {
-	err := suite.BankKeeper.AddCoins(suite.Ctx, dataVal1, fundForDataVal)
+func (suite *poolTestSuite) TestGetRegisterOracle() {
+	err := suite.BankKeeper.AddCoins(suite.Ctx, oracle1, fundForOracle)
 	suite.Require().NoError(err)
 
-	suite.setDataValidatorAccount()
+	suite.setOracleAccount()
 
-	tempDataValidatorDetail := types.DataValidator{
-		Address:  dataVal1.String(),
-		Endpoint: "https://my-validator.org",
+	tempOracle := types.Oracle{
+		Address:  oracle1.String(),
+		Endpoint: "https://my-oracle.org",
 	}
 
-	err = suite.DataPoolKeeper.RegisterDataValidator(suite.Ctx, tempDataValidatorDetail)
+	err = suite.DataPoolKeeper.RegisterOracle(suite.Ctx, tempOracle)
 	suite.Require().NoError(err)
 
-	getDataValidator, err := suite.DataPoolKeeper.GetDataValidator(suite.Ctx, dataVal1)
+	getOracle, err := suite.DataPoolKeeper.GetOracle(suite.Ctx, oracle1)
 	suite.Require().NoError(err)
-	suite.Require().Equal(tempDataValidatorDetail.Endpoint, getDataValidator.Endpoint)
+	suite.Require().Equal(tempOracle.Endpoint, getOracle.Endpoint)
 }
 
-func (suite *poolTestSuite) TestIsDataValidatorDuplicate() {
-	err := suite.BankKeeper.AddCoins(suite.Ctx, dataVal1, fundForDataVal)
+func (suite *poolTestSuite) TestIsOracleDuplicate() {
+	err := suite.BankKeeper.AddCoins(suite.Ctx, oracle1, fundForOracle)
 	suite.Require().NoError(err)
 
-	suite.setDataValidatorAccount()
+	suite.setOracleAccount()
 
-	tempDataValidatorDetail := types.DataValidator{
-		Address:  dataVal1.String(),
-		Endpoint: "https://my-validator.org",
+	tempOracle := types.Oracle{
+		Address:  oracle1.String(),
+		Endpoint: "https://my-oralce.org",
 	}
 
-	err = suite.DataPoolKeeper.RegisterDataValidator(suite.Ctx, tempDataValidatorDetail)
+	err = suite.DataPoolKeeper.RegisterOracle(suite.Ctx, tempOracle)
 	suite.Require().NoError(err)
 
-	err = suite.DataPoolKeeper.RegisterDataValidator(suite.Ctx, tempDataValidatorDetail)
-	suite.Require().Error(err, types.ErrDataValidatorAlreadyExist)
+	err = suite.DataPoolKeeper.RegisterOracle(suite.Ctx, tempOracle)
+	suite.Require().Error(err, types.ErrOracleAlreadyExist)
 }
 
 func (suite *poolTestSuite) TestNotGetPubKey() {
-	err := suite.BankKeeper.AddCoins(suite.Ctx, dataVal1, fundForDataVal)
+	err := suite.BankKeeper.AddCoins(suite.Ctx, oracle1, fundForOracle)
 	suite.Require().NoError(err)
 
-	tempDataValidatorDetail := types.DataValidator{
-		Address:  dataVal1.String(),
-		Endpoint: "https://my-validator.org",
+	tempOracle := types.Oracle{
+		Address:  oracle1.String(),
+		Endpoint: "https://my-oracle.org",
 	}
 
-	err = suite.DataPoolKeeper.RegisterDataValidator(suite.Ctx, tempDataValidatorDetail)
+	err = suite.DataPoolKeeper.RegisterOracle(suite.Ctx, tempOracle)
 	suite.Require().Error(err, sdkerrors.ErrKeyNotFound)
 }
 
-func (suite *poolTestSuite) TestUpdateDataValidator() {
-	err := suite.BankKeeper.AddCoins(suite.Ctx, dataVal1, fundForDataVal)
+func (suite *poolTestSuite) TestUpdateOracle() {
+	err := suite.BankKeeper.AddCoins(suite.Ctx, oracle1, fundForOracle)
 	suite.Require().NoError(err)
 
-	suite.setDataValidatorAccount()
+	suite.setOracleAccount()
 
-	tempDataValidator := types.DataValidator{
-		Address:  dataVal1.String(),
-		Endpoint: "https://my-validator.org",
+	tempOracle := types.Oracle{
+		Address:  oracle1.String(),
+		Endpoint: "https://my-oracle.org",
 	}
 
-	err = suite.DataPoolKeeper.RegisterDataValidator(suite.Ctx, tempDataValidator)
+	err = suite.DataPoolKeeper.RegisterOracle(suite.Ctx, tempOracle)
 	suite.Require().NoError(err)
 
-	updateTempDataValidator := types.DataValidator{
-		Address:  dataVal1.String(),
-		Endpoint: "https://update-my-validator.org",
+	updateTempOracle := types.Oracle{
+		Address:  oracle1.String(),
+		Endpoint: "https://update-my-oracle.org",
 	}
 
-	err = suite.DataPoolKeeper.UpdateDataValidator(suite.Ctx, dataVal1, updateTempDataValidator.Endpoint)
+	err = suite.DataPoolKeeper.UpdateOracle(suite.Ctx, oracle1, updateTempOracle.Endpoint)
 	suite.Require().NoError(err)
 
-	getDataValidator, err := suite.DataPoolKeeper.GetDataValidator(suite.Ctx, dataVal1)
+	getOracle, err := suite.DataPoolKeeper.GetOracle(suite.Ctx, oracle1)
 	suite.Require().NoError(err)
 
-	suite.Require().Equal(getDataValidator.GetAddress(), updateTempDataValidator.GetAddress())
-	suite.Require().Equal(getDataValidator.GetEndpoint(), updateTempDataValidator.GetEndpoint())
+	suite.Require().Equal(getOracle.GetAddress(), updateTempOracle.GetAddress())
+	suite.Require().Equal(getOracle.GetEndpoint(), updateTempOracle.GetEndpoint())
 }
 
 func (suite *poolTestSuite) TestGetPool() {
 	poolID := uint64(1)
 	poolParams := types.PoolParams{
-		DataSchema:            []string{"https://json.schemastore.org/github-issue-forms.json"},
-		TargetNumData:         defaultTargetNumData,
-		MaxNftSupply:          defaultMaxNftSupply,
-		NftPrice:              &NFTPrice,
-		TrustedDataValidators: []string{dataVal1.String()},
+		DataSchema:     []string{"https://json.schemastore.org/github-issue-forms.json"},
+		TargetNumData:  defaultTargetNumData,
+		MaxNftSupply:   defaultMaxNftSupply,
+		NftPrice:       &NFTPrice,
+		TrustedOracles: []string{oracle1.String()},
 	}
 
 	pool := types.NewPool(poolID, curatorAddr, poolParams)
@@ -234,7 +234,7 @@ func (suite poolTestSuite) TestCreatePool() {
 
 	suite.Require().Equal(poolID, uint64(1))
 
-	newPoolParams := makePoolParamsWithDataValidator(defaultTargetNumData, defaultMaxNftSupply)
+	newPoolParams := makePoolParamsWithOracle(defaultTargetNumData, defaultMaxNftSupply)
 
 	pool, err := suite.DataPoolKeeper.GetPool(suite.Ctx, poolID)
 	suite.Require().NoError(err)
@@ -248,24 +248,24 @@ func (suite poolTestSuite) TestCreatePool() {
 	suite.Require().Equal(pool.GetStatus(), types.PENDING)
 }
 
-func (suite poolTestSuite) TestNotRegisteredDataValidator() {
+func (suite poolTestSuite) TestNotRegisteredOracle() {
 	// create and instantiate NFT contract
 	suite.setupNFTContract()
 
 	err := suite.BankKeeper.AddCoins(suite.Ctx, curatorAddr, fundForCurator)
 	suite.Require().NoError(err)
 
-	newPoolParams := makePoolParamsWithDataValidator(defaultTargetNumData, defaultMaxNftSupply)
+	newPoolParams := makePoolParamsWithOracle(defaultTargetNumData, defaultMaxNftSupply)
 
 	_, err = suite.DataPoolKeeper.CreatePool(suite.Ctx, curatorAddr, enoughDeposit, newPoolParams)
-	suite.Require().Error(err, types.ErrNotRegisteredDataValidator)
+	suite.Require().Error(err, types.ErrNotRegisteredOracle)
 }
 
 func (suite poolTestSuite) TestNotEnoughBalanceForDeposit() {
 	// create and instantiate NFT contract
 	suite.setupNFTContract()
 
-	newPoolParams := makePoolParamsNoDataValidator(defaultMaxNftSupply)
+	newPoolParams := makePoolParamsNoOracle(defaultMaxNftSupply)
 
 	_, err := suite.DataPoolKeeper.CreatePool(suite.Ctx, curatorAddr, enoughDeposit, newPoolParams)
 	suite.Require().Error(err, types.ErrNotEnoughPoolDeposit)
@@ -275,7 +275,7 @@ func (suite poolTestSuite) TestNotRegisteredNFTContract() {
 	err := suite.BankKeeper.AddCoins(suite.Ctx, curatorAddr, fundForCurator)
 	suite.Require().NoError(err)
 
-	newPoolParams := makePoolParamsNoDataValidator(defaultMaxNftSupply)
+	newPoolParams := makePoolParamsNoOracle(defaultMaxNftSupply)
 
 	_, err = suite.DataPoolKeeper.CreatePool(suite.Ctx, curatorAddr, enoughDeposit, newPoolParams)
 	suite.Require().Error(err, types.ErrNoRegisteredNFTContract)
@@ -367,7 +367,7 @@ func (suite poolTestSuite) TestNotEnoughDeposit() {
 	err := suite.BankKeeper.AddCoins(suite.Ctx, curatorAddr, fundForCurator)
 	suite.Require().NoError(err)
 
-	newPoolParams := makePoolParamsNoDataValidator(defaultMaxNftSupply)
+	newPoolParams := makePoolParamsNoOracle(defaultMaxNftSupply)
 
 	// 10 MED is required to create pool. but 5 MED for deposit
 	deposit := sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(500000))
@@ -453,25 +453,25 @@ func (suite poolTestSuite) TestNotOwnedRedeemerNFT() {
 	_, err = suite.DataPoolKeeper.RedeemDataPass(suite.Ctx, *redeemNFT)
 	suite.Require().Error(err, types.ErrNotOwnedRedeemerNft)
 }
-func makePoolParamsWithDataValidator(TargetNumData, MaxNftSupply uint64) types.PoolParams {
+func makePoolParamsWithOracle(TargetNumData, MaxNftSupply uint64) types.PoolParams {
 	return types.PoolParams{
-		DataSchema:            []string{"https://www.json.ld"},
-		TargetNumData:         TargetNumData,
-		MaxNftSupply:          MaxNftSupply,
-		NftPrice:              &NFTPrice,
-		TrustedDataValidators: []string{dataVal1.String()},
-		TrustedDataIssuers:    []string(nil),
+		DataSchema:         []string{"https://www.json.ld"},
+		TargetNumData:      TargetNumData,
+		MaxNftSupply:       MaxNftSupply,
+		NftPrice:           &NFTPrice,
+		TrustedOracles:     []string{oracle1.String()},
+		TrustedDataIssuers: []string(nil),
 	}
 }
 
-func makePoolParamsNoDataValidator(maxNftSupply uint64) types.PoolParams {
+func makePoolParamsNoOracle(maxNftSupply uint64) types.PoolParams {
 	return types.PoolParams{
-		DataSchema:            []string{"https://www.json.ld"},
-		TargetNumData:         100,
-		MaxNftSupply:          maxNftSupply,
-		NftPrice:              &NFTPrice,
-		TrustedDataValidators: []string(nil),
-		TrustedDataIssuers:    []string(nil),
+		DataSchema:         []string{"https://www.json.ld"},
+		TargetNumData:      100,
+		MaxNftSupply:       maxNftSupply,
+		NftPrice:           &NFTPrice,
+		TrustedOracles:     []string(nil),
+		TrustedDataIssuers: []string(nil),
 	}
 }
 
@@ -481,17 +481,17 @@ func (suite *poolTestSuite) TestSetDataCert() {
 	dataHash := []byte("dataHash")
 
 	unsignedCert := types.UnsignedDataCert{
-		PoolId:        poolID,
-		Round:         round,
-		DataHash:      dataHash,
-		DataValidator: dataVal1.String(),
-		Requester:     requesterAddr.String(),
+		PoolId:    poolID,
+		Round:     round,
+		DataHash:  dataHash,
+		Oracle:    oracle1.String(),
+		Requester: requesterAddr.String(),
 	}
 
 	bz, err := suite.Cdc.Marshaler.MarshalBinaryBare(&unsignedCert)
 	suite.Require().NoError(err)
 
-	sign, err := dataValPrivKey.Sign(bz)
+	sign, err := oraclePrivKey.Sign(bz)
 	suite.Require().NoError(err)
 
 	cert := types.DataCert{
@@ -507,7 +507,7 @@ func (suite *poolTestSuite) TestSetDataCert() {
 	suite.Require().Equal(cert.UnsignedCert.PoolId, getCert.UnsignedCert.PoolId)
 	suite.Require().Equal(cert.UnsignedCert.Round, getCert.UnsignedCert.Round)
 	suite.Require().Equal(cert.UnsignedCert.DataHash, getCert.UnsignedCert.DataHash)
-	suite.Require().Equal(cert.UnsignedCert.DataValidator, getCert.UnsignedCert.DataValidator)
+	suite.Require().Equal(cert.UnsignedCert.Oracle, getCert.UnsignedCert.Oracle)
 	suite.Require().Equal(cert.UnsignedCert.PoolId, getCert.UnsignedCert.PoolId)
 	suite.Require().Equal(cert.UnsignedCert.Requester, getCert.UnsignedCert.Requester)
 	suite.Require().Equal(cert.Signature, getCert.Signature)
@@ -573,12 +573,12 @@ func (suite *poolTestSuite) TestSellData_not_same_seller() {
 	suite.Require().Equal(types.ErrNotEqualsSeller.Error(), err.Error())
 }
 
-func (suite *poolTestSuite) TestSellData_failed_get_publicKey_validator_in_signature() {
+func (suite *poolTestSuite) TestSellData_failed_get_publicKey_oracle_in_signature() {
 	poolID := uint64(1)
 	round := uint64(1)
 	dataHash := []byte("dataHash")
 
-	// Unregistered data validator publicKey
+	// Unregistered oracle publicKey
 
 	cert, err := makeTestDataCert(suite.Cdc.Marshaler, poolID, round, dataHash, requesterAddr.String())
 	suite.Require().NoError(err)
@@ -600,7 +600,7 @@ func (suite *poolTestSuite) TestSellData_invalid_signature() {
 	round := uint64(1)
 	dataHash := []byte("dataHash")
 
-	suite.setDataValidatorAccount()
+	suite.setOracleAccount()
 
 	cert, err := makeTestDataCert(suite.Cdc.Marshaler, poolID, round, dataHash, requesterAddr.String())
 	suite.Require().NoError(err)
@@ -645,7 +645,7 @@ func (suite *poolTestSuite) TestSellData_not_exist_pool() {
 	round := uint64(1)
 	dataHash := []byte("dataHash")
 
-	suite.setDataValidatorAccount()
+	suite.setOracleAccount()
 
 	// Unregistered pool
 
@@ -662,7 +662,7 @@ func (suite *poolTestSuite) TestSellData_impossible_status_pool() {
 	round := uint64(1)
 	dataHash := []byte("dataHash")
 
-	suite.setDataValidatorAccount()
+	suite.setOracleAccount()
 
 	// Already activate status
 	pool := makeTestDataPool(poolID)
@@ -684,7 +684,7 @@ func (suite *poolTestSuite) TestSellData_mismatch_cert_and_pool_round() {
 	round := uint64(2)
 	dataHash := []byte("dataHash")
 
-	suite.setDataValidatorAccount()
+	suite.setOracleAccount()
 
 	pool := makeTestDataPool(poolID)
 	suite.DataPoolKeeper.SetPool(suite.Ctx, pool)
@@ -698,13 +698,13 @@ func (suite *poolTestSuite) TestSellData_mismatch_cert_and_pool_round() {
 	suite.Require().True(strings.HasSuffix(err.Error(), types.ErrInvalidDataCert.Error()))
 }
 
-func makeTestDataCert(marshaler codec.Marshaler, poolID, round uint64, dataHash []byte, requester string) (*types.DataCert, error) {
-	unsignedCert := types.UnsignedDataCert{
-		PoolId:        poolID,
-		Round:         round,
-		DataHash:      dataHash,
-		DataValidator: dataVal1.String(),
-		Requester:     requester,
+func makeTestDataCertificate(marshaler codec.Marshaler, poolID, round uint64, dataHash []byte, requester string) (*types.DataValidationCertificate, error) {
+	unsignedCert := types.UnsignedDataValidationCertificate{
+		PoolId:    poolID,
+		Round:     round,
+		DataHash:  dataHash,
+		Oracle:    oracle1.String(),
+		Requester: requester,
 	}
 
 	bz, err := marshaler.MarshalBinaryBare(&unsignedCert)
@@ -712,7 +712,7 @@ func makeTestDataCert(marshaler codec.Marshaler, poolID, round uint64, dataHash 
 		return nil, err
 	}
 
-	sign, err := dataValPrivKey.Sign(bz)
+	sign, err := oraclePrivKey.Sign(bz)
 	if err != nil {
 		return nil, err
 	}
@@ -725,11 +725,11 @@ func makeTestDataCert(marshaler codec.Marshaler, poolID, round uint64, dataHash 
 
 func makeTestDataPool(poolID uint64) *types.Pool {
 	poolParams := types.PoolParams{
-		DataSchema:            []string{"https://json.schemastore.org/github-issue-forms.json"},
-		TargetNumData:         defaultTargetNumData,
-		MaxNftSupply:          defaultMaxNftSupply,
-		NftPrice:              &NFTPrice,
-		TrustedDataValidators: []string{dataVal1.String()},
+		DataSchema:     []string{"https://json.schemastore.org/github-issue-forms.json"},
+		TargetNumData:  defaultTargetNumData,
+		MaxNftSupply:   defaultMaxNftSupply,
+		NftPrice:       &NFTPrice,
+		TrustedOracles: []string{oracle1.String()},
 	}
 
 	return types.NewPool(poolID, curatorAddr, poolParams)

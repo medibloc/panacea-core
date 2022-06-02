@@ -5,87 +5,87 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-var _ sdk.Msg = &MsgRegisterDataValidator{}
+var _ sdk.Msg = &MsgRegisterOracle{}
 
-func NewMsgRegisterDataValidator(dataValidator *DataValidator) *MsgRegisterDataValidator {
-	return &MsgRegisterDataValidator{
-		ValidatorDetail: dataValidator,
+func NewMsgRegisterOracle(oracle *Oracle) *MsgRegisterOracle {
+	return &MsgRegisterOracle{
+		OracleDetail: oracle,
 	}
 }
 
-func (msg *MsgRegisterDataValidator) Route() string {
+func (msg *MsgRegisterOracle) Route() string {
 	return RouterKey
 }
 
-func (msg *MsgRegisterDataValidator) Type() string {
-	return "RegisterDataValidator"
+func (msg *MsgRegisterOracle) Type() string {
+	return "RegisterOracle"
 }
 
-func (msg *MsgRegisterDataValidator) ValidateBasic() error {
-	_, err := sdk.AccAddressFromBech32(msg.ValidatorDetail.Address)
+func (msg *MsgRegisterOracle) ValidateBasic() error {
+	_, err := sdk.AccAddressFromBech32(msg.OracleDetail.Address)
 	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid data validator address (%s)", err)
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid oracle address (%s)", err)
 	}
 
-	if msg.ValidatorDetail.Endpoint == "" {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "empty data validator endpoint URL")
+	if msg.OracleDetail.Endpoint == "" {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "empty oracle endpoint URL")
 	}
 	return nil
 }
 
-func (msg *MsgRegisterDataValidator) GetSignBytes() []byte {
+func (msg *MsgRegisterOracle) GetSignBytes() []byte {
 	bz := ModuleCdc.MustMarshalJSON(msg)
 	return sdk.MustSortJSON(bz)
 }
 
-func (msg *MsgRegisterDataValidator) GetSigners() []sdk.AccAddress {
-	dataValidator, err := sdk.AccAddressFromBech32(msg.ValidatorDetail.Address)
+func (msg *MsgRegisterOracle) GetSigners() []sdk.AccAddress {
+	oracle, err := sdk.AccAddressFromBech32(msg.OracleDetail.Address)
 	if err != nil {
 		panic(err)
 	}
-	return []sdk.AccAddress{dataValidator}
+	return []sdk.AccAddress{oracle}
 }
 
-var _ sdk.Msg = &MsgUpdateDataValidator{}
+var _ sdk.Msg = &MsgUpdateOracle{}
 
-func NewMsgUpdateDataValidator(address, endpoint string) *MsgUpdateDataValidator {
-	return &MsgUpdateDataValidator{
-		DataValidator: address,
-		Endpoint:      endpoint,
+func NewMsgUpdateOracle(address, endpoint string) *MsgUpdateOracle {
+	return &MsgUpdateOracle{
+		Oracle:   address,
+		Endpoint: endpoint,
 	}
 }
 
-func (msg *MsgUpdateDataValidator) Route() string {
+func (msg *MsgUpdateOracle) Route() string {
 	return RouterKey
 }
 
-func (msg *MsgUpdateDataValidator) Type() string {
-	return "UpdateDataValidator"
+func (msg *MsgUpdateOracle) Type() string {
+	return "UpdateOracle"
 }
 
-func (msg *MsgUpdateDataValidator) ValidateBasic() error {
-	_, err := sdk.AccAddressFromBech32(msg.DataValidator)
+func (msg *MsgUpdateOracle) ValidateBasic() error {
+	_, err := sdk.AccAddressFromBech32(msg.Oracle)
 	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid data validator address (%s)", err)
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid oracle address (%s)", err)
 	}
 
 	if msg.Endpoint == "" {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "empty data validator endpoint URL")
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "empty oracle endpoint URL")
 	}
 	return nil
 }
 
-func (msg *MsgUpdateDataValidator) GetSignBytes() []byte {
+func (msg *MsgUpdateOracle) GetSignBytes() []byte {
 	bz := ModuleCdc.MustMarshalJSON(msg)
 	return sdk.MustSortJSON(bz)
 }
 
-func (msg *MsgUpdateDataValidator) GetSigners() []sdk.AccAddress {
-	dataValidator, err := sdk.AccAddressFromBech32(msg.DataValidator)
+func (msg *MsgUpdateOracle) GetSigners() []sdk.AccAddress {
+	oracle, err := sdk.AccAddressFromBech32(msg.Oracle)
 	if err != nil {
 		panic(err)
 	}
-	return []sdk.AccAddress{dataValidator}
+	return []sdk.AccAddress{oracle}
 }
 
 var _ sdk.Msg = &MsgCreatePool{}
@@ -133,10 +133,10 @@ func (msg *MsgCreatePool) ValidateBasic() error {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "the price of NFT is invalid")
 	}
 
-	for _, validatorAddr := range poolParams.TrustedDataValidators {
-		_, err = sdk.AccAddressFromBech32(validatorAddr)
+	for _, oracleAddr := range poolParams.TrustedOracles {
+		_, err = sdk.AccAddressFromBech32(oracleAddr)
 		if err != nil {
-			return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid data validator address of %s", validatorAddr)
+			return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid oracle address of %s", oracleAddr)
 		}
 	}
 
@@ -192,8 +192,8 @@ func (msg *MsgSellData) ValidateBasic() error {
 	unsignedCert := cert.UnsignedCert
 	if unsignedCert.DataHash == nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "dataHash is nil")
-	} else if unsignedCert.DataValidator == "" {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "empty data validator address")
+	} else if unsignedCert.Oracle == "" {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "empty oracle address")
 	} else if unsignedCert.Requester == "" {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "empty requester address")
 	}

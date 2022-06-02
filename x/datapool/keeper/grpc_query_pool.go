@@ -30,24 +30,24 @@ func (k Keeper) Pool(goCtx context.Context, req *types.QueryPoolRequest) (*types
 	}, nil
 }
 
-func (k Keeper) DataValidator(goCtx context.Context, req *types.QueryDataValidatorRequest) (*types.QueryDataValidatorResponse, error) {
+func (k Keeper) Oracle(goCtx context.Context, req *types.QueryOracleRequest) (*types.QueryOracleResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	accValidatorAddress, err := sdk.AccAddressFromBech32(req.GetAddress())
+	accOracleAddress, err := sdk.AccAddressFromBech32(req.GetAddress())
 	if err != nil {
 		return nil, err
 	}
 
-	dataValidator, err := k.GetDataValidator(ctx, accValidatorAddress)
+	oracle, err := k.GetOracle(ctx, accOracleAddress)
 	if err != nil {
 		return nil, err
 	}
 
-	return &types.QueryDataValidatorResponse{DataValidator: &dataValidator}, nil
+	return &types.QueryOracleResponse{Oracle: &oracle}, nil
 }
 
 func (k Keeper) DataPoolParams(goCtx context.Context, req *types.QueryDataPoolParamsRequest) (*types.QueryDataPoolParamsResponse, error) {

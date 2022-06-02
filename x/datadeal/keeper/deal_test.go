@@ -48,11 +48,11 @@ func (suite *dealTestSuite) TestCreateNewDeal() {
 	suite.Require().NoError(err)
 
 	tempDeal := types.Deal{
-		DataSchema:            []string{"http://jsonld.com"},
-		Budget:                &sdk.Coin{Denom: assets.MicroMedDenom, Amount: sdk.NewInt(10000000)},
-		MaxNumData:            10000,
-		TrustedDataValidators: []string{acc2.String()},
-		Owner:                 acc1.String(),
+		DataSchema:     []string{"http://jsonld.com"},
+		Budget:         &sdk.Coin{Denom: assets.MicroMedDenom, Amount: sdk.NewInt(10000000)},
+		MaxNumData:     10000,
+		TrustedOracles: []string{acc2.String()},
+		Owner:          acc1.String(),
 	}
 
 	owner, err := sdk.AccAddressFromBech32(tempDeal.GetOwner())
@@ -71,7 +71,7 @@ func (suite *dealTestSuite) TestCreateNewDeal() {
 	suite.Require().Equal(deal.GetBudget(), tempDeal.GetBudget())
 	suite.Require().Equal(deal.GetMaxNumData(), tempDeal.GetMaxNumData())
 	suite.Require().Equal(deal.GetCurNumData(), tempDeal.GetCurNumData())
-	suite.Require().Equal(deal.GetTrustedDataValidators(), tempDeal.GetTrustedDataValidators())
+	suite.Require().Equal(deal.GetTrustedOracles(), tempDeal.GetTrustedOracles())
 	suite.Require().Equal(deal.GetOwner(), tempDeal.GetOwner())
 	suite.Require().Equal(deal.GetStatus(), ACTIVE)
 }
@@ -87,7 +87,7 @@ func (suite *dealTestSuite) TestGetDeal() {
 	suite.Require().Equal(deal.GetBudget(), testDeal.GetBudget())
 	suite.Require().Equal(deal.GetMaxNumData(), testDeal.GetMaxNumData())
 	suite.Require().Equal(deal.GetCurNumData(), testDeal.GetCurNumData())
-	suite.Require().Equal(deal.GetTrustedDataValidators(), testDeal.GetTrustedDataValidators())
+	suite.Require().Equal(deal.GetTrustedOracles(), testDeal.GetTrustedOracles())
 	suite.Require().Equal(deal.GetOwner(), testDeal.GetOwner())
 	suite.Require().Equal(deal.GetStatus(), testDeal.GetStatus())
 }
@@ -97,11 +97,11 @@ func (suite *dealTestSuite) TestListDeals() {
 	suite.Require().NoError(err)
 
 	tempDeal := types.Deal{
-		DataSchema:            []string{"http://jsonld.com"},
-		Budget:                &sdk.Coin{Denom: assets.MicroMedDenom, Amount: sdk.NewInt(10000000)},
-		MaxNumData:            10000,
-		TrustedDataValidators: []string{acc2.String()},
-		Owner:                 acc1.String(),
+		DataSchema:     []string{"http://jsonld.com"},
+		Budget:         &sdk.Coin{Denom: assets.MicroMedDenom, Amount: sdk.NewInt(10000000)},
+		MaxNumData:     10000,
+		TrustedOracles: []string{acc2.String()},
+		Owner:          acc1.String(),
 	}
 
 	owner, err := sdk.AccAddressFromBech32(tempDeal.GetOwner())
@@ -128,7 +128,7 @@ func (suite *dealTestSuite) TestListDeals() {
 		suite.Require().Equal(deal.GetBudget(), deals[i+1].GetBudget())
 		suite.Require().Equal(deal.GetMaxNumData(), deals[i+1].GetMaxNumData())
 		suite.Require().Equal(deal.GetCurNumData(), deals[i+1].GetCurNumData())
-		suite.Require().Equal(deal.GetTrustedDataValidators(), deals[i+1].GetTrustedDataValidators())
+		suite.Require().Equal(deal.GetTrustedOracles(), deals[i+1].GetTrustedOracles())
 		suite.Require().Equal(deal.GetOwner(), deals[i+1].GetOwner())
 		suite.Require().Equal(deal.GetStatus(), deals[i+1].GetStatus())
 	}
@@ -139,11 +139,11 @@ func (suite *dealTestSuite) TestGetBalanceOfDeal() {
 	suite.Require().NoError(err)
 
 	tempDeal := types.Deal{
-		DataSchema:            []string{"http://jsonld.com"},
-		Budget:                &sdk.Coin{Denom: assets.MicroMedDenom, Amount: sdk.NewInt(10000000)},
-		MaxNumData:            10000,
-		TrustedDataValidators: []string{acc2.String()},
-		Owner:                 acc1.String(),
+		DataSchema:     []string{"http://jsonld.com"},
+		Budget:         &sdk.Coin{Denom: assets.MicroMedDenom, Amount: sdk.NewInt(10000000)},
+		MaxNumData:     10000,
+		TrustedOracles: []string{acc2.String()},
+		Owner:          acc1.String(),
 	}
 
 	owner, err := sdk.AccAddressFromBech32(tempDeal.GetOwner())
@@ -173,11 +173,11 @@ func (suite *dealTestSuite) TestSellOwnData() {
 	suite.Require().NoError(err)
 
 	tempDeal := types.Deal{
-		DataSchema:            []string{"http://jsonld.com"},
-		Budget:                &sdk.Coin{Denom: assets.MicroMedDenom, Amount: sdk.NewInt(10000000)},
-		MaxNumData:            10000,
-		TrustedDataValidators: []string{newAddr.String()},
-		Owner:                 acc1.String(),
+		DataSchema:     []string{"http://jsonld.com"},
+		Budget:         &sdk.Coin{Denom: assets.MicroMedDenom, Amount: sdk.NewInt(10000000)},
+		MaxNumData:     10000,
+		TrustedOracles: []string{newAddr.String()},
+		Owner:          acc1.String(),
 	}
 
 	newDealID, err := suite.DataDealKeeper.CreateDeal(suite.Ctx, acc1, tempDeal)
@@ -207,11 +207,11 @@ func (suite *dealTestSuite) TestIsDataCertDuplicate() {
 	suite.Require().NoError(err)
 
 	tempDeal := types.Deal{
-		DataSchema:            []string{"http://jsonld.com"},
-		Budget:                &sdk.Coin{Denom: assets.MicroMedDenom, Amount: sdk.NewInt(10000000)},
-		MaxNumData:            10000,
-		TrustedDataValidators: []string{newAddr.String()},
-		Owner:                 acc1.String(),
+		DataSchema:     []string{"http://jsonld.com"},
+		Budget:         &sdk.Coin{Denom: assets.MicroMedDenom, Amount: sdk.NewInt(10000000)},
+		MaxNumData:     10000,
+		TrustedOracles: []string{newAddr.String()},
+		Owner:          acc1.String(),
 	}
 
 	_, err = suite.DataDealKeeper.CreateDeal(suite.Ctx, acc1, tempDeal)
@@ -226,22 +226,22 @@ func (suite *dealTestSuite) TestIsDataCertDuplicate() {
 	suite.Require().Error(err, types.ErrDataAlreadyExist)
 }
 
-func (suite *dealTestSuite) TestIsTrustedDataValidator_Invalid() {
+func (suite *dealTestSuite) TestIsTrustedOracles_Invalid() {
 	err := suite.BankKeeper.AddCoins(suite.Ctx, acc1, defaultFunds)
 	suite.Require().NoError(err)
 
 	err = suite.BankKeeper.AddCoins(suite.Ctx, acc3, zeroFunds)
 	suite.Require().NoError(err)
 
-	errValidator1 := secp256k1.GenPrivKey().PubKey().Address().String()
-	errValidator2 := secp256k1.GenPrivKey().PubKey().Address().String()
+	errOracle1 := secp256k1.GenPrivKey().PubKey().Address().String()
+	errOracle2 := secp256k1.GenPrivKey().PubKey().Address().String()
 
 	tempDeal := types.Deal{
-		DataSchema:            []string{"http://jsonld.com"},
-		Budget:                &sdk.Coin{Denom: assets.MicroMedDenom, Amount: sdk.NewInt(10000000)},
-		MaxNumData:            10000,
-		TrustedDataValidators: []string{errValidator1, errValidator2},
-		Owner:                 acc1.String(),
+		DataSchema:     []string{"http://jsonld.com"},
+		Budget:         &sdk.Coin{Denom: assets.MicroMedDenom, Amount: sdk.NewInt(10000000)},
+		MaxNumData:     10000,
+		TrustedOracles: []string{errOracle1, errOracle2},
+		Owner:          acc1.String(),
 	}
 
 	_, err = suite.DataDealKeeper.CreateDeal(suite.Ctx, acc1, tempDeal)
@@ -260,11 +260,11 @@ func (suite *dealTestSuite) TestDealStatusInactiveOrCompleted() {
 	suite.Require().NoError(err)
 
 	tempDeal := types.Deal{
-		DataSchema:            []string{"http://jsonld.com"},
-		Budget:                &sdk.Coin{Denom: assets.MicroMedDenom, Amount: sdk.NewInt(10000000)},
-		MaxNumData:            10000,
-		TrustedDataValidators: []string{newAddr.String()},
-		Owner:                 acc1.String(),
+		DataSchema:     []string{"http://jsonld.com"},
+		Budget:         &sdk.Coin{Denom: assets.MicroMedDenom, Amount: sdk.NewInt(10000000)},
+		MaxNumData:     10000,
+		TrustedOracles: []string{newAddr.String()},
+		Owner:          acc1.String(),
 	}
 
 	dealID, err := suite.DataDealKeeper.CreateDeal(suite.Ctx, acc1, tempDeal)
@@ -287,11 +287,11 @@ func (suite *dealTestSuite) TestDealStatusInactiveOrCompleted() {
 func (suite *dealTestSuite) TestVerifyDataCert() {
 	cert := makeTestCert("1a312c1223x2fs3", newAddr, acc3)
 
-	validatorAddr, err := sdk.AccAddressFromBech32(cert.UnsignedCert.GetDataValidatorAddress())
+	oracleAddr, err := sdk.AccAddressFromBech32(cert.UnsignedCert.GetOracleAddress())
 	suite.Require().NoError(err)
-	suite.Require().Equal(newAddr, validatorAddr)
+	suite.Require().Equal(newAddr, oracleAddr)
 
-	account := suite.AccountKeeper.NewAccountWithAddress(suite.Ctx, validatorAddr)
+	account := suite.AccountKeeper.NewAccountWithAddress(suite.Ctx, oracleAddr)
 	err = account.SetPubKey(privKey.PubKey())
 	suite.Require().NoError(err)
 	suite.AccountKeeper.SetAccount(suite.Ctx, account)
@@ -312,11 +312,11 @@ func (suite *dealTestSuite) TestIsDealStatusCompleted() {
 	suite.Require().NoError(err)
 
 	tempDeal := types.Deal{
-		DataSchema:            []string{"http://jsonld.com"},
-		Budget:                &sdk.Coin{Denom: assets.MicroMedDenom, Amount: sdk.NewInt(10000000)},
-		MaxNumData:            2,
-		TrustedDataValidators: []string{newAddr.String()},
-		Owner:                 acc1.String(),
+		DataSchema:     []string{"http://jsonld.com"},
+		Budget:         &sdk.Coin{Denom: assets.MicroMedDenom, Amount: sdk.NewInt(10000000)},
+		MaxNumData:     2,
+		TrustedOracles: []string{newAddr.String()},
+		Owner:          acc1.String(),
 	}
 
 	dealID, err := suite.DataDealKeeper.CreateDeal(suite.Ctx, acc1, tempDeal)
@@ -344,11 +344,11 @@ func (suite *dealTestSuite) TestGetDataCert() {
 	suite.Require().NoError(err)
 
 	tempDeal := types.Deal{
-		DataSchema:            []string{"http://jsonld.com"},
-		Budget:                &sdk.Coin{Denom: assets.MicroMedDenom, Amount: sdk.NewInt(10000000)},
-		MaxNumData:            10000,
-		TrustedDataValidators: []string{newAddr.String()},
-		Owner:                 acc1.String(),
+		DataSchema:     []string{"http://jsonld.com"},
+		Budget:         &sdk.Coin{Denom: assets.MicroMedDenom, Amount: sdk.NewInt(10000000)},
+		MaxNumData:     10000,
+		TrustedOracles: []string{newAddr.String()},
+		Owner:          acc1.String(),
 	}
 
 	newDealID, err := suite.DataDealKeeper.CreateDeal(suite.Ctx, acc1, tempDeal)
@@ -364,12 +364,12 @@ func (suite *dealTestSuite) TestGetDataCert() {
 	getCert, err := suite.DataDealKeeper.GetDataCert(suite.Ctx, cert)
 	suite.Require().NoError(err)
 
-	suite.Require().Equal(getCert.GetSignature(), cert.GetSignature())
-	suite.Require().Equal(getCert.UnsignedCert.GetDealId(), cert.UnsignedCert.GetDealId())
-	suite.Require().Equal(getCert.UnsignedCert.GetDataHash(), cert.UnsignedCert.GetDataHash())
-	suite.Require().Equal(getCert.UnsignedCert.GetEncryptedDataUrl(), cert.UnsignedCert.GetEncryptedDataUrl())
-	suite.Require().Equal(getCert.UnsignedCert.GetDataValidatorAddress(), cert.UnsignedCert.GetDataValidatorAddress())
-	suite.Require().Equal(getCert.UnsignedCert.GetRequesterAddress(), cert.UnsignedCert.GetRequesterAddress())
+	suite.Require().Equal(getCertificate.GetSignature(), cert.GetSignature())
+	suite.Require().Equal(getCertificate.UnsignedCert.GetDealId(), cert.UnsignedCert.GetDealId())
+	suite.Require().Equal(getCertificate.UnsignedCert.GetDataHash(), cert.UnsignedCert.GetDataHash())
+	suite.Require().Equal(getCertificate.UnsignedCert.GetEncryptedDataUrl(), cert.UnsignedCert.GetEncryptedDataUrl())
+	suite.Require().Equal(getCertificate.UnsignedCert.GetOracleAddress(), cert.UnsignedCert.GetOracleAddress())
+	suite.Require().Equal(getCertificate.UnsignedCert.GetRequesterAddress(), cert.UnsignedCert.GetRequesterAddress())
 }
 
 func (suite *dealTestSuite) TestListDataCerts() {
@@ -380,11 +380,11 @@ func (suite *dealTestSuite) TestListDataCerts() {
 	suite.Require().NoError(err)
 
 	tempDeal := types.Deal{
-		DataSchema:            []string{"http://jsonld.com"},
-		Budget:                &sdk.Coin{Denom: assets.MicroMedDenom, Amount: sdk.NewInt(10000000)},
-		MaxNumData:            10000,
-		TrustedDataValidators: []string{newAddr.String()},
-		Owner:                 acc1.String(),
+		DataSchema:     []string{"http://jsonld.com"},
+		Budget:         &sdk.Coin{Denom: assets.MicroMedDenom, Amount: sdk.NewInt(10000000)},
+		MaxNumData:     10000,
+		TrustedOracles: []string{newAddr.String()},
+		Owner:          acc1.String(),
 	}
 
 	newDealID, err := suite.DataDealKeeper.CreateDeal(suite.Ctx, acc1, tempDeal)
@@ -403,13 +403,13 @@ func (suite *dealTestSuite) TestListDataCerts() {
 	listDataCerts, err := suite.DataDealKeeper.ListDataCerts(suite.Ctx)
 	suite.Require().NoError(err)
 
-	for i, dataCert := range listDataCerts {
-		suite.Require().Equal(dataCert.GetSignature(), dataCerts[i+1].GetSignature())
-		suite.Require().Equal(dataCert.UnsignedCert.GetDealId(), dataCerts[i+1].UnsignedCert.GetDealId())
-		suite.Require().Equal(dataCert.UnsignedCert.GetDataHash(), dataCerts[i+1].UnsignedCert.GetDataHash())
-		suite.Require().Equal(dataCert.UnsignedCert.GetEncryptedDataUrl(), dataCerts[i+1].UnsignedCert.GetEncryptedDataUrl())
-		suite.Require().Equal(dataCert.UnsignedCert.GetDataValidatorAddress(), dataCerts[i+1].UnsignedCert.GetDataValidatorAddress())
-		suite.Require().Equal(dataCert.UnsignedCert.GetRequesterAddress(), dataCerts[i+1].UnsignedCert.GetRequesterAddress())
+	for i, dataCertificate := range listDataCertificates {
+		suite.Require().Equal(dataCertificate.GetSignature(), dataCertificates[i+1].GetSignature())
+		suite.Require().Equal(dataCertificate.UnsignedCert.GetDealId(), dataCertificates[i+1].UnsignedCert.GetDealId())
+		suite.Require().Equal(dataCertificate.UnsignedCert.GetDataHash(), dataCertificates[i+1].UnsignedCert.GetDataHash())
+		suite.Require().Equal(dataCertificate.UnsignedCert.GetEncryptedDataUrl(), dataCertificates[i+1].UnsignedCert.GetEncryptedDataUrl())
+		suite.Require().Equal(dataCertificate.UnsignedCert.GetOracleAddress(), dataCertificates[i+1].UnsignedCert.GetOracleAddress())
+		suite.Require().Equal(dataCertificate.UnsignedCert.GetRequesterAddress(), dataCertificates[i+1].UnsignedCert.GetRequesterAddress())
 	}
 }
 
@@ -421,11 +421,11 @@ func (suite *dealTestSuite) TestDeactivateDeal() {
 	suite.Require().NoError(err)
 
 	tempDeal := types.Deal{
-		DataSchema:            []string{"http://jsonld.com"},
-		Budget:                &sdk.Coin{Denom: assets.MicroMedDenom, Amount: sdk.NewInt(1000000000)},
-		MaxNumData:            10000,
-		TrustedDataValidators: []string{newAddr.String()},
-		Owner:                 acc1.String(),
+		DataSchema:     []string{"http://jsonld.com"},
+		Budget:         &sdk.Coin{Denom: assets.MicroMedDenom, Amount: sdk.NewInt(1000000000)},
+		MaxNumData:     10000,
+		TrustedOracles: []string{newAddr.String()},
+		Owner:          acc1.String(),
 	}
 
 	dealID, err := suite.DataDealKeeper.CreateDeal(suite.Ctx, acc1, tempDeal)
@@ -463,11 +463,11 @@ func (suite *dealTestSuite) TestIsNotEqualOwner() {
 	suite.Require().NoError(err)
 
 	tempDeal := types.Deal{
-		DataSchema:            []string{"http://jsonld.com"},
-		Budget:                &sdk.Coin{Denom: assets.MicroMedDenom, Amount: sdk.NewInt(1000000000)},
-		MaxNumData:            10000,
-		TrustedDataValidators: []string{newAddr.String()},
-		Owner:                 acc1.String(),
+		DataSchema:     []string{"http://jsonld.com"},
+		Budget:         &sdk.Coin{Denom: assets.MicroMedDenom, Amount: sdk.NewInt(1000000000)},
+		MaxNumData:     10000,
+		TrustedOracles: []string{newAddr.String()},
+		Owner:          acc1.String(),
 	}
 
 	dealID, err := suite.DataDealKeeper.CreateDeal(suite.Ctx, acc1, tempDeal)
@@ -489,11 +489,11 @@ func (suite *dealTestSuite) TestDealIsNotActive() {
 	suite.Require().NoError(err)
 
 	tempDeal := types.Deal{
-		DataSchema:            []string{"http://jsonld.com"},
-		Budget:                &sdk.Coin{Denom: assets.MicroMedDenom, Amount: sdk.NewInt(1000000000)},
-		MaxNumData:            10,
-		TrustedDataValidators: []string{newAddr.String()},
-		Owner:                 acc1.String(),
+		DataSchema:     []string{"http://jsonld.com"},
+		Budget:         &sdk.Coin{Denom: assets.MicroMedDenom, Amount: sdk.NewInt(1000000000)},
+		MaxNumData:     10,
+		TrustedOracles: []string{newAddr.String()},
+		Owner:          acc1.String(),
 	}
 
 	dealID, err := suite.DataDealKeeper.CreateDeal(suite.Ctx, acc1, tempDeal)
@@ -530,25 +530,25 @@ func (suite *dealTestSuite) TestDealIsNotActive() {
 
 func makeTestDeal() types.Deal {
 	return types.Deal{
-		DealId:                1,
-		DealAddress:           types.NewDealAddress(1).String(),
-		DataSchema:            []string{acc1.String()},
-		Budget:                &sdk.Coin{Denom: assets.MicroMedDenom, Amount: sdk.NewInt(1000000000)},
-		MaxNumData:            10000,
-		CurNumData:            0,
-		TrustedDataValidators: []string{acc2.String()},
-		Owner:                 acc1.String(),
-		Status:                ACTIVE,
+		DealId:         1,
+		DealAddress:    types.NewDealAddress(1).String(),
+		DataSchema:     []string{acc1.String()},
+		Budget:         &sdk.Coin{Denom: assets.MicroMedDenom, Amount: sdk.NewInt(1000000000)},
+		MaxNumData:     10000,
+		CurNumData:     0,
+		TrustedOracles: []string{acc2.String()},
+		Owner:          acc1.String(),
+		Status:         ACTIVE,
 	}
 }
 
-func makeTestCert(dataHash string, validatorAddress sdk.AccAddress, requesterAddress sdk.AccAddress) types.DataCert {
-	uCert := types.UnsignedDataCert{
-		DealId:               2,
-		DataHash:             []byte(dataHash),
-		EncryptedDataUrl:     []byte("https://panacea.org/a/123.json"),
-		DataValidatorAddress: validatorAddress.String(),
-		RequesterAddress:     requesterAddress.String(),
+func makeTestCert(dataHash string, oracleAddress sdk.AccAddress, requesterAddress sdk.AccAddress) types.DataValidationCertificate {
+	uCert := types.UnsignedDataValidationCertificate{
+		DealId:           2,
+		DataHash:         []byte(dataHash),
+		EncryptedDataUrl: []byte("https://panacea.org/a/123.json"),
+		OracleAddress:    oracleAddress.String(),
+		RequesterAddress: requesterAddress.String(),
 	}
 
 	marshal, err := uCert.Marshal()

@@ -12,7 +12,7 @@ message Deal {
   string deal_address = 2;
   repeated string data_schema = 3;
   cosmos.base.v1beta1.Coin budget = 4;
-  repeated string trusted_data_validators = 5;
+  repeated string trusted_oracles = 5;
   uint64 max_num_data = 6;
   uint64 cur_num_data = 7;
   string owner = 8;

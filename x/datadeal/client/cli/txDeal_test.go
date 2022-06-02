@@ -17,7 +17,7 @@ func TestReadDataCertFile(t *testing.T) {
 	require.Equal(t, parsedDataCert.UnsignedCert.GetDealId(), testCert.UnsignedCert.GetDealId())
 	require.Equal(t, parsedDataCert.UnsignedCert.GetDataHash(), testCert.UnsignedCert.GetDataHash())
 	require.Equal(t, parsedDataCert.UnsignedCert.GetEncryptedDataUrl(), testCert.UnsignedCert.GetEncryptedDataUrl())
-	require.Equal(t, parsedDataCert.UnsignedCert.GetDataValidatorAddress(), testCert.UnsignedCert.GetDataValidatorAddress())
+	require.Equal(t, parsedDataCert.UnsignedCert.GetOracleAddress(), testCert.UnsignedCert.GetOracleAddress())
 	require.Equal(t, parsedDataCert.UnsignedCert.GetRequesterAddress(), testCert.UnsignedCert.GetRequesterAddress())
 }
 
@@ -26,12 +26,12 @@ func makeTestCert() types.DataCert {
 	decodeDataHash, _ := base64.StdEncoding.DecodeString("ZGF0YUhhc2g=")
 	decodeURL, _ := base64.StdEncoding.DecodeString("ZW5jcnlwdGVkRGF0YVVSTA==")
 
-	unsignedDataCert := types.UnsignedDataCert{
-		DealId:               1,
-		DataHash:             decodeDataHash,
-		EncryptedDataUrl:     decodeURL,
-		DataValidatorAddress: "panacea1ugrau4qqr9446rpuj0srjrxspz02dd9nmlrjg3",
-		RequesterAddress:     "panacea1fpfugtgpzux8spqpe3kyqqpyy6rular2zlpusu",
+	unsignedDataValidationCertificate := types.UnsignedDataValidationCertificate{
+		DealId:           1,
+		DataHash:         decodeDataHash,
+		EncryptedDataUrl: decodeURL,
+		OracleAddress:    "panacea1ugrau4qqr9446rpuj0srjrxspz02dd9nmlrjg3",
+		RequesterAddress: "panacea1fpfugtgpzux8spqpe3kyqqpyy6rular2zlpusu",
 	}
 
 	decodeSig, _ := base64.StdEncoding.DecodeString("c2lnbmF0dXJl")
