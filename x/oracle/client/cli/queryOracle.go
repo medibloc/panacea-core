@@ -9,7 +9,7 @@ import (
 
 func CmdGetOracle() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "oracle [oracle-address]",
+		Use:   "oracle-node [oracle-address]",
 		Short: "Query a oracle",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
