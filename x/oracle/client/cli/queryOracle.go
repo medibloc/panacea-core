@@ -10,7 +10,7 @@ import (
 func CmdGetOracle() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "oracle-node [oracle-address]",
-		Short: "Query a oracle",
+		Short: "Query an oracle",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientQueryContext(cmd)
