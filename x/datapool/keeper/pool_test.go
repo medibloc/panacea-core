@@ -562,6 +562,8 @@ func (suite *poolTestSuite) TestSellData_impossible_status_pool() {
 	round := uint64(1)
 	dataHash := []byte("dataHash")
 
+	suite.setOracleAccount()
+
 	// Already activate status
 	pool := makeTestDataPool(poolID)
 	pool.Status = types.ACTIVE
