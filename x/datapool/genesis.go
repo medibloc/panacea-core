@@ -12,13 +12,6 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 	k.SetParams(ctx, genState.Params)
 	k.SetPoolNumber(ctx, genState.NextPoolNumber)
 
-	for _, oracle := range genState.Oracles {
-		err := k.SetOracle(ctx, oracle)
-		if err != nil {
-			panic(err)
-		}
-	}
-
 	for _, pool := range genState.Pools {
 		k.SetPool(ctx, &pool)
 	}
@@ -46,13 +39,6 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	genesis := types.DefaultGenesis()
 
 	genesis.NextPoolNumber = k.GetNextPoolNumber(ctx)
-
-	oracles, err := k.GetAllOracles(ctx)
-	if err != nil {
-		panic(err)
-	}
-
-	genesis.Oracles = append(genesis.Oracles, oracles...)
 
 	pools, err := k.GetAllPools(ctx)
 	if err != nil {

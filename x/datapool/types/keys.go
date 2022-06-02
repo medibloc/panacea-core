@@ -26,9 +26,6 @@ const (
 )
 
 var (
-	// KeyPrefixOracles defines key to store oracle
-	KeyPrefixOracles = []byte{0x01}
-
 	// KeyPoolNextNumber defines key to store next Pool ID to be used
 	KeyPoolNextNumber = []byte{0x02}
 
@@ -51,10 +48,6 @@ var (
 
 	KeyIndexSeparator = []byte{0xFF}
 )
-
-func GetKeyPrefixOracle(oracleAddr sdk.AccAddress) []byte {
-	return append(KeyPrefixOracles, oracleAddr.Bytes()...)
-}
 
 func GetKeyPrefixPools(poolID uint64) []byte {
 	return append(KeyPrefixPools, sdk.Uint64ToBigEndian(poolID)...)

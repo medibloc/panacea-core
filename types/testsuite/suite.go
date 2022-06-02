@@ -36,6 +36,9 @@ import (
 	"github.com/medibloc/panacea-core/v2/x/datapool"
 	datapoolkeeper "github.com/medibloc/panacea-core/v2/x/datapool/keeper"
 	datapooltypes "github.com/medibloc/panacea-core/v2/x/datapool/types"
+	"github.com/medibloc/panacea-core/v2/x/oracle"
+	oraclekeeper "github.com/medibloc/panacea-core/v2/x/oracle/keeper"
+	oracletypes "github.com/medibloc/panacea-core/v2/x/oracle/types"
 	tokenkeeper "github.com/medibloc/panacea-core/v2/x/token/keeper"
 	tokentypes "github.com/medibloc/panacea-core/v2/x/token/types"
 	"github.com/stretchr/testify/suite"
@@ -71,8 +74,10 @@ type TestSuite struct {
 	TokenKeeper       tokenkeeper.Keeper
 	DataDealKeeper    datadealkeeper.Keeper
 	DataDealMsgServer datadealtypes.MsgServer
-	DataPoolKeeper    datapoolkeeper.Keeper
 	DataPoolMsgServer datapooltypes.MsgServer
+	DataPoolKeeper    datapoolkeeper.Keeper
+	OracleKeeper      oraclekeeper.Keeper
+	OracleMsgServer   oracletypes.MsgServer
 	WasmKeeper        wasm.Keeper
 }
 
@@ -88,6 +93,7 @@ func (suite *TestSuite) SetupTest() {
 		tokentypes.StoreKey,
 		datadealtypes.StoreKey,
 		datapooltypes.StoreKey,
+		oracletypes.StoreKey,
 		wasm.StoreKey,
 		ibchost.StoreKey,
 		capabilitytypes.StoreKey,
@@ -244,6 +250,18 @@ func (suite *TestSuite) SetupTest() {
 
 	dataPoolGenState := datapooltypes.DefaultGenesis()
 	datapool.InitGenesis(suite.Ctx, suite.DataPoolKeeper, *dataPoolGenState)
+
+	suite.OracleKeeper = *oraclekeeper.NewKeeper(
+		cdc.Marshaler,
+		keyParams[datapooltypes.StoreKey],
+		memKeys[datapooltypes.MemStoreKey],
+		suite.AccountKeeper,
+	)
+
+	suite.OracleMsgServer = oraclekeeper.NewMsgServerImpl(suite.OracleKeeper)
+
+	oracleGenState := oracletypes.DefaultGenesis()
+	oracle.InitGenesis(suite.Ctx, suite.OracleKeeper, *oracleGenState)
 }
 
 func (suite *TestSuite) BeforeTest(suiteName, testName string) {
@@ -263,6 +281,7 @@ func newTestCodec() params.EncodingConfig {
 	didtypes.RegisterInterfaces(interfaceRegistry)
 	datadealtypes.RegisterInterfaces(interfaceRegistry)
 	datapooltypes.RegisterInterfaces(interfaceRegistry)
+	oracletypes.RegisterInterfaces(interfaceRegistry)
 	marshaler := codec.NewProtoCodec(interfaceRegistry)
 
 	return params.EncodingConfig{

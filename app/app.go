@@ -1,6 +1,9 @@
 package app
 
 import (
+	"github.com/medibloc/panacea-core/v2/x/oracle"
+	oraclekeeper "github.com/medibloc/panacea-core/v2/x/oracle/keeper"
+	oracletypes "github.com/medibloc/panacea-core/v2/x/oracle/types"
 	"io"
 	"net/http"
 	"os"
@@ -190,6 +193,7 @@ var (
 		wasm.AppModuleBasic{},
 		datadeal.AppModuleBasic{},
 		datapool.AppModuleBasic{},
+		oracle.AppModuleBasic{},
 	)
 
 	// module account permissions
@@ -265,6 +269,7 @@ type App struct {
 	wasmKeeper     wasm.Keeper
 	dataDealKeeper datadealkeeper.Keeper
 	dataPoolKeeper datapoolkeeper.Keeper
+	oracleKeeper   oraclekeeper.Keeper
 
 	// the module manager
 	mm *module.Manager
@@ -299,6 +304,7 @@ func New(
 		wasm.StoreKey,
 		datadealtypes.StoreKey,
 		datapooltypes.StoreKey,
+		oracletypes.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
@@ -458,6 +464,13 @@ func New(
 		app.wasmKeeper,
 	)
 
+	app.oracleKeeper = *oraclekeeper.NewKeeper(
+		appCodec,
+		keys[oracletypes.StoreKey],
+		keys[oracletypes.MemStoreKey],
+		app.AccountKeeper,
+	)
+
 	// The gov proposal types can be individually enabled
 	if len(enabledWasmProposals) != 0 {
 		govRouter.AddRoute(wasm.RouterKey, wasm.NewWasmProposalHandler(app.wasmKeeper, enabledWasmProposals))
@@ -511,6 +524,7 @@ func New(
 		wasm.NewAppModule(appCodec, &app.wasmKeeper, app.StakingKeeper),
 		datadeal.NewAppModule(appCodec, app.dataDealKeeper),
 		datapool.NewAppModule(appCodec, app.dataPoolKeeper),
+		oracle.NewAppModule(appCodec, app.oracleKeeper),
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -550,6 +564,7 @@ func New(
 		wasm.ModuleName,
 		datadealtypes.ModuleName,
 		datapooltypes.ModuleName,
+		oracletypes.ModuleName,
 	)
 
 	app.mm.RegisterInvariants(&app.CrisisKeeper)
@@ -762,6 +777,7 @@ func initParamsKeeper(appCodec codec.BinaryMarshaler, legacyAmino *codec.LegacyA
 	paramsKeeper.Subspace(wasm.ModuleName)
 	paramsKeeper.Subspace(datadealtypes.ModuleName)
 	paramsKeeper.Subspace(datapooltypes.ModuleName)
+	paramsKeeper.Subspace(oracletypes.ModuleName)
 
 	return paramsKeeper
 }

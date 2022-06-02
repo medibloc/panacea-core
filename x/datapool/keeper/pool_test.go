@@ -2,6 +2,7 @@ package keeper_test
 
 import (
 	"fmt"
+	oracletypes "github.com/medibloc/panacea-core/v2/x/oracle/types"
 	"io/ioutil"
 	"strconv"
 	"strings"
@@ -84,14 +85,14 @@ func (suite poolTestSuite) setupCreatePool(targetNumData, maxNftSupply uint64) u
 	err = suite.BankKeeper.AddCoins(suite.Ctx, oracle1, fundForOracle)
 	suite.Require().NoError(err)
 
-	suite.setOracleAccount()
-
-	oracle := types.Oracle{
+	oracle := oracletypes.Oracle{
 		Address:  oracle1.String(),
 		Endpoint: "https://my-oracle.org",
 	}
 
-	err = suite.DataPoolKeeper.RegisterOracle(suite.Ctx, oracle)
+	suite.setOracleAccount()
+
+	err = suite.OracleKeeper.RegisterOracle(suite.Ctx, oracle)
 	suite.Require().NoError(err)
 
 	newPoolParams := makePoolParamsWithOracle(targetNumData, maxNftSupply)
@@ -100,107 +101,6 @@ func (suite poolTestSuite) setupCreatePool(targetNumData, maxNftSupply uint64) u
 	suite.Require().NoError(err)
 
 	return poolID
-}
-
-func (suite *poolTestSuite) TestRegisterOracle() {
-	err := suite.BankKeeper.AddCoins(suite.Ctx, oracle1, fundForOracle)
-	suite.Require().NoError(err)
-
-	suite.setOracleAccount()
-
-	tempOracle := types.Oracle{
-		Address:  oracle1.String(),
-		Endpoint: "https://my-oracle.org",
-	}
-
-	err = suite.DataPoolKeeper.RegisterOracle(suite.Ctx, tempOracle)
-	suite.Require().NoError(err)
-}
-
-func (suite *poolTestSuite) setOracleAccount() {
-	oracleAccount := suite.AccountKeeper.NewAccountWithAddress(suite.Ctx, oracle1)
-	err := oracleAccount.SetPubKey(oraclePubKey)
-	suite.Require().NoError(err)
-	suite.AccountKeeper.SetAccount(suite.Ctx, oracleAccount)
-}
-
-func (suite *poolTestSuite) TestGetRegisterOracle() {
-	err := suite.BankKeeper.AddCoins(suite.Ctx, oracle1, fundForOracle)
-	suite.Require().NoError(err)
-
-	suite.setOracleAccount()
-
-	tempOracle := types.Oracle{
-		Address:  oracle1.String(),
-		Endpoint: "https://my-oracle.org",
-	}
-
-	err = suite.DataPoolKeeper.RegisterOracle(suite.Ctx, tempOracle)
-	suite.Require().NoError(err)
-
-	getOracle, err := suite.DataPoolKeeper.GetOracle(suite.Ctx, oracle1)
-	suite.Require().NoError(err)
-	suite.Require().Equal(tempOracle.Endpoint, getOracle.Endpoint)
-}
-
-func (suite *poolTestSuite) TestIsOracleDuplicate() {
-	err := suite.BankKeeper.AddCoins(suite.Ctx, oracle1, fundForOracle)
-	suite.Require().NoError(err)
-
-	suite.setOracleAccount()
-
-	tempOracle := types.Oracle{
-		Address:  oracle1.String(),
-		Endpoint: "https://my-oralce.org",
-	}
-
-	err = suite.DataPoolKeeper.RegisterOracle(suite.Ctx, tempOracle)
-	suite.Require().NoError(err)
-
-	err = suite.DataPoolKeeper.RegisterOracle(suite.Ctx, tempOracle)
-	suite.Require().Error(err, types.ErrOracleAlreadyExist)
-}
-
-func (suite *poolTestSuite) TestNotGetPubKey() {
-	err := suite.BankKeeper.AddCoins(suite.Ctx, oracle1, fundForOracle)
-	suite.Require().NoError(err)
-
-	tempOracle := types.Oracle{
-		Address:  oracle1.String(),
-		Endpoint: "https://my-oracle.org",
-	}
-
-	err = suite.DataPoolKeeper.RegisterOracle(suite.Ctx, tempOracle)
-	suite.Require().Error(err, sdkerrors.ErrKeyNotFound)
-}
-
-func (suite *poolTestSuite) TestUpdateOracle() {
-	err := suite.BankKeeper.AddCoins(suite.Ctx, oracle1, fundForOracle)
-	suite.Require().NoError(err)
-
-	suite.setOracleAccount()
-
-	tempOracle := types.Oracle{
-		Address:  oracle1.String(),
-		Endpoint: "https://my-oracle.org",
-	}
-
-	err = suite.DataPoolKeeper.RegisterOracle(suite.Ctx, tempOracle)
-	suite.Require().NoError(err)
-
-	updateTempOracle := types.Oracle{
-		Address:  oracle1.String(),
-		Endpoint: "https://update-my-oracle.org",
-	}
-
-	err = suite.DataPoolKeeper.UpdateOracle(suite.Ctx, oracle1, updateTempOracle.Endpoint)
-	suite.Require().NoError(err)
-
-	getOracle, err := suite.DataPoolKeeper.GetOracle(suite.Ctx, oracle1)
-	suite.Require().NoError(err)
-
-	suite.Require().Equal(getOracle.GetAddress(), updateTempOracle.GetAddress())
-	suite.Require().Equal(getOracle.GetEndpoint(), updateTempOracle.GetEndpoint())
 }
 
 func (suite *poolTestSuite) TestGetPool() {
@@ -662,8 +562,6 @@ func (suite *poolTestSuite) TestSellData_impossible_status_pool() {
 	round := uint64(1)
 	dataHash := []byte("dataHash")
 
-	suite.setOracleAccount()
-
 	// Already activate status
 	pool := makeTestDataPool(poolID)
 	pool.Status = types.ACTIVE
@@ -721,6 +619,13 @@ func makeTestDataCertificate(marshaler codec.Marshaler, poolID, round uint64, da
 		UnsignedCert: &unsignedCert,
 		Signature:    sign,
 	}, nil
+}
+
+func (suite *poolTestSuite) setOracleAccount() {
+	oracleAccount := suite.AccountKeeper.NewAccountWithAddress(suite.Ctx, oracle1)
+	err := oracleAccount.SetPubKey(oraclePubKey)
+	suite.Require().NoError(err)
+	suite.AccountKeeper.SetAccount(suite.Ctx, oracleAccount)
 }
 
 func makeTestDataPool(poolID uint64) *types.Pool {
