@@ -4,7 +4,7 @@
 ```shell
 CREATOR=$(panacead keys show {your deal creator} -a)
 
-panacead tx datadeal create-deal --deal-file {your deal json file path} --from $CREATOR --chain-id {your chain ID}
+panacead tx datadeal create-deal {your deal json file path} --from $CREATOR --chain-id {your chain ID}
 ```
 Deal JSON File Example
 ```json
@@ -24,7 +24,7 @@ Deal JSON File Example
 ```shell
 SELLER=$(panacead keys show {your seller} -a)
 
-panacead tx datadeal sell-data --data-cert-file {your data cert json file path} --from $SELLER --chain-id {your chain ID}
+panacead tx datadeal sell-data {your data cert json file path} --from $SELLER --chain-id {your chain ID}
 ```
 Data Verification Certificate JSON File Example
 ```json

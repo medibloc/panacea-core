@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"context"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/medibloc/panacea-core/v2/x/datadeal/types"
 )
@@ -22,11 +23,11 @@ func (m msgServer) CreateDeal(goCtx context.Context, msg *types.MsgCreateDeal) (
 		return nil, err
 	}
 
-	newDealId, err := m.Keeper.CreateNewDeal(ctx, owner, deal)
+	newDealID, err := m.Keeper.CreateDeal(ctx, owner, deal)
 	if err != nil {
 		return nil, err
 	}
-	return &types.MsgCreateDealResponse{DealId: newDealId}, nil
+	return &types.MsgCreateDealResponse{DealId: newDealID}, nil
 }
 
 func (m msgServer) SellData(goCtx context.Context, msg *types.MsgSellData) (*types.MsgSellDataResponse, error) {
@@ -47,7 +48,7 @@ func (m msgServer) SellData(goCtx context.Context, msg *types.MsgSellData) (*typ
 		return nil, err
 	}
 
-	reward, err := m.Keeper.SellOwnData(ctx, seller, *msg.Cert)
+	reward, err := m.Keeper.SellData(ctx, seller, *msg.Cert)
 	if err != nil {
 		return nil, err
 	}
@@ -63,10 +64,10 @@ func (m msgServer) DeactivateDeal(goCtx context.Context, msg *types.MsgDeactivat
 		return nil, err
 	}
 
-	deactivatedDealId, err := m.Keeper.DeactivateDeal(ctx, msg.DealId, requester)
+	deactivatedDealID, err := m.Keeper.DeactivateDeal(ctx, msg.DealId, requester)
 	if err != nil {
 		return nil, err
 	}
 
-	return &types.MsgDeactivateDealResponse{DealId: deactivatedDealId}, nil
+	return &types.MsgDeactivateDealResponse{DealId: deactivatedDealID}, nil
 }

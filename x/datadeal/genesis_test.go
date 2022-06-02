@@ -1,6 +1,8 @@
 package datadeal_test
 
 import (
+	"testing"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/medibloc/panacea-core/v2/types/assets"
 	"github.com/medibloc/panacea-core/v2/types/testsuite"
@@ -8,7 +10,6 @@ import (
 	"github.com/medibloc/panacea-core/v2/x/datadeal/types"
 	"github.com/stretchr/testify/suite"
 	"github.com/tendermint/tendermint/crypto/secp256k1"
-	"testing"
 )
 
 var (
@@ -34,16 +35,18 @@ func (suite *genesisTestSuite) TestDataDealInitGenesis() {
 	stringDataCertificateKey := string(dataCertificateKey)
 
 	datadeal.InitGenesis(suite.Ctx, suite.DataDealKeeper, types.GenesisState{
-		Deals: map[uint64]*types.Deal{
-			newDeal.GetDealId(): &newDeal,
+		Deals: map[uint64]types.Deal{
+			newDeal.GetDealId(): newDeal,
 		},
-		DataCertificates: map[string]*types.DataValidationCertificate{
-			stringDataCertificateKey: &newDataCert,
+		DataCertificates: map[string]types.DataValidationCertificate{
+			stringDataCertificateKey: newDataCert,
 		},
 		NextDealNumber: 2,
 	})
 
-	suite.Require().Equal(suite.DataDealKeeper.GetNextDealNumberAndIncrement(suite.Ctx), uint64(2))
+	nextNum, err := suite.DataDealKeeper.GetNextDealNumberAndIncrement(suite.Ctx)
+	suite.Require().NoError(err)
+	suite.Require().Equal(nextNum, uint64(2))
 
 	dealStored, err := suite.DataDealKeeper.GetDeal(suite.Ctx, 1)
 	suite.Require().NoError(err)
@@ -78,11 +81,11 @@ func (suite *genesisTestSuite) TestDataDealExportGenesis() {
 	stringDataCertificateKey := string(dataCertificateKey)
 
 	datadeal.InitGenesis(suite.Ctx, suite.DataDealKeeper, types.GenesisState{
-		Deals: map[uint64]*types.Deal{
-			newDeal.GetDealId(): &newDeal,
+		Deals: map[uint64]types.Deal{
+			newDeal.GetDealId(): newDeal,
 		},
-		DataCertificates: map[string]*types.DataValidationCertificate{
-			stringDataCertificateKey: &newDataCert,
+		DataCertificates: map[string]types.DataValidationCertificate{
+			stringDataCertificateKey: newDataCert,
 		},
 		NextDealNumber: 2,
 	})
@@ -98,11 +101,11 @@ func (suite *genesisTestSuite) TestDataDealExportGenesis() {
 		Owner:          acc1.String(),
 	}
 
-	_, err = suite.DataDealKeeper.CreateNewDeal(suite.Ctx, acc1, tempDeal)
+	_, err = suite.DataDealKeeper.CreateDeal(suite.Ctx, acc1, tempDeal)
 	suite.Require().NoError(err)
 
 	newDataCert2 := makeTestDataCert2()
-	_, err = suite.DataDealKeeper.SellOwnData(suite.Ctx, acc2, newDataCert2)
+	_, err = suite.DataDealKeeper.SellData(suite.Ctx, acc2, newDataCert2)
 	suite.Require().NoError(err)
 
 	genesis := datadeal.ExportGenesis(suite.Ctx, suite.DataDealKeeper)

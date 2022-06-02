@@ -2,18 +2,15 @@ package cli
 
 import (
 	"encoding/base64"
+	"testing"
+
 	"github.com/medibloc/panacea-core/v2/x/datadeal/types"
 	"github.com/stretchr/testify/require"
-	"testing"
 )
 
-func TestParseSellDataFlags(t *testing.T) {
-	flags := CmdSellData().Flags()
-	err := flags.Set(DataVerificationCertificateFile, "./testdata/data_certificate_file.json")
-	require.NoError(t, err)
-
+func TestReadDataCertFile(t *testing.T) {
 	testCert := makeTestCert()
-	parsedDataCert, err := parseSellDataFlags(flags)
+	parsedDataCert, err := readDataCertFile("./testdata/data_certificate_file.json")
 	require.NoError(t, err)
 
 	require.Equal(t, parsedDataCert.GetSignature(), testCert.GetSignature())

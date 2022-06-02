@@ -58,13 +58,14 @@ func (suite *dealTestSuite) TestCreateNewDeal() {
 	owner, err := sdk.AccAddressFromBech32(tempDeal.GetOwner())
 	suite.Require().NoError(err)
 
-	dealId, err := suite.DataDealKeeper.CreateNewDeal(suite.Ctx, owner, tempDeal)
+	dealID, err := suite.DataDealKeeper.CreateDeal(suite.Ctx, owner, tempDeal)
 	suite.Require().NoError(err)
 
-	expectedId := suite.DataDealKeeper.GetNextDealNumberAndIncrement(suite.Ctx) - 1
-	suite.Require().Equal(dealId, expectedId)
+	expectedId, err := suite.DataDealKeeper.GetNextDealNumberAndIncrement(suite.Ctx)
+	suite.Require().NoError(err)
+	suite.Require().Equal(dealID, expectedId-uint64(1))
 
-	deal, err := suite.DataDealKeeper.GetDeal(suite.Ctx, dealId)
+	deal, err := suite.DataDealKeeper.GetDeal(suite.Ctx, dealID)
 	suite.Require().NoError(err)
 	suite.Require().Equal(deal.GetDataSchema(), tempDeal.GetDataSchema())
 	suite.Require().Equal(deal.GetBudget(), tempDeal.GetBudget())
@@ -106,19 +107,19 @@ func (suite *dealTestSuite) TestListDeals() {
 	owner, err := sdk.AccAddressFromBech32(tempDeal.GetOwner())
 	suite.Require().NoError(err)
 
-	dealIds := make([]uint64, 0)
+	dealIDs := make([]uint64, 0)
 
 	for i := 0; i < 5; i++ {
-		dealId, err := suite.DataDealKeeper.CreateNewDeal(suite.Ctx, owner, tempDeal)
+		dealID, err := suite.DataDealKeeper.CreateDeal(suite.Ctx, owner, tempDeal)
 		suite.Require().NoError(err)
-		dealIds = append(dealIds, dealId)
+		dealIDs = append(dealIDs, dealID)
 	}
 
 	deals, err := suite.DataDealKeeper.ListDeals(suite.Ctx)
 	suite.Require().NoError(err)
 
-	for i, dealId := range dealIds {
-		deal, err := suite.DataDealKeeper.GetDeal(suite.Ctx, dealId)
+	for i, dealID := range dealIDs {
+		deal, err := suite.DataDealKeeper.GetDeal(suite.Ctx, dealID)
 		suite.Require().NoError(err)
 
 		suite.Require().Equal(deal.GetDealId(), deals[i+1].GetDealId())
@@ -148,13 +149,13 @@ func (suite *dealTestSuite) TestGetBalanceOfDeal() {
 	owner, err := sdk.AccAddressFromBech32(tempDeal.GetOwner())
 	suite.Require().NoError(err)
 
-	dealId, err := suite.DataDealKeeper.CreateNewDeal(suite.Ctx, owner, tempDeal)
+	dealID, err := suite.DataDealKeeper.CreateDeal(suite.Ctx, owner, tempDeal)
 	suite.Require().NoError(err)
 
-	deal, err := suite.DataDealKeeper.GetDeal(suite.Ctx, dealId)
+	deal, err := suite.DataDealKeeper.GetDeal(suite.Ctx, dealID)
 	suite.Require().NoError(err)
 
-	addr, err := types.AccDealAddressFromBech32(deal.GetDealAddress())
+	addr, err := sdk.AccAddressFromBech32(deal.GetDealAddress())
 	suite.Require().NoError(err)
 
 	balance := suite.BankKeeper.GetBalance(suite.Ctx, addr, assets.MicroMedDenom)
@@ -179,21 +180,21 @@ func (suite *dealTestSuite) TestSellOwnData() {
 		Owner:          acc1.String(),
 	}
 
-	newDealId, err := suite.DataDealKeeper.CreateNewDeal(suite.Ctx, acc1, tempDeal)
+	newDealID, err := suite.DataDealKeeper.CreateDeal(suite.Ctx, acc1, tempDeal)
 	suite.Require().NoError(err)
 
-	deal, err := suite.DataDealKeeper.GetDeal(suite.Ctx, newDealId)
+	deal, err := suite.DataDealKeeper.GetDeal(suite.Ctx, newDealID)
 	suite.Require().NoError(err)
 
 	cert := makeTestCert("1a312c1223x2fs3", newAddr, acc3)
-	reward, err := suite.DataDealKeeper.SellOwnData(suite.Ctx, acc3, cert)
+	reward, err := suite.DataDealKeeper.SellData(suite.Ctx, acc3, cert)
 	suite.Require().NoError(err)
 	suite.Require().Equal(cert.UnsignedCert.GetDealId(), deal.GetDealId())
 
 	sellerBalance := suite.BankKeeper.GetBalance(suite.Ctx, acc3, assets.MicroMedDenom)
 	suite.Require().Equal(sellerBalance, reward)
 
-	updatedDeal, err := suite.DataDealKeeper.GetDeal(suite.Ctx, newDealId)
+	updatedDeal, err := suite.DataDealKeeper.GetDeal(suite.Ctx, newDealID)
 	suite.Require().NoError(err)
 	suite.Require().Equal(updatedDeal.GetCurNumData(), deal.GetCurNumData()+1)
 }
@@ -213,15 +214,15 @@ func (suite *dealTestSuite) TestIsDataCertDuplicate() {
 		Owner:          acc1.String(),
 	}
 
-	_, err = suite.DataDealKeeper.CreateNewDeal(suite.Ctx, acc1, tempDeal)
+	_, err = suite.DataDealKeeper.CreateDeal(suite.Ctx, acc1, tempDeal)
 	suite.Require().NoError(err)
 
 	testCert1 := makeTestCert("1a312c1223x", newAddr, acc3)
-	_, err = suite.DataDealKeeper.SellOwnData(suite.Ctx, acc3, testCert1)
+	_, err = suite.DataDealKeeper.SellData(suite.Ctx, acc3, testCert1)
 	suite.Require().NoError(err)
 
 	testCert2 := makeTestCert("1a312c1223x", newAddr, acc3)
-	_, err = suite.DataDealKeeper.SellOwnData(suite.Ctx, acc3, testCert2)
+	_, err = suite.DataDealKeeper.SellData(suite.Ctx, acc3, testCert2)
 	suite.Require().Error(err, types.ErrDataAlreadyExist)
 }
 
@@ -243,11 +244,11 @@ func (suite *dealTestSuite) TestIsTrustedOracles_Invalid() {
 		Owner:          acc1.String(),
 	}
 
-	_, err = suite.DataDealKeeper.CreateNewDeal(suite.Ctx, acc1, tempDeal)
+	_, err = suite.DataDealKeeper.CreateDeal(suite.Ctx, acc1, tempDeal)
 	suite.Require().NoError(err)
 
 	testCert1 := makeTestCert("1a312c1223x2fs3", newAddr, acc3)
-	_, err = suite.DataDealKeeper.SellOwnData(suite.Ctx, acc3, testCert1)
+	_, err = suite.DataDealKeeper.SellData(suite.Ctx, acc3, testCert1)
 	suite.Require().Error(err, sdkerrors.ErrInvalidAddress)
 }
 
@@ -266,16 +267,16 @@ func (suite *dealTestSuite) TestDealStatusInactiveOrCompleted() {
 		Owner:          acc1.String(),
 	}
 
-	dealId, err := suite.DataDealKeeper.CreateNewDeal(suite.Ctx, acc1, tempDeal)
+	dealID, err := suite.DataDealKeeper.CreateDeal(suite.Ctx, acc1, tempDeal)
 	suite.Require().NoError(err)
-	findDeal, err := suite.DataDealKeeper.GetDeal(suite.Ctx, dealId)
+	findDeal, err := suite.DataDealKeeper.GetDeal(suite.Ctx, dealID)
 	suite.Require().NoError(err)
 
 	findDeal.Status = INACTIVE
 	suite.DataDealKeeper.SetDeal(suite.Ctx, findDeal)
 
 	testCert1 := makeTestCert("1a312c1223x2fs3", newAddr, acc3)
-	_, err = suite.DataDealKeeper.SellOwnData(suite.Ctx, acc3, testCert1)
+	_, err = suite.DataDealKeeper.SellData(suite.Ctx, acc3, testCert1)
 	suite.Require().Error(err, types.ErrInvalidStatus)
 
 	findDeal.Status = COMPLETED
@@ -318,18 +319,18 @@ func (suite *dealTestSuite) TestIsDealStatusCompleted() {
 		Owner:          acc1.String(),
 	}
 
-	dealId, err := suite.DataDealKeeper.CreateNewDeal(suite.Ctx, acc1, tempDeal)
+	dealID, err := suite.DataDealKeeper.CreateDeal(suite.Ctx, acc1, tempDeal)
 	suite.Require().NoError(err)
 
 	testCert1 := makeTestCert("1a312c1223x2fs3", newAddr, acc3)
-	_, err = suite.DataDealKeeper.SellOwnData(suite.Ctx, acc3, testCert1)
+	_, err = suite.DataDealKeeper.SellData(suite.Ctx, acc3, testCert1)
 	suite.Require().NoError(err)
 
 	testCert2 := makeTestCert("1a312c1223x", newAddr, acc2)
-	_, err = suite.DataDealKeeper.SellOwnData(suite.Ctx, acc2, testCert2)
+	_, err = suite.DataDealKeeper.SellData(suite.Ctx, acc2, testCert2)
 	suite.Require().NoError(err)
 
-	updatedDeal, err := suite.DataDealKeeper.GetDeal(suite.Ctx, dealId)
+	updatedDeal, err := suite.DataDealKeeper.GetDeal(suite.Ctx, dealID)
 	suite.Require().NoError(err)
 
 	suite.Require().Equal(updatedDeal.GetStatus(), COMPLETED)
@@ -350,14 +351,14 @@ func (suite *dealTestSuite) TestGetDataCertificate() {
 		Owner:          acc1.String(),
 	}
 
-	newDealId, err := suite.DataDealKeeper.CreateNewDeal(suite.Ctx, acc1, tempDeal)
+	newDealID, err := suite.DataDealKeeper.CreateDeal(suite.Ctx, acc1, tempDeal)
 	suite.Require().NoError(err)
 
 	cert := makeTestCert("1a312c1223x2fs3", newAddr, acc3)
-	_, err = suite.DataDealKeeper.GetDeal(suite.Ctx, newDealId)
+	_, err = suite.DataDealKeeper.GetDeal(suite.Ctx, newDealID)
 	suite.Require().NoError(err)
 
-	_, err = suite.DataDealKeeper.SellOwnData(suite.Ctx, acc3, cert)
+	_, err = suite.DataDealKeeper.SellData(suite.Ctx, acc3, cert)
 	suite.Require().NoError(err)
 
 	getCertificate, err := suite.DataDealKeeper.GetDataCertificate(suite.Ctx, cert)
@@ -386,11 +387,11 @@ func (suite *dealTestSuite) TestListDataCertificates() {
 		Owner:          acc1.String(),
 	}
 
-	newDealId, err := suite.DataDealKeeper.CreateNewDeal(suite.Ctx, acc1, tempDeal)
+	newDealID, err := suite.DataDealKeeper.CreateDeal(suite.Ctx, acc1, tempDeal)
 	suite.Require().NoError(err)
 
 	cert := makeTestCert("1a312c1223x2fs3", newAddr, acc3)
-	_, err = suite.DataDealKeeper.GetDeal(suite.Ctx, newDealId)
+	_, err = suite.DataDealKeeper.GetDeal(suite.Ctx, newDealID)
 	suite.Require().NoError(err)
 
 	dataCertificates := make([]types.DataValidationCertificate, 0)
@@ -427,29 +428,29 @@ func (suite *dealTestSuite) TestDeactivateDeal() {
 		Owner:          acc1.String(),
 	}
 
-	dealId, err := suite.DataDealKeeper.CreateNewDeal(suite.Ctx, acc1, tempDeal)
+	dealID, err := suite.DataDealKeeper.CreateDeal(suite.Ctx, acc1, tempDeal)
 	suite.Require().NoError(err)
 
 	testCert := makeTestCert("1a312c1223x2fs3", newAddr, acc3)
-	_, err = suite.DataDealKeeper.SellOwnData(suite.Ctx, acc3, testCert)
+	_, err = suite.DataDealKeeper.SellData(suite.Ctx, acc3, testCert)
 	suite.Require().NoError(err)
 
-	findDeal, err := suite.DataDealKeeper.GetDeal(suite.Ctx, dealId)
+	findDeal, err := suite.DataDealKeeper.GetDeal(suite.Ctx, dealID)
 	suite.Require().NoError(err)
 
-	dealAddress, err := types.AccDealAddressFromBech32(findDeal.GetDealAddress())
+	dealAddress, err := sdk.AccAddressFromBech32(findDeal.GetDealAddress())
 	suite.Require().NoError(err)
 
 	dealBalance := suite.BankKeeper.GetBalance(suite.Ctx, dealAddress, assets.MicroMedDenom)
 
 	beforeDeactivateBalance := suite.BankKeeper.GetBalance(suite.Ctx, acc1, assets.MicroMedDenom)
 
-	deactivatedDealId, err := suite.DataDealKeeper.DeactivateDeal(suite.Ctx, dealId, acc1)
+	deactivatedDealID, err := suite.DataDealKeeper.DeactivateDeal(suite.Ctx, dealID, acc1)
 	suite.Require().NoError(err)
 
 	newAcc1Balance := suite.BankKeeper.GetBalance(suite.Ctx, acc1, assets.MicroMedDenom)
 
-	suite.Require().Equal(deactivatedDealId, dealId)
+	suite.Require().Equal(deactivatedDealID, dealID)
 
 	suite.Require().Equal(newAcc1Balance, beforeDeactivateBalance.Add(dealBalance))
 }
@@ -469,14 +470,14 @@ func (suite *dealTestSuite) TestIsNotEqualOwner() {
 		Owner:          acc1.String(),
 	}
 
-	dealId, err := suite.DataDealKeeper.CreateNewDeal(suite.Ctx, acc1, tempDeal)
+	dealID, err := suite.DataDealKeeper.CreateDeal(suite.Ctx, acc1, tempDeal)
 	suite.Require().NoError(err)
 
 	testCert := makeTestCert("1a312c1223x2fs3", newAddr, acc3)
-	_, err = suite.DataDealKeeper.SellOwnData(suite.Ctx, acc3, testCert)
+	_, err = suite.DataDealKeeper.SellData(suite.Ctx, acc3, testCert)
 	suite.Require().NoError(err)
 
-	_, err = suite.DataDealKeeper.DeactivateDeal(suite.Ctx, dealId, acc2)
+	_, err = suite.DataDealKeeper.DeactivateDeal(suite.Ctx, dealID, acc2)
 	suite.Require().Error(err, "the owner of deal and requester is not equal")
 }
 
@@ -495,16 +496,16 @@ func (suite *dealTestSuite) TestDealIsNotActive() {
 		Owner:          acc1.String(),
 	}
 
-	dealId, err := suite.DataDealKeeper.CreateNewDeal(suite.Ctx, acc1, tempDeal)
+	dealID, err := suite.DataDealKeeper.CreateDeal(suite.Ctx, acc1, tempDeal)
 	suite.Require().NoError(err)
 
-	findDeal, err := suite.DataDealKeeper.GetDeal(suite.Ctx, dealId)
+	findDeal, err := suite.DataDealKeeper.GetDeal(suite.Ctx, dealID)
 	suite.Require().NoError(err)
 
 	findDeal.Status = INACTIVE
 	suite.DataDealKeeper.SetDeal(suite.Ctx, findDeal)
 
-	_, err = suite.DataDealKeeper.DeactivateDeal(suite.Ctx, dealId, acc1)
+	_, err = suite.DataDealKeeper.DeactivateDeal(suite.Ctx, dealID, acc1)
 	suite.Require().Error(err, types.ErrInvalidStatus)
 	suite.Require().Error(err, "the deal's status is not activated")
 
@@ -514,14 +515,14 @@ func (suite *dealTestSuite) TestDealIsNotActive() {
 	dataHash := "123456"
 	for i := 0; i < 10; i++ {
 		cert := makeTestCert(dataHash+strconv.Itoa(i), newAddr, acc1)
-		_, err := suite.DataDealKeeper.SellOwnData(suite.Ctx, acc1, cert)
+		_, err := suite.DataDealKeeper.SellData(suite.Ctx, acc1, cert)
 		suite.Require().NoError(err)
 	}
 
-	completedDeal, err := suite.DataDealKeeper.GetDeal(suite.Ctx, dealId)
+	completedDeal, err := suite.DataDealKeeper.GetDeal(suite.Ctx, dealID)
 	suite.Require().NoError(err)
 
-	_, err = suite.DataDealKeeper.DeactivateDeal(suite.Ctx, dealId, acc1)
+	_, err = suite.DataDealKeeper.DeactivateDeal(suite.Ctx, dealID, acc1)
 	suite.Require().Error(err, types.ErrInvalidStatus)
 	suite.Require().Equal(completedDeal.GetStatus(), COMPLETED)
 	suite.Require().Error(err, "the deal's status is not activated")

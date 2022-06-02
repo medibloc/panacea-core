@@ -11,28 +11,25 @@ import (
 	"github.com/medibloc/panacea-core/v2/x/datadeal/types"
 )
 
-const (
-	ACTIVE    = "ACTIVE"    // When deal is activated.
-	INACTIVE  = "INACTIVE"  // When deal is deactivated.
-	COMPLETED = "COMPLETED" // When deal is completed.
-)
+func (k Keeper) CreateDeal(ctx sdk.Context, owner sdk.AccAddress, deal types.Deal) (uint64, error) {
+	dealID, err := k.GetNextDealNumberAndIncrement(ctx)
+	if err != nil {
+		return 0, sdkerrors.Wrapf(err, "failed to get next deal num")
+	}
 
-func (k Keeper) CreateNewDeal(ctx sdk.Context, owner sdk.AccAddress, deal types.Deal) (uint64, error) {
-	dealId := k.GetNextDealNumberAndIncrement(ctx)
-
-	newDeal := newDeal(dealId, deal)
+	newDeal := types.NewDeal(dealID, deal)
 
 	var coins sdk.Coins
 	coins = append(coins, *deal.GetBudget())
 
-	dealAddress, err := types.AccDealAddressFromBech32(newDeal.GetDealAddress())
+	dealAddress, err := sdk.AccAddressFromBech32(newDeal.GetDealAddress())
 	if err != nil {
 		return 0, err
 	}
 
 	acc := k.accountKeeper.GetAccount(ctx, dealAddress)
 	if acc != nil {
-		return 0, sdkerrors.Wrapf(types.ErrDealAlreadyExist, "deal %d already exist", dealId)
+		return 0, sdkerrors.Wrapf(types.ErrDealAlreadyExist, "deal %d already exist", dealID)
 	}
 
 	k.SetDeal(ctx, newDeal)
@@ -49,26 +46,8 @@ func (k Keeper) CreateNewDeal(ctx sdk.Context, owner sdk.AccAddress, deal types.
 	if err != nil {
 		return 0, sdkerrors.Wrapf(types.ErrNotEnoughBalance, "The owner's balance is not enough to make deal")
 	}
+
 	return newDeal.GetDealId(), nil
-}
-
-func newDeal(dealId uint64, deal types.Deal) types.Deal {
-
-	dealAddress := types.NewDealAddress(dealId)
-
-	newDeal := &types.Deal{
-		DealId:         dealId,
-		DealAddress:    dealAddress.String(),
-		DataSchema:     deal.GetDataSchema(),
-		Budget:         deal.GetBudget(),
-		TrustedOracles: deal.GetTrustedOracles(),
-		MaxNumData:     deal.GetMaxNumData(),
-		CurNumData:     0,
-		Owner:          deal.GetOwner(),
-		Status:         ACTIVE,
-	}
-
-	return *newDeal
 }
 
 func (k Keeper) SetNextDealNumber(ctx sdk.Context, dealNumber uint64) {
@@ -77,37 +56,44 @@ func (k Keeper) SetNextDealNumber(ctx sdk.Context, dealNumber uint64) {
 	store.Set(types.KeyDealNextNumber, bz)
 }
 
-func (k Keeper) GetNextDealNumber(ctx sdk.Context) uint64 {
+func (k Keeper) GetNextDealNumber(ctx sdk.Context) (uint64, error) {
 	var dealNumber uint64
 	store := ctx.KVStore(k.storeKey)
 
-	bz := store.Get(types.KeyDealNextNumber)
-	if bz == nil {
-		panic(fmt.Errorf("deal has not been initialized -- Should have been done in InitGenesis"))
-	} else {
-		val := gogotypes.UInt64Value{}
-
-		err := k.cdc.UnmarshalBinaryLengthPrefixed(bz, &val)
-		if err != nil {
-			panic(err)
-		}
-
-		dealNumber = val.GetValue()
+	if !store.Has(types.KeyDealNextNumber) {
+		return 0, types.ErrDealNotInitialized
 	}
-	return dealNumber
+
+	bz := store.Get(types.KeyDealNextNumber)
+
+	val := gogotypes.UInt64Value{}
+
+	err := k.cdc.UnmarshalBinaryLengthPrefixed(bz, &val)
+	if err != nil {
+		return 0, err
+	}
+
+	dealNumber = val.GetValue()
+
+	return dealNumber, nil
 }
 
-func (k Keeper) GetNextDealNumberAndIncrement(ctx sdk.Context) uint64 {
-	dealNumber := k.GetNextDealNumber(ctx)
+func (k Keeper) GetNextDealNumberAndIncrement(ctx sdk.Context) (uint64, error) {
+	dealNumber, err := k.GetNextDealNumber(ctx)
+	if err != nil {
+		return 0, err
+	}
+
 	k.SetNextDealNumber(ctx, dealNumber+1)
-	return dealNumber
+
+	return dealNumber, nil
 }
 
-func (k Keeper) GetDeal(ctx sdk.Context, dealId uint64) (types.Deal, error) {
+func (k Keeper) GetDeal(ctx sdk.Context, dealID uint64) (types.Deal, error) {
 	store := ctx.KVStore(k.storeKey)
-	dealKey := types.GetKeyPrefixDeals(dealId)
+	dealKey := types.GetKeyPrefixDeals(dealID)
 	if !store.Has(dealKey) {
-		return types.Deal{}, sdkerrors.Wrapf(types.ErrDealNotFound, "deal with ID %d does not exist", dealId)
+		return types.Deal{}, sdkerrors.Wrapf(types.ErrDealNotFound, "deal with ID %d does not exist", dealID)
 	}
 
 	bz := store.Get(dealKey)
@@ -150,79 +136,82 @@ func (k Keeper) ListDeals(ctx sdk.Context) ([]types.Deal, error) {
 	return deals, nil
 }
 
-func (k Keeper) SellOwnData(ctx sdk.Context, seller sdk.AccAddress, cert types.DataValidationCertificate) (sdk.Coin, error) {
-	err := k.isDataCertDuplicate(ctx, cert)
+func (k Keeper) SellData(ctx sdk.Context, seller sdk.AccAddress, cert types.DataValidationCertificate) (sdk.Coin, error) {
+	if k.isDuplicatedData(ctx, cert) {
+		return sdk.Coin{}, types.ErrDataAlreadyExist
+	}
+
+	deal, err := k.GetDeal(ctx, cert.UnsignedCert.GetDealId())
 	if err != nil {
 		return sdk.Coin{}, err
 	}
 
-	findDeal, err := k.GetDeal(ctx, cert.UnsignedCert.GetDealId())
+	if deal.GetStatus() != types.ACTIVE {
+		return sdk.Coin{}, sdkerrors.Wrapf(types.ErrInvalidStatus, "%s", deal.GetStatus())
+	}
+
+	dealAddress, err := sdk.AccAddressFromBech32(deal.GetDealAddress())
 	if err != nil {
 		return sdk.Coin{}, err
 	}
 
-	if findDeal.GetStatus() != ACTIVE {
-		return sdk.Coin{}, sdkerrors.Wrapf(types.ErrInvalidStatus, "%s", findDeal.GetStatus())
+	if !k.isTrustedOracle(cert, deal) {
+		return sdk.Coin{}, types.ErrInvalidDataVal
 	}
 
-	dealAddress, err := types.AccDealAddressFromBech32(findDeal.GetDealAddress())
-	if err != nil {
-		return sdk.Coin{}, err
-	}
+	//TODO: Fields max_num_data and cur_num_data will be changed in next data datadeal model.
+	totalBudget := deal.GetBudget().Amount.ToDec()
+	maxNumData := sdk.NewIntFromUint64(deal.GetMaxNumData()).ToDec()
+	pricePerData := totalBudget.Quo(maxNumData).TruncateInt()
 
-	err = k.isTrustedOracle(cert, findDeal)
-	if err != nil {
-		return sdk.Coin{}, err
-	}
-
-	totalAmount := findDeal.GetBudget().Amount.Uint64()
-	countOfData := findDeal.GetMaxNumData()
-	pricePerData := sdk.NewCoin(assets.MicroMedDenom, sdk.NewIntFromUint64(totalAmount/countOfData))
+	reward := sdk.NewCoin(assets.MicroMedDenom, pricePerData)
 
 	dealBalance := k.bankKeeper.GetBalance(ctx, dealAddress, assets.MicroMedDenom)
-	if dealBalance.IsLT(pricePerData) {
+	if dealBalance.IsLT(reward) {
 		return sdk.Coin{}, fmt.Errorf("deal's balance is smaller than reward")
 	}
 
-	coins := append(sdk.Coins{}, pricePerData)
+	coins := append(sdk.Coins{}, reward)
 
 	err = k.bankKeeper.SendCoins(ctx, dealAddress, seller, coins)
 	if err != nil {
 		return sdk.Coin{}, sdkerrors.Wrapf(types.ErrNotEnoughBalance, "The deal's balance is not enough to make deal")
 	}
 
-	k.SetDataCertificate(ctx, findDeal.GetDealId(), cert)
-	SetCurNumData(&findDeal)
+	k.SetDataCertificate(ctx, deal.GetDealId(), cert)
+	SetCurNumData(&deal)
 
-	if findDeal.GetCurNumData() == findDeal.GetMaxNumData() {
-		SetStatusCompleted(&findDeal)
+	if deal.GetCurNumData() == deal.GetMaxNumData() {
+		SetStatusCompleted(&deal)
 	}
 
-	k.SetDeal(ctx, findDeal)
-	return pricePerData, nil
+	k.SetDeal(ctx, deal)
+
+	return reward, nil
 }
 
-func (k Keeper) isDataCertDuplicate(ctx sdk.Context, cert types.DataValidationCertificate) error {
+func (k Keeper) isDuplicatedData(ctx sdk.Context, cert types.DataValidationCertificate) bool {
 	store := ctx.KVStore(k.storeKey)
 	dataCertKey := types.GetKeyPrefixDataCertificate(cert.UnsignedCert.GetDealId(), cert.UnsignedCert.GetDataHash())
 
-	if store.Has(dataCertKey) {
-		return sdkerrors.Wrapf(types.ErrDataAlreadyExist, "data %s is already exist.", dataCertKey)
-	}
-
-	return nil
+	return store.Has(dataCertKey)
 }
 
-func (k Keeper) isTrustedOracle(cert types.DataValidationCertificate, findDeal types.Deal) error {
+func (k Keeper) isTrustedOracle(cert types.DataValidationCertificate, findDeal types.Deal) bool {
 	oracle := cert.UnsignedCert.GetOracleAddress()
 	trustedOracles := findDeal.GetTrustedOracles()
 
+	if len(trustedOracles) == 0 {
+		return true
+	}
+
 	for _, v := range trustedOracles {
 		if oracle == v {
-			return nil
+			return true
 		}
 	}
-	return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "invalid oracle address")
+
+	return false
 }
 
 func (k Keeper) GetDataCertificate(ctx sdk.Context, cert types.DataValidationCertificate) (types.DataValidationCertificate, error) {
@@ -263,10 +252,10 @@ func (k Keeper) ListDataCertificates(ctx sdk.Context) ([]types.DataValidationCer
 	return dataCertificates, nil
 }
 
-func (k Keeper) SetDataCertificate(ctx sdk.Context, dealId uint64, cert types.DataValidationCertificate) {
+func (k Keeper) SetDataCertificate(ctx sdk.Context, dealID uint64, cert types.DataValidationCertificate) {
 	store := ctx.KVStore(k.storeKey)
 	dataHash := cert.UnsignedCert.GetDataHash()
-	dataCertificateKey := types.GetKeyPrefixDataCertificate(dealId, dataHash)
+	dataCertificateKey := types.GetKeyPrefixDataCertificate(dealID, dataHash)
 	storedDataCertificate := k.cdc.MustMarshalBinaryLengthPrefixed(&cert)
 	store.Set(dataCertificateKey, storedDataCertificate)
 }
@@ -277,17 +266,13 @@ func SetCurNumData(deal *types.Deal) {
 }
 
 func SetStatusCompleted(deal *types.Deal) {
-	deal.Status = COMPLETED
+	deal.Status = types.COMPLETED
 }
 
 func (k Keeper) VerifyDataCertificate(ctx sdk.Context, oracleAddr sdk.AccAddress, cert types.DataValidationCertificate) (bool, error) {
 	oracleAcc := k.accountKeeper.GetAccount(ctx, oracleAddr)
 	if oracleAcc == nil {
 		return false, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid oracle address")
-	}
-
-	if oracleAcc.GetPubKey() == nil {
-		return false, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "the publicKey does not exist in the oracle account")
 	}
 
 	unSignedMarshaled, err := cert.UnsignedCert.Marshal()
@@ -305,16 +290,16 @@ func (k Keeper) VerifyDataCertificate(ctx sdk.Context, oracleAddr sdk.AccAddress
 		return false, sdkerrors.Wrapf(types.ErrInvalidSignature, "%s", cert.GetSignature())
 	}
 
-	return isValid, nil
+	return true, nil
 }
 
-func (k Keeper) DeactivateDeal(ctx sdk.Context, dealId uint64, requester sdk.AccAddress) (uint64, error) {
-	findDeal, err := k.GetDeal(ctx, dealId)
+func (k Keeper) DeactivateDeal(ctx sdk.Context, dealID uint64, requester sdk.AccAddress) (uint64, error) {
+	deal, err := k.GetDeal(ctx, dealID)
 	if err != nil {
 		return 0, err
 	}
 
-	dealOwner, err := sdk.AccAddressFromBech32(findDeal.GetOwner())
+	dealOwner, err := sdk.AccAddressFromBech32(deal.GetOwner())
 	if err != nil {
 		return 0, err
 	}
@@ -323,24 +308,24 @@ func (k Keeper) DeactivateDeal(ctx sdk.Context, dealId uint64, requester sdk.Acc
 		return 0, fmt.Errorf("the owner of deal and requester is not equal")
 	}
 
-	if findDeal.GetStatus() != ACTIVE {
-		return 0, sdkerrors.Wrapf(types.ErrInvalidStatus, "%s", findDeal.GetStatus())
+	if deal.GetStatus() != types.ACTIVE {
+		return 0, sdkerrors.Wrapf(types.ErrInvalidStatus, "%s", deal.GetStatus())
 	}
 
-	findDealAddress, err := types.AccDealAddressFromBech32(findDeal.GetDealAddress())
+	dealAddress, err := sdk.AccAddressFromBech32(deal.GetDealAddress())
 	if err != nil {
 		return 0, err
 	}
 
-	remainDealBalance := k.bankKeeper.GetBalance(ctx, findDealAddress, assets.MicroMedDenom)
+	remainDealBalance := k.bankKeeper.GetBalance(ctx, dealAddress, assets.MicroMedDenom)
 
-	err = k.bankKeeper.SendCoins(ctx, findDealAddress, requester, sdk.Coins{remainDealBalance})
+	err = k.bankKeeper.SendCoins(ctx, dealAddress, requester, sdk.Coins{remainDealBalance})
 	if err != nil {
 		return 0, err
 	}
 
-	findDeal.Status = INACTIVE
-	k.SetDeal(ctx, findDeal)
+	deal.Status = types.INACTIVE
+	k.SetDeal(ctx, deal)
 
-	return dealId, nil
+	return dealID, nil
 }
