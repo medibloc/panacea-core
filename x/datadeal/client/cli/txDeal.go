@@ -77,7 +77,7 @@ func CmdSellData() *cobra.Command {
 func CmdDeactivateDeal() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "deactivate-deal [deal-id]",
-		Short: "deactivate-deal",
+		Short: "deactivate deal",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
@@ -85,13 +85,13 @@ func CmdDeactivateDeal() *cobra.Command {
 				return err
 			}
 
-			dealId, err := strconv.ParseUint(args[0], 10, 64)
+			dealID, err := strconv.ParseUint(args[0], 10, 64)
 			if err != nil {
 				return err
 			}
 
 			requesterAddress := clientCtx.GetFromAddress()
-			msg := types.NewMsgDeactivateDeal(dealId, requesterAddress.String())
+			msg := types.NewMsgDeactivateDeal(dealID, requesterAddress.String())
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}

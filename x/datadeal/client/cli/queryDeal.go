@@ -21,13 +21,13 @@ func CmdGetDeal() *cobra.Command {
 			}
 
 			queryClient := types.NewQueryClient(clientCtx)
-			dealId, err := strconv.Atoi(args[0])
+			dealID, err := strconv.ParseUint(args[0], 10, 64)
 			if err != nil {
 				return err
 			}
 
 			res, err := queryClient.Deal(cmd.Context(), &types.QueryDealRequest{
-				DealId: uint64(dealId),
+				DealId: dealID,
 			})
 			if err != nil {
 				return err
