@@ -70,7 +70,7 @@ func (k Keeper) GetNextDealNumber(ctx sdk.Context) (uint64, error) {
 
 	err := k.cdc.UnmarshalBinaryLengthPrefixed(bz, &val)
 	if err != nil {
-		return 0, nil
+		return 0, err
 	}
 
 	dealNumber = val.GetValue()
