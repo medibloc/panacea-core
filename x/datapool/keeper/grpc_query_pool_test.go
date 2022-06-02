@@ -76,36 +76,36 @@ func (suite *queryPoolTestSuite) TestQueryPool() {
 	suite.Require().Equal(pool.Curator, resultPool.Curator)
 }
 
-func (suite queryPoolTestSuite) TestQueryDataValidationCertificates() {
+func (suite queryPoolTestSuite) TestQueryDataCerts() {
 	suite.setDataValidatorAccount()
 	pool := suite.setPool()
 
-	req := types.QueryDataValidationCertificatesRequest{
+	req := types.QueryDataCertsRequest{
 		PoolId: pool.GetPoolId(),
 		Round:  pool.GetRound(),
 	}
 
-	res, err := suite.DataPoolKeeper.DataValidationCertificates(sdk.WrapSDKContext(suite.Ctx), &req)
+	res, err := suite.DataPoolKeeper.DataCerts(sdk.WrapSDKContext(suite.Ctx), &req)
 	suite.Require().NoError(err)
-	suite.Require().Len(res.DataValidationCertificates, 0)
+	suite.Require().Len(res.DataCerts, 0)
 
 	dataHash1 := []byte("data1")
-	cert1, err := makeTestDataCertificate(suite.Cdc.Marshaler, pool.GetPoolId(), pool.GetRound(), dataHash1, requesterAddr.String())
+	cert1, err := makeTestDataCert(suite.Cdc.Marshaler, pool.GetPoolId(), pool.GetRound(), dataHash1, requesterAddr.String())
 	suite.Require().NoError(err)
 
-	suite.DataPoolKeeper.SetDataValidationCertificate(suite.Ctx, *cert1)
+	suite.DataPoolKeeper.SetDataCert(suite.Ctx, *cert1)
 
 	dataHash2 := []byte("data2")
-	cert2, err := makeTestDataCertificate(suite.Cdc.Marshaler, pool.GetPoolId(), pool.GetRound(), dataHash2, requesterAddr.String())
+	cert2, err := makeTestDataCert(suite.Cdc.Marshaler, pool.GetPoolId(), pool.GetRound(), dataHash2, requesterAddr.String())
 	suite.Require().NoError(err)
 
-	suite.DataPoolKeeper.SetDataValidationCertificate(suite.Ctx, *cert2)
+	suite.DataPoolKeeper.SetDataCert(suite.Ctx, *cert2)
 
-	res, err = suite.DataPoolKeeper.DataValidationCertificates(sdk.WrapSDKContext(suite.Ctx), &req)
+	res, err = suite.DataPoolKeeper.DataCerts(sdk.WrapSDKContext(suite.Ctx), &req)
 	suite.Require().NoError(err)
-	suite.Require().Len(res.DataValidationCertificates, 2)
-	suite.Require().Contains(res.DataValidationCertificates, *cert1)
-	suite.Require().Contains(res.DataValidationCertificates, *cert2)
+	suite.Require().Len(res.DataCerts, 2)
+	suite.Require().Contains(res.DataCerts, *cert1)
+	suite.Require().Contains(res.DataCerts, *cert2)
 }
 
 func (suite *queryPoolTestSuite) TestQueryDataPassRedeemReceipt() {

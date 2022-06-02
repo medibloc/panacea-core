@@ -335,7 +335,7 @@ func (k Keeper) DeployAndRegisterNFTContract(ctx sdk.Context, wasmCode []byte) (
 
 // SellData verifies the certificate against the pool information and stores it using a key combined with poolID, dataHash, and round.
 // Seller is paid shareToken.
-func (k Keeper) SellData(ctx sdk.Context, seller sdk.AccAddress, cert types.DataValidationCertificate) error {
+func (k Keeper) SellData(ctx sdk.Context, seller sdk.AccAddress, cert types.DataCert) error {
 	if cert.UnsignedCert.Requester != seller.String() {
 		return types.ErrNotEqualsSeller
 	}
@@ -344,7 +344,7 @@ func (k Keeper) SellData(ctx sdk.Context, seller sdk.AccAddress, cert types.Data
 		return err
 	}
 
-	if k.isDuplicatedCertificate(ctx, cert) {
+	if k.isDuplicatedCert(ctx, cert) {
 		return types.ErrExistSameDataHash
 	}
 
@@ -354,11 +354,11 @@ func (k Keeper) SellData(ctx sdk.Context, seller sdk.AccAddress, cert types.Data
 		return err
 	}
 
-	if err := k.validateCertificateByPool(cert, pool); err != nil {
+	if err := k.validateCertByPool(cert, pool); err != nil {
 		return err
 	}
 
-	k.SetDataValidationCertificate(ctx, cert)
+	k.SetDataCert(ctx, cert)
 
 	k.increaseCurNumAndUpdatePool(ctx, pool)
 
@@ -370,7 +370,7 @@ func (k Keeper) SellData(ctx sdk.Context, seller sdk.AccAddress, cert types.Data
 }
 
 // verifySignature verifies that the signature of the dataValidator is correct
-func (k Keeper) verifySignature(ctx sdk.Context, dataValidatorCert types.DataValidationCertificate) error {
+func (k Keeper) verifySignature(ctx sdk.Context, dataValidatorCert types.DataCert) error {
 	dataValidator := dataValidatorCert.UnsignedCert.DataValidator
 	unsignedCert := dataValidatorCert.UnsignedCert
 	sign := dataValidatorCert.Signature
@@ -393,8 +393,8 @@ func (k Keeper) verifySignature(ctx sdk.Context, dataValidatorCert types.DataVal
 	return nil
 }
 
-// isDuplicatedCertificate goes through all rounds and checks for data duplication.
-func (k Keeper) isDuplicatedCertificate(ctx sdk.Context, cert types.DataValidationCertificate) bool {
+// isDuplicatedCert goes through all rounds and checks for data duplication.
+func (k Keeper) isDuplicatedCert(ctx sdk.Context, cert types.DataCert) bool {
 	store := ctx.KVStore(k.storeKey)
 	unsignedCert := cert.UnsignedCert
 	for round := uint64(1); round <= unsignedCert.Round; round++ {
@@ -406,27 +406,27 @@ func (k Keeper) isDuplicatedCertificate(ctx sdk.Context, cert types.DataValidati
 	return false
 }
 
-// validateCertificateByPool verifies the pool and certificate data
-func (k Keeper) validateCertificateByPool(cert types.DataValidationCertificate, pool *types.Pool) error {
+// validateCertByPool verifies the pool and certificate data
+func (k Keeper) validateCertByPool(cert types.DataCert, pool *types.Pool) error {
 	validator := cert.UnsignedCert.DataValidator
 	trustedValidators := pool.PoolParams.TrustedDataValidators
 
 	if !contains(trustedValidators, validator) {
-		return sdkerrors.Wrap(types.ErrInvalidDataValidationCert, "the data validator is not trusted")
+		return sdkerrors.Wrap(types.ErrInvalidDataCert, "the data validator is not trusted")
 	}
 
 	if pool.Status != types.PENDING {
-		return sdkerrors.Wrap(types.ErrInvalidDataValidationCert, "the status of the pool is not 'PENDING'")
+		return sdkerrors.Wrap(types.ErrInvalidDataCert, "the status of the pool is not 'PENDING'")
 	}
 
 	if pool.Round != cert.UnsignedCert.Round {
-		return sdkerrors.Wrap(types.ErrInvalidDataValidationCert, fmt.Sprintf("pool round do not matched. pool round: %v", pool.Round))
+		return sdkerrors.Wrap(types.ErrInvalidDataCert, fmt.Sprintf("pool round do not matched. pool round: %v", pool.Round))
 	}
 
 	return nil
 }
 
-func (k Keeper) SetDataValidationCertificate(ctx sdk.Context, cert types.DataValidationCertificate) {
+func (k Keeper) SetDataCert(ctx sdk.Context, cert types.DataCert) {
 	unsignedCert := cert.UnsignedCert
 	key := types.GetKeyPrefixDataValidateCert(unsignedCert.PoolId, unsignedCert.Round, unsignedCert.DataHash)
 	store := ctx.KVStore(k.storeKey)
@@ -443,20 +443,20 @@ func (k Keeper) increaseCurNumAndUpdatePool(ctx sdk.Context, pool *types.Pool) {
 	k.SetPool(ctx, pool)
 }
 
-func (k Keeper) GetDataValidationCertificate(ctx sdk.Context, poolID, round uint64, dataHash []byte) (types.DataValidationCertificate, error) {
+func (k Keeper) GetDataCert(ctx sdk.Context, poolID, round uint64, dataHash []byte) (types.DataCert, error) {
 	key := types.GetKeyPrefixDataValidateCert(poolID, round, dataHash)
 	store := ctx.KVStore(k.storeKey)
 
 	if !store.Has(key) {
-		return types.DataValidationCertificate{}, sdkerrors.Wrap(types.ErrGetDataValidationCert, "certification is not exist")
+		return types.DataCert{}, sdkerrors.Wrap(types.ErrGetDataCert, "certification is not exist")
 	}
 
 	bz := store.Get(key)
 
-	var cert types.DataValidationCertificate
+	var cert types.DataCert
 	err := k.cdc.UnmarshalBinaryLengthPrefixed(bz, &cert)
 	if err != nil {
-		return types.DataValidationCertificate{}, sdkerrors.Wrap(types.ErrGetDataValidationCert, err.Error())
+		return types.DataCert{}, sdkerrors.Wrap(types.ErrGetDataCert, err.Error())
 	}
 
 	return cert, nil

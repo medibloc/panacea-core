@@ -27,14 +27,14 @@ message Pool {
   ]; // curator commission rate
 }
 
-// DataValidationCertificate defines the certificate for data validation w/ data validator signature.
-message DataValidationCertificate {
-  UnsignedDataValidationCertificate unsigned_cert = 1;  // unsigned certificate
+// DataCert defines the certificate for data validation w/ data validator signature.
+message DataCert {
+  UnsignedDataCert unsigned_cert = 1;  // unsigned certificate
   bytes                             signature = 2;      // signature for data validation by data validator
 }
 
-// UnsignedDataValidationCertificate defines the unsigned certificate for data validation.
-message UnsignedDataValidationCertificate {
+// UnsignedDataCert defines the unsigned certificate for data validation.
+message UnsignedDataCert {
   uint64 pool_id = 1;           // pool Id for selling data
   uint64 round = 2;             // Always 1 for v0
   bytes  data_hash = 3;         // sha-256 hash of the data

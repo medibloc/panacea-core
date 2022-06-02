@@ -136,7 +136,7 @@ func (k Keeper) ListDeals(ctx sdk.Context) ([]types.Deal, error) {
 	return deals, nil
 }
 
-func (k Keeper) SellData(ctx sdk.Context, seller sdk.AccAddress, cert types.DataValidationCertificate) (sdk.Coin, error) {
+func (k Keeper) SellData(ctx sdk.Context, seller sdk.AccAddress, cert types.DataCert) (sdk.Coin, error) {
 	if k.isDuplicatedData(ctx, cert) {
 		return sdk.Coin{}, types.ErrDataAlreadyExist
 	}
@@ -178,7 +178,7 @@ func (k Keeper) SellData(ctx sdk.Context, seller sdk.AccAddress, cert types.Data
 		return sdk.Coin{}, sdkerrors.Wrapf(types.ErrNotEnoughBalance, "The deal's balance is not enough to make deal")
 	}
 
-	k.SetDataCertificate(ctx, deal.GetDealId(), cert)
+	k.SetDataCert(ctx, deal.GetDealId(), cert)
 	SetCurNumData(&deal)
 
 	if deal.GetCurNumData() == deal.GetMaxNumData() {
@@ -190,14 +190,14 @@ func (k Keeper) SellData(ctx sdk.Context, seller sdk.AccAddress, cert types.Data
 	return reward, nil
 }
 
-func (k Keeper) isDuplicatedData(ctx sdk.Context, cert types.DataValidationCertificate) bool {
+func (k Keeper) isDuplicatedData(ctx sdk.Context, cert types.DataCert) bool {
 	store := ctx.KVStore(k.storeKey)
-	dataCertKey := types.GetKeyPrefixDataCertificate(cert.UnsignedCert.GetDealId(), cert.UnsignedCert.GetDataHash())
+	dataCertKey := types.GetKeyPrefixDataCert(cert.UnsignedCert.GetDealId(), cert.UnsignedCert.GetDataHash())
 
 	return store.Has(dataCertKey)
 }
 
-func (k Keeper) isTrustedDataValidator(cert types.DataValidationCertificate, deal types.Deal) bool {
+func (k Keeper) isTrustedDataValidator(cert types.DataCert, deal types.Deal) bool {
 	validator := cert.UnsignedCert.GetDataValidatorAddress()
 	trustedValidators := deal.GetTrustedDataValidators()
 
@@ -214,50 +214,50 @@ func (k Keeper) isTrustedDataValidator(cert types.DataValidationCertificate, dea
 	return false
 }
 
-func (k Keeper) GetDataCertificate(ctx sdk.Context, cert types.DataValidationCertificate) (types.DataValidationCertificate, error) {
+func (k Keeper) GetDataCert(ctx sdk.Context, cert types.DataCert) (types.DataCert, error) {
 	store := ctx.KVStore(k.storeKey)
-	dataCertificateKey := types.GetKeyPrefixDataCertificate(cert.UnsignedCert.DealId, cert.UnsignedCert.DataHash)
-	if !store.Has(dataCertificateKey) {
-		return types.DataValidationCertificate{}, sdkerrors.Wrapf(types.ErrDataNotFound, "data with ID %s does not exist", dataCertificateKey)
+	dataCertKey := types.GetKeyPrefixDataCert(cert.UnsignedCert.DealId, cert.UnsignedCert.DataHash)
+	if !store.Has(dataCertKey) {
+		return types.DataCert{}, sdkerrors.Wrapf(types.ErrDataNotFound, "data with ID %s does not exist", dataCertKey)
 	}
 
-	bz := store.Get(dataCertificateKey)
+	bz := store.Get(dataCertKey)
 
-	var dataCertificate types.DataValidationCertificate
-	err := k.cdc.UnmarshalBinaryLengthPrefixed(bz, &dataCertificate)
+	var dataCert types.DataCert
+	err := k.cdc.UnmarshalBinaryLengthPrefixed(bz, &dataCert)
 	if err != nil {
-		return types.DataValidationCertificate{}, err
+		return types.DataCert{}, err
 	}
 
-	return dataCertificate, nil
+	return dataCert, nil
 }
 
-func (k Keeper) ListDataCertificates(ctx sdk.Context) ([]types.DataValidationCertificate, error) {
+func (k Keeper) ListDataCerts(ctx sdk.Context) ([]types.DataCert, error) {
 	store := ctx.KVStore(k.storeKey)
-	dataCertificates := make([]types.DataValidationCertificate, 0)
+	dataCerts := make([]types.DataCert, 0)
 
-	iter := sdk.KVStorePrefixIterator(store, types.KeyPrefixDataCertificateStore)
+	iter := sdk.KVStorePrefixIterator(store, types.KeyPrefixDataCertStore)
 	defer iter.Close()
 
 	for ; iter.Valid(); iter.Next() {
 		bz := iter.Value()
-		var dataCertificate types.DataValidationCertificate
+		var dataCert types.DataCert
 
-		err := k.cdc.UnmarshalBinaryLengthPrefixed(bz, &dataCertificate)
+		err := k.cdc.UnmarshalBinaryLengthPrefixed(bz, &dataCert)
 		if err != nil {
-			return []types.DataValidationCertificate{}, err
+			return []types.DataCert{}, err
 		}
-		dataCertificates = append(dataCertificates, dataCertificate)
+		dataCerts = append(dataCerts, dataCert)
 	}
-	return dataCertificates, nil
+	return dataCerts, nil
 }
 
-func (k Keeper) SetDataCertificate(ctx sdk.Context, dealID uint64, cert types.DataValidationCertificate) {
+func (k Keeper) SetDataCert(ctx sdk.Context, dealID uint64, cert types.DataCert) {
 	store := ctx.KVStore(k.storeKey)
 	dataHash := cert.UnsignedCert.GetDataHash()
-	dataCertificateKey := types.GetKeyPrefixDataCertificate(dealID, dataHash)
-	storedDataCertificate := k.cdc.MustMarshalBinaryLengthPrefixed(&cert)
-	store.Set(dataCertificateKey, storedDataCertificate)
+	dataCertKey := types.GetKeyPrefixDataCert(dealID, dataHash)
+	storedDataCert := k.cdc.MustMarshalBinaryLengthPrefixed(&cert)
+	store.Set(dataCertKey, storedDataCert)
 }
 
 func SetCurNumData(deal *types.Deal) {
@@ -269,7 +269,7 @@ func SetStatusCompleted(deal *types.Deal) {
 	deal.Status = types.COMPLETED
 }
 
-func (k Keeper) VerifyDataCertificate(ctx sdk.Context, validatorAddr sdk.AccAddress, cert types.DataValidationCertificate) (bool, error) {
+func (k Keeper) VerifyDataCert(ctx sdk.Context, validatorAddr sdk.AccAddress, cert types.DataCert) (bool, error) {
 	validatorAcc := k.accountKeeper.GetAccount(ctx, validatorAddr)
 	if validatorAcc == nil {
 		return false, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid validator address")

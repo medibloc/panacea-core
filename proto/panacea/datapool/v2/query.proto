@@ -31,9 +31,9 @@ service Query {
     option (google.api.http).get = "/panacea/datapool/v2/module_addr";
   }
 
-  // DataValidationCertificates returns DataValidationCertificates
-  rpc DataValidationCertificates(QueryDataValidationCertificatesRequest) returns (QueryDataValidationCertificatesResponse) {
-    option (google.api.http).get = "/panacea/datapool/v2/data_validation_certificates/pool/{pool_id}/round/{round}";
+  // DataCert returns DataCerts
+  rpc DataCerts(QueryDataCertsRequest) returns (QueryDataCertsResponse) {
+    option (google.api.http).get = "/panacea/datapool/v2/data_certs/pool/{pool_id}/round/{round}";
   }
 
   // DataPassRedeemReceipt returns DataPassRedeemReceipt
@@ -88,16 +88,16 @@ message QueryDataPoolModuleAddrResponse {
   string address = 1;
 }
 
-// QueryDataValidationCertificatesRequest is the request type for the Query/DataValidationCertificates RPC method.
-message QueryDataValidationCertificatesRequest {
+// QueryDataCertsRequest is the request type for the Query/DataCerts RPC method.
+message QueryDataCertsRequest {
   uint64 pool_id = 1;
   uint64 round = 2;
   cosmos.base.query.v1beta1.PageRequest pagination = 3;
 }
 
-// QueryDataValidationCertificatesResponse is the response type for the QueryDataValidationCertificates RPC method.
-message QueryDataValidationCertificatesResponse {
-  repeated DataValidationCertificate data_validation_certificates = 1 [
+// QueryDataCertsResponse is the response type for the Query/DataCerts RPC method.
+message QueryDataCertsResponse {
+  repeated DataCert data_certs = 1 [
     (gogoproto.nullable) = false
   ];
   cosmos.base.query.v1beta1.PageResponse pagination = 2;

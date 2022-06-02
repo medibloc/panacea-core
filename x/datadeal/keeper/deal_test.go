@@ -284,7 +284,7 @@ func (suite *dealTestSuite) TestDealStatusInactiveOrCompleted() {
 	suite.Require().Error(err, types.ErrInvalidStatus)
 }
 
-func (suite *dealTestSuite) TestVerifyDataCertificate() {
+func (suite *dealTestSuite) TestVerifyDataCert() {
 	cert := makeTestCert("1a312c1223x2fs3", newAddr, acc3)
 
 	validatorAddr, err := sdk.AccAddressFromBech32(cert.UnsignedCert.GetDataValidatorAddress())
@@ -296,7 +296,7 @@ func (suite *dealTestSuite) TestVerifyDataCertificate() {
 	suite.Require().NoError(err)
 	suite.AccountKeeper.SetAccount(suite.Ctx, account)
 
-	verify, err := suite.DataDealKeeper.VerifyDataCertificate(suite.Ctx, validatorAddr, cert)
+	verify, err := suite.DataDealKeeper.VerifyDataCert(suite.Ctx, validatorAddr, cert)
 	suite.Require().Equal(true, verify)
 	suite.Require().NoError(err)
 }
@@ -336,7 +336,7 @@ func (suite *dealTestSuite) TestIsDealStatusCompleted() {
 	suite.Require().Equal(updatedDeal.GetStatus(), COMPLETED)
 }
 
-func (suite *dealTestSuite) TestGetDataCertificate() {
+func (suite *dealTestSuite) TestGetDataCert() {
 	err := suite.BankKeeper.AddCoins(suite.Ctx, acc1, defaultFunds)
 	suite.Require().NoError(err)
 
@@ -361,18 +361,18 @@ func (suite *dealTestSuite) TestGetDataCertificate() {
 	_, err = suite.DataDealKeeper.SellData(suite.Ctx, acc3, cert)
 	suite.Require().NoError(err)
 
-	getCertificate, err := suite.DataDealKeeper.GetDataCertificate(suite.Ctx, cert)
+	getCert, err := suite.DataDealKeeper.GetDataCert(suite.Ctx, cert)
 	suite.Require().NoError(err)
 
-	suite.Require().Equal(getCertificate.GetSignature(), cert.GetSignature())
-	suite.Require().Equal(getCertificate.UnsignedCert.GetDealId(), cert.UnsignedCert.GetDealId())
-	suite.Require().Equal(getCertificate.UnsignedCert.GetDataHash(), cert.UnsignedCert.GetDataHash())
-	suite.Require().Equal(getCertificate.UnsignedCert.GetEncryptedDataUrl(), cert.UnsignedCert.GetEncryptedDataUrl())
-	suite.Require().Equal(getCertificate.UnsignedCert.GetDataValidatorAddress(), cert.UnsignedCert.GetDataValidatorAddress())
-	suite.Require().Equal(getCertificate.UnsignedCert.GetRequesterAddress(), cert.UnsignedCert.GetRequesterAddress())
+	suite.Require().Equal(getCert.GetSignature(), cert.GetSignature())
+	suite.Require().Equal(getCert.UnsignedCert.GetDealId(), cert.UnsignedCert.GetDealId())
+	suite.Require().Equal(getCert.UnsignedCert.GetDataHash(), cert.UnsignedCert.GetDataHash())
+	suite.Require().Equal(getCert.UnsignedCert.GetEncryptedDataUrl(), cert.UnsignedCert.GetEncryptedDataUrl())
+	suite.Require().Equal(getCert.UnsignedCert.GetDataValidatorAddress(), cert.UnsignedCert.GetDataValidatorAddress())
+	suite.Require().Equal(getCert.UnsignedCert.GetRequesterAddress(), cert.UnsignedCert.GetRequesterAddress())
 }
 
-func (suite *dealTestSuite) TestListDataCertificates() {
+func (suite *dealTestSuite) TestListDataCerts() {
 	err := suite.BankKeeper.AddCoins(suite.Ctx, acc1, defaultFunds)
 	suite.Require().NoError(err)
 
@@ -394,22 +394,22 @@ func (suite *dealTestSuite) TestListDataCertificates() {
 	_, err = suite.DataDealKeeper.GetDeal(suite.Ctx, newDealID)
 	suite.Require().NoError(err)
 
-	dataCertificates := make([]types.DataValidationCertificate, 0)
+	dataCerts := make([]types.DataCert, 0)
 
 	for i := 0; i < 5; i++ {
-		dataCertificates = append(dataCertificates, cert)
+		dataCerts = append(dataCerts, cert)
 	}
 
-	listDataCertificates, err := suite.DataDealKeeper.ListDataCertificates(suite.Ctx)
+	listDataCerts, err := suite.DataDealKeeper.ListDataCerts(suite.Ctx)
 	suite.Require().NoError(err)
 
-	for i, dataCertificate := range listDataCertificates {
-		suite.Require().Equal(dataCertificate.GetSignature(), dataCertificates[i+1].GetSignature())
-		suite.Require().Equal(dataCertificate.UnsignedCert.GetDealId(), dataCertificates[i+1].UnsignedCert.GetDealId())
-		suite.Require().Equal(dataCertificate.UnsignedCert.GetDataHash(), dataCertificates[i+1].UnsignedCert.GetDataHash())
-		suite.Require().Equal(dataCertificate.UnsignedCert.GetEncryptedDataUrl(), dataCertificates[i+1].UnsignedCert.GetEncryptedDataUrl())
-		suite.Require().Equal(dataCertificate.UnsignedCert.GetDataValidatorAddress(), dataCertificates[i+1].UnsignedCert.GetDataValidatorAddress())
-		suite.Require().Equal(dataCertificate.UnsignedCert.GetRequesterAddress(), dataCertificates[i+1].UnsignedCert.GetRequesterAddress())
+	for i, dataCert := range listDataCerts {
+		suite.Require().Equal(dataCert.GetSignature(), dataCerts[i+1].GetSignature())
+		suite.Require().Equal(dataCert.UnsignedCert.GetDealId(), dataCerts[i+1].UnsignedCert.GetDealId())
+		suite.Require().Equal(dataCert.UnsignedCert.GetDataHash(), dataCerts[i+1].UnsignedCert.GetDataHash())
+		suite.Require().Equal(dataCert.UnsignedCert.GetEncryptedDataUrl(), dataCerts[i+1].UnsignedCert.GetEncryptedDataUrl())
+		suite.Require().Equal(dataCert.UnsignedCert.GetDataValidatorAddress(), dataCerts[i+1].UnsignedCert.GetDataValidatorAddress())
+		suite.Require().Equal(dataCert.UnsignedCert.GetRequesterAddress(), dataCerts[i+1].UnsignedCert.GetRequesterAddress())
 	}
 }
 
@@ -542,8 +542,8 @@ func makeTestDeal() types.Deal {
 	}
 }
 
-func makeTestCert(dataHash string, validatorAddress sdk.AccAddress, requesterAddress sdk.AccAddress) types.DataValidationCertificate {
-	uCert := types.UnsignedDataValidationCertificate{
+func makeTestCert(dataHash string, validatorAddress sdk.AccAddress, requesterAddress sdk.AccAddress) types.DataCert {
+	uCert := types.UnsignedDataCert{
 		DealId:               2,
 		DataHash:             []byte(dataHash),
 		EncryptedDataUrl:     []byte("https://panacea.org/a/123.json"),
@@ -553,15 +553,15 @@ func makeTestCert(dataHash string, validatorAddress sdk.AccAddress, requesterAdd
 
 	marshal, err := uCert.Marshal()
 	if err != nil {
-		return types.DataValidationCertificate{}
+		return types.DataCert{}
 	}
 
 	sign, err := privKey.Sign(marshal)
 	if err != nil {
-		return types.DataValidationCertificate{}
+		return types.DataCert{}
 	}
 
-	return types.DataValidationCertificate{
+	return types.DataCert{
 		UnsignedCert: &uCert,
 		Signature:    sign,
 	}

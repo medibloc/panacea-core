@@ -21,12 +21,12 @@ func TestReadDataCertFile(t *testing.T) {
 	require.Equal(t, parsedDataCert.UnsignedCert.GetRequesterAddress(), testCert.UnsignedCert.GetRequesterAddress())
 }
 
-func makeTestCert() types.DataValidationCertificate {
+func makeTestCert() types.DataCert {
 
 	decodeDataHash, _ := base64.StdEncoding.DecodeString("ZGF0YUhhc2g=")
 	decodeURL, _ := base64.StdEncoding.DecodeString("ZW5jcnlwdGVkRGF0YVVSTA==")
 
-	unsignedDataValidationCertificate := types.UnsignedDataValidationCertificate{
+	unsignedDataCert := types.UnsignedDataCert{
 		DealId:               1,
 		DataHash:             decodeDataHash,
 		EncryptedDataUrl:     decodeURL,
@@ -35,10 +35,10 @@ func makeTestCert() types.DataValidationCertificate {
 	}
 
 	decodeSig, _ := base64.StdEncoding.DecodeString("c2lnbmF0dXJl")
-	dataValidationCertificate := types.DataValidationCertificate{
-		UnsignedCert: &unsignedDataValidationCertificate,
+	dataCert := types.DataCert{
+		UnsignedCert: &unsignedDataCert,
 		Signature:    decodeSig,
 	}
 
-	return dataValidationCertificate
+	return dataCert
 }

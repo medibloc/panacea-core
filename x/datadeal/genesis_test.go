@@ -31,15 +31,15 @@ func (suite *genesisTestSuite) TestDataDealInitGenesis() {
 	newDeal := makeTestDeal()
 	newDataCert := makeTestDataCert()
 
-	dataCertificateKey := types.GetKeyPrefixDataCertificate(newDataCert.UnsignedCert.DealId, newDataCert.UnsignedCert.DataHash)
-	stringDataCertificateKey := string(dataCertificateKey)
+	dataCertKey := types.GetKeyPrefixDataCert(newDataCert.UnsignedCert.DealId, newDataCert.UnsignedCert.DataHash)
+	stringDataCertKey := string(dataCertKey)
 
 	datadeal.InitGenesis(suite.Ctx, suite.DataDealKeeper, types.GenesisState{
 		Deals: map[uint64]types.Deal{
 			newDeal.GetDealId(): newDeal,
 		},
-		DataCertificates: map[string]types.DataValidationCertificate{
-			stringDataCertificateKey: newDataCert,
+		DataCerts: map[string]types.DataCert{
+			stringDataCertKey: newDataCert,
 		},
 		NextDealNumber: 2,
 	})
@@ -63,29 +63,29 @@ func (suite *genesisTestSuite) TestDataDealInitGenesis() {
 	_, err = suite.DataDealKeeper.GetDeal(suite.Ctx, 2)
 	suite.Require().Error(err)
 
-	dataCertificateStored, err := suite.DataDealKeeper.GetDataCertificate(suite.Ctx, newDataCert)
+	dataCertStored, err := suite.DataDealKeeper.GetDataCert(suite.Ctx, newDataCert)
 	suite.Require().NoError(err)
-	suite.Require().Equal(newDataCert.GetSignature(), dataCertificateStored.GetSignature())
-	suite.Require().Equal(newDataCert.UnsignedCert.GetDealId(), dataCertificateStored.UnsignedCert.GetDealId())
-	suite.Require().Equal(newDataCert.UnsignedCert.GetDataHash(), dataCertificateStored.UnsignedCert.GetDataHash())
-	suite.Require().Equal(newDataCert.UnsignedCert.GetEncryptedDataUrl(), dataCertificateStored.UnsignedCert.GetEncryptedDataUrl())
-	suite.Require().Equal(newDataCert.UnsignedCert.GetDataValidatorAddress(), dataCertificateStored.UnsignedCert.GetDataValidatorAddress())
-	suite.Require().Equal(newDataCert.UnsignedCert.GetRequesterAddress(), dataCertificateStored.UnsignedCert.GetRequesterAddress())
+	suite.Require().Equal(newDataCert.GetSignature(), dataCertStored.GetSignature())
+	suite.Require().Equal(newDataCert.UnsignedCert.GetDealId(), dataCertStored.UnsignedCert.GetDealId())
+	suite.Require().Equal(newDataCert.UnsignedCert.GetDataHash(), dataCertStored.UnsignedCert.GetDataHash())
+	suite.Require().Equal(newDataCert.UnsignedCert.GetEncryptedDataUrl(), dataCertStored.UnsignedCert.GetEncryptedDataUrl())
+	suite.Require().Equal(newDataCert.UnsignedCert.GetDataValidatorAddress(), dataCertStored.UnsignedCert.GetDataValidatorAddress())
+	suite.Require().Equal(newDataCert.UnsignedCert.GetRequesterAddress(), dataCertStored.UnsignedCert.GetRequesterAddress())
 }
 
 func (suite *genesisTestSuite) TestDataDealExportGenesis() {
 	newDeal := makeTestDeal()
 	newDataCert := makeTestDataCert()
 
-	dataCertificateKey := types.GetKeyPrefixDataCertificate(newDataCert.UnsignedCert.DealId, newDataCert.UnsignedCert.DataHash)
-	stringDataCertificateKey := string(dataCertificateKey)
+	dataCertKey := types.GetKeyPrefixDataCert(newDataCert.UnsignedCert.DealId, newDataCert.UnsignedCert.DataHash)
+	stringDataCertKey := string(dataCertKey)
 
 	datadeal.InitGenesis(suite.Ctx, suite.DataDealKeeper, types.GenesisState{
 		Deals: map[uint64]types.Deal{
 			newDeal.GetDealId(): newDeal,
 		},
-		DataCertificates: map[string]types.DataValidationCertificate{
-			stringDataCertificateKey: newDataCert,
+		DataCerts: map[string]types.DataCert{
+			stringDataCertKey: newDataCert,
 		},
 		NextDealNumber: 2,
 	})
@@ -111,7 +111,7 @@ func (suite *genesisTestSuite) TestDataDealExportGenesis() {
 	genesis := datadeal.ExportGenesis(suite.Ctx, suite.DataDealKeeper)
 	suite.Require().Equal(genesis.NextDealNumber, uint64(3))
 	suite.Require().Len(genesis.Deals, 2)
-	suite.Require().Len(genesis.DataCertificates, 2)
+	suite.Require().Len(genesis.DataCerts, 2)
 }
 
 func makeTestDeal() types.Deal {
@@ -128,8 +128,8 @@ func makeTestDeal() types.Deal {
 	}
 }
 
-func makeTestDataCert() types.DataValidationCertificate {
-	uCert := types.UnsignedDataValidationCertificate{
+func makeTestDataCert() types.DataCert {
+	uCert := types.UnsignedDataCert{
 		DealId:               2,
 		DataHash:             []byte("1a312c123x23"),
 		EncryptedDataUrl:     []byte("https://panacea.org/a/123.json"),
@@ -139,22 +139,22 @@ func makeTestDataCert() types.DataValidationCertificate {
 
 	marshal, err := uCert.Marshal()
 	if err != nil {
-		return types.DataValidationCertificate{}
+		return types.DataCert{}
 	}
 
 	sign, err := privKey.Sign(marshal)
 	if err != nil {
-		return types.DataValidationCertificate{}
+		return types.DataCert{}
 	}
 
-	return types.DataValidationCertificate{
+	return types.DataCert{
 		UnsignedCert: &uCert,
 		Signature:    sign,
 	}
 }
 
-func makeTestDataCert2() types.DataValidationCertificate {
-	uCert := types.UnsignedDataValidationCertificate{
+func makeTestDataCert2() types.DataCert {
+	uCert := types.UnsignedDataCert{
 		DealId:               2,
 		DataHash:             []byte("1a312c1223x2fs3"),
 		EncryptedDataUrl:     []byte("https://panacea.org/a/123.json"),
@@ -164,15 +164,15 @@ func makeTestDataCert2() types.DataValidationCertificate {
 
 	marshal, err := uCert.Marshal()
 	if err != nil {
-		return types.DataValidationCertificate{}
+		return types.DataCert{}
 	}
 
 	sign, err := privKey.Sign(marshal)
 	if err != nil {
-		return types.DataValidationCertificate{}
+		return types.DataCert{}
 	}
 
-	return types.DataValidationCertificate{
+	return types.DataCert{
 		UnsignedCert: &uCert,
 		Signature:    sign,
 	}

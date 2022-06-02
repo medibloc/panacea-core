@@ -67,8 +67,8 @@ message MsgCreatePoolResponse {
 
 // MsgSellData defines the Msg/SellData request type.
 message MsgSellData {
-  DataValidationCertificate cert = 1;     // certificate for data validation
-  string                    seller = 2;   // 'panacea1' address of seller
+  DataCert cert = 1;     // certificate for data validation
+  string   seller = 2;   // 'panacea1' address of seller
 }
 
 // MsgSellDataResponse defines the Msg/SellData response type.
