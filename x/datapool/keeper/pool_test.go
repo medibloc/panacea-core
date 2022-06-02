@@ -475,12 +475,12 @@ func makePoolParamsNoOracle(maxNftSupply uint64) types.PoolParams {
 	}
 }
 
-func (suite *poolTestSuite) TestSetDataCertificate() {
+func (suite *poolTestSuite) TestSetDataCert() {
 	poolID := uint64(1)
 	round := uint64(1)
 	dataHash := []byte("dataHash")
 
-	unsignedCert := types.UnsignedDataValidationCertificate{
+	unsignedCert := types.UnsignedDataCert{
 		PoolId:    poolID,
 		Round:     round,
 		DataHash:  dataHash,
@@ -494,14 +494,14 @@ func (suite *poolTestSuite) TestSetDataCertificate() {
 	sign, err := oraclePrivKey.Sign(bz)
 	suite.Require().NoError(err)
 
-	cert := types.DataValidationCertificate{
+	cert := types.DataCert{
 		UnsignedCert: &unsignedCert,
 		Signature:    sign,
 	}
 
-	suite.DataPoolKeeper.SetDataValidationCertificate(suite.Ctx, cert)
+	suite.DataPoolKeeper.SetDataCert(suite.Ctx, cert)
 
-	getCert, err := suite.DataPoolKeeper.GetDataValidationCertificate(suite.Ctx, poolID, round, dataHash)
+	getCert, err := suite.DataPoolKeeper.GetDataCert(suite.Ctx, poolID, round, dataHash)
 	suite.Require().NoError(err)
 
 	suite.Require().Equal(cert.UnsignedCert.PoolId, getCert.UnsignedCert.PoolId)
@@ -521,7 +521,7 @@ func (suite *poolTestSuite) TestSellData() {
 	round := pool.Round
 	dataHash := []byte("dataHash")
 
-	cert, err := makeTestDataCertificate(suite.Cdc.Marshaler, poolID, round, dataHash, requesterAddr.String())
+	cert, err := makeTestDataCert(suite.Cdc.Marshaler, poolID, round, dataHash, requesterAddr.String())
 	suite.Require().NoError(err)
 
 	err = suite.DataPoolKeeper.SellData(suite.Ctx, requesterAddr, *cert)
@@ -546,7 +546,7 @@ func (suite *poolTestSuite) TestSellData_change_status_activity() {
 	pool.PoolParams.TargetNumData = 1
 	suite.DataPoolKeeper.SetPool(suite.Ctx, pool)
 
-	cert, err := makeTestDataCertificate(suite.Cdc.Marshaler, poolID, round, dataHash, requesterAddr.String())
+	cert, err := makeTestDataCert(suite.Cdc.Marshaler, poolID, round, dataHash, requesterAddr.String())
 	suite.Require().NoError(err)
 
 	err = suite.DataPoolKeeper.SellData(suite.Ctx, requesterAddr, *cert)
@@ -564,7 +564,7 @@ func (suite *poolTestSuite) TestSellData_not_same_seller() {
 	round := uint64(1)
 	dataHash := []byte("dataHash")
 
-	cert, err := makeTestDataCertificate(suite.Cdc.Marshaler, poolID, round, dataHash, requesterAddr.String())
+	cert, err := makeTestDataCert(suite.Cdc.Marshaler, poolID, round, dataHash, requesterAddr.String())
 	suite.Require().NoError(err)
 
 	// A curator requests to sell data
@@ -580,7 +580,7 @@ func (suite *poolTestSuite) TestSellData_failed_get_publicKey_oracle_in_signatur
 
 	// Unregistered oracle publicKey
 
-	cert, err := makeTestDataCertificate(suite.Cdc.Marshaler, poolID, round, dataHash, requesterAddr.String())
+	cert, err := makeTestDataCert(suite.Cdc.Marshaler, poolID, round, dataHash, requesterAddr.String())
 	suite.Require().NoError(err)
 
 	unsignedCertBz, err := suite.Cdc.Marshaler.MarshalBinaryBare(cert.UnsignedCert)
@@ -602,7 +602,7 @@ func (suite *poolTestSuite) TestSellData_invalid_signature() {
 
 	suite.setOracleAccount()
 
-	cert, err := makeTestDataCertificate(suite.Cdc.Marshaler, poolID, round, dataHash, requesterAddr.String())
+	cert, err := makeTestDataCert(suite.Cdc.Marshaler, poolID, round, dataHash, requesterAddr.String())
 	suite.Require().NoError(err)
 
 	unsignedCertBz, err := suite.Cdc.Marshaler.MarshalBinaryBare(cert.UnsignedCert)
@@ -628,7 +628,7 @@ func (suite *poolTestSuite) TestSellData_duplicate_data() {
 	round := pool.Round
 	dataHash := []byte("dataHash")
 
-	cert, err := makeTestDataCertificate(suite.Cdc.Marshaler, poolID, round, dataHash, requesterAddr.String())
+	cert, err := makeTestDataCert(suite.Cdc.Marshaler, poolID, round, dataHash, requesterAddr.String())
 	suite.Require().NoError(err)
 
 	err = suite.DataPoolKeeper.SellData(suite.Ctx, requesterAddr, *cert)
@@ -649,7 +649,7 @@ func (suite *poolTestSuite) TestSellData_not_exist_pool() {
 
 	// Unregistered pool
 
-	cert, err := makeTestDataCertificate(suite.Cdc.Marshaler, poolID, round, dataHash, requesterAddr.String())
+	cert, err := makeTestDataCert(suite.Cdc.Marshaler, poolID, round, dataHash, requesterAddr.String())
 	suite.Require().NoError(err)
 
 	err = suite.DataPoolKeeper.SellData(suite.Ctx, requesterAddr, *cert)
@@ -669,16 +669,16 @@ func (suite *poolTestSuite) TestSellData_impossible_status_pool() {
 	pool.Status = types.ACTIVE
 	suite.DataPoolKeeper.SetPool(suite.Ctx, pool)
 
-	cert, err := makeTestDataCertificate(suite.Cdc.Marshaler, poolID, round, dataHash, requesterAddr.String())
+	cert, err := makeTestDataCert(suite.Cdc.Marshaler, poolID, round, dataHash, requesterAddr.String())
 	suite.Require().NoError(err)
 
 	err = suite.DataPoolKeeper.SellData(suite.Ctx, requesterAddr, *cert)
 	suite.Require().Error(err)
 	suite.Require().True(strings.Contains(err.Error(), "the status of the pool is not 'PENDING'"))
-	suite.Require().True(strings.HasSuffix(err.Error(), types.ErrInvalidDataValidationCert.Error()))
+	suite.Require().True(strings.HasSuffix(err.Error(), types.ErrInvalidDataCert.Error()))
 }
 
-func (suite *poolTestSuite) TestSellData_mismatch_certificate_and_pool_round() {
+func (suite *poolTestSuite) TestSellData_mismatch_cert_and_pool_round() {
 	poolID := uint64(1)
 	// Wrong rounds recorded in the certificate
 	round := uint64(2)
@@ -689,17 +689,17 @@ func (suite *poolTestSuite) TestSellData_mismatch_certificate_and_pool_round() {
 	pool := makeTestDataPool(poolID)
 	suite.DataPoolKeeper.SetPool(suite.Ctx, pool)
 
-	cert, err := makeTestDataCertificate(suite.Cdc.Marshaler, poolID, round, dataHash, requesterAddr.String())
+	cert, err := makeTestDataCert(suite.Cdc.Marshaler, poolID, round, dataHash, requesterAddr.String())
 	suite.Require().NoError(err)
 
 	err = suite.DataPoolKeeper.SellData(suite.Ctx, requesterAddr, *cert)
 	suite.Require().Error(err)
 	suite.Require().True(strings.Contains(err.Error(), "pool round do not matched. pool round: 1"))
-	suite.Require().True(strings.HasSuffix(err.Error(), types.ErrInvalidDataValidationCert.Error()))
+	suite.Require().True(strings.HasSuffix(err.Error(), types.ErrInvalidDataCert.Error()))
 }
 
-func makeTestDataCertificate(marshaler codec.Marshaler, poolID, round uint64, dataHash []byte, requester string) (*types.DataValidationCertificate, error) {
-	unsignedCert := types.UnsignedDataValidationCertificate{
+func makeTestDataCert(marshaler codec.Marshaler, poolID, round uint64, dataHash []byte, requester string) (*types.DataCert, error) {
+	unsignedCert := types.UnsignedDataCert{
 		PoolId:    poolID,
 		Round:     round,
 		DataHash:  dataHash,
@@ -717,7 +717,7 @@ func makeTestDataCertificate(marshaler codec.Marshaler, poolID, round uint64, da
 		return nil, err
 	}
 
-	return &types.DataValidationCertificate{
+	return &types.DataCert{
 		UnsignedCert: &unsignedCert,
 		Signature:    sign,
 	}, nil

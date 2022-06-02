@@ -2,6 +2,7 @@ package keeper_test
 
 import (
 	"fmt"
+
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/medibloc/panacea-core/v2/types/assets"
@@ -48,7 +49,7 @@ func (suite poolTestSuite) TestExecuteRevenueDistributionPoolActive() {
 
 	// sell all seller data to the second pool
 	for i, sellerAddr := range sellers {
-		cert, err := makeTestDataCertificate(
+		cert, err := makeTestDataCert(
 			suite.Cdc.Marshaler,
 			poolID,
 			1,
@@ -119,7 +120,7 @@ func (suite poolTestSuite) TestExecuteRevenueDistributionDataPassSoldOut() {
 
 	// sell all seller data to the second pool
 	for i, sellerAddr := range sellers {
-		cert, err := makeTestDataCertificate(
+		cert, err := makeTestDataCert(
 			suite.Cdc.Marshaler,
 			poolID,
 			1,
@@ -175,7 +176,7 @@ func (suite poolTestSuite) TestExecuteRevenueDistributionPoolPending() {
 
 	// sell all seller data to the second pool
 	for i, sellerAddr := range sellers {
-		cert, err := makeTestDataCertificate(
+		cert, err := makeTestDataCert(
 			suite.Cdc.Marshaler,
 			poolID,
 			1,
@@ -250,7 +251,7 @@ func (suite poolTestSuite) TestExecuteRevenueDistributionPoolPendingDataPassSold
 
 	// sell all seller data to the second pool
 	for i, sellerAddr := range sellers {
-		cert, err := makeTestDataCertificate(
+		cert, err := makeTestDataCert(
 			suite.Cdc.Marshaler,
 			poolID,
 			1,
@@ -312,7 +313,7 @@ func (suite poolTestSuite) TestExecuteRevenueDistributionDuplicateSeller() {
 
 	// sell all seller data to the second pool
 	for i, sellerAddr := range sellers[:5] {
-		cert, err := makeTestDataCertificate(
+		cert, err := makeTestDataCert(
 			suite.Cdc.Marshaler,
 			poolID,
 			1,
@@ -326,7 +327,7 @@ func (suite poolTestSuite) TestExecuteRevenueDistributionDuplicateSeller() {
 
 	// sell all seller data to the second pool
 	for i, sellerAddr := range sellers {
-		cert, err := makeTestDataCertificate(
+		cert, err := makeTestDataCert(
 			suite.Cdc.Marshaler,
 			poolID,
 			1,
@@ -408,7 +409,7 @@ func (suite poolTestSuite) TestExecuteRevenueionTarget101() {
 
 	// sell all seller data to the second pool
 	for i, sellerAddr := range sellers {
-		cert, err := makeTestDataCertificate(
+		cert, err := makeTestDataCert(
 			suite.Cdc.Marshaler,
 			poolID,
 			1,

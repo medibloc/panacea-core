@@ -184,7 +184,7 @@ func (msg *MsgSellData) ValidateBasic() error {
 
 	cert := msg.Cert
 	if cert.UnsignedCert == nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "unsignedCertificate is nil")
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "unsignedCert is nil")
 	} else if cert.Signature == nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "signature is nil")
 	}

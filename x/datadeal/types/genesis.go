@@ -5,9 +5,9 @@ import sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 // DefaultGenesis returns the default Capability genesis state
 func DefaultGenesis() *GenesisState {
 	return &GenesisState{
-		Deals:            map[uint64]Deal{},
-		DataCertificates: map[string]DataValidationCertificate{},
-		NextDealNumber:   uint64(1),
+		Deals:          map[uint64]Deal{},
+		DataCerts:      map[string]DataCert{},
+		NextDealNumber: uint64(1),
 	}
 }
 
@@ -20,8 +20,8 @@ func (gs GenesisState) Validate() error {
 		}
 	}
 
-	for certMapKey, cert := range gs.DataCertificates {
-		key := string(GetKeyPrefixDataCertificate(cert.UnsignedCert.GetDealId(), cert.UnsignedCert.GetDataHash()))
+	for certMapKey, cert := range gs.DataCerts {
+		key := string(GetKeyPrefixDataCert(cert.UnsignedCert.GetDealId(), cert.UnsignedCert.GetDataHash()))
 		if certMapKey != key {
 			return sdkerrors.Wrapf(ErrInvalidGenesisDataCert, "dealID: %v, dataHash: %s", cert.UnsignedCert.GetDealId(), string(cert.UnsignedCert.GetDataHash()))
 		}

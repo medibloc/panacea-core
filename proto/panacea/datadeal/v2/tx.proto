@@ -34,7 +34,7 @@ message MsgCreateDealResponse {
 
 //MsgSellData defines the Msg/SellData request type.
 message MsgSellData {
-  DataValidationCertificate cert = 1;
+  DataCert cert = 1;
   string seller = 2;
 }
 
@@ -43,14 +43,14 @@ message MsgSellDataResponse {
   cosmos.base.v1beta1.Coin reward = 1;
 }
 
-// DataValidationCertificate defines data validation certificate.
-message DataValidationCertificate {
-  UnsignedDataValidationCertificate unsigned_cert = 1;
+// DataCert defines data validation certificate.
+message DataCert {
+  UnsignedDataCert unsigned_cert = 1;
   bytes signature = 2;
 }
 
-// UnsignedDataValidationCertificate defines unsigned data validation certificate.
-message UnsignedDataValidationCertificate {
+// UnsignedDataCert defines unsigned data validation certificate.
+message UnsignedDataCert {
   uint64 deal_id = 1;
   bytes data_hash = 2;
   bytes encrypted_data_url = 3;

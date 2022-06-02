@@ -131,13 +131,13 @@ func newCreateDealMsg(clientCtx client.Context, file string) (sdk.Msg, error) {
 	return msg, nil
 }
 
-func readDataCertFile(file string) (*types.DataValidationCertificate, error) {
+func readDataCertFile(file string) (*types.DataCert, error) {
 	contents, err := ioutil.ReadFile(file)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read file: %w", err)
 	}
 
-	var cert types.DataValidationCertificate
+	var cert types.DataCert
 
 	if err := json.Unmarshal(contents, &cert); err != nil {
 		return nil, err

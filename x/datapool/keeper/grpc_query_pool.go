@@ -72,7 +72,7 @@ func (k Keeper) DataPoolModuleAddr(goCtx context.Context, req *types.QueryDataPo
 	return &types.QueryDataPoolModuleAddrResponse{Address: moduleAddr.String()}, nil
 }
 
-func (k Keeper) DataValidationCertificates(goCtx context.Context, req *types.QueryDataValidationCertificatesRequest) (*types.QueryDataValidationCertificatesResponse, error) {
+func (k Keeper) DataCerts(goCtx context.Context, req *types.QueryDataCertsRequest) (*types.QueryDataCertsResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
@@ -82,9 +82,9 @@ func (k Keeper) DataValidationCertificates(goCtx context.Context, req *types.Que
 	store := ctx.KVStore(k.storeKey)
 	certsStore := prefix.NewStore(store, types.GetKeyPrefixDataValidateCerts(req.PoolId, req.Round))
 
-	var certs []types.DataValidationCertificate
+	var certs []types.DataCert
 	pageRes, err := query.Paginate(certsStore, req.Pagination, func(_ []byte, value []byte) error {
-		var cert types.DataValidationCertificate
+		var cert types.DataCert
 		err := k.cdc.UnmarshalBinaryLengthPrefixed(value, &cert)
 		if err != nil {
 			return err
@@ -97,9 +97,9 @@ func (k Keeper) DataValidationCertificates(goCtx context.Context, req *types.Que
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	return &types.QueryDataValidationCertificatesResponse{
-		DataValidationCertificates: certs,
-		Pagination:                 pageRes,
+	return &types.QueryDataCertsResponse{
+		DataCerts:  certs,
+		Pagination: pageRes,
 	}, nil
 }
 

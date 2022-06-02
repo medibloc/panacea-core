@@ -73,10 +73,10 @@ func CmdGetPool() *cobra.Command {
 	return cmd
 }
 
-func CmdGetDataValidationCertificates() *cobra.Command {
+func CmdGetDataCerts() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "data-validation-certs [pool-id] [round]",
-		Short: "Query data validation certificates by pool and round",
+		Use:   "data-certs [pool-id] [round]",
+		Short: "Query data certificates by pool and round",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientQueryContext(cmd)
@@ -101,7 +101,7 @@ func CmdGetDataValidationCertificates() *cobra.Command {
 				return err
 			}
 
-			res, err := queryClient.DataValidationCertificates(cmd.Context(), &types.QueryDataValidationCertificatesRequest{
+			res, err := queryClient.DataCerts(cmd.Context(), &types.QueryDataCertsRequest{
 				PoolId:     poolID,
 				Round:      round,
 				Pagination: pageReq,

@@ -10,6 +10,6 @@ import "panacea/datadeal/v2/tx.proto";
 // GenesisState defines the datadeal module's genesis state.
 message GenesisState {
   map<uint64, Deal> deals = 1 [(gogoproto.nullable) = false];
-  map<string, DataValidationCertificate> data_certificates = 2 [(gogoproto.nullable) = false];
+  map<string, DataCert> data_certs = 2 [(gogoproto.nullable) = false];
   uint64 next_deal_number = 3;
 }
