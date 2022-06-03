@@ -95,6 +95,9 @@ func (suite poolTestSuite) setupCreatePool(targetNumData, maxNftSupply uint64) u
 	err = suite.OracleKeeper.RegisterOracle(suite.Ctx, oracle)
 	suite.Require().NoError(err)
 
+	err = suite.OracleKeeper.SetOracle(suite.Ctx, oracle)
+	suite.Require().NoError(err)
+
 	newPoolParams := makePoolParamsWithOracle(targetNumData, maxNftSupply)
 
 	poolID, err := suite.DataPoolKeeper.CreatePool(suite.Ctx, curatorAddr, enoughDeposit, newPoolParams)

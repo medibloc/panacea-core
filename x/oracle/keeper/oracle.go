@@ -87,6 +87,12 @@ func (k Keeper) SetOracle(ctx sdk.Context, oracle types.Oracle) error {
 	return nil
 }
 
+func (k Keeper) IsRegisteredOracle(ctx sdk.Context, oracleAddress sdk.AccAddress) bool {
+	store := ctx.KVStore(k.storeKey)
+	oracleKey := types.GetKeyPrefixOracle(oracleAddress)
+	return store.Has(oracleKey)
+}
+
 func (k Keeper) UpdateOracle(ctx sdk.Context, address sdk.AccAddress, endpoint string) error {
 	oracle, err := k.GetOracle(ctx, address)
 	if err != nil {

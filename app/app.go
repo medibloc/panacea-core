@@ -462,6 +462,7 @@ func New(
 		app.BankKeeper,
 		app.AccountKeeper,
 		app.wasmKeeper,
+		app.oracleKeeper,
 	)
 
 	app.oracleKeeper = *oraclekeeper.NewKeeper(

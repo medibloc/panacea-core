@@ -234,7 +234,8 @@ func (suite *TestSuite) SetupTest() {
 		keyParams[datadealtypes.StoreKey],
 		memKeys[datadealtypes.MemStoreKey],
 		suite.BankKeeper,
-		suite.AccountKeeper)
+		suite.AccountKeeper,
+	)
 	suite.DataDealMsgServer = datadealkeeper.NewMsgServerImpl(suite.DataDealKeeper)
 
 	suite.DataPoolKeeper = *datapoolkeeper.NewKeeper(
@@ -245,6 +246,7 @@ func (suite *TestSuite) SetupTest() {
 		suite.BankKeeper,
 		suite.AccountKeeper,
 		suite.WasmKeeper,
+		suite.OracleKeeper,
 	)
 	suite.DataPoolMsgServer = datapoolkeeper.NewMsgServerImpl(suite.DataPoolKeeper)
 
@@ -253,8 +255,8 @@ func (suite *TestSuite) SetupTest() {
 
 	suite.OracleKeeper = *oraclekeeper.NewKeeper(
 		cdc.Marshaler,
-		keyParams[datapooltypes.StoreKey],
-		memKeys[datapooltypes.MemStoreKey],
+		keyParams[oracletypes.StoreKey],
+		memKeys[oracletypes.MemStoreKey],
 		suite.AccountKeeper,
 	)
 
