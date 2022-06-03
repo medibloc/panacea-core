@@ -14,6 +14,7 @@ var (
 	oraclePrivKey = secp256k1.GenPrivKey()
 	oraclePubKey  = oraclePrivKey.PubKey()
 	oracle1       = sdk.AccAddress(oraclePubKey.Address())
+	oracle2       = sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address())
 
 	fundForOracle = sdk.NewCoins(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(10000000000)))
 )
@@ -112,4 +113,27 @@ func (suite *oracleTestSuite) TestUpdateOracle() {
 
 	suite.Require().Equal(getOracle.GetAddress(), updateTempOracle.GetAddress())
 	suite.Require().Equal(getOracle.GetEndpoint(), updateTempOracle.GetEndpoint())
+}
+
+func (suite *oracleTestSuite) TestUpdateOracle_invalid_requester() {
+	err := suite.BankKeeper.AddCoins(suite.Ctx, oracle1, fundForOracle)
+	suite.Require().NoError(err)
+
+	suite.setOracleAccount()
+
+	tempOracle := types.Oracle{
+		Address:  oracle1.String(),
+		Endpoint: "https://my-oracle.org",
+	}
+
+	err = suite.OracleKeeper.RegisterOracle(suite.Ctx, tempOracle)
+	suite.Require().NoError(err)
+
+	updateTempOracle := types.Oracle{
+		Address:  oracle2.String(),
+		Endpoint: "https://update-my-oracle.org",
+	}
+
+	err = suite.OracleKeeper.UpdateOracle(suite.Ctx, oracle2, updateTempOracle.Endpoint)
+	suite.Require().Error(err, types.ErrInvalidUpdateRequester)
 }

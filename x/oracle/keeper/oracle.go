@@ -99,6 +99,10 @@ func (k Keeper) UpdateOracle(ctx sdk.Context, address sdk.AccAddress, endpoint s
 		return err
 	}
 
+	if oracle.Address != address.String() {
+		return sdkerrors.Wrapf(types.ErrInvalidUpdateRequester, "the requester %s is invalid", address.String())
+	}
+
 	oracle.Endpoint = endpoint
 
 	err = k.SetOracle(ctx, oracle)
