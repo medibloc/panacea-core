@@ -156,7 +156,7 @@ func (k Keeper) SellData(ctx sdk.Context, seller sdk.AccAddress, cert types.Data
 	}
 
 	if !k.isTrustedOracle(cert, deal) {
-		return sdk.Coin{}, types.ErrInvalidDataVal
+		return sdk.Coin{}, types.ErrInvalidOracle
 	}
 
 	//TODO: Fields max_num_data and cur_num_data will be changed in next data datadeal model.

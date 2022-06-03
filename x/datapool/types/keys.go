@@ -26,35 +26,28 @@ const (
 )
 
 var (
-	// KeyPrefixOracles defines key to store oracle
-	KeyPrefixOracles = []byte{0x01}
-
 	// KeyPoolNextNumber defines key to store next Pool ID to be used
-	KeyPoolNextNumber = []byte{0x02}
+	KeyPoolNextNumber = []byte{0x01}
 
 	// KeyPrefixPools defines key to store Pools
-	KeyPrefixPools = []byte{0x03}
+	KeyPrefixPools = []byte{0x02}
 
 	// KeyPrefixOracleCerts defines key to store oracle certs
-	KeyPrefixOracleCerts = []byte{0x04}
+	KeyPrefixOracleCerts = []byte{0x03}
 
 	// KeyPrefixNFTRedeemReceipts define key to store redeemed receipts
-	KeyPrefixNFTRedeemReceipts = []byte{0x05}
+	KeyPrefixNFTRedeemReceipts = []byte{0x04}
 
-	KeyPrefixSalesHistory = []byte{0x06}
+	KeyPrefixSalesHistory = []byte{0x05}
 
 	// KeyPrefixInstantRevenueDistribution defines key to distribution reward pool
-	KeyPrefixInstantRevenueDistribution = []byte{0x07}
+	KeyPrefixInstantRevenueDistribution = []byte{0x06}
 
 	// KeyPrefixDataPassRedeemHistory defines key to store redeem receipts by address
-	KeyPrefixDataPassRedeemHistory = []byte{0x08}
+	KeyPrefixDataPassRedeemHistory = []byte{0x07}
 
 	KeyIndexSeparator = []byte{0xFF}
 )
-
-func GetKeyPrefixOracle(oracleAddr sdk.AccAddress) []byte {
-	return append(KeyPrefixOracles, oracleAddr.Bytes()...)
-}
 
 func GetKeyPrefixPools(poolID uint64) []byte {
 	return append(KeyPrefixPools, sdk.Uint64ToBigEndian(poolID)...)

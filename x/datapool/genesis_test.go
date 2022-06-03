@@ -36,12 +36,6 @@ func TestGenesisTestSuite(t *testing.T) {
 }
 
 func (suite genesisTestSuite) TestDataPoolInitGenesis() {
-	var oracles []types.Oracle
-
-	oracle := makeSampleOracle()
-
-	oracles = append(oracles, oracle)
-
 	pool := makeSamplePool()
 
 	pools := []types.Pool{pool}
@@ -63,7 +57,6 @@ func (suite genesisTestSuite) TestDataPoolInitGenesis() {
 	dataPassRedeemHistories := makeSampleDataPassRedeemHistory()
 
 	genState := &types.GenesisState{
-		Oracles:                    oracles,
 		NextPoolNumber:             2,
 		Pools:                      pools,
 		Params:                     params,
@@ -74,11 +67,6 @@ func (suite genesisTestSuite) TestDataPoolInitGenesis() {
 	}
 
 	datapool.InitGenesis(suite.Ctx, suite.DataPoolKeeper, *genState)
-
-	// check oracle
-	oracleFromKeeper, err := suite.DataPoolKeeper.GetOracle(suite.Ctx, oracle1)
-	suite.Require().NoError(err)
-	suite.Require().Equal(oracle, oracleFromKeeper)
 
 	// check the next pool number
 	suite.Require().Equal(uint64(2), suite.DataPoolKeeper.GetNextPoolNumber(suite.Ctx))
@@ -146,11 +134,6 @@ func (suite genesisTestSuite) TestDataPoolInitGenesis() {
 }
 
 func (suite genesisTestSuite) TestDataPoolExportGenesis() {
-	// register oracle
-	oracle := makeSampleOracle()
-	err := suite.DataPoolKeeper.SetOracle(suite.Ctx, oracle)
-	suite.Require().NoError(err)
-
 	// create pool
 	pool := makeSamplePool()
 	suite.DataPoolKeeper.SetPool(suite.Ctx, &pool)
@@ -183,19 +166,11 @@ func (suite genesisTestSuite) TestDataPoolExportGenesis() {
 	suite.Require().Equal(uint64(2), genesisState.NextPoolNumber)
 	suite.Require().Len(genesisState.Pools, 1)
 	suite.Require().Equal(types.DefaultParams(), genesisState.Params)
-	suite.Require().Len(genesisState.Oracles, 1)
 	suite.Require().Len(genesisState.DataPassRedeemReceipts, 1)
 	suite.Require().Equal(poolIDs, genesisState.InstantRevenueDistribution.PoolIds)
 	suite.Require().True(len(genesisState.SalesHistories) == 4)
 	suite.Require().Len(genesisState.DataPassRedeemHistories, 1)
 	suite.Require().Equal(redeemHistory, genesisState.DataPassRedeemHistories)
-}
-
-func makeSampleOracle() types.Oracle {
-	return types.Oracle{
-		Address:  oracle1.String(),
-		Endpoint: "https://my-oracle.org",
-	}
 }
 
 func makeSamplePool() types.Pool {

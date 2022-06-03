@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"fmt"
+	oraclekeeper "github.com/medibloc/panacea-core/v2/x/oracle/keeper"
 
 	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
 
@@ -33,6 +34,7 @@ type (
 		accountKeeper types.AccountKeeper
 		wasmKeeper    wasmtypes.ContractOpsKeeper
 		viewKeeper    wasmtypes.ViewKeeper
+		oracleKeeper  oraclekeeper.Keeper
 	}
 )
 
@@ -46,6 +48,7 @@ func NewKeeper(
 	bankKeeper types.BankKeeper,
 	accountKeeper types.AccountKeeper,
 	wasmKeeper wasm.Keeper,
+	oracleKeeper oraclekeeper.Keeper,
 ) *Keeper {
 	if !paramSpace.HasKeyTable() {
 		paramSpace = paramSpace.WithKeyTable(types.ParamKeyTable())
@@ -60,6 +63,7 @@ func NewKeeper(
 		accountKeeper: accountKeeper,
 		wasmKeeper:    wasmkeeper.NewDefaultPermissionKeeper(wasmKeeper),
 		viewKeeper:    wasmKeeper,
+		oracleKeeper:  oracleKeeper,
 	}
 }
 

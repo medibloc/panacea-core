@@ -16,11 +16,6 @@ service Query {
     option (google.api.http).get = "/panacea/datapool/v2/pools/{pool_id}";
   }
 
-  // Oracle returns a Oracle.
-  rpc Oracle(QueryOracleRequest) returns (QueryOracleResponse) {
-    option (google.api.http).get = "/panacea/datapool/v2/oracle";
-  }
-
   // DataPoolParams returns params of x/datapool module.
   rpc DataPoolParams(QueryDataPoolParamsRequest) returns (QueryDataPoolParamsResponse) {
     option (google.api.http).get = "/panacea/datapool/v2/params";
@@ -60,16 +55,6 @@ message QueryPoolRequest {
 // QueryPoolResponse is the response type for the Query/Pool RPC method.
 message QueryPoolResponse {
   Pool pool = 1;
-}
-
-// QueryOracleRequest is the request type for the Query/Oracle RPC method.
-message QueryOracleRequest {
-  string address = 1 ;
-}
-
-// QueryOracleResponse is the response type for the Query/Oracle RPC method.
-message QueryOracleResponse {
-  Oracle oracle = 1;
 }
 
 // QueryDataPoolParamsRequest is the request type for the Query/DataPoolParams RPC method.

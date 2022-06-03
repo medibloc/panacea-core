@@ -12,12 +12,6 @@ import "panacea/datapool/v2/pool.proto";
 
 // Msg defines the Msg service.
 service Msg {
-  // RegisterOracle defines a method for registration of oracle.
-  rpc RegisterOracle(MsgRegisterOracle) returns (MsgRegisterOracleResponse);
-
-  // UpdateOracle defines a method for updating of oracle.
-  rpc UpdateOracle(MsgUpdateOracle) returns (MsgUpdateOracleResponse);
-
   // CreatePool defines a method for creating data pool.
   rpc CreatePool(MsgCreatePool) returns (MsgCreatePoolResponse);
 
@@ -29,26 +23,6 @@ service Msg {
 
   // RedeemDataPass defines a method for redeeming data pass to get data
   rpc RedeemDataPass(MsgRedeemDataPass) returns (MsgRedeemDataPassResponse);
-}
-
-// MsgRegisterOracle defines the Msg/RegisterOracle request type.
-message MsgRegisterOracle {
-  Oracle oracle_detail = 1;      // Detail of oracle
-}
-
-// MsgRegisterOracleResponse defines the Msg/RegisterOracle response type.
-message MsgRegisterOracleResponse {
-}
-
-// MsgUpdateOracle defines the Msg/UpdateOracle request type.
-message MsgUpdateOracle {
-  string oracle = 1;
-  string endpoint = 2;
-}
-
-// MsgUpdateOracleResponse defines the Msg/UpdateOracle response type.
-message MsgUpdateOracleResponse {
-
 }
 
 // MsgCreatePool defines the Msg/CreatePool request type.

@@ -39,24 +39,6 @@ func (suite queryPoolTestSuite) TestQueryDataPoolParams() {
 	suite.Require().Equal(params, res.GetParams())
 }
 
-func (suite *queryPoolTestSuite) TestQueryOracle() {
-	oracle := types.Oracle{
-		Address:  oracle1.String(),
-		Endpoint: "https://my-oracle-url.org",
-	}
-	err := suite.DataPoolKeeper.SetOracle(suite.Ctx, oracle)
-	suite.Require().NoError(err)
-
-	req := types.QueryOracleRequest{
-		Address: oracle1.String(),
-	}
-
-	res, err := suite.DataPoolKeeper.Oracle(sdk.WrapSDKContext(suite.Ctx), &req)
-	suite.Require().NoError(err)
-	suite.Require().NotNil(res)
-	suite.Require().Equal(oracle, *res.Oracle)
-}
-
 func (suite *queryPoolTestSuite) TestQueryPool() {
 	pool := suite.setPool()
 
@@ -77,7 +59,6 @@ func (suite *queryPoolTestSuite) TestQueryPool() {
 }
 
 func (suite queryPoolTestSuite) TestQueryDataCerts() {
-	suite.setOracleAccount()
 	pool := suite.setPool()
 
 	req := types.QueryDataCertsRequest{
@@ -146,13 +127,6 @@ func (suite *queryPoolTestSuite) TestQueryRedeemReceiptsList() {
 	suite.Require().NoError(err)
 	suite.Require().NotNil(res)
 	suite.Require().Equal(*redeemHistory, res.DataPassRedeemHistories)
-}
-
-func (suite *queryPoolTestSuite) setOracleAccount() {
-	oracleAccount := suite.AccountKeeper.NewAccountWithAddress(suite.Ctx, oracle1)
-	err := oracleAccount.SetPubKey(oraclePubKey)
-	suite.Require().NoError(err)
-	suite.AccountKeeper.SetAccount(suite.Ctx, oracleAccount)
 }
 
 func (suite *queryPoolTestSuite) setPool() *types.Pool {

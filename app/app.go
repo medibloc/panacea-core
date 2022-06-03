@@ -7,6 +7,10 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/medibloc/panacea-core/v2/x/oracle"
+	oraclekeeper "github.com/medibloc/panacea-core/v2/x/oracle/keeper"
+	oracletypes "github.com/medibloc/panacea-core/v2/x/oracle/types"
+
 	"github.com/medibloc/panacea-core/v2/x/datapool"
 	datapoolkeeper "github.com/medibloc/panacea-core/v2/x/datapool/keeper"
 	datapooltypes "github.com/medibloc/panacea-core/v2/x/datapool/types"
@@ -190,6 +194,7 @@ var (
 		wasm.AppModuleBasic{},
 		datadeal.AppModuleBasic{},
 		datapool.AppModuleBasic{},
+		oracle.AppModuleBasic{},
 	)
 
 	// module account permissions
@@ -265,6 +270,7 @@ type App struct {
 	wasmKeeper     wasm.Keeper
 	dataDealKeeper datadealkeeper.Keeper
 	dataPoolKeeper datapoolkeeper.Keeper
+	oracleKeeper   oraclekeeper.Keeper
 
 	// the module manager
 	mm *module.Manager
@@ -299,6 +305,7 @@ func New(
 		wasm.StoreKey,
 		datadealtypes.StoreKey,
 		datapooltypes.StoreKey,
+		oracletypes.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
@@ -440,6 +447,13 @@ func New(
 		wasmOpts...,
 	)
 
+	app.oracleKeeper = *oraclekeeper.NewKeeper(
+		appCodec,
+		keys[oracletypes.StoreKey],
+		keys[oracletypes.MemStoreKey],
+		app.AccountKeeper,
+	)
+
 	app.dataDealKeeper = *datadealkeeper.NewKeeper(
 		appCodec,
 		keys[datadealtypes.StoreKey],
@@ -456,6 +470,7 @@ func New(
 		app.BankKeeper,
 		app.AccountKeeper,
 		app.wasmKeeper,
+		app.oracleKeeper,
 	)
 
 	// The gov proposal types can be individually enabled
@@ -511,6 +526,7 @@ func New(
 		wasm.NewAppModule(appCodec, &app.wasmKeeper, app.StakingKeeper),
 		datadeal.NewAppModule(appCodec, app.dataDealKeeper),
 		datapool.NewAppModule(appCodec, app.dataPoolKeeper),
+		oracle.NewAppModule(appCodec, app.oracleKeeper),
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -550,6 +566,7 @@ func New(
 		wasm.ModuleName,
 		datadealtypes.ModuleName,
 		datapooltypes.ModuleName,
+		oracletypes.ModuleName,
 	)
 
 	app.mm.RegisterInvariants(&app.CrisisKeeper)
@@ -762,6 +779,7 @@ func initParamsKeeper(appCodec codec.BinaryMarshaler, legacyAmino *codec.LegacyA
 	paramsKeeper.Subspace(wasm.ModuleName)
 	paramsKeeper.Subspace(datadealtypes.ModuleName)
 	paramsKeeper.Subspace(datapooltypes.ModuleName)
+	paramsKeeper.Subspace(oracletypes.ModuleName)
 
 	return paramsKeeper
 }
