@@ -37,6 +37,12 @@ func (suite genesisTestSuite) TestDataPoolInitGenesis() {
 	oracleFromKeeper, err := suite.OracleKeeper.GetOracle(suite.Ctx, oracle1)
 	suite.Require().NoError(err)
 	suite.Require().Equal(tempOracle, oracleFromKeeper)
+
+	// check all oracles
+	oraclesFromKeeper, err := suite.OracleKeeper.GetAllOracles(suite.Ctx)
+	suite.Require().NoError(err)
+	suite.Require().Equal(oraclesFromKeeper, oracles)
+	suite.Require().Len(oraclesFromKeeper, 1)
 }
 
 func (suite genesisTestSuite) TestOracleExportGenesis() {
@@ -47,6 +53,9 @@ func (suite genesisTestSuite) TestOracleExportGenesis() {
 
 	genesisState := oracle.ExportGenesis(suite.Ctx, suite.OracleKeeper)
 	suite.Require().Len(genesisState.Oracles, 1)
+
+	suite.Require().Equal(genesisState.Oracles[0].Address, tempOracle.Address)
+	suite.Require().Equal(genesisState.Oracles[0].Endpoint, tempOracle.Endpoint)
 }
 
 func makeSampleOracle() types.Oracle {

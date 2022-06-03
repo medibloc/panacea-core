@@ -137,6 +137,7 @@ func (suite poolTestSuite) TestCreatePool() {
 	newPoolParams := makePoolParamsWithOracle(defaultTargetNumData, defaultMaxNftSupply)
 
 	pool, err := suite.DataPoolKeeper.GetPool(suite.Ctx, poolID)
+
 	suite.Require().NoError(err)
 	suite.Require().Equal(pool.GetPoolId(), uint64(1))
 	suite.Require().Equal(pool.GetPoolAddress(), types.NewPoolAddress(poolID).String())
@@ -354,7 +355,7 @@ func (suite poolTestSuite) TestNotOwnedRedeemerNFT() {
 	suite.Require().Error(err, types.ErrNotOwnedRedeemerNft)
 }
 func makePoolParamsWithOracle(TargetNumData, MaxNftSupply uint64) types.PoolParams {
-	return types.PoolParams{
+	params := types.PoolParams{
 		DataSchema:         []string{"https://www.json.ld"},
 		TargetNumData:      TargetNumData,
 		MaxNftSupply:       MaxNftSupply,
@@ -362,6 +363,8 @@ func makePoolParamsWithOracle(TargetNumData, MaxNftSupply uint64) types.PoolPara
 		TrustedOracles:     []string{oracle1.String()},
 		TrustedDataIssuers: []string(nil),
 	}
+
+	return params
 }
 
 func makePoolParamsNoOracle(maxNftSupply uint64) types.PoolParams {

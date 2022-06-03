@@ -40,7 +40,7 @@ func (k Keeper) CreatePool(ctx sdk.Context, curator sdk.AccAddress, deposit sdk.
 	// check if the trusted_oracles are registered
 	for _, oracle := range poolParams.TrustedOracles {
 		accAddr, _ := sdk.AccAddressFromBech32(oracle)
-		if !k.isRegisteredOracle(ctx, accAddr) {
+		if !k.IsRegisteredOracle(ctx, accAddr) {
 			return 0, types.ErrNotRegisteredOracle
 		}
 	}
@@ -113,12 +113,6 @@ func (k Keeper) CreatePool(ctx sdk.Context, curator sdk.AccAddress, deposit sdk.
 	k.SetPool(ctx, newPool)
 
 	return newPool.GetPoolId(), nil
-}
-
-func (k Keeper) isRegisteredOracle(ctx sdk.Context, oracleAddress sdk.AccAddress) bool {
-	store := ctx.KVStore(k.storeKey)
-	oracleKey := oracletypes.GetKeyPrefixOracle(oracleAddress)
-	return store.Has(oracleKey)
 }
 
 func (k Keeper) GetNextPoolNumberAndIncrement(ctx sdk.Context) uint64 {
@@ -194,6 +188,12 @@ func (k Keeper) GetPool(ctx sdk.Context, poolID uint64) (*types.Pool, error) {
 	k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, pool)
 
 	return pool, nil
+}
+
+func (k Keeper) IsRegisteredOracle(ctx sdk.Context, oracleAddress sdk.AccAddress) bool {
+	store := ctx.KVStore(k.storeKey)
+	oracleKey := oracletypes.GetKeyPrefixOracle(oracleAddress)
+	return store.Has(oracleKey)
 }
 
 // CreateNFTContract stores NFT contract

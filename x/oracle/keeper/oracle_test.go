@@ -3,7 +3,6 @@ package keeper_test
 import (
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/medibloc/panacea-core/v2/types/assets"
 	"github.com/medibloc/panacea-core/v2/types/testsuite"
 	"github.com/medibloc/panacea-core/v2/x/oracle/types"
@@ -84,19 +83,6 @@ func (suite *oracleTestSuite) TestIsOracleDuplicate() {
 
 	err = suite.OracleKeeper.RegisterOracle(suite.Ctx, tempOracle)
 	suite.Require().Error(err, types.ErrOracleAlreadyExist)
-}
-
-func (suite *oracleTestSuite) TestNotGetPubKey() {
-	err := suite.BankKeeper.AddCoins(suite.Ctx, oracle1, fundForOracle)
-	suite.Require().NoError(err)
-
-	tempOracle := types.Oracle{
-		Address:  oracle1.String(),
-		Endpoint: "https://my-oracle.org",
-	}
-
-	err = suite.OracleKeeper.RegisterOracle(suite.Ctx, tempOracle)
-	suite.Require().Error(err, sdkerrors.ErrKeyNotFound)
 }
 
 func (suite *oracleTestSuite) TestUpdateOracle() {
