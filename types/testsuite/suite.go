@@ -229,6 +229,18 @@ func (suite *TestSuite) SetupTest() {
 		suite.BankKeeper,
 	)
 
+	suite.OracleKeeper = *oraclekeeper.NewKeeper(
+		cdc.Marshaler,
+		keyParams[oracletypes.StoreKey],
+		memKeys[oracletypes.MemStoreKey],
+		suite.AccountKeeper,
+	)
+
+	suite.OracleMsgServer = oraclekeeper.NewMsgServerImpl(suite.OracleKeeper)
+
+	oracleGenState := oracletypes.DefaultGenesis()
+	oracle.InitGenesis(suite.Ctx, suite.OracleKeeper, *oracleGenState)
+
 	suite.DataDealKeeper = *datadealkeeper.NewKeeper(
 		cdc.Marshaler,
 		keyParams[datadealtypes.StoreKey],
@@ -252,18 +264,6 @@ func (suite *TestSuite) SetupTest() {
 
 	dataPoolGenState := datapooltypes.DefaultGenesis()
 	datapool.InitGenesis(suite.Ctx, suite.DataPoolKeeper, *dataPoolGenState)
-
-	suite.OracleKeeper = *oraclekeeper.NewKeeper(
-		cdc.Marshaler,
-		keyParams[oracletypes.StoreKey],
-		memKeys[oracletypes.MemStoreKey],
-		suite.AccountKeeper,
-	)
-
-	suite.OracleMsgServer = oraclekeeper.NewMsgServerImpl(suite.OracleKeeper)
-
-	oracleGenState := oracletypes.DefaultGenesis()
-	oracle.InitGenesis(suite.Ctx, suite.OracleKeeper, *oracleGenState)
 }
 
 func (suite *TestSuite) BeforeTest(suiteName, testName string) {

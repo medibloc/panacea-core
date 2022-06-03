@@ -1,14 +1,15 @@
 package app
 
 import (
-	"github.com/medibloc/panacea-core/v2/x/oracle"
-	oraclekeeper "github.com/medibloc/panacea-core/v2/x/oracle/keeper"
-	oracletypes "github.com/medibloc/panacea-core/v2/x/oracle/types"
 	"io"
 	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/medibloc/panacea-core/v2/x/oracle"
+	oraclekeeper "github.com/medibloc/panacea-core/v2/x/oracle/keeper"
+	oracletypes "github.com/medibloc/panacea-core/v2/x/oracle/types"
 
 	"github.com/medibloc/panacea-core/v2/x/datapool"
 	datapoolkeeper "github.com/medibloc/panacea-core/v2/x/datapool/keeper"
@@ -446,6 +447,13 @@ func New(
 		wasmOpts...,
 	)
 
+	app.oracleKeeper = *oraclekeeper.NewKeeper(
+		appCodec,
+		keys[oracletypes.StoreKey],
+		keys[oracletypes.MemStoreKey],
+		app.AccountKeeper,
+	)
+
 	app.dataDealKeeper = *datadealkeeper.NewKeeper(
 		appCodec,
 		keys[datadealtypes.StoreKey],
@@ -463,13 +471,6 @@ func New(
 		app.AccountKeeper,
 		app.wasmKeeper,
 		app.oracleKeeper,
-	)
-
-	app.oracleKeeper = *oraclekeeper.NewKeeper(
-		appCodec,
-		keys[oracletypes.StoreKey],
-		keys[oracletypes.MemStoreKey],
-		app.AccountKeeper,
 	)
 
 	// The gov proposal types can be individually enabled
