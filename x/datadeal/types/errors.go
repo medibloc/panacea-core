@@ -16,7 +16,7 @@ var (
 	ErrDealNotFound           = sdkerrors.Register(ModuleName, 6, "deal is not found")
 	ErrDataNotFound           = sdkerrors.Register(ModuleName, 7, "data is not found")
 	ErrDealNotInitialized     = sdkerrors.Register(ModuleName, 8, "deal has not been initialized")
-	ErrInvalidDataVal         = sdkerrors.Register(ModuleName, 9, "invalid data validator")
+	ErrInvalidOracle          = sdkerrors.Register(ModuleName, 9, "invalid oracle")
 	ErrInvalidGenesisDeal     = sdkerrors.Register(ModuleName, 10, "invalid genesis state of deal")
 	ErrInvalidGenesisDataCert = sdkerrors.Register(ModuleName, 11, "invalid genesis state of data cert")
 )
