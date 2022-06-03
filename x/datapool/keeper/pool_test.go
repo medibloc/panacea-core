@@ -2,11 +2,12 @@ package keeper_test
 
 import (
 	"fmt"
-	oracletypes "github.com/medibloc/panacea-core/v2/x/oracle/types"
 	"io/ioutil"
 	"strconv"
 	"strings"
 	"testing"
+
+	oracletypes "github.com/medibloc/panacea-core/v2/x/oracle/types"
 
 	"github.com/cosmos/cosmos-sdk/codec"
 
@@ -162,7 +163,7 @@ func (suite poolTestSuite) TestNotRegisteredOracle() {
 	newPoolParams := makePoolParamsWithOracle(defaultTargetNumData, defaultMaxNftSupply)
 
 	_, err = suite.DataPoolKeeper.CreatePool(suite.Ctx, curatorAddr, enoughDeposit, newPoolParams)
-	suite.Require().Error(err, types.ErrNotRegisteredOracle)
+	suite.Require().Error(err, oracletypes.ErrNotRegisteredOracle)
 }
 
 func (suite poolTestSuite) TestNotEnoughBalanceForDeposit() {

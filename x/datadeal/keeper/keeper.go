@@ -3,6 +3,8 @@ package keeper
 import (
 	"fmt"
 
+	oraclekeeper "github.com/medibloc/panacea-core/v2/x/oracle/keeper"
+
 	"github.com/tendermint/tendermint/libs/log"
 
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -17,6 +19,7 @@ type (
 		memKey        sdk.StoreKey
 		bankKeeper    types.BankKeeper
 		accountKeeper types.AccountKeeper
+		oracleKeeper  oraclekeeper.Keeper
 	}
 )
 
@@ -26,6 +29,7 @@ func NewKeeper(
 	memKey sdk.StoreKey,
 	bankKeeper types.BankKeeper,
 	accountKeeper types.AccountKeeper,
+	oracleKeeper oraclekeeper.Keeper,
 ) *Keeper {
 	return &Keeper{
 		cdc:           cdc,
@@ -33,6 +37,7 @@ func NewKeeper(
 		memKey:        memKey,
 		bankKeeper:    bankKeeper,
 		accountKeeper: accountKeeper,
+		oracleKeeper:  oracleKeeper,
 	}
 }
 

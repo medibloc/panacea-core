@@ -460,6 +460,7 @@ func New(
 		keys[datadealtypes.MemStoreKey],
 		app.BankKeeper,
 		app.AccountKeeper,
+		app.oracleKeeper,
 	)
 
 	app.dataPoolKeeper = *datapoolkeeper.NewKeeper(
