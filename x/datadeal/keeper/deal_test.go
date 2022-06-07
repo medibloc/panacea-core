@@ -4,6 +4,8 @@ import (
 	"strconv"
 	"testing"
 
+	oracletypes "github.com/medibloc/panacea-core/v2/x/oracle/types"
+
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -50,6 +52,14 @@ func (suite *dealTestSuite) TestCreateNewDeal() {
 	}
 
 	owner, err := sdk.AccAddressFromBech32(tempDeal.GetOwner())
+	suite.Require().NoError(err)
+
+	oracle := oracletypes.Oracle{
+		Address:  acc2.String(),
+		Endpoint: "https://my-oracle.org",
+	}
+
+	err = suite.OracleKeeper.SetOracle(suite.Ctx, oracle)
 	suite.Require().NoError(err)
 
 	dealID, err := suite.DataDealKeeper.CreateDeal(suite.Ctx, owner, tempDeal)
@@ -101,6 +111,14 @@ func (suite *dealTestSuite) TestListDeals() {
 	owner, err := sdk.AccAddressFromBech32(tempDeal.GetOwner())
 	suite.Require().NoError(err)
 
+	oracle := oracletypes.Oracle{
+		Address:  acc2.String(),
+		Endpoint: "https://my-oracle.org",
+	}
+
+	err = suite.OracleKeeper.SetOracle(suite.Ctx, oracle)
+	suite.Require().NoError(err)
+
 	dealIDs := make([]uint64, 0)
 
 	for i := 0; i < 5; i++ {
@@ -143,6 +161,14 @@ func (suite *dealTestSuite) TestGetBalanceOfDeal() {
 	owner, err := sdk.AccAddressFromBech32(tempDeal.GetOwner())
 	suite.Require().NoError(err)
 
+	oracle := oracletypes.Oracle{
+		Address:  acc2.String(),
+		Endpoint: "https://my-oracle.org",
+	}
+
+	err = suite.OracleKeeper.SetOracle(suite.Ctx, oracle)
+	suite.Require().NoError(err)
+
 	dealID, err := suite.DataDealKeeper.CreateDeal(suite.Ctx, owner, tempDeal)
 	suite.Require().NoError(err)
 
@@ -173,6 +199,14 @@ func (suite *dealTestSuite) TestSellOwnData() {
 		TrustedOracles: []string{newAddr.String()},
 		Owner:          acc1.String(),
 	}
+
+	oracle := oracletypes.Oracle{
+		Address:  newAddr.String(),
+		Endpoint: "https://my-oracle.org",
+	}
+
+	err = suite.OracleKeeper.SetOracle(suite.Ctx, oracle)
+	suite.Require().NoError(err)
 
 	newDealID, err := suite.DataDealKeeper.CreateDeal(suite.Ctx, acc1, tempDeal)
 	suite.Require().NoError(err)
@@ -208,6 +242,14 @@ func (suite *dealTestSuite) TestIsDataCertDuplicate() {
 		Owner:          acc1.String(),
 	}
 
+	oracle := oracletypes.Oracle{
+		Address:  newAddr.String(),
+		Endpoint: "https://my-oracle.org",
+	}
+
+	err = suite.OracleKeeper.SetOracle(suite.Ctx, oracle)
+	suite.Require().NoError(err)
+
 	_, err = suite.DataDealKeeper.CreateDeal(suite.Ctx, acc1, tempDeal)
 	suite.Require().NoError(err)
 
@@ -227,16 +269,21 @@ func (suite *dealTestSuite) TestIsTrustedOracles_Invalid() {
 	err = suite.BankKeeper.AddCoins(suite.Ctx, acc3, zeroFunds)
 	suite.Require().NoError(err)
 
-	errOracle1 := secp256k1.GenPrivKey().PubKey().Address().String()
-	errOracle2 := secp256k1.GenPrivKey().PubKey().Address().String()
-
 	tempDeal := types.Deal{
 		DataSchema:     []string{"http://jsonld.com"},
 		Budget:         &sdk.Coin{Denom: assets.MicroMedDenom, Amount: sdk.NewInt(10000000)},
 		MaxNumData:     10000,
-		TrustedOracles: []string{errOracle1, errOracle2},
+		TrustedOracles: []string{acc2.String()},
 		Owner:          acc1.String(),
 	}
+
+	oracle := oracletypes.Oracle{
+		Address:  acc2.String(),
+		Endpoint: "https://my-oracle.org",
+	}
+
+	err = suite.OracleKeeper.SetOracle(suite.Ctx, oracle)
+	suite.Require().NoError(err)
 
 	_, err = suite.DataDealKeeper.CreateDeal(suite.Ctx, acc1, tempDeal)
 	suite.Require().NoError(err)
@@ -261,6 +308,14 @@ func (suite *dealTestSuite) TestDealStatusInactiveOrCompleted() {
 		Owner:          acc1.String(),
 	}
 
+	oracle := oracletypes.Oracle{
+		Address:  newAddr.String(),
+		Endpoint: "https://my-oracle.org",
+	}
+
+	err = suite.OracleKeeper.SetOracle(suite.Ctx, oracle)
+	suite.Require().NoError(err)
+
 	dealID, err := suite.DataDealKeeper.CreateDeal(suite.Ctx, acc1, tempDeal)
 	suite.Require().NoError(err)
 	findDeal, err := suite.DataDealKeeper.GetDeal(suite.Ctx, dealID)
@@ -271,11 +326,11 @@ func (suite *dealTestSuite) TestDealStatusInactiveOrCompleted() {
 
 	testCert1 := makeTestCert("1a312c1223x2fs3", newAddr, acc3)
 	_, err = suite.DataDealKeeper.SellData(suite.Ctx, acc3, testCert1)
-	suite.Require().Error(err, types.ErrInvalidStatus)
+	suite.Require().Error(err, types.ErrDealNotActive)
 
 	findDeal.Status = types.COMPLETED
 	suite.DataDealKeeper.SetDeal(suite.Ctx, findDeal)
-	suite.Require().Error(err, types.ErrInvalidStatus)
+	suite.Require().Error(err, types.ErrDealNotActive)
 }
 
 func (suite *dealTestSuite) TestVerifyDataCert() {
@@ -313,6 +368,14 @@ func (suite *dealTestSuite) TestIsDealStatusCompleted() {
 		Owner:          acc1.String(),
 	}
 
+	oracle := oracletypes.Oracle{
+		Address:  newAddr.String(),
+		Endpoint: "https://my-oracle.org",
+	}
+
+	err = suite.OracleKeeper.SetOracle(suite.Ctx, oracle)
+	suite.Require().NoError(err)
+
 	dealID, err := suite.DataDealKeeper.CreateDeal(suite.Ctx, acc1, tempDeal)
 	suite.Require().NoError(err)
 
@@ -344,6 +407,14 @@ func (suite *dealTestSuite) TestGetDataCert() {
 		TrustedOracles: []string{newAddr.String()},
 		Owner:          acc1.String(),
 	}
+
+	oracle := oracletypes.Oracle{
+		Address:  newAddr.String(),
+		Endpoint: "https://my-oracle.org",
+	}
+
+	err = suite.OracleKeeper.SetOracle(suite.Ctx, oracle)
+	suite.Require().NoError(err)
 
 	newDealID, err := suite.DataDealKeeper.CreateDeal(suite.Ctx, acc1, tempDeal)
 	suite.Require().NoError(err)
@@ -380,6 +451,14 @@ func (suite *dealTestSuite) TestListDataCerts() {
 		TrustedOracles: []string{newAddr.String()},
 		Owner:          acc1.String(),
 	}
+
+	oracle := oracletypes.Oracle{
+		Address:  newAddr.String(),
+		Endpoint: "https://my-oracle.org",
+	}
+
+	err = suite.OracleKeeper.SetOracle(suite.Ctx, oracle)
+	suite.Require().NoError(err)
 
 	newDealID, err := suite.DataDealKeeper.CreateDeal(suite.Ctx, acc1, tempDeal)
 	suite.Require().NoError(err)
@@ -421,6 +500,14 @@ func (suite *dealTestSuite) TestDeactivateDeal() {
 		TrustedOracles: []string{newAddr.String()},
 		Owner:          acc1.String(),
 	}
+
+	oracle := oracletypes.Oracle{
+		Address:  newAddr.String(),
+		Endpoint: "https://my-oracle.org",
+	}
+
+	err = suite.OracleKeeper.SetOracle(suite.Ctx, oracle)
+	suite.Require().NoError(err)
 
 	dealID, err := suite.DataDealKeeper.CreateDeal(suite.Ctx, acc1, tempDeal)
 	suite.Require().NoError(err)
@@ -464,6 +551,14 @@ func (suite *dealTestSuite) TestIsNotEqualOwner() {
 		Owner:          acc1.String(),
 	}
 
+	oracle := oracletypes.Oracle{
+		Address:  newAddr.String(),
+		Endpoint: "https://my-oracle.org",
+	}
+
+	err = suite.OracleKeeper.SetOracle(suite.Ctx, oracle)
+	suite.Require().NoError(err)
+
 	dealID, err := suite.DataDealKeeper.CreateDeal(suite.Ctx, acc1, tempDeal)
 	suite.Require().NoError(err)
 
@@ -472,7 +567,7 @@ func (suite *dealTestSuite) TestIsNotEqualOwner() {
 	suite.Require().NoError(err)
 
 	_, err = suite.DataDealKeeper.DeactivateDeal(suite.Ctx, dealID, acc2)
-	suite.Require().Error(err, "the owner of deal and requester is not equal")
+	suite.Require().Error(err, types.ErrDealUnauthorized)
 }
 
 func (suite *dealTestSuite) TestDealIsNotActive() {
@@ -490,6 +585,14 @@ func (suite *dealTestSuite) TestDealIsNotActive() {
 		Owner:          acc1.String(),
 	}
 
+	oracle := oracletypes.Oracle{
+		Address:  newAddr.String(),
+		Endpoint: "https://my-oracle.org",
+	}
+
+	err = suite.OracleKeeper.SetOracle(suite.Ctx, oracle)
+	suite.Require().NoError(err)
+
 	dealID, err := suite.DataDealKeeper.CreateDeal(suite.Ctx, acc1, tempDeal)
 	suite.Require().NoError(err)
 
@@ -500,7 +603,7 @@ func (suite *dealTestSuite) TestDealIsNotActive() {
 	suite.DataDealKeeper.SetDeal(suite.Ctx, findDeal)
 
 	_, err = suite.DataDealKeeper.DeactivateDeal(suite.Ctx, dealID, acc1)
-	suite.Require().Error(err, types.ErrInvalidStatus)
+	suite.Require().Error(err, types.ErrDealNotActive)
 	suite.Require().Error(err, "the deal's status is not activated")
 
 	findDeal.Status = types.ACTIVE
@@ -517,7 +620,7 @@ func (suite *dealTestSuite) TestDealIsNotActive() {
 	suite.Require().NoError(err)
 
 	_, err = suite.DataDealKeeper.DeactivateDeal(suite.Ctx, dealID, acc1)
-	suite.Require().Error(err, types.ErrInvalidStatus)
+	suite.Require().Error(err, types.ErrDealNotActive)
 	suite.Require().Equal(completedDeal.GetStatus(), types.COMPLETED)
 	suite.Require().Error(err, "the deal's status is not activated")
 }
