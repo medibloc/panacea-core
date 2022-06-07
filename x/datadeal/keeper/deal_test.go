@@ -34,7 +34,7 @@ var (
 )
 
 func (suite *dealTestSuite) BeforeTest(_, _ string) {
-	testDeal := makeTestDeal()
+	testDeal := makeTestDeal(1)
 	suite.DataDealKeeper.SetNextDealNumber(suite.Ctx, 2)
 	suite.DataDealKeeper.SetDeal(suite.Ctx, testDeal)
 }
@@ -83,7 +83,7 @@ func (suite *dealTestSuite) TestCreateNewDeal() {
 func (suite *dealTestSuite) TestGetDeal() {
 	deal, err := suite.DataDealKeeper.GetDeal(suite.Ctx, 1)
 	suite.Require().NoError(err)
-	testDeal := makeTestDeal()
+	testDeal := makeTestDeal(1)
 
 	suite.Require().Equal(deal.GetDealId(), testDeal.GetDealId())
 	suite.Require().Equal(deal.GetDealAddress(), testDeal.GetDealAddress())
@@ -625,9 +625,9 @@ func (suite *dealTestSuite) TestDealIsNotActive() {
 	suite.Require().Error(err, "the deal's status is not activated")
 }
 
-func makeTestDeal() types.Deal {
+func makeTestDeal(dealID uint64) types.Deal {
 	return types.Deal{
-		DealId:         1,
+		DealId:         dealID,
 		DealAddress:    types.NewDealAddress(1).String(),
 		DataSchema:     []string{acc1.String()},
 		Budget:         &sdk.Coin{Denom: assets.MicroMedDenom, Amount: sdk.NewInt(1000000000)},
