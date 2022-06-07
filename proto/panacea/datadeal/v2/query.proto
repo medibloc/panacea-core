@@ -19,12 +19,11 @@ service Query {
   }
   // DataCert returns a DataCert.
   rpc DataCert(QueryDataCertRequest) returns (QueryDataCertResponse) {
-    option (google.api.http).get = "/panacea/datadeal/v2/data_certs/deal/{deal_id}/data_hash/{data_hash}";
+    option (google.api.http).get = "/panacea/datadeal/v2/deals/{deal_id}/data_certs/{data_hash}";
   }
-
   // DataCerts return DataCerts.
   rpc DataCerts(QueryDataCertsRequest) returns (QueryDataCertsResponse) {
-    option (google.api.http).get = "/panacea/datadeal/v2/data_certs/deal/{deal_id}";
+    option (google.api.http).get = "/panacea/datadeal/v2/deals/{deal_id}/data_certs";
   }
 }
 

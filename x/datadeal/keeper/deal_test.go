@@ -214,7 +214,9 @@ func (suite *dealTestSuite) TestSellOwnData() {
 	deal, err := suite.DataDealKeeper.GetDeal(suite.Ctx, newDealID)
 	suite.Require().NoError(err)
 
-	cert := makeTestCert("1a312c1223x2fs3", newAddr, acc3)
+	cert, err := makeTestCert("1a312c1223x2fs3", newAddr, acc3)
+	suite.Require().NoError(err)
+
 	reward, err := suite.DataDealKeeper.SellData(suite.Ctx, acc3, cert)
 	suite.Require().NoError(err)
 	suite.Require().Equal(cert.UnsignedCert.GetDealId(), deal.GetDealId())
@@ -253,11 +255,15 @@ func (suite *dealTestSuite) TestIsDataCertDuplicate() {
 	_, err = suite.DataDealKeeper.CreateDeal(suite.Ctx, acc1, tempDeal)
 	suite.Require().NoError(err)
 
-	testCert1 := makeTestCert("1a312c1223x", newAddr, acc3)
+	testCert1, err := makeTestCert("1a312c1223x", newAddr, acc3)
+	suite.Require().NoError(err)
+
 	_, err = suite.DataDealKeeper.SellData(suite.Ctx, acc3, testCert1)
 	suite.Require().NoError(err)
 
-	testCert2 := makeTestCert("1a312c1223x", newAddr, acc3)
+	testCert2, err := makeTestCert("1a312c1223x", newAddr, acc3)
+	suite.Require().NoError(err)
+
 	_, err = suite.DataDealKeeper.SellData(suite.Ctx, acc3, testCert2)
 	suite.Require().Error(err, types.ErrDataAlreadyExist)
 }
@@ -288,7 +294,9 @@ func (suite *dealTestSuite) TestIsTrustedOracles_Invalid() {
 	_, err = suite.DataDealKeeper.CreateDeal(suite.Ctx, acc1, tempDeal)
 	suite.Require().NoError(err)
 
-	testCert1 := makeTestCert("1a312c1223x2fs3", newAddr, acc3)
+	testCert1, err := makeTestCert("1a312c1223x2fs3", newAddr, acc3)
+	suite.Require().NoError(err)
+
 	_, err = suite.DataDealKeeper.SellData(suite.Ctx, acc3, testCert1)
 	suite.Require().Error(err, sdkerrors.ErrInvalidAddress)
 }
@@ -324,7 +332,9 @@ func (suite *dealTestSuite) TestDealStatusInactiveOrCompleted() {
 	findDeal.Status = types.INACTIVE
 	suite.DataDealKeeper.SetDeal(suite.Ctx, findDeal)
 
-	testCert1 := makeTestCert("1a312c1223x2fs3", newAddr, acc3)
+	testCert1, err := makeTestCert("1a312c1223x2fs3", newAddr, acc3)
+	suite.Require().NoError(err)
+
 	_, err = suite.DataDealKeeper.SellData(suite.Ctx, acc3, testCert1)
 	suite.Require().Error(err, types.ErrDealNotActive)
 
@@ -334,7 +344,8 @@ func (suite *dealTestSuite) TestDealStatusInactiveOrCompleted() {
 }
 
 func (suite *dealTestSuite) TestVerifyDataCert() {
-	cert := makeTestCert("1a312c1223x2fs3", newAddr, acc3)
+	cert, err := makeTestCert("1a312c1223x2fs3", newAddr, acc3)
+	suite.Require().NoError(err)
 
 	oracleAddr, err := sdk.AccAddressFromBech32(cert.UnsignedCert.GetOracleAddress())
 	suite.Require().NoError(err)
@@ -379,11 +390,15 @@ func (suite *dealTestSuite) TestIsDealStatusCompleted() {
 	dealID, err := suite.DataDealKeeper.CreateDeal(suite.Ctx, acc1, tempDeal)
 	suite.Require().NoError(err)
 
-	testCert1 := makeTestCert("1a312c1223x2fs3", newAddr, acc3)
+	testCert1, err := makeTestCert("1a312c1223x2fs3", newAddr, acc3)
+	suite.Require().NoError(err)
+
 	_, err = suite.DataDealKeeper.SellData(suite.Ctx, acc3, testCert1)
 	suite.Require().NoError(err)
 
-	testCert2 := makeTestCert("1a312c1223x", newAddr, acc2)
+	testCert2, err := makeTestCert("1a312c1223x", newAddr, acc2)
+	suite.Require().NoError(err)
+
 	_, err = suite.DataDealKeeper.SellData(suite.Ctx, acc2, testCert2)
 	suite.Require().NoError(err)
 
@@ -419,7 +434,9 @@ func (suite *dealTestSuite) TestGetDataCert() {
 	newDealID, err := suite.DataDealKeeper.CreateDeal(suite.Ctx, acc1, tempDeal)
 	suite.Require().NoError(err)
 
-	cert := makeTestCert("1a312c1223x2fs3", newAddr, acc3)
+	cert, err := makeTestCert("1a312c1223x2fs3", newAddr, acc3)
+	suite.Require().NoError(err)
+
 	_, err = suite.DataDealKeeper.GetDeal(suite.Ctx, newDealID)
 	suite.Require().NoError(err)
 
@@ -463,7 +480,9 @@ func (suite *dealTestSuite) TestListDataCerts() {
 	newDealID, err := suite.DataDealKeeper.CreateDeal(suite.Ctx, acc1, tempDeal)
 	suite.Require().NoError(err)
 
-	cert := makeTestCert("1a312c1223x2fs3", newAddr, acc3)
+	cert, err := makeTestCert("1a312c1223x2fs3", newAddr, acc3)
+	suite.Require().NoError(err)
+
 	_, err = suite.DataDealKeeper.GetDeal(suite.Ctx, newDealID)
 	suite.Require().NoError(err)
 
@@ -512,7 +531,9 @@ func (suite *dealTestSuite) TestDeactivateDeal() {
 	dealID, err := suite.DataDealKeeper.CreateDeal(suite.Ctx, acc1, tempDeal)
 	suite.Require().NoError(err)
 
-	testCert := makeTestCert("1a312c1223x2fs3", newAddr, acc3)
+	testCert, err := makeTestCert("1a312c1223x2fs3", newAddr, acc3)
+	suite.Require().NoError(err)
+
 	_, err = suite.DataDealKeeper.SellData(suite.Ctx, acc3, testCert)
 	suite.Require().NoError(err)
 
@@ -562,7 +583,9 @@ func (suite *dealTestSuite) TestIsNotEqualOwner() {
 	dealID, err := suite.DataDealKeeper.CreateDeal(suite.Ctx, acc1, tempDeal)
 	suite.Require().NoError(err)
 
-	testCert := makeTestCert("1a312c1223x2fs3", newAddr, acc3)
+	testCert, err := makeTestCert("1a312c1223x2fs3", newAddr, acc3)
+	suite.Require().NoError(err)
+
 	_, err = suite.DataDealKeeper.SellData(suite.Ctx, acc3, testCert)
 	suite.Require().NoError(err)
 
@@ -611,8 +634,10 @@ func (suite *dealTestSuite) TestDealIsNotActive() {
 
 	dataHash := "123456"
 	for i := 0; i < 10; i++ {
-		cert := makeTestCert(dataHash+strconv.Itoa(i), newAddr, acc1)
-		_, err := suite.DataDealKeeper.SellData(suite.Ctx, acc1, cert)
+		cert, err := makeTestCert(dataHash+strconv.Itoa(i), newAddr, acc1)
+		suite.Require().NoError(err)
+
+		_, err = suite.DataDealKeeper.SellData(suite.Ctx, acc1, cert)
 		suite.Require().NoError(err)
 	}
 
@@ -639,7 +664,7 @@ func makeTestDeal() types.Deal {
 	}
 }
 
-func makeTestCert(dataHash string, oracleAddress sdk.AccAddress, requesterAddress sdk.AccAddress) types.DataCert {
+func makeTestCert(dataHash string, oracleAddress sdk.AccAddress, requesterAddress sdk.AccAddress) (types.DataCert, error) {
 	uCert := types.UnsignedDataCert{
 		DealId:           2,
 		DataHash:         []byte(dataHash),
@@ -650,16 +675,16 @@ func makeTestCert(dataHash string, oracleAddress sdk.AccAddress, requesterAddres
 
 	marshal, err := uCert.Marshal()
 	if err != nil {
-		return types.DataCert{}
+		return types.DataCert{}, err
 	}
 
 	sign, err := privKey.Sign(marshal)
 	if err != nil {
-		return types.DataCert{}
+		return types.DataCert{}, err
 	}
 
 	return types.DataCert{
 		UnsignedCert: &uCert,
 		Signature:    sign,
-	}
+	}, nil
 }
