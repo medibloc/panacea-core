@@ -247,6 +247,7 @@ func (suite *TestSuite) SetupTest() {
 		memKeys[datadealtypes.MemStoreKey],
 		suite.BankKeeper,
 		suite.AccountKeeper,
+		suite.OracleKeeper,
 	)
 	suite.DataDealMsgServer = datadealkeeper.NewMsgServerImpl(suite.DataDealKeeper)
 
