@@ -16,6 +16,11 @@ service Query {
   rpc Deal(QueryDealRequest) returns (QueryDealResponse) {
     option (google.api.http).get = "/panacea/datadeal/v2/deals/{deal_id}";
   }
+
+  // Deals returns multiple deals
+  rpc Deals(QueryDealsRequest) returns (QueryDealsResponse) {
+    option (google.api.http).get = "/panacea/datadeal/v2/deals";
+  }
 }
 
 // QueryDealRequest is the request type for Query/Deal RPC method.
@@ -26,4 +31,15 @@ message QueryDealRequest {
 // QueryDealResponse is the response type for the Query/Deal RPC method.
 message QueryDealResponse {
   Deal deal = 1;
+}
+
+// QueryDealsRequest is the request type for Query/Deals RPC method.
+message QueryDealsRequest {
+  cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+// QueryDealsResponse is the response type for Query/Deals RPC method.
+message QueryDealsResponse {
+  repeated Deal deals = 1 [(gogoproto.nullable) = false];
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
