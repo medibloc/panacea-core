@@ -2,7 +2,6 @@ package keeper_test
 
 import (
 	"fmt"
-	oracletypes "github.com/medibloc/panacea-core/v2/x/oracle/types"
 	"io/ioutil"
 	"strconv"
 	"strings"
