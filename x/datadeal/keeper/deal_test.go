@@ -355,7 +355,7 @@ func (suite *dealTestSuite) TestGetDataCert() {
 	_, err = suite.DataDealKeeper.SellData(suite.Ctx, acc3, cert)
 	suite.Require().NoError(err)
 
-	getCert, err := suite.DataDealKeeper.GetDataCert(suite.Ctx, cert)
+	getCert, err := suite.DataDealKeeper.GetDataCert(suite.Ctx, newDealID, cert.UnsignedCert.DataHash)
 	suite.Require().NoError(err)
 
 	suite.Require().Equal(getCert.GetSignature(), cert.GetSignature())

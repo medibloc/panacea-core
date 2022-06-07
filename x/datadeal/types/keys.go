@@ -40,6 +40,10 @@ func GetKeyPrefixDeals(dealID uint64) []byte {
 	return append(KeyPrefixDeals, sdk.Uint64ToBigEndian(dealID)...)
 }
 
+func GetKeyPrefixDataCertsByDealID(dealID uint64) []byte {
+	return append(KeyPrefixDataCertStore, sdk.Uint64ToBigEndian(dealID)...)
+}
+
 func GetKeyPrefixDataCert(dealID uint64, dataHash []byte) []byte {
 	keys := CombineKeys(sdk.Uint64ToBigEndian(dealID), dataHash)
 	return append(KeyPrefixDataCertStore, keys...)

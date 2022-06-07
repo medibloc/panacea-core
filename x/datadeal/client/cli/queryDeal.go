@@ -41,3 +41,34 @@ func CmdGetDeal() *cobra.Command {
 
 	return cmd
 }
+
+func CmdGetDataCert() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "data-cert [deal-id] [data-hash]",
+		Short: "Query a data cert",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientQueryContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			queryClient := types.NewQueryClient(clientCtx)
+			dealID, err := strconv.ParseUint(args[0], 10, 64)
+			if err != nil {
+				return err
+			}
+
+			res, err := queryClient.DataCert(cmd.Context(), &types.QueryDataCertRequest{
+				DealId:   dealID,
+				DataHash: args[1],
+			})
+
+			return clientCtx.PrintProto(res)
+		},
+	}
+
+	flags.AddQueryFlagsToCmd(cmd)
+
+	return cmd
+}
