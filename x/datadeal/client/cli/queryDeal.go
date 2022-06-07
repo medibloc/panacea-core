@@ -42,6 +42,41 @@ func CmdGetDeal() *cobra.Command {
 	return cmd
 }
 
+func CmdGetDeals() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "deals",
+		Short: "Query deals",
+		Args:  cobra.ExactArgs(0),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientQueryContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			queryClient := types.NewQueryClient(clientCtx)
+
+			pageReq, err := client.ReadPageRequest(cmd.Flags())
+			if err != nil {
+				return err
+			}
+
+			res, err := queryClient.Deals(cmd.Context(), &types.QueryDealsRequest{
+				Pagination: pageReq,
+			})
+			if err != nil {
+				return nil
+			}
+
+			return clientCtx.PrintProto(res)
+		},
+	}
+
+	flags.AddPaginationFlagsToCmd(cmd, "all deals")
+	flags.AddQueryFlagsToCmd(cmd)
+
+	return cmd
+}
+
 func CmdGetDataCert() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "data-cert [deal-id] [data-hash]",

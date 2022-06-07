@@ -19,7 +19,7 @@ func TestQueryDealTest(t *testing.T) {
 }
 
 func (suite *queryDealTestSuite) TestQueryDeal() {
-	deal := makeTestDeal()
+	deal := makeTestDeal(1)
 	suite.DataDealKeeper.SetDeal(suite.Ctx, deal)
 	suite.DataDealKeeper.SetNextDealNumber(suite.Ctx, 2)
 
@@ -32,8 +32,29 @@ func (suite *queryDealTestSuite) TestQueryDeal() {
 	suite.Require().Equal(deal, *res.Deal)
 }
 
+func (suite queryDealTestSuite) TestQueryDeals() {
+	// set deals
+	deal1 := makeTestDeal(1)
+	suite.DataDealKeeper.SetDeal(suite.Ctx, deal1)
+
+	deal2 := makeTestDeal(2)
+	suite.DataDealKeeper.SetDeal(suite.Ctx, deal2)
+
+	deal3 := makeTestDeal(3)
+	suite.DataDealKeeper.SetDeal(suite.Ctx, deal3)
+
+	req := types.QueryDealsRequest{}
+
+	res, err := suite.DataDealKeeper.Deals(sdk.WrapSDKContext(suite.Ctx), &req)
+	suite.Require().NoError(err)
+	suite.Require().Len(res.Deals, 3)
+	suite.Require().Contains(res.Deals, deal1)
+	suite.Require().Contains(res.Deals, deal2)
+	suite.Require().Contains(res.Deals, deal3)
+}
+
 func (suite *queryDealTestSuite) TestQueryDataCert() {
-	deal := makeTestDeal()
+	deal := makeTestDeal(1)
 	suite.DataDealKeeper.SetDeal(suite.Ctx, deal)
 
 	dataCert, err := makeTestCert("1a312c1223x2fs3", newAddr, acc1)
@@ -54,7 +75,7 @@ func (suite *queryDealTestSuite) TestQueryDataCert() {
 }
 
 func (suite *queryDealTestSuite) TestQueryDataCerts() {
-	deal := makeTestDeal()
+	deal := makeTestDeal(1)
 	suite.DataDealKeeper.SetDeal(suite.Ctx, deal)
 
 	req := types.QueryDataCertsRequest{
