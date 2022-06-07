@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"context"
+	"encoding/base64"
 
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	"github.com/cosmos/cosmos-sdk/types/query"
@@ -34,7 +35,12 @@ func (k Keeper) DataCert(goCtx context.Context, req *types.QueryDataCertRequest)
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	dataCert, err := k.GetDataCert(ctx, req.DealId, []byte(req.DataHash))
+	bz, err := base64.StdEncoding.DecodeString(req.DataHash)
+	if err != nil {
+		return nil, err
+	}
+
+	dataCert, err := k.GetDataCert(ctx, req.DealId, bz)
 	if err != nil {
 		return nil, err
 	}

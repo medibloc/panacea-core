@@ -1,6 +1,7 @@
 package keeper_test
 
 import (
+	"encoding/base64"
 	"testing"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -40,9 +41,11 @@ func (suite *queryDealTestSuite) TestQueryDataCert() {
 
 	suite.DataDealKeeper.SetDataCert(suite.Ctx, 1, dataCert)
 
+	str := base64.StdEncoding.EncodeToString(dataCert.UnsignedCert.GetDataHash())
+
 	req := types.QueryDataCertRequest{
 		DealId:   deal.GetDealId(),
-		DataHash: string(dataCert.UnsignedCert.GetDataHash()),
+		DataHash: str,
 	}
 	res, err := suite.DataDealKeeper.DataCert(sdk.WrapSDKContext(suite.Ctx), &req)
 	suite.Require().NoError(err)
