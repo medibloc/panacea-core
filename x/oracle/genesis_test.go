@@ -1,13 +1,14 @@
 package oracle_test
 
 import (
+	"testing"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/medibloc/panacea-core/v2/types/testsuite"
 	"github.com/medibloc/panacea-core/v2/x/oracle"
 	"github.com/medibloc/panacea-core/v2/x/oracle/types"
 	"github.com/stretchr/testify/suite"
 	"github.com/tendermint/tendermint/crypto/secp256k1"
-	"testing"
 )
 
 var oracle1 = sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address())
@@ -28,7 +29,9 @@ func (suite genesisTestSuite) TestDataPoolInitGenesis() {
 	oracles = append(oracles, tempOracle)
 
 	genState := &types.GenesisState{
-		Oracles: oracles,
+		Oracles: map[string]types.Oracle{
+			tempOracle.Address: tempOracle,
+		},
 	}
 
 	oracle.InitGenesis(suite.Ctx, suite.OracleKeeper, *genState)
@@ -54,8 +57,8 @@ func (suite genesisTestSuite) TestOracleExportGenesis() {
 	genesisState := oracle.ExportGenesis(suite.Ctx, suite.OracleKeeper)
 	suite.Require().Len(genesisState.Oracles, 1)
 
-	suite.Require().Equal(genesisState.Oracles[0].Address, tempOracle.Address)
-	suite.Require().Equal(genesisState.Oracles[0].Endpoint, tempOracle.Endpoint)
+	suite.Require().Equal(genesisState.Oracles[tempOracle.Address].Address, tempOracle.Address)
+	suite.Require().Equal(genesisState.Oracles[tempOracle.Address].Endpoint, tempOracle.Endpoint)
 }
 
 func makeSampleOracle() types.Oracle {

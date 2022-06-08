@@ -19,13 +19,23 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 
 // ExportGenesis returns the capability module's exported genesis.
 func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
-	genesis := types.DefaultGenesis()
-
 	oracles, err := k.GetAllOracles(ctx)
 	if err != nil {
 		panic(err)
 	}
 
-	genesis.Oracles = append(genesis.Oracles, oracles...)
-	return genesis
+	oracleMap := make(map[string]types.Oracle)
+	for _, oracle := range oracles {
+		oracleAddr, err := sdk.AccAddressFromBech32(oracle.GetAddress())
+		if err != nil {
+			panic(err)
+		}
+
+		oracleKey := types.GetKeyPrefixOracle(oracleAddr)
+		oracleMap[string(oracleKey)] = oracle
+	}
+
+	return &types.GenesisState{
+		Oracles: oracleMap,
+	}
 }

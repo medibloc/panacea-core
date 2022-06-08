@@ -8,5 +8,5 @@ import "panacea/oracle/v2/oracle.proto";
 
 // GenesisState defines the oracle module's genesis state.
 message GenesisState {
-  repeated Oracle                oracles = 1 [(gogoproto.nullable) = false];
+  map<string, Oracle> oracles = 1 [(gogoproto.nullable) = false];
 }
