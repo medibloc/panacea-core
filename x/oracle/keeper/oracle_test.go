@@ -1,6 +1,7 @@
 package keeper_test
 
 import (
+	"sort"
 	"testing"
 
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
@@ -144,8 +145,19 @@ func (suite *oracleTestSuite) TestGetAllOracles() {
 	allOracles, err := suite.OracleKeeper.GetAllOracles(suite.Ctx)
 	suite.Require().NoError(err)
 
+	var allOracleStr []string
+	var tempOracleStr []string
+
 	for i := 0; i < 5; i++ {
-		suite.Require().Equal(allOracles[i].Address, oracles[4-i].String())
+		allOracleStr = append(allOracleStr, allOracles[i].Address)
+		tempOracleStr = append(tempOracleStr, oracles[i].String())
+	}
+
+	sort.Strings(allOracleStr)
+	sort.Strings(tempOracleStr)
+
+	for i := 0; i < 5; i++ {
+		suite.Require().Equal(allOracleStr[i], tempOracleStr[i])
 		suite.Require().Equal(allOracles[i].Endpoint, "https://my-oracle.org")
 	}
 }
