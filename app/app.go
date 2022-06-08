@@ -7,6 +7,14 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/medibloc/panacea-core/v2/x/oracle"
+	oraclekeeper "github.com/medibloc/panacea-core/v2/x/oracle/keeper"
+	oracletypes "github.com/medibloc/panacea-core/v2/x/oracle/types"
+
+	"github.com/medibloc/panacea-core/v2/x/datapool"
+	datapoolkeeper "github.com/medibloc/panacea-core/v2/x/datapool/keeper"
+	datapooltypes "github.com/medibloc/panacea-core/v2/x/datapool/types"
+
 	"github.com/CosmWasm/wasmd/x/wasm"
 	wasmclient "github.com/CosmWasm/wasmd/x/wasm/client"
 
@@ -98,6 +106,9 @@ import (
 	"github.com/medibloc/panacea-core/v2/x/burn"
 	burnkeeper "github.com/medibloc/panacea-core/v2/x/burn/keeper"
 	burntypes "github.com/medibloc/panacea-core/v2/x/burn/types"
+	"github.com/medibloc/panacea-core/v2/x/datadeal"
+	datadealkeeper "github.com/medibloc/panacea-core/v2/x/datadeal/keeper"
+	datadealtypes "github.com/medibloc/panacea-core/v2/x/datadeal/types"
 	"github.com/medibloc/panacea-core/v2/x/did"
 	didkeeper "github.com/medibloc/panacea-core/v2/x/did/keeper"
 	didtypes "github.com/medibloc/panacea-core/v2/x/did/types"
@@ -181,6 +192,9 @@ var (
 		token.AppModuleBasic{},
 		burn.AppModuleBasic{},
 		wasm.AppModuleBasic{},
+		datadeal.AppModuleBasic{},
+		datapool.AppModuleBasic{},
+		oracle.AppModuleBasic{},
 	)
 
 	// module account permissions
@@ -193,6 +207,7 @@ var (
 		govtypes.ModuleName:            {authtypes.Burner},
 		ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
 		wasm.ModuleName:                {authtypes.Burner},
+		datapooltypes.ModuleName:       {authtypes.Minter},
 	}
 )
 
@@ -248,11 +263,14 @@ type App struct {
 	ScopedTransferKeeper capabilitykeeper.ScopedKeeper
 	ScopedWasmKeeper     capabilitykeeper.ScopedKeeper
 
-	aolKeeper   aolkeeper.Keeper
-	didKeeper   didkeeper.Keeper
-	burnKeeper  burnkeeper.Keeper
-	tokenKeeper tokenkeeper.Keeper
-	wasmKeeper  wasm.Keeper
+	aolKeeper      aolkeeper.Keeper
+	didKeeper      didkeeper.Keeper
+	burnKeeper     burnkeeper.Keeper
+	tokenKeeper    tokenkeeper.Keeper
+	wasmKeeper     wasm.Keeper
+	dataDealKeeper datadealkeeper.Keeper
+	dataPoolKeeper datapoolkeeper.Keeper
+	oracleKeeper   oraclekeeper.Keeper
 
 	// the module manager
 	mm *module.Manager
@@ -285,6 +303,9 @@ func New(
 		tokentypes.StoreKey,
 		burntypes.StoreKey,
 		wasm.StoreKey,
+		datadealtypes.StoreKey,
+		datapooltypes.StoreKey,
+		oracletypes.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
@@ -329,7 +350,8 @@ func New(
 	)
 	app.DistrKeeper = distrkeeper.NewKeeper(
 		appCodec, keys[distrtypes.StoreKey], app.GetSubspace(distrtypes.ModuleName), app.AccountKeeper, app.BankKeeper,
-		&stakingKeeper, authtypes.FeeCollectorName, app.ModuleAccountAddrs(),
+		&stakingKeeper, authtypes.FeeCollectorName,
+		app.ModuleAccountAddrs(),
 	)
 	app.SlashingKeeper = slashingkeeper.NewKeeper(
 		appCodec, keys[slashingtypes.StoreKey], &stakingKeeper, app.GetSubspace(slashingtypes.ModuleName),
@@ -404,7 +426,7 @@ func New(
 		panic("failed to read wasm config: " + err.Error())
 	}
 
-	supportedFeatures := "staking,stargate"
+	supportedFeatures := "iterator,staking,stargate"
 	app.wasmKeeper = wasm.NewKeeper(
 		appCodec,
 		keys[wasm.StoreKey],
@@ -423,6 +445,33 @@ func New(
 		wasmConfig,
 		supportedFeatures,
 		wasmOpts...,
+	)
+
+	app.oracleKeeper = *oraclekeeper.NewKeeper(
+		appCodec,
+		keys[oracletypes.StoreKey],
+		keys[oracletypes.MemStoreKey],
+		app.AccountKeeper,
+	)
+
+	app.dataDealKeeper = *datadealkeeper.NewKeeper(
+		appCodec,
+		keys[datadealtypes.StoreKey],
+		keys[datadealtypes.MemStoreKey],
+		app.BankKeeper,
+		app.AccountKeeper,
+		app.oracleKeeper,
+	)
+
+	app.dataPoolKeeper = *datapoolkeeper.NewKeeper(
+		appCodec,
+		keys[datapooltypes.StoreKey],
+		keys[datapooltypes.MemStoreKey],
+		app.GetSubspace(datapooltypes.ModuleName),
+		app.BankKeeper,
+		app.AccountKeeper,
+		app.wasmKeeper,
+		app.oracleKeeper,
 	)
 
 	// The gov proposal types can be individually enabled
@@ -476,6 +525,9 @@ func New(
 		token.NewAppModule(appCodec, app.tokenKeeper),
 		burn.NewAppModule(appCodec, app.burnKeeper),
 		wasm.NewAppModule(appCodec, &app.wasmKeeper, app.StakingKeeper),
+		datadeal.NewAppModule(appCodec, app.dataDealKeeper),
+		datapool.NewAppModule(appCodec, app.dataPoolKeeper),
+		oracle.NewAppModule(appCodec, app.oracleKeeper),
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -513,6 +565,9 @@ func New(
 		tokentypes.ModuleName,
 		burntypes.ModuleName,
 		wasm.ModuleName,
+		datadealtypes.ModuleName,
+		datapooltypes.ModuleName,
+		oracletypes.ModuleName,
 	)
 
 	app.mm.RegisterInvariants(&app.CrisisKeeper)
@@ -723,6 +778,9 @@ func initParamsKeeper(appCodec codec.BinaryMarshaler, legacyAmino *codec.LegacyA
 	paramsKeeper.Subspace(tokentypes.ModuleName)
 	paramsKeeper.Subspace(burntypes.ModuleName)
 	paramsKeeper.Subspace(wasm.ModuleName)
+	paramsKeeper.Subspace(datadealtypes.ModuleName)
+	paramsKeeper.Subspace(datapooltypes.ModuleName)
+	paramsKeeper.Subspace(oracletypes.ModuleName)
 
 	return paramsKeeper
 }

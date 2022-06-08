@@ -1,0 +1,79 @@
+syntax = "proto3";
+package panacea.datapool.v2;
+
+// this line is used by starport scaffolding # proto/tx/import
+
+option go_package = "github.com/medibloc/panacea-core/x/datapool/types";
+
+import "gogoproto/gogo.proto";
+import "cosmos/base/v1beta1/coin.proto";
+import "google/protobuf/duration.proto";
+import "panacea/datapool/v2/pool.proto";
+
+// Msg defines the Msg service.
+service Msg {
+  // CreatePool defines a method for creating data pool.
+  rpc CreatePool(MsgCreatePool) returns (MsgCreatePoolResponse);
+
+  // SellData defines a method for selling data
+  rpc SellData(MsgSellData) returns (MsgSellDataResponse);
+
+  // BuyDataPass defines a method for buying data pass
+  rpc BuyDataPass(MsgBuyDataPass) returns (MsgBuyDataPassResponse);
+
+  // RedeemDataPass defines a method for redeeming data pass to get data
+  rpc RedeemDataPass(MsgRedeemDataPass) returns (MsgRedeemDataPassResponse);
+}
+
+// MsgCreatePool defines the Msg/CreatePool request type.
+message MsgCreatePool {
+  string                   curator = 1;                                // 'panacea1' address
+  cosmos.base.v1beta1.Coin deposit = 2 [(gogoproto.nullable) = false]; // deposit
+  PoolParams               pool_params = 3;                            // pool parameters
+}
+
+// MsgCreatePoolResponse defines the Msg/CreatePool response type.
+message MsgCreatePoolResponse {
+  uint64 pool_id = 1;
+  uint64 round = 2;           // Always 1 for v0
+  uint64 curation_nft_id = 3; // A NFT that presents the right to curate this pool continuously
+}
+
+// MsgSellData defines the Msg/SellData request type.
+message MsgSellData {
+  DataCert cert = 1;     // certificate for data validation
+  string   seller = 2;   // 'panacea1' address of seller
+}
+
+// MsgSellDataResponse defines the Msg/SellData response type.
+message MsgSellDataResponse {
+
+}
+
+// MsgBuyDataPass defines the Msg/BuyDataPass request type.
+message MsgBuyDataPass {
+  uint64                   pool_id = 1;
+  uint64                   round = 2;
+  cosmos.base.v1beta1.Coin payment = 3;
+  string                   buyer = 4;   // 'panacea1' address of buyer
+}
+
+// MsgBuyDataPassResponse defines the Msg/BuyDataPass response type.
+message MsgBuyDataPassResponse {
+  uint64 pool_id = 1;
+  uint64 round = 2;
+  uint64 data_pass_id = 3;
+}
+
+// MsgRedeemDataPass defines the Msg/RedeemDataPass request type.
+message MsgRedeemDataPass {
+  uint64 pool_id = 1;
+  uint64 round = 2;
+  uint64 data_pass_id = 3;
+  string redeemer = 4;  // 'panacea1' address
+}
+
+// MsgRedeemDataPassResponse defines the Msg/RedeemDataPass response type.
+message MsgRedeemDataPassResponse {
+  DataPassRedeemReceipt receipt = 1;
+}

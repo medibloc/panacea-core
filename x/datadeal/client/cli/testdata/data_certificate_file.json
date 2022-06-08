@@ -1,0 +1,10 @@
+{
+  "unsigned_cert": {
+    "deal_id": 1,
+    "data_hash": "ZGF0YUhhc2g=",
+    "encrypted_data_url": "ZW5jcnlwdGVkRGF0YVVSTA==",
+    "oracle_address": "panacea1ugrau4qqr9446rpuj0srjrxspz02dd9nmlrjg3",
+    "requester_address": "panacea1fpfugtgpzux8spqpe3kyqqpyy6rular2zlpusu"
+  },
+  "signature": "c2lnbmF0dXJl"
+}

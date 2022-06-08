@@ -1,0 +1,10 @@
+syntax = "proto3";
+package panacea.oracle.v2;
+
+option go_package = "github.com/medibloc/panacea-core/x/oracle/types";
+
+// Oracle defines a detail of oracle.
+message Oracle {
+  string endpoint = 1;
+  string address = 2;
+}

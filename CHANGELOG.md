@@ -4,7 +4,6 @@
 
 TBD
 
-
 ## [v2.0.3](https://github.com/medibloc/panacea-core/releases/tag/v2.0.3) - 2022-04-12
 
 ### Improvements
