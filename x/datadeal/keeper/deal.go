@@ -14,6 +14,10 @@ import (
 )
 
 func (k Keeper) CreateDeal(ctx sdk.Context, owner sdk.AccAddress, deal types.Deal) (uint64, error) {
+	if len(deal.GetTrustedOracles()) == 0 {
+		return 0, types.ErrNoTrustedOracle
+	}
+
 	dealID, err := k.GetNextDealNumberAndIncrement(ctx)
 	if err != nil {
 		return 0, sdkerrors.Wrapf(err, "failed to get next deal num")
@@ -41,7 +45,7 @@ func (k Keeper) CreateDeal(ctx sdk.Context, owner sdk.AccAddress, deal types.Dea
 		}
 
 		if !k.oracleKeeper.IsRegisteredOracle(ctx, accAddr) {
-			return 0, oracletypes.ErrNotRegisteredOracle
+			return 0, sdkerrors.Wrapf(oracletypes.ErrNotRegisteredOracle, "oracle %s is not registered", accAddr)
 		}
 	}
 

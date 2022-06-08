@@ -27,4 +27,5 @@ var (
 	ErrNotOwnedRedeemerNft      = sdkerrors.Register(ModuleName, 19, "invalid nft id")
 	ErrRedeemDataPassNotFound   = sdkerrors.Register(ModuleName, 20, "redeem data pass not found")
 	ErrRedeemHistoryNotFound    = sdkerrors.Register(ModuleName, 21, "redeem history not found")
+	ErrNoTrustedOracle          = sdkerrors.Register(ModuleName, 22, "no trusted oracle, but it is required")
 )
