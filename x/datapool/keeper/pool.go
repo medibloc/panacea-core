@@ -16,6 +16,9 @@ import (
 )
 
 func (k Keeper) CreatePool(ctx sdk.Context, curator sdk.AccAddress, deposit sdk.Coin, poolParams types.PoolParams) (uint64, error) {
+	if len(poolParams.GetTrustedOracles()) == 0 {
+		return 0, types.ErrNoTrustedOracle
+	}
 	// Get the next pool id
 	poolID := k.GetNextPoolNumberAndIncrement(ctx)
 
@@ -45,7 +48,7 @@ func (k Keeper) CreatePool(ctx sdk.Context, curator sdk.AccAddress, deposit sdk.
 		}
 
 		if !k.oracleKeeper.IsRegisteredOracle(ctx, accAddr) {
-			return 0, oracletypes.ErrNotRegisteredOracle
+			return 0, sdkerrors.Wrapf(oracletypes.ErrNotRegisteredOracle, "oracle %s is not registered", accAddr)
 		}
 	}
 
