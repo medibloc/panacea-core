@@ -219,45 +219,264 @@ func (m *QueryDealsResponse) GetPagination() *query.PageResponse {
 	return nil
 }
 
+// QueryDataCertRequest is the request type for Query/DataCert RPC method.
+type QueryDataCertRequest struct {
+	DealId   uint64 `protobuf:"varint,1,opt,name=deal_id,json=dealId,proto3" json:"deal_id,omitempty"`
+	DataHash string `protobuf:"bytes,2,opt,name=data_hash,json=dataHash,proto3" json:"data_hash,omitempty"`
+}
+
+func (m *QueryDataCertRequest) Reset()         { *m = QueryDataCertRequest{} }
+func (m *QueryDataCertRequest) String() string { return proto.CompactTextString(m) }
+func (*QueryDataCertRequest) ProtoMessage()    {}
+func (*QueryDataCertRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_4c7a445ecc4b9161, []int{4}
+}
+func (m *QueryDataCertRequest) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *QueryDataCertRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_QueryDataCertRequest.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *QueryDataCertRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryDataCertRequest.Merge(m, src)
+}
+func (m *QueryDataCertRequest) XXX_Size() int {
+	return m.Size()
+}
+func (m *QueryDataCertRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryDataCertRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_QueryDataCertRequest proto.InternalMessageInfo
+
+func (m *QueryDataCertRequest) GetDealId() uint64 {
+	if m != nil {
+		return m.DealId
+	}
+	return 0
+}
+
+func (m *QueryDataCertRequest) GetDataHash() string {
+	if m != nil {
+		return m.DataHash
+	}
+	return ""
+}
+
+// QueryDataCertResponse is the response type for Query/DataCert RPC method.
+type QueryDataCertResponse struct {
+	DataCert *DataCert `protobuf:"bytes,1,opt,name=data_cert,json=dataCert,proto3" json:"data_cert,omitempty"`
+}
+
+func (m *QueryDataCertResponse) Reset()         { *m = QueryDataCertResponse{} }
+func (m *QueryDataCertResponse) String() string { return proto.CompactTextString(m) }
+func (*QueryDataCertResponse) ProtoMessage()    {}
+func (*QueryDataCertResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_4c7a445ecc4b9161, []int{5}
+}
+func (m *QueryDataCertResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *QueryDataCertResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_QueryDataCertResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *QueryDataCertResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryDataCertResponse.Merge(m, src)
+}
+func (m *QueryDataCertResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *QueryDataCertResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryDataCertResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_QueryDataCertResponse proto.InternalMessageInfo
+
+func (m *QueryDataCertResponse) GetDataCert() *DataCert {
+	if m != nil {
+		return m.DataCert
+	}
+	return nil
+}
+
+// QueryDataCertsRequest is the request type for Query/DataCerts RPC method.
+type QueryDataCertsRequest struct {
+	DealId     uint64             `protobuf:"varint,1,opt,name=deal_id,json=dealId,proto3" json:"deal_id,omitempty"`
+	Pagination *query.PageRequest `protobuf:"bytes,2,opt,name=pagination,proto3" json:"pagination,omitempty"`
+}
+
+func (m *QueryDataCertsRequest) Reset()         { *m = QueryDataCertsRequest{} }
+func (m *QueryDataCertsRequest) String() string { return proto.CompactTextString(m) }
+func (*QueryDataCertsRequest) ProtoMessage()    {}
+func (*QueryDataCertsRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_4c7a445ecc4b9161, []int{6}
+}
+func (m *QueryDataCertsRequest) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *QueryDataCertsRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_QueryDataCertsRequest.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *QueryDataCertsRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryDataCertsRequest.Merge(m, src)
+}
+func (m *QueryDataCertsRequest) XXX_Size() int {
+	return m.Size()
+}
+func (m *QueryDataCertsRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryDataCertsRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_QueryDataCertsRequest proto.InternalMessageInfo
+
+func (m *QueryDataCertsRequest) GetDealId() uint64 {
+	if m != nil {
+		return m.DealId
+	}
+	return 0
+}
+
+func (m *QueryDataCertsRequest) GetPagination() *query.PageRequest {
+	if m != nil {
+		return m.Pagination
+	}
+	return nil
+}
+
+// QueryDataCertsResponse is the response type for Query/DataCerts RPC method.
+type QueryDataCertsResponse struct {
+	DataCerts  []DataCert          `protobuf:"bytes,1,rep,name=data_certs,json=dataCerts,proto3" json:"data_certs"`
+	Pagination *query.PageResponse `protobuf:"bytes,2,opt,name=pagination,proto3" json:"pagination,omitempty"`
+}
+
+func (m *QueryDataCertsResponse) Reset()         { *m = QueryDataCertsResponse{} }
+func (m *QueryDataCertsResponse) String() string { return proto.CompactTextString(m) }
+func (*QueryDataCertsResponse) ProtoMessage()    {}
+func (*QueryDataCertsResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_4c7a445ecc4b9161, []int{7}
+}
+func (m *QueryDataCertsResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *QueryDataCertsResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_QueryDataCertsResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *QueryDataCertsResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryDataCertsResponse.Merge(m, src)
+}
+func (m *QueryDataCertsResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *QueryDataCertsResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryDataCertsResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_QueryDataCertsResponse proto.InternalMessageInfo
+
+func (m *QueryDataCertsResponse) GetDataCerts() []DataCert {
+	if m != nil {
+		return m.DataCerts
+	}
+	return nil
+}
+
+func (m *QueryDataCertsResponse) GetPagination() *query.PageResponse {
+	if m != nil {
+		return m.Pagination
+	}
+	return nil
+}
+
 func init() {
 	proto.RegisterType((*QueryDealRequest)(nil), "panacea.datadeal.v2.QueryDealRequest")
 	proto.RegisterType((*QueryDealResponse)(nil), "panacea.datadeal.v2.QueryDealResponse")
 	proto.RegisterType((*QueryDealsRequest)(nil), "panacea.datadeal.v2.QueryDealsRequest")
 	proto.RegisterType((*QueryDealsResponse)(nil), "panacea.datadeal.v2.QueryDealsResponse")
+	proto.RegisterType((*QueryDataCertRequest)(nil), "panacea.datadeal.v2.QueryDataCertRequest")
+	proto.RegisterType((*QueryDataCertResponse)(nil), "panacea.datadeal.v2.QueryDataCertResponse")
+	proto.RegisterType((*QueryDataCertsRequest)(nil), "panacea.datadeal.v2.QueryDataCertsRequest")
+	proto.RegisterType((*QueryDataCertsResponse)(nil), "panacea.datadeal.v2.QueryDataCertsResponse")
 }
 
 func init() { proto.RegisterFile("panacea/datadeal/v2/query.proto", fileDescriptor_4c7a445ecc4b9161) }
 
 var fileDescriptor_4c7a445ecc4b9161 = []byte{
-	// 444 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x84, 0x92, 0xcf, 0x8b, 0xd3, 0x40,
-	0x1c, 0xc5, 0x33, 0x35, 0x5d, 0x61, 0xbc, 0xe8, 0x28, 0xb8, 0x1b, 0x96, 0xec, 0x12, 0xb4, 0x15,
-	0xb5, 0x33, 0x34, 0xe2, 0x3f, 0x50, 0x44, 0x11, 0x2f, 0x9a, 0xa3, 0x1e, 0x64, 0x92, 0x8c, 0x31,
-	0x90, 0x66, 0xd2, 0xce, 0xa4, 0x58, 0xd4, 0x8b, 0x1e, 0xbd, 0x08, 0xfa, 0x47, 0xf5, 0x58, 0xf0,
-	0xe2, 0x49, 0xa4, 0xf5, 0x0f, 0x91, 0xf9, 0x11, 0x1a, 0xa5, 0xdd, 0xdc, 0x66, 0x32, 0xef, 0xfb,
-	0xde, 0x27, 0x6f, 0x06, 0x9e, 0x55, 0xb4, 0xa4, 0x09, 0xa3, 0x24, 0xa5, 0x92, 0xa6, 0x8c, 0x16,
-	0x64, 0x11, 0x92, 0x59, 0xcd, 0xe6, 0x4b, 0x5c, 0xcd, 0xb9, 0xe4, 0xe8, 0xba, 0x15, 0xe0, 0x46,
-	0x80, 0x17, 0xa1, 0x77, 0x9a, 0x71, 0x9e, 0x15, 0x8c, 0xd0, 0x2a, 0x27, 0xb4, 0x2c, 0xb9, 0xa4,
-	0x32, 0xe7, 0xa5, 0x30, 0x23, 0xde, 0xdd, 0x84, 0x8b, 0x29, 0x17, 0x24, 0xa6, 0x82, 0x19, 0x2f,
-	0xb2, 0x18, 0xc7, 0x4c, 0xd2, 0x31, 0xa9, 0x68, 0x96, 0x97, 0x5a, 0x6c, 0xb5, 0xfe, 0xbe, 0x7c,
-	0x1d, 0x63, 0xce, 0x4f, 0x6c, 0x92, 0xde, 0xc5, 0xf5, 0x1b, 0x42, 0x4b, 0x4b, 0xe6, 0xdd, 0xc8,
-	0x78, 0xc6, 0xf5, 0x92, 0xa8, 0x95, 0xf9, 0x1a, 0xdc, 0x83, 0x57, 0x5f, 0xa8, 0xc8, 0x47, 0x8c,
-	0x16, 0x11, 0x9b, 0xd5, 0x4c, 0x48, 0x74, 0x13, 0x5e, 0x56, 0x96, 0xaf, 0xf3, 0xf4, 0x18, 0x9c,
-	0x83, 0x3b, 0x6e, 0x74, 0xa4, 0xb6, 0x4f, 0xd3, 0x60, 0x02, 0xaf, 0xb5, 0xc4, 0xa2, 0xe2, 0xa5,
-	0x60, 0x68, 0x04, 0x5d, 0x75, 0xac, 0xa5, 0x57, 0xc2, 0x13, 0xbc, 0xa7, 0x00, 0xac, 0x07, 0xb4,
-	0x2c, 0x78, 0xd5, 0xf2, 0x10, 0x4d, 0xe2, 0x63, 0x08, 0x77, 0xbf, 0x6a, 0x9d, 0x06, 0xd8, 0xf4,
-	0x82, 0x55, 0x2f, 0xd8, 0x74, 0x6c, 0x7b, 0xc1, 0xcf, 0x69, 0xc6, 0xec, 0x6c, 0xd4, 0x9a, 0x0c,
-	0xbe, 0x03, 0x88, 0xda, 0xee, 0x16, 0xf1, 0x21, 0xec, 0xab, 0x6c, 0x71, 0x0c, 0xce, 0x2f, 0x5d,
-	0xc8, 0x38, 0x71, 0x57, 0xbf, 0xce, 0x9c, 0xc8, 0xa8, 0xd1, 0x93, 0x7f, 0xa8, 0x7a, 0x9a, 0x6a,
-	0xd8, 0x49, 0x65, 0x32, 0xdb, 0x58, 0xe1, 0x97, 0x1e, 0xec, 0x6b, 0x2c, 0xf4, 0x19, 0x40, 0x57,
-	0x05, 0xa1, 0xdb, 0x7b, 0x19, 0xfe, 0xbf, 0x0a, 0x6f, 0xd0, 0x25, 0x33, 0x69, 0xc1, 0xfd, 0x4f,
-	0x3f, 0xfe, 0x7c, 0xeb, 0x0d, 0xd0, 0x2d, 0x72, 0xe8, 0x81, 0x08, 0xf2, 0xde, 0x5e, 0xea, 0x47,
-	0xf4, 0x01, 0xf6, 0x75, 0x41, 0xa8, 0xc3, 0xbe, 0xb9, 0x1f, 0x6f, 0xd8, 0xa9, 0xb3, 0x1c, 0x81,
-	0xe6, 0x38, 0x45, 0xde, 0x61, 0x8e, 0xc9, 0xb3, 0xd5, 0xc6, 0x07, 0xeb, 0x8d, 0x0f, 0x7e, 0x6f,
-	0x7c, 0xf0, 0x75, 0xeb, 0x3b, 0xeb, 0xad, 0xef, 0xfc, 0xdc, 0xfa, 0xce, 0xcb, 0x71, 0x96, 0xcb,
-	0xb7, 0x75, 0x8c, 0x13, 0x3e, 0x25, 0x53, 0x96, 0xe6, 0x71, 0xc1, 0x93, 0xc6, 0x68, 0x94, 0xf0,
-	0x39, 0x23, 0xef, 0x76, 0x7e, 0x72, 0x59, 0x31, 0x11, 0x1f, 0xe9, 0x67, 0xfc, 0xe0, 0x6f, 0x00,
-	0x00, 0x00, 0xff, 0xff, 0xd8, 0x41, 0x19, 0xa5, 0x99, 0x03, 0x00, 0x00,
+	// 616 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x94, 0x4f, 0x6f, 0xd3, 0x3e,
+	0x18, 0xc7, 0xeb, 0xfd, 0xda, 0xfd, 0x56, 0x73, 0x01, 0x33, 0x60, 0x0b, 0x25, 0x9b, 0x22, 0xe8,
+	0x60, 0x63, 0xb1, 0x5a, 0x84, 0x90, 0x40, 0x5c, 0x3a, 0x34, 0x40, 0x70, 0x80, 0x72, 0x83, 0xc3,
+	0xe4, 0xa4, 0x26, 0x8d, 0xd4, 0xc6, 0x59, 0xec, 0x56, 0x9d, 0xc6, 0x2e, 0xf0, 0x06, 0x90, 0xe0,
+	0xca, 0x11, 0x5e, 0xcb, 0x8e, 0x93, 0xe0, 0xc0, 0x09, 0xa1, 0x96, 0x17, 0x82, 0xec, 0x38, 0xfd,
+	0xa7, 0xac, 0x29, 0x88, 0x9b, 0x13, 0x7f, 0xfd, 0x7d, 0x3e, 0xcf, 0xf7, 0x71, 0x02, 0xd7, 0x42,
+	0x12, 0x10, 0x97, 0x12, 0xdc, 0x20, 0x82, 0x34, 0x28, 0x69, 0xe1, 0x6e, 0x15, 0xef, 0x77, 0x68,
+	0x74, 0x60, 0x87, 0x11, 0x13, 0x0c, 0x9d, 0xd7, 0x02, 0x3b, 0x11, 0xd8, 0xdd, 0xaa, 0x51, 0xf2,
+	0x18, 0xf3, 0x5a, 0x14, 0x93, 0xd0, 0xc7, 0x24, 0x08, 0x98, 0x20, 0xc2, 0x67, 0x01, 0x8f, 0x8f,
+	0x18, 0x9b, 0x2e, 0xe3, 0x6d, 0xc6, 0xb1, 0x43, 0x38, 0x8d, 0xbd, 0x70, 0xb7, 0xe2, 0x50, 0x41,
+	0x2a, 0x38, 0x24, 0x9e, 0x1f, 0x28, 0xb1, 0xd6, 0x9a, 0x69, 0xf5, 0x55, 0x99, 0x78, 0xbf, 0x94,
+	0xb6, 0x2f, 0x7a, 0x7a, 0x77, 0x55, 0x73, 0xa8, 0x27, 0xa7, 0xf3, 0x1a, 0x93, 0x40, 0x73, 0x1b,
+	0xcb, 0x1e, 0xf3, 0x98, 0x5a, 0x62, 0xb9, 0x8a, 0xdf, 0x5a, 0x5b, 0xf0, 0xec, 0x73, 0x09, 0xf4,
+	0x80, 0x92, 0x56, 0x9d, 0xee, 0x77, 0x28, 0x17, 0xe8, 0x12, 0xfc, 0x5f, 0x1a, 0xef, 0xf9, 0x8d,
+	0x15, 0xb0, 0x0e, 0xae, 0xe7, 0xeb, 0x8b, 0xf2, 0xf1, 0x71, 0xc3, 0xaa, 0xc1, 0x73, 0x63, 0x62,
+	0x1e, 0xb2, 0x80, 0x53, 0xb4, 0x0d, 0xf3, 0x72, 0x5b, 0x49, 0xcf, 0x54, 0x57, 0xed, 0x94, 0x78,
+	0x6c, 0x75, 0x40, 0xc9, 0xac, 0x57, 0x63, 0x1e, 0x3c, 0xa9, 0xb8, 0x0b, 0xe1, 0x28, 0x08, 0xed,
+	0x54, 0xb6, 0xe3, 0xd4, 0x6c, 0x99, 0x9a, 0x1d, 0x4f, 0x40, 0xa7, 0x66, 0x3f, 0x23, 0x1e, 0xd5,
+	0x67, 0xeb, 0x63, 0x27, 0xad, 0x8f, 0x00, 0xa2, 0x71, 0x77, 0x8d, 0x78, 0x1b, 0x16, 0x64, 0x6d,
+	0xbe, 0x02, 0xd6, 0xff, 0x9b, 0xc9, 0x58, 0xcb, 0x1f, 0xff, 0x58, 0xcb, 0xd5, 0x63, 0x35, 0x7a,
+	0x38, 0x41, 0xb5, 0xa0, 0xa8, 0x36, 0x32, 0xa9, 0xe2, 0x9a, 0x13, 0x58, 0x4f, 0xe1, 0x72, 0x4c,
+	0x45, 0x04, 0xd9, 0xa1, 0x91, 0xc8, 0x0a, 0x1a, 0x5d, 0x86, 0x45, 0x89, 0xb6, 0xd7, 0x24, 0xbc,
+	0xa9, 0x0a, 0x17, 0xeb, 0x4b, 0xf2, 0xc5, 0x23, 0xc2, 0x9b, 0xd6, 0x0b, 0x78, 0x61, 0xca, 0x4d,
+	0xb7, 0x79, 0x57, 0x9f, 0x72, 0x69, 0x24, 0x74, 0x88, 0x57, 0xd2, 0x5b, 0x4d, 0x4e, 0x2a, 0x53,
+	0xb9, 0xb2, 0x7a, 0x53, 0xa6, 0x3c, 0x93, 0x71, 0x37, 0x25, 0x9d, 0xbf, 0x99, 0xd9, 0x67, 0x00,
+	0x2f, 0x4e, 0x97, 0xd6, 0x0d, 0xd5, 0x20, 0x1c, 0x36, 0x94, 0x0c, 0x6f, 0x76, 0x47, 0x7a, 0x80,
+	0xc5, 0xa4, 0xaf, 0x7f, 0x37, 0xc4, 0xea, 0xb7, 0x3c, 0x2c, 0x28, 0x4e, 0xf4, 0x0e, 0xc0, 0xbc,
+	0xbc, 0x2d, 0xe8, 0x5a, 0x2a, 0xcb, 0xf4, 0xf7, 0x64, 0x94, 0xb3, 0x64, 0x71, 0x35, 0xeb, 0xe6,
+	0xdb, 0xaf, 0xbf, 0x3e, 0x2c, 0x94, 0xd1, 0x55, 0x7c, 0xda, 0x3f, 0x80, 0xe3, 0x43, 0x3d, 0x8c,
+	0x23, 0xf4, 0x06, 0x16, 0xd4, 0x2d, 0x47, 0x19, 0xf6, 0xc9, 0x24, 0x8d, 0x8d, 0x4c, 0x9d, 0xe6,
+	0xb0, 0x14, 0x47, 0x09, 0x19, 0xa7, 0x73, 0xa0, 0x2f, 0x00, 0x2e, 0x25, 0xa1, 0xa3, 0x1b, 0x33,
+	0x9c, 0x27, 0xaf, 0xbc, 0xb1, 0x39, 0x8f, 0x54, 0x73, 0xec, 0x28, 0x8e, 0xfb, 0xe8, 0xde, 0x3c,
+	0x79, 0xe0, 0xd1, 0x4d, 0xc1, 0x87, 0xc3, 0x8f, 0xe7, 0x08, 0x7d, 0x02, 0xb0, 0x38, 0xbc, 0x59,
+	0x68, 0x8e, 0xf2, 0xc3, 0xbc, 0xb6, 0xe6, 0xd2, 0x6a, 0xd6, 0x3b, 0x8a, 0xb5, 0x82, 0xf0, 0x1f,
+	0xb2, 0xd6, 0x9e, 0x1c, 0xf7, 0x4d, 0x70, 0xd2, 0x37, 0xc1, 0xcf, 0xbe, 0x09, 0xde, 0x0f, 0xcc,
+	0xdc, 0xc9, 0xc0, 0xcc, 0x7d, 0x1f, 0x98, 0xb9, 0x97, 0x15, 0xcf, 0x17, 0xcd, 0x8e, 0x63, 0xbb,
+	0xac, 0x8d, 0xdb, 0xb4, 0xe1, 0x3b, 0x2d, 0xe6, 0x26, 0xee, 0xdb, 0x2e, 0x8b, 0x28, 0xee, 0x8d,
+	0x8a, 0x88, 0x83, 0x90, 0x72, 0x67, 0x51, 0xfd, 0xd4, 0x6f, 0xfd, 0x0e, 0x00, 0x00, 0xff, 0xff,
+	0x56, 0x32, 0x37, 0xdd, 0xc5, 0x06, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -276,6 +495,10 @@ type QueryClient interface {
 	Deal(ctx context.Context, in *QueryDealRequest, opts ...grpc.CallOption) (*QueryDealResponse, error)
 	// Deals returns multiple deals
 	Deals(ctx context.Context, in *QueryDealsRequest, opts ...grpc.CallOption) (*QueryDealsResponse, error)
+	// DataCert returns a DataCert.
+	DataCert(ctx context.Context, in *QueryDataCertRequest, opts ...grpc.CallOption) (*QueryDataCertResponse, error)
+	// DataCerts return DataCerts.
+	DataCerts(ctx context.Context, in *QueryDataCertsRequest, opts ...grpc.CallOption) (*QueryDataCertsResponse, error)
 }
 
 type queryClient struct {
@@ -304,12 +527,34 @@ func (c *queryClient) Deals(ctx context.Context, in *QueryDealsRequest, opts ...
 	return out, nil
 }
 
+func (c *queryClient) DataCert(ctx context.Context, in *QueryDataCertRequest, opts ...grpc.CallOption) (*QueryDataCertResponse, error) {
+	out := new(QueryDataCertResponse)
+	err := c.cc.Invoke(ctx, "/panacea.datadeal.v2.Query/DataCert", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *queryClient) DataCerts(ctx context.Context, in *QueryDataCertsRequest, opts ...grpc.CallOption) (*QueryDataCertsResponse, error) {
+	out := new(QueryDataCertsResponse)
+	err := c.cc.Invoke(ctx, "/panacea.datadeal.v2.Query/DataCerts", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // QueryServer is the server API for Query service.
 type QueryServer interface {
 	// Deal returns a Deal.
 	Deal(context.Context, *QueryDealRequest) (*QueryDealResponse, error)
 	// Deals returns multiple deals
 	Deals(context.Context, *QueryDealsRequest) (*QueryDealsResponse, error)
+	// DataCert returns a DataCert.
+	DataCert(context.Context, *QueryDataCertRequest) (*QueryDataCertResponse, error)
+	// DataCerts return DataCerts.
+	DataCerts(context.Context, *QueryDataCertsRequest) (*QueryDataCertsResponse, error)
 }
 
 // UnimplementedQueryServer can be embedded to have forward compatible implementations.
@@ -321,6 +566,12 @@ func (*UnimplementedQueryServer) Deal(ctx context.Context, req *QueryDealRequest
 }
 func (*UnimplementedQueryServer) Deals(ctx context.Context, req *QueryDealsRequest) (*QueryDealsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Deals not implemented")
+}
+func (*UnimplementedQueryServer) DataCert(ctx context.Context, req *QueryDataCertRequest) (*QueryDataCertResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DataCert not implemented")
+}
+func (*UnimplementedQueryServer) DataCerts(ctx context.Context, req *QueryDataCertsRequest) (*QueryDataCertsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DataCerts not implemented")
 }
 
 func RegisterQueryServer(s grpc1.Server, srv QueryServer) {
@@ -363,6 +614,42 @@ func _Query_Deals_Handler(srv interface{}, ctx context.Context, dec func(interfa
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Query_DataCert_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryDataCertRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(QueryServer).DataCert(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/panacea.datadeal.v2.Query/DataCert",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(QueryServer).DataCert(ctx, req.(*QueryDataCertRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Query_DataCerts_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryDataCertsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(QueryServer).DataCerts(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/panacea.datadeal.v2.Query/DataCerts",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(QueryServer).DataCerts(ctx, req.(*QueryDataCertsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _Query_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "panacea.datadeal.v2.Query",
 	HandlerType: (*QueryServer)(nil),
@@ -374,6 +661,14 @@ var _Query_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Deals",
 			Handler:    _Query_Deals_Handler,
+		},
+		{
+			MethodName: "DataCert",
+			Handler:    _Query_DataCert_Handler,
+		},
+		{
+			MethodName: "DataCerts",
+			Handler:    _Query_DataCerts_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
@@ -527,6 +822,165 @@ func (m *QueryDealsResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
+func (m *QueryDataCertRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *QueryDataCertRequest) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *QueryDataCertRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.DataHash) > 0 {
+		i -= len(m.DataHash)
+		copy(dAtA[i:], m.DataHash)
+		i = encodeVarintQuery(dAtA, i, uint64(len(m.DataHash)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if m.DealId != 0 {
+		i = encodeVarintQuery(dAtA, i, uint64(m.DealId))
+		i--
+		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *QueryDataCertResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *QueryDataCertResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *QueryDataCertResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.DataCert != nil {
+		{
+			size, err := m.DataCert.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintQuery(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *QueryDataCertsRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *QueryDataCertsRequest) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *QueryDataCertsRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.Pagination != nil {
+		{
+			size, err := m.Pagination.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintQuery(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x12
+	}
+	if m.DealId != 0 {
+		i = encodeVarintQuery(dAtA, i, uint64(m.DealId))
+		i--
+		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *QueryDataCertsResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *QueryDataCertsResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *QueryDataCertsResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.Pagination != nil {
+		{
+			size, err := m.Pagination.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintQuery(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.DataCerts) > 0 {
+		for iNdEx := len(m.DataCerts) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.DataCerts[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintQuery(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0xa
+		}
+	}
+	return len(dAtA) - i, nil
+}
+
 func encodeVarintQuery(dAtA []byte, offset int, v uint64) int {
 	offset -= sovQuery(v)
 	base := offset
@@ -584,6 +1038,70 @@ func (m *QueryDealsResponse) Size() (n int) {
 	_ = l
 	if len(m.Deals) > 0 {
 		for _, e := range m.Deals {
+			l = e.Size()
+			n += 1 + l + sovQuery(uint64(l))
+		}
+	}
+	if m.Pagination != nil {
+		l = m.Pagination.Size()
+		n += 1 + l + sovQuery(uint64(l))
+	}
+	return n
+}
+
+func (m *QueryDataCertRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.DealId != 0 {
+		n += 1 + sovQuery(uint64(m.DealId))
+	}
+	l = len(m.DataHash)
+	if l > 0 {
+		n += 1 + l + sovQuery(uint64(l))
+	}
+	return n
+}
+
+func (m *QueryDataCertResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.DataCert != nil {
+		l = m.DataCert.Size()
+		n += 1 + l + sovQuery(uint64(l))
+	}
+	return n
+}
+
+func (m *QueryDataCertsRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.DealId != 0 {
+		n += 1 + sovQuery(uint64(m.DealId))
+	}
+	if m.Pagination != nil {
+		l = m.Pagination.Size()
+		n += 1 + l + sovQuery(uint64(l))
+	}
+	return n
+}
+
+func (m *QueryDataCertsResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if len(m.DataCerts) > 0 {
+		for _, e := range m.DataCerts {
 			l = e.Size()
 			n += 1 + l + sovQuery(uint64(l))
 		}
@@ -902,6 +1420,418 @@ func (m *QueryDealsResponse) Unmarshal(dAtA []byte) error {
 			}
 			m.Deals = append(m.Deals, Deal{})
 			if err := m.Deals[len(m.Deals)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Pagination", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Pagination == nil {
+				m.Pagination = &query.PageResponse{}
+			}
+			if err := m.Pagination.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipQuery(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *QueryDataCertRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowQuery
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: QueryDataCertRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: QueryDataCertRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field DealId", wireType)
+			}
+			m.DealId = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.DealId |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field DataHash", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.DataHash = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipQuery(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *QueryDataCertResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowQuery
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: QueryDataCertResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: QueryDataCertResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field DataCert", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.DataCert == nil {
+				m.DataCert = &DataCert{}
+			}
+			if err := m.DataCert.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipQuery(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *QueryDataCertsRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowQuery
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: QueryDataCertsRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: QueryDataCertsRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field DealId", wireType)
+			}
+			m.DealId = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.DealId |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Pagination", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Pagination == nil {
+				m.Pagination = &query.PageRequest{}
+			}
+			if err := m.Pagination.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipQuery(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *QueryDataCertsResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowQuery
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: QueryDataCertsResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: QueryDataCertsResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field DataCerts", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.DataCerts = append(m.DataCerts, DataCert{})
+			if err := m.DataCerts[len(m.DataCerts)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex

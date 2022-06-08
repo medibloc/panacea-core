@@ -5,6 +5,7 @@ import "google/api/annotations.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";
 
 import "panacea/datadeal/v2/deal.proto";
+import "panacea/datadeal/v2/tx.proto";
 import "google/protobuf/any.proto";
 import "gogoproto/gogo.proto";
 
@@ -16,10 +17,17 @@ service Query {
   rpc Deal(QueryDealRequest) returns (QueryDealResponse) {
     option (google.api.http).get = "/panacea/datadeal/v2/deals/{deal_id}";
   }
-
   // Deals returns multiple deals
   rpc Deals(QueryDealsRequest) returns (QueryDealsResponse) {
     option (google.api.http).get = "/panacea/datadeal/v2/deals";
+  }
+  // DataCert returns a DataCert.
+  rpc DataCert(QueryDataCertRequest) returns (QueryDataCertResponse) {
+    option (google.api.http).get = "/panacea/datadeal/v2/deals/{deal_id}/data_certs/{data_hash}";
+  }
+  // DataCerts return DataCerts.
+  rpc DataCerts(QueryDataCertsRequest) returns (QueryDataCertsResponse) {
+    option (google.api.http).get = "/panacea/datadeal/v2/deals/{deal_id}/data_certs";
   }
 }
 
@@ -41,5 +49,28 @@ message QueryDealsRequest {
 // QueryDealsResponse is the response type for Query/Deals RPC method.
 message QueryDealsResponse {
   repeated Deal deals = 1 [(gogoproto.nullable) = false];
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+// QueryDataCertRequest is the request type for Query/DataCert RPC method.
+message QueryDataCertRequest {
+  uint64 deal_id = 1;
+  string data_hash = 2;
+}
+
+// QueryDataCertResponse is the response type for Query/DataCert RPC method.
+message QueryDataCertResponse {
+  DataCert data_cert = 1;
+}
+
+// QueryDataCertsRequest is the request type for Query/DataCerts RPC method.
+message QueryDataCertsRequest {
+  uint64 deal_id = 1;
+  cosmos.base.query.v1beta1.PageRequest pagination = 2;
+}
+
+// QueryDataCertsResponse is the response type for Query/DataCerts RPC method.
+message QueryDataCertsResponse {
+  repeated DataCert data_certs = 1 [(gogoproto.nullable) = false];
   cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }

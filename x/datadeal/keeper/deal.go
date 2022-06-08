@@ -227,9 +227,9 @@ func (k Keeper) isTrustedOracle(cert types.DataCert, findDeal types.Deal) bool {
 	return false
 }
 
-func (k Keeper) GetDataCert(ctx sdk.Context, cert types.DataCert) (types.DataCert, error) {
+func (k Keeper) GetDataCert(ctx sdk.Context, dealID uint64, dataHash []byte) (types.DataCert, error) {
 	store := ctx.KVStore(k.storeKey)
-	dataCertKey := types.GetKeyPrefixDataCert(cert.UnsignedCert.DealId, cert.UnsignedCert.DataHash)
+	dataCertKey := types.GetKeyPrefixDataCert(dealID, dataHash)
 	if !store.Has(dataCertKey) {
 		return types.DataCert{}, sdkerrors.Wrapf(types.ErrDataNotFound, "data with ID %s does not exist", dataCertKey)
 	}

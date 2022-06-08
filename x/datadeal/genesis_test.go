@@ -65,7 +65,7 @@ func (suite *genesisTestSuite) TestDataDealInitGenesis() {
 	_, err = suite.DataDealKeeper.GetDeal(suite.Ctx, 2)
 	suite.Require().Error(err)
 
-	dataCertStored, err := suite.DataDealKeeper.GetDataCert(suite.Ctx, newDataCert)
+	dataCertStored, err := suite.DataDealKeeper.GetDataCert(suite.Ctx, newDataCert.UnsignedCert.DealId, newDataCert.UnsignedCert.DataHash)
 	suite.Require().NoError(err)
 	suite.Require().Equal(newDataCert.GetSignature(), dataCertStored.GetSignature())
 	suite.Require().Equal(newDataCert.UnsignedCert.GetDealId(), dataCertStored.UnsignedCert.GetDealId())
