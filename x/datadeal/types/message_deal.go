@@ -50,6 +50,10 @@ func (msg *MsgCreateDeal) ValidateBasic() error {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "max num of data is negative number")
 	}
 
+	if len(msg.TrustedOracles) == 0 {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "at least 1 trusted oracle is required")
+	}
+
 	for _, oracle := range msg.TrustedOracles {
 		_, err = sdk.AccAddressFromBech32(oracle)
 		if err != nil {

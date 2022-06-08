@@ -19,4 +19,5 @@ var (
 	ErrInvalidGenesisDeal     = sdkerrors.Register(ModuleName, 9, "invalid genesis state of deal")
 	ErrInvalidGenesisDataCert = sdkerrors.Register(ModuleName, 10, "invalid genesis state of data cert")
 	ErrDealUnauthorized       = sdkerrors.Register(ModuleName, 11, "unauthorized owner of the deal")
+	ErrNoTrustedOracle        = sdkerrors.Register(ModuleName, 12, "no trusted oracle, but it is required")
 )

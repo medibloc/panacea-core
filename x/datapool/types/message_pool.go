@@ -50,6 +50,10 @@ func (msg *MsgCreatePool) ValidateBasic() error {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "the price of NFT is invalid")
 	}
 
+	if len(poolParams.TrustedOracles) == 0 {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "at least 1 trusted oracle is required")
+	}
+
 	for _, oracleAddr := range poolParams.TrustedOracles {
 		_, err = sdk.AccAddressFromBech32(oracleAddr)
 		if err != nil {

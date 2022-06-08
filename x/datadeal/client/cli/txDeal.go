@@ -58,10 +58,7 @@ func CmdSellData() *cobra.Command {
 				return err
 			}
 
-			msg := &types.MsgSellData{
-				Cert:   cert,
-				Seller: clientCtx.GetFromAddress().String(),
-			}
+			msg := types.NewMsgSellData(*cert, clientCtx.GetFromAddress().String())
 
 			if err := msg.ValidateBasic(); err != nil {
 				return err
