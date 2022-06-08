@@ -3,6 +3,8 @@ package datadeal_test
 import (
 	"testing"
 
+	oracletypes "github.com/medibloc/panacea-core/v2/x/oracle/types"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/medibloc/panacea-core/v2/types/assets"
 	"github.com/medibloc/panacea-core/v2/types/testsuite"
@@ -63,7 +65,7 @@ func (suite *genesisTestSuite) TestDataDealInitGenesis() {
 	_, err = suite.DataDealKeeper.GetDeal(suite.Ctx, 2)
 	suite.Require().Error(err)
 
-	dataCertStored, err := suite.DataDealKeeper.GetDataCert(suite.Ctx, newDataCert)
+	dataCertStored, err := suite.DataDealKeeper.GetDataCert(suite.Ctx, newDataCert.UnsignedCert.DealId, newDataCert.UnsignedCert.DataHash)
 	suite.Require().NoError(err)
 	suite.Require().Equal(newDataCert.GetSignature(), dataCertStored.GetSignature())
 	suite.Require().Equal(newDataCert.UnsignedCert.GetDealId(), dataCertStored.UnsignedCert.GetDealId())
@@ -100,6 +102,14 @@ func (suite *genesisTestSuite) TestDataDealExportGenesis() {
 		TrustedOracles: []string{acc1.String()},
 		Owner:          acc1.String(),
 	}
+
+	oracle := oracletypes.Oracle{
+		Address:  acc1.String(),
+		Endpoint: "https://my-oracle.org",
+	}
+
+	err = suite.OracleKeeper.SetOracle(suite.Ctx, oracle)
+	suite.Require().NoError(err)
 
 	_, err = suite.DataDealKeeper.CreateDeal(suite.Ctx, acc1, tempDeal)
 	suite.Require().NoError(err)

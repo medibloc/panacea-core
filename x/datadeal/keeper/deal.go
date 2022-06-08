@@ -9,6 +9,8 @@ import (
 	gogotypes "github.com/gogo/protobuf/types"
 	"github.com/medibloc/panacea-core/v2/types/assets"
 	"github.com/medibloc/panacea-core/v2/x/datadeal/types"
+
+	oracletypes "github.com/medibloc/panacea-core/v2/x/oracle/types"
 )
 
 func (k Keeper) CreateDeal(ctx sdk.Context, owner sdk.AccAddress, deal types.Deal) (uint64, error) {
@@ -32,6 +34,17 @@ func (k Keeper) CreateDeal(ctx sdk.Context, owner sdk.AccAddress, deal types.Dea
 		return 0, sdkerrors.Wrapf(types.ErrDealAlreadyExist, "deal %d already exist", dealID)
 	}
 
+	for _, oracle := range newDeal.TrustedOracles {
+		accAddr, err := sdk.AccAddressFromBech32(oracle)
+		if err != nil {
+			return 0, err
+		}
+
+		if !k.oracleKeeper.IsRegisteredOracle(ctx, accAddr) {
+			return 0, oracletypes.ErrNotRegisteredOracle
+		}
+	}
+
 	k.SetDeal(ctx, newDeal)
 
 	acc = k.accountKeeper.NewAccount(ctx, authtypes.NewModuleAccount(
@@ -44,7 +57,7 @@ func (k Keeper) CreateDeal(ctx sdk.Context, owner sdk.AccAddress, deal types.Dea
 
 	err = k.bankKeeper.SendCoins(ctx, owner, dealAddress, coins)
 	if err != nil {
-		return 0, sdkerrors.Wrapf(types.ErrNotEnoughBalance, "The owner's balance is not enough to make deal")
+		return 0, sdkerrors.Wrapf(err, "The owner's balance is not enough to make deal")
 	}
 
 	return newDeal.GetDealId(), nil
@@ -147,7 +160,7 @@ func (k Keeper) SellData(ctx sdk.Context, seller sdk.AccAddress, cert types.Data
 	}
 
 	if deal.GetStatus() != types.ACTIVE {
-		return sdk.Coin{}, sdkerrors.Wrapf(types.ErrInvalidStatus, "%s", deal.GetStatus())
+		return sdk.Coin{}, sdkerrors.Wrapf(types.ErrDealNotActive, "%s", deal.GetStatus())
 	}
 
 	dealAddress, err := sdk.AccAddressFromBech32(deal.GetDealAddress())
@@ -175,7 +188,7 @@ func (k Keeper) SellData(ctx sdk.Context, seller sdk.AccAddress, cert types.Data
 
 	err = k.bankKeeper.SendCoins(ctx, dealAddress, seller, coins)
 	if err != nil {
-		return sdk.Coin{}, sdkerrors.Wrapf(types.ErrNotEnoughBalance, "The deal's balance is not enough to make deal")
+		return sdk.Coin{}, sdkerrors.Wrapf(err, "The deal's balance is not enough to make deal")
 	}
 
 	k.SetDataCert(ctx, deal.GetDealId(), cert)
@@ -214,9 +227,9 @@ func (k Keeper) isTrustedOracle(cert types.DataCert, findDeal types.Deal) bool {
 	return false
 }
 
-func (k Keeper) GetDataCert(ctx sdk.Context, cert types.DataCert) (types.DataCert, error) {
+func (k Keeper) GetDataCert(ctx sdk.Context, dealID uint64, dataHash []byte) (types.DataCert, error) {
 	store := ctx.KVStore(k.storeKey)
-	dataCertKey := types.GetKeyPrefixDataCert(cert.UnsignedCert.DealId, cert.UnsignedCert.DataHash)
+	dataCertKey := types.GetKeyPrefixDataCert(dealID, dataHash)
 	if !store.Has(dataCertKey) {
 		return types.DataCert{}, sdkerrors.Wrapf(types.ErrDataNotFound, "data with ID %s does not exist", dataCertKey)
 	}
@@ -304,11 +317,11 @@ func (k Keeper) DeactivateDeal(ctx sdk.Context, dealID uint64, requester sdk.Acc
 	}
 
 	if !dealOwner.Equals(requester) {
-		return 0, fmt.Errorf("the owner of deal and requester is not equal")
+		return 0, types.ErrDealUnauthorized
 	}
 
 	if deal.GetStatus() != types.ACTIVE {
-		return 0, sdkerrors.Wrapf(types.ErrInvalidStatus, "%s", deal.GetStatus())
+		return 0, sdkerrors.Wrapf(types.ErrDealNotActive, "%s", deal.GetStatus())
 	}
 
 	dealAddress, err := sdk.AccAddressFromBech32(deal.GetDealAddress())

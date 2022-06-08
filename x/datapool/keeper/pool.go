@@ -12,6 +12,7 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	gogotypes "github.com/gogo/protobuf/types"
 	"github.com/medibloc/panacea-core/v2/x/datapool/types"
+	oracletypes "github.com/medibloc/panacea-core/v2/x/oracle/types"
 )
 
 func (k Keeper) CreatePool(ctx sdk.Context, curator sdk.AccAddress, deposit sdk.Coin, poolParams types.PoolParams) (uint64, error) {
@@ -38,9 +39,13 @@ func (k Keeper) CreatePool(ctx sdk.Context, curator sdk.AccAddress, deposit sdk.
 
 	// check if the trusted_oracles are registered
 	for _, oracle := range poolParams.TrustedOracles {
-		accAddr, _ := sdk.AccAddressFromBech32(oracle)
+		accAddr, err := sdk.AccAddressFromBech32(oracle)
+		if err != nil {
+			return 0, err
+		}
+
 		if !k.oracleKeeper.IsRegisteredOracle(ctx, accAddr) {
-			return 0, types.ErrNotRegisteredOracle
+			return 0, oracletypes.ErrNotRegisteredOracle
 		}
 	}
 
