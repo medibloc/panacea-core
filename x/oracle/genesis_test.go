@@ -51,14 +51,20 @@ func (suite genesisTestSuite) TestDataPoolInitGenesis() {
 func (suite genesisTestSuite) TestOracleExportGenesis() {
 	// register oracle
 	tempOracle := makeSampleOracle()
+
 	err := suite.OracleKeeper.SetOracle(suite.Ctx, tempOracle)
 	suite.Require().NoError(err)
 
 	genesisState := oracle.ExportGenesis(suite.Ctx, suite.OracleKeeper)
 	suite.Require().Len(genesisState.Oracles, 1)
 
-	suite.Require().Equal(genesisState.Oracles[tempOracle.Address].Address, tempOracle.Address)
-	suite.Require().Equal(genesisState.Oracles[tempOracle.Address].Endpoint, tempOracle.Endpoint)
+	oracleAddr, err := sdk.AccAddressFromBech32(tempOracle.Address)
+	suite.Require().NoError(err)
+
+	oracleKey := types.GetKeyPrefixOracle(oracleAddr)
+
+	suite.Require().Equal(genesisState.Oracles[string(oracleKey)].Address, tempOracle.Address)
+	suite.Require().Equal(genesisState.Oracles[string(oracleKey)].Endpoint, tempOracle.Endpoint)
 }
 
 func makeSampleOracle() types.Oracle {

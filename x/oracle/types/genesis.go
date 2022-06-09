@@ -1,7 +1,6 @@
 package types
 
 import (
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
@@ -16,13 +15,7 @@ func DefaultGenesis() *GenesisState {
 // failure.
 func (gs GenesisState) Validate() error {
 	for oracleMapKey, oracle := range gs.Oracles {
-		oracleAddr, err := sdk.AccAddressFromBech32(oracle.GetAddress())
-		if err != nil {
-			return err
-		}
-
-		key := string(GetKeyPrefixOracle(oracleAddr))
-		if oracleMapKey != key {
+		if oracleMapKey != oracle.Address {
 			return sdkerrors.Wrapf(ErrInvalidGenesisOracle, "oracle address: %s", oracle.GetAddress())
 		}
 	}
