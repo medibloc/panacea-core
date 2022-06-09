@@ -295,6 +295,7 @@ panacead tx staking create-validator \
 - `details`: A detail description of the validator
 - `identity`: The `identity` can be used as to verify identity with systems like Keybase or UPort. When using with Keybase `identity` should be populated with a 16-digit string that is generated with a [keybase.io](https://keybase.io/) account.
 - `commission-rate`: An initial commission rate on block rewards and fees charged to delegators
+  - This shouldn't be smaller than the minimum commission rate (a genesis parameter) that can be queried by `panacead query staking params`.
 - `commission-max-rate`: A maximum commission rate which this validator can charge. This cannot be changed after the
   `create-validator` transaction is processed.
 - `commission-max-change-rate`: A maximum daily increase of the validator commission. This cannot be changed after the
@@ -338,7 +339,7 @@ For more details of each flag, please see the [`Create your validator`](#create-
 
 **Note**: The `--commission-rate` value must adhere to the following invariants:
 
-- Must be between 0 and the validator's `commission-max-rate`
+- Must be between the minimum commission rate (a genesis parameter) and the validator's `commission-max-rate`
 - Must not exceed the validator's `commission-max-change-rate` which is maximum % point change rate **per day**.
   In other words, a validator can only change its commission once per day and within `commission-max-change-rate` bounds.
 
