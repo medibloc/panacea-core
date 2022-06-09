@@ -5242,7 +5242,7 @@ paths:
           format: boolean
       tags:
         - Query
-  '/cosmos/bank/v1beta1/balances/{address}/{denom}':
+  '/cosmos/bank/v1beta1/balances/{address}/by_denom':
     get:
       summary: Balance queries the balance of a single coin for a single account.
       operationId: Balance
@@ -5300,8 +5300,8 @@ paths:
           type: string
         - name: denom
           description: denom is the coin denom to query balances for.
-          in: path
-          required: true
+          in: query
+          required: false
           type: string
       tags:
         - Query
@@ -16129,6 +16129,11 @@ paths:
                   bond_denom:
                     type: string
                     description: bond_denom defines the bondable coin denomination.
+                  min_commission_rate:
+                    type: string
+                    title: >-
+                      min_commission_rate is the chain-wide minimum commission
+                      rate that a validator can charge their delegators
             description: >-
               QueryParamsResponse is response type for the Query/Params RPC
               method.
@@ -19652,6 +19657,53 @@ paths:
                       For height == 1,
 
                       it's genesis time.
+                  events:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        type:
+                          type: string
+                        attributes:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              key:
+                                type: string
+                                format: byte
+                              value:
+                                type: string
+                                format: byte
+                              index:
+                                type: boolean
+                                format: boolean
+                            description: >-
+                              EventAttribute is a single key-value pair,
+                              associated with an event.
+                      description: >-
+                        Event allows application developers to attach additional
+                        information to
+
+                        ResponseBeginBlock, ResponseEndBlock, ResponseCheckTx
+                        and ResponseDeliverTx.
+
+                        Later, transactions may be queried using these events.
+                    description: >-
+                      Events defines all the events emitted by processing a
+                      transaction. Note,
+
+                      these events include those emitted by processing all the
+                      messages and those
+
+                      emitted from the ante handler. Whereas Logs contains the
+                      events, with
+
+                      additional metadata, emitted only by processing the
+                      messages.
+
+
+                      Since: cosmos-sdk 0.42.11, 0.44.5, 0.45
                 description: >-
                   TxResponse defines a structure containing relevant tx data and
                   metadata. The
@@ -39455,6 +39507,11 @@ definitions:
       bond_denom:
         type: string
         description: bond_denom defines the bondable coin denomination.
+      min_commission_rate:
+        type: string
+        title: >-
+          min_commission_rate is the chain-wide minimum commission rate that a
+          validator can charge their delegators
     description: Params defines the parameters for the staking module.
   cosmos.staking.v1beta1.Pool:
     type: object
@@ -40695,6 +40752,11 @@ definitions:
           bond_denom:
             type: string
             description: bond_denom defines the bondable coin denomination.
+          min_commission_rate:
+            type: string
+            title: >-
+              min_commission_rate is the chain-wide minimum commission rate that
+              a validator can charge their delegators
     description: QueryParamsResponse is response type for the Query/Params RPC method.
   cosmos.staking.v1beta1.QueryPoolResponse:
     type: object
@@ -42581,6 +42643,51 @@ definitions:
           == 1,
 
           it's genesis time.
+      events:
+        type: array
+        items:
+          type: object
+          properties:
+            type:
+              type: string
+            attributes:
+              type: array
+              items:
+                type: object
+                properties:
+                  key:
+                    type: string
+                    format: byte
+                  value:
+                    type: string
+                    format: byte
+                  index:
+                    type: boolean
+                    format: boolean
+                description: >-
+                  EventAttribute is a single key-value pair, associated with an
+                  event.
+          description: >-
+            Event allows application developers to attach additional information
+            to
+
+            ResponseBeginBlock, ResponseEndBlock, ResponseCheckTx and
+            ResponseDeliverTx.
+
+            Later, transactions may be queried using these events.
+        description: >-
+          Events defines all the events emitted by processing a transaction.
+          Note,
+
+          these events include those emitted by processing all the messages and
+          those
+
+          emitted from the ante handler. Whereas Logs contains the events, with
+
+          additional metadata, emitted only by processing the messages.
+
+
+          Since: cosmos-sdk 0.42.11, 0.44.5, 0.45
     description: >-
       TxResponse defines a structure containing relevant tx data and metadata.
       The
@@ -43011,6 +43118,52 @@ definitions:
               height == 1,
 
               it's genesis time.
+          events:
+            type: array
+            items:
+              type: object
+              properties:
+                type:
+                  type: string
+                attributes:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      key:
+                        type: string
+                        format: byte
+                      value:
+                        type: string
+                        format: byte
+                      index:
+                        type: boolean
+                        format: boolean
+                    description: >-
+                      EventAttribute is a single key-value pair, associated with
+                      an event.
+              description: >-
+                Event allows application developers to attach additional
+                information to
+
+                ResponseBeginBlock, ResponseEndBlock, ResponseCheckTx and
+                ResponseDeliverTx.
+
+                Later, transactions may be queried using these events.
+            description: >-
+              Events defines all the events emitted by processing a transaction.
+              Note,
+
+              these events include those emitted by processing all the messages
+              and those
+
+              emitted from the ante handler. Whereas Logs contains the events,
+              with
+
+              additional metadata, emitted only by processing the messages.
+
+
+              Since: cosmos-sdk 0.42.11, 0.44.5, 0.45
         description: >-
           TxResponse defines a structure containing relevant tx data and
           metadata. The
@@ -43338,6 +43491,52 @@ definitions:
               height == 1,
 
               it's genesis time.
+          events:
+            type: array
+            items:
+              type: object
+              properties:
+                type:
+                  type: string
+                attributes:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      key:
+                        type: string
+                        format: byte
+                      value:
+                        type: string
+                        format: byte
+                      index:
+                        type: boolean
+                        format: boolean
+                    description: >-
+                      EventAttribute is a single key-value pair, associated with
+                      an event.
+              description: >-
+                Event allows application developers to attach additional
+                information to
+
+                ResponseBeginBlock, ResponseEndBlock, ResponseCheckTx and
+                ResponseDeliverTx.
+
+                Later, transactions may be queried using these events.
+            description: >-
+              Events defines all the events emitted by processing a transaction.
+              Note,
+
+              these events include those emitted by processing all the messages
+              and those
+
+              emitted from the ante handler. Whereas Logs contains the events,
+              with
+
+              additional metadata, emitted only by processing the messages.
+
+
+              Since: cosmos-sdk 0.42.11, 0.44.5, 0.45
         description: >-
           TxResponse defines a structure containing relevant tx data and
           metadata. The
@@ -43617,6 +43816,52 @@ definitions:
                 height == 1,
 
                 it's genesis time.
+            events:
+              type: array
+              items:
+                type: object
+                properties:
+                  type:
+                    type: string
+                  attributes:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        key:
+                          type: string
+                          format: byte
+                        value:
+                          type: string
+                          format: byte
+                        index:
+                          type: boolean
+                          format: boolean
+                      description: >-
+                        EventAttribute is a single key-value pair, associated
+                        with an event.
+                description: >-
+                  Event allows application developers to attach additional
+                  information to
+
+                  ResponseBeginBlock, ResponseEndBlock, ResponseCheckTx and
+                  ResponseDeliverTx.
+
+                  Later, transactions may be queried using these events.
+              description: >-
+                Events defines all the events emitted by processing a
+                transaction. Note,
+
+                these events include those emitted by processing all the
+                messages and those
+
+                emitted from the ante handler. Whereas Logs contains the events,
+                with
+
+                additional metadata, emitted only by processing the messages.
+
+
+                Since: cosmos-sdk 0.42.11, 0.44.5, 0.45
           description: >-
             TxResponse defines a structure containing relevant tx data and
             metadata. The
