@@ -818,4 +818,10 @@ func (app *App) registerUpgradeHandlers() {
 			}
 		}
 	})
+
+	app.UpgradeKeeper.SetUpgradeHandler("v2.1.0-alpha1", func(ctx sdk.Context, plan upgradetypes.Plan) {
+		datadeal.InitGenesis(ctx, app.dataDealKeeper, *datadealtypes.DefaultGenesis())
+		datapool.InitGenesis(ctx, app.dataPoolKeeper, *datapooltypes.DefaultGenesis())
+		oracle.InitGenesis(ctx, app.oracleKeeper, *oracletypes.DefaultGenesis())
+	})
 }
