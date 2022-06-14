@@ -36,6 +36,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/server/api"
 	"github.com/cosmos/cosmos-sdk/server/config"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
+	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/cosmos/cosmos-sdk/version"
@@ -590,6 +591,11 @@ func New(
 	)
 	app.SetEndBlocker(app.EndBlocker)
 
+	err = app.registerUpgradeHandlers()
+	if err != nil {
+		panic("Failed to register upgradeHandler: " + err.Error())
+	}
+
 	if loadLatest {
 		if err := app.LoadLatestVersion(); err != nil {
 			tmos.Exit(err.Error())
@@ -614,8 +620,6 @@ func New(
 	app.ScopedIBCKeeper = scopedIBCKeeper
 	app.ScopedTransferKeeper = scopedTransferKeeper
 	app.ScopedWasmKeeper = scopedWasmKeeper
-
-	app.registerUpgradeHandlers()
 
 	return app
 }
@@ -785,7 +789,10 @@ func initParamsKeeper(appCodec codec.BinaryMarshaler, legacyAmino *codec.LegacyA
 	return paramsKeeper
 }
 
-func (app *App) registerUpgradeHandlers() {
+// registerUpgradeHandlers registers upgrade handlers, and sets the store loader if necessary.
+// This function must be called before sealing the BaseApp (i.e. by app.LoadLatestVersion())
+// because the storetypes loader cannot be set if BaseApp is already sealed.
+func (app *App) registerUpgradeHandlers() error {
 	app.UpgradeKeeper.SetUpgradeHandler("v2.0.2", func(ctx sdk.Context, plan upgradetypes.Plan) {})
 
 	app.UpgradeKeeper.SetUpgradeHandler("v2.0.3", func(ctx sdk.Context, plan upgradetypes.Plan) {
@@ -819,9 +826,25 @@ func (app *App) registerUpgradeHandlers() {
 		}
 	})
 
-	app.UpgradeKeeper.SetUpgradeHandler("v2.1.0-alpha1", func(ctx sdk.Context, plan upgradetypes.Plan) {
+	app.UpgradeKeeper.SetUpgradeHandler("v2.1.0-alpha2", func(ctx sdk.Context, plan upgradetypes.Plan) {
 		datadeal.InitGenesis(ctx, app.dataDealKeeper, *datadealtypes.DefaultGenesis())
 		datapool.InitGenesis(ctx, app.dataPoolKeeper, *datapooltypes.DefaultGenesis())
 		oracle.InitGenesis(ctx, app.oracleKeeper, *oracletypes.DefaultGenesis())
 	})
+
+	upgradeInfo, err := app.UpgradeKeeper.ReadUpgradeInfoFromDisk()
+	if err != nil {
+		return err
+	}
+
+	if upgradeInfo.Name == "v2.1.0-alpha2" && !app.UpgradeKeeper.IsSkipHeight(upgradeInfo.Height) {
+		storeUpgrades := storetypes.StoreUpgrades{
+			Added: []string{datadealtypes.ModuleName, datapooltypes.ModuleName, oracletypes.ModuleName},
+		}
+
+		// configure storetypes loader that checks if version == upgradeHeight and applies storetypes upgrades
+		app.SetStoreLoader(upgradetypes.UpgradeStoreLoader(upgradeInfo.Height, &storeUpgrades))
+	}
+
+	return nil
 }
