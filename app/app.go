@@ -789,7 +789,7 @@ func initParamsKeeper(appCodec codec.BinaryMarshaler, legacyAmino *codec.LegacyA
 	return paramsKeeper
 }
 
-// registerUpgradeHandlers registers upgrade handlers, and sets the storetypes loader if necessary.
+// registerUpgradeHandlers registers upgrade handlers, and sets the store loader if necessary.
 // This function must be called before sealing the BaseApp (i.e. by app.LoadLatestVersion())
 // because the storetypes loader cannot be set if BaseApp is already sealed.
 func (app *App) registerUpgradeHandlers() error {
