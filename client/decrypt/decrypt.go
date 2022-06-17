@@ -4,12 +4,12 @@ import (
 	"encoding/base64"
 	"encoding/hex"
 	"fmt"
+	"github.com/btcsuite/btcd/btcec"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
-	"github.com/tendermint/btcd/btcec"
 	"github.com/tendermint/tendermint/libs/cli"
 	"io/ioutil"
 )

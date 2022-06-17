@@ -4,6 +4,7 @@ go 1.15
 
 require (
 	github.com/CosmWasm/wasmd v0.21.0
+	github.com/btcsuite/btcd v0.22.0-beta
 	github.com/btcsuite/btcutil v1.0.3-0.20201208143702-a53e38424cce
 	github.com/cosmos/cosmos-sdk v0.42.11
 	github.com/cosmos/go-bip39 v1.0.0
@@ -25,7 +26,6 @@ require (
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.10.1
 	github.com/stretchr/testify v1.7.1
-	github.com/tendermint/btcd v0.1.1
 	github.com/tendermint/tendermint v0.34.14
 	github.com/tendermint/tm-db v0.6.4
 	golang.org/x/crypto v0.0.0-20220214200702-86341886e292
