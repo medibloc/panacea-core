@@ -1,7 +1,6 @@
 package decrypt
 
 import (
-	"encoding/base64"
 	"encoding/hex"
 	"fmt"
 	"github.com/btcsuite/btcd/btcec"
@@ -24,10 +23,8 @@ func Command(defaultNodeHome string) *cobra.Command {
 		Use:   "decrypt [name] (--text [ciphertext] | --path [ciphertext-file])",
 		Short: "Decrypt and output the ciphertext file encrypted with ECDSA PublicKey.",
 		Long: `This command can decrypt ciphertext encrypted with ECDSA PublicKey. 
-The file contents must be Standard Base64 encoded.
-Also, make sure your key is stored in the localStore.
-(According to the following command (panacead keys add ...)
-`,
+And your key should be stored in the localStore.
+(According to the following command (panacead keys add ...)`,
 		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
@@ -49,11 +46,10 @@ Also, make sure your key is stored in the localStore.
 			}
 
 			ecdsaPrivKey, _ := btcec.PrivKeyFromBytes(btcec.S256(), privKey)
-			decodeText, err := base64.StdEncoding.DecodeString(content)
 			if err != nil {
 				return err
 			}
-			plainText, err := btcec.Decrypt(ecdsaPrivKey, decodeText)
+			plainText, err := btcec.Decrypt(ecdsaPrivKey, content)
 			if err != nil {
 				return err
 			}
@@ -68,35 +64,35 @@ Also, make sure your key is stored in the localStore.
 	cmd.PersistentFlags().String(flags.FlagKeyringDir, "", "The client Keyring directory; if omitted, the default 'home' directory will be used")
 	cmd.PersistentFlags().String(flags.FlagKeyringBackend, flags.DefaultKeyringBackend, "Select keyring's backend (os|file|test)")
 	cmd.PersistentFlags().String(cli.OutputFlag, "text", "Output format (text|json)")
-	cmd.Flags().String(FlagCipherText, "", "Standard Base64-encoded ciphertext")
-	cmd.Flags().String(FlagCipherTextPath, "", "File path where Standard Base64-encoded ciphertext is stored")
+	cmd.Flags().String(FlagCipherText, "", "Cipher text in the form of a byte array")
+	cmd.Flags().String(FlagCipherTextPath, "", "Path to the file where the cipher text in the form of a byte array is stored")
 
 	return cmd
 }
 
-func getContent(flag *pflag.FlagSet) (string, error) {
+func getContent(flag *pflag.FlagSet) ([]byte, error) {
 	cipherText, err := flag.GetString(FlagCipherText)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 	cipherTextPath, err := flag.GetString(FlagCipherTextPath)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	if len(cipherText) == 0 && len(cipherTextPath) == 0 {
-		return "", fmt.Errorf("either --text or --path should be required")
+		return nil, fmt.Errorf("either --text or --path should be required")
 	} else if len(cipherText) != 0 && len(cipherTextPath) != 0 {
-		return "", fmt.Errorf("only one of --text or --path should be specified")
+		return nil, fmt.Errorf("only one of --text or --path should be specified")
 	}
 
 	if len(cipherText) != 0 {
-		return cipherText, nil
+		return []byte(cipherText), nil
 	}
 
 	content, err := ioutil.ReadFile(cipherTextPath)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
-	return string(content), nil
+	return content, nil
 }
