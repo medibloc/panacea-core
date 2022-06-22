@@ -305,6 +305,4 @@ func NewTestProtocolVersionSetter() TestProtocolVersionSetter {
 	return TestProtocolVersionSetter{}
 }
 
-func (vs TestProtocolVersionSetter) SetProtocolVersion(v uint64) {
-	return
-}
+func (vs TestProtocolVersionSetter) SetProtocolVersion(v uint64) {}

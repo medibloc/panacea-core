@@ -30,6 +30,9 @@ func (k Keeper) BurnCoins(ctx sdk.Context, acc string) error {
 	}
 
 	err = k.bankKeeper.BurnCoins(ctx, types.ModuleName, burnCoins)
+	if err != nil {
+		return err
+	}
 
 	ctx.Logger().Info("Success burn coin to burnAccount.", fmt.Sprintf("address: %s, coins: %s", acc, burnCoins))
 
