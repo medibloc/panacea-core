@@ -147,9 +147,6 @@
     },
     {
       "url": "./tmp-swagger-gen/panacea/did/v2/query.swagger.json"
-    },
-    {
-      "url": "./tmp-swagger-gen/panacea/token/v2/query.swagger.json"
     }
   ]
 }
