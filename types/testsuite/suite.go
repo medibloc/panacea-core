@@ -20,17 +20,21 @@ import (
 	distrkeeper "github.com/cosmos/cosmos-sdk/x/distribution/keeper"
 	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
-	ibctransferkeeper "github.com/cosmos/cosmos-sdk/x/ibc/applications/transfer/keeper"
-	ibctransfertypes "github.com/cosmos/cosmos-sdk/x/ibc/applications/transfer/types"
-	ibchost "github.com/cosmos/cosmos-sdk/x/ibc/core/24-host"
-	ibckeeper "github.com/cosmos/cosmos-sdk/x/ibc/core/keeper"
+	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
 	paramskeeper "github.com/cosmos/cosmos-sdk/x/params/keeper"
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
+	upgradekeeper "github.com/cosmos/cosmos-sdk/x/upgrade/keeper"
+	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
+	ibctransferkeeper "github.com/cosmos/ibc-go/v2/modules/apps/transfer/keeper"
+	ibctransfertypes "github.com/cosmos/ibc-go/v2/modules/apps/transfer/types"
+	ibchost "github.com/cosmos/ibc-go/v2/modules/core/24-host"
+	ibckeeper "github.com/cosmos/ibc-go/v2/modules/core/keeper"
 	aolkeeper "github.com/medibloc/panacea-core/v2/x/aol/keeper"
 	aoltypes "github.com/medibloc/panacea-core/v2/x/aol/types"
 	burnkeeper "github.com/medibloc/panacea-core/v2/x/burn/keeper"
+	burntypes "github.com/medibloc/panacea-core/v2/x/burn/types"
 	datadealkeeper "github.com/medibloc/panacea-core/v2/x/datadeal/keeper"
 	datadealtypes "github.com/medibloc/panacea-core/v2/x/datadeal/types"
 	"github.com/medibloc/panacea-core/v2/x/datapool"
@@ -39,8 +43,6 @@ import (
 	"github.com/medibloc/panacea-core/v2/x/oracle"
 	oraclekeeper "github.com/medibloc/panacea-core/v2/x/oracle/keeper"
 	oracletypes "github.com/medibloc/panacea-core/v2/x/oracle/types"
-	tokenkeeper "github.com/medibloc/panacea-core/v2/x/token/keeper"
-	tokentypes "github.com/medibloc/panacea-core/v2/x/token/types"
 	"github.com/stretchr/testify/suite"
 	"github.com/tendermint/tendermint/crypto/secp256k1"
 	"github.com/tendermint/tendermint/libs/log"
@@ -52,6 +54,8 @@ import (
 	didkeeper "github.com/medibloc/panacea-core/v2/x/did/keeper"
 	didtypes "github.com/medibloc/panacea-core/v2/x/did/types"
 )
+
+type TestProtocolVersionSetter struct{}
 
 type TestSuite struct {
 	suite.Suite
@@ -71,7 +75,6 @@ type TestSuite struct {
 	TransferKeeper    ibctransferkeeper.Keeper
 	DIDMsgServer      didtypes.MsgServer
 	DIDKeeper         didkeeper.Keeper
-	TokenKeeper       tokenkeeper.Keeper
 	DataDealKeeper    datadealkeeper.Keeper
 	DataDealMsgServer datadealtypes.MsgServer
 	DataPoolMsgServer datapooltypes.MsgServer
@@ -79,6 +82,7 @@ type TestSuite struct {
 	OracleKeeper      oraclekeeper.Keeper
 	OracleMsgServer   oracletypes.MsgServer
 	WasmKeeper        wasm.Keeper
+	UpgradeKeeper     upgradekeeper.Keeper
 }
 
 func (suite *TestSuite) SetupTest() {
@@ -90,7 +94,6 @@ func (suite *TestSuite) SetupTest() {
 		stakingtypes.StoreKey,
 		paramstypes.StoreKey,
 		didtypes.StoreKey,
-		tokentypes.StoreKey,
 		datadealtypes.StoreKey,
 		datapooltypes.StoreKey,
 		oracletypes.StoreKey,
@@ -98,6 +101,7 @@ func (suite *TestSuite) SetupTest() {
 		ibchost.StoreKey,
 		capabilitytypes.StoreKey,
 		ibctransfertypes.StoreKey,
+		upgradetypes.StoreKey,
 	)
 	tKeyParams := sdk.NewTransientStoreKey(paramstypes.TStoreKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
@@ -119,11 +123,13 @@ func (suite *TestSuite) SetupTest() {
 	maccPerms := map[string][]string{
 		authtypes.FeeCollectorName:     nil,
 		distrtypes.ModuleName:          nil,
+		minttypes.ModuleName:           {authtypes.Minter},
 		stakingtypes.BondedPoolName:    {authtypes.Burner, authtypes.Staking},
 		stakingtypes.NotBondedPoolName: {authtypes.Burner, authtypes.Staking},
 		govtypes.ModuleName:            {authtypes.Burner},
 		ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
 		wasm.ModuleName:                {authtypes.Burner},
+		burntypes.ModuleName:           {authtypes.Burner},
 		datapooltypes.ModuleName:       {authtypes.Minter},
 	}
 
@@ -174,8 +180,9 @@ func (suite *TestSuite) SetupTest() {
 	suite.DistrKeeper = distrkeeper.NewKeeper(
 		cdc.Marshaler, keyParams[distrtypes.StoreKey], paramsKeeper.Subspace(distrtypes.ModuleName), suite.AccountKeeper, suite.BankKeeper, &suite.StakingKeeper, "test_fee_collector", modAccAddrs,
 	)
+	suite.UpgradeKeeper = upgradekeeper.NewKeeper(map[int64]bool{}, keyParams[upgradetypes.StoreKey], cdc.Marshaler, suite.T().TempDir(), NewTestProtocolVersionSetter())
 	suite.IBCKeeper = ibckeeper.NewKeeper(
-		cdc.Marshaler, keyParams[ibchost.StoreKey], paramsKeeper.Subspace(ibchost.ModuleName), suite.StakingKeeper, scopedIBCKeeper,
+		cdc.Marshaler, keyParams[ibchost.StoreKey], paramsKeeper.Subspace(ibchost.ModuleName), suite.StakingKeeper, suite.UpgradeKeeper, scopedIBCKeeper,
 	)
 	suite.TransferKeeper = ibctransferkeeper.NewKeeper(
 		cdc.Marshaler, keyParams[ibctransfertypes.StoreKey], paramsKeeper.Subspace(ibctransfertypes.ModuleName),
@@ -183,7 +190,7 @@ func (suite *TestSuite) SetupTest() {
 		suite.AccountKeeper, suite.BankKeeper, scopedIBCKeeper,
 	)
 
-	router := baseapp.NewRouter()
+	msgRouter := baseapp.NewMsgServiceRouter()
 
 	querier := baseapp.NewGRPCQueryRouter()
 
@@ -200,7 +207,7 @@ func (suite *TestSuite) SetupTest() {
 		&suite.IBCKeeper.PortKeeper,
 		scopedIBCKeeper,
 		suite.TransferKeeper,
-		router,
+		msgRouter,
 		querier,
 		suite.T().TempDir(),
 		wasmtypes.DefaultWasmConfig(),
@@ -222,12 +229,6 @@ func (suite *TestSuite) SetupTest() {
 		memKeys[didtypes.MemStoreKey],
 	)
 	suite.DIDMsgServer = didkeeper.NewMsgServerImpl(suite.DIDKeeper)
-	suite.TokenKeeper = *tokenkeeper.NewKeeper(
-		cdc.Marshaler,
-		keyParams[tokentypes.StoreKey],
-		memKeys[tokentypes.MemStoreKey],
-		suite.BankKeeper,
-	)
 
 	suite.OracleKeeper = *oraclekeeper.NewKeeper(
 		cdc.Marshaler,
@@ -298,4 +299,12 @@ func newTestCodec() params.EncodingConfig {
 
 func (suite *TestSuite) GetAccAddress() sdk.AccAddress {
 	return sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address())
+}
+
+func NewTestProtocolVersionSetter() TestProtocolVersionSetter {
+	return TestProtocolVersionSetter{}
+}
+
+func (vs TestProtocolVersionSetter) SetProtocolVersion(v uint64) {
+	return
 }

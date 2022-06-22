@@ -69,7 +69,7 @@ func (k Keeper) CreateDeal(ctx sdk.Context, owner sdk.AccAddress, deal types.Dea
 
 func (k Keeper) SetNextDealNumber(ctx sdk.Context, dealNumber uint64) {
 	store := ctx.KVStore(k.storeKey)
-	bz := k.cdc.MustMarshalBinaryLengthPrefixed(&gogotypes.UInt64Value{Value: dealNumber})
+	bz := k.cdc.MustMarshalLengthPrefixed(&gogotypes.UInt64Value{Value: dealNumber})
 	store.Set(types.KeyDealNextNumber, bz)
 }
 
@@ -85,7 +85,7 @@ func (k Keeper) GetNextDealNumber(ctx sdk.Context) (uint64, error) {
 
 	val := gogotypes.UInt64Value{}
 
-	err := k.cdc.UnmarshalBinaryLengthPrefixed(bz, &val)
+	err := k.cdc.UnmarshalLengthPrefixed(bz, &val)
 	if err != nil {
 		return 0, err
 	}
@@ -116,7 +116,7 @@ func (k Keeper) GetDeal(ctx sdk.Context, dealID uint64) (types.Deal, error) {
 	bz := store.Get(dealKey)
 
 	var deal types.Deal
-	err := k.cdc.UnmarshalBinaryLengthPrefixed(bz, &deal)
+	err := k.cdc.UnmarshalLengthPrefixed(bz, &deal)
 	if err != nil {
 		return types.Deal{}, err
 	}
@@ -127,7 +127,7 @@ func (k Keeper) GetDeal(ctx sdk.Context, dealID uint64) (types.Deal, error) {
 func (k Keeper) SetDeal(ctx sdk.Context, deal types.Deal) {
 	store := ctx.KVStore(k.storeKey)
 	dealKey := types.GetKeyPrefixDeals(deal.GetDealId())
-	bz := k.cdc.MustMarshalBinaryLengthPrefixed(&deal)
+	bz := k.cdc.MustMarshalLengthPrefixed(&deal)
 	store.Set(dealKey, bz)
 }
 
@@ -142,7 +142,7 @@ func (k Keeper) ListDeals(ctx sdk.Context) ([]types.Deal, error) {
 		bz := iter.Value()
 		var deal types.Deal
 
-		err := k.cdc.UnmarshalBinaryLengthPrefixed(bz, &deal)
+		err := k.cdc.UnmarshalLengthPrefixed(bz, &deal)
 		if err != nil {
 			return []types.Deal{}, err
 		}
@@ -241,7 +241,7 @@ func (k Keeper) GetDataCert(ctx sdk.Context, dealID uint64, dataHash []byte) (ty
 	bz := store.Get(dataCertKey)
 
 	var dataCert types.DataCert
-	err := k.cdc.UnmarshalBinaryLengthPrefixed(bz, &dataCert)
+	err := k.cdc.UnmarshalLengthPrefixed(bz, &dataCert)
 	if err != nil {
 		return types.DataCert{}, err
 	}
@@ -260,7 +260,7 @@ func (k Keeper) ListDataCerts(ctx sdk.Context) ([]types.DataCert, error) {
 		bz := iter.Value()
 		var dataCert types.DataCert
 
-		err := k.cdc.UnmarshalBinaryLengthPrefixed(bz, &dataCert)
+		err := k.cdc.UnmarshalLengthPrefixed(bz, &dataCert)
 		if err != nil {
 			return []types.DataCert{}, err
 		}
@@ -273,7 +273,7 @@ func (k Keeper) SetDataCert(ctx sdk.Context, dealID uint64, cert types.DataCert)
 	store := ctx.KVStore(k.storeKey)
 	dataHash := cert.UnsignedCert.GetDataHash()
 	dataCertKey := types.GetKeyPrefixDataCert(dealID, dataHash)
-	storedDataCert := k.cdc.MustMarshalBinaryLengthPrefixed(&cert)
+	storedDataCert := k.cdc.MustMarshalLengthPrefixed(&cert)
 	store.Set(dataCertKey, storedDataCert)
 }
 

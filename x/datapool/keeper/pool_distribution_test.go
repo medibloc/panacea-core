@@ -3,6 +3,8 @@ package keeper_test
 import (
 	"fmt"
 
+	"github.com/cosmos/cosmos-sdk/simapp"
+
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/medibloc/panacea-core/v2/types/assets"
@@ -32,7 +34,7 @@ func setupRevenueDistributionTest(suite poolTestSuite, targetNumData, poolMaxNft
 
 func buyDataPass(suite poolTestSuite, poolID, count uint64) {
 	// Buyer buys DataPass.
-	err := suite.BankKeeper.AddCoins(suite.Ctx, buyerAddr, fundForBuyer)
+	err := simapp.FundAccount(suite.BankKeeper, suite.Ctx, buyerAddr, fundForBuyer)
 	suite.Require().NoError(err)
 
 	for i := uint64(0); i < count; i++ {

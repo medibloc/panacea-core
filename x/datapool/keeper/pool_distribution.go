@@ -33,7 +33,7 @@ func (k Keeper) SetSalesHistory(ctx sdk.Context, salesHistory *types.SalesHistor
 		salesHistory.SellerAddress,
 	)
 	store := ctx.KVStore(k.storeKey)
-	store.Set(key, k.cdc.MustMarshalBinaryLengthPrefixed(salesHistory))
+	store.Set(key, k.cdc.MustMarshalLengthPrefixed(salesHistory))
 }
 
 // GetSalesHistory returns the sales history. If there is no value, it responds nil.
@@ -45,7 +45,7 @@ func (k Keeper) GetSalesHistory(ctx sdk.Context, poolID, round uint64, sellerAdd
 	}
 	bz := store.Get(key)
 	var salesHistory types.SalesHistory
-	k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &salesHistory)
+	k.cdc.MustUnmarshalLengthPrefixed(bz, &salesHistory)
 	return &salesHistory
 }
 
@@ -57,7 +57,7 @@ func (k Keeper) GetSalesHistories(ctx sdk.Context, poolID, round uint64) []*type
 	for ; iter.Valid(); iter.Next() {
 		history := &types.SalesHistory{}
 		bz := iter.Value()
-		k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, history)
+		k.cdc.MustUnmarshalLengthPrefixed(bz, history)
 		histories = append(histories, history)
 	}
 	return histories
@@ -70,7 +70,7 @@ func (k Keeper) GetAllSalesHistories(ctx sdk.Context) []*types.SalesHistory {
 	for ; iter.Valid(); iter.Next() {
 		history := &types.SalesHistory{}
 		bz := iter.Value()
-		k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, history)
+		k.cdc.MustUnmarshalLengthPrefixed(bz, history)
 		histories = append(histories, history)
 	}
 	return histories
@@ -78,7 +78,7 @@ func (k Keeper) GetAllSalesHistories(ctx sdk.Context) []*types.SalesHistory {
 
 // SetInstantRevenueDistribution stores the poolID to which the revenue should be distributed immediately.
 func (k Keeper) SetInstantRevenueDistribution(ctx sdk.Context, instantRevenueDistribution *types.InstantRevenueDistribution) {
-	bz := k.cdc.MustMarshalBinaryLengthPrefixed(instantRevenueDistribution)
+	bz := k.cdc.MustMarshalLengthPrefixed(instantRevenueDistribution)
 	store := ctx.KVStore(k.storeKey)
 	store.Set(types.KeyPrefixInstantRevenueDistribution, bz)
 }
@@ -90,7 +90,7 @@ func (k Keeper) GetInstantRevenueDistribution(ctx sdk.Context) *types.InstantRev
 	}
 	bz := store.Get(types.KeyPrefixInstantRevenueDistribution)
 	var delayedRevenueDistribution types.InstantRevenueDistribution
-	k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &delayedRevenueDistribution)
+	k.cdc.MustUnmarshalLengthPrefixed(bz, &delayedRevenueDistribution)
 	return &delayedRevenueDistribution
 }
 

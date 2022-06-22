@@ -7,6 +7,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/cosmos/cosmos-sdk/simapp"
+
 	oracletypes "github.com/medibloc/panacea-core/v2/x/oracle/types"
 
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -79,11 +81,11 @@ func (suite poolTestSuite) setupNFTContract() {
 func (suite poolTestSuite) setupCreatePool(targetNumData, maxNftSupply uint64) uint64 {
 	suite.setupNFTContract()
 
-	err := suite.BankKeeper.AddCoins(suite.Ctx, curatorAddr, fundForCurator)
+	err := simapp.FundAccount(suite.BankKeeper, suite.Ctx, curatorAddr, fundForCurator)
 	suite.Require().NoError(err)
 
 	// register oracle
-	err = suite.BankKeeper.AddCoins(suite.Ctx, oracle1, fundForOracle)
+	err = simapp.FundAccount(suite.BankKeeper, suite.Ctx, oracle1, fundForOracle)
 	suite.Require().NoError(err)
 
 	oracle := oracletypes.Oracle{
@@ -157,7 +159,7 @@ func (suite poolTestSuite) TestNotRegisteredOracle() {
 	// create and instantiate NFT contract
 	suite.setupNFTContract()
 
-	err := suite.BankKeeper.AddCoins(suite.Ctx, curatorAddr, fundForCurator)
+	err := simapp.FundAccount(suite.BankKeeper, suite.Ctx, curatorAddr, fundForCurator)
 	suite.Require().NoError(err)
 
 	newPoolParams := makePoolParamsWithOracle(defaultTargetNumData, defaultMaxNftSupply)
@@ -177,7 +179,7 @@ func (suite poolTestSuite) TestNotEnoughBalanceForDeposit() {
 }
 
 func (suite poolTestSuite) TestNotRegisteredNFTContract() {
-	err := suite.BankKeeper.AddCoins(suite.Ctx, curatorAddr, fundForCurator)
+	err := simapp.FundAccount(suite.BankKeeper, suite.Ctx, curatorAddr, fundForCurator)
 	suite.Require().NoError(err)
 
 	newPoolParams := makePoolParamsNoOracle(defaultMaxNftSupply)
@@ -190,7 +192,7 @@ func (suite poolTestSuite) TestBuyDataPassPending() {
 	// create pool
 	poolID := suite.setupCreatePool(defaultTargetNumData, defaultMaxNftSupply)
 
-	err := suite.BankKeeper.AddCoins(suite.Ctx, buyerAddr, fundForBuyer)
+	err := simapp.FundAccount(suite.BankKeeper, suite.Ctx, buyerAddr, fundForBuyer)
 	suite.Require().NoError(err)
 
 	err = suite.DataPoolKeeper.BuyDataPass(suite.Ctx, buyerAddr, poolID, 1, NFTPrice)
@@ -208,7 +210,7 @@ func (suite poolTestSuite) TestBuyDataPassPoolNotFound() {
 	// create pool
 	suite.setupCreatePool(defaultTargetNumData, defaultMaxNftSupply)
 
-	err := suite.BankKeeper.AddCoins(suite.Ctx, buyerAddr, fundForBuyer)
+	err := simapp.FundAccount(suite.BankKeeper, suite.Ctx, buyerAddr, fundForBuyer)
 	suite.Require().NoError(err)
 
 	// buy NFT other data pool
@@ -220,7 +222,7 @@ func (suite poolTestSuite) TestBuyDataPassSoldOut() {
 	// create pool w/ NFT max supply of 1
 	poolID := suite.setupCreatePool(defaultTargetNumData, 1)
 
-	err := suite.BankKeeper.AddCoins(suite.Ctx, buyerAddr, fundForBuyer)
+	err := simapp.FundAccount(suite.BankKeeper, suite.Ctx, buyerAddr, fundForBuyer)
 	suite.Require().NoError(err)
 
 	// buy 1 NFT
@@ -236,7 +238,7 @@ func (suite poolTestSuite) TestBuyDataPassRoundNotMatched() {
 	// create pool
 	poolID := suite.setupCreatePool(defaultTargetNumData, defaultMaxNftSupply)
 
-	err := suite.BankKeeper.AddCoins(suite.Ctx, buyerAddr, fundForBuyer)
+	err := simapp.FundAccount(suite.BankKeeper, suite.Ctx, buyerAddr, fundForBuyer)
 	suite.Require().NoError(err)
 
 	// different round
@@ -248,7 +250,7 @@ func (suite poolTestSuite) TestBuyDataPassPaymentNotMatched() {
 	// create pool
 	poolID := suite.setupCreatePool(defaultTargetNumData, defaultMaxNftSupply)
 
-	err := suite.BankKeeper.AddCoins(suite.Ctx, buyerAddr, fundForBuyer)
+	err := simapp.FundAccount(suite.BankKeeper, suite.Ctx, buyerAddr, fundForBuyer)
 	suite.Require().NoError(err)
 
 	// buy NFT with different payment
@@ -261,7 +263,7 @@ func (suite poolTestSuite) TestBuyDataPassInsufficientBalance() {
 	poolID := suite.setupCreatePool(defaultTargetNumData, defaultMaxNftSupply)
 
 	// buyer with small balance
-	err := suite.BankKeeper.AddCoins(suite.Ctx, buyerAddr, sdk.NewCoins(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(1000))))
+	err := simapp.FundAccount(suite.BankKeeper, suite.Ctx, buyerAddr, sdk.NewCoins(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(1000))))
 	suite.Require().NoError(err)
 
 	err = suite.DataPoolKeeper.BuyDataPass(suite.Ctx, buyerAddr, poolID, 1, NFTPrice)
@@ -269,7 +271,7 @@ func (suite poolTestSuite) TestBuyDataPassInsufficientBalance() {
 }
 
 func (suite poolTestSuite) TestNotEnoughDeposit() {
-	err := suite.BankKeeper.AddCoins(suite.Ctx, curatorAddr, fundForCurator)
+	err := simapp.FundAccount(suite.BankKeeper, suite.Ctx, curatorAddr, fundForCurator)
 	suite.Require().NoError(err)
 
 	newPoolParams := makePoolParamsNoOracle(defaultMaxNftSupply)
@@ -284,7 +286,7 @@ func (suite poolTestSuite) TestNotEnoughDeposit() {
 func (suite poolTestSuite) TestRedeemDataPass() {
 	poolID := suite.setupCreatePool(1, defaultMaxNftSupply)
 
-	err := suite.BankKeeper.AddCoins(suite.Ctx, buyerAddr, fundForBuyer)
+	err := simapp.FundAccount(suite.BankKeeper, suite.Ctx, buyerAddr, fundForBuyer)
 	suite.Require().NoError(err)
 
 	err = suite.DataPoolKeeper.BuyDataPass(suite.Ctx, buyerAddr, poolID, 1, NFTPrice)
@@ -310,7 +312,7 @@ func (suite poolTestSuite) TestRedeemDataPass() {
 func (suite poolTestSuite) TestGetRedeemerDataPass() {
 	poolID := suite.setupCreatePool(1, defaultMaxNftSupply)
 
-	err := suite.BankKeeper.AddCoins(suite.Ctx, buyerAddr, fundForBuyer)
+	err := simapp.FundAccount(suite.BankKeeper, suite.Ctx, buyerAddr, fundForBuyer)
 	suite.Require().NoError(err)
 
 	err = suite.DataPoolKeeper.BuyDataPass(suite.Ctx, buyerAddr, poolID, 1, NFTPrice)
@@ -332,7 +334,7 @@ func (suite poolTestSuite) TestGetRedeemerDataPass() {
 func (suite poolTestSuite) TestRedeemDataPassRoundNotMatched() {
 	poolID := suite.setupCreatePool(1, defaultMaxNftSupply)
 
-	err := suite.BankKeeper.AddCoins(suite.Ctx, buyerAddr, fundForBuyer)
+	err := simapp.FundAccount(suite.BankKeeper, suite.Ctx, buyerAddr, fundForBuyer)
 	suite.Require().NoError(err)
 
 	err = suite.DataPoolKeeper.BuyDataPass(suite.Ctx, buyerAddr, poolID, 1, NFTPrice)
@@ -347,7 +349,7 @@ func (suite poolTestSuite) TestRedeemDataPassRoundNotMatched() {
 func (suite poolTestSuite) TestNotOwnedRedeemerNFT() {
 	poolID := suite.setupCreatePool(1, defaultMaxNftSupply)
 
-	err := suite.BankKeeper.AddCoins(suite.Ctx, buyerAddr, fundForBuyer)
+	err := simapp.FundAccount(suite.BankKeeper, suite.Ctx, buyerAddr, fundForBuyer)
 	suite.Require().NoError(err)
 
 	err = suite.DataPoolKeeper.BuyDataPass(suite.Ctx, buyerAddr, poolID, 1, NFTPrice)
@@ -395,7 +397,7 @@ func (suite *poolTestSuite) TestSetDataCert() {
 		Requester: requesterAddr.String(),
 	}
 
-	bz, err := suite.Cdc.Marshaler.MarshalBinaryBare(&unsignedCert)
+	bz, err := suite.Cdc.Marshaler.Marshal(&unsignedCert)
 	suite.Require().NoError(err)
 
 	sign, err := oraclePrivKey.Sign(bz)
@@ -490,7 +492,7 @@ func (suite *poolTestSuite) TestSellData_failed_get_publicKey_oracle_in_signatur
 	cert, err := makeTestDataCert(suite.Cdc.Marshaler, poolID, round, dataHash, requesterAddr.String())
 	suite.Require().NoError(err)
 
-	unsignedCertBz, err := suite.Cdc.Marshaler.MarshalBinaryBare(cert.UnsignedCert)
+	unsignedCertBz, err := suite.Cdc.Marshaler.Marshal(cert.UnsignedCert)
 	suite.Require().NoError(err)
 
 	curatorSign, err := curatorPrivKey.Sign(unsignedCertBz)
@@ -512,7 +514,7 @@ func (suite *poolTestSuite) TestSellData_invalid_signature() {
 	cert, err := makeTestDataCert(suite.Cdc.Marshaler, poolID, round, dataHash, requesterAddr.String())
 	suite.Require().NoError(err)
 
-	unsignedCertBz, err := suite.Cdc.Marshaler.MarshalBinaryBare(cert.UnsignedCert)
+	unsignedCertBz, err := suite.Cdc.Marshaler.Marshal(cert.UnsignedCert)
 	suite.Require().NoError(err)
 
 	// Curator's signature
@@ -605,7 +607,7 @@ func (suite *poolTestSuite) TestSellData_mismatch_cert_and_pool_round() {
 	suite.Require().True(strings.HasSuffix(err.Error(), types.ErrInvalidDataCert.Error()))
 }
 
-func makeTestDataCert(marshaler codec.Marshaler, poolID, round uint64, dataHash []byte, requester string) (*types.DataCert, error) {
+func makeTestDataCert(marshaler codec.Codec, poolID, round uint64, dataHash []byte, requester string) (*types.DataCert, error) {
 	unsignedCert := types.UnsignedDataCert{
 		PoolId:    poolID,
 		Round:     round,
@@ -614,7 +616,7 @@ func makeTestDataCert(marshaler codec.Marshaler, poolID, round uint64, dataHash 
 		Requester: requester,
 	}
 
-	bz, err := marshaler.MarshalBinaryBare(&unsignedCert)
+	bz, err := marshaler.Marshal(&unsignedCert)
 	if err != nil {
 		return nil, err
 	}

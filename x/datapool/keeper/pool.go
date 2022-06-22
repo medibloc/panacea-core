@@ -138,7 +138,7 @@ func (k Keeper) GetNextPoolNumber(ctx sdk.Context) uint64 {
 	} else {
 		val := gogotypes.UInt64Value{}
 
-		err := k.cdc.UnmarshalBinaryLengthPrefixed(bz, &val)
+		err := k.cdc.UnmarshalLengthPrefixed(bz, &val)
 		if err != nil {
 			panic(err)
 		}
@@ -150,14 +150,14 @@ func (k Keeper) GetNextPoolNumber(ctx sdk.Context) uint64 {
 
 func (k Keeper) SetPoolNumber(ctx sdk.Context, poolNumber uint64) {
 	store := ctx.KVStore(k.storeKey)
-	bz := k.cdc.MustMarshalBinaryLengthPrefixed(&gogotypes.UInt64Value{Value: poolNumber})
+	bz := k.cdc.MustMarshalLengthPrefixed(&gogotypes.UInt64Value{Value: poolNumber})
 	store.Set(types.KeyPoolNextNumber, bz)
 }
 
 func (k Keeper) SetPool(ctx sdk.Context, pool *types.Pool) {
 	store := ctx.KVStore(k.storeKey)
 	poolKey := types.GetKeyPrefixPools(pool.GetPoolId())
-	bz := k.cdc.MustMarshalBinaryLengthPrefixed(pool)
+	bz := k.cdc.MustMarshalLengthPrefixed(pool)
 	store.Set(poolKey, bz)
 }
 
@@ -173,7 +173,7 @@ func (k Keeper) GetAllPools(ctx sdk.Context) ([]types.Pool, error) {
 		bz := iterator.Value()
 		var pool types.Pool
 
-		err := k.cdc.UnmarshalBinaryLengthPrefixed(bz, &pool)
+		err := k.cdc.UnmarshalLengthPrefixed(bz, &pool)
 		if err != nil {
 			return []types.Pool{}, err
 		}
@@ -192,7 +192,7 @@ func (k Keeper) GetPool(ctx sdk.Context, poolID uint64) (*types.Pool, error) {
 		return nil, types.ErrPoolNotFound
 	}
 	pool := &types.Pool{}
-	k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, pool)
+	k.cdc.MustUnmarshalLengthPrefixed(bz, pool)
 
 	return pool, nil
 }
@@ -287,7 +287,7 @@ func (k Keeper) verifySignature(ctx sdk.Context, oracleCert types.DataCert) erro
 	if err != nil {
 		return sdkerrors.Wrap(types.ErrInvalidSignature, err.Error())
 	}
-	unsignedCertBinary, err := k.cdc.MarshalBinaryBare(unsignedCert)
+	unsignedCertBinary, err := k.cdc.Marshal(unsignedCert)
 	if err != nil {
 		return sdkerrors.Wrap(types.ErrInvalidSignature, err.Error())
 	}
@@ -334,7 +334,7 @@ func (k Keeper) SetDataCert(ctx sdk.Context, cert types.DataCert) {
 	unsignedCert := cert.UnsignedCert
 	key := types.GetKeyPrefixDataValidateCert(unsignedCert.PoolId, unsignedCert.Round, unsignedCert.DataHash)
 	store := ctx.KVStore(k.storeKey)
-	store.Set(key, k.cdc.MustMarshalBinaryLengthPrefixed(&cert))
+	store.Set(key, k.cdc.MustMarshalLengthPrefixed(&cert))
 }
 
 func (k Keeper) increaseCurNumAndUpdatePool(ctx sdk.Context, pool *types.Pool) {
@@ -358,7 +358,7 @@ func (k Keeper) GetDataCert(ctx sdk.Context, poolID, round uint64, dataHash []by
 	bz := store.Get(key)
 
 	var cert types.DataCert
-	err := k.cdc.UnmarshalBinaryLengthPrefixed(bz, &cert)
+	err := k.cdc.UnmarshalLengthPrefixed(bz, &cert)
 	if err != nil {
 		return types.DataCert{}, sdkerrors.Wrap(types.ErrGetDataCert, err.Error())
 	}
@@ -492,7 +492,7 @@ func (k Keeper) GetAllDataPassRedeemReceipts(ctx sdk.Context) ([]types.DataPassR
 		bz := iterator.Value()
 		var dataPassRedeemReceipt types.DataPassRedeemReceipt
 
-		err := k.cdc.UnmarshalBinaryLengthPrefixed(bz, &dataPassRedeemReceipt)
+		err := k.cdc.UnmarshalLengthPrefixed(bz, &dataPassRedeemReceipt)
 		if err != nil {
 			return nil, err
 		}
@@ -513,7 +513,7 @@ func (k Keeper) GetDataPassRedeemReceipt(ctx sdk.Context, poolID, round, dataPas
 	bz := store.Get(key)
 
 	var receipt types.DataPassRedeemReceipt
-	err := k.cdc.UnmarshalBinaryLengthPrefixed(bz, &receipt)
+	err := k.cdc.UnmarshalLengthPrefixed(bz, &receipt)
 	if err != nil {
 		return types.DataPassRedeemReceipt{}, sdkerrors.Wrap(types.ErrGetDataPassRedeemReceipt, err.Error())
 	}
@@ -524,7 +524,7 @@ func (k Keeper) GetDataPassRedeemReceipt(ctx sdk.Context, poolID, round, dataPas
 func (k Keeper) SetDataPassRedeemReceipt(ctx sdk.Context, redeemReceipt types.DataPassRedeemReceipt) {
 	store := ctx.KVStore(k.storeKey)
 	receiptKey := types.GetKeyPrefixNFTRedeemReceipt(redeemReceipt.PoolId, redeemReceipt.Round, redeemReceipt.DataPassId)
-	bz := k.cdc.MustMarshalBinaryLengthPrefixed(&redeemReceipt)
+	bz := k.cdc.MustMarshalLengthPrefixed(&redeemReceipt)
 	store.Set(receiptKey, bz)
 }
 
@@ -540,7 +540,7 @@ func (k Keeper) GetDataPassRedeemHistory(ctx sdk.Context, redeemer string, poolI
 	bz := store.Get(key)
 
 	var history types.DataPassRedeemHistory
-	err := k.cdc.UnmarshalBinaryLengthPrefixed(bz, &history)
+	err := k.cdc.UnmarshalLengthPrefixed(bz, &history)
 	if err != nil {
 		return types.DataPassRedeemHistory{}, err
 	}
@@ -551,7 +551,7 @@ func (k Keeper) GetDataPassRedeemHistory(ctx sdk.Context, redeemer string, poolI
 func (k Keeper) SetDataPassRedeemHistory(ctx sdk.Context, redeemHistory types.DataPassRedeemHistory) {
 	store := ctx.KVStore(k.storeKey)
 	key := types.GetKeyPrefixDataPassRedeemHistoryByPool(redeemHistory.Redeemer, redeemHistory.PoolId)
-	bz := k.cdc.MustMarshalBinaryLengthPrefixed(&redeemHistory)
+	bz := k.cdc.MustMarshalLengthPrefixed(&redeemHistory)
 	store.Set(key, bz)
 }
 
@@ -590,7 +590,7 @@ func (k Keeper) GetAllDataPassRedeemHistory(ctx sdk.Context) ([]types.DataPassRe
 		bz := iterator.Value()
 		var history types.DataPassRedeemHistory
 
-		err := k.cdc.UnmarshalBinaryLengthPrefixed(bz, &history)
+		err := k.cdc.UnmarshalLengthPrefixed(bz, &history)
 		if err != nil {
 			return nil, err
 		}

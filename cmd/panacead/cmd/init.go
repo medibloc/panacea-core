@@ -39,7 +39,7 @@ func InitCmd(mbm module.BasicManager, defaultNodeHome string) *cobra.Command {
 	initCmd := genutilcli.InitCmd(app.ModuleBasics, app.DefaultNodeHome)
 	initCmd.PostRunE = func(cmd *cobra.Command, args []string) error {
 		clientCtx := client.GetClientContextFromCmd(cmd)
-		cdc := clientCtx.JSONMarshaler
+		cdc := clientCtx.Codec
 
 		serverCtx := server.GetServerContextFromCmd(cmd)
 		config := serverCtx.Config
@@ -82,7 +82,7 @@ const (
 )
 
 // overrideGenesis overrides some parameters in the genesis doc to the panacea-specific values.
-func overrideGenesis(cdc codec.JSONMarshaler, genDoc *types.GenesisDoc) (json.RawMessage, error) {
+func overrideGenesis(cdc codec.JSONCodec, genDoc *types.GenesisDoc) (json.RawMessage, error) {
 	appState := make(map[string]json.RawMessage)
 	if err := tmjson.Unmarshal(genDoc.AppState, &appState); err != nil {
 		return nil, fmt.Errorf("failed to JSON unmarshal initial genesis state %w", err)
@@ -120,7 +120,7 @@ func overrideGenesis(cdc codec.JSONMarshaler, genDoc *types.GenesisDoc) (json.Ra
 	if err := cdc.UnmarshalJSON(appState[govtypes.ModuleName], &govGenState); err != nil {
 		return nil, err
 	}
-	minDepositTokens := sdk.TokensFromConsensusPower(100000) // 100,000 MED
+	minDepositTokens := sdk.TokensFromConsensusPower(100000, sdk.DefaultPowerReduction) // 100,000 MED
 	govGenState.DepositParams.MinDeposit = sdk.Coins{sdk.NewCoin(assets.MicroMedDenom, minDepositTokens)}
 	govGenState.DepositParams.MaxDepositPeriod = 60 * 60 * 24 * 14 * time.Second // 14 days
 	govGenState.VotingParams.VotingPeriod = 60 * 60 * 24 * 14 * time.Second      // 14 days

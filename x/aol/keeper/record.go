@@ -10,7 +10,7 @@ import (
 // SetRecord set a specific record in the store
 func (k Keeper) SetRecord(ctx sdk.Context, key types.RecordCompositeKey, record types.Record) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.RecordKeyPrefix)
-	b := k.cdc.MustMarshalBinaryBare(&record)
+	b := k.cdc.MustMarshal(&record)
 	store.Set(compkey.MustEncode(&key), b)
 }
 
@@ -18,7 +18,7 @@ func (k Keeper) SetRecord(ctx sdk.Context, key types.RecordCompositeKey, record 
 func (k Keeper) GetRecord(ctx sdk.Context, key types.RecordCompositeKey) types.Record {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.RecordKeyPrefix)
 	var record types.Record
-	k.cdc.MustUnmarshalBinaryBare(store.Get(compkey.MustEncode(&key)), &record)
+	k.cdc.MustUnmarshal(store.Get(compkey.MustEncode(&key)), &record)
 	return record
 }
 
@@ -43,7 +43,7 @@ func (k Keeper) GetAllRecords(ctx sdk.Context) ([]types.RecordCompositeKey, []ty
 		keys = append(keys, key)
 
 		var value types.Record
-		k.cdc.MustUnmarshalBinaryBare(iterator.Value(), &value)
+		k.cdc.MustUnmarshal(iterator.Value(), &value)
 		values = append(values, value)
 	}
 

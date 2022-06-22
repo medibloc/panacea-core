@@ -3,6 +3,8 @@ package datadeal_test
 import (
 	"testing"
 
+	"github.com/cosmos/cosmos-sdk/simapp"
+
 	oracletypes "github.com/medibloc/panacea-core/v2/x/oracle/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -92,7 +94,7 @@ func (suite *genesisTestSuite) TestDataDealExportGenesis() {
 		NextDealNumber: 2,
 	})
 
-	err := suite.BankKeeper.AddCoins(suite.Ctx, acc1, defaultFunds)
+	err := simapp.FundAccount(suite.BankKeeper, suite.Ctx, acc1, defaultFunds)
 	suite.Require().NoError(err)
 
 	tempDeal := types.Deal{

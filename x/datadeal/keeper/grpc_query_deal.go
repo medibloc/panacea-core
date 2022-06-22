@@ -41,7 +41,7 @@ func (k Keeper) Deals(goCtx context.Context, req *types.QueryDealsRequest) (*typ
 	var deals []types.Deal
 	pageRes, err := query.Paginate(dealsStore, req.Pagination, func(_ []byte, value []byte) error {
 		var deal types.Deal
-		err := k.cdc.UnmarshalBinaryLengthPrefixed(value, &deal)
+		err := k.cdc.UnmarshalLengthPrefixed(value, &deal)
 		if err != nil {
 			return err
 		}
@@ -93,7 +93,7 @@ func (k Keeper) DataCerts(goCtx context.Context, req *types.QueryDataCertsReques
 
 	pageRes, err := query.Paginate(certsStore, req.Pagination, func(_ []byte, value []byte) error {
 		var cert types.DataCert
-		err := k.cdc.UnmarshalBinaryLengthPrefixed(value, &cert)
+		err := k.cdc.UnmarshalLengthPrefixed(value, &cert)
 		if err != nil {
 			return err
 		}

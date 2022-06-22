@@ -10,7 +10,7 @@ import (
 // SetOwner set a specific owner in the store
 func (k Keeper) SetOwner(ctx sdk.Context, key types.OwnerCompositeKey, owner types.Owner) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.OwnerKeyPrefix)
-	b := k.cdc.MustMarshalBinaryBare(&owner)
+	b := k.cdc.MustMarshal(&owner)
 	store.Set(compkey.MustEncode(&key), b)
 }
 
@@ -18,7 +18,7 @@ func (k Keeper) SetOwner(ctx sdk.Context, key types.OwnerCompositeKey, owner typ
 func (k Keeper) GetOwner(ctx sdk.Context, key types.OwnerCompositeKey) types.Owner {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.OwnerKeyPrefix)
 	var owner types.Owner
-	k.cdc.MustUnmarshalBinaryBare(store.Get(compkey.MustEncode(&key)), &owner)
+	k.cdc.MustUnmarshal(store.Get(compkey.MustEncode(&key)), &owner)
 	return owner
 }
 
@@ -42,7 +42,7 @@ func (k Keeper) GetAllOwners(ctx sdk.Context) ([]types.OwnerCompositeKey, []type
 		keys = append(keys, key)
 
 		var value types.Owner
-		k.cdc.MustUnmarshalBinaryBare(iterator.Value(), &value)
+		k.cdc.MustUnmarshal(iterator.Value(), &value)
 		values = append(values, value)
 	}
 
