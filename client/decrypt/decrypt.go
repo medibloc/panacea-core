@@ -14,13 +14,13 @@ import (
 )
 
 const (
-	FlagCipherText     = "text"
+	FlagCipherText     = "cipher-text"
 	FlagCipherTextPath = "path"
 )
 
 func Command(defaultNodeHome string) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "decrypt [name] (--text [ciphertext] | --path [ciphertext-file])",
+		Use:   "decrypt [name] (--cipher-text [ciphertext] | --path [ciphertext-file])",
 		Short: "Decrypt and output the ciphertext file encrypted with ECDSA PublicKey.",
 		Long: `This command can decrypt ciphertext encrypted with ECDSA PublicKey. 
 And your key should be stored in the localStore.
