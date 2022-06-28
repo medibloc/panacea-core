@@ -4,6 +4,7 @@ go 1.15
 
 require (
 	github.com/CosmWasm/wasmd v0.24.0
+	github.com/btcsuite/btcd v0.22.0-beta
 	github.com/btcsuite/btcutil v1.0.3-0.20201208143702-a53e38424cce
 	github.com/confio/ics23/go v0.7.0 // indirect
 	github.com/cosmos/cosmos-sdk v0.45.4
