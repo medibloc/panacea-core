@@ -7,8 +7,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/cosmos/cosmos-sdk/simapp"
-
 	oracletypes "github.com/medibloc/panacea-core/v2/x/oracle/types"
 
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -81,11 +79,11 @@ func (suite poolTestSuite) setupNFTContract() {
 func (suite poolTestSuite) setupCreatePool(targetNumData, maxNftSupply uint64) uint64 {
 	suite.setupNFTContract()
 
-	err := simapp.FundAccount(suite.BankKeeper, suite.Ctx, curatorAddr, fundForCurator)
+	err := suite.FundAccount(suite.BankKeeper, suite.Ctx, curatorAddr, fundForCurator)
 	suite.Require().NoError(err)
 
 	// register oracle
-	err = simapp.FundAccount(suite.BankKeeper, suite.Ctx, oracle1, fundForOracle)
+	err = suite.FundAccount(suite.BankKeeper, suite.Ctx, oracle1, fundForOracle)
 	suite.Require().NoError(err)
 
 	oracle := oracletypes.Oracle{
@@ -159,7 +157,7 @@ func (suite poolTestSuite) TestNotRegisteredOracle() {
 	// create and instantiate NFT contract
 	suite.setupNFTContract()
 
-	err := simapp.FundAccount(suite.BankKeeper, suite.Ctx, curatorAddr, fundForCurator)
+	err := suite.FundAccount(suite.BankKeeper, suite.Ctx, curatorAddr, fundForCurator)
 	suite.Require().NoError(err)
 
 	newPoolParams := makePoolParamsWithOracle(defaultTargetNumData, defaultMaxNftSupply)
@@ -179,7 +177,7 @@ func (suite poolTestSuite) TestNotEnoughBalanceForDeposit() {
 }
 
 func (suite poolTestSuite) TestNotRegisteredNFTContract() {
-	err := simapp.FundAccount(suite.BankKeeper, suite.Ctx, curatorAddr, fundForCurator)
+	err := suite.FundAccount(suite.BankKeeper, suite.Ctx, curatorAddr, fundForCurator)
 	suite.Require().NoError(err)
 
 	newPoolParams := makePoolParamsNoOracle(defaultMaxNftSupply)
@@ -192,7 +190,7 @@ func (suite poolTestSuite) TestBuyDataPassPending() {
 	// create pool
 	poolID := suite.setupCreatePool(defaultTargetNumData, defaultMaxNftSupply)
 
-	err := simapp.FundAccount(suite.BankKeeper, suite.Ctx, buyerAddr, fundForBuyer)
+	err := suite.FundAccount(suite.BankKeeper, suite.Ctx, buyerAddr, fundForBuyer)
 	suite.Require().NoError(err)
 
 	err = suite.DataPoolKeeper.BuyDataPass(suite.Ctx, buyerAddr, poolID, 1, NFTPrice)
@@ -210,7 +208,7 @@ func (suite poolTestSuite) TestBuyDataPassPoolNotFound() {
 	// create pool
 	suite.setupCreatePool(defaultTargetNumData, defaultMaxNftSupply)
 
-	err := simapp.FundAccount(suite.BankKeeper, suite.Ctx, buyerAddr, fundForBuyer)
+	err := suite.FundAccount(suite.BankKeeper, suite.Ctx, buyerAddr, fundForBuyer)
 	suite.Require().NoError(err)
 
 	// buy NFT other data pool
@@ -222,7 +220,7 @@ func (suite poolTestSuite) TestBuyDataPassSoldOut() {
 	// create pool w/ NFT max supply of 1
 	poolID := suite.setupCreatePool(defaultTargetNumData, 1)
 
-	err := simapp.FundAccount(suite.BankKeeper, suite.Ctx, buyerAddr, fundForBuyer)
+	err := suite.FundAccount(suite.BankKeeper, suite.Ctx, buyerAddr, fundForBuyer)
 	suite.Require().NoError(err)
 
 	// buy 1 NFT
@@ -238,7 +236,7 @@ func (suite poolTestSuite) TestBuyDataPassRoundNotMatched() {
 	// create pool
 	poolID := suite.setupCreatePool(defaultTargetNumData, defaultMaxNftSupply)
 
-	err := simapp.FundAccount(suite.BankKeeper, suite.Ctx, buyerAddr, fundForBuyer)
+	err := suite.FundAccount(suite.BankKeeper, suite.Ctx, buyerAddr, fundForBuyer)
 	suite.Require().NoError(err)
 
 	// different round
@@ -250,7 +248,7 @@ func (suite poolTestSuite) TestBuyDataPassPaymentNotMatched() {
 	// create pool
 	poolID := suite.setupCreatePool(defaultTargetNumData, defaultMaxNftSupply)
 
-	err := simapp.FundAccount(suite.BankKeeper, suite.Ctx, buyerAddr, fundForBuyer)
+	err := suite.FundAccount(suite.BankKeeper, suite.Ctx, buyerAddr, fundForBuyer)
 	suite.Require().NoError(err)
 
 	// buy NFT with different payment
@@ -263,7 +261,7 @@ func (suite poolTestSuite) TestBuyDataPassInsufficientBalance() {
 	poolID := suite.setupCreatePool(defaultTargetNumData, defaultMaxNftSupply)
 
 	// buyer with small balance
-	err := simapp.FundAccount(suite.BankKeeper, suite.Ctx, buyerAddr, sdk.NewCoins(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(1000))))
+	err := suite.FundAccount(suite.BankKeeper, suite.Ctx, buyerAddr, sdk.NewCoins(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(1000))))
 	suite.Require().NoError(err)
 
 	err = suite.DataPoolKeeper.BuyDataPass(suite.Ctx, buyerAddr, poolID, 1, NFTPrice)
@@ -271,7 +269,7 @@ func (suite poolTestSuite) TestBuyDataPassInsufficientBalance() {
 }
 
 func (suite poolTestSuite) TestNotEnoughDeposit() {
-	err := simapp.FundAccount(suite.BankKeeper, suite.Ctx, curatorAddr, fundForCurator)
+	err := suite.FundAccount(suite.BankKeeper, suite.Ctx, curatorAddr, fundForCurator)
 	suite.Require().NoError(err)
 
 	newPoolParams := makePoolParamsNoOracle(defaultMaxNftSupply)
@@ -286,7 +284,7 @@ func (suite poolTestSuite) TestNotEnoughDeposit() {
 func (suite poolTestSuite) TestRedeemDataPass() {
 	poolID := suite.setupCreatePool(1, defaultMaxNftSupply)
 
-	err := simapp.FundAccount(suite.BankKeeper, suite.Ctx, buyerAddr, fundForBuyer)
+	err := suite.FundAccount(suite.BankKeeper, suite.Ctx, buyerAddr, fundForBuyer)
 	suite.Require().NoError(err)
 
 	err = suite.DataPoolKeeper.BuyDataPass(suite.Ctx, buyerAddr, poolID, 1, NFTPrice)
@@ -312,7 +310,7 @@ func (suite poolTestSuite) TestRedeemDataPass() {
 func (suite poolTestSuite) TestGetRedeemerDataPass() {
 	poolID := suite.setupCreatePool(1, defaultMaxNftSupply)
 
-	err := simapp.FundAccount(suite.BankKeeper, suite.Ctx, buyerAddr, fundForBuyer)
+	err := suite.FundAccount(suite.BankKeeper, suite.Ctx, buyerAddr, fundForBuyer)
 	suite.Require().NoError(err)
 
 	err = suite.DataPoolKeeper.BuyDataPass(suite.Ctx, buyerAddr, poolID, 1, NFTPrice)
@@ -334,7 +332,7 @@ func (suite poolTestSuite) TestGetRedeemerDataPass() {
 func (suite poolTestSuite) TestRedeemDataPassRoundNotMatched() {
 	poolID := suite.setupCreatePool(1, defaultMaxNftSupply)
 
-	err := simapp.FundAccount(suite.BankKeeper, suite.Ctx, buyerAddr, fundForBuyer)
+	err := suite.FundAccount(suite.BankKeeper, suite.Ctx, buyerAddr, fundForBuyer)
 	suite.Require().NoError(err)
 
 	err = suite.DataPoolKeeper.BuyDataPass(suite.Ctx, buyerAddr, poolID, 1, NFTPrice)
@@ -349,7 +347,7 @@ func (suite poolTestSuite) TestRedeemDataPassRoundNotMatched() {
 func (suite poolTestSuite) TestNotOwnedRedeemerNFT() {
 	poolID := suite.setupCreatePool(1, defaultMaxNftSupply)
 
-	err := simapp.FundAccount(suite.BankKeeper, suite.Ctx, buyerAddr, fundForBuyer)
+	err := suite.FundAccount(suite.BankKeeper, suite.Ctx, buyerAddr, fundForBuyer)
 	suite.Require().NoError(err)
 
 	err = suite.DataPoolKeeper.BuyDataPass(suite.Ctx, buyerAddr, poolID, 1, NFTPrice)

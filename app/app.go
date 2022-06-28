@@ -942,7 +942,8 @@ func (app *App) registerUpgradeHandlers() error {
 
 	if upgradeInfo.Name == "v2.2.0-alpha1" && !app.UpgradeKeeper.IsSkipHeight(upgradeInfo.Height) {
 		storeUpgrades := storetypes.StoreUpgrades{
-			Added: []string{"authz", "feegrant"},
+			Added:   []string{"authz", "feegrant"},
+			Deleted: []string{"token"},
 		}
 
 		// configure store loader that checks if version == upgradeHeight and applies store upgrades

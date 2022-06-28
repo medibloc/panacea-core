@@ -3,8 +3,6 @@ package keeper_test
 import (
 	"testing"
 
-	"github.com/cosmos/cosmos-sdk/simapp"
-
 	"github.com/medibloc/panacea-core/v2/types/testsuite"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -47,7 +45,7 @@ func (suite *BurnTestSuite) BeforeTest(_, _ string) {
 
 	for _, addr := range address {
 		// mint coins and send to each account
-		err := simapp.FundAccount(suite.BankKeeper, suite.Ctx, addr, initCoins)
+		err := suite.FundAccount(bankKeeper, suite.Ctx, addr, initCoins)
 		suite.Require().NoError(err)
 	}
 

@@ -123,7 +123,7 @@ func overrideGenesis(cdc codec.JSONCodec, genDoc *types.GenesisDoc) (json.RawMes
 	minDepositTokens := sdk.TokensFromConsensusPower(100000, sdk.DefaultPowerReduction) // 100,000 MED
 	govGenState.DepositParams.MinDeposit = sdk.Coins{sdk.NewCoin(assets.MicroMedDenom, minDepositTokens)}
 	govGenState.DepositParams.MaxDepositPeriod = 60 * 60 * 24 * 14 * time.Second // 14 days
-	govGenState.VotingParams.VotingPeriod = 60 * 60 * 24 * 14 * time.Second      // 14 days
+	govGenState.VotingParams.VotingPeriod = 60 * 60 * 24 * 3 * time.Second       // 3 days (shortened voting period: https://www.mintscan.io/medibloc/proposals/5)
 	appState[govtypes.ModuleName] = cdc.MustMarshalJSON(&govGenState)
 
 	var crisisGenState crisistypes.GenesisState
