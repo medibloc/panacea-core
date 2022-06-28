@@ -32,7 +32,7 @@ func setupRevenueDistributionTest(suite poolTestSuite, targetNumData, poolMaxNft
 
 func buyDataPass(suite poolTestSuite, poolID, count uint64) {
 	// Buyer buys DataPass.
-	err := suite.FundAccount(suite.BankKeeper, suite.Ctx, buyerAddr, fundForBuyer)
+	err := suite.FundAccount(suite.Ctx, buyerAddr, fundForBuyer)
 	suite.Require().NoError(err)
 
 	for i := uint64(0); i < count; i++ {

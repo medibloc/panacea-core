@@ -301,12 +301,12 @@ func (suite *TestSuite) GetAccAddress() sdk.AccAddress {
 	return sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address())
 }
 
-func (suite *TestSuite) FundAccount(bankKeeper bankkeeper.Keeper, ctx sdk.Context, addr sdk.AccAddress, amounts sdk.Coins) error {
-	if err := bankKeeper.MintCoins(ctx, minttypes.ModuleName, amounts); err != nil {
+func (suite *TestSuite) FundAccount(ctx sdk.Context, addr sdk.AccAddress, amounts sdk.Coins) error {
+	if err := suite.BankKeeper.MintCoins(ctx, minttypes.ModuleName, amounts); err != nil {
 		return err
 	}
 
-	return bankKeeper.SendCoinsFromModuleToAccount(ctx, minttypes.ModuleName, addr, amounts)
+	return suite.BankKeeper.SendCoinsFromModuleToAccount(ctx, minttypes.ModuleName, addr, amounts)
 }
 
 func NewTestProtocolVersionSetter() TestProtocolVersionSetter {

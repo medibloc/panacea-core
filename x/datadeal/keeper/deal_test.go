@@ -40,7 +40,7 @@ func (suite *dealTestSuite) BeforeTest(_, _ string) {
 }
 
 func (suite *dealTestSuite) TestCreateNewDeal() {
-	err := suite.FundAccount(suite.BankKeeper, suite.Ctx, acc1, defaultFunds)
+	err := suite.FundAccount(suite.Ctx, acc1, defaultFunds)
 	suite.Require().NoError(err)
 
 	tempDeal := types.Deal{
@@ -97,7 +97,7 @@ func (suite *dealTestSuite) TestGetDeal() {
 }
 
 func (suite *dealTestSuite) TestListDeals() {
-	err := suite.FundAccount(suite.BankKeeper, suite.Ctx, acc1, defaultFunds)
+	err := suite.FundAccount(suite.Ctx, acc1, defaultFunds)
 	suite.Require().NoError(err)
 
 	tempDeal := types.Deal{
@@ -147,7 +147,7 @@ func (suite *dealTestSuite) TestListDeals() {
 }
 
 func (suite *dealTestSuite) TestGetBalanceOfDeal() {
-	err := suite.FundAccount(suite.BankKeeper, suite.Ctx, acc1, defaultFunds)
+	err := suite.FundAccount(suite.Ctx, acc1, defaultFunds)
 	suite.Require().NoError(err)
 
 	tempDeal := types.Deal{
@@ -186,10 +186,10 @@ func (suite *dealTestSuite) TestGetBalanceOfDeal() {
 }
 
 func (suite *dealTestSuite) TestSellOwnData() {
-	err := suite.FundAccount(suite.BankKeeper, suite.Ctx, acc1, defaultFunds)
+	err := suite.FundAccount(suite.Ctx, acc1, defaultFunds)
 	suite.Require().NoError(err)
 
-	err = suite.FundAccount(suite.BankKeeper, suite.Ctx, acc3, zeroFunds)
+	err = suite.FundAccount(suite.Ctx, acc3, zeroFunds)
 	suite.Require().NoError(err)
 
 	tempDeal := types.Deal{
@@ -230,10 +230,10 @@ func (suite *dealTestSuite) TestSellOwnData() {
 }
 
 func (suite *dealTestSuite) TestIsDataCertDuplicate() {
-	err := suite.FundAccount(suite.BankKeeper, suite.Ctx, acc1, sdk.NewCoins(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(10000000000))))
+	err := suite.FundAccount(suite.Ctx, acc1, sdk.NewCoins(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(10000000000))))
 	suite.Require().NoError(err)
 
-	err = suite.FundAccount(suite.BankKeeper, suite.Ctx, acc3, zeroFunds)
+	err = suite.FundAccount(suite.Ctx, acc3, zeroFunds)
 	suite.Require().NoError(err)
 
 	tempDeal := types.Deal{
@@ -269,10 +269,10 @@ func (suite *dealTestSuite) TestIsDataCertDuplicate() {
 }
 
 func (suite *dealTestSuite) TestIsTrustedOracles_Invalid() {
-	err := suite.FundAccount(suite.BankKeeper, suite.Ctx, acc1, defaultFunds)
+	err := suite.FundAccount(suite.Ctx, acc1, defaultFunds)
 	suite.Require().NoError(err)
 
-	err = suite.FundAccount(suite.BankKeeper, suite.Ctx, acc3, zeroFunds)
+	err = suite.FundAccount(suite.Ctx, acc3, zeroFunds)
 	suite.Require().NoError(err)
 
 	tempDeal := types.Deal{
@@ -302,10 +302,10 @@ func (suite *dealTestSuite) TestIsTrustedOracles_Invalid() {
 }
 
 func (suite *dealTestSuite) TestDealStatusInactiveOrCompleted() {
-	err := suite.FundAccount(suite.BankKeeper, suite.Ctx, acc1, defaultFunds)
+	err := suite.FundAccount(suite.Ctx, acc1, defaultFunds)
 	suite.Require().NoError(err)
 
-	err = suite.FundAccount(suite.BankKeeper, suite.Ctx, acc3, zeroFunds)
+	err = suite.FundAccount(suite.Ctx, acc3, zeroFunds)
 	suite.Require().NoError(err)
 
 	tempDeal := types.Deal{
@@ -362,13 +362,13 @@ func (suite *dealTestSuite) TestVerifyDataCert() {
 }
 
 func (suite *dealTestSuite) TestIsDealStatusCompleted() {
-	err := suite.FundAccount(suite.BankKeeper, suite.Ctx, acc1, defaultFunds)
+	err := suite.FundAccount(suite.Ctx, acc1, defaultFunds)
 	suite.Require().NoError(err)
 
-	err = suite.FundAccount(suite.BankKeeper, suite.Ctx, acc2, zeroFunds)
+	err = suite.FundAccount(suite.Ctx, acc2, zeroFunds)
 	suite.Require().NoError(err)
 
-	err = suite.FundAccount(suite.BankKeeper, suite.Ctx, acc3, zeroFunds)
+	err = suite.FundAccount(suite.Ctx, acc3, zeroFunds)
 	suite.Require().NoError(err)
 
 	tempDeal := types.Deal{
@@ -409,10 +409,10 @@ func (suite *dealTestSuite) TestIsDealStatusCompleted() {
 }
 
 func (suite *dealTestSuite) TestGetDataCert() {
-	err := suite.FundAccount(suite.BankKeeper, suite.Ctx, acc1, defaultFunds)
+	err := suite.FundAccount(suite.Ctx, acc1, defaultFunds)
 	suite.Require().NoError(err)
 
-	err = suite.FundAccount(suite.BankKeeper, suite.Ctx, acc3, zeroFunds)
+	err = suite.FundAccount(suite.Ctx, acc3, zeroFunds)
 	suite.Require().NoError(err)
 
 	tempDeal := types.Deal{
@@ -455,10 +455,10 @@ func (suite *dealTestSuite) TestGetDataCert() {
 }
 
 func (suite *dealTestSuite) TestListDataCerts() {
-	err := suite.FundAccount(suite.BankKeeper, suite.Ctx, acc1, defaultFunds)
+	err := suite.FundAccount(suite.Ctx, acc1, defaultFunds)
 	suite.Require().NoError(err)
 
-	err = suite.FundAccount(suite.BankKeeper, suite.Ctx, acc3, zeroFunds)
+	err = suite.FundAccount(suite.Ctx, acc3, zeroFunds)
 	suite.Require().NoError(err)
 
 	tempDeal := types.Deal{
@@ -506,10 +506,10 @@ func (suite *dealTestSuite) TestListDataCerts() {
 }
 
 func (suite *dealTestSuite) TestDeactivateDeal() {
-	err := suite.FundAccount(suite.BankKeeper, suite.Ctx, acc1, sdk.NewCoins(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(10000000000))))
+	err := suite.FundAccount(suite.Ctx, acc1, sdk.NewCoins(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(10000000000))))
 	suite.Require().NoError(err)
 
-	err = suite.FundAccount(suite.BankKeeper, suite.Ctx, acc3, zeroFunds)
+	err = suite.FundAccount(suite.Ctx, acc3, zeroFunds)
 	suite.Require().NoError(err)
 
 	tempDeal := types.Deal{
@@ -558,10 +558,10 @@ func (suite *dealTestSuite) TestDeactivateDeal() {
 }
 
 func (suite *dealTestSuite) TestIsNotEqualOwner() {
-	err := suite.FundAccount(suite.BankKeeper, suite.Ctx, acc1, sdk.NewCoins(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(10000000000))))
+	err := suite.FundAccount(suite.Ctx, acc1, sdk.NewCoins(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(10000000000))))
 	suite.Require().NoError(err)
 
-	err = suite.FundAccount(suite.BankKeeper, suite.Ctx, acc3, zeroFunds)
+	err = suite.FundAccount(suite.Ctx, acc3, zeroFunds)
 	suite.Require().NoError(err)
 
 	tempDeal := types.Deal{
@@ -594,10 +594,10 @@ func (suite *dealTestSuite) TestIsNotEqualOwner() {
 }
 
 func (suite *dealTestSuite) TestDealIsNotActive() {
-	err := suite.FundAccount(suite.BankKeeper, suite.Ctx, acc1, sdk.NewCoins(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(10000000000))))
+	err := suite.FundAccount(suite.Ctx, acc1, sdk.NewCoins(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(10000000000))))
 	suite.Require().NoError(err)
 
-	err = suite.FundAccount(suite.BankKeeper, suite.Ctx, acc3, zeroFunds)
+	err = suite.FundAccount(suite.Ctx, acc3, zeroFunds)
 	suite.Require().NoError(err)
 
 	tempDeal := types.Deal{

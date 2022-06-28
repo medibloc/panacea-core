@@ -92,7 +92,7 @@ func (suite *genesisTestSuite) TestDataDealExportGenesis() {
 		NextDealNumber: 2,
 	})
 
-	err := suite.FundAccount(suite.BankKeeper, suite.Ctx, acc1, defaultFunds)
+	err := suite.FundAccount(suite.Ctx, acc1, defaultFunds)
 	suite.Require().NoError(err)
 
 	tempDeal := types.Deal{

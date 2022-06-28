@@ -45,7 +45,7 @@ func (suite *BurnTestSuite) BeforeTest(_, _ string) {
 
 	for _, addr := range address {
 		// mint coins and send to each account
-		err := suite.FundAccount(bankKeeper, suite.Ctx, addr, initCoins)
+		err := suite.FundAccount(suite.Ctx, addr, initCoins)
 		suite.Require().NoError(err)
 	}
 
