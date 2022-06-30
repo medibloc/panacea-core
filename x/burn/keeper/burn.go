@@ -3,6 +3,10 @@ package keeper
 import (
 	"fmt"
 
+	"github.com/medibloc/panacea-core/v2/types/assets"
+
+	"github.com/medibloc/panacea-core/v2/x/burn/types"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -20,23 +24,20 @@ func (k Keeper) BurnCoins(ctx sdk.Context, acc string) error {
 
 	ctx.Logger().Info("find burn coin.", fmt.Sprintf("address: %s, coins: %s", acc, burnCoins))
 
-	err = k.bankKeeper.SubtractCoins(ctx, burnAcc, burnCoins)
+	err = k.bankKeeper.SendCoinsFromAccountToModule(ctx, burnAcc, types.ModuleName, burnCoins)
+	if err != nil {
+		return err
+	}
+
+	err = k.bankKeeper.BurnCoins(ctx, types.ModuleName, burnCoins)
 	if err != nil {
 		return err
 	}
 
 	ctx.Logger().Info("Success burn coin to burnAccount.", fmt.Sprintf("address: %s, coins: %s", acc, burnCoins))
 
-	burnCoinsFromSupply(ctx, k, burnCoins)
+	ctx.Logger().Info("Success burn coin to supply.", fmt.Sprintf("total: %s", k.bankKeeper.GetSupply(ctx, assets.MicroMedDenom)))
 
 	return nil
 
-}
-
-func burnCoinsFromSupply(ctx sdk.Context, k Keeper, amt sdk.Coins) {
-	supply := k.bankKeeper.GetSupply(ctx)
-	supply.Deflate(amt)
-	k.bankKeeper.SetSupply(ctx, supply)
-
-	ctx.Logger().Info("Success burn coin to supply.", fmt.Sprintf("total: %s", supply.GetTotal()))
 }

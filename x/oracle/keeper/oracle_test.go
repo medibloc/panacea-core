@@ -33,7 +33,7 @@ func TestOracleTestSuite(t *testing.T) {
 }
 
 func (suite *oracleTestSuite) TestRegisterOracle() {
-	err := suite.BankKeeper.AddCoins(suite.Ctx, oracle1, fundForOracle)
+	err := suite.FundAccount(suite.Ctx, oracle1, fundForOracle)
 	suite.Require().NoError(err)
 
 	suite.setOracleAccount(oracle1)
@@ -55,7 +55,7 @@ func (suite *oracleTestSuite) setOracleAccount(oracleAddr sdk.AccAddress) {
 }
 
 func (suite *oracleTestSuite) TestGetRegisterOracle() {
-	err := suite.BankKeeper.AddCoins(suite.Ctx, oracle1, fundForOracle)
+	err := suite.FundAccount(suite.Ctx, oracle1, fundForOracle)
 	suite.Require().NoError(err)
 
 	suite.setOracleAccount(oracle1)
@@ -74,7 +74,7 @@ func (suite *oracleTestSuite) TestGetRegisterOracle() {
 }
 
 func (suite *oracleTestSuite) TestIsOracleDuplicate() {
-	err := suite.BankKeeper.AddCoins(suite.Ctx, oracle1, fundForOracle)
+	err := suite.FundAccount(suite.Ctx, oracle1, fundForOracle)
 	suite.Require().NoError(err)
 
 	suite.setOracleAccount(oracle1)
@@ -92,7 +92,7 @@ func (suite *oracleTestSuite) TestIsOracleDuplicate() {
 }
 
 func (suite *oracleTestSuite) TestGetOracle() {
-	err := suite.BankKeeper.AddCoins(suite.Ctx, oracle1, fundForOracle)
+	err := suite.FundAccount(suite.Ctx, oracle1, fundForOracle)
 	suite.Require().NoError(err)
 
 	suite.setOracleAccount(oracle1)
@@ -113,7 +113,7 @@ func (suite *oracleTestSuite) TestGetOracle() {
 }
 
 func (suite *oracleTestSuite) TestOracleNotFound() {
-	err := suite.BankKeeper.AddCoins(suite.Ctx, oracle1, fundForOracle)
+	err := suite.FundAccount(suite.Ctx, oracle1, fundForOracle)
 	suite.Require().NoError(err)
 
 	suite.setOracleAccount(oracle1)
@@ -126,7 +126,7 @@ func (suite *oracleTestSuite) TestGetAllOracles() {
 	oracles := [5]sdk.AccAddress{oracle1, oracle2, oracle3, oracle4, oracle5}
 
 	for _, o := range oracles {
-		err := suite.BankKeeper.AddCoins(suite.Ctx, o, fundForOracle)
+		err := suite.FundAccount(suite.Ctx, o, fundForOracle)
 		suite.Require().NoError(err)
 
 		suite.setOracleAccount(o)
@@ -163,7 +163,7 @@ func (suite *oracleTestSuite) TestGetAllOracles() {
 }
 
 func (suite *oracleTestSuite) TestUpdateOracle() {
-	err := suite.BankKeeper.AddCoins(suite.Ctx, oracle1, fundForOracle)
+	err := suite.FundAccount(suite.Ctx, oracle1, fundForOracle)
 	suite.Require().NoError(err)
 
 	suite.setOracleAccount(oracle1)
@@ -192,7 +192,7 @@ func (suite *oracleTestSuite) TestUpdateOracle() {
 }
 
 func (suite *oracleTestSuite) TestUpdateOracle_invalid_requester() {
-	err := suite.BankKeeper.AddCoins(suite.Ctx, oracle1, fundForOracle)
+	err := suite.FundAccount(suite.Ctx, oracle1, fundForOracle)
 	suite.Require().NoError(err)
 
 	suite.setOracleAccount(oracle1)

@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"fmt"
+
 	oraclekeeper "github.com/medibloc/panacea-core/v2/x/oracle/keeper"
 
 	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
@@ -23,7 +24,7 @@ import (
 
 type (
 	Keeper struct {
-		cdc      codec.Marshaler
+		cdc      codec.Codec
 		storeKey sdk.StoreKey
 		memKey   sdk.StoreKey
 
@@ -41,7 +42,7 @@ type (
 var _ wasmtypes.ViewKeeper = (*wasm.Keeper)(nil)
 
 func NewKeeper(
-	cdc codec.Marshaler,
+	cdc codec.Codec,
 	storeKey,
 	memKey sdk.StoreKey,
 	paramSpace paramtypes.Subspace,

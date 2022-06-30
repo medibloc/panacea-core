@@ -9,7 +9,7 @@ import (
 func (k Keeper) SetDIDDocument(ctx sdk.Context, did string, doc types.DIDDocumentWithSeq) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.DIDKeyPrefix)
 	key := []byte(did)
-	bz := k.cdc.MustMarshalBinaryLengthPrefixed(&doc)
+	bz := k.cdc.MustMarshalLengthPrefixed(&doc)
 	store.Set(key, bz)
 }
 
@@ -22,7 +22,7 @@ func (k Keeper) GetDIDDocument(ctx sdk.Context, did string) types.DIDDocumentWit
 	}
 
 	var doc types.DIDDocumentWithSeq
-	k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &doc)
+	k.cdc.MustUnmarshalLengthPrefixed(bz, &doc)
 	return doc
 }
 

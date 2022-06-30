@@ -65,7 +65,7 @@ func (k Keeper) DataCerts(goCtx context.Context, req *types.QueryDataCertsReques
 	var certs []types.DataCert
 	pageRes, err := query.Paginate(certsStore, req.Pagination, func(_ []byte, value []byte) error {
 		var cert types.DataCert
-		err := k.cdc.UnmarshalBinaryLengthPrefixed(value, &cert)
+		err := k.cdc.UnmarshalLengthPrefixed(value, &cert)
 		if err != nil {
 			return err
 		}
@@ -114,7 +114,7 @@ func (k Keeper) DataPassRedeemReceipts(goCtx context.Context, req *types.QueryDa
 	var redeemReceipts []types.DataPassRedeemReceipt
 	pageRes, err := query.Paginate(redeemReceiptStore, req.Pagination, func(_, value []byte) error {
 		var redeemReceipt types.DataPassRedeemReceipt
-		err := k.cdc.UnmarshalBinaryLengthPrefixed(value, &redeemReceipt)
+		err := k.cdc.UnmarshalLengthPrefixed(value, &redeemReceipt)
 		if err != nil {
 			return err
 		}

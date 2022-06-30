@@ -46,7 +46,7 @@ func (k Keeper) GetAllOracles(ctx sdk.Context) ([]types.Oracle, error) {
 		bz := iterator.Value()
 		var oracle types.Oracle
 
-		err := k.cdc.UnmarshalBinaryLengthPrefixed(bz, &oracle)
+		err := k.cdc.UnmarshalLengthPrefixed(bz, &oracle)
 		if err != nil {
 			return nil, err
 		}
@@ -66,7 +66,7 @@ func (k Keeper) GetOracle(ctx sdk.Context, oracleAddress sdk.AccAddress) (types.
 	bz := store.Get(oracleKey)
 
 	var oracle types.Oracle
-	err := k.cdc.UnmarshalBinaryLengthPrefixed(bz, &oracle)
+	err := k.cdc.UnmarshalLengthPrefixed(bz, &oracle)
 	if err != nil {
 		return types.Oracle{}, err
 	}
@@ -82,7 +82,7 @@ func (k Keeper) SetOracle(ctx sdk.Context, oracle types.Oracle) error {
 
 	store := ctx.KVStore(k.storeKey)
 	oracleKey := types.GetKeyPrefixOracle(oracleAddr)
-	bz := k.cdc.MustMarshalBinaryLengthPrefixed(&oracle)
+	bz := k.cdc.MustMarshalLengthPrefixed(&oracle)
 	store.Set(oracleKey, bz)
 	return nil
 }
