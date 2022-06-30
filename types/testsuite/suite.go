@@ -11,13 +11,24 @@ import (
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	capabilitytypes "github.com/cosmos/cosmos-sdk/x/capability/types"
+	distrkeeper "github.com/cosmos/cosmos-sdk/x/distribution/keeper"
+	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
+	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
+	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
 	paramskeeper "github.com/cosmos/cosmos-sdk/x/params/keeper"
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
+	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
+	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
+	upgradekeeper "github.com/cosmos/cosmos-sdk/x/upgrade/keeper"
+	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
+	ibctransferkeeper "github.com/cosmos/ibc-go/v2/modules/apps/transfer/keeper"
+	ibctransfertypes "github.com/cosmos/ibc-go/v2/modules/apps/transfer/types"
+	ibchost "github.com/cosmos/ibc-go/v2/modules/core/24-host"
+	ibckeeper "github.com/cosmos/ibc-go/v2/modules/core/keeper"
 	aolkeeper "github.com/medibloc/panacea-core/v2/x/aol/keeper"
 	aoltypes "github.com/medibloc/panacea-core/v2/x/aol/types"
 	burnkeeper "github.com/medibloc/panacea-core/v2/x/burn/keeper"
-	tokenkeeper "github.com/medibloc/panacea-core/v2/x/token/keeper"
-	tokentypes "github.com/medibloc/panacea-core/v2/x/token/types"
+	burntypes "github.com/medibloc/panacea-core/v2/x/burn/types"
 	"github.com/stretchr/testify/suite"
 	"github.com/tendermint/tendermint/crypto/secp256k1"
 	"github.com/tendermint/tendermint/libs/log"
@@ -30,19 +41,27 @@ import (
 	didtypes "github.com/medibloc/panacea-core/v2/x/did/types"
 )
 
+type TestProtocolVersionSetter struct{}
+
 type TestSuite struct {
 	suite.Suite
 
 	Ctx sdk.Context
 
-	AccountKeeper authkeeper.AccountKeeper
-	AolKeeper     aolkeeper.Keeper
-	AolMsgServer  aoltypes.MsgServer
-	BankKeeper    bankkeeper.Keeper
-	BurnKeeper    burnkeeper.Keeper
-	DIDMsgServer  didtypes.MsgServer
-	DIDKeeper     didkeeper.Keeper
-	TokenKeeper   tokenkeeper.Keeper
+	AccountKeeper    authkeeper.AccountKeeper
+	StakingKeeper    stakingkeeper.Keeper
+	AolKeeper        aolkeeper.Keeper
+	AolMsgServer     aoltypes.MsgServer
+	BankKeeper       bankkeeper.Keeper
+	BurnKeeper       burnkeeper.Keeper
+	CapabilityKeeper *capabilitykeeper.Keeper
+	DistrKeeper      distrkeeper.Keeper
+	IBCKeeper        *ibckeeper.Keeper
+	TransferKeeper   ibctransferkeeper.Keeper
+	DIDMsgServer     didtypes.MsgServer
+	DIDKeeper        didkeeper.Keeper
+	WasmKeeper       wasm.Keeper
+	UpgradeKeeper    upgradekeeper.Keeper
 }
 
 func (suite *TestSuite) SetupTest() {
@@ -52,7 +71,12 @@ func (suite *TestSuite) SetupTest() {
 		banktypes.StoreKey,
 		paramstypes.StoreKey,
 		didtypes.StoreKey,
-		tokentypes.StoreKey)
+		wasm.StoreKey,
+		ibchost.StoreKey,
+		capabilitytypes.StoreKey,
+		ibctransfertypes.StoreKey,
+		upgradetypes.StoreKey,
+	)
 	tKeyParams := sdk.NewTransientStoreKey(paramstypes.TStoreKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
 
@@ -71,7 +95,15 @@ func (suite *TestSuite) SetupTest() {
 	suite.Require().NoError(ms.LoadLatestVersion())
 
 	maccPerms := map[string][]string{
-		authtypes.FeeCollectorName: nil,
+		authtypes.FeeCollectorName:     nil,
+		distrtypes.ModuleName:          nil,
+		minttypes.ModuleName:           {authtypes.Minter},
+		stakingtypes.BondedPoolName:    {authtypes.Burner, authtypes.Staking},
+		stakingtypes.NotBondedPoolName: {authtypes.Burner, authtypes.Staking},
+		govtypes.ModuleName:            {authtypes.Burner},
+		ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
+		wasm.ModuleName:                {authtypes.Burner},
+		burntypes.ModuleName:           {authtypes.Burner},
 	}
 
 	modAccAddrs := make(map[string]bool)
@@ -109,18 +141,58 @@ func (suite *TestSuite) SetupTest() {
 	)
 	suite.BankKeeper.SetParams(ctx, banktypes.DefaultParams())
 	suite.BurnKeeper = *burnkeeper.NewKeeper(suite.BankKeeper)
+	suite.DistrKeeper = distrkeeper.NewKeeper(
+		cdc.Marshaler, keyParams[distrtypes.StoreKey], paramsKeeper.Subspace(distrtypes.ModuleName), suite.AccountKeeper, suite.BankKeeper, &suite.StakingKeeper, "test_fee_collector", modAccAddrs,
+	)
+	suite.UpgradeKeeper = upgradekeeper.NewKeeper(map[int64]bool{}, keyParams[upgradetypes.StoreKey], cdc.Marshaler, suite.T().TempDir(), NewTestProtocolVersionSetter())
+	suite.IBCKeeper = ibckeeper.NewKeeper(
+		cdc.Marshaler, keyParams[ibchost.StoreKey], paramsKeeper.Subspace(ibchost.ModuleName), suite.StakingKeeper, suite.UpgradeKeeper, scopedIBCKeeper,
+	)
+	suite.TransferKeeper = ibctransferkeeper.NewKeeper(
+		cdc.Marshaler, keyParams[ibctransfertypes.StoreKey], paramsKeeper.Subspace(ibctransfertypes.ModuleName),
+		suite.IBCKeeper.ChannelKeeper, &suite.IBCKeeper.PortKeeper,
+		suite.AccountKeeper, suite.BankKeeper, scopedIBCKeeper,
+	)
+
+	msgRouter := baseapp.NewMsgServiceRouter()
+
+	querier := baseapp.NewGRPCQueryRouter()
+
+	supportedFeatures := "iterator,staking,stargate"
+	suite.WasmKeeper = wasmkeeper.NewKeeper(
+		cdc.Marshaler,
+		keyParams[wasm.StoreKey],
+		paramsKeeper.Subspace(wasm.ModuleName),
+		suite.AccountKeeper,
+		suite.BankKeeper,
+		suite.StakingKeeper,
+		suite.DistrKeeper,
+		suite.IBCKeeper.ChannelKeeper,
+		&suite.IBCKeeper.PortKeeper,
+		scopedIBCKeeper,
+		suite.TransferKeeper,
+		msgRouter,
+		querier,
+		suite.T().TempDir(),
+		wasmtypes.DefaultWasmConfig(),
+		supportedFeatures,
+		[]wasm.Option{}...,
+	)
+
+	wasmGenState := wasmtypes.GenesisState{
+		Codes:     []wasmtypes.Code{},
+		Sequences: []wasmtypes.Sequence{},
+		Params:    wasmtypes.DefaultParams(),
+	}
+	_, err := wasmkeeper.InitGenesis(suite.Ctx, &suite.WasmKeeper, wasmGenState, suite.StakingKeeper, wasmkeeper.TestHandler(wasmkeeper.NewDefaultPermissionKeeper(suite.WasmKeeper)))
+	suite.Require().NoError(err)
+
 	suite.DIDKeeper = *didkeeper.NewKeeper(
 		cdc.Marshaler,
 		keyParams[didtypes.StoreKey],
 		memKeys[didtypes.MemStoreKey],
 	)
 	suite.DIDMsgServer = didkeeper.NewMsgServerImpl(suite.DIDKeeper)
-	suite.TokenKeeper = *tokenkeeper.NewKeeper(
-		cdc.Marshaler,
-		keyParams[tokentypes.StoreKey],
-		memKeys[tokentypes.MemStoreKey],
-		suite.BankKeeper,
-	)
 }
 
 func (suite *TestSuite) BeforeTest(suiteName, testName string) {
@@ -151,3 +223,17 @@ func newTestCodec() params.EncodingConfig {
 func (suite *TestSuite) GetAccAddress() sdk.AccAddress {
 	return sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address())
 }
+
+func (suite *TestSuite) FundAccount(ctx sdk.Context, addr sdk.AccAddress, amounts sdk.Coins) error {
+	if err := suite.BankKeeper.MintCoins(ctx, minttypes.ModuleName, amounts); err != nil {
+		return err
+	}
+
+	return suite.BankKeeper.SendCoinsFromModuleToAccount(ctx, minttypes.ModuleName, addr, amounts)
+}
+
+func NewTestProtocolVersionSetter() TestProtocolVersionSetter {
+	return TestProtocolVersionSetter{}
+}
+
+func (vs TestProtocolVersionSetter) SetProtocolVersion(v uint64) {}

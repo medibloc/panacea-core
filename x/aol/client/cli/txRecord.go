@@ -70,7 +70,7 @@ func generateOrBroadcastTxWithMultiSigners(clientCtx client.Context, flagSet *pf
 // broadcastTxWithMultiSigners is a fork of tx.BroadcastTx, but with multi signers.
 func broadcastTxWithMultiSigners(clientCtx client.Context, txf tx.Factory, signerAddrs []sdk.AccAddress, msgs ...sdk.Msg) error {
 	if txf.SimulateAndExecute() || clientCtx.Simulate {
-		_, adjusted, err := tx.CalculateGas(clientCtx.QueryWithData, txf, msgs...)
+		_, adjusted, err := tx.CalculateGas(clientCtx, txf, msgs...)
 		if err != nil {
 			return err
 		}

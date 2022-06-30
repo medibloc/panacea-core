@@ -3,7 +3,6 @@ package keeper_test
 import (
 	"testing"
 
-	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	"github.com/medibloc/panacea-core/v2/types/testsuite"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -27,7 +26,7 @@ var (
 		sdk.AccAddress(pubKeys[2].Address()),
 	}
 
-	initTokens = sdk.TokensFromConsensusPower(200)
+	initTokens = sdk.TokensFromConsensusPower(200, sdk.DefaultPowerReduction)
 	initCoin   = sdk.NewCoin(assets.MicroMedDenom, initTokens)
 	initCoins  = sdk.NewCoins(initCoin)
 )
@@ -45,20 +44,15 @@ func (suite *BurnTestSuite) BeforeTest(_, _ string) {
 	bankKeeper := suite.BankKeeper
 
 	for _, addr := range address {
-		err := bankKeeper.AddCoins(ctx, addr, initCoins)
+		// mint coins and send to each account
+		err := suite.FundAccount(suite.Ctx, addr, initCoins)
 		suite.Require().NoError(err)
 	}
 
-	bankKeeper.SetSupply(ctx, banktypes.DefaultSupply())
-	supply := bankKeeper.GetSupply(ctx)
-	supply.SetTotal(sdk.NewCoins(sdk.NewCoin("umed", sdk.TokensFromConsensusPower(600))))
-	bankKeeper.SetSupply(ctx, supply)
+	totalCoin := bankKeeper.GetSupply(ctx, assets.MicroMedDenom)
 
-	totalCoins := bankKeeper.GetSupply(ctx).GetTotal()
-
-	suite.Require().Equal(1, len(totalCoins))
-	suite.Require().Equal(assets.MicroMedDenom, totalCoins[0].Denom)
-	suite.Require().Equal(sdk.TokensFromConsensusPower(600), totalCoins[0].Amount)
+	suite.Require().Equal(assets.MicroMedDenom, totalCoin.Denom)
+	suite.Require().Equal(sdk.TokensFromConsensusPower(600, sdk.DefaultPowerReduction), totalCoin.Amount)
 }
 
 func (suite *BurnTestSuite) TestBurnCoins() {
@@ -69,13 +63,13 @@ func (suite *BurnTestSuite) TestBurnCoins() {
 	beforeBurnCoin1 := bankKeeper.GetBalance(ctx, address[0], assets.MicroMedDenom)
 	beforeBurnCoin2 := bankKeeper.GetBalance(ctx, address[1], assets.MicroMedDenom)
 	beforeBurnCoin3 := bankKeeper.GetBalance(ctx, address[2], assets.MicroMedDenom)
-	beforeBurnTotal := bankKeeper.GetSupply(ctx).GetTotal()
+	beforeBurnTotal := bankKeeper.GetSupply(ctx, assets.MicroMedDenom)
 
 	suite.Require().Equal(initCoin, beforeBurnCoin1)
 	suite.Require().Equal(initCoin, beforeBurnCoin2)
 	suite.Require().Equal(initCoin, beforeBurnCoin3)
-	suite.Require().Equal(assets.MicroMedDenom, beforeBurnTotal[0].GetDenom())
-	suite.Require().Equal(sdk.TokensFromConsensusPower(600), beforeBurnTotal[0].Amount)
+	suite.Require().Equal(assets.MicroMedDenom, beforeBurnTotal.GetDenom())
+	suite.Require().Equal(sdk.TokensFromConsensusPower(600, sdk.DefaultPowerReduction), beforeBurnTotal.Amount)
 
 	err := burnKeeper.BurnCoins(ctx, address[1].String())
 
@@ -84,13 +78,13 @@ func (suite *BurnTestSuite) TestBurnCoins() {
 	afterBurnCoin1 := bankKeeper.GetBalance(ctx, address[0], assets.MicroMedDenom)
 	afterBurnCoin2 := bankKeeper.GetBalance(ctx, address[1], assets.MicroMedDenom)
 	afterBurnCoin3 := bankKeeper.GetBalance(ctx, address[2], assets.MicroMedDenom)
-	afterBurnTotal := bankKeeper.GetSupply(ctx).GetTotal()
+	afterBurnTotal := bankKeeper.GetSupply(ctx, assets.MicroMedDenom)
 
 	suite.Require().True(afterBurnCoin2.IsZero())
 	suite.Require().Equal(initCoin, afterBurnCoin1)
 	suite.Require().Equal(initCoin, afterBurnCoin3)
-	suite.Require().Equal(assets.MicroMedDenom, afterBurnTotal[0].GetDenom())
-	suite.Require().Equal(sdk.TokensFromConsensusPower(400), afterBurnTotal[0].Amount)
+	suite.Require().Equal(assets.MicroMedDenom, afterBurnTotal.GetDenom())
+	suite.Require().Equal(sdk.TokensFromConsensusPower(400, sdk.DefaultPowerReduction), afterBurnTotal.Amount)
 }
 
 func (suite *BurnTestSuite) TestGetAccount_NotExistAddress() {
@@ -101,13 +95,13 @@ func (suite *BurnTestSuite) TestGetAccount_NotExistAddress() {
 	beforeBurnCoin1 := bankKeeper.GetBalance(ctx, address[0], assets.MicroMedDenom)
 	beforeBurnCoin2 := bankKeeper.GetBalance(ctx, address[1], assets.MicroMedDenom)
 	beforeBurnCoin3 := bankKeeper.GetBalance(ctx, address[2], assets.MicroMedDenom)
-	beforeBurnTotal := bankKeeper.GetSupply(ctx).GetTotal()
+	beforeBurnTotal := bankKeeper.GetSupply(ctx, assets.MicroMedDenom)
 
 	suite.Require().Equal(initCoin, beforeBurnCoin1)
 	suite.Require().Equal(initCoin, beforeBurnCoin2)
 	suite.Require().Equal(initCoin, beforeBurnCoin3)
-	suite.Require().Equal(assets.MicroMedDenom, beforeBurnTotal[0].GetDenom())
-	suite.Require().Equal(sdk.TokensFromConsensusPower(600), beforeBurnTotal[0].Amount)
+	suite.Require().Equal(assets.MicroMedDenom, beforeBurnTotal.GetDenom())
+	suite.Require().Equal(sdk.TokensFromConsensusPower(600, sdk.DefaultPowerReduction), beforeBurnTotal.Amount)
 
 	err := burnKeeper.BurnCoins(ctx, "invalid address")
 
@@ -116,12 +110,12 @@ func (suite *BurnTestSuite) TestGetAccount_NotExistAddress() {
 	afterBurnCoin1 := bankKeeper.GetBalance(ctx, address[0], assets.MicroMedDenom)
 	afterBurnCoin2 := bankKeeper.GetBalance(ctx, address[1], assets.MicroMedDenom)
 	afterBurnCoin3 := bankKeeper.GetBalance(ctx, address[2], assets.MicroMedDenom)
-	afterBurnTotal := bankKeeper.GetSupply(ctx).GetTotal()
+	afterBurnTotal := bankKeeper.GetSupply(ctx, assets.MicroMedDenom)
 
 	suite.Require().Equal(initCoin, afterBurnCoin1)
 	suite.Require().Equal(initCoin, afterBurnCoin2)
 	suite.Require().Equal(initCoin, afterBurnCoin3)
-	suite.Require().Equal(assets.MicroMedDenom, afterBurnTotal[0].GetDenom())
-	suite.Require().Equal(sdk.TokensFromConsensusPower(600), afterBurnTotal[0].Amount)
+	suite.Require().Equal(assets.MicroMedDenom, afterBurnTotal.GetDenom())
+	suite.Require().Equal(sdk.TokensFromConsensusPower(600, sdk.DefaultPowerReduction), afterBurnTotal.Amount)
 
 }
