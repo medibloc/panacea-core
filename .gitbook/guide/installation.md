@@ -3,7 +3,7 @@
 
 ## Install Go
 
-[Go 1.15+](https://golang.org/doc/install) is required.
+[Go 1.17+](https://golang.org/doc/install) is required.
 
 ## Install the `panacead`
 
@@ -12,7 +12,7 @@ please clone the `panacea-core` project and build it.
 
 ```bash
 # Make sure to checkout the correct branch.
-git clone -b v2.0.2 https://github.com/medibloc/panacea-core
+git clone -b v2.0.3 https://github.com/medibloc/panacea-core
 cd panacea-core
 make install  # All binaries are installed in $GOPATH/bin
 ```
@@ -20,7 +20,7 @@ make install  # All binaries are installed in $GOPATH/bin
 Verify that the `panacead` binary is installed successfully.
 ```bash
 $ panacead version
-2.0.2
+2.0.3
 ```
 
 ## Import `panacea-core` as a Go dependency
@@ -33,11 +33,12 @@ As a workaround, please add `replace` directives in your `go.mod` as below.
 ```
 module your.com/yours
 
-go 1.16
+go 1.17
 
 replace (
 	github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
 	google.golang.org/grpc => google.golang.org/grpc v1.33.2
+	github.com/cosmos/cosmos-sdk => github.com/medibloc/cosmos-sdk v0.42.11-panacea.1
 )
 ```
 
