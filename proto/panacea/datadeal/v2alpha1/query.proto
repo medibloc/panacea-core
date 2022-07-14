@@ -1,5 +1,5 @@
 syntax = "proto3";
-package panacea.datadeal.v2;
+package panacea.datadeal.v2alpha1;
 
 import "google/api/annotations.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";

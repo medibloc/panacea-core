@@ -1,5 +1,5 @@
 syntax = "proto3";
-package panacea.oracle.v2;
+package panacea.oracle.v2alpha1;
 
 option go_package = "github.com/medibloc/panacea-core/x/oracle/types";
 
