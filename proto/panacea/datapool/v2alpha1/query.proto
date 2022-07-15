@@ -1,49 +1,49 @@
 syntax = "proto3";
-package panacea.datapool.v2;
+package panacea.datapool.v2alpha1;
 
 option go_package = "github.com/medibloc/panacea-core/x/datapool/types";
 
 import "gogoproto/gogo.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";
 import "google/api/annotations.proto";
-import "panacea/datapool/v2/pool.proto";
-import "panacea/datapool/v2/genesis.proto";
+import "panacea/datapool/v2alpha1/pool.proto";
+import "panacea/datapool/v2alpha1/genesis.proto";
 
 // Query defines the gRPC querier service.
 service Query {
   // Pool returns a Pool.
   rpc Pool(QueryPoolRequest) returns (QueryPoolResponse) {
-    option (google.api.http).get = "/panacea/datapool/v2/pools/{pool_id}";
+    option (google.api.http).get = "/panacea/datapool/v2alpha1/pools/{pool_id}";
   }
 
   // DataPoolParams returns params of x/datapool module.
   rpc DataPoolParams(QueryDataPoolParamsRequest) returns (QueryDataPoolParamsResponse) {
-    option (google.api.http).get = "/panacea/datapool/v2/params";
+    option (google.api.http).get = "/panacea/datapool/v2alpha1/params";
   }
 
   // DataPoolModuleAddr returns x/datapool module address.
   rpc DataPoolModuleAddr(QueryDataPoolModuleAddrRequest) returns (QueryDataPoolModuleAddrResponse) {
-    option (google.api.http).get = "/panacea/datapool/v2/module_addr";
+    option (google.api.http).get = "/panacea/datapool/v2alpha1/module_addr";
   }
 
   // DataCert returns DataCerts
   rpc DataCerts(QueryDataCertsRequest) returns (QueryDataCertsResponse) {
-    option (google.api.http).get = "/panacea/datapool/v2/data_certs/pool/{pool_id}/round/{round}";
+    option (google.api.http).get = "/panacea/datapool/v2alpha1/data_certs/pool/{pool_id}/round/{round}";
   }
 
   // DataPassRedeemReceipt returns DataPassRedeemReceipt
   rpc DataPassRedeemReceipt(QueryDataPassRedeemReceiptRequest) returns (QueryDataPassRedeemReceiptResponse) {
-    option (google.api.http).get = "/panacea/datapool/v2/pools/{pool_id}/rounds/{round}/data_passes/{data_pass_id}/redeem_receipt";
+    option (google.api.http).get = "/panacea/datapool/v2alpha1/pools/{pool_id}/rounds/{round}/data_passes/{data_pass_id}/redeem_receipt";
   }
 
   // DataPassRedeemReceipts returns DataPassRedeemReceipts
   rpc DataPassRedeemReceipts(QueryDataPassRedeemReceiptsRequest) returns (QueryDataPassRedeemReceiptsResponse) {
-    option (google.api.http).get = "/panacea/datapool/v2/pools/{pool_id}/data_passes/redeem_receipt";
+    option (google.api.http).get = "/panacea/datapool/v2alpha1/pools/{pool_id}/data_passes/redeem_receipt";
   }
 
   // DataPassRedeemHistory returns a list of DataPassRedeemHistories
   rpc DataPassRedeemHistory(QueryDataPassRedeemHistoryRequest) returns (QueryDataPassRedeemHistoryResponse) {
-    option (google.api.http).get = "/panacea/datapool/v2/redeemers/{redeemer}/pools/{pool_id}/redeem_history";
+    option (google.api.http).get = "/panacea/datapool/v2alpha1/redeemers/{redeemer}/pools/{pool_id}/redeem_history";
   }
 }
 

@@ -1,5 +1,5 @@
 syntax = "proto3";
-package panacea.datadeal.v2;
+package panacea.datadeal.v2alpha1;
 
 // this line is used by starport scaffolding # proto/tx/import
 
