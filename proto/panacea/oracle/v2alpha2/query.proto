@@ -1,0 +1,45 @@
+syntax = "proto3";
+package panacea.oracle.v2alpha2;
+
+option go_package = "github.com/medibloc/panacea-core/x/oracle/types";
+
+import "panacea/oracle/v2alpha2/oracle.proto";
+import "panacea/oracle/v2alpha2/genesis.proto";
+import "cosmos/base/query/v1beta1/pagination.proto";
+import "google/api/annotations.proto";
+
+service Query {
+  rpc Oracles(QueryOraclesRequest) returns (QueryOraclesResponse) {
+    option (google.api.http).get = "/panacea/oracle/v2alpha2/oracles";
+  }
+  rpc Oracle(QueryOracleRequest) returns (QueryOracleResponse) {
+    option (google.api.http).get = "/panacea/oracle/v2alpha2/oracles/{address}";
+  }
+  rpc Params(QueryOracleParamsRequest) returns (QueryOracleParamsResponse) {
+    option (google.api.http).get = "/panacea/oracle/v2alpha2/params";
+  }
+}
+
+message QueryOraclesRequest {
+  cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+message QueryOraclesResponse {
+  repeated Oracle oracles = 1;
+}
+
+message QueryOracleRequest {
+  string address = 1;
+}
+
+message QueryOracleResponse {
+  Oracle oracle = 1;
+}
+
+message QueryOracleParamsRequest {
+
+}
+
+message QueryOracleParamsResponse {
+  Params params = 1;
+}

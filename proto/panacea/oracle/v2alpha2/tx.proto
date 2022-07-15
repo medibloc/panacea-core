@@ -1,0 +1,60 @@
+syntax = "proto3";
+package panacea.oracle.v2alpha2;
+
+option go_package = "github.com/medibloc/panacea-core/x/oracle/types";
+
+import "panacea/oracle/v2alpha2/oracle.proto";
+import "panacea/oracle/v2alpha2/genesis.proto";
+import "gogoproto/gogo.proto";
+
+// Msg defines the Msg service.
+service Msg {
+  // RegisterOracle defines a method for registration of oracle.
+  rpc RegisterOracle(MsgRegisterOracle) returns (MsgRegisterOracleResponse);
+
+  // VoteOracleRegistration  defines a method for voting registration of oracle.
+  rpc VoteOracleRegistration(MsgVoteOracleRegistration) returns (MsgVoteOracleRegistrationResponse);
+}
+
+// MsgRegisterOracle defines the Msg/RegisterOracle request type.
+message MsgRegisterOracle {
+  OracleRegistrationInfo oracle_registration_info = 1;
+}
+
+// MsgRegisterOracleResponse defines the Msg/RegisterOracle response type.
+message MsgRegisterOracleResponse {
+}
+
+message MsgVoteOracleRegistration {
+  SignedOracleRegistrationVote signed_oracle_registration_vote = 1;
+}
+
+message MsgVoteOracleRegistrationResponse {
+}
+
+message OracleRegistrationInfo {
+  string unique_id = 1;
+  string oracle_address = 2;
+  bytes node_pub_key = 3;
+  bytes node_pub_key_remote_report = 4;
+  bytes encrypted_oracle_priv_key = 5;
+  TallyResult tally_result = 6;
+}
+
+message SignedOracleRegistrationVote {
+  OracleRegistrationVote oracle_registration_vote = 1;
+  bytes signature = 2;
+}
+
+enum VoteOption {
+  VOTE_VALID = 0;
+  VOTE_INVALID = 1;
+}
+
+message OracleRegistrationVote {
+  string unique_id = 1;
+  string voter_address = 2;
+  string voting_target_address = 3;
+  VoteOption vote_option = 4;
+  bytes encrypted_oracle_priv_key = 5;
+}

@@ -1,0 +1,43 @@
+syntax = "proto3";
+package panacea.oracle.v2alpha2;
+
+option go_package = "github.com/medibloc/panacea-core/x/oracle/types";
+
+import "gogoproto/gogo.proto";
+import "google/protobuf/duration.proto";
+
+// GenesisState defines the oracle module's genesis state.
+message GenesisState {
+}
+
+message TallyResult {
+  string yes = 1 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int", (gogoproto.nullable) = false];
+  string no = 2 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int", (gogoproto.nullable) = false];
+  string invalid_yes = 3 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int", (gogoproto.nullable) = false];
+  bytes consensus_value = 4;
+}
+
+message Params {
+  bytes oracle_public_key = 1;
+  bytes oracle_pub_key_remote_report = 2;
+  string unique_id = 3;
+  VoteParams vote_params = 4;
+  SlashParams slash_params = 5;
+}
+
+message VoteParams {
+  google.protobuf.Duration voting_period = 1;
+  google.protobuf.Duration unjailed_period = 2;
+  string quorum = 3 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false];
+}
+
+message SlashParams {
+  string down_time = 1 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false];
+  string forgery = 2 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false];
+}
+
+// TODO: Upgrade Oracle Discussion
+message UpgradeOracleInfo {
+  string unique_id = 1;
+  int64 height = 2; //uint64
+}
