@@ -15,10 +15,11 @@ message Deal {
   uint64 max_num_data = 5;
   uint64 cur_num_data = 6;
   string owner_address = 7;
-  Status status = 8;
+  DealStatus status = 8;
 }
 
-enum Status {
+// DealStatus enumerates the status of deal.
+enum DealStatus {
   ACTIVE = 0;
   INACTIVE = 1;
 }

@@ -16,11 +16,11 @@ service Msg {
   // SellData defines a method for selling a data.
   rpc SellData(MsgSellData) returns (MsgSellDataResponse);
 
-  // VoteSellData defines a method for voting sell data.
-  rpc VoteSellData(MsgVoteSellData) returns (MsgVoteSellDataResponse);
+  // VoteDataVerification defines a method for voting data verification.
+  rpc VoteDataVerification(MsgVoteDataVerification) returns (MsgVoteDataVerificationResponse);
 
-  // VoteBuyData defines a method for voting buy data.
-  rpc VoteBuyData(MsgVoteBuyData) returns (MsgVoteBuyDataResponse);
+  // VoteDataDelivery defines a method for voting data delivery.
+  rpc VoteDataDelivery(MsgVoteDataDelivery) returns (MsgVoteDataDeliveryResponse);
 
   // DeactivateDeal defines a method for deactivating the deal.
   rpc DeactivateDeal(MsgDeactivateDeal) returns (MsgDeactivateDealResponse);
@@ -28,77 +28,86 @@ service Msg {
 
 // MsgCreateDeal defines the Msg/CreateDeal request type.
 message MsgCreateDeal {
-
+  repeated string data_schema = 1;
+  cosmos.base.v1beta1.Coin budget = 2;
+  uint64 max_num_data = 3;
+  string buyer_address = 4;
 }
 
 // MsgCreateDealResponse defines the Msg/CreateDeal response type.
 message MsgCreateDealResponse {
+  uint64 deal_id = 1;
 }
 
 // MsgSellData defines the Msg/SellData request type.
 message MsgSellData {
+  uint64 deal_id = 1;
+  string seller_cid = 2;
+  string seller_address = 3;
 }
 
 // MsgSellDataResponse defines the Msg/SellData response type.
 message MsgSellDataResponse {
 }
 
-enum Valid {
+// VoteOption enumerates the vote option.
+enum VoteOption {
   VOTE_VALID = 0;
   VOTE_INVALID = 1;
 }
 
-// MsgVoteSellData defines the Msg/VoteSellData request type.
-message MsgVoteSellData {
-  SignedSellDataVote signed_sell_data_vote = 1;
+// MsgVoteDataVerification defines the Msg/VoteDataVerification request type.
+message MsgVoteDataVerification {
+  SignedDataVerificationVote signed_data_verification_vote = 1;
 }
 
-// MsgVoteSellData defines the Msg/VoteSellData response type.
-message MsgVoteSellDataResponse {
+// MsgVoteDataVerificationResponse defines the Msg/VoteDataVerification response type.
+message MsgVoteDataVerificationResponse {
 }
 
-// SignedSellDataVote defines the SellDataVote with signature.
-message SignedSellDataVote {
-  SellDataVote sell_data_vote = 1;
+// SignedDataVerificationVote defines the DataVerificationVote with signature.
+message SignedDataVerificationVote {
+  DataVerificationVote data_verification_vote = 1;
   bytes signature = 2;
 }
 
-// SellDataVote defines the vote info for selling data.
-message SellDataVote {
+// DataVerificationVote defines the vote info for verifying data.
+message DataVerificationVote {
   string voter_address = 1;
   string seller_address = 2;
   uint64 deal_id = 3;
   bytes seller_cid = 4;
-  Valid valid = 5;
+  VoteOption valid = 5;
 }
 
-// MsgVoteBuyData defines the Msg/VoteBuyData request type.
-message MsgVoteBuyData {
-  SignedBuyDataVote signed_buy_data_vote = 1;
+// MsgVoteDataDelivery defines the Msg/VoteDataDelivery request type.
+message MsgVoteDataDelivery {
+  SignedDataDeliveryVote signed_data_delivery_vote = 1;
 }
 
-// MsgVoteBuyDataResponse defines the Msg/VoteBuyData response type.
-message MsgVoteBuyDataResponse {
+// MsgVoteDataDeliveryResponse defines the Msg/VoteDataDelivery response type.
+message MsgVoteDataDeliveryResponse {
 }
 
-// SignedBuyData defines the BuyDataVote with signature.
-message SignedBuyDataVote {
-  BuyDataVote buy_data_vote = 1;
+// SignedDataDeliveryVote defines the DataDeliveryVote with signature.
+message SignedDataDeliveryVote {
+  DataDeliveryVote data_delivery_vote = 1;
   bytes signature = 2;
 }
 
-// BuyDataVote defines the vote info for buying data.
-message BuyDataVote {
+// DataDeliveryVote defines the vote info for delivering data.
+message DataDeliveryVote {
   string voter_address = 1;
   uint64 deal_id = 2;
   bytes seller_cid = 3;
   bytes buyer_cid = 4;
-  Valid valid = 5;
+  VoteOption valid = 5;
 }
 
 // MsgDeactivateDeal defines the Msg/DeactivateDeal request type.
 message MsgDeactivateDeal {
-
+  uint64 deal_id = 1;
+  string requester_address = 2;
 }
 
 // MsgDeactivateDealResponse defines the Msg/DeactivateDeal response type.
