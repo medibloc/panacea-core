@@ -25,32 +25,37 @@ message MsgRegisterOracle {
 message MsgRegisterOracleResponse {
 }
 
+// MsgVoteOracleRegistration defines the Msg/VoteOracleRegistration request type.
 message MsgVoteOracleRegistration {
   SignedOracleRegistrationVote signed_oracle_registration_vote = 1;
 }
 
-message MsgVoteOracleRegistrationResponse {
-}
+// MsgVoteOracleRegistrationResponse defines the Msg/VoteOracleRegistration response type.
+message MsgVoteOracleRegistrationResponse {}
 
+// OracleRegistrationInfo defines the required info for oracle registration.
 message OracleRegistrationInfo {
   string unique_id = 1;
   string oracle_address = 2;
   bytes node_pub_key = 3;
   bytes node_pub_key_remote_report = 4;
-  bytes encrypted_oracle_priv_key = 5;
-  TallyResult tally_result = 6;
+  int64 trusted_block_height = 5;
+  bytes trusted_block_hash = 6;
 }
 
+// SignedOracleRegistrationVote defines the vote of OracleRegistration and signature signed by oracle private key.
 message SignedOracleRegistrationVote {
   OracleRegistrationVote oracle_registration_vote = 1;
   bytes signature = 2;
 }
 
+// VoteOption enumerates the vote option.
 enum VoteOption {
   VOTE_VALID = 0;
   VOTE_INVALID = 1;
 }
 
+// OracleRegistrationVote defines the vote for oracle registration
 message OracleRegistrationVote {
   string unique_id = 1;
   string voter_address = 2;
