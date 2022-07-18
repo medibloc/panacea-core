@@ -20,6 +20,8 @@ message Deal {
 
 // DealStatus enumerates the status of deal.
 enum DealStatus {
+  // ACTIVE defines the deal status that is active.
   ACTIVE = 0;
+  // INACTIVE defines the deal status that is inactive.
   INACTIVE = 1;
 }

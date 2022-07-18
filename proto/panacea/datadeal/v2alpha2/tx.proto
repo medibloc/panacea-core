@@ -52,7 +52,9 @@ message MsgSellDataResponse {
 
 // VoteOption enumerates the vote option.
 enum VoteOption {
+  // VOTE_VALID defines the vote option that is valid.
   VOTE_VALID = 0;
+  // VOTE_INVALID defines the vote option that is invalid.
   VOTE_INVALID = 1;
 }
 
