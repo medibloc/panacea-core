@@ -2,7 +2,6 @@ package keeper
 
 import (
 	"fmt"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/medibloc/panacea-core/v2/x/oracle/types"
@@ -167,6 +166,7 @@ func (k Keeper) SetOracle(ctx sdk.Context, oracle *types.Oracle) error {
 		return err
 	}
 	key := types.GetOracleKey(accAddr)
+
 	bz, err := k.cdc.MarshalLengthPrefixed(oracle)
 	if err != nil {
 		return err
@@ -229,6 +229,7 @@ func (k Keeper) SetOracleRegistration(ctx sdk.Context, regOracle *types.OracleRe
 		return err
 	}
 	key := types.GetOracleRegistrationKey(accAddr)
+
 	bz, err := k.cdc.MarshalLengthPrefixed(regOracle)
 	if err != nil {
 		return err
