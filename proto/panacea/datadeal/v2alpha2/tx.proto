@@ -1,0 +1,107 @@
+syntax = "proto3";
+package panacea.datadeal.v2alpha2;
+
+// this line is used by starport scaffolding # proto/tx/import
+
+option go_package = "github.com/medibloc/panacea-core/x/datadeal/types";
+
+import "gogoproto/gogo.proto";
+import "cosmos/base/v1beta1/coin.proto";
+
+// Msg defines the Msg service.
+service Msg {
+  // CreateDeal defines a method for creating a deal.
+  rpc CreateDeal(MsgCreateDeal) returns (MsgCreateDealResponse);
+
+  // SellData defines a method for selling a data.
+  rpc SellData(MsgSellData) returns (MsgSellDataResponse);
+
+  // VoteSellData defines a method for voting sell data.
+  rpc VoteSellData(MsgVoteSellData) returns (MsgVoteSellDataResponse);
+
+  // VoteBuyData defines a method for voting buy data.
+  rpc VoteBuyData(MsgVoteBuyData) returns (MsgVoteBuyDataResponse);
+
+  // DeactivateDeal defines a method for deactivating the deal.
+  rpc DeactivateDeal(MsgDeactivateDeal) returns (MsgDeactivateDealResponse);
+}
+
+// MsgCreateDeal defines the Msg/CreateDeal request type.
+message MsgCreateDeal {
+
+}
+
+// MsgCreateDealResponse defines the Msg/CreateDeal response type.
+message MsgCreateDealResponse {
+}
+
+// MsgSellData defines the Msg/SellData request type.
+message MsgSellData {
+}
+
+// MsgSellDataResponse defines the Msg/SellData response type.
+message MsgSellDataResponse {
+}
+
+enum Valid {
+  VOTE_VALID = 0;
+  VOTE_INVALID = 1;
+}
+
+// MsgVoteSellData defines the Msg/VoteSellData request type.
+message MsgVoteSellData {
+  SignedSellDataVote signed_sell_data_vote = 1;
+}
+
+// MsgVoteSellData defines the Msg/VoteSellData response type.
+message MsgVoteSellDataResponse {
+}
+
+// SignedSellDataVote defines the SellDataVote with signature.
+message SignedSellDataVote {
+  SellDataVote sell_data_vote = 1;
+  bytes signature = 2;
+}
+
+// SellDataVote defines the vote info for selling data.
+message SellDataVote {
+  string voter_address = 1;
+  string seller_address = 2;
+  uint64 deal_id = 3;
+  bytes seller_cid = 4;
+  Valid valid = 5;
+}
+
+// MsgVoteBuyData defines the Msg/VoteBuyData request type.
+message MsgVoteBuyData {
+  SignedBuyDataVote signed_buy_data_vote = 1;
+}
+
+// MsgVoteBuyDataResponse defines the Msg/VoteBuyData response type.
+message MsgVoteBuyDataResponse {
+}
+
+// SignedBuyData defines the BuyDataVote with signature.
+message SignedBuyDataVote {
+  BuyDataVote buy_data_vote = 1;
+  bytes signature = 2;
+}
+
+// BuyDataVote defines the vote info for buying data.
+message BuyDataVote {
+  string voter_address = 1;
+  uint64 deal_id = 2;
+  bytes seller_cid = 3;
+  bytes buyer_cid = 4;
+  Valid valid = 5;
+}
+
+// MsgDeactivateDeal defines the Msg/DeactivateDeal request type.
+message MsgDeactivateDeal {
+
+}
+
+// MsgDeactivateDealResponse defines the Msg/DeactivateDeal response type.
+message MsgDeactivateDealResponse {
+
+}
