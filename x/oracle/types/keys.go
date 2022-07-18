@@ -1,5 +1,7 @@
 package types
 
+import "bytes"
+
 const (
 	// ModuleName defines the module name
 	ModuleName = "oracle"
@@ -18,5 +20,26 @@ const (
 )
 
 var (
-// KeyPrefixOracles defines key to store oracle
+	// KeyPrefixOracle defines key to store oracle
+	KeyPrefixOracle                 = []byte{0x01}
+	KeyPrefixOracleRegistration     = []byte{0x02}
+	KeyPrefixOracleRegistrationVote = []byte{0x03}
+
+	KeyIndexSeparator = []byte{0xFF}
 )
+
+func GetKeyPrefixOracle(address string) []byte {
+	return append(KeyPrefixOracle, []byte(address)...)
+}
+
+func GetKeyPrefixOracleRegistration(address string) []byte {
+	return append(KeyPrefixOracleRegistration, []byte(address)...)
+}
+
+func GetKeyPrefixOracleRegistrationVote(uniqueID, votingTargetAddress, voterAddress string) []byte {
+	return append(KeyPrefixOracleRegistrationVote, CombineKeys([]byte(uniqueID), []byte(votingTargetAddress), []byte(voterAddress))...)
+}
+
+func CombineKeys(keys ...[]byte) []byte {
+	return bytes.Join(keys, KeyIndexSeparator)
+}
