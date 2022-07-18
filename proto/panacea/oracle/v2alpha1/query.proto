@@ -1,0 +1,25 @@
+syntax = "proto3";
+package panacea.oracle.v2alpha1;
+
+option go_package = "github.com/medibloc/panacea-core/x/oracle/types";
+
+import "panacea/oracle/v2alpha1/oracle.proto";
+import "google/api/annotations.proto";
+
+// Query defines the gRPC querier service.
+service Query {
+  // Oracle returns a Oracle.
+  rpc Oracle(QueryOracleRequest) returns (QueryOracleResponse) {
+    option (google.api.http).get = "/panacea/oracle/v2alpha1/oracle";
+  }
+}
+
+// QueryOracleRequest is the request type for the Query/Oracle RPC method.
+message QueryOracleRequest {
+  string address = 1 ;
+}
+
+// QueryOracleResponse is the response type for the Query/Oracle RPC method.
+message QueryOracleResponse {
+  Oracle oracle = 1;
+}
