@@ -19,10 +19,7 @@ message DataSale {
 
 // DataSaleStatus enumerates the status of data sale.
 enum DataSaleStatus {
-  // VERIFICATION_VOTING_PERIOD defines the data sale status that is now in verification voting period.
-  DATA_SALE_STATUS_VERIFICATION_VOTING_PERIOD = 0;
-  // DELIVERY_VOTING_PERIOD defines the data sale status that is now in delivery voting period.
-  DATA_SALE_STATUS_DELIVERY_VOTING_PERIOD = 1;
-  // FAILED defines the data sale status that is failed.
-  DATA_SALE_STATUS_FAILED = 2;
+  VERIFICATION_VOTING_PERIOD = 0;
+  DELIVERY_VOTING_PERIOD = 1;
+  FAILED = 2;
 }

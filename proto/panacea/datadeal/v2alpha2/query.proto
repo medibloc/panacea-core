@@ -15,7 +15,7 @@ service Query {
   rpc Deal(QueryDealRequest) returns (QueryDealResponse) {
     option (google.api.http).get = "/panacea/datadeal/v2alpha2/deals/{deal_id}";
   }
-  // Deals return a list of Deal.
+  // Deals return Deals.
   rpc Deals(QueryDealsRequest) returns (QueryDealsResponse) {
     option (google.api.http).get = "/panacea/datadeal/v2alpha2/deals";
   }
