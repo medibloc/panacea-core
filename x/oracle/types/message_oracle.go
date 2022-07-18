@@ -53,8 +53,7 @@ func (msg *MsgRegisterOracle) ValidateBasic() error {
 }
 
 func (msg *MsgRegisterOracle) GetSignBytes() []byte {
-	bz := ModuleCdc.MustMarshalJSON(msg)
-	return sdk.MustSortJSON(bz)
+	panic("implemenets me")
 }
 
 func (msg *MsgRegisterOracle) GetSigners() []sdk.AccAddress {

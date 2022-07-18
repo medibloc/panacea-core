@@ -15,10 +15,9 @@ import (
 
 type (
 	Keeper struct {
-		cdc      codec.Codec
-		storeKey sdk.StoreKey
-		memKey   sdk.StoreKey
-
+		cdc           codec.Codec
+		storeKey      sdk.StoreKey
+		memKey        sdk.StoreKey
 		paramSpace    paramtypes.Subspace
 		stakingKeeper types.StakingKeeper
 	}

@@ -30,7 +30,6 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 	k.SetParams(ctx, genState.Params)
 
 	// TODO implements SetUpgradeInfo
-
 }
 
 // ExportGenesis returns the capability module's exported genesis.
