@@ -23,6 +23,12 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 		case *types.MsgSellData:
 			res, err := msgServer.SellData(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)
+		case *types.MsgVoteDataVerification:
+			res, err := msgServer.VoteDataVerification(sdk.WrapSDKContext(ctx), msg)
+			return sdk.WrapServiceResult(ctx, res, err)
+		case *types.MsgVoteDataDelivery:
+			res, err := msgServer.VoteDataDelivery(sdk.WrapSDKContext(ctx), msg)
+			return sdk.WrapServiceResult(ctx, res, err)
 		case *types.MsgDeactivateDeal:
 			res, err := msgServer.DeactivateDeal(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)

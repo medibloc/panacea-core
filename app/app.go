@@ -14,10 +14,6 @@ import (
 	oraclekeeper "github.com/medibloc/panacea-core/v2/x/oracle/keeper"
 	oracletypes "github.com/medibloc/panacea-core/v2/x/oracle/types"
 
-	"github.com/medibloc/panacea-core/v2/x/datapool"
-	datapoolkeeper "github.com/medibloc/panacea-core/v2/x/datapool/keeper"
-	datapooltypes "github.com/medibloc/panacea-core/v2/x/datapool/types"
-
 	"github.com/CosmWasm/wasmd/x/wasm"
 	wasmclient "github.com/CosmWasm/wasmd/x/wasm/client"
 
@@ -201,7 +197,6 @@ var (
 		burn.AppModuleBasic{},
 		wasm.AppModuleBasic{},
 		datadeal.AppModuleBasic{},
-		datapool.AppModuleBasic{},
 		oracle.AppModuleBasic{},
 		feegrantmodule.AppModuleBasic{},
 		authzmodule.AppModuleBasic{},
@@ -218,7 +213,6 @@ var (
 		ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
 		wasm.ModuleName:                {authtypes.Burner},
 		burntypes.ModuleName:           {authtypes.Burner},
-		datapooltypes.ModuleName:       {authtypes.Minter},
 	}
 )
 
@@ -281,7 +275,6 @@ type App struct {
 	burnKeeper     burnkeeper.Keeper
 	wasmKeeper     wasm.Keeper
 	dataDealKeeper datadealkeeper.Keeper
-	dataPoolKeeper datapoolkeeper.Keeper
 	oracleKeeper   oraclekeeper.Keeper
 
 	// the module manager
@@ -327,7 +320,6 @@ func New(
 		burntypes.StoreKey,
 		wasm.StoreKey,
 		datadealtypes.StoreKey,
-		datapooltypes.StoreKey,
 		oracletypes.StoreKey,
 		feegrant.StoreKey,
 	)
@@ -474,26 +466,12 @@ func New(
 		appCodec,
 		keys[oracletypes.StoreKey],
 		keys[oracletypes.MemStoreKey],
-		app.AccountKeeper,
 	)
 
 	app.dataDealKeeper = *datadealkeeper.NewKeeper(
 		appCodec,
 		keys[datadealtypes.StoreKey],
 		keys[datadealtypes.MemStoreKey],
-		app.BankKeeper,
-		app.AccountKeeper,
-		app.oracleKeeper,
-	)
-
-	app.dataPoolKeeper = *datapoolkeeper.NewKeeper(
-		appCodec,
-		keys[datapooltypes.StoreKey],
-		keys[datapooltypes.MemStoreKey],
-		app.GetSubspace(datapooltypes.ModuleName),
-		app.BankKeeper,
-		app.AccountKeeper,
-		app.wasmKeeper,
 		app.oracleKeeper,
 	)
 
@@ -550,7 +528,6 @@ func New(
 		burn.NewAppModule(appCodec, app.burnKeeper),
 		wasm.NewAppModule(appCodec, &app.wasmKeeper, app.StakingKeeper),
 		datadeal.NewAppModule(appCodec, app.dataDealKeeper),
-		datapool.NewAppModule(appCodec, app.dataPoolKeeper),
 		oracle.NewAppModule(appCodec, app.oracleKeeper),
 	)
 
@@ -568,7 +545,6 @@ func New(
 		stakingtypes.ModuleName,
 		ibchost.ModuleName,
 		feegrant.ModuleName,
-		datapooltypes.ModuleName,
 		oracletypes.ModuleName,
 		vestingtypes.ModuleName,
 		govtypes.ModuleName,
@@ -599,7 +575,6 @@ func New(
 		vestingtypes.ModuleName,
 		minttypes.ModuleName,
 		didtypes.ModuleName,
-		datapooltypes.ModuleName,
 		evidencetypes.ModuleName,
 		ibchost.ModuleName,
 		banktypes.ModuleName,
@@ -639,7 +614,6 @@ func New(
 		burntypes.ModuleName,
 		wasm.ModuleName,
 		datadealtypes.ModuleName,
-		datapooltypes.ModuleName,
 		oracletypes.ModuleName,
 		paramstypes.ModuleName,
 		upgradetypes.ModuleName,
@@ -871,7 +845,6 @@ func initParamsKeeper(appCodec codec.Codec, legacyAmino *codec.LegacyAmino, key,
 	paramsKeeper.Subspace(burntypes.ModuleName)
 	paramsKeeper.Subspace(wasm.ModuleName)
 	paramsKeeper.Subspace(datadealtypes.ModuleName)
-	paramsKeeper.Subspace(datapooltypes.ModuleName)
 	paramsKeeper.Subspace(oracletypes.ModuleName)
 
 	return paramsKeeper
@@ -887,7 +860,6 @@ func (app *App) registerUpgradeHandlers() error {
 
 	app.UpgradeKeeper.SetUpgradeHandler("v2.1.0-alpha2", func(ctx sdk.Context, plan upgradetypes.Plan, _ module.VersionMap) (module.VersionMap, error) {
 		datadeal.InitGenesis(ctx, app.dataDealKeeper, *datadealtypes.DefaultGenesis())
-		datapool.InitGenesis(ctx, app.dataPoolKeeper, *datapooltypes.DefaultGenesis())
 		oracle.InitGenesis(ctx, app.oracleKeeper, *oracletypes.DefaultGenesis())
 		return nil, nil
 	})
@@ -899,7 +871,7 @@ func (app *App) registerUpgradeHandlers() error {
 
 	if upgradeInfo.Name == "v2.1.0-alpha2" && !app.UpgradeKeeper.IsSkipHeight(upgradeInfo.Height) {
 		storeUpgrades := storetypes.StoreUpgrades{
-			Added: []string{datadealtypes.ModuleName, datapooltypes.ModuleName, oracletypes.ModuleName},
+			Added: []string{datadealtypes.ModuleName, oracletypes.ModuleName},
 		}
 
 		// configure storetypes loader that checks if version == upgradeHeight and applies storetypes upgrades
@@ -931,7 +903,6 @@ func (app *App) registerUpgradeHandlers() error {
 			"burn":         1,
 			"wasm":         1,
 			"datadeal":     1,
-			"datapool":     1,
 			"oracle":       1,
 		}
 

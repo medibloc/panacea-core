@@ -2,7 +2,7 @@ syntax = "proto3";
 package panacea.did.v2;
 
 option java_multiple_files = true;
-option go_package = "github.com/medibloc/panacea-core/x/did/types";
+option go_package = "github.com/medibloc/panacea-core/v2/x/did/types";
 
 import "gogoproto/gogo.proto";
 import "panacea/did/v2/did.proto";

@@ -1,7 +1,5 @@
 package types
 
-import sdk "github.com/cosmos/cosmos-sdk/types"
-
 const (
 	// ModuleName defines the module name
 	ModuleName = "oracle"
@@ -20,10 +18,5 @@ const (
 )
 
 var (
-	// KeyPrefixOracles defines key to store oracle
-	KeyPrefixOracles = []byte{0x01}
+// KeyPrefixOracles defines key to store oracle
 )
-
-func GetKeyPrefixOracle(oracleAddr sdk.AccAddress) []byte {
-	return append(KeyPrefixOracles, oracleAddr.Bytes()...)
-}

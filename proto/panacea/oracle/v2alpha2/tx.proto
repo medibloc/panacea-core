@@ -1,7 +1,7 @@
 syntax = "proto3";
 package panacea.oracle.v2alpha2;
 
-option go_package = "github.com/medibloc/panacea-core/x/oracle/types";
+option go_package = "github.com/medibloc/panacea-core/v2/x/oracle/types";
 
 import "panacea/oracle/v2alpha2/oracle.proto";
 import "panacea/oracle/v2alpha2/genesis.proto";

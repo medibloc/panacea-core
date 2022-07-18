@@ -15,8 +15,6 @@ type (
 		cdc      codec.Codec
 		storeKey sdk.StoreKey
 		memKey   sdk.StoreKey
-
-		accountKeeper types.AccountKeeper
 	}
 )
 
@@ -24,13 +22,11 @@ func NewKeeper(
 	cdc codec.Codec,
 	storeKey,
 	memKey sdk.StoreKey,
-	accountKeeper types.AccountKeeper,
 ) *Keeper {
 	return &Keeper{
-		cdc:           cdc,
-		storeKey:      storeKey,
-		memKey:        memKey,
-		accountKeeper: accountKeeper,
+		cdc:      cdc,
+		storeKey: storeKey,
+		memKey:   memKey,
 	}
 }
 

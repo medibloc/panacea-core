@@ -2,16 +2,9 @@ package types
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 var _ sdk.Msg = &MsgRegisterOracle{}
-
-func NewMsgRegisterOracle(oracle *Oracle) *MsgRegisterOracle {
-	return &MsgRegisterOracle{
-		OracleDetail: oracle,
-	}
-}
 
 func (msg *MsgRegisterOracle) Route() string {
 	return RouterKey
@@ -22,68 +15,35 @@ func (msg *MsgRegisterOracle) Type() string {
 }
 
 func (msg *MsgRegisterOracle) ValidateBasic() error {
-	_, err := sdk.AccAddressFromBech32(msg.OracleDetail.Address)
-	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid oracle address (%s)", err)
-	}
-
-	if msg.OracleDetail.Endpoint == "" {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "empty oracle endpoint URL")
-	}
-	return nil
+	panic("implemenets me")
 }
 
 func (msg *MsgRegisterOracle) GetSignBytes() []byte {
-	bz := ModuleCdc.MustMarshalJSON(msg)
-	return sdk.MustSortJSON(bz)
+	panic("implemenets me")
 }
 
 func (msg *MsgRegisterOracle) GetSigners() []sdk.AccAddress {
-	oracle, err := sdk.AccAddressFromBech32(msg.OracleDetail.Address)
-	if err != nil {
-		panic(err)
-	}
-	return []sdk.AccAddress{oracle}
+	panic("implemenets me")
 }
 
-var _ sdk.Msg = &MsgUpdateOracle{}
+var _ sdk.Msg = &MsgVoteOracleRegistration{}
 
-func NewMsgUpdateOracle(address, endpoint string) *MsgUpdateOracle {
-	return &MsgUpdateOracle{
-		Oracle:   address,
-		Endpoint: endpoint,
-	}
-}
-
-func (msg *MsgUpdateOracle) Route() string {
+func (msg *MsgVoteOracleRegistration) Route() string {
 	return RouterKey
 }
 
-func (msg *MsgUpdateOracle) Type() string {
-	return "UpdateOracle"
+func (msg *MsgVoteOracleRegistration) Type() string {
+	return "VoteOracleRegistration"
 }
 
-func (msg *MsgUpdateOracle) ValidateBasic() error {
-	_, err := sdk.AccAddressFromBech32(msg.Oracle)
-	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid oracle address (%s)", err)
-	}
-
-	if msg.Endpoint == "" {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "empty oracle endpoint URL")
-	}
-	return nil
+func (msg *MsgVoteOracleRegistration) ValidateBasic() error {
+	panic("implemenets me")
 }
 
-func (msg *MsgUpdateOracle) GetSignBytes() []byte {
-	bz := ModuleCdc.MustMarshalJSON(msg)
-	return sdk.MustSortJSON(bz)
+func (msg *MsgVoteOracleRegistration) GetSignBytes() []byte {
+	panic("implemenets me")
 }
 
-func (msg *MsgUpdateOracle) GetSigners() []sdk.AccAddress {
-	oracle, err := sdk.AccAddressFromBech32(msg.Oracle)
-	if err != nil {
-		panic(err)
-	}
-	return []sdk.AccAddress{oracle}
+func (msg *MsgVoteOracleRegistration) GetSigners() []sdk.AccAddress {
+	panic("implemenets me")
 }
