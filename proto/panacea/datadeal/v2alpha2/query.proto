@@ -48,6 +48,7 @@ message QueryDealsResponse {
 // QueryDataSaleRequest defines the request type for the Query/DataSale RPC method.
 message QueryDataSaleRequest {
   uint64 deal_id = 1;
+  bytes seller_cid = 2;
 }
 
 // QueryDataSaleResponse defines the response type for the Query/DataSale RPC method.
