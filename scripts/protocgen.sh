@@ -17,7 +17,7 @@ protoc_gen_gocosmos() {
 
 protoc_gen_gocosmos
 
-proto_dirs=$(find ./proto -path -prune -o -name '*.proto' -print0 | xargs -0 -n1 dirname | sort | uniq)
+proto_dirs=$(find ./proto -path -prune -o -name '*.proto' -not -path '*/v2alpha2/*' -print0 | xargs -0 -n1 dirname | sort | uniq)
 for dir in $proto_dirs; do
   buf protoc \
   -I "proto" \
