@@ -11,6 +11,7 @@ import "panacea/datadeal/v2alpha2/tx.proto";
 message GenesisState {
 }
 
+// Params defines the datatdeal module's params.
 message Params {
   string oracle_commission = 1 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int", (gogoproto.nullable) = false];
 }

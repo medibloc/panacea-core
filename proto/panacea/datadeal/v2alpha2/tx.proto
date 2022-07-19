@@ -52,8 +52,16 @@ message MsgSellDataResponse {
 
 // VoteOption enumerates the vote option.
 enum VoteOption {
-  VOTE_VALID = 0;
-  VOTE_INVALID = 1;
+  option (gogoproto.goproto_enum_prefix) = false;
+
+  // VOTE_OPTION_UNSPECIFIED
+  VOTE_OPTION_UNSPECIFIED = 0;
+
+  // VOTE_OPTION_VALID
+  VOTE_OPTION_VALID = 1;
+
+  // VOTE_OPTION_INVALID
+  VOTE_OPTION_INVALID = 2;
 }
 
 // MsgVoteDataVerification defines the Msg/VoteDataVerification request type.
