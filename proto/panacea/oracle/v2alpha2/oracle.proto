@@ -1,7 +1,7 @@
 syntax = "proto3";
 package panacea.oracle.v2alpha2;
 
-option go_package = "github.com/medibloc/panacea-core/x/oracle/types2";
+option go_package = "github.com/medibloc/panacea-core/x/oracle/types";
 
 import "gogoproto/gogo.proto";
 import "google/protobuf/timestamp.proto";
@@ -27,6 +27,8 @@ message Oracle {
   OracleStatus status = 2;
   uint64 up_time = 3;
   google.protobuf.Timestamp jailed_at = 4 [
-    (gogoproto.stdtime) = true, (gogoproto.stdduration) = true, (gogoproto.nullable) = true, (gogoproto.moretags) = "yaml:\"jailed_at\""
+    (gogoproto.stdtime) = true,
+    (gogoproto.nullable) = true,
+    (gogoproto.moretags) = "yaml:\"jailed_at\""
   ];
 }
