@@ -1,12 +1,13 @@
 syntax = "proto3";
 package panacea.oracle.v2alpha2;
 
-option go_package = "github.com/medibloc/panacea-core/x/oracle/types";
+option go_package = "github.com/medibloc/panacea-core/x/oracle/types2";
 
 import "panacea/oracle/v2alpha2/oracle.proto";
 import "panacea/oracle/v2alpha2/genesis.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";
 import "google/api/annotations.proto";
+import "gogoproto/gogo.proto";
 
 // Query defines the gRPC querier service.
 service Query {
@@ -22,11 +23,11 @@ service Query {
 
   // OracleRegistration returns a OracleRegistration details.
   rpc OracleRegistration(QueryOracleRegistrationRequest) returns (QueryOracleRegistrationResponse) {
-    option (google.api.http).get = "panacea/oracle/v2alpha2/oracle_registrations/unique_id/{unique_id}/addresses/{address}";
+    option (google.api.http).get = "/panacea/oracle/v2alpha2/oracle_registrations/unique_id/{unique_id}/addresses/{address}";
   }
 
   // Params returns params of oracle module.
-  rpc Params(QueryOracleParamsRequest) returns (QueryOracleParamsResponse) {
+  rpc Params(QueryOracleParamsRequest) returns (QueryParamsResponse) {
     option (google.api.http).get = "/panacea/oracle/v2alpha2/params";
   }
 }
@@ -65,19 +66,24 @@ message QueryOracleRegistrationResponse {
 // QueryOracleParamsRequest is the request type for the Query/OracleParams RPC method.
 message QueryOracleParamsRequest {}
 
-// QueryOracleParamsResponse is the response type for the Query/OracleParams RPC method.
-message QueryOracleParamsResponse {
+// QueryParamsResponse is the response type for the Query/OracleParams RPC method.
+message QueryParamsResponse {
   Params params = 1;
 }
 
 // OracleRegistrationStatus enumerates the status of OracleRegistration.
 enum OracleRegistrationStatus {
+  option (gogoproto.goproto_enum_prefix) = false;
+
+  // ORACLE_REGISTRATION_STATUS_UNSPECIFIED
+  ORACLE_REGISTRATION_STATUS_UNSPECIFIED = 0;
+
   // VOTING_PERIOD defines the status of OracleRegistration in voting period.
-  VOTING_PERIOD = 0;
+  ORACLE_REGISTRATION_STATUS_VOTING_PERIOD = 1;
   // PASSED defines the status of OracleRegistration passed.
-  PASSED = 1;
+  ORACLE_REGISTRATION_STATUS_PASSED = 2;
   // PASSED defines the status of OracleRegistration rejected.
-  REJECTED = 2;
+  ORACLE_REGISTRATION_STATUS_REJECTED = 3;
 }
 
 // OracleRegistration defines the detailed states of the registration of oracle.
