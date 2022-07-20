@@ -5,6 +5,7 @@ option go_package = "github.com/medibloc/panacea-core/x/oracle/types";
 
 import "gogoproto/gogo.proto";
 import "google/protobuf/timestamp.proto";
+import "panacea/oracle/v2alpha2/genesis.proto";
 
 // OracleStatus enumerates the status of oracle.
 enum OracleStatus {
@@ -31,4 +32,40 @@ message Oracle {
     (gogoproto.nullable) = true,
     (gogoproto.moretags) = "yaml:\"jailed_at\""
   ];
+}
+
+// OracleRegistrationStatus enumerates the status of OracleRegistration.
+enum OracleRegistrationStatus {
+  option (gogoproto.goproto_enum_prefix) = false;
+
+  // ORACLE_REGISTRATION_STATUS_UNSPECIFIED
+  ORACLE_REGISTRATION_STATUS_UNSPECIFIED = 0;
+
+  // VOTING_PERIOD defines the status of OracleRegistration in voting period.
+  ORACLE_REGISTRATION_STATUS_VOTING_PERIOD = 1;
+  // PASSED defines the status of OracleRegistration passed.
+  ORACLE_REGISTRATION_STATUS_PASSED = 2;
+  // PASSED defines the status of OracleRegistration rejected.
+  ORACLE_REGISTRATION_STATUS_REJECTED = 3;
+}
+
+// OracleRegistration defines the detailed states of the registration of oracle.
+message OracleRegistration {
+  string unique_id = 1;
+  string address = 2;
+  // Node public key is a pair of node private key which is generated in SGX by each oracle.
+  // This key is used to share the oracle private key from other oracles.
+  bytes node_pub_key = 3;
+  // Anyone can validate that the node key pair is generated in SGX using this node key remote report.
+  bytes node_pub_key_remote_report = 4;
+  // The trusted block info is required for light client.
+  // Other oracle can validate whether the oracle set correct trusted block info.
+  int64 trusted_block_height = 5;
+  bytes trusted_block_hash = 6;
+  // Encrypted oracle private key by node public key, which can only be decrypted in SGX securely.
+  bytes encrypted_oracle_priv_key = 7;
+  // The status of OracleRegistration.
+  OracleRegistrationStatus status = 8;
+  VotingPeriod voting_period = 9;
+  TallyResult tally_result = 10;
 }
