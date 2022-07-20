@@ -21,7 +21,7 @@ service Query {
   }
   // DataSale returns a DataSale.
   rpc DataSale(QueryDataSaleRequest) returns (QueryDataSaleResponse) {
-    option (google.api.http).get = "/panacea/datadeal/v2alpha1/datasales/{deal_id}/{seller_cid}";
+    option (google.api.http).get = "/panacea/datadeal/v2alpha2/datasales/{deal_id}/{seller_cid}";
   }
 }
 

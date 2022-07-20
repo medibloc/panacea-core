@@ -14,7 +14,7 @@ message Deal {
   cosmos.base.v1beta1.Coin budget = 4;
   uint64 max_num_data = 5;
   uint64 cur_num_data = 6;
-  string owner_address = 7;
+  string buyer_address = 7;
   DealStatus status = 8;
 }
 
@@ -22,7 +22,7 @@ message Deal {
 enum DealStatus {
   option (gogoproto.goproto_enum_prefix) = false;
 
-  // DEAL_STATUS_UNSPECIFIED
+  // DEAL_STATUS_UNSPECIFIED 
   DEAL_STATUS_UNSPECIFIED = 0;
 
   // DEAL_STATUS_ACTIVE defines the deal status that is active.
