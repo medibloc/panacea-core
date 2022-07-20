@@ -18,7 +18,12 @@ service Msg {
 
 // MsgRegisterOracle defines the Msg/RegisterOracle request type.
 message MsgRegisterOracle {
-  OracleRegistrationInfo oracle_registration_info = 1;
+  string unique_id = 1;
+  string oracle_address = 2;
+  bytes node_pub_key = 3;
+  bytes node_pub_key_remote_report = 4;
+  int64 trusted_block_height = 5;
+  bytes trusted_block_hash = 6;
 }
 
 // MsgRegisterOracleResponse defines the Msg/RegisterOracle response type.
@@ -32,16 +37,6 @@ message MsgVoteOracleRegistration {
 
 // MsgVoteOracleRegistrationResponse defines the Msg/VoteOracleRegistration response type.
 message MsgVoteOracleRegistrationResponse {}
-
-// OracleRegistrationInfo defines the required info for oracle registration.
-message OracleRegistrationInfo {
-  string unique_id = 1;
-  string oracle_address = 2;
-  bytes node_pub_key = 3;
-  bytes node_pub_key_remote_report = 4;
-  int64 trusted_block_height = 5;
-  bytes trusted_block_hash = 6;
-}
 
 // SignedOracleRegistrationVote defines the vote of OracleRegistration and signature signed by oracle private key.
 message SignedOracleRegistrationVote {
