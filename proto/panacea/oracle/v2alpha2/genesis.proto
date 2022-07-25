@@ -15,7 +15,7 @@ message GenesisState {
 message TallyResult {
   string yes = 1 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int", (gogoproto.nullable) = false];
   string no = 2 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int", (gogoproto.nullable) = false];
-  // Votes yes, but the value is different with the consensus value
+  // The vote is yes, but its value is different with the consensus value 
   string invalid_yes = 3 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int", (gogoproto.nullable) = false];
   // The consensus value between oracles
   bytes consensus_value = 4;
