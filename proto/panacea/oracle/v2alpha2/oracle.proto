@@ -53,7 +53,7 @@ enum OracleRegistrationStatus {
 message OracleRegistration {
   string unique_id = 1;
   string address = 2;
-  // Node public key is a pair of node private key which is generated in SGX by each oracle.
+  // Node public key is a pair with a node private key which is generated in SGX by each oracle.
   // This key is used to share the oracle private key from other oracles.
   bytes node_pub_key = 3;
   // Anyone can validate that the node key pair is generated in SGX using this node key remote report.
