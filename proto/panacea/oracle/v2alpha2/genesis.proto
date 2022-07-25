@@ -15,7 +15,7 @@ message GenesisState {
 message TallyResult {
   string yes = 1 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int", (gogoproto.nullable) = false];
   string no = 2 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int", (gogoproto.nullable) = false];
-  // Votes yes, but the value is different with the consensus value
+  // The vote is yes, but its value is different with the consensus value 
   string invalid_yes = 3 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int", (gogoproto.nullable) = false];
   // The consensus value between oracles
   bytes consensus_value = 4;
@@ -23,7 +23,7 @@ message TallyResult {
 
 // Params defines the oracle module's params.
 message Params {
-  // Oracle public key is a pair of oracle private key which is generated in SGX by the first oracle.
+  // Oracle public key is a pair with an oracle private key which is generated in SGX by the first oracle.
   // This key is used to encrypt data, which enables to decrypt and verify the data securely only in SGX
   bytes oracle_public_key = 1;
   // Anyone can validate that the oracle key pair is generated in SGX using this oracle key remote report.
@@ -55,10 +55,10 @@ message VoteParams {
     (gogoproto.stdduration) = true,
     (gogoproto.moretags) = "yaml:\"voting_period\""
   ];
-  google.protobuf.Duration jailed_period = 2 [
+  google.protobuf.Duration jail_period = 2 [
     (gogoproto.nullable) = false,
     (gogoproto.stdduration) = true,
-    (gogoproto.moretags) = "yaml:\"jailed_period\""
+    (gogoproto.moretags) = "yaml:\"jail_period\""
   ];
   string quorum = 3 [
     (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
@@ -68,7 +68,7 @@ message VoteParams {
 
 // SlashParams defines the params related to slashing of oracle.
 message SlashParams {
-  string slash_fraction_down_time = 1 [
+  string slash_fraction_downtime = 1 [
     (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
     (gogoproto.nullable) = false
   ];

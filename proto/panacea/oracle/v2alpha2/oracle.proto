@@ -18,15 +18,15 @@ enum OracleStatus {
   ORACLE_STATUS_ACTIVE = 1;
   // JAILED defines the oracle status that has been jailed
   ORACLE_STATUS_JAILED = 2;
-  // MIGRATING defines the oracle status that is in migrating to new version of oracle
-  ORACLE_STATUS_MIGRATING = 3;
+  // UPGRADING defines the oracle status that is being upgraded to new version of oracle
+  ORACLE_STATUS_UPGRADING = 3;
 }
 
 // Oracle defines a detail of oracle.
 message Oracle {
   string address = 1;
   OracleStatus status = 2;
-  uint64 up_time = 3;
+  uint64 uptime = 3; // in block
   google.protobuf.Timestamp jailed_at = 4 [
     (gogoproto.stdtime) = true,
     (gogoproto.nullable) = true,
@@ -53,7 +53,7 @@ enum OracleRegistrationStatus {
 message OracleRegistration {
   string unique_id = 1;
   string address = 2;
-  // Node public key is a pair of node private key which is generated in SGX by each oracle.
+  // Node public key is a pair with a node private key which is generated in SGX by each oracle.
   // This key is used to share the oracle private key from other oracles.
   bytes node_pub_key = 3;
   // Anyone can validate that the node key pair is generated in SGX using this node key remote report.

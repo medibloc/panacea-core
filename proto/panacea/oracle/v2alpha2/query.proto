@@ -40,6 +40,7 @@ message QueryOraclesRequest {
 // QueryOracleResponse is the response type for the Query/Oracles RPC method.
 message QueryOraclesResponse {
   repeated Oracle oracles = 1;
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 
 // QueryOracleRequest is the request type for the Query/Oracle RPC method.
