@@ -8,8 +8,8 @@ import "cosmos/base/v1beta1/coin.proto";
 
 // Deal defines a deal.
 message Deal {
-  uint64 deal_id = 1;
-  string deal_address = 2;
+  uint64 id = 1;
+  string address = 2;
   repeated string data_schema = 3;
   cosmos.base.v1beta1.Coin budget = 4;
   uint64 max_num_data = 5;

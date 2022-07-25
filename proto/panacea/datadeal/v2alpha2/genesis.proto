@@ -11,5 +11,5 @@ message GenesisState {
 
 // Params defines the datatdeal module's params.
 message Params {
-  string oracle_commission = 1 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int", (gogoproto.nullable) = false];
+  string oracle_commission = 1 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false];
 }

@@ -7,6 +7,7 @@ option go_package = "github.com/medibloc/panacea-core/x/datadeal/types";
 
 import "gogoproto/gogo.proto";
 import "cosmos/base/v1beta1/coin.proto";
+import "panacea/oracle/v2alpha2/tx.proto";
 
 // Msg defines the Msg service.
 service Msg {
@@ -50,20 +51,6 @@ message MsgSellData {
 message MsgSellDataResponse {
 }
 
-// VoteOption enumerates the vote option.
-enum VoteOption {
-  option (gogoproto.goproto_enum_prefix) = false;
-
-  // VOTE_OPTION_UNSPECIFIED
-  VOTE_OPTION_UNSPECIFIED = 0;
-
-  // VOTE_OPTION_VALID
-  VOTE_OPTION_VALID = 1;
-
-  // VOTE_OPTION_INVALID
-  VOTE_OPTION_INVALID = 2;
-}
-
 // MsgVoteDataVerification defines the Msg/VoteDataVerification request type.
 message MsgVoteDataVerification {
   SignedDataVerificationVote signed_data_verification_vote = 1;
@@ -85,7 +72,7 @@ message DataVerificationVote {
   string seller_address = 2;
   uint64 deal_id = 3;
   bytes seller_cid = 4;
-  VoteOption valid = 5;
+  panacea.oracle.v2alpha2.VoteOption valid = 5;
 }
 
 // MsgVoteDataDelivery defines the Msg/VoteDataDelivery request type.
@@ -109,7 +96,7 @@ message DataDeliveryVote {
   uint64 deal_id = 2;
   bytes seller_cid = 3;
   bytes buyer_cid = 4;
-  VoteOption valid = 5;
+  panacea.oracle.v2alpha2.VoteOption valid = 5;
 }
 
 // MsgDeactivateDeal defines the Msg/DeactivateDeal request type.
