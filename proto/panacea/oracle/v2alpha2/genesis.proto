@@ -23,7 +23,7 @@ message TallyResult {
 
 // Params defines the oracle module's params.
 message Params {
-  // Oracle public key is a pair of oracle private key which is generated in SGX by the first oracle.
+  // Oracle public key is a pair with an oracle private key which is generated in SGX by the first oracle.
   // This key is used to encrypt data, which enables to decrypt and verify the data securely only in SGX
   bytes oracle_public_key = 1;
   // Anyone can validate that the oracle key pair is generated in SGX using this oracle key remote report.
