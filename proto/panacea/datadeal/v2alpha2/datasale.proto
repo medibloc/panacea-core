@@ -1,0 +1,39 @@
+syntax = "proto3";
+package panacea.datadeal.v2alpha2;
+
+option go_package = "github.com/medibloc/panacea-core/x/datadeal/types";
+
+import "panacea/oracle/v2alpha2/genesis.proto";
+import "gogoproto/gogo.proto";
+
+// DataSale defines a data sale.
+message DataSale {
+  string seller_address = 1;
+  uint64 deal_id = 2;
+  bytes verifiable_cid = 3;
+  bytes delivered_cid = 4;
+  DataSaleStatus status = 5;
+  panacea.oracle.v2alpha2.VotingPeriod voting_period = 6;
+  panacea.oracle.v2alpha2.TallyResult verification_tally_result = 7;
+  panacea.oracle.v2alpha2.TallyResult delivery_tally_result = 8;
+}
+
+// DataSaleStatus enumerates the status of data sale.
+enum DataSaleStatus {
+  option (gogoproto.goproto_enum_prefix) = false;
+
+  // DATA_SALE_STATUS_UNSPECIFIED
+  DATA_SALE_STATUS_UNSPECIFIED = 0;
+
+  // DATA_SALE_STATUS_VERIFICATION_VOTING_PERIOD defines that the status of DataSale is verifying in voting period.
+  DATA_SALE_STATUS_VERIFICATION_VOTING_PERIOD = 1;
+
+  // DATA_SALE_STATUS_DELIVERY_VOTING_PERIOD defines that the status of DataSale is delivering in voting period.
+  DATA_SALE_STATUS_DELIVERY_VOTING_PERIOD = 2;
+
+  // // DATA_SALE_STATUS_COMPLETED defines that the status of DataSale is completed.
+  DATA_SALE_STATUS_COMPLETED = 3;
+
+  // DATA_SALE_STATUS_FAILED defines that the status of DataSale is failed.
+  DATA_SALE_STATUS_FAILED = 4;
+}

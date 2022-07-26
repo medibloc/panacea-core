@@ -1,0 +1,58 @@
+syntax = "proto3";
+package panacea.datadeal.v2alpha2;
+
+import "google/api/annotations.proto";
+import "cosmos/base/query/v1beta1/pagination.proto";
+
+import "panacea/datadeal/v2alpha2/deal.proto";
+import "panacea/datadeal/v2alpha2/datasale.proto";
+
+option go_package = "github.com/medibloc/panacea-core/x/datadeal/types";
+
+// Query defines the gRPC querier service.
+service Query {
+  // Deal returns a Deal.
+  rpc Deal(QueryDealRequest) returns (QueryDealResponse) {
+    option (google.api.http).get = "/panacea/datadeal/v2alpha2/deals/{deal_id}";
+  }
+  // Deals return a list of Deal.
+  rpc Deals(QueryDealsRequest) returns (QueryDealsResponse) {
+    option (google.api.http).get = "/panacea/datadeal/v2alpha2/deals";
+  }
+  // DataSale returns a DataSale.
+  rpc DataSale(QueryDataSaleRequest) returns (QueryDataSaleResponse) {
+    option (google.api.http).get = "/panacea/datadeal/v2alpha2/datasales/{deal_id}/{verifiable_cid}";
+  }
+}
+
+// QueryDealRequest defines the request type for the Query/Deal RPC method.
+message QueryDealRequest {
+  uint64 deal_id = 1;
+}
+
+// QueryDealResponse defines the response type for the Query/Deal RPC method.
+message QueryDealResponse {
+  Deal deal = 1;
+}
+
+// QueryDealsRequest defines the request type for the Query/Deals RPC method.
+message QueryDealsRequest {
+  cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+// QueryDealsResponse defines the response type for the Query/Deals RPC method.
+message QueryDealsResponse {
+  repeated Deal deal = 1;
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+// QueryDataSaleRequest defines the request type for the Query/DataSale RPC method.
+message QueryDataSaleRequest {
+  uint64 deal_id = 1;
+  bytes verifiable_cid = 2;
+}
+
+// QueryDataSaleResponse defines the response type for the Query/DataSale RPC method.
+message QueryDataSaleResponse {
+  DataSale data_sale = 1;
+}
