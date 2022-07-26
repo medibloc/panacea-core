@@ -1,0 +1,111 @@
+syntax = "proto3";
+package panacea.datadeal.v2alpha2;
+
+// this line is used by starport scaffolding # proto/tx/import
+
+option go_package = "github.com/medibloc/panacea-core/x/datadeal/types";
+
+import "gogoproto/gogo.proto";
+import "cosmos/base/v1beta1/coin.proto";
+import "panacea/oracle/v2alpha2/tx.proto";
+
+// Msg defines the Msg service.
+service Msg {
+  // CreateDeal defines a method for creating a deal.
+  rpc CreateDeal(MsgCreateDeal) returns (MsgCreateDealResponse);
+
+  // SellData defines a method for selling a data.
+  rpc SellData(MsgSellData) returns (MsgSellDataResponse);
+
+  // VoteDataVerification defines a method for voting data verification.
+  rpc VoteDataVerification(MsgVoteDataVerification) returns (MsgVoteDataVerificationResponse);
+
+  // VoteDataDelivery defines a method for voting data delivery.
+  rpc VoteDataDelivery(MsgVoteDataDelivery) returns (MsgVoteDataDeliveryResponse);
+
+  // DeactivateDeal defines a method for deactivating the deal.
+  rpc DeactivateDeal(MsgDeactivateDeal) returns (MsgDeactivateDealResponse);
+}
+
+// MsgCreateDeal defines the Msg/CreateDeal request type.
+message MsgCreateDeal {
+  repeated string data_schema = 1;
+  cosmos.base.v1beta1.Coin budget = 2;
+  uint64 max_num_data = 3;
+  string buyer_address = 4;
+}
+
+// MsgCreateDealResponse defines the Msg/CreateDeal response type.
+message MsgCreateDealResponse {
+  uint64 deal_id = 1;
+}
+
+// MsgSellData defines the Msg/SellData request type.
+message MsgSellData {
+  uint64 deal_id = 1;
+  string verifiable_cid = 2;
+  string seller_address = 3;
+}
+
+// MsgSellDataResponse defines the Msg/SellData response type.
+message MsgSellDataResponse {
+}
+
+// MsgVoteDataVerification defines the Msg/VoteDataVerification request type.
+message MsgVoteDataVerification {
+  SignedDataVerificationVote signed_data_verification_vote = 1;
+}
+
+// MsgVoteDataVerificationResponse defines the Msg/VoteDataVerification response type.
+message MsgVoteDataVerificationResponse {
+}
+
+// SignedDataVerificationVote defines the DataVerificationVote with signature.
+message SignedDataVerificationVote {
+  DataVerificationVote data_verification_vote = 1;
+  bytes signature = 2;
+}
+
+// DataVerificationVote defines the vote info for verifying data.
+message DataVerificationVote {
+  string voter_address = 1;
+  string seller_address = 2;
+  uint64 deal_id = 3;
+  bytes verifiable_cid = 4;
+  panacea.oracle.v2alpha2.VoteOption valid = 5;
+}
+
+// MsgVoteDataDelivery defines the Msg/VoteDataDelivery request type.
+message MsgVoteDataDelivery {
+  SignedDataDeliveryVote signed_data_delivery_vote = 1;
+}
+
+// MsgVoteDataDeliveryResponse defines the Msg/VoteDataDelivery response type.
+message MsgVoteDataDeliveryResponse {
+}
+
+// SignedDataDeliveryVote defines the DataDeliveryVote with signature.
+message SignedDataDeliveryVote {
+  DataDeliveryVote data_delivery_vote = 1;
+  bytes signature = 2;
+}
+
+// DataDeliveryVote defines the vote info for delivering data.
+message DataDeliveryVote {
+  string voter_address = 1;
+  uint64 deal_id = 2;
+  bytes verifiable_cid = 3;
+  bytes delivered_cid = 4;
+  panacea.oracle.v2alpha2.VoteOption valid = 5;
+}
+
+// MsgDeactivateDeal defines the Msg/DeactivateDeal request type.
+message MsgDeactivateDeal {
+  uint64 deal_id = 1;
+  string requester_address = 2;
+}
+
+// MsgDeactivateDealResponse defines the Msg/DeactivateDeal response type.
+message MsgDeactivateDealResponse {
+
+}
