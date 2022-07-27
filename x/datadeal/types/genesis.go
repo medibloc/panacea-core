@@ -12,5 +12,6 @@ func DefaultGenesis() *GenesisState {
 // failure.
 func (gs GenesisState) Validate() error {
 	//panic("implements me")
+
 	return nil
 }
