@@ -21,6 +21,5 @@ func (suite *paramsTestSuite) TestSetAndGetParams() {
 	suite.OracleKeeper.SetParams(suite.Ctx, params)
 
 	getParams := suite.OracleKeeper.GetParams(suite.Ctx)
-
 	suite.Require().Equal(params, getParams)
 }
