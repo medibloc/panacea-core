@@ -7,7 +7,7 @@ option go_package = "github.com/medibloc/panacea-core/v2/x/datadeal/types";
 
 import "gogoproto/gogo.proto";
 import "cosmos/base/v1beta1/coin.proto";
-import "panacea/oracle/v2alpha2/tx.proto";
+import "panacea/oracle/v2alpha2/oracle.proto";
 
 // Msg defines the Msg service.
 service Msg {
