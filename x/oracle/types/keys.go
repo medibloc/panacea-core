@@ -23,26 +23,26 @@ const (
 )
 
 var (
-	// KeyPrefixOracle defines key to store oracle
-	KeyPrefixOracle                 = []byte{0x01}
-	KeyPrefixOracleRegistration     = []byte{0x02}
-	KeyPrefixOracleRegistrationVote = []byte{0x03}
+	// OraclesKey defines key to store oracle
+	OraclesKey                 = []byte{0x01}
+	OracleRegistrationsKey     = []byte{0x02}
+	OracleRegistrationVotesKey = []byte{0x03}
 
-	KeyIndexSeparator = []byte{0xFF}
+	IndexSeparator = []byte{0xFF}
 )
 
-func GetKeyPrefixOracle(address string) []byte {
-	return append(KeyPrefixOracle, []byte(address)...)
+func GetOracleKey(address string) []byte {
+	return append(OraclesKey, []byte(address)...)
 }
 
-func GetKeyPrefixOracleRegistration(address sdk.AccAddress) []byte {
-	return append(KeyPrefixOracleRegistration, address...)
+func GetOracleRegistrationKey(address sdk.AccAddress) []byte {
+	return append(OracleRegistrationsKey, address...)
 }
 
-func GetKeyPrefixOracleRegistrationVote(uniqueID string, votingTargetAddress, voterAddress sdk.AccAddress) []byte {
-	return append(KeyPrefixOracleRegistrationVote, CombineKeys([]byte(uniqueID), votingTargetAddress, voterAddress)...)
+func GetOracleRegistrationVoteKey(uniqueID string, votingTargetAddress, voterAddress sdk.AccAddress) []byte {
+	return append(OracleRegistrationVotesKey, CombineKeys([]byte(uniqueID), votingTargetAddress, voterAddress)...)
 }
 
 func CombineKeys(keys ...[]byte) []byte {
-	return bytes.Join(keys, KeyIndexSeparator)
+	return bytes.Join(keys, IndexSeparator)
 }

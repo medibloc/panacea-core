@@ -14,7 +14,7 @@ func (k Keeper) VoteOracleRegistration(ctx sdk.Context, vote *types.OracleRegist
 		return sdkerrors.Wrap(types.ErrOracleRegistrationVote, err.Error())
 	}
 
-	if k.isMaliciousRequest(ctx, vote, signature) {
+	if k.verifyVoteSignature(ctx, vote, signature) {
 		// TODO implements request slashing
 		return sdkerrors.Wrap(types.ErrDetectionMaliciousBehavior, "")
 	}
@@ -33,8 +33,8 @@ func (k Keeper) VoteOracleRegistration(ctx sdk.Context, vote *types.OracleRegist
 	return nil
 }
 
-// isMaliciousRequest defines to check for malicious requests.
-func (k Keeper) isMaliciousRequest(ctx sdk.Context, vote *types.OracleRegistrationVote, signature []byte) bool {
+// verifyVoteSignature defines to check for malicious requests.
+func (k Keeper) verifyVoteSignature(ctx sdk.Context, vote *types.OracleRegistrationVote, signature []byte) bool {
 	voteBz := k.cdc.MustMarshal(vote)
 	// Verifies that voting requests are signed with oraclePrivKey.
 	ok := secp256k1.PubKey(k.GetParams(ctx).OraclePublicKey).VerifySignature(voteBz, signature)
@@ -72,7 +72,7 @@ func (k Keeper) validateOracleRegistrationVote(ctx sdk.Context, vote *types.Orac
 
 func (k Keeper) GetOracle(ctx sdk.Context, address string) (*types.Oracle, error) {
 	store := ctx.KVStore(k.storeKey)
-	key := types.GetKeyPrefixOracle(address)
+	key := types.GetOracleKey(address)
 	bz := store.Get(key)
 	if bz == nil {
 		return nil, fmt.Errorf(fmt.Sprintf("'%s' is not exist oracle", address))
@@ -90,7 +90,7 @@ func (k Keeper) GetOracle(ctx sdk.Context, address string) (*types.Oracle, error
 
 func (k Keeper) SetOracle(ctx sdk.Context, oracle *types.Oracle) error {
 	store := ctx.KVStore(k.storeKey)
-	key := types.GetKeyPrefixOracle(oracle.Address)
+	key := types.GetOracleKey(oracle.Address)
 	bz, err := k.cdc.MarshalLengthPrefixed(oracle)
 	if err != nil {
 		return err
@@ -107,7 +107,7 @@ func (k Keeper) GetOracleRegistration(ctx sdk.Context, address string) (*types.O
 	if err != nil {
 		return nil, err
 	}
-	key := types.GetKeyPrefixOracleRegistration(accAddr)
+	key := types.GetOracleRegistrationKey(accAddr)
 	bz := store.Get(key)
 	if bz == nil {
 		return nil, fmt.Errorf("is not exist oracleRegistration with the address of '%s'", address)
@@ -129,7 +129,7 @@ func (k Keeper) SetOracleRegistration(ctx sdk.Context, regOracle *types.OracleRe
 	if err != nil {
 		return err
 	}
-	key := types.GetKeyPrefixOracleRegistration(accAddr)
+	key := types.GetOracleRegistrationKey(accAddr)
 	bz, err := k.cdc.MarshalLengthPrefixed(regOracle)
 	if err != nil {
 		return err
@@ -150,7 +150,7 @@ func (k Keeper) GetOracleRegistrationVote(ctx sdk.Context, uniqueId, votingTarge
 	if err != nil {
 		return nil, err
 	}
-	key := types.GetKeyPrefixOracleRegistrationVote(uniqueId, votingTargetAccAddr, voterAccAddr)
+	key := types.GetOracleRegistrationVoteKey(uniqueId, votingTargetAccAddr, voterAccAddr)
 	bz := store.Get(key)
 	if bz == nil {
 		return nil, fmt.Errorf("oracle does not exist. uniqueID: %s, votingTargetAddress: %s, voterAddress: %s", uniqueId, votingTargetAddress, voterAddress)
@@ -175,7 +175,7 @@ func (k Keeper) SetOracleRegistrationVote(ctx sdk.Context, vote *types.OracleReg
 	if err != nil {
 		return err
 	}
-	key := types.GetKeyPrefixOracleRegistrationVote(vote.UniqueId, votingTargetAccAddr, voterAccAddr)
+	key := types.GetOracleRegistrationVoteKey(vote.UniqueId, votingTargetAccAddr, voterAccAddr)
 	bz, err := k.cdc.MarshalLengthPrefixed(vote)
 	if err != nil {
 		return err
