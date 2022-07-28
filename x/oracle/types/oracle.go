@@ -71,6 +71,14 @@ func (m OracleRegistration) ValidateBasic() error {
 		}
 	}
 
+	if m.VotingPeriod == nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "votingPeriod is nil")
+	}
+
+	if m.TallyResult != nil {
+
+	}
+
 	return nil
 }
 
