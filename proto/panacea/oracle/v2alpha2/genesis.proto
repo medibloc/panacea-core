@@ -10,6 +10,11 @@ import "panacea/oracle/v2alpha2/oracle.proto";
 
 // GenesisState defines the oracle module's genesis state.
 message GenesisState {
+  repeated Oracle oracles = 1 [(gogoproto.nullable) = false];
+  repeated OracleRegistration oracle_registrations = 2 [(gogoproto.nullable) = false];
+  repeated OracleRegistrationVote oracle_registration_votes = 3 [(gogoproto.nullable) = false];
+  Params params = 4 [(gogoproto.nullable) = false];
+  UpgradeOracleInfo upgrade_oracle_info = 5 [(gogoproto.nullable) = false];
 }
 
 // Params defines the oracle module's params.

@@ -72,6 +72,28 @@ func (k Keeper) validateOracleRegistrationVote(ctx sdk.Context, signedVote *type
 	return nil
 }
 
+func (k Keeper) GetAllOracles(ctx sdk.Context) ([]types.Oracle, error) {
+	store := ctx.KVStore(k.storeKey)
+	iterator := sdk.KVStorePrefixIterator(store, types.KeyPrefixOracle)
+	defer iterator.Close()
+
+	oracles := make([]types.Oracle, 0)
+
+	for ; iterator.Valid(); iterator.Next() {
+		bz := iterator.Value()
+		var oracle types.Oracle
+
+		err := k.cdc.UnmarshalLengthPrefixed(bz, &oracle)
+		if err != nil {
+			return nil, sdkerrors.Wrapf(types.ErrGetOracle, err.Error())
+		}
+
+		oracles = append(oracles, oracle)
+	}
+
+	return oracles, nil
+}
+
 func (k Keeper) GetOracle(ctx sdk.Context, address string) (*types.Oracle, error) {
 	store := ctx.KVStore(k.storeKey)
 	key := types.GetKeyPrefixOracle(address)
@@ -103,6 +125,28 @@ func (k Keeper) SetOracle(ctx sdk.Context, oracle *types.Oracle) error {
 	return nil
 }
 
+func (k Keeper) GetAllOracleRegistration(ctx sdk.Context) ([]types.OracleRegistration, error) {
+	store := ctx.KVStore(k.storeKey)
+	iterator := sdk.KVStorePrefixIterator(store, types.KeyPrefixOracleRegistration)
+	defer iterator.Close()
+
+	oracleRegistrations := make([]types.OracleRegistration, 0)
+
+	for ; iterator.Valid(); iterator.Next() {
+		bz := iterator.Value()
+		var oracleRegistration types.OracleRegistration
+		err := k.cdc.UnmarshalLengthPrefixed(bz, &oracleRegistration)
+		if err != nil {
+			return nil, sdkerrors.Wrapf(types.ErrGetOracleRegistration, err.Error())
+		}
+
+		oracleRegistrations = append(oracleRegistrations, oracleRegistration)
+	}
+
+	return oracleRegistrations, nil
+
+}
+
 func (k Keeper) GetOracleRegistration(ctx sdk.Context, address string) (*types.OracleRegistration, error) {
 	store := ctx.KVStore(k.storeKey)
 	key := types.GetKeyPrefixOracleRegistration(address)
@@ -132,6 +176,27 @@ func (k Keeper) SetOracleRegistration(ctx sdk.Context, regOracle *types.OracleRe
 	store.Set(key, bz)
 
 	return nil
+}
+
+func (k Keeper) GetAllOracleRegistrationVote(ctx sdk.Context) ([]types.OracleRegistrationVote, error) {
+	store := ctx.KVStore(k.storeKey)
+	iterator := sdk.KVStorePrefixIterator(store, types.KeyPrefixOracleRegistrationVote)
+	defer iterator.Close()
+
+	oracleRegistrationVotes := make([]types.OracleRegistrationVote, 0)
+
+	for ; iterator.Valid(); iterator.Next() {
+		bz := iterator.Value()
+		var oracleRegistrationVote types.OracleRegistrationVote
+		err := k.cdc.UnmarshalLengthPrefixed(bz, &oracleRegistrationVote)
+		if err != nil {
+			return nil, sdkerrors.Wrapf(types.ErrGetOracleRegistration, err.Error())
+		}
+
+		oracleRegistrationVotes = append(oracleRegistrationVotes, oracleRegistrationVote)
+	}
+
+	return oracleRegistrationVotes, nil
 }
 
 func (k Keeper) GetOracleRegistrationVote(ctx sdk.Context, uniqueId, votingTargetAddress, voterAddress string) (*types.OracleRegistrationVote, error) {
