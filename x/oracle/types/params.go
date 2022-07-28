@@ -53,6 +53,12 @@ func (p Params) Validate() error {
 	if err := validateOraclePublicKey(p.OraclePublicKey); err != nil {
 		return err
 	}
+	if err := validateOraclePubKeyRemoteReport(p.OraclePubKeyRemoteReport); err != nil {
+		return err
+	}
+	if err := validateUniqueID(p.UniqueId); err != nil {
+		return err
+	}
 	if err := validateVoteParams(p.VoteParams); err != nil {
 		return err
 	}
