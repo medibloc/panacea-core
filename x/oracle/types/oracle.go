@@ -48,10 +48,17 @@ func (m OracleRegistration) ValidateBasic() error {
 		return sdkerrors.Wrapf(err, "oracle address is invalid. address: %s", m.Address)
 	}
 
+	if m.NodePubKey == nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "nodePubKey is empty")
+	}
 	if m.NodePubKey != nil {
 		if _, err := btcec.ParsePubKey(m.NodePubKey, btcec.S256()); err != nil {
 			return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "nodePubKey is invalid. %s", err.Error())
 		}
+	}
+
+	if m.NodePubKeyRemoteReport == nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "nodePubKeyRemoteReport is empty")
 	}
 
 	if m.TrustedBlockHeight <= 0 {
@@ -60,6 +67,14 @@ func (m OracleRegistration) ValidateBasic() error {
 
 	if m.TrustedBlockHash == nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "trustedBlockHash is nil")
+	}
+
+	if m.VotingPeriod == nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "votingPeriod is nil")
+	}
+
+	if m.TallyResult != nil {
+
 	}
 
 	return nil

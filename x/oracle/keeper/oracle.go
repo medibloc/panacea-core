@@ -190,7 +190,7 @@ func (k Keeper) GetAllOracleRegistrationVote(ctx sdk.Context) ([]types.OracleReg
 		var oracleRegistrationVote types.OracleRegistrationVote
 		err := k.cdc.UnmarshalLengthPrefixed(bz, &oracleRegistrationVote)
 		if err != nil {
-			return nil, sdkerrors.Wrapf(types.ErrGetOracleRegistration, err.Error())
+			return nil, sdkerrors.Wrapf(types.ErrOracleRegistrationVote, err.Error())
 		}
 
 		oracleRegistrationVotes = append(oracleRegistrationVotes, oracleRegistrationVote)
