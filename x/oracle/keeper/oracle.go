@@ -42,7 +42,7 @@ func (k Keeper) isMaliciousRequest(ctx sdk.Context, vote *types.OracleRegistrati
 	return !ok
 }
 
-// validateOracleRegistrationVote defines checking the status of a panacea to ensure that voting is possible.
+// validateOracleRegistrationVote checks the oracle/registration status in the Panacea to ensure that the oracle can be voted to be registered.
 func (k Keeper) validateOracleRegistrationVote(ctx sdk.Context, vote *types.OracleRegistrationVote) error {
 	params := k.GetParams(ctx)
 
