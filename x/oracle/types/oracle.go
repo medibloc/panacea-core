@@ -76,7 +76,21 @@ func (m OracleRegistration) ValidateBasic() error {
 	}
 
 	if m.TallyResult != nil {
+		if m.TallyResult.Yes.IsNegative() {
+			return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "yes in TallyResult must not be negative: %s", m.TallyResult.Yes)
+		}
 
+		if m.TallyResult.No.IsNegative() {
+			return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "no in TallyResult must not be negative: %s", m.TallyResult.Yes)
+		}
+
+		if m.TallyResult.InvalidYes.IsNegative() {
+			return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalidYes in TallyResult must not be negative: %s", m.TallyResult.Yes)
+		}
+
+		if m.TallyResult.ConsensusValue == nil {
+			return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "consensusValue in TallyResult must not be nil: %s", m.TallyResult.Yes)
+		}
 	}
 
 	return nil
