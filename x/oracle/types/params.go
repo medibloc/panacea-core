@@ -119,12 +119,12 @@ func validateSlashParams(i interface{}) error {
 	if !ok {
 		return fmt.Errorf("invalid parameter type: %T", i)
 	}
-	if sdk.NewDec(0).Equal(slashParams.SlashFractionDowntime) {
-		return fmt.Errorf("'slashFactionDowntime' cannot be set to zero")
+	if slashParams.SlashFractionDowntime.IsNegative() {
+		return fmt.Errorf("'slashFactionDowntime' cannot be negative: %s", slashParams.SlashFractionDowntime)
 	}
 
-	if sdk.NewDec(0).Equal(slashParams.SlashFractionForgery) {
-		return fmt.Errorf("'slashFactionForgery' cannot be set to zero")
+	if slashParams.SlashFractionForgery.IsNegative() {
+		return fmt.Errorf("'slashFractionForgery' cannot be negative: %s", slashParams.SlashFractionForgery)
 	}
 
 	return nil
