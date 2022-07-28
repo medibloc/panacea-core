@@ -32,14 +32,9 @@ message MsgRegisterOracleResponse {
 
 // MsgVoteOracleRegistration defines the Msg/VoteOracleRegistration request type.
 message MsgVoteOracleRegistration {
-  SignedOracleRegistrationVote signed_oracle_registration_vote = 1;
+  OracleRegistrationVote oracle_registration_vote = 1;
+  bytes signature = 2;
 }
 
 // MsgVoteOracleRegistrationResponse defines the Msg/VoteOracleRegistration response type.
 message MsgVoteOracleRegistrationResponse {}
-
-// SignedOracleRegistrationVote defines the vote of OracleRegistration and signature signed by oracle private key.
-message SignedOracleRegistrationVote {
-  OracleRegistrationVote oracle_registration_vote = 1;
-  bytes signature = 2;
-}

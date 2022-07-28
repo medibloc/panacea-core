@@ -1,6 +1,9 @@
 package types
 
-import "bytes"
+import (
+	"bytes"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+)
 
 const (
 	// ModuleName defines the module name
@@ -32,12 +35,12 @@ func GetKeyPrefixOracle(address string) []byte {
 	return append(KeyPrefixOracle, []byte(address)...)
 }
 
-func GetKeyPrefixOracleRegistration(address string) []byte {
-	return append(KeyPrefixOracleRegistration, []byte(address)...)
+func GetKeyPrefixOracleRegistration(address sdk.AccAddress) []byte {
+	return append(KeyPrefixOracleRegistration, address...)
 }
 
-func GetKeyPrefixOracleRegistrationVote(uniqueID, votingTargetAddress, voterAddress string) []byte {
-	return append(KeyPrefixOracleRegistrationVote, CombineKeys([]byte(uniqueID), []byte(votingTargetAddress), []byte(voterAddress))...)
+func GetKeyPrefixOracleRegistrationVote(uniqueID string, votingTargetAddress, voterAddress sdk.AccAddress) []byte {
+	return append(KeyPrefixOracleRegistrationVote, CombineKeys([]byte(uniqueID), votingTargetAddress, voterAddress)...)
 }
 
 func CombineKeys(keys ...[]byte) []byte {

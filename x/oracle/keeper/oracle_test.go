@@ -124,11 +124,7 @@ func (suite *oracleTestSuite) TestOracleRegistrationVoteSuccess() {
 	signature, err := oraclePrivKeySecp256k1.Sign(voteBz)
 	suite.Require().NoError(err)
 
-	signedVote := &types.SignedOracleRegistrationVote{
-		OracleRegistrationVote: oracleRegistrationVote,
-		Signature:              signature,
-	}
-	err = suite.OracleKeeper.VoteOracleRegistration(ctx, signedVote)
+	err = suite.OracleKeeper.VoteOracleRegistration(ctx, oracleRegistrationVote, signature)
 	suite.Require().NoError(err)
 
 	getOracleRegistrationVote, err := suite.OracleKeeper.GetOracleRegistrationVote(ctx, uniqueID, newOracleAcc.String(), genesisOracleAcc.String())
@@ -180,11 +176,7 @@ func (suite *oracleTestSuite) TestOracleRegistrationVoteFailedVerifySignature() 
 	signature, err := oraclePrivKeySecp256k1.Sign(voteBz)
 	suite.Require().NoError(err)
 
-	signedVote := &types.SignedOracleRegistrationVote{
-		OracleRegistrationVote: oracleRegistrationVote,
-		Signature:              signature,
-	}
-	err = suite.OracleKeeper.VoteOracleRegistration(ctx, signedVote)
+	err = suite.OracleKeeper.VoteOracleRegistration(ctx, oracleRegistrationVote, signature)
 	suite.Require().ErrorIs(err, types.ErrDetectionMaliciousBehavior)
 }
 
@@ -231,12 +223,7 @@ func (suite *oracleTestSuite) TestOracleRegistrationVoteInvalidUniqueID() {
 	signature, err := oraclePrivKeySecp256k1.Sign(voteBz)
 	suite.Require().NoError(err)
 
-	signedVote := &types.SignedOracleRegistrationVote{
-		OracleRegistrationVote: oracleRegistrationVote,
-		Signature:              signature,
-	}
-
-	err = suite.OracleKeeper.VoteOracleRegistration(ctx, signedVote)
+	err = suite.OracleKeeper.VoteOracleRegistration(ctx, oracleRegistrationVote, signature)
 	suite.Require().ErrorIs(err, types.ErrOracleRegistrationVote)
 	suite.Require().ErrorContains(err, fmt.Sprintf("is not match the currently active uniqueID. expected %s, got %s", uniqueID, invalidUniqueID))
 }
@@ -283,12 +270,7 @@ func (suite *oracleTestSuite) TestOracleRegistrationVoteInvalidGenesisOracleStat
 	signature, err := oraclePrivKeySecp256k1.Sign(voteBz)
 	suite.Require().NoError(err)
 
-	signedVote := &types.SignedOracleRegistrationVote{
-		OracleRegistrationVote: oracleRegistrationVote,
-		Signature:              signature,
-	}
-
-	err = suite.OracleKeeper.VoteOracleRegistration(ctx, signedVote)
+	err = suite.OracleKeeper.VoteOracleRegistration(ctx, oracleRegistrationVote, signature)
 	suite.Require().ErrorIs(err, types.ErrOracleRegistrationVote)
 	suite.Require().ErrorContains(err, "this oracle is not in 'ACTIVE' state")
 }
@@ -336,12 +318,7 @@ func (suite *oracleTestSuite) TestOracleRegistrationVoteInvalidOracleRegistratio
 	signature, err := oraclePrivKeySecp256k1.Sign(voteBz)
 	suite.Require().NoError(err)
 
-	signedVote := &types.SignedOracleRegistrationVote{
-		OracleRegistrationVote: oracleRegistrationVote,
-		Signature:              signature,
-	}
-
-	err = suite.OracleKeeper.VoteOracleRegistration(ctx, signedVote)
+	err = suite.OracleKeeper.VoteOracleRegistration(ctx, oracleRegistrationVote, signature)
 	suite.Require().ErrorIs(err, types.ErrOracleRegistrationVote)
 	suite.Require().ErrorContains(err, "the currently voted oracle's status is not 'VOTING_PERIOD'")
 }
