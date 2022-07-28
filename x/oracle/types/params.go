@@ -127,11 +127,14 @@ func validateSlashParams(i interface{}) error {
 	}
 	if slashParams.SlashFractionDowntime.IsNegative() {
 		return fmt.Errorf("'slashFactionDowntime' cannot be negative: %s", slashParams.SlashFractionDowntime)
+	} else if slashParams.SlashFractionDowntime.GT(sdk.OneDec()) {
+		return fmt.Errorf("'slashFactionDowntime' rate cannot be greater than 100%%: %s", slashParams.SlashFractionDowntime)
 	}
 
 	if slashParams.SlashFractionForgery.IsNegative() {
 		return fmt.Errorf("'slashFractionForgery' cannot be negative: %s", slashParams.SlashFractionForgery)
+	} else if slashParams.SlashFractionForgery.GT(sdk.OneDec()) {
+		return fmt.Errorf("'slashFractionForgery' rate cannot be greater than 100%%: %s", slashParams.SlashFractionForgery)
 	}
-
 	return nil
 }
