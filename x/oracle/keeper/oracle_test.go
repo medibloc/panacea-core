@@ -225,7 +225,7 @@ func (suite *oracleTestSuite) TestOracleRegistrationVoteInvalidUniqueID() {
 
 	err = suite.OracleKeeper.VoteOracleRegistration(ctx, oracleRegistrationVote, signature)
 	suite.Require().ErrorIs(err, types.ErrOracleRegistrationVote)
-	suite.Require().ErrorContains(err, fmt.Sprintf("is not match the currently active uniqueID. expected %s, got %s", uniqueID, invalidUniqueID))
+	suite.Require().ErrorContains(err, fmt.Sprintf("not matched with the currently active uniqueID. expected %s, got %s", uniqueID, invalidUniqueID))
 }
 
 func (suite *oracleTestSuite) TestOracleRegistrationVoteInvalidGenesisOracleStatus() {
