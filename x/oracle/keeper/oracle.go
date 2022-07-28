@@ -15,7 +15,7 @@ func (k Keeper) VoteOracleRegistration(ctx sdk.Context, vote *types.OracleRegist
 	}
 
 	if k.isMaliciousRequest(ctx, vote, signature) {
-		// TODO implements request slashing
+		// TODO implement slashing
 		return sdkerrors.Wrap(types.ErrDetectionMaliciousBehavior, "")
 	}
 
