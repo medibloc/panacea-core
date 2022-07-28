@@ -1,7 +1,6 @@
 package keeper
 
 import (
-	"errors"
 	"fmt"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -50,7 +49,7 @@ func (k Keeper) validateOracleRegistrationVote(ctx sdk.Context, signedVote *type
 	params := k.GetParams(ctx)
 
 	if params.UniqueId != vote.UniqueId {
-		return errors.New(fmt.Sprintf("is not match the currently active uniqueID. expected %s, got %s", params.UniqueId, vote.UniqueId))
+		return fmt.Errorf("is not match the currently active uniqueID. expected %s, got %s", params.UniqueId, vote.UniqueId)
 	}
 
 	oracle, err := k.GetOracle(ctx, vote.VoterAddress)
@@ -58,7 +57,7 @@ func (k Keeper) validateOracleRegistrationVote(ctx sdk.Context, signedVote *type
 		return err
 	}
 	if oracle.Status != types.ORACLE_STATUS_ACTIVE {
-		return errors.New("this oracle is not in 'ACTIVE' state")
+		return fmt.Errorf("this oracle is not in 'ACTIVE' state")
 	}
 
 	oracleRegistration, err := k.GetOracleRegistration(ctx, vote.VotingTargetAddress)
@@ -67,7 +66,7 @@ func (k Keeper) validateOracleRegistrationVote(ctx sdk.Context, signedVote *type
 	}
 
 	if oracleRegistration.Status != types.ORACLE_REGISTRATION_STATUS_VOTING_PERIOD {
-		return errors.New("the currently voted oracle's status is not 'VOTING_PERIOD'")
+		return fmt.Errorf("the currently voted oracle's status is not 'VOTING_PERIOD'")
 	}
 
 	return nil
@@ -78,7 +77,7 @@ func (k Keeper) GetOracle(ctx sdk.Context, address string) (*types.Oracle, error
 	key := types.GetKeyPrefixOracle(address)
 	bz := store.Get(key)
 	if bz == nil {
-		return nil, errors.New(fmt.Sprintf("'%s' is not exist oracle", address))
+		return nil, fmt.Errorf(fmt.Sprintf("'%s' is not exist oracle", address))
 	}
 
 	oracle := &types.Oracle{}
@@ -109,7 +108,7 @@ func (k Keeper) GetOracleRegistration(ctx sdk.Context, address string) (*types.O
 	key := types.GetKeyPrefixOracleRegistration(address)
 	bz := store.Get(key)
 	if bz == nil {
-		return nil, errors.New(fmt.Sprintf("There is no oracleRegistration with the address of '%s'", address))
+		return nil, fmt.Errorf("is not exist oracleRegistration with the address of '%s'", address)
 	}
 
 	oracleRegistration := &types.OracleRegistration{}
@@ -140,7 +139,7 @@ func (k Keeper) GetOracleRegistrationVote(ctx sdk.Context, uniqueId, votingTarge
 	key := types.GetKeyPrefixOracleRegistrationVote(uniqueId, votingTargetAddress, voterAddress)
 	bz := store.Get(key)
 	if bz == nil {
-		return nil, errors.New("")
+		return nil, fmt.Errorf("oracle does not exist. uniqueID: %s, votingTargetAddress: %s, voterAddress: %s", uniqueId, votingTargetAddress, voterAddress)
 	}
 
 	vote := &types.OracleRegistrationVote{}
