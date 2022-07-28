@@ -99,6 +99,7 @@ func (k Keeper) validateOracleRegistrationVote(ctx sdk.Context, vote *types.Orac
 	if err != nil {
 		return err
 	}
+
 	if oracle.Status != types.ORACLE_STATUS_ACTIVE {
 		return fmt.Errorf("this oracle is not in 'ACTIVE' state")
 	}
