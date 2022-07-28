@@ -36,6 +36,5 @@ func (m GenesisState) Validate() error {
 	if err := m.Params.Validate(); err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, err.Error())
 	}
-
 	return nil
 }
