@@ -19,7 +19,7 @@ func (k Keeper) VoteOracleRegistration(ctx sdk.Context, vote *types.OracleRegist
 		return sdkerrors.Wrap(types.ErrDetectionMaliciousBehavior, "")
 	}
 
-	// Validate the status of panacea to ensure that voting is possible.
+	// Check if the oracle can be voted to be registered.
 	if err := k.validateOracleRegistrationVote(ctx, vote); err != nil {
 		return sdkerrors.Wrap(types.ErrOracleRegistrationVote, err.Error())
 	}
