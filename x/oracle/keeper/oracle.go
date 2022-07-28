@@ -47,7 +47,7 @@ func (k Keeper) validateOracleRegistrationVote(ctx sdk.Context, vote *types.Orac
 	params := k.GetParams(ctx)
 
 	if params.UniqueId != vote.UniqueId {
-		return fmt.Errorf("is not match the currently active uniqueID. expected %s, got %s", params.UniqueId, vote.UniqueId)
+		return fmt.Errorf("not matched with the currently active uniqueID. expected %s, got %s", params.UniqueId, vote.UniqueId)
 	}
 
 	oracle, err := k.GetOracle(ctx, vote.VoterAddress)
