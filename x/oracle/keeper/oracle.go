@@ -70,7 +70,7 @@ func (k Keeper) validateOracleRegistrationVote(ctx sdk.Context, vote *types.Orac
 	return nil
 }
 
-func (k Keeper) GetAllOracles(ctx sdk.Context) ([]types.Oracle, error) {
+func (k Keeper) GetAllOracleList(ctx sdk.Context) ([]types.Oracle, error) {
 	store := ctx.KVStore(k.storeKey)
 	iterator := sdk.KVStorePrefixIterator(store, types.OraclesKey)
 	defer iterator.Close()
@@ -131,7 +131,7 @@ func (k Keeper) SetOracle(ctx sdk.Context, oracle *types.Oracle) error {
 	return nil
 }
 
-func (k Keeper) GetAllOracleRegistration(ctx sdk.Context) ([]types.OracleRegistration, error) {
+func (k Keeper) GetAllOracleRegistrationList(ctx sdk.Context) ([]types.OracleRegistration, error) {
 	store := ctx.KVStore(k.storeKey)
 	iterator := sdk.KVStorePrefixIterator(store, types.OracleRegistrationsKey)
 	defer iterator.Close()
@@ -192,7 +192,7 @@ func (k Keeper) SetOracleRegistration(ctx sdk.Context, regOracle *types.OracleRe
 	return nil
 }
 
-func (k Keeper) GetAllOracleRegistrationVote(ctx sdk.Context) ([]types.OracleRegistrationVote, error) {
+func (k Keeper) GetAllOracleRegistrationVoteList(ctx sdk.Context) ([]types.OracleRegistrationVote, error) {
 	store := ctx.KVStore(k.storeKey)
 	iterator := sdk.KVStorePrefixIterator(store, types.OracleRegistrationVotesKey)
 	defer iterator.Close()

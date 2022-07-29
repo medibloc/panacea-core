@@ -37,19 +37,19 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	genesis := types.DefaultGenesis()
 
-	oracles, err := k.GetAllOracles(ctx)
+	oracles, err := k.GetAllOracleList(ctx)
 	if err != nil {
 		panic(err)
 	}
 	genesis.Oracles = oracles
 
-	oracleRegistrations, err := k.GetAllOracleRegistration(ctx)
+	oracleRegistrations, err := k.GetAllOracleRegistrationList(ctx)
 	if err != nil {
 		panic(err)
 	}
 	genesis.OracleRegistrations = oracleRegistrations
 
-	oracleRegistrationVotes, err := k.GetAllOracleRegistrationVote(ctx)
+	oracleRegistrationVotes, err := k.GetAllOracleRegistrationVoteList(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -58,6 +58,6 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	genesis.Params = k.GetParams(ctx)
 
 	// TODO implements SetUpgradeInfo
-	
+
 	return genesis
 }
