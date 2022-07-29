@@ -45,12 +45,12 @@ func (suite *oracleTestSuite) BeforeTest(_, _ string) {
 		OraclePublicKey:          oraclePubKey.SerializeCompressed(),
 		OraclePubKeyRemoteReport: nil,
 		UniqueId:                 uniqueID,
-		VoteParams: &types.VoteParams{
+		VoteParams: types.VoteParams{
 			VotingPeriod: 100,
 			JailPeriod:   60,
 			Quorum:       sdk.NewDecWithPrec(1, 3),
 		},
-		SlashingParams: &types.SlashParams{
+		SlashParams: types.SlashParams{
 			SlashFractionDowntime: sdk.NewDecWithPrec(3, 1),
 			SlashFractionForgery:  sdk.NewDecWithPrec(1, 1),
 		},

@@ -466,6 +466,7 @@ func New(
 		appCodec,
 		keys[oracletypes.StoreKey],
 		keys[oracletypes.MemStoreKey],
+		app.GetSubspace(oracletypes.ModuleName),
 	)
 
 	app.dataDealKeeper = *datadealkeeper.NewKeeper(
