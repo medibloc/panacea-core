@@ -31,8 +31,8 @@ var (
 	IndexSeparator = []byte{0xFF}
 )
 
-func GetOracleKey(address string) []byte {
-	return append(OraclesKey, []byte(address)...)
+func GetOracleKey(address sdk.AccAddress) []byte {
+	return append(OraclesKey, address...)
 }
 
 func GetOracleRegistrationKey(address sdk.AccAddress) []byte {

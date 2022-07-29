@@ -72,7 +72,11 @@ func (k Keeper) validateOracleRegistrationVote(ctx sdk.Context, vote *types.Orac
 
 func (k Keeper) GetOracle(ctx sdk.Context, address string) (*types.Oracle, error) {
 	store := ctx.KVStore(k.storeKey)
-	key := types.GetOracleKey(address)
+	accAddr, err := sdk.AccAddressFromBech32(address)
+	if err != nil {
+		return nil, err
+	}
+	key := types.GetOracleKey(accAddr)
 	bz := store.Get(key)
 	if bz == nil {
 		return nil, fmt.Errorf(fmt.Sprintf("'%s' is not exist oracle", address))
@@ -80,7 +84,7 @@ func (k Keeper) GetOracle(ctx sdk.Context, address string) (*types.Oracle, error
 
 	oracle := &types.Oracle{}
 
-	err := k.cdc.UnmarshalLengthPrefixed(bz, oracle)
+	err = k.cdc.UnmarshalLengthPrefixed(bz, oracle)
 	if err != nil {
 		return nil, err
 	}
@@ -90,7 +94,11 @@ func (k Keeper) GetOracle(ctx sdk.Context, address string) (*types.Oracle, error
 
 func (k Keeper) SetOracle(ctx sdk.Context, oracle *types.Oracle) error {
 	store := ctx.KVStore(k.storeKey)
-	key := types.GetOracleKey(oracle.Address)
+	accAddr, err := sdk.AccAddressFromBech32(oracle.Address)
+	if err != nil {
+		return err
+	}
+	key := types.GetOracleKey(accAddr)
 	bz, err := k.cdc.MarshalLengthPrefixed(oracle)
 	if err != nil {
 		return err
