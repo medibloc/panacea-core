@@ -2,10 +2,11 @@ package types
 
 import (
 	"fmt"
+	"time"
+
 	"github.com/btcsuite/btcd/btcec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
-	"time"
 )
 
 var (
@@ -93,10 +94,15 @@ func validateOraclePubKeyRemoteReport(i interface{}) error {
 }
 
 func validateUniqueID(i interface{}) error {
-	_, ok := i.(string)
+	uniqueID, ok := i.(string)
 	if !ok {
 		return fmt.Errorf("invalid parameter type: %T", i)
 	}
+
+	if len(uniqueID) == 0 {
+		return fmt.Errorf("empty unique ID: %s", uniqueID)
+	}
+
 	return nil
 }
 

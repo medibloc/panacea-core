@@ -18,7 +18,8 @@ type (
 		storeKey sdk.StoreKey
 		memKey   sdk.StoreKey
 
-		paramSpace paramtypes.Subspace
+		paramSpace    paramtypes.Subspace
+		stakingKeeper types.StakingKeeper
 	}
 )
 
@@ -27,16 +28,18 @@ func NewKeeper(
 	storeKey,
 	memKey sdk.StoreKey,
 	paramSpace paramtypes.Subspace,
+	stakingKeeper types.StakingKeeper,
 ) *Keeper {
 	if !paramSpace.HasKeyTable() {
 		paramSpace = paramSpace.WithKeyTable(types.ParamKeyTable())
 	}
 
 	return &Keeper{
-		cdc:        cdc,
-		storeKey:   storeKey,
-		memKey:     memKey,
-		paramSpace: paramSpace,
+		cdc:           cdc,
+		storeKey:      storeKey,
+		memKey:        memKey,
+		paramSpace:    paramSpace,
+		stakingKeeper: stakingKeeper,
 	}
 }
 

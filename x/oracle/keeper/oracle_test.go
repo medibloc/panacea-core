@@ -2,6 +2,9 @@ package keeper_test
 
 import (
 	"fmt"
+	"testing"
+	"time"
+
 	"github.com/btcsuite/btcd/btcec"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
@@ -9,8 +12,6 @@ import (
 	"github.com/medibloc/panacea-core/v2/types/testsuite"
 	"github.com/medibloc/panacea-core/v2/x/oracle/types"
 	"github.com/stretchr/testify/suite"
-	"testing"
-	"time"
 )
 
 var (
