@@ -30,9 +30,6 @@ func (msg *MsgRegisterOracle) ValidateBasic() error {
 	if err := validateUniqueID(msg.UniqueId); err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid unique ID")
 	}
-	if len(msg.UniqueId) == 0 {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "unique ID cannot be empty")
-	}
 	if _, err := sdk.AccAddressFromBech32(msg.OracleAddress); err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid oracle address (%s)", err)
 	}
@@ -53,7 +50,8 @@ func (msg *MsgRegisterOracle) ValidateBasic() error {
 }
 
 func (msg *MsgRegisterOracle) GetSignBytes() []byte {
-	panic("implemenets me")
+	bz := ModuleCdc.MustMarshalJSON(msg)
+	return sdk.MustSortJSON(bz)
 }
 
 func (msg *MsgRegisterOracle) GetSigners() []sdk.AccAddress {

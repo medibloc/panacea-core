@@ -98,7 +98,6 @@ func validateUniqueID(i interface{}) error {
 	if !ok {
 		return fmt.Errorf("invalid parameter type: %T", i)
 	}
-
 	return nil
 }
 
