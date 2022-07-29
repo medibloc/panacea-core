@@ -16,9 +16,5 @@ func GetTxCmd() *cobra.Command {
 		SuggestionsMinimumDistance: 2,
 		RunE:                       client.ValidateCmd,
 	}
-
-	cmd.AddCommand(CmdCreateDeal())
-	cmd.AddCommand(CmdSellData())
-	cmd.AddCommand(CmdDeactivateDeal())
 	return cmd
 }

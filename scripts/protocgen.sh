@@ -17,7 +17,7 @@ protoc_gen_gocosmos() {
 
 protoc_gen_gocosmos
 
-proto_dirs=$(find ./proto -path -prune -o -name '*.proto' -not -path '*/v2alpha2/*' -print0 | xargs -0 -n1 dirname | sort | uniq)
+proto_dirs=$(find ./proto -path -prune -o -name '*.proto' -not -path '*/v2alpha1/*' -print0 | xargs -0 -n1 dirname | sort | uniq)
 for dir in $proto_dirs; do
   buf protoc \
   -I "proto" \
@@ -30,5 +30,6 @@ Mgoogle/protobuf/any.proto=github.com/cosmos/cosmos-sdk/codec/types:. \
 done
 
 ## move proto files to the right places
-cp -r github.com/medibloc/panacea-core/* ./
-rm -rf github.com
+find ./x -type f -name "*.pb*.go" -exec rm {} \;
+cp -rv github.com/medibloc/panacea-core/v*/x/* ./x/
+rm -rfv github.com

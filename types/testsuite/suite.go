@@ -37,10 +37,6 @@ import (
 	burntypes "github.com/medibloc/panacea-core/v2/x/burn/types"
 	datadealkeeper "github.com/medibloc/panacea-core/v2/x/datadeal/keeper"
 	datadealtypes "github.com/medibloc/panacea-core/v2/x/datadeal/types"
-	"github.com/medibloc/panacea-core/v2/x/datapool"
-	datapoolkeeper "github.com/medibloc/panacea-core/v2/x/datapool/keeper"
-	datapooltypes "github.com/medibloc/panacea-core/v2/x/datapool/types"
-	"github.com/medibloc/panacea-core/v2/x/oracle"
 	oraclekeeper "github.com/medibloc/panacea-core/v2/x/oracle/keeper"
 	oracletypes "github.com/medibloc/panacea-core/v2/x/oracle/types"
 	"github.com/stretchr/testify/suite"
@@ -77,8 +73,6 @@ type TestSuite struct {
 	DIDKeeper         didkeeper.Keeper
 	DataDealKeeper    datadealkeeper.Keeper
 	DataDealMsgServer datadealtypes.MsgServer
-	DataPoolMsgServer datapooltypes.MsgServer
-	DataPoolKeeper    datapoolkeeper.Keeper
 	OracleKeeper      oraclekeeper.Keeper
 	OracleMsgServer   oracletypes.MsgServer
 	WasmKeeper        wasm.Keeper
@@ -95,7 +89,6 @@ func (suite *TestSuite) SetupTest() {
 		paramstypes.StoreKey,
 		didtypes.StoreKey,
 		datadealtypes.StoreKey,
-		datapooltypes.StoreKey,
 		oracletypes.StoreKey,
 		wasm.StoreKey,
 		ibchost.StoreKey,
@@ -130,7 +123,6 @@ func (suite *TestSuite) SetupTest() {
 		ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
 		wasm.ModuleName:                {authtypes.Burner},
 		burntypes.ModuleName:           {authtypes.Burner},
-		datapooltypes.ModuleName:       {authtypes.Minter},
 	}
 
 	modAccAddrs := make(map[string]bool)
@@ -234,38 +226,21 @@ func (suite *TestSuite) SetupTest() {
 		cdc.Marshaler,
 		keyParams[oracletypes.StoreKey],
 		memKeys[oracletypes.MemStoreKey],
-		suite.AccountKeeper,
+		paramsKeeper.Subspace(oracletypes.ModuleName),
 	)
 
 	suite.OracleMsgServer = oraclekeeper.NewMsgServerImpl(suite.OracleKeeper)
 
-	oracleGenState := oracletypes.DefaultGenesis()
-	oracle.InitGenesis(suite.Ctx, suite.OracleKeeper, *oracleGenState)
+	/*oracleGenState := oracletypes.DefaultGenesis()
+	oracle.InitGenesis(suite.Ctx, suite.OracleKeeper, *oracleGenState)*/
 
 	suite.DataDealKeeper = *datadealkeeper.NewKeeper(
 		cdc.Marshaler,
 		keyParams[datadealtypes.StoreKey],
 		memKeys[datadealtypes.MemStoreKey],
-		suite.BankKeeper,
-		suite.AccountKeeper,
 		suite.OracleKeeper,
 	)
 	suite.DataDealMsgServer = datadealkeeper.NewMsgServerImpl(suite.DataDealKeeper)
-
-	suite.DataPoolKeeper = *datapoolkeeper.NewKeeper(
-		cdc.Marshaler,
-		keyParams[datapooltypes.StoreKey],
-		memKeys[datapooltypes.MemStoreKey],
-		paramsKeeper.Subspace(datapooltypes.ModuleName),
-		suite.BankKeeper,
-		suite.AccountKeeper,
-		suite.WasmKeeper,
-		suite.OracleKeeper,
-	)
-	suite.DataPoolMsgServer = datapoolkeeper.NewMsgServerImpl(suite.DataPoolKeeper)
-
-	dataPoolGenState := datapooltypes.DefaultGenesis()
-	datapool.InitGenesis(suite.Ctx, suite.DataPoolKeeper, *dataPoolGenState)
 }
 
 func (suite *TestSuite) BeforeTest(suiteName, testName string) {
@@ -284,7 +259,6 @@ func newTestCodec() params.EncodingConfig {
 	cryptocodec.RegisterInterfaces(interfaceRegistry)
 	didtypes.RegisterInterfaces(interfaceRegistry)
 	datadealtypes.RegisterInterfaces(interfaceRegistry)
-	datapooltypes.RegisterInterfaces(interfaceRegistry)
 	oracletypes.RegisterInterfaces(interfaceRegistry)
 	marshaler := codec.NewProtoCodec(interfaceRegistry)
 

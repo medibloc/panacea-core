@@ -1,6 +1,9 @@
 package types
 
-import sdk "github.com/cosmos/cosmos-sdk/types"
+import (
+	"bytes"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+)
 
 const (
 	// ModuleName defines the module name
@@ -20,10 +23,26 @@ const (
 )
 
 var (
-	// KeyPrefixOracles defines key to store oracle
-	KeyPrefixOracles = []byte{0x01}
+	// OraclesKey defines key to store oracle
+	OraclesKey                 = []byte{0x01}
+	OracleRegistrationsKey     = []byte{0x02}
+	OracleRegistrationVotesKey = []byte{0x03}
+
+	IndexSeparator = []byte{0xFF}
 )
 
-func GetKeyPrefixOracle(oracleAddr sdk.AccAddress) []byte {
-	return append(KeyPrefixOracles, oracleAddr.Bytes()...)
+func GetOracleKey(address sdk.AccAddress) []byte {
+	return append(OraclesKey, address...)
+}
+
+func GetOracleRegistrationKey(address sdk.AccAddress) []byte {
+	return append(OracleRegistrationsKey, address...)
+}
+
+func GetOracleRegistrationVoteKey(uniqueID string, votingTargetAddress, voterAddress sdk.AccAddress) []byte {
+	return append(OracleRegistrationVotesKey, CombineKeys([]byte(uniqueID), votingTargetAddress, voterAddress)...)
+}
+
+func CombineKeys(keys ...[]byte) []byte {
+	return bytes.Join(keys, IndexSeparator)
 }

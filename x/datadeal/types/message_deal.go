@@ -7,13 +7,12 @@ import (
 
 var _ sdk.Msg = &MsgCreateDeal{}
 
-func NewMsgCreateDeal(dataSchema []string, budget *sdk.Coin, maxNumData uint64, trustedOracle []string, owner string) *MsgCreateDeal {
+func NewMsgCreateDeal(dataSchema []string, budget *sdk.Coin, maxNumData uint64, buyerAddress string) *MsgCreateDeal {
 	return &MsgCreateDeal{
-		DataSchema:     dataSchema,
-		Budget:         budget,
-		MaxNumData:     maxNumData,
-		TrustedOracles: trustedOracle,
-		Owner:          owner,
+		DataSchema:   dataSchema,
+		Budget:       budget,
+		MaxNumData:   maxNumData,
+		BuyerAddress: buyerAddress,
 	}
 }
 
@@ -27,7 +26,7 @@ func (msg *MsgCreateDeal) Type() string {
 
 // ValidateBasic is validation for MsgCreateDeal.
 func (msg *MsgCreateDeal) ValidateBasic() error {
-	_, err := sdk.AccAddressFromBech32(msg.Owner)
+	_, err := sdk.AccAddressFromBech32(msg.BuyerAddress)
 	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
@@ -50,16 +49,6 @@ func (msg *MsgCreateDeal) ValidateBasic() error {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "max num of data is negative number")
 	}
 
-	if len(msg.TrustedOracles) == 0 {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "at least 1 trusted oracle is required")
-	}
-
-	for _, oracle := range msg.TrustedOracles {
-		_, err = sdk.AccAddressFromBech32(oracle)
-		if err != nil {
-			return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid oracle address (%s)", err)
-		}
-	}
 	return nil
 }
 
@@ -69,7 +58,7 @@ func (msg *MsgCreateDeal) GetSignBytes() []byte {
 }
 
 func (msg *MsgCreateDeal) GetSigners() []sdk.AccAddress {
-	creator, err := sdk.AccAddressFromBech32(msg.Owner)
+	creator, err := sdk.AccAddressFromBech32(msg.BuyerAddress)
 	if err != nil {
 		panic(err)
 	}
@@ -78,10 +67,11 @@ func (msg *MsgCreateDeal) GetSigners() []sdk.AccAddress {
 
 var _ sdk.Msg = &MsgSellData{}
 
-func NewMsgSellData(cert DataCert, seller string) *MsgSellData {
+func NewMsgSellData(dealID uint64, verifiableCID, sellerAddress string) *MsgSellData {
 	return &MsgSellData{
-		Cert:   &cert,
-		Seller: seller,
+		DealId:        dealID,
+		VerifiableCid: verifiableCID,
+		SellerAddress: sellerAddress,
 	}
 }
 
@@ -95,55 +85,13 @@ func (msg *MsgSellData) Type() string {
 
 // ValidateBasic is validation for MsgSellData.
 func (msg *MsgSellData) ValidateBasic() error {
-	_, err := sdk.AccAddressFromBech32(msg.Seller)
+	_, err := sdk.AccAddressFromBech32(msg.SellerAddress)
 	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
 
-	if msg.Cert == nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "empty certificate")
-	}
-
-	signature := msg.Cert.Signature
-	if signature == nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "empty signature")
-	}
-
-	unsignedCert := msg.Cert.UnsignedCert
-	if unsignedCert == nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "no unsigned data certificate")
-	}
-
-	if unsignedCert.DealId <= 0 {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid deal id format")
-	}
-
-	if unsignedCert.DataHash == nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "empty data hash")
-	}
-
-	if unsignedCert.EncryptedDataUrl == nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "empty encrypted data url")
-	}
-
-	if unsignedCert.OracleAddress == "" {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "empty oracle address")
-	}
-	_, err = sdk.AccAddressFromBech32(unsignedCert.OracleAddress)
-	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid oracle address (%s)", err)
-	}
-
-	if unsignedCert.RequesterAddress == "" {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "empty requester address")
-	}
-	_, err = sdk.AccAddressFromBech32(unsignedCert.RequesterAddress)
-	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid requester address (%s)", err)
-	}
-
-	if unsignedCert.RequesterAddress != msg.Seller {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "request address and seller address is not same")
+	if len(msg.VerifiableCid) == 0 {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "empty sellerCID")
 	}
 
 	return nil
@@ -155,18 +103,58 @@ func (msg *MsgSellData) GetSignBytes() []byte {
 }
 
 func (msg *MsgSellData) GetSigners() []sdk.AccAddress {
-	seller, err := sdk.AccAddressFromBech32(msg.Seller)
+	seller, err := sdk.AccAddressFromBech32(msg.SellerAddress)
 	if err != nil {
 		panic(err)
 	}
 	return []sdk.AccAddress{seller}
 }
 
-func NewMsgDeactivateDeal(dealID uint64, deactivateRequester string) *MsgDeactivateDeal {
+func NewMsgDeactivateDeal(dealID uint64, requesterAddress string) *MsgDeactivateDeal {
 	return &MsgDeactivateDeal{
-		DealId:              dealID,
-		DeactivateRequester: deactivateRequester,
+		DealId:           dealID,
+		RequesterAddress: requesterAddress,
 	}
+}
+
+var _ sdk.Msg = &MsgVoteDataVerification{}
+
+func (msg *MsgVoteDataVerification) Route() string {
+	return RouterKey
+}
+
+func (msg *MsgVoteDataVerification) Type() string {
+	return "VoteDataVerification"
+}
+
+func (msg *MsgVoteDataVerification) ValidateBasic() error {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (msg *MsgVoteDataVerification) GetSigners() []sdk.AccAddress {
+	//TODO implement me
+	panic("implement me")
+}
+
+var _ sdk.Msg = &MsgVoteDataDelivery{}
+
+func (msg *MsgVoteDataDelivery) Route() string {
+	return RouterKey
+}
+
+func (msg *MsgVoteDataDelivery) Type() string {
+	return "VoteDataDelivery"
+}
+
+func (msg *MsgVoteDataDelivery) ValidateBasic() error {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (msg *MsgVoteDataDelivery) GetSigners() []sdk.AccAddress {
+	//TODO implement me
+	panic("implement me")
 }
 
 func (msg *MsgDeactivateDeal) Route() string {
@@ -179,7 +167,7 @@ func (msg *MsgDeactivateDeal) Type() string {
 
 // ValidateBasic is validation for MsgCreateDeal.
 func (msg *MsgDeactivateDeal) ValidateBasic() error {
-	_, err := sdk.AccAddressFromBech32(msg.DeactivateRequester)
+	_, err := sdk.AccAddressFromBech32(msg.RequesterAddress)
 	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid requester address (%s)", err)
 	}
@@ -196,7 +184,7 @@ func (msg *MsgDeactivateDeal) GetSignBytes() []byte {
 }
 
 func (msg *MsgDeactivateDeal) GetSigners() []sdk.AccAddress {
-	creator, err := sdk.AccAddressFromBech32(msg.DeactivateRequester)
+	creator, err := sdk.AccAddressFromBech32(msg.RequesterAddress)
 	if err != nil {
 		panic(err)
 	}

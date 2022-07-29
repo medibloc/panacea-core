@@ -12,6 +12,8 @@ import (
 func RegisterCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&MsgCreateDeal{}, "datadeal/CreateDeal", nil)
 	cdc.RegisterConcrete(&MsgSellData{}, "datadeal/SellData", nil)
+	cdc.RegisterConcrete(&MsgVoteDataVerification{}, "datadeal/VoteDataVerification", nil)
+	cdc.RegisterConcrete(&MsgVoteDataDelivery{}, "datadeal/VoteDataDelivery", nil)
 	cdc.RegisterConcrete(&MsgDeactivateDeal{}, "datadeal/DeactivateDeal", nil)
 }
 
@@ -19,6 +21,8 @@ func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 	registry.RegisterImplementations((*sdk.Msg)(nil),
 		&MsgCreateDeal{},
 		&MsgSellData{},
+		&MsgVoteDataVerification{},
+		&MsgVoteDataDelivery{},
 		&MsgDeactivateDeal{},
 	)
 	msgservice.RegisterMsgServiceDesc(registry, &_Msg_serviceDesc)

@@ -1,27 +1,33 @@
 package keeper_test
 
 import (
-	"sort"
-	"testing"
-
+	"fmt"
+	"github.com/btcsuite/btcd/btcec"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
+	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/medibloc/panacea-core/v2/types/assets"
 	"github.com/medibloc/panacea-core/v2/types/testsuite"
 	"github.com/medibloc/panacea-core/v2/x/oracle/types"
 	"github.com/stretchr/testify/suite"
+	"testing"
+	"time"
 )
 
 var (
-	oraclePrivKey = secp256k1.GenPrivKey()
-	oraclePubKey  = oraclePrivKey.PubKey()
-	oracle1       = sdk.AccAddress(oraclePubKey.Address())
-	oracle2       = sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address())
-	oracle3       = sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address())
-	oracle4       = sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address())
-	oracle5       = sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address())
+	uniqueID             = "correctUniqueID"
+	genesisOraclePrivKey = secp256k1.GenPrivKey()
+	genesisOraclePubKey  = genesisOraclePrivKey.PubKey()
+	genesisOracleAcc     = sdk.AccAddress(genesisOraclePubKey.Address())
 
-	fundForOracle = sdk.NewCoins(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(10000000000)))
+	newOraclePrivKey = secp256k1.GenPrivKey()
+	newOraclePubKey  = newOraclePrivKey.PubKey()
+	newOracleAcc     = sdk.AccAddress(newOraclePubKey.Address())
+
+	oraclePrivKey, _ = btcec.NewPrivateKey(btcec.S256())
+	oraclePubKey     = oraclePrivKey.PubKey()
+
+	nodePrivKey, _ = btcec.NewPrivateKey(btcec.S256())
+	nodePubKey     = nodePrivKey.PubKey()
 )
 
 type oracleTestSuite struct {
@@ -32,184 +38,287 @@ func TestOracleTestSuite(t *testing.T) {
 	suite.Run(t, new(oracleTestSuite))
 }
 
-func (suite *oracleTestSuite) TestRegisterOracle() {
-	err := suite.FundAccount(suite.Ctx, oracle1, fundForOracle)
-	suite.Require().NoError(err)
+func (suite *oracleTestSuite) BeforeTest(_, _ string) {
+	ctx := suite.Ctx
 
-	suite.setOracleAccount(oracle1)
-
-	tempOracle := types.Oracle{
-		Address:  oracle1.String(),
-		Endpoint: "https://my-oracle.org",
-	}
-
-	err = suite.OracleKeeper.RegisterOracle(suite.Ctx, tempOracle)
-	suite.Require().NoError(err)
+	suite.OracleKeeper.SetParams(ctx, types.Params{
+		OraclePublicKey:          oraclePubKey.SerializeCompressed(),
+		OraclePubKeyRemoteReport: nil,
+		UniqueId:                 uniqueID,
+		VoteParams: types.VoteParams{
+			VotingPeriod: 100,
+			JailPeriod:   60,
+			Quorum:       sdk.NewDecWithPrec(1, 3),
+		},
+		SlashParams: types.SlashParams{
+			SlashFractionDowntime: sdk.NewDecWithPrec(3, 1),
+			SlashFractionForgery:  sdk.NewDecWithPrec(1, 1),
+		},
+	})
 }
 
-func (suite *oracleTestSuite) setOracleAccount(oracleAddr sdk.AccAddress) {
-	oracleAccount := suite.AccountKeeper.NewAccountWithAddress(suite.Ctx, oracleAddr)
-	err := oracleAccount.SetPubKey(oraclePubKey)
+func (suite *oracleTestSuite) setOracleAccount(pubKey cryptotypes.PubKey) {
+	address := sdk.AccAddress(pubKey.Address())
+	oracleAccount := suite.AccountKeeper.NewAccountWithAddress(suite.Ctx, address)
+	err := oracleAccount.SetPubKey(pubKey)
 	suite.Require().NoError(err)
 	suite.AccountKeeper.SetAccount(suite.Ctx, oracleAccount)
 }
 
-func (suite *oracleTestSuite) TestGetRegisterOracle() {
-	err := suite.FundAccount(suite.Ctx, oracle1, fundForOracle)
-	suite.Require().NoError(err)
-
-	suite.setOracleAccount(oracle1)
-
-	tempOracle := types.Oracle{
-		Address:  oracle1.String(),
-		Endpoint: "https://my-oracle.org",
-	}
-
-	err = suite.OracleKeeper.RegisterOracle(suite.Ctx, tempOracle)
-	suite.Require().NoError(err)
-
-	getOracle, err := suite.OracleKeeper.GetOracle(suite.Ctx, oracle1)
-	suite.Require().NoError(err)
-	suite.Require().Equal(tempOracle.Endpoint, getOracle.Endpoint)
-}
-
-func (suite *oracleTestSuite) TestIsOracleDuplicate() {
-	err := suite.FundAccount(suite.Ctx, oracle1, fundForOracle)
-	suite.Require().NoError(err)
-
-	suite.setOracleAccount(oracle1)
-
-	tempOracle := types.Oracle{
-		Address:  oracle1.String(),
-		Endpoint: "https://my-oracle.org",
-	}
-
-	err = suite.OracleKeeper.RegisterOracle(suite.Ctx, tempOracle)
-	suite.Require().NoError(err)
-
-	err = suite.OracleKeeper.RegisterOracle(suite.Ctx, tempOracle)
-	suite.Require().Error(err, types.ErrOracleAlreadyExist)
-}
-
-func (suite *oracleTestSuite) TestGetOracle() {
-	err := suite.FundAccount(suite.Ctx, oracle1, fundForOracle)
-	suite.Require().NoError(err)
-
-	suite.setOracleAccount(oracle1)
-
-	tempOracle := types.Oracle{
-		Address:  oracle1.String(),
-		Endpoint: "https://my-oracle.org",
-	}
-
-	err = suite.OracleKeeper.RegisterOracle(suite.Ctx, tempOracle)
-	suite.Require().NoError(err)
-
-	getOracle, err := suite.OracleKeeper.GetOracle(suite.Ctx, oracle1)
-	suite.Require().NoError(err)
-
-	suite.Require().Equal(tempOracle.Address, getOracle.Address)
-	suite.Require().Equal(tempOracle.Endpoint, getOracle.Endpoint)
-}
-
-func (suite *oracleTestSuite) TestOracleNotFound() {
-	err := suite.FundAccount(suite.Ctx, oracle1, fundForOracle)
-	suite.Require().NoError(err)
-
-	suite.setOracleAccount(oracle1)
-
-	_, err = suite.OracleKeeper.GetOracle(suite.Ctx, oracle1)
-	suite.Require().Error(err, types.ErrOracleNotFound)
-}
-
-func (suite *oracleTestSuite) TestGetAllOracles() {
-	oracles := [5]sdk.AccAddress{oracle1, oracle2, oracle3, oracle4, oracle5}
-
-	for _, o := range oracles {
-		err := suite.FundAccount(suite.Ctx, o, fundForOracle)
-		suite.Require().NoError(err)
-
-		suite.setOracleAccount(o)
-	}
-
-	for _, o := range oracles {
-		tempOracle := types.Oracle{
-			Address:  o.String(),
-			Endpoint: "https://my-oracle.org",
-		}
-
-		err := suite.OracleKeeper.RegisterOracle(suite.Ctx, tempOracle)
-		suite.Require().NoError(err)
-	}
-
-	allOracles, err := suite.OracleKeeper.GetAllOracles(suite.Ctx)
-	suite.Require().NoError(err)
-
-	var allOracleStr []string
-	var tempOracleStr []string
-
-	for i := 0; i < 5; i++ {
-		allOracleStr = append(allOracleStr, allOracles[i].Address)
-		tempOracleStr = append(tempOracleStr, oracles[i].String())
-	}
-
-	sort.Strings(allOracleStr)
-	sort.Strings(tempOracleStr)
-
-	for i := 0; i < 5; i++ {
-		suite.Require().Equal(allOracleStr[i], tempOracleStr[i])
-		suite.Require().Equal(allOracles[i].Endpoint, "https://my-oracle.org")
+func makeNewOracleRegistration() *types.OracleRegistration {
+	return &types.OracleRegistration{
+		UniqueId:               uniqueID,
+		Address:                newOracleAcc.String(),
+		NodePubKey:             nodePubKey.SerializeCompressed(),
+		NodePubKeyRemoteReport: nil,
+		TrustedBlockHeight:     0,
+		TrustedBlockHash:       nil,
+		EncryptedOraclePrivKey: nil,
+		Status:                 types.ORACLE_REGISTRATION_STATUS_VOTING_PERIOD,
+		VotingPeriod: &types.VotingPeriod{
+			VotingStartTime: time.Now(),
+			VotingEndTime:   time.Now().Add(5 * time.Second),
+		},
 	}
 }
 
-func (suite *oracleTestSuite) TestUpdateOracle() {
-	err := suite.FundAccount(suite.Ctx, oracle1, fundForOracle)
-	suite.Require().NoError(err)
+func (suite *oracleTestSuite) TestOracleRegistrationVoteSuccess() {
+	ctx := suite.Ctx
 
-	suite.setOracleAccount(oracle1)
+	suite.setOracleAccount(genesisOraclePubKey)
+	suite.setOracleAccount(newOraclePubKey)
 
-	tempOracle := types.Oracle{
-		Address:  oracle1.String(),
-		Endpoint: "https://my-oracle.org",
+	// make the correct genesis oracle
+	oracle := &types.Oracle{
+		Address:  genesisOracleAcc.String(),
+		Status:   types.ORACLE_STATUS_ACTIVE,
+		Uptime:   0,
+		JailedAt: nil,
 	}
 
-	err = suite.OracleKeeper.RegisterOracle(suite.Ctx, tempOracle)
+	err := suite.OracleKeeper.SetOracle(ctx, oracle)
 	suite.Require().NoError(err)
 
-	updateTempOracle := types.Oracle{
-		Address:  oracle1.String(),
-		Endpoint: "https://update-my-oracle.org",
+	oracleRegistration := makeNewOracleRegistration()
+	err = suite.OracleKeeper.SetOracleRegistration(ctx, oracleRegistration)
+	suite.Require().NoError(err)
+
+	// make the correct encryptedOraclePrivKey
+	encryptedOraclePrivKey, err := btcec.Encrypt(nodePubKey, oraclePrivKey.Serialize())
+	suite.Require().NoError(err)
+	// make the correct vote info
+	oracleRegistrationVote := &types.OracleRegistrationVote{
+		UniqueId:               uniqueID,
+		VoterAddress:           genesisOracleAcc.String(),
+		VotingTargetAddress:    newOracleAcc.String(),
+		VoteOption:             types.VOTE_OPTION_VALID,
+		EncryptedOraclePrivKey: encryptedOraclePrivKey,
 	}
 
-	err = suite.OracleKeeper.UpdateOracle(suite.Ctx, oracle1, updateTempOracle.Endpoint)
+	// make the correct signature
+	voteBz, err := suite.Cdc.Marshaler.Marshal(oracleRegistrationVote)
+	suite.Require().NoError(err)
+	oraclePrivKeySecp256k1 := secp256k1.PrivKey{
+		Key: oraclePrivKey.Serialize(),
+	}
+	signature, err := oraclePrivKeySecp256k1.Sign(voteBz)
 	suite.Require().NoError(err)
 
-	getOracle, err := suite.OracleKeeper.GetOracle(suite.Ctx, oracle1)
+	err = suite.OracleKeeper.VoteOracleRegistration(ctx, oracleRegistrationVote, signature)
 	suite.Require().NoError(err)
 
-	suite.Require().Equal(getOracle.GetAddress(), updateTempOracle.GetAddress())
-	suite.Require().Equal(getOracle.GetEndpoint(), updateTempOracle.GetEndpoint())
+	getOracleRegistrationVote, err := suite.OracleKeeper.GetOracleRegistrationVote(ctx, uniqueID, newOracleAcc.String(), genesisOracleAcc.String())
+	suite.Require().NoError(err)
+	suite.Require().Equal(oracleRegistrationVote, getOracleRegistrationVote)
 }
 
-func (suite *oracleTestSuite) TestUpdateOracle_invalid_requester() {
-	err := suite.FundAccount(suite.Ctx, oracle1, fundForOracle)
-	suite.Require().NoError(err)
+func (suite *oracleTestSuite) TestOracleRegistrationVoteFailedVerifySignature() {
+	ctx := suite.Ctx
 
-	suite.setOracleAccount(oracle1)
+	suite.setOracleAccount(genesisOraclePubKey)
+	suite.setOracleAccount(newOraclePubKey)
 
-	tempOracle := types.Oracle{
-		Address:  oracle1.String(),
-		Endpoint: "https://my-oracle.org",
+	// make the correct genesis oracle
+	oracle := &types.Oracle{
+		Address:  genesisOracleAcc.String(),
+		Status:   types.ORACLE_STATUS_ACTIVE,
+		Uptime:   0,
+		JailedAt: nil,
 	}
 
-	err = suite.OracleKeeper.RegisterOracle(suite.Ctx, tempOracle)
+	err := suite.OracleKeeper.SetOracle(ctx, oracle)
 	suite.Require().NoError(err)
 
-	updateTempOracle := types.Oracle{
-		Address:  oracle2.String(),
-		Endpoint: "https://update-my-oracle.org",
+	oracleRegistration := makeNewOracleRegistration()
+	err = suite.OracleKeeper.SetOracleRegistration(ctx, oracleRegistration)
+	suite.Require().NoError(err)
+
+	// make the correct encryptedOraclePrivKey
+	encryptedOraclePrivKey, err := btcec.Encrypt(nodePubKey, oraclePrivKey.Serialize())
+	suite.Require().NoError(err)
+	// make the correct vote info
+	oracleRegistrationVote := &types.OracleRegistrationVote{
+		UniqueId:               uniqueID,
+		VoterAddress:           genesisOracleAcc.String(),
+		VotingTargetAddress:    newOracleAcc.String(),
+		VoteOption:             types.VOTE_OPTION_VALID,
+		EncryptedOraclePrivKey: encryptedOraclePrivKey,
 	}
 
-	err = suite.OracleKeeper.UpdateOracle(suite.Ctx, oracle2, updateTempOracle.Endpoint)
-	suite.Require().Error(err, types.ErrInvalidUpdateRequester)
+	// make the correct signature
+	voteBz, err := suite.Cdc.Marshaler.Marshal(oracleRegistrationVote)
+	suite.Require().NoError(err)
+	invalidOraclePrivKey, err := btcec.NewPrivateKey(btcec.S256())
+	suite.Require().NoError(err)
+	oraclePrivKeySecp256k1 := secp256k1.PrivKey{
+		Key: invalidOraclePrivKey.Serialize(),
+	}
+	signature, err := oraclePrivKeySecp256k1.Sign(voteBz)
+	suite.Require().NoError(err)
+
+	err = suite.OracleKeeper.VoteOracleRegistration(ctx, oracleRegistrationVote, signature)
+	suite.Require().ErrorIs(err, types.ErrDetectionMaliciousBehavior)
+}
+
+func (suite *oracleTestSuite) TestOracleRegistrationVoteInvalidUniqueID() {
+	ctx := suite.Ctx
+
+	suite.setOracleAccount(genesisOraclePubKey)
+	suite.setOracleAccount(newOraclePubKey)
+
+	// make the correct genesis oracle
+	oracle := &types.Oracle{
+		Address:  genesisOracleAcc.String(),
+		Status:   types.ORACLE_STATUS_ACTIVE,
+		Uptime:   0,
+		JailedAt: nil,
+	}
+
+	err := suite.OracleKeeper.SetOracle(ctx, oracle)
+	suite.Require().NoError(err)
+
+	oracleRegistration := makeNewOracleRegistration()
+	err = suite.OracleKeeper.SetOracleRegistration(ctx, oracleRegistration)
+	suite.Require().NoError(err)
+
+	// make the correct encryptedOraclePrivKey
+	encryptedOraclePrivKey, err := btcec.Encrypt(nodePubKey, oraclePrivKey.Serialize())
+	suite.Require().NoError(err)
+	// make vote with invalid uniqueID
+	invalidUniqueID := "invalidUniqueID"
+	oracleRegistrationVote := &types.OracleRegistrationVote{
+		UniqueId:               invalidUniqueID,
+		VoterAddress:           genesisOracleAcc.String(),
+		VotingTargetAddress:    newOracleAcc.String(),
+		VoteOption:             types.VOTE_OPTION_VALID,
+		EncryptedOraclePrivKey: encryptedOraclePrivKey,
+	}
+
+	// make the correct signature
+	voteBz, err := suite.Cdc.Marshaler.Marshal(oracleRegistrationVote)
+	suite.Require().NoError(err)
+	oraclePrivKeySecp256k1 := secp256k1.PrivKey{
+		Key: oraclePrivKey.Serialize(),
+	}
+	signature, err := oraclePrivKeySecp256k1.Sign(voteBz)
+	suite.Require().NoError(err)
+
+	err = suite.OracleKeeper.VoteOracleRegistration(ctx, oracleRegistrationVote, signature)
+	suite.Require().ErrorIs(err, types.ErrOracleRegistrationVote)
+	suite.Require().ErrorContains(err, fmt.Sprintf("not matched with the currently active uniqueID. expected %s, got %s", uniqueID, invalidUniqueID))
+}
+
+func (suite *oracleTestSuite) TestOracleRegistrationVoteInvalidGenesisOracleStatus() {
+	ctx := suite.Ctx
+
+	suite.setOracleAccount(genesisOraclePubKey)
+	suite.setOracleAccount(newOraclePubKey)
+
+	// make the correct genesis oracle
+	oracle := &types.Oracle{
+		Address:  genesisOracleAcc.String(),
+		Status:   types.ORACLE_STATUS_JAILED,
+		Uptime:   0,
+		JailedAt: nil,
+	}
+
+	err := suite.OracleKeeper.SetOracle(ctx, oracle)
+	suite.Require().NoError(err)
+
+	oracleRegistration := makeNewOracleRegistration()
+	err = suite.OracleKeeper.SetOracleRegistration(ctx, oracleRegistration)
+	suite.Require().NoError(err)
+
+	// make the correct encryptedOraclePrivKey
+	encryptedOraclePrivKey, err := btcec.Encrypt(nodePubKey, oraclePrivKey.Serialize())
+	suite.Require().NoError(err)
+	// make vote with invalid uniqueID
+	oracleRegistrationVote := &types.OracleRegistrationVote{
+		UniqueId:               uniqueID,
+		VoterAddress:           genesisOracleAcc.String(),
+		VotingTargetAddress:    newOracleAcc.String(),
+		VoteOption:             types.VOTE_OPTION_VALID,
+		EncryptedOraclePrivKey: encryptedOraclePrivKey,
+	}
+
+	// make the correct signature
+	voteBz, err := suite.Cdc.Marshaler.Marshal(oracleRegistrationVote)
+	suite.Require().NoError(err)
+	oraclePrivKeySecp256k1 := secp256k1.PrivKey{
+		Key: oraclePrivKey.Serialize(),
+	}
+	signature, err := oraclePrivKeySecp256k1.Sign(voteBz)
+	suite.Require().NoError(err)
+
+	err = suite.OracleKeeper.VoteOracleRegistration(ctx, oracleRegistrationVote, signature)
+	suite.Require().ErrorIs(err, types.ErrOracleRegistrationVote)
+	suite.Require().ErrorContains(err, "this oracle is not in 'ACTIVE' state")
+}
+
+func (suite *oracleTestSuite) TestOracleRegistrationVoteInvalidOracleRegistrationStatus() {
+	ctx := suite.Ctx
+
+	suite.setOracleAccount(genesisOraclePubKey)
+	suite.setOracleAccount(newOraclePubKey)
+
+	// make the correct genesis oracle
+	oracle := &types.Oracle{
+		Address:  genesisOracleAcc.String(),
+		Status:   types.ORACLE_STATUS_ACTIVE,
+		Uptime:   0,
+		JailedAt: nil,
+	}
+
+	err := suite.OracleKeeper.SetOracle(ctx, oracle)
+	suite.Require().NoError(err)
+
+	oracleRegistration := makeNewOracleRegistration()
+	oracleRegistration.Status = types.ORACLE_REGISTRATION_STATUS_REJECTED
+	err = suite.OracleKeeper.SetOracleRegistration(ctx, oracleRegistration)
+	suite.Require().NoError(err)
+
+	// make the correct encryptedOraclePrivKey
+	encryptedOraclePrivKey, err := btcec.Encrypt(nodePubKey, oraclePrivKey.Serialize())
+	suite.Require().NoError(err)
+	// make vote with invalid uniqueID
+	oracleRegistrationVote := &types.OracleRegistrationVote{
+		UniqueId:               uniqueID,
+		VoterAddress:           genesisOracleAcc.String(),
+		VotingTargetAddress:    newOracleAcc.String(),
+		VoteOption:             types.VOTE_OPTION_VALID,
+		EncryptedOraclePrivKey: encryptedOraclePrivKey,
+	}
+
+	// make the correct signature
+	voteBz, err := suite.Cdc.Marshaler.Marshal(oracleRegistrationVote)
+	suite.Require().NoError(err)
+	oraclePrivKeySecp256k1 := secp256k1.PrivKey{
+		Key: oraclePrivKey.Serialize(),
+	}
+	signature, err := oraclePrivKeySecp256k1.Sign(voteBz)
+	suite.Require().NoError(err)
+
+	err = suite.OracleKeeper.VoteOracleRegistration(ctx, oracleRegistrationVote, signature)
+	suite.Require().ErrorIs(err, types.ErrOracleRegistrationVote)
+	suite.Require().ErrorContains(err, "the currently voted oracle's status is not 'VOTING_PERIOD'")
 }

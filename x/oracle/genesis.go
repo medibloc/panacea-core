@@ -9,23 +9,10 @@ import (
 // InitGenesis initializes the capability module's state from a provided genesis
 // state.
 func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) {
-	for _, oracle := range genState.Oracles {
-		err := k.SetOracle(ctx, oracle)
-		if err != nil {
-			panic(err)
-		}
-	}
+	panic("implements me")
 }
 
 // ExportGenesis returns the capability module's exported genesis.
 func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
-	genesis := types.DefaultGenesis()
-
-	oracles, err := k.GetAllOracles(ctx)
-	if err != nil {
-		panic(err)
-	}
-
-	genesis.Oracles = append(genesis.Oracles, oracles...)
-	return genesis
+	panic("implements me")
 }

@@ -7,11 +7,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func CmdGetOracle() *cobra.Command {
+func CmdGetParams() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "oracle-node [oracle-address]",
-		Short: "Query an oracle",
-		Args:  cobra.ExactArgs(1),
+		Use:   "params",
+		Short: "Query params of oracle module",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientQueryContext(cmd)
 			if err != nil {
@@ -20,10 +19,7 @@ func CmdGetOracle() *cobra.Command {
 
 			queryClient := types.NewQueryClient(clientCtx)
 
-			res, err := queryClient.Oracle(cmd.Context(), &types.QueryOracleRequest{
-				Address: args[0],
-			})
-
+			res, err := queryClient.Params(cmd.Context(), &types.QueryOracleParamsRequest{})
 			if err != nil {
 				return err
 			}

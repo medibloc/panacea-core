@@ -16,8 +16,5 @@ func GetTxCmd() *cobra.Command {
 		SuggestionsMinimumDistance: 2,
 		RunE:                       client.ValidateCmd,
 	}
-
-	cmd.AddCommand(CmdRegisterOracle())
-	cmd.AddCommand(CmdUpdateOracle())
 	return cmd
 }

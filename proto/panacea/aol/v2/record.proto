@@ -2,7 +2,7 @@ syntax = "proto3";
 package panacea.aol.v2;
 
 option java_multiple_files = true;
-option go_package = "github.com/medibloc/panacea-core/x/aol/types";
+option go_package = "github.com/medibloc/panacea-core/v2/x/aol/types";
 
 import "gogoproto/gogo.proto";
 

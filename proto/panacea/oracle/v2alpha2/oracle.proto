@@ -1,11 +1,10 @@
 syntax = "proto3";
 package panacea.oracle.v2alpha2;
 
-option go_package = "github.com/medibloc/panacea-core/x/oracle/types";
+option go_package = "github.com/medibloc/panacea-core/v2/x/oracle/types";
 
 import "gogoproto/gogo.proto";
 import "google/protobuf/timestamp.proto";
-import "panacea/oracle/v2alpha2/genesis.proto";
 
 // OracleStatus enumerates the status of oracle.
 enum OracleStatus {
@@ -68,4 +67,51 @@ message OracleRegistration {
   OracleRegistrationStatus status = 8;
   VotingPeriod voting_period = 9;
   TallyResult tally_result = 10;
+}
+
+// TallyResult defines the tally result of the votes.
+message TallyResult {
+  string yes = 1 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int", (gogoproto.nullable) = false];
+  string no = 2 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int", (gogoproto.nullable) = false];
+  // Votes yes, but the value is different with the consensus value
+  string invalid_yes = 3 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int", (gogoproto.nullable) = false];
+  // The consensus value between oracles
+  bytes consensus_value = 4;
+}
+
+// VotingPeriod defines the voting period of transactions governed by oracles.
+message VotingPeriod {
+  google.protobuf.Timestamp voting_start_time = 1 [
+    (gogoproto.stdtime) = true,
+    (gogoproto.nullable) = false,
+    (gogoproto.moretags) = "yaml:\"voting_start_time\""
+  ];
+  google.protobuf.Timestamp voting_end_time = 2 [
+    (gogoproto.stdtime) = true,
+    (gogoproto.nullable) = false,
+    (gogoproto.moretags) = "yaml:\"voting_end_time\""
+  ];
+}
+
+// OracleRegistrationVote defines the vote for oracle registration
+message OracleRegistrationVote {
+  string unique_id = 1;
+  string voter_address = 2;
+  string voting_target_address = 3;
+  VoteOption vote_option = 4;
+  bytes encrypted_oracle_priv_key = 5;
+}
+
+// VoteOption enumerates the vote option.
+enum VoteOption {
+  option (gogoproto.goproto_enum_prefix) = false;
+
+  // VOTE_OPTION_UNSPECIFIED
+  VOTE_OPTION_UNSPECIFIED = 0;
+
+  // VOTE_OPTION_VALID
+  VOTE_OPTION_VALID = 1;
+
+  // VOTE_OPTION_INVALID
+  VOTE_OPTION_INVALID = 2;
 }
