@@ -30,8 +30,9 @@ require (
 	google.golang.org/grpc v1.42.0
 )
 
-replace google.golang.org/grpc => google.golang.org/grpc v1.33.2
-
-replace github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
-
-replace github.com/cosmos/cosmos-sdk => github.com/medibloc/cosmos-sdk v0.42.11-panacea.1
+replace (
+	github.com/cosmos/cosmos-sdk => github.com/medibloc/cosmos-sdk v0.42.11-panacea.1
+	github.com/cosmos/ledger-go => github.com/cosmos/ledger-go v0.9.3-0.20220721150524-52ff0c88619c
+	github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
+	google.golang.org/grpc => google.golang.org/grpc v1.33.2
+)
