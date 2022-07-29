@@ -30,7 +30,7 @@ func DefaultParams() Params {
 		VoteParams: VoteParams{
 			VotingPeriod: 30 * time.Second,
 			JailPeriod:   10 * time.Minute,
-			Quorum:       sdk.NewDecWithPrec(1, 3),
+			Quorum:       sdk.NewDec(1).Quo(sdk.NewDec(3)),
 		},
 		SlashParams: SlashParams{
 			SlashFractionDowntime: sdk.NewDecWithPrec(2, 1),
@@ -51,6 +51,12 @@ func (p *Params) ParamSetPairs() paramtypes.ParamSetPairs {
 
 func (p Params) Validate() error {
 	if err := validateOraclePublicKey(p.OraclePublicKey); err != nil {
+		return err
+	}
+	if err := validateOraclePubKeyRemoteReport(p.OraclePubKeyRemoteReport); err != nil {
+		return err
+	}
+	if err := validateUniqueID(p.UniqueId); err != nil {
 		return err
 	}
 	if err := validateVoteParams(p.VoteParams); err != nil {
@@ -119,12 +125,17 @@ func validateSlashParams(i interface{}) error {
 	if !ok {
 		return fmt.Errorf("invalid parameter type: %T", i)
 	}
-	if sdk.NewDec(0).Equal(slashParams.SlashFractionDowntime) {
-		return fmt.Errorf("'slashFactionDowntime' cannot be set to zero")
+
+	if slashParams.SlashFractionDowntime.IsNegative() {
+		return fmt.Errorf("'slashFactionDowntime' cannot be negative: %s", slashParams.SlashFractionDowntime)
+	} else if slashParams.SlashFractionDowntime.GT(sdk.OneDec()) {
+		return fmt.Errorf("'slashFactionDowntime' rate cannot be greater than 100%%: %s", slashParams.SlashFractionDowntime)
 	}
 
-	if sdk.NewDec(0).Equal(slashParams.SlashFractionForgery) {
-		return fmt.Errorf("'slashFactionForgery' cannot be set to zero")
+	if slashParams.SlashFractionForgery.IsNegative() {
+		return fmt.Errorf("'slashFractionForgery' cannot be negative: %s", slashParams.SlashFractionForgery)
+	} else if slashParams.SlashFractionForgery.GT(sdk.OneDec()) {
+		return fmt.Errorf("'slashFractionForgery' rate cannot be greater than 100%%: %s", slashParams.SlashFractionForgery)
 	}
 
 	return nil
