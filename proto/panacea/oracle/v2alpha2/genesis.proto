@@ -21,8 +21,8 @@ message Params {
   bytes oracle_pub_key_remote_report = 2;
   // The unique ID of current version of oracle.
   string unique_id = 3;
-  VoteParams vote_params = 4;
-  SlashParams slashing_params = 5;
+  VoteParams vote_params = 4 [(gogoproto.nullable)   = false];
+  SlashParams slash_params = 5 [(gogoproto.nullable)   = false];
 }
 
 // Vote Params defines the params related to voting.

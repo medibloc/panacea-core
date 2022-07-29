@@ -28,38 +28,6 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
-// VoteOption enumerates the vote option.
-type VoteOption int32
-
-const (
-	// VOTE_OPTION_UNSPECIFIED
-	VOTE_OPTION_UNSPECIFIED VoteOption = 0
-	// VOTE_OPTION_VALID
-	VOTE_OPTION_VALID VoteOption = 1
-	// VOTE_OPTION_INVALID
-	VOTE_OPTION_INVALID VoteOption = 2
-)
-
-var VoteOption_name = map[int32]string{
-	0: "VOTE_OPTION_UNSPECIFIED",
-	1: "VOTE_OPTION_VALID",
-	2: "VOTE_OPTION_INVALID",
-}
-
-var VoteOption_value = map[string]int32{
-	"VOTE_OPTION_UNSPECIFIED": 0,
-	"VOTE_OPTION_VALID":       1,
-	"VOTE_OPTION_INVALID":     2,
-}
-
-func (x VoteOption) String() string {
-	return proto.EnumName(VoteOption_name, int32(x))
-}
-
-func (VoteOption) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_c4592444ae79a4d4, []int{0}
-}
-
 // MsgRegisterOracle defines the Msg/RegisterOracle request type.
 type MsgRegisterOracle struct {
 	UniqueId               string `protobuf:"bytes,1,opt,name=unique_id,json=uniqueId,proto3" json:"unique_id,omitempty"`
@@ -184,7 +152,8 @@ var xxx_messageInfo_MsgRegisterOracleResponse proto.InternalMessageInfo
 
 // MsgVoteOracleRegistration defines the Msg/VoteOracleRegistration request type.
 type MsgVoteOracleRegistration struct {
-	SignedOracleRegistrationVote *SignedOracleRegistrationVote `protobuf:"bytes,1,opt,name=signed_oracle_registration_vote,json=signedOracleRegistrationVote,proto3" json:"signed_oracle_registration_vote,omitempty"`
+	OracleRegistrationVote *OracleRegistrationVote `protobuf:"bytes,1,opt,name=oracle_registration_vote,json=oracleRegistrationVote,proto3" json:"oracle_registration_vote,omitempty"`
+	Signature              []byte                  `protobuf:"bytes,2,opt,name=signature,proto3" json:"signature,omitempty"`
 }
 
 func (m *MsgVoteOracleRegistration) Reset()         { *m = MsgVoteOracleRegistration{} }
@@ -220,9 +189,16 @@ func (m *MsgVoteOracleRegistration) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgVoteOracleRegistration proto.InternalMessageInfo
 
-func (m *MsgVoteOracleRegistration) GetSignedOracleRegistrationVote() *SignedOracleRegistrationVote {
+func (m *MsgVoteOracleRegistration) GetOracleRegistrationVote() *OracleRegistrationVote {
 	if m != nil {
-		return m.SignedOracleRegistrationVote
+		return m.OracleRegistrationVote
+	}
+	return nil
+}
+
+func (m *MsgVoteOracleRegistration) GetSignature() []byte {
+	if m != nil {
+		return m.Signature
 	}
 	return nil
 }
@@ -264,193 +240,47 @@ func (m *MsgVoteOracleRegistrationResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgVoteOracleRegistrationResponse proto.InternalMessageInfo
 
-// SignedOracleRegistrationVote defines the vote of OracleRegistration and signature signed by oracle private key.
-type SignedOracleRegistrationVote struct {
-	OracleRegistrationVote *OracleRegistrationVote `protobuf:"bytes,1,opt,name=oracle_registration_vote,json=oracleRegistrationVote,proto3" json:"oracle_registration_vote,omitempty"`
-	Signature              []byte                  `protobuf:"bytes,2,opt,name=signature,proto3" json:"signature,omitempty"`
-}
-
-func (m *SignedOracleRegistrationVote) Reset()         { *m = SignedOracleRegistrationVote{} }
-func (m *SignedOracleRegistrationVote) String() string { return proto.CompactTextString(m) }
-func (*SignedOracleRegistrationVote) ProtoMessage()    {}
-func (*SignedOracleRegistrationVote) Descriptor() ([]byte, []int) {
-	return fileDescriptor_c4592444ae79a4d4, []int{4}
-}
-func (m *SignedOracleRegistrationVote) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *SignedOracleRegistrationVote) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_SignedOracleRegistrationVote.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *SignedOracleRegistrationVote) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_SignedOracleRegistrationVote.Merge(m, src)
-}
-func (m *SignedOracleRegistrationVote) XXX_Size() int {
-	return m.Size()
-}
-func (m *SignedOracleRegistrationVote) XXX_DiscardUnknown() {
-	xxx_messageInfo_SignedOracleRegistrationVote.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_SignedOracleRegistrationVote proto.InternalMessageInfo
-
-func (m *SignedOracleRegistrationVote) GetOracleRegistrationVote() *OracleRegistrationVote {
-	if m != nil {
-		return m.OracleRegistrationVote
-	}
-	return nil
-}
-
-func (m *SignedOracleRegistrationVote) GetSignature() []byte {
-	if m != nil {
-		return m.Signature
-	}
-	return nil
-}
-
-// OracleRegistrationVote defines the vote for oracle registration
-type OracleRegistrationVote struct {
-	UniqueId               string     `protobuf:"bytes,1,opt,name=unique_id,json=uniqueId,proto3" json:"unique_id,omitempty"`
-	VoterAddress           string     `protobuf:"bytes,2,opt,name=voter_address,json=voterAddress,proto3" json:"voter_address,omitempty"`
-	VotingTargetAddress    string     `protobuf:"bytes,3,opt,name=voting_target_address,json=votingTargetAddress,proto3" json:"voting_target_address,omitempty"`
-	VoteOption             VoteOption `protobuf:"varint,4,opt,name=vote_option,json=voteOption,proto3,enum=panacea.oracle.v2alpha2.VoteOption" json:"vote_option,omitempty"`
-	EncryptedOraclePrivKey []byte     `protobuf:"bytes,5,opt,name=encrypted_oracle_priv_key,json=encryptedOraclePrivKey,proto3" json:"encrypted_oracle_priv_key,omitempty"`
-}
-
-func (m *OracleRegistrationVote) Reset()         { *m = OracleRegistrationVote{} }
-func (m *OracleRegistrationVote) String() string { return proto.CompactTextString(m) }
-func (*OracleRegistrationVote) ProtoMessage()    {}
-func (*OracleRegistrationVote) Descriptor() ([]byte, []int) {
-	return fileDescriptor_c4592444ae79a4d4, []int{5}
-}
-func (m *OracleRegistrationVote) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *OracleRegistrationVote) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_OracleRegistrationVote.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *OracleRegistrationVote) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_OracleRegistrationVote.Merge(m, src)
-}
-func (m *OracleRegistrationVote) XXX_Size() int {
-	return m.Size()
-}
-func (m *OracleRegistrationVote) XXX_DiscardUnknown() {
-	xxx_messageInfo_OracleRegistrationVote.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_OracleRegistrationVote proto.InternalMessageInfo
-
-func (m *OracleRegistrationVote) GetUniqueId() string {
-	if m != nil {
-		return m.UniqueId
-	}
-	return ""
-}
-
-func (m *OracleRegistrationVote) GetVoterAddress() string {
-	if m != nil {
-		return m.VoterAddress
-	}
-	return ""
-}
-
-func (m *OracleRegistrationVote) GetVotingTargetAddress() string {
-	if m != nil {
-		return m.VotingTargetAddress
-	}
-	return ""
-}
-
-func (m *OracleRegistrationVote) GetVoteOption() VoteOption {
-	if m != nil {
-		return m.VoteOption
-	}
-	return VOTE_OPTION_UNSPECIFIED
-}
-
-func (m *OracleRegistrationVote) GetEncryptedOraclePrivKey() []byte {
-	if m != nil {
-		return m.EncryptedOraclePrivKey
-	}
-	return nil
-}
-
 func init() {
-	proto.RegisterEnum("panacea.oracle.v2alpha2.VoteOption", VoteOption_name, VoteOption_value)
 	proto.RegisterType((*MsgRegisterOracle)(nil), "panacea.oracle.v2alpha2.MsgRegisterOracle")
 	proto.RegisterType((*MsgRegisterOracleResponse)(nil), "panacea.oracle.v2alpha2.MsgRegisterOracleResponse")
 	proto.RegisterType((*MsgVoteOracleRegistration)(nil), "panacea.oracle.v2alpha2.MsgVoteOracleRegistration")
 	proto.RegisterType((*MsgVoteOracleRegistrationResponse)(nil), "panacea.oracle.v2alpha2.MsgVoteOracleRegistrationResponse")
-	proto.RegisterType((*SignedOracleRegistrationVote)(nil), "panacea.oracle.v2alpha2.SignedOracleRegistrationVote")
-	proto.RegisterType((*OracleRegistrationVote)(nil), "panacea.oracle.v2alpha2.OracleRegistrationVote")
 }
 
 func init() { proto.RegisterFile("panacea/oracle/v2alpha2/tx.proto", fileDescriptor_c4592444ae79a4d4) }
 
 var fileDescriptor_c4592444ae79a4d4 = []byte{
-	// 673 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x94, 0xcf, 0x4f, 0xdb, 0x4a,
-	0x10, 0xc7, 0xe3, 0x04, 0xd0, 0x63, 0x08, 0x08, 0x16, 0x08, 0x21, 0x20, 0xbf, 0xbc, 0xf0, 0x90,
-	0x10, 0x6a, 0xe3, 0xca, 0x55, 0x0f, 0xe5, 0x06, 0x85, 0xaa, 0x11, 0x3f, 0x12, 0x19, 0xca, 0xa1,
-	0x97, 0x95, 0x13, 0x8f, 0x1c, 0x0b, 0xf0, 0xba, 0xbb, 0xeb, 0x88, 0x48, 0x3d, 0xf5, 0xc4, 0xad,
-	0xbd, 0xf4, 0xd0, 0x73, 0x0f, 0xfd, 0x57, 0x7a, 0xe4, 0xd8, 0x63, 0x05, 0xff, 0x48, 0xe5, 0x75,
-	0x9c, 0xa4, 0x80, 0xd3, 0xf6, 0xb6, 0x9a, 0xef, 0x67, 0x7e, 0xec, 0xec, 0xec, 0x40, 0x39, 0xb0,
-	0x7d, 0xbb, 0x85, 0xb6, 0xc1, 0xb8, 0xdd, 0x3a, 0x47, 0xa3, 0x63, 0xda, 0xe7, 0x41, 0xdb, 0x36,
-	0x0d, 0x79, 0x59, 0x0d, 0x38, 0x93, 0x8c, 0x2c, 0xf5, 0x88, 0x6a, 0x4c, 0x54, 0x13, 0xa2, 0xf4,
-	0x7f, 0x9a, 0x6b, 0x0f, 0x54, 0xee, 0xa5, 0xf5, 0x34, 0xca, 0x45, 0x1f, 0x85, 0x27, 0x7a, 0xd8,
-	0x82, 0xcb, 0x5c, 0xa6, 0x8e, 0x46, 0x74, 0x8a, 0xad, 0x95, 0x4f, 0x59, 0x98, 0x3b, 0x14, 0xae,
-	0x85, 0xae, 0x27, 0x24, 0xf2, 0xba, 0x0a, 0x41, 0x56, 0x60, 0x32, 0xf4, 0xbd, 0xb7, 0x21, 0x52,
-	0xcf, 0x29, 0x6a, 0x65, 0x6d, 0x63, 0xd2, 0xfa, 0x27, 0x36, 0xd4, 0x1c, 0xb2, 0x0e, 0x33, 0x71,
-	0x26, 0x6a, 0x3b, 0x0e, 0x47, 0x21, 0x8a, 0x59, 0x45, 0x4c, 0xc7, 0xd6, 0xed, 0xd8, 0x48, 0xca,
-	0x90, 0xf7, 0x99, 0x83, 0x34, 0x08, 0x9b, 0xf4, 0x0c, 0xbb, 0xc5, 0x5c, 0x59, 0xdb, 0xc8, 0x5b,
-	0x10, 0xd9, 0x1a, 0x61, 0x73, 0x1f, 0xbb, 0x64, 0x0b, 0x4a, 0xc3, 0x04, 0xe5, 0x78, 0xc1, 0x24,
-	0x52, 0x8e, 0x01, 0xe3, 0xb2, 0x38, 0xa6, 0xf8, 0xc2, 0x80, 0xb7, 0x94, 0x6c, 0x29, 0x95, 0x3c,
-	0x81, 0x05, 0xc9, 0x43, 0x21, 0xd1, 0xa1, 0xcd, 0x73, 0xd6, 0x3a, 0xa3, 0x6d, 0xf4, 0xdc, 0xb6,
-	0x2c, 0x8e, 0x97, 0xb5, 0x8d, 0x9c, 0x45, 0x7a, 0xda, 0x4e, 0x24, 0xbd, 0x52, 0x0a, 0x79, 0x04,
-	0xe4, 0x8e, 0x87, 0x2d, 0xda, 0xc5, 0x09, 0x95, 0x65, 0xf6, 0x17, 0xde, 0x16, 0xed, 0xca, 0x0a,
-	0x2c, 0xdf, 0x6b, 0x8b, 0x85, 0x22, 0x60, 0xbe, 0xc0, 0xca, 0x67, 0x4d, 0xa9, 0xa7, 0x4c, 0x62,
-	0xa2, 0x44, 0x1c, 0xb7, 0xa5, 0xc7, 0x7c, 0xf2, 0x0e, 0xfe, 0x15, 0x9e, 0xeb, 0xa3, 0x43, 0x7b,
-	0x6d, 0xe2, 0x43, 0x2a, 0xed, 0x30, 0x89, 0xaa, 0xa5, 0x53, 0xe6, 0xb3, 0x6a, 0xca, 0xc3, 0x57,
-	0x8f, 0x95, 0xff, 0xfd, 0xd8, 0x51, 0x46, 0x6b, 0x55, 0x8c, 0x50, 0x2b, 0x6b, 0xf0, 0x5f, 0x6a,
-	0x69, 0xfd, 0x0b, 0x7c, 0xd5, 0x60, 0x75, 0x54, 0x0e, 0xe2, 0x41, 0xf1, 0x37, 0xc5, 0x1b, 0xa9,
-	0xc5, 0xa7, 0x94, 0x5d, 0x60, 0x0f, 0xa7, 0x5a, 0x85, 0xc9, 0xe8, 0x42, 0xb6, 0x0c, 0x39, 0xaa,
-	0x49, 0xca, 0x5b, 0x03, 0x43, 0xe5, 0x43, 0x16, 0x0a, 0x29, 0x35, 0x8e, 0x1c, 0xd2, 0x35, 0x98,
-	0x8e, 0x8a, 0xe5, 0x77, 0x66, 0x34, 0xaf, 0x8c, 0xc9, 0x88, 0x9a, 0xb0, 0xd8, 0x61, 0xd2, 0xf3,
-	0x5d, 0x2a, 0x6d, 0xee, 0xa2, 0xec, 0xc3, 0x39, 0x05, 0xcf, 0xc7, 0xe2, 0x89, 0xd2, 0x12, 0x9f,
-	0x5d, 0x98, 0x8a, 0x62, 0x50, 0x16, 0x44, 0x85, 0xa8, 0x29, 0x9d, 0x31, 0xd7, 0x52, 0x9b, 0xa1,
-	0x1e, 0x42, 0xa1, 0x16, 0x74, 0xfa, 0x67, 0xf2, 0x1c, 0x96, 0xd1, 0x6f, 0xf1, 0x6e, 0x20, 0x07,
-	0x63, 0x12, 0x70, 0xaf, 0xa3, 0x7e, 0xca, 0x78, 0x3c, 0xf9, 0x7d, 0x20, 0xbe, 0x7f, 0x83, 0x7b,
-	0x9d, 0x7d, 0xec, 0x6e, 0x52, 0x80, 0x41, 0x50, 0xb2, 0x02, 0x4b, 0xa7, 0xf5, 0x93, 0x3d, 0x5a,
-	0x6f, 0x9c, 0xd4, 0xea, 0x47, 0xf4, 0xf5, 0xd1, 0x71, 0x63, 0xef, 0x45, 0xed, 0x65, 0x6d, 0x6f,
-	0x77, 0x36, 0x43, 0x16, 0x61, 0x6e, 0x58, 0x3c, 0xdd, 0x3e, 0xa8, 0xed, 0xce, 0x6a, 0x64, 0x09,
-	0xe6, 0x87, 0xcd, 0xb5, 0xa3, 0x58, 0xc8, 0x96, 0xc6, 0xae, 0xbe, 0xe8, 0x19, 0xf3, 0x7d, 0x16,
-	0x72, 0x87, 0xc2, 0x25, 0x01, 0xcc, 0xdc, 0x59, 0x0b, 0x9b, 0xa9, 0xd7, 0xbc, 0xf7, 0x57, 0x4a,
-	0xe6, 0x9f, 0xb3, 0xc9, 0x58, 0x92, 0x2b, 0x0d, 0x0a, 0x29, 0x9f, 0x6a, 0x64, 0xb8, 0x87, 0x7d,
-	0x4a, 0x5b, 0x7f, 0xef, 0x93, 0x94, 0xb2, 0x73, 0xf0, 0xed, 0x46, 0xd7, 0xae, 0x6f, 0x74, 0xed,
-	0xc7, 0x8d, 0xae, 0x7d, 0xbc, 0xd5, 0x33, 0xd7, 0xb7, 0x7a, 0xe6, 0xfb, 0xad, 0x9e, 0x79, 0x63,
-	0xba, 0x9e, 0x6c, 0x87, 0xcd, 0x6a, 0x8b, 0x5d, 0x18, 0x17, 0xe8, 0x78, 0xd1, 0x32, 0x31, 0x7a,
-	0x89, 0x1e, 0xb7, 0x18, 0x8f, 0x16, 0xb0, 0x71, 0x99, 0x2c, 0x63, 0xd9, 0x0d, 0x50, 0x34, 0x27,
-	0xd4, 0xb2, 0x7d, 0xfa, 0x33, 0x00, 0x00, 0xff, 0xff, 0x25, 0x0d, 0xd0, 0xfb, 0x0c, 0x06, 0x00,
-	0x00,
+	// 478 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x93, 0x3f, 0x6f, 0xd4, 0x3e,
+	0x18, 0xc7, 0x2f, 0x77, 0xbf, 0x5f, 0xc5, 0x99, 0xa3, 0x02, 0xab, 0x3a, 0x42, 0x8a, 0xa2, 0x70,
+	0x50, 0xe9, 0x84, 0x20, 0x41, 0x61, 0xeb, 0x46, 0x27, 0x10, 0x54, 0x20, 0x0f, 0x0c, 0x2c, 0x96,
+	0x93, 0x3c, 0x72, 0xac, 0xde, 0xc5, 0xc1, 0x76, 0xaa, 0xde, 0xca, 0xc4, 0xc8, 0xc2, 0x3b, 0xe0,
+	0xc5, 0x30, 0x76, 0x64, 0x44, 0x77, 0x6f, 0x04, 0xc5, 0x49, 0xd4, 0xd2, 0x6b, 0x10, 0x6c, 0xd6,
+	0xf7, 0xfb, 0x79, 0xfe, 0xf8, 0xb1, 0x1f, 0x14, 0x94, 0xac, 0x60, 0x29, 0xb0, 0x48, 0x2a, 0x96,
+	0x2e, 0x20, 0x3a, 0x8d, 0xd9, 0xa2, 0xcc, 0x59, 0x1c, 0x99, 0xb3, 0xb0, 0x54, 0xd2, 0x48, 0x7c,
+	0xb7, 0x25, 0xc2, 0x86, 0x08, 0x3b, 0xc2, 0x7b, 0xd4, 0x17, 0xda, 0x82, 0x36, 0xdc, 0x3b, 0xe8,
+	0xa3, 0x38, 0x14, 0xa0, 0x85, 0x6e, 0xb1, 0x3d, 0x2e, 0xb9, 0xb4, 0xc7, 0xa8, 0x3e, 0x35, 0xea,
+	0xec, 0xeb, 0x10, 0xdd, 0x39, 0xd6, 0x9c, 0x00, 0x17, 0xda, 0x80, 0x7a, 0x6b, 0x53, 0xe0, 0x7d,
+	0x34, 0xae, 0x0a, 0xf1, 0xb1, 0x02, 0x2a, 0x32, 0xd7, 0x09, 0x9c, 0xf9, 0x98, 0xdc, 0x68, 0x84,
+	0x57, 0x19, 0x3e, 0x40, 0xbb, 0x4d, 0x25, 0xca, 0xb2, 0x4c, 0x81, 0xd6, 0xee, 0xd0, 0x12, 0xb7,
+	0x1a, 0xf5, 0x45, 0x23, 0xe2, 0x00, 0x4d, 0x0a, 0x99, 0x01, 0x2d, 0xab, 0x84, 0x9e, 0xc0, 0xca,
+	0x1d, 0x05, 0xce, 0x7c, 0x42, 0x50, 0xad, 0xbd, 0xab, 0x92, 0xd7, 0xb0, 0xc2, 0x87, 0xc8, 0xbb,
+	0x4c, 0x50, 0x05, 0x4b, 0x69, 0x80, 0x2a, 0x28, 0xa5, 0x32, 0xee, 0x7f, 0x96, 0x9f, 0x5e, 0xf0,
+	0xc4, 0xda, 0xc4, 0xba, 0xf8, 0x19, 0xda, 0x33, 0xaa, 0xd2, 0x06, 0x32, 0x9a, 0x2c, 0x64, 0x7a,
+	0x42, 0x73, 0x10, 0x3c, 0x37, 0xee, 0xff, 0x81, 0x33, 0x1f, 0x11, 0xdc, 0x7a, 0x47, 0xb5, 0xf5,
+	0xd2, 0x3a, 0xf8, 0x09, 0xc2, 0x57, 0x22, 0x98, 0xce, 0xdd, 0x1d, 0x5b, 0xe5, 0xf6, 0x6f, 0x3c,
+	0xd3, 0xf9, 0x6c, 0x1f, 0xdd, 0xdb, 0x1a, 0x0b, 0x01, 0x5d, 0xca, 0x42, 0xc3, 0xec, 0x9b, 0x63,
+	0xdd, 0xf7, 0xd2, 0x40, 0xe7, 0xd4, 0x9c, 0x62, 0x46, 0xc8, 0x02, 0x0b, 0xe4, 0xb6, 0xf3, 0x51,
+	0x97, 0x64, 0x7a, 0x2a, 0x0d, 0xd8, 0x59, 0xde, 0x8c, 0xa3, 0xb0, 0xe7, 0xc5, 0xc3, 0xed, 0x74,
+	0x75, 0x11, 0x32, 0x95, 0xd7, 0xea, 0xf8, 0x3e, 0x1a, 0x6b, 0xc1, 0x0b, 0x66, 0x2a, 0x05, 0xf6,
+	0x15, 0x26, 0xe4, 0x42, 0x98, 0x3d, 0x44, 0x0f, 0x7a, 0xbb, 0xec, 0xee, 0x12, 0x7f, 0x1a, 0xa2,
+	0xd1, 0xb1, 0xe6, 0xb8, 0x44, 0xbb, 0x57, 0x3e, 0xc1, 0xe3, 0xde, 0x2e, 0xb7, 0x26, 0xe3, 0xc5,
+	0x7f, 0xcf, 0x76, 0x95, 0xf1, 0x67, 0x07, 0x4d, 0x7b, 0x46, 0xf8, 0xc7, 0x74, 0xd7, 0xc7, 0x78,
+	0x87, 0xff, 0x1e, 0xd3, 0xb5, 0x72, 0xf4, 0xe6, 0xfb, 0xda, 0x77, 0xce, 0xd7, 0xbe, 0xf3, 0x73,
+	0xed, 0x3b, 0x5f, 0x36, 0xfe, 0xe0, 0x7c, 0xe3, 0x0f, 0x7e, 0x6c, 0xfc, 0xc1, 0x87, 0x98, 0x0b,
+	0x93, 0x57, 0x49, 0x98, 0xca, 0x65, 0xb4, 0x84, 0x4c, 0xd4, 0x5f, 0x27, 0x6a, 0x0b, 0x3d, 0x4d,
+	0xa5, 0xaa, 0xd7, 0x2d, 0x3a, 0xeb, 0x56, 0xcf, 0xac, 0x4a, 0xd0, 0xc9, 0x8e, 0x5d, 0xad, 0xe7,
+	0xbf, 0x02, 0x00, 0x00, 0xff, 0xff, 0xe8, 0xc2, 0xf5, 0x2d, 0xfa, 0x03, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -679,9 +509,16 @@ func (m *MsgVoteOracleRegistration) MarshalToSizedBuffer(dAtA []byte) (int, erro
 	_ = i
 	var l int
 	_ = l
-	if m.SignedOracleRegistrationVote != nil {
+	if len(m.Signature) > 0 {
+		i -= len(m.Signature)
+		copy(dAtA[i:], m.Signature)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Signature)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if m.OracleRegistrationVote != nil {
 		{
-			size, err := m.SignedOracleRegistrationVote.MarshalToSizedBuffer(dAtA[:i])
+			size, err := m.OracleRegistrationVote.MarshalToSizedBuffer(dAtA[:i])
 			if err != nil {
 				return 0, err
 			}
@@ -714,104 +551,6 @@ func (m *MsgVoteOracleRegistrationResponse) MarshalToSizedBuffer(dAtA []byte) (i
 	_ = i
 	var l int
 	_ = l
-	return len(dAtA) - i, nil
-}
-
-func (m *SignedOracleRegistrationVote) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *SignedOracleRegistrationVote) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *SignedOracleRegistrationVote) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if len(m.Signature) > 0 {
-		i -= len(m.Signature)
-		copy(dAtA[i:], m.Signature)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.Signature)))
-		i--
-		dAtA[i] = 0x12
-	}
-	if m.OracleRegistrationVote != nil {
-		{
-			size, err := m.OracleRegistrationVote.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintTx(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *OracleRegistrationVote) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *OracleRegistrationVote) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *OracleRegistrationVote) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if len(m.EncryptedOraclePrivKey) > 0 {
-		i -= len(m.EncryptedOraclePrivKey)
-		copy(dAtA[i:], m.EncryptedOraclePrivKey)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.EncryptedOraclePrivKey)))
-		i--
-		dAtA[i] = 0x2a
-	}
-	if m.VoteOption != 0 {
-		i = encodeVarintTx(dAtA, i, uint64(m.VoteOption))
-		i--
-		dAtA[i] = 0x20
-	}
-	if len(m.VotingTargetAddress) > 0 {
-		i -= len(m.VotingTargetAddress)
-		copy(dAtA[i:], m.VotingTargetAddress)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.VotingTargetAddress)))
-		i--
-		dAtA[i] = 0x1a
-	}
-	if len(m.VoterAddress) > 0 {
-		i -= len(m.VoterAddress)
-		copy(dAtA[i:], m.VoterAddress)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.VoterAddress)))
-		i--
-		dAtA[i] = 0x12
-	}
-	if len(m.UniqueId) > 0 {
-		i -= len(m.UniqueId)
-		copy(dAtA[i:], m.UniqueId)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.UniqueId)))
-		i--
-		dAtA[i] = 0xa
-	}
 	return len(dAtA) - i, nil
 }
 
@@ -873,28 +612,6 @@ func (m *MsgVoteOracleRegistration) Size() (n int) {
 	}
 	var l int
 	_ = l
-	if m.SignedOracleRegistrationVote != nil {
-		l = m.SignedOracleRegistrationVote.Size()
-		n += 1 + l + sovTx(uint64(l))
-	}
-	return n
-}
-
-func (m *MsgVoteOracleRegistrationResponse) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	return n
-}
-
-func (m *SignedOracleRegistrationVote) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
 	if m.OracleRegistrationVote != nil {
 		l = m.OracleRegistrationVote.Size()
 		n += 1 + l + sovTx(uint64(l))
@@ -906,31 +623,12 @@ func (m *SignedOracleRegistrationVote) Size() (n int) {
 	return n
 }
 
-func (m *OracleRegistrationVote) Size() (n int) {
+func (m *MsgVoteOracleRegistrationResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	l = len(m.UniqueId)
-	if l > 0 {
-		n += 1 + l + sovTx(uint64(l))
-	}
-	l = len(m.VoterAddress)
-	if l > 0 {
-		n += 1 + l + sovTx(uint64(l))
-	}
-	l = len(m.VotingTargetAddress)
-	if l > 0 {
-		n += 1 + l + sovTx(uint64(l))
-	}
-	if m.VoteOption != 0 {
-		n += 1 + sovTx(uint64(m.VoteOption))
-	}
-	l = len(m.EncryptedOraclePrivKey)
-	if l > 0 {
-		n += 1 + l + sovTx(uint64(l))
-	}
 	return n
 }
 
@@ -1256,142 +954,6 @@ func (m *MsgVoteOracleRegistration) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field SignedOracleRegistrationVote", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthTx
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthTx
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.SignedOracleRegistrationVote == nil {
-				m.SignedOracleRegistrationVote = &SignedOracleRegistrationVote{}
-			}
-			if err := m.SignedOracleRegistrationVote.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipTx(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthTx
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *MsgVoteOracleRegistrationResponse) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowTx
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: MsgVoteOracleRegistrationResponse: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgVoteOracleRegistrationResponse: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		default:
-			iNdEx = preIndex
-			skippy, err := skipTx(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthTx
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *SignedOracleRegistrationVote) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowTx
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: SignedOracleRegistrationVote: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: SignedOracleRegistrationVote: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field OracleRegistrationVote", wireType)
 			}
 			var msglen int
@@ -1481,7 +1043,7 @@ func (m *SignedOracleRegistrationVote) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *OracleRegistrationVote) Unmarshal(dAtA []byte) error {
+func (m *MsgVoteOracleRegistrationResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -1504,161 +1066,12 @@ func (m *OracleRegistrationVote) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: OracleRegistrationVote: wiretype end group for non-group")
+			return fmt.Errorf("proto: MsgVoteOracleRegistrationResponse: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: OracleRegistrationVote: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MsgVoteOracleRegistrationResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field UniqueId", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthTx
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthTx
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.UniqueId = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field VoterAddress", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthTx
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthTx
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.VoterAddress = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 3:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field VotingTargetAddress", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthTx
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthTx
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.VotingTargetAddress = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 4:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field VoteOption", wireType)
-			}
-			m.VoteOption = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.VoteOption |= VoteOption(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 5:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field EncryptedOraclePrivKey", wireType)
-			}
-			var byteLen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				byteLen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if byteLen < 0 {
-				return ErrInvalidLengthTx
-			}
-			postIndex := iNdEx + byteLen
-			if postIndex < 0 {
-				return ErrInvalidLengthTx
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.EncryptedOraclePrivKey = append(m.EncryptedOraclePrivKey[:0], dAtA[iNdEx:postIndex]...)
-			if m.EncryptedOraclePrivKey == nil {
-				m.EncryptedOraclePrivKey = []byte{}
-			}
-			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipTx(dAtA[iNdEx:])

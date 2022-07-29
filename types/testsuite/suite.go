@@ -226,6 +226,7 @@ func (suite *TestSuite) SetupTest() {
 		cdc.Marshaler,
 		keyParams[oracletypes.StoreKey],
 		memKeys[oracletypes.MemStoreKey],
+		paramsKeeper.Subspace(oracletypes.ModuleName),
 	)
 
 	suite.OracleMsgServer = oraclekeeper.NewMsgServerImpl(suite.OracleKeeper)

@@ -92,3 +92,26 @@ message VotingPeriod {
     (gogoproto.moretags) = "yaml:\"voting_end_time\""
   ];
 }
+
+// OracleRegistrationVote defines the vote for oracle registration
+message OracleRegistrationVote {
+  string unique_id = 1;
+  string voter_address = 2;
+  string voting_target_address = 3;
+  VoteOption vote_option = 4;
+  bytes encrypted_oracle_priv_key = 5;
+}
+
+// VoteOption enumerates the vote option.
+enum VoteOption {
+  option (gogoproto.goproto_enum_prefix) = false;
+
+  // VOTE_OPTION_UNSPECIFIED
+  VOTE_OPTION_UNSPECIFIED = 0;
+
+  // VOTE_OPTION_VALID
+  VOTE_OPTION_VALID = 1;
+
+  // VOTE_OPTION_INVALID
+  VOTE_OPTION_INVALID = 2;
+}

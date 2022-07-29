@@ -32,37 +32,9 @@ message MsgRegisterOracleResponse {
 
 // MsgVoteOracleRegistration defines the Msg/VoteOracleRegistration request type.
 message MsgVoteOracleRegistration {
-  SignedOracleRegistrationVote signed_oracle_registration_vote = 1;
-}
-
-// MsgVoteOracleRegistrationResponse defines the Msg/VoteOracleRegistration response type.
-message MsgVoteOracleRegistrationResponse {}
-
-// SignedOracleRegistrationVote defines the vote of OracleRegistration and signature signed by oracle private key.
-message SignedOracleRegistrationVote {
   OracleRegistrationVote oracle_registration_vote = 1;
   bytes signature = 2;
 }
 
-// VoteOption enumerates the vote option.
-enum VoteOption {
-  option (gogoproto.goproto_enum_prefix) = false;
-
-  // VOTE_OPTION_UNSPECIFIED
-  VOTE_OPTION_UNSPECIFIED = 0;
-
-  // VOTE_OPTION_VALID
-  VOTE_OPTION_VALID = 1;
-
-  // VOTE_OPTION_INVALID
-  VOTE_OPTION_INVALID = 2;
-}
-
-// OracleRegistrationVote defines the vote for oracle registration
-message OracleRegistrationVote {
-  string unique_id = 1;
-  string voter_address = 2;
-  string voting_target_address = 3;
-  VoteOption vote_option = 4;
-  bytes encrypted_oracle_priv_key = 5;
-}
+// MsgVoteOracleRegistrationResponse defines the Msg/VoteOracleRegistration response type.
+message MsgVoteOracleRegistrationResponse {}
