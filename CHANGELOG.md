@@ -4,6 +4,12 @@
 
 TBD
 
+## [v2.0.4](https://github.com/medibloc/panacea-core/releases/tag/v2.0.4) - 2022-07-29
+
+### Improvements
+
+- [\#367](https://github.com/medibloc/panacea-core/pull/367) Use a new version of `cosmos/ledger-go` for Ledger Nano S+
+
 
 ## [v2.0.3](https://github.com/medibloc/panacea-core/releases/tag/v2.0.3) - 2022-04-12
 
