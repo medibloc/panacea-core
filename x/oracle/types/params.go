@@ -30,7 +30,7 @@ func DefaultParams() Params {
 		VoteParams: VoteParams{
 			VotingPeriod: 30 * time.Second,
 			JailPeriod:   10 * time.Minute,
-			Quorum:       sdk.NewDecWithPrec(1, 3),
+			Quorum:       sdk.NewDec(1).Quo(sdk.NewDec(3)),
 		},
 		SlashParams: SlashParams{
 			SlashFractionDowntime: sdk.NewDecWithPrec(2, 1),
