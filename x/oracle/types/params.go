@@ -94,13 +94,9 @@ func validateOraclePubKeyRemoteReport(i interface{}) error {
 }
 
 func validateUniqueID(i interface{}) error {
-	uniqueID, ok := i.(string)
+	_, ok := i.(string)
 	if !ok {
 		return fmt.Errorf("invalid parameter type: %T", i)
-	}
-
-	if len(uniqueID) == 0 {
-		return fmt.Errorf("empty unique ID: %s", uniqueID)
 	}
 
 	return nil

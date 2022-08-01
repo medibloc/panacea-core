@@ -36,12 +36,12 @@ func (k Keeper) RegisterOracle(ctx sdk.Context, msg *types.MsgRegisterOracle) er
 }
 
 func (k Keeper) CheckValidatorStatus(ctx sdk.Context, oracleAddress string) error {
-	valAddr, err := sdk.ValAddressFromBech32(oracleAddress)
+	valAccAddr, err := sdk.AccAddressFromBech32(oracleAddress)
 	if err != nil {
 		return err
 	}
 
-	validator, found := k.stakingKeeper.GetValidator(ctx, valAddr)
+	validator, found := k.stakingKeeper.GetValidator(ctx, sdk.ValAddress(valAccAddr))
 	if !found {
 		return types.ErrValidatorNotFound
 	}
@@ -222,6 +222,7 @@ func (k Keeper) GetOracleRegistration(ctx sdk.Context, address string) (*types.O
 
 func (k Keeper) SetOracleRegistration(ctx sdk.Context, regOracle *types.OracleRegistration) error {
 	store := ctx.KVStore(k.storeKey)
+
 	accAddr, err := sdk.AccAddressFromBech32(regOracle.Address)
 	if err != nil {
 		return err
