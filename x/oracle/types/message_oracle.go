@@ -7,6 +7,17 @@ import (
 
 var _ sdk.Msg = &MsgRegisterOracle{}
 
+func NewMsgRegisterOracle(uniqueID, oracleAddress string, nodePubKey, nodePubKeyRemoteReport []byte, trustedBlockHeight int64, trustedBlockHash []byte) *MsgRegisterOracle {
+	return &MsgRegisterOracle{
+		UniqueId:               uniqueID,
+		OracleAddress:          oracleAddress,
+		NodePubKey:             nodePubKey,
+		NodePubKeyRemoteReport: nodePubKeyRemoteReport,
+		TrustedBlockHeight:     trustedBlockHeight,
+		TrustedBlockHash:       trustedBlockHash,
+	}
+}
+
 func (msg *MsgRegisterOracle) Route() string {
 	return RouterKey
 }
