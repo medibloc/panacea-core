@@ -35,6 +35,7 @@ func (k Keeper) RegisterOracle(ctx sdk.Context, msg *types.MsgRegisterOracle) er
 	return nil
 }
 
+// CheckValidatorStatus gets validator and check its status if it's eligible to be an oracle
 func (k Keeper) CheckValidatorStatus(ctx sdk.Context, oracleAddress string) error {
 	valAccAddr, err := sdk.AccAddressFromBech32(oracleAddress)
 	if err != nil {
@@ -305,6 +306,7 @@ func (k Keeper) SetOracleRegistrationVote(ctx sdk.Context, vote *types.OracleReg
 	return nil
 }
 
+// GetVotingPeriod gets voting period based on the current block time
 func (k Keeper) GetVotingPeriod(ctx sdk.Context) *types.VotingPeriod {
 	params := k.GetParams(ctx)
 	votingStartTime := ctx.BlockHeader().Time
