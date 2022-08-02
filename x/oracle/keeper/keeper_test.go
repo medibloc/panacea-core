@@ -33,8 +33,8 @@ func TestKeeperTestSuite(t *testing.T) {
 
 func (m keeperTestSuite) TestEndVoteQueue() {
 	now := time.Now()
-	m.OracleKeeper.AddOracleRegistrationVoteQueue(m.Ctx, oracle2Acc, now.Add(3*time.Second))
 	m.OracleKeeper.AddOracleRegistrationVoteQueue(m.Ctx, oracle1Acc, now.Add(1*time.Second))
+	m.OracleKeeper.AddOracleRegistrationVoteQueue(m.Ctx, oracle2Acc, now.Add(3*time.Second))
 	m.OracleKeeper.AddOracleRegistrationVoteQueue(m.Ctx, oracle3Acc, now.Add(5*time.Second))
 
 	iter := m.OracleKeeper.GetEndOracleRegistrationVoteQueueIterator(m.Ctx, now)
