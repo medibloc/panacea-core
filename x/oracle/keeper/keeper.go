@@ -45,9 +45,9 @@ func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 	return ctx.Logger().With("module", fmt.Sprintf("x/%s", types.ModuleName))
 }
 
-func (k Keeper) AddOracleRegistrationVoteQueue(ctx sdk.Context, addr sdk.AccAddress, endTime time.Time) {
+func (k Keeper) AddOracleRegistrationVoteQueue(ctx sdk.Context, uniqueID string, addr sdk.AccAddress, endTime time.Time) {
 	store := ctx.KVStore(k.storeKey)
-	store.Set(types.GetOracleRegistrationVoteQueueKey(addr, endTime), addr)
+	store.Set(types.GetOracleRegistrationVoteQueueKey(uniqueID, addr, endTime), addr)
 }
 
 func (k Keeper) GetEndOracleRegistrationVoteQueueIterator(ctx sdk.Context, endTime time.Time) sdk.Iterator {
@@ -55,7 +55,7 @@ func (k Keeper) GetEndOracleRegistrationVoteQueueIterator(ctx sdk.Context, endTi
 	return store.Iterator(types.OracleRegistrationVotesQueueKey, sdk.PrefixEndBytes(types.GetOracleRegistrationVoteQueueByTimeKey(endTime)))
 }
 
-func (k Keeper) RemoveOracleRegistrationVoteQueue(ctx sdk.Context, addr sdk.AccAddress, endTime time.Time) {
+func (k Keeper) RemoveOracleRegistrationVoteQueue(ctx sdk.Context, uniqueID string, addr sdk.AccAddress, endTime time.Time) {
 	store := ctx.KVStore(k.storeKey)
-	store.Delete(types.GetOracleRegistrationVoteQueueKey(addr, endTime))
+	store.Delete(types.GetOracleRegistrationVoteQueueKey(uniqueID, addr, endTime))
 }

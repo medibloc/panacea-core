@@ -45,8 +45,8 @@ func GetOracleRegistrationVoteKey(uniqueID string, votingTargetAddress, voterAdd
 	return append(OracleRegistrationVotesKey, CombineKeys([]byte(uniqueID), votingTargetAddress, voterAddress)...)
 }
 
-func GetOracleRegistrationVoteQueueKey(addr sdk.AccAddress, endTime time.Time) []byte {
-	return append(OracleRegistrationVotesQueueKey, CombineKeys(sdk.FormatTimeBytes(endTime), addr)...)
+func GetOracleRegistrationVoteQueueKey(uniqueID string, addr sdk.AccAddress, endTime time.Time) []byte {
+	return append(OracleRegistrationVotesQueueKey, CombineKeys(sdk.FormatTimeBytes(endTime), []byte(uniqueID), addr)...)
 }
 
 func GetOracleRegistrationVoteQueueByTimeKey(endTime time.Time) []byte {

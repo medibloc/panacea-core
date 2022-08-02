@@ -33,9 +33,9 @@ func TestKeeperTestSuite(t *testing.T) {
 
 func (m keeperTestSuite) TestEndVoteQueue() {
 	now := time.Now()
-	m.OracleKeeper.AddOracleRegistrationVoteQueue(m.Ctx, oracle1Acc, now.Add(1*time.Second))
-	m.OracleKeeper.AddOracleRegistrationVoteQueue(m.Ctx, oracle2Acc, now.Add(3*time.Second))
-	m.OracleKeeper.AddOracleRegistrationVoteQueue(m.Ctx, oracle3Acc, now.Add(5*time.Second))
+	m.OracleKeeper.AddOracleRegistrationVoteQueue(m.Ctx, uniqueID, oracle1Acc, now.Add(1*time.Second))
+	m.OracleKeeper.AddOracleRegistrationVoteQueue(m.Ctx, uniqueID, oracle2Acc, now.Add(3*time.Second))
+	m.OracleKeeper.AddOracleRegistrationVoteQueue(m.Ctx, uniqueID, oracle3Acc, now.Add(5*time.Second))
 
 	iter := m.OracleKeeper.GetEndOracleRegistrationVoteQueueIterator(m.Ctx, now)
 	m.Require().False(iter.Valid())
@@ -69,7 +69,7 @@ func (m keeperTestSuite) TestEndVoteQueue() {
 	m.Require().Equal(oracle3Acc, addrList[2])
 
 	// remove first queue and check
-	m.OracleKeeper.RemoveOracleRegistrationVoteQueue(m.Ctx, oracle1Acc, now.Add(1*time.Second))
+	m.OracleKeeper.RemoveOracleRegistrationVoteQueue(m.Ctx, uniqueID, oracle1Acc, now.Add(1*time.Second))
 
 	iter = m.OracleKeeper.GetEndOracleRegistrationVoteQueueIterator(m.Ctx, now.Add(6*time.Second))
 	addrList = make([]sdk.AccAddress, 0)
