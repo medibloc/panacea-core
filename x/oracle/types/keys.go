@@ -3,6 +3,7 @@ package types
 import (
 	"bytes"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"time"
 )
 
 const (
@@ -24,9 +25,10 @@ const (
 
 var (
 	// OraclesKey defines key to store oracle
-	OraclesKey                 = []byte{0x01}
-	OracleRegistrationsKey     = []byte{0x02}
-	OracleRegistrationVotesKey = []byte{0x03}
+	OraclesKey                      = []byte{0x01}
+	OracleRegistrationsKey          = []byte{0x02}
+	OracleRegistrationVotesKey      = []byte{0x03}
+	OracleRegistrationVotesQueueKey = []byte{0x04}
 
 	IndexSeparator = []byte{0xFF}
 )
@@ -41,6 +43,14 @@ func GetOracleRegistrationKey(address sdk.AccAddress) []byte {
 
 func GetOracleRegistrationVoteKey(uniqueID string, votingTargetAddress, voterAddress sdk.AccAddress) []byte {
 	return append(OracleRegistrationVotesKey, CombineKeys([]byte(uniqueID), votingTargetAddress, voterAddress)...)
+}
+
+func GetOracleRegistrationVoteQueueKey(addr sdk.AccAddress, endTime time.Time) []byte {
+	return append(OracleRegistrationVotesQueueKey, CombineKeys(sdk.FormatTimeBytes(endTime), addr)...)
+}
+
+func GetOracleRegistrationVoteQueueByTimeKey(endTime time.Time) []byte {
+	return append(OracleRegistrationVotesQueueKey, sdk.FormatTimeBytes(endTime)...)
 }
 
 func CombineKeys(keys ...[]byte) []byte {

@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/tendermint/tendermint/libs/log"
 
@@ -42,4 +43,19 @@ func NewKeeper(
 
 func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 	return ctx.Logger().With("module", fmt.Sprintf("x/%s", types.ModuleName))
+}
+
+func (k Keeper) AddOracleRegistrationVoteQueue(ctx sdk.Context, addr sdk.AccAddress, endTime time.Time) {
+	store := ctx.KVStore(k.storeKey)
+	store.Set(types.GetOracleRegistrationVoteQueueKey(addr, endTime), addr)
+}
+
+func (k Keeper) GetEndOracleRegistrationVoteQueueIterator(ctx sdk.Context, endTime time.Time) sdk.Iterator {
+	store := ctx.KVStore(k.storeKey)
+	return store.Iterator(types.OracleRegistrationVotesQueueKey, sdk.PrefixEndBytes(types.GetOracleRegistrationVoteQueueByTimeKey(endTime)))
+}
+
+func (k Keeper) RemoveOracleRegistrationVoteQueue(ctx sdk.Context, addr sdk.AccAddress, endTime time.Time) {
+	store := ctx.KVStore(k.storeKey)
+	store.Delete(types.GetOracleRegistrationVoteQueueKey(addr, endTime))
 }
