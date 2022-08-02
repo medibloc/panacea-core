@@ -1,9 +1,11 @@
 package keeper_test
 
 import (
+	"fmt"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/medibloc/panacea-core/v2/types/testsuite"
+	"github.com/medibloc/panacea-core/v2/x/oracle/types"
 	"github.com/stretchr/testify/suite"
 	"testing"
 	"time"
@@ -79,4 +81,14 @@ func (m keeperTestSuite) TestEndVoteQueue() {
 	m.Require().Equal(2, len(addrList))
 	m.Require().Equal(oracle2Acc, addrList[0])
 	m.Require().Equal(oracle3Acc, addrList[1])
+}
+
+func (m keeperTestSuite) Test() {
+	lenTime := len(sdk.FormatTimeBytes(time.Now()))
+
+	key := types.GetOracleRegistrationVoteQueueKey(uniqueID, oracle1Acc, time.Now())
+	fmt.Println(len(key))
+	fmt.Println(oracle1Acc.String())
+	fmt.Println(sdk.AccAddress(key[len(key)-20:]).String())
+	fmt.Println(string(key[1+lenTime+1 : len(key)-21]))
 }

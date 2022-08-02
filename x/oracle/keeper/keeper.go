@@ -59,3 +59,12 @@ func (k Keeper) RemoveOracleRegistrationVoteQueue(ctx sdk.Context, uniqueID stri
 	store := ctx.KVStore(k.storeKey)
 	store.Delete(types.GetOracleRegistrationVoteQueueKey(uniqueID, addr, endTime))
 }
+
+func (k Keeper) IterateEndOracleRegistrationVotesQueue(ctx sdk.Context, endTime time.Time, cb func() (stop bool)) {
+	iter := k.GetEndOracleRegistrationVoteQueueIterator(ctx, endTime)
+
+	defer iter.Close()
+	for ; iter.Valid(); iter.Next() {
+
+	}
+}
