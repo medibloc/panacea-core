@@ -125,6 +125,7 @@ func validateSlashParams(i interface{}) error {
 	if !ok {
 		return fmt.Errorf("invalid parameter type: %T", i)
 	}
+
 	if slashParams.SlashFractionDowntime.IsNegative() {
 		return fmt.Errorf("'slashFactionDowntime' cannot be negative: %s", slashParams.SlashFractionDowntime)
 	} else if slashParams.SlashFractionDowntime.GT(sdk.OneDec()) {
@@ -136,5 +137,6 @@ func validateSlashParams(i interface{}) error {
 	} else if slashParams.SlashFractionForgery.GT(sdk.OneDec()) {
 		return fmt.Errorf("'slashFractionForgery' rate cannot be greater than 100%%: %s", slashParams.SlashFractionForgery)
 	}
+
 	return nil
 }
