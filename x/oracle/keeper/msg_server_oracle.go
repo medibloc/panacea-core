@@ -11,7 +11,7 @@ func (m msgServer) RegisterOracle(goCtx context.Context, msg *types.MsgRegisterO
 }
 
 func (m msgServer) VoteOracleRegistration(goCtx context.Context, msg *types.MsgVoteOracleRegistration) (*types.MsgVoteOracleRegistrationResponse, error) {
-	err := m.Keeper.VoteOracleRegistration(sdk.UnwrapSDKContext(goCtx), msg.SignedOracleRegistrationVote)
+	err := m.Keeper.VoteOracleRegistration(sdk.UnwrapSDKContext(goCtx), msg.OracleRegistrationVote, msg.Signature)
 	if err != nil {
 		return nil, err
 	}
