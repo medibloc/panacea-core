@@ -37,10 +37,10 @@ func (m keeperTestSuite) TestEndVoteQueue() {
 	m.OracleKeeper.AddOracleRegistrationVoteQueue(m.Ctx, uniqueID, oracle2Acc, now.Add(3*time.Second))
 	m.OracleKeeper.AddOracleRegistrationVoteQueue(m.Ctx, uniqueID, oracle3Acc, now.Add(5*time.Second))
 
-	iter := m.OracleKeeper.GetEndOracleRegistrationVoteQueueIterator(m.Ctx, now)
+	iter := m.OracleKeeper.GetClosedOracleRegistrationVoteQueueIterator(m.Ctx, now)
 	m.Require().False(iter.Valid())
 
-	iter = m.OracleKeeper.GetEndOracleRegistrationVoteQueueIterator(m.Ctx, now.Add(2*time.Second))
+	iter = m.OracleKeeper.GetClosedOracleRegistrationVoteQueueIterator(m.Ctx, now.Add(2*time.Second))
 
 	addrList := make([]sdk.AccAddress, 0)
 	for ; iter.Valid(); iter.Next() {
@@ -49,7 +49,7 @@ func (m keeperTestSuite) TestEndVoteQueue() {
 	m.Require().Equal(1, len(addrList))
 	m.Require().Equal(oracle1Acc, addrList[0])
 
-	iter = m.OracleKeeper.GetEndOracleRegistrationVoteQueueIterator(m.Ctx, now.Add(4*time.Second))
+	iter = m.OracleKeeper.GetClosedOracleRegistrationVoteQueueIterator(m.Ctx, now.Add(4*time.Second))
 	addrList = make([]sdk.AccAddress, 0)
 	for ; iter.Valid(); iter.Next() {
 		addrList = append(addrList, iter.Value())
@@ -58,7 +58,7 @@ func (m keeperTestSuite) TestEndVoteQueue() {
 	m.Require().Equal(oracle1Acc, addrList[0])
 	m.Require().Equal(oracle2Acc, addrList[1])
 
-	iter = m.OracleKeeper.GetEndOracleRegistrationVoteQueueIterator(m.Ctx, now.Add(6*time.Second))
+	iter = m.OracleKeeper.GetClosedOracleRegistrationVoteQueueIterator(m.Ctx, now.Add(6*time.Second))
 	addrList = make([]sdk.AccAddress, 0)
 	for ; iter.Valid(); iter.Next() {
 		addrList = append(addrList, iter.Value())
@@ -71,7 +71,7 @@ func (m keeperTestSuite) TestEndVoteQueue() {
 	// remove first queue and check
 	m.OracleKeeper.RemoveOracleRegistrationVoteQueue(m.Ctx, uniqueID, oracle1Acc, now.Add(1*time.Second))
 
-	iter = m.OracleKeeper.GetEndOracleRegistrationVoteQueueIterator(m.Ctx, now.Add(6*time.Second))
+	iter = m.OracleKeeper.GetClosedOracleRegistrationVoteQueueIterator(m.Ctx, now.Add(6*time.Second))
 	addrList = make([]sdk.AccAddress, 0)
 	for ; iter.Valid(); iter.Next() {
 		addrList = append(addrList, iter.Value())
