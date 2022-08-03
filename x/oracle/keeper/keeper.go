@@ -50,7 +50,7 @@ func (k Keeper) AddOracleRegistrationVoteQueue(ctx sdk.Context, uniqueID string,
 	store.Set(types.GetOracleRegistrationVoteQueueKey(uniqueID, addr, endTime), addr)
 }
 
-func (k Keeper) GetEndOracleRegistrationVoteQueueIterator(ctx sdk.Context, endTime time.Time) sdk.Iterator {
+func (k Keeper) GetClosedOracleRegistrationVoteQueueIterator(ctx sdk.Context, endTime time.Time) sdk.Iterator {
 	store := ctx.KVStore(k.storeKey)
 	return store.Iterator(types.OracleRegistrationVotesQueueKey, sdk.PrefixEndBytes(types.GetOracleRegistrationVoteQueueByTimeKey(endTime)))
 }
