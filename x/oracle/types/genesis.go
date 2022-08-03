@@ -9,7 +9,7 @@ func DefaultGenesis() *GenesisState {
 		OracleRegistrations:     []OracleRegistration{},
 		OracleRegistrationVotes: []OracleRegistrationVote{},
 		Params:                  Params{},
-		UpgradeOracleInfo:       UpgradeOracleInfo{},
+		OracleUpgradeInfo:       OracleUpgradeInfo{},
 	}
 }
 
