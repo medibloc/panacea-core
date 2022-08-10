@@ -14,7 +14,7 @@ func (k Keeper) Tally(ctx sdk.Context, voteIterator sdk.Iterator, voteType types
 	}
 
 	tally := types.NewTally()
-	k.setOracleValidatorInfos(ctx, tally)
+	k.setOracleValidatorInfosInTally(ctx, tally)
 
 	for ; voteIterator.Valid(); voteIterator.Next() {
 		bz := voteIterator.Value()
@@ -34,7 +34,7 @@ func (k Keeper) Tally(ctx sdk.Context, voteIterator sdk.Iterator, voteType types
 	return tallyResult, nil
 }
 
-func (k Keeper) setOracleValidatorInfos(ctx sdk.Context, tally *types.Tally) {
+func (k Keeper) setOracleValidatorInfosInTally(ctx sdk.Context, tally *types.Tally) {
 	oracleValidatorInfos := make(map[string]*types.OracleValidatorInfo)
 	k.IterateOracleValidator(ctx, func(info *types.OracleValidatorInfo) bool {
 		oracleValidatorInfos[info.Address] = info
