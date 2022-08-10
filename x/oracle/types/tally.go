@@ -7,15 +7,21 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-type Vote interface {
-	codec.ProtoMarshaler
+type (
+	Vote interface {
+		codec.ProtoMarshaler
 
-	GetVoterAddress() string
+		GetVoterAddress() string
 
-	GetVoteOption() VoteOption
+		GetVoteOption() VoteOption
 
-	GetConsensusValue() []byte
-}
+		GetConsensusValue() []byte
+	}
+
+	TallyKeeper interface {
+		Tally(sdk.Context, sdk.Iterator, Vote) (*TallyResult, error)
+	}
+)
 
 func NewTally() *Tally {
 	return &Tally{

@@ -2,7 +2,6 @@ package keeper
 
 import (
 	"fmt"
-	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 	"time"
 
 	"github.com/tendermint/tendermint/libs/log"
@@ -21,7 +20,7 @@ type (
 		memKey   sdk.StoreKey
 
 		paramSpace    paramtypes.Subspace
-		stakingKeeper stakingkeeper.Keeper
+		stakingKeeper types.StakingKeeper
 	}
 )
 
@@ -30,7 +29,7 @@ func NewKeeper(
 	storeKey,
 	memKey sdk.StoreKey,
 	paramSpace paramtypes.Subspace,
-	stakingKeeper stakingkeeper.Keeper,
+	stakingKeeper types.StakingKeeper,
 ) *Keeper {
 	if !paramSpace.HasKeyTable() {
 		paramSpace = paramSpace.WithKeyTable(types.ParamKeyTable())

@@ -25,7 +25,7 @@ func TestTallyTestSuite(t *testing.T) {
 func (suite *tallyTestSuite) BeforeTest(_, _ string) {
 	ctx := suite.Ctx
 
-	suite.OracleKeeper.SetParams(ctx, types.Params{
+	suite.GetOracleKeeper().SetParams(ctx, types.Params{
 		OraclePublicKey:          oraclePubKey.SerializeCompressed(),
 		OraclePubKeyRemoteReport: nil,
 		UniqueId:                 uniqueID,
@@ -41,20 +41,15 @@ func (suite *tallyTestSuite) BeforeTest(_, _ string) {
 	})
 }
 
-// SetOracle defines to register Oracle and Validator by default.
-func (suite *tallyTestSuite) setOracle(pubKey cryptotypes.PubKey, amount sdk.Int) {
+// createOracleValidator defines to register Oracle and Validator by default.
+func (suite *tallyTestSuite) createOracleValidator(pubKey cryptotypes.PubKey, amount sdk.Int) {
 	oracleAccAddr := sdk.AccAddress(pubKey.Address().Bytes())
 	oracleAccount := suite.AccountKeeper.NewAccountWithAddress(suite.Ctx, oracleAccAddr)
 	err := oracleAccount.SetPubKey(pubKey)
 	suite.Require().NoError(err)
 	suite.AccountKeeper.SetAccount(suite.Ctx, oracleAccount)
-
 	varAddr := sdk.ValAddress(pubKey.Address().Bytes())
-	description := stakingtypes.Description{
-		Moniker: "validator1",
-		Details: "it is test validator",
-	}
-	validator, err := stakingtypes.NewValidator(varAddr, pubKey, description)
+	validator, err := stakingtypes.NewValidator(varAddr, pubKey, stakingtypes.Description{})
 	suite.Require().NoError(err)
 	validator = validator.UpdateStatus(stakingtypes.Bonded)
 	validator, _ = validator.AddTokensFromDel(amount)
@@ -68,18 +63,17 @@ func (suite *tallyTestSuite) setOracle(pubKey cryptotypes.PubKey, amount sdk.Int
 		JailedAt: nil,
 	}
 
-	err = suite.OracleKeeper.SetOracle(suite.Ctx, oracle)
+	err = suite.GetOracleKeeper().SetOracle(suite.Ctx, oracle)
 	suite.Require().NoError(err)
 }
 
 func (suite *tallyTestSuite) TestTally() {
 	ctx := suite.Ctx
-
 	oraclePubKey := secp256k1.GenPrivKey().PubKey()
 	oracleAccAddr := sdk.AccAddress(oraclePubKey.Address().Bytes())
 	oracleTokens := sdk.NewInt(30)
 
-	suite.setOracle(oraclePubKey, oracleTokens)
+	suite.createOracleValidator(oraclePubKey, oracleTokens)
 
 	newOraclePubKey := secp256k1.GenPrivKey().PubKey()
 	newOracleAccAddr := sdk.AccAddress(newOraclePubKey.Address().Bytes())
@@ -114,7 +108,7 @@ func (suite *tallyTestSuite) TestTally() {
 	require.NoError(suite.T(), err)
 
 	iter := suite.OracleKeeper.GetOracleRegistrationVoteIterator(suite.Ctx, uniqueID, newOracleAccAddr.String())
-	tallyResult, err := suite.OracleKeeper.Tally(suite.Ctx, iter, &types.OracleRegistrationVote{})
+	tallyResult, err := suite.GetTallyKeeper().Tally(suite.Ctx, iter, &types.OracleRegistrationVote{})
 	suite.Require().NoError(err)
 
 	suite.Require().Equal(oracleTokens, tallyResult.Yes)

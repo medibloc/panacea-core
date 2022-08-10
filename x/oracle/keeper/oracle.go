@@ -217,7 +217,7 @@ func (k Keeper) GetAllOracleRegistrationVoteList(ctx sdk.Context) ([]types.Oracl
 func (k Keeper) GetOracleRegistrationVoteIterator(ctx sdk.Context, uniqueID, voteTargetAddress string) sdk.Iterator {
 	accAddr, err := sdk.AccAddressFromBech32(voteTargetAddress)
 	if err != nil {
-		panic("")
+		panic(err)
 	}
 	store := ctx.KVStore(k.storeKey)
 	return sdk.KVStorePrefixIterator(store, types.GetOracleRegistrationVotesKey(uniqueID, accAddr))
