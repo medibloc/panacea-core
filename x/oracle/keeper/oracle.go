@@ -58,7 +58,7 @@ func (k Keeper) validateOracleRegistrationVote(ctx sdk.Context, vote *types.Orac
 		return fmt.Errorf("this oracle is not in 'ACTIVE' state")
 	}
 
-	oracleRegistration, err := k.GetOracleRegistration(ctx, vote.VotingTargetAddress)
+	oracleRegistration, err := k.GetOracleRegistration(ctx, vote.UniqueId, vote.VotingTargetAddress)
 	if err != nil {
 		return err
 	}
@@ -153,13 +153,13 @@ func (k Keeper) GetAllOracleRegistrationList(ctx sdk.Context) ([]types.OracleReg
 
 }
 
-func (k Keeper) GetOracleRegistration(ctx sdk.Context, address string) (*types.OracleRegistration, error) {
+func (k Keeper) GetOracleRegistration(ctx sdk.Context, uniqueID, address string) (*types.OracleRegistration, error) {
 	store := ctx.KVStore(k.storeKey)
 	accAddr, err := sdk.AccAddressFromBech32(address)
 	if err != nil {
 		return nil, err
 	}
-	key := types.GetOracleRegistrationKey(accAddr)
+	key := types.GetOracleRegistrationKey(uniqueID, accAddr)
 	bz := store.Get(key)
 	if bz == nil {
 		return nil, fmt.Errorf("is not exist oracleRegistration with the address of '%s'", address)
@@ -181,7 +181,7 @@ func (k Keeper) SetOracleRegistration(ctx sdk.Context, regOracle *types.OracleRe
 	if err != nil {
 		return err
 	}
-	key := types.GetOracleRegistrationKey(accAddr)
+	key := types.GetOracleRegistrationKey(regOracle.UniqueId, accAddr)
 	bz, err := k.cdc.MarshalLengthPrefixed(regOracle)
 	if err != nil {
 		return err
@@ -194,6 +194,7 @@ func (k Keeper) SetOracleRegistration(ctx sdk.Context, regOracle *types.OracleRe
 
 func (k Keeper) GetAllOracleRegistrationVoteList(ctx sdk.Context) ([]types.OracleRegistrationVote, error) {
 	store := ctx.KVStore(k.storeKey)
+
 	iterator := sdk.KVStorePrefixIterator(store, types.OracleRegistrationVotesKey)
 	defer iterator.Close()
 
@@ -211,6 +212,15 @@ func (k Keeper) GetAllOracleRegistrationVoteList(ctx sdk.Context) ([]types.Oracl
 	}
 
 	return oracleRegistrationVotes, nil
+}
+
+func (k Keeper) GetOracleRegistrationVoteIterator(ctx sdk.Context, uniqueID, voteTargetAddress string) sdk.Iterator {
+	accAddr, err := sdk.AccAddressFromBech32(voteTargetAddress)
+	if err != nil {
+		panic(err)
+	}
+	store := ctx.KVStore(k.storeKey)
+	return sdk.KVStorePrefixIterator(store, types.GetOracleRegistrationVotesKey(uniqueID, accAddr))
 }
 
 func (k Keeper) GetOracleRegistrationVote(ctx sdk.Context, uniqueId, votingTargetAddress, voterAddress string) (*types.OracleRegistrationVote, error) {

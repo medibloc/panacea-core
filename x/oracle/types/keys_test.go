@@ -14,7 +14,7 @@ func TestSplitOracleRegistrationVoteQueueKey(t *testing.T) {
 	now := time.Now()
 	addr := sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address())
 
-	key := types.GetOracleRegistrationVoteQueueKey(uniqueID, addr, now)
+	key := types.GetOracleRegistrationQueueKey(uniqueID, addr, now)
 
 	splitUniqueID, splitAddr := types.SplitOracleRegistrationVoteQueueKey(key)
 

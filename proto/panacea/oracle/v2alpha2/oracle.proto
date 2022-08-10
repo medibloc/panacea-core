@@ -75,8 +75,9 @@ message TallyResult {
   string no = 2 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int", (gogoproto.nullable) = false];
   // Votes yes, but the value is different with the consensus value
   string invalid_yes = 3 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int", (gogoproto.nullable) = false];
+  string total = 4 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int", (gogoproto.nullable) = false];
   // The consensus value between oracles
-  bytes consensus_value = 4;
+  bytes consensus_value = 5;
 }
 
 // VotingPeriod defines the voting period of transactions governed by oracles.

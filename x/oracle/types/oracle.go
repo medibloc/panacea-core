@@ -1,16 +1,49 @@
 package types
 
 import (
+	"fmt"
 	"github.com/btcsuite/btcd/btcec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
+
+type OracleKeeper interface {
+	VoteOracleRegistration(sdk.Context, *OracleRegistrationVote, []byte) error
+
+	GetAllOracleList(sdk.Context) ([]Oracle, error)
+
+	GetOracle(sdk.Context, string) (*Oracle, error)
+
+	SetOracle(sdk.Context, *Oracle) error
+
+	GetAllOracleRegistrationList(sdk.Context) ([]OracleRegistration, error)
+
+	GetOracleRegistration(sdk.Context, string, string) (*OracleRegistration, error)
+
+	SetOracleRegistration(sdk.Context, *OracleRegistration) error
+
+	GetAllOracleRegistrationVoteList(sdk.Context) ([]OracleRegistrationVote, error)
+
+	GetOracleRegistrationVoteIterator(sdk.Context, string, string) sdk.Iterator
+
+	GetOracleRegistrationVote(sdk.Context, string, string, string) (*OracleRegistrationVote, error)
+
+	SetOracleRegistrationVote(sdk.Context, *OracleRegistrationVote) error
+
+	GetParams(sdk.Context) Params
+
+	SetParams(sdk.Context, Params)
+}
 
 func (m Oracle) ValidateBasic() error {
 	if _, err := sdk.AccAddressFromBech32(m.Address); err != nil {
 		return sdkerrors.Wrapf(err, "oracle address is invalid. address: %s", m.Address)
 	}
 	return nil
+}
+
+func (m Oracle) IsActivated() bool {
+	return m.Status == ORACLE_STATUS_ACTIVE
 }
 
 func (m OracleRegistration) ValidateBasic() error {
@@ -67,6 +100,14 @@ func (m OracleRegistration) ValidateBasic() error {
 	return nil
 }
 
+func (m OracleRegistration) MustGetOracleAccAddress() sdk.AccAddress {
+	accAddr, err := sdk.AccAddressFromBech32(m.Address)
+	if err != nil {
+		panic(fmt.Sprintf("failed convert address to AccAddress. address: %s, error: %v", m.Address, err))
+	}
+	return accAddr
+}
+
 func (m OracleRegistrationVote) ValidateBasic() error {
 	if len(m.UniqueId) == 0 {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "uniqueID is empty")
@@ -89,6 +130,10 @@ func (m OracleRegistrationVote) ValidateBasic() error {
 	return nil
 }
 
+func (m OracleRegistrationVote) GetConsensusValue() []byte {
+	return m.EncryptedOraclePrivKey
+}
+
 func (m VoteOption) ValidateBasic() error {
 	if m == VOTE_OPTION_VALID ||
 		m == VOTE_OPTION_INVALID {
@@ -96,4 +141,14 @@ func (m VoteOption) ValidateBasic() error {
 	}
 
 	return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "voteOption is invalid")
+}
+
+func NewTallyResult() *TallyResult {
+	return &TallyResult{
+		Yes:            sdk.ZeroInt(),
+		No:             sdk.ZeroInt(),
+		InvalidYes:     sdk.ZeroInt(),
+		ConsensusValue: nil,
+		Total:          sdk.ZeroInt(),
+	}
 }
