@@ -15,8 +15,12 @@ func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) {
 		// Remove the closed oracleRegistration from the queue.
 		keeper.RemoveOracleRegistrationQueue(ctx, oracleRegistration.UniqueId, oracleRegistration.MustGetOracleAccAddress(), oracleRegistration.VotingPeriod.VotingEndTime)
 
+		// Iterate the OracleRegistrationVote corresponding to the OracleRegistration and calculate the TallyResult.
 		keeper.IterateOracleRegistrationVote(ctx, oracleRegistration.UniqueId, oracleRegistration.Address, func(vote *types.OracleRegistrationVote) bool {
 			iterator := keeper.GetOracleRegistrationVoteIterator(ctx, oracleRegistration.UniqueId, oracleRegistration.Address)
+
+			defer iterator.Close()
+
 			tallyResult, err := keeper.Tally(ctx, iterator, &types.OracleRegistrationVote{})
 			if err != nil {
 				panic("")
