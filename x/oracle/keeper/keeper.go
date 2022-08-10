@@ -21,7 +21,7 @@ type (
 		memKey   sdk.StoreKey
 
 		paramSpace    paramtypes.Subspace
-		stakingKeeper stakingkeeper.Keeper
+		stakingKeeper types.StakingKeeper
 	}
 )
 

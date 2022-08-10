@@ -14,7 +14,5 @@ type AccountKeeper interface {
 
 // StakingKeeper expected staking keeper (Validator and Delegator sets) (noalias)
 type StakingKeeper interface {
-	IterateBondedValidatorsByPower(
-		sdk.Context, func(index int64, validator stakingtypes.ValidatorI) (stop bool),
-	)
+	GetValidator(sdk.Context, sdk.ValAddress) (stakingtypes.Validator, bool)
 }
