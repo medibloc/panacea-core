@@ -2,11 +2,57 @@ package keeper
 
 import (
 	"fmt"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/medibloc/panacea-core/v2/x/oracle/types"
 	"github.com/tendermint/tendermint/crypto/secp256k1"
 )
+
+func (k Keeper) RegisterOracle(ctx sdk.Context, msg *types.MsgRegisterOracle) error {
+	// check if the oracle is active validator
+	if err := k.CheckValidatorStatus(ctx, msg.OracleAddress); err != nil {
+		return sdkerrors.Wrapf(types.ErrRegisterOracle, err.Error())
+	}
+
+	// check unique id
+	params := k.GetParams(ctx)
+	if params.UniqueId != msg.UniqueId {
+		return sdkerrors.Wrapf(types.ErrRegisterOracle, "is not match the currently active uniqueID")
+	}
+
+	// store
+	oracleRegistration := types.NewOracleRegistration(msg)
+	oracleRegistration.VotingPeriod = k.GetVotingPeriod(ctx)
+
+	if err := k.SetOracleRegistration(ctx, oracleRegistration); err != nil {
+		return sdkerrors.Wrapf(types.ErrRegisterOracle, err.Error())
+	}
+
+	// TODO: Add active queue of Oracle Registration
+
+	// TODO: emit RegisterOracle event
+	return nil
+}
+
+// CheckValidatorStatus gets validator and check its status if it's eligible to be an oracle
+func (k Keeper) CheckValidatorStatus(ctx sdk.Context, oracleAddress string) error {
+	valAccAddr, err := sdk.AccAddressFromBech32(oracleAddress)
+	if err != nil {
+		return err
+	}
+
+	validator, found := k.stakingKeeper.GetValidator(ctx, sdk.ValAddress(valAccAddr))
+	if !found {
+		return types.ErrValidatorNotFound
+	}
+
+	if validator.IsJailed() {
+		return types.ErrJailedValidator
+	}
+
+	return nil
+}
 
 // VoteOracleRegistration defines to vote for the new oracle's verification results.
 func (k Keeper) VoteOracleRegistration(ctx sdk.Context, vote *types.OracleRegistrationVote, signature []byte) error {
@@ -177,6 +223,7 @@ func (k Keeper) GetOracleRegistration(ctx sdk.Context, address string) (*types.O
 
 func (k Keeper) SetOracleRegistration(ctx sdk.Context, regOracle *types.OracleRegistration) error {
 	store := ctx.KVStore(k.storeKey)
+
 	accAddr, err := sdk.AccAddressFromBech32(regOracle.Address)
 	if err != nil {
 		return err
@@ -257,4 +304,16 @@ func (k Keeper) SetOracleRegistrationVote(ctx sdk.Context, vote *types.OracleReg
 	store.Set(key, bz)
 
 	return nil
+}
+
+// GetVotingPeriod gets voting period based on the current block time
+func (k Keeper) GetVotingPeriod(ctx sdk.Context) *types.VotingPeriod {
+	params := k.GetParams(ctx)
+	votingStartTime := ctx.BlockHeader().Time
+	votingEndTime := votingStartTime.Add(params.VoteParams.VotingPeriod)
+
+	return &types.VotingPeriod{
+		VotingStartTime: votingStartTime,
+		VotingEndTime:   votingEndTime,
+	}
 }
