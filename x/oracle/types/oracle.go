@@ -7,34 +7,6 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-type OracleKeeper interface {
-	VoteOracleRegistration(sdk.Context, *OracleRegistrationVote, []byte) error
-
-	GetAllOracleList(sdk.Context) ([]Oracle, error)
-
-	GetOracle(sdk.Context, string) (*Oracle, error)
-
-	SetOracle(sdk.Context, *Oracle) error
-
-	GetAllOracleRegistrationList(sdk.Context) ([]OracleRegistration, error)
-
-	GetOracleRegistration(sdk.Context, string, string) (*OracleRegistration, error)
-
-	SetOracleRegistration(sdk.Context, *OracleRegistration) error
-
-	GetAllOracleRegistrationVoteList(sdk.Context) ([]OracleRegistrationVote, error)
-
-	GetOracleRegistrationVoteIterator(sdk.Context, string, string) sdk.Iterator
-
-	GetOracleRegistrationVote(sdk.Context, string, string, string) (*OracleRegistrationVote, error)
-
-	SetOracleRegistrationVote(sdk.Context, *OracleRegistrationVote) error
-
-	GetParams(sdk.Context) Params
-
-	SetParams(sdk.Context, Params)
-}
-
 func (m Oracle) ValidateBasic() error {
 	if _, err := sdk.AccAddressFromBech32(m.Address); err != nil {
 		return sdkerrors.Wrapf(err, "oracle address is invalid. address: %s", m.Address)

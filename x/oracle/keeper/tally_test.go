@@ -25,7 +25,7 @@ func TestTallyTestSuite(t *testing.T) {
 func (suite *tallyTestSuite) BeforeTest(_, _ string) {
 	ctx := suite.Ctx
 
-	suite.GetOracleKeeper().SetParams(ctx, types.Params{
+	suite.OracleKeeper.SetParams(ctx, types.Params{
 		OraclePublicKey:          oraclePubKey.SerializeCompressed(),
 		OraclePubKeyRemoteReport: nil,
 		UniqueId:                 uniqueID,
@@ -63,7 +63,7 @@ func (suite *tallyTestSuite) createOracleValidator(pubKey cryptotypes.PubKey, am
 		JailedAt: nil,
 	}
 
-	err = suite.GetOracleKeeper().SetOracle(suite.Ctx, oracle)
+	err = suite.OracleKeeper.SetOracle(suite.Ctx, oracle)
 	suite.Require().NoError(err)
 }
 

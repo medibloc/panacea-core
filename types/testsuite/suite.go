@@ -274,10 +274,6 @@ func newTestCodec() params.EncodingConfig {
 
 }
 
-func (suite *TestSuite) GetOracleKeeper() oracletypes.OracleKeeper {
-	return suite.OracleKeeper
-}
-
 func (suite *TestSuite) GetTallyKeeper() oracletypes.TallyKeeper {
 	return suite.OracleKeeper
 }
