@@ -2,6 +2,11 @@ package keeper_test
 
 import (
 	"fmt"
+	"testing"
+	"time"
+
+	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
+
 	"github.com/btcsuite/btcd/btcec"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
@@ -9,8 +14,6 @@ import (
 	"github.com/medibloc/panacea-core/v2/types/testsuite"
 	"github.com/medibloc/panacea-core/v2/x/oracle/types"
 	"github.com/stretchr/testify/suite"
-	"testing"
-	"time"
 )
 
 var (
@@ -28,6 +31,14 @@ var (
 
 	nodePrivKey, _ = btcec.NewPrivateKey(btcec.S256())
 	nodePubKey     = nodePrivKey.PubKey()
+
+	nodePubKeyRemoteReport = []byte("nodePubKeyRemoteReport")
+
+	valPubKey = secp256k1.GenPrivKey().PubKey()
+	valAddr   = valPubKey.Address()
+
+	trustedBlockHeight = int64(1)
+	trustedBlockHash   = []byte("trustedBlockHash")
 )
 
 type oracleTestSuite struct {
@@ -80,6 +91,104 @@ func makeNewOracleRegistration() *types.OracleRegistration {
 			VotingEndTime:   time.Now().Add(5 * time.Second),
 		},
 	}
+}
+
+func (suite oracleTestSuite) makeNewValidator(operator sdk.ValAddress, pubKey cryptotypes.PubKey) *stakingtypes.Validator {
+	v, err := stakingtypes.NewValidator(operator, pubKey, stakingtypes.Description{})
+	suite.Require().NoError(err)
+	return &v
+}
+
+func (suite oracleTestSuite) TestRegisterOracleSuccess() {
+	ctx := suite.Ctx
+
+	// set validator
+	validator := suite.makeNewValidator(sdk.ValAddress(valAddr), valPubKey)
+	suite.StakingKeeper.SetValidator(ctx, *validator)
+
+	msgRegisterOracle := &types.MsgRegisterOracle{
+		UniqueId:               uniqueID,
+		OracleAddress:          sdk.AccAddress(valAddr).String(),
+		NodePubKey:             nodePubKey.SerializeCompressed(),
+		NodePubKeyRemoteReport: nodePubKeyRemoteReport,
+		TrustedBlockHeight:     trustedBlockHeight,
+		TrustedBlockHash:       trustedBlockHash,
+	}
+
+	err := suite.OracleKeeper.RegisterOracle(ctx, msgRegisterOracle)
+	suite.Require().NoError(err)
+
+	votingPeriod := suite.OracleKeeper.GetVotingPeriod(ctx)
+
+	oracleFromKeeper, err := suite.OracleKeeper.GetOracleRegistration(ctx, uniqueID, sdk.AccAddress(valAddr).String())
+	suite.Require().NoError(err)
+	suite.Require().Equal(uniqueID, oracleFromKeeper.UniqueId)
+	suite.Require().Equal(sdk.AccAddress(valAddr).String(), oracleFromKeeper.Address)
+	suite.Require().Equal(nodePubKey.SerializeCompressed(), oracleFromKeeper.NodePubKey)
+	suite.Require().Equal(nodePubKeyRemoteReport, oracleFromKeeper.NodePubKeyRemoteReport)
+	suite.Require().Equal(trustedBlockHeight, oracleFromKeeper.TrustedBlockHeight)
+	suite.Require().Equal(trustedBlockHash, oracleFromKeeper.TrustedBlockHash)
+	suite.Require().Nil(oracleFromKeeper.EncryptedOraclePrivKey)
+	suite.Require().Equal(types.ORACLE_REGISTRATION_STATUS_VOTING_PERIOD, oracleFromKeeper.Status)
+	suite.Require().Equal(votingPeriod, oracleFromKeeper.VotingPeriod)
+	suite.Require().Nil(oracleFromKeeper.TallyResult)
+}
+
+func (suite oracleTestSuite) TestRegisterOracleFailedValidatorNotFound() {
+	ctx := suite.Ctx
+
+	msgRegisterOracle := &types.MsgRegisterOracle{
+		UniqueId:               uniqueID,
+		OracleAddress:          sdk.AccAddress(valAddr).String(),
+		NodePubKey:             nodePubKey.SerializeCompressed(),
+		NodePubKeyRemoteReport: nodePubKeyRemoteReport,
+		TrustedBlockHeight:     trustedBlockHeight,
+		TrustedBlockHash:       trustedBlockHash,
+	}
+
+	err := suite.OracleKeeper.RegisterOracle(ctx, msgRegisterOracle)
+	suite.Require().Error(err, types.ErrValidatorNotFound)
+}
+
+func (suite oracleTestSuite) TestRegisterOracleFailedValidatorJailed() {
+	ctx := suite.Ctx
+
+	// set jailed validator
+	validator := suite.makeNewValidator(sdk.ValAddress(valAddr), valPubKey)
+	validator.Jailed = true
+	suite.StakingKeeper.SetValidator(ctx, *validator)
+
+	msgRegisterOracle := &types.MsgRegisterOracle{
+		UniqueId:               uniqueID,
+		OracleAddress:          sdk.AccAddress(valAddr).String(),
+		NodePubKey:             nodePubKey.SerializeCompressed(),
+		NodePubKeyRemoteReport: nodePubKeyRemoteReport,
+		TrustedBlockHeight:     trustedBlockHeight,
+		TrustedBlockHash:       trustedBlockHash,
+	}
+
+	err := suite.OracleKeeper.RegisterOracle(ctx, msgRegisterOracle)
+	suite.Require().Error(err, types.ErrJailedValidator)
+}
+
+func (suite oracleTestSuite) TestRegisterOracleFailedInvalidUniqueID() {
+	ctx := suite.Ctx
+
+	// set validator
+	validator := suite.makeNewValidator(sdk.ValAddress(valAddr), valPubKey)
+	suite.StakingKeeper.SetValidator(ctx, *validator)
+
+	msgRegisterOracle := &types.MsgRegisterOracle{
+		UniqueId:               "invalidUniqueID",
+		OracleAddress:          sdk.AccAddress(valAddr).String(),
+		NodePubKey:             nodePubKey.SerializeCompressed(),
+		NodePubKeyRemoteReport: nodePubKeyRemoteReport,
+		TrustedBlockHeight:     trustedBlockHeight,
+		TrustedBlockHash:       trustedBlockHash,
+	}
+
+	err := suite.OracleKeeper.RegisterOracle(ctx, msgRegisterOracle)
+	suite.Require().Error(err, types.ErrRegisterOracle)
 }
 
 func (suite *oracleTestSuite) TestOracleRegistrationVoteSuccess() {

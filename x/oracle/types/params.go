@@ -2,10 +2,11 @@ package types
 
 import (
 	"fmt"
+	"time"
+
 	"github.com/btcsuite/btcd/btcec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
-	"time"
 )
 
 var (
@@ -97,6 +98,7 @@ func validateUniqueID(i interface{}) error {
 	if !ok {
 		return fmt.Errorf("invalid parameter type: %T", i)
 	}
+
 	return nil
 }
 

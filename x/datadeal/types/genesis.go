@@ -11,5 +11,6 @@ func DefaultGenesis() *GenesisState {
 // Validate performs basic genesis state validation returning an error upon any
 // failure.
 func (gs GenesisState) Validate() error {
-	panic("implements me")
+	//panic("implements me")
+	return nil
 }
