@@ -66,20 +66,20 @@ func (k Keeper) RemoveOracleRegistrationQueue(ctx sdk.Context, uniqueID string, 
 func (k Keeper) IterateOracleValidator(ctx sdk.Context, cb func(info *types.OracleValidatorInfo) bool) {
 	oracles, err := k.GetAllOracleList(ctx)
 	if err != nil {
-		panic(fmt.Sprintf(""))
+		panic(err)
 	}
 
 	for _, oracle := range oracles {
 		accAddr, err := sdk.AccAddressFromBech32(oracle.Address)
 		if err != nil {
-			panic(fmt.Sprintf(""))
+			panic(err)
 		}
 
 		oracleValAddr := sdk.ValAddress(accAddr.Bytes())
 
 		validator, ok := k.stakingKeeper.GetValidator(ctx, oracleValAddr)
 		if !ok {
-			panic(fmt.Sprintf(""))
+			panic(fmt.Sprintf("failed to retrieve validator information. address: %s", oracle.Address))
 		}
 
 		oracleValidatorInfo := &types.OracleValidatorInfo{
