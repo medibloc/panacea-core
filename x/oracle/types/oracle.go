@@ -176,3 +176,9 @@ func NewTallyResult() *TallyResult {
 		Total:          sdk.ZeroInt(),
 	}
 }
+
+func (m TallyResult) IsPassed() bool {
+	return m.ConsensusValue != nil &&
+		m.Yes.GT(m.No) &&
+		m.Yes.GT(m.InvalidYes)
+}

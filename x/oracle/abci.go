@@ -24,7 +24,7 @@ func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) {
 		}
 
 		// If ConsensusValue does not exist, consensus has not been passed.
-		if tallyResult.ConsensusValue != nil && tallyResult.Yes.GT(tallyResult.No) {
+		if tallyResult.IsPassed() {
 			oracleRegistration.Status = types.ORACLE_REGISTRATION_STATUS_PASSED
 			oracleRegistration.EncryptedOraclePrivKey = tallyResult.ConsensusValue
 
