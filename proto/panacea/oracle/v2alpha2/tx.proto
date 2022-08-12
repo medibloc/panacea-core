@@ -19,7 +19,7 @@ service Msg {
 // MsgRegisterOracle defines the Msg/RegisterOracle request type.
 message MsgRegisterOracle {
   string unique_id = 1;
-  string oracle_address = 2;
+  string oracle_address = 2;  // panacea1.. account address
   bytes node_pub_key = 3;
   bytes node_pub_key_remote_report = 4;
   int64 trusted_block_height = 5;
