@@ -34,7 +34,7 @@ func (k Keeper) RegisterOracle(ctx sdk.Context, msg *types.MsgRegisterOracle) er
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
 			types.EventTypeRegisterOracle,
-			sdk.NewAttribute(types.AttributeKeyRegisterOracle, types.AttributeValueRegisterOracle)),
+			sdk.NewAttribute(types.AttributeKeyOracle, types.AttributeValueOracle)),
 	})
 	return nil
 }
