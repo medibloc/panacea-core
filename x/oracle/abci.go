@@ -14,35 +14,36 @@ func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) {
 
 		// Remove the closed oracleRegistration from the queue.
 		keeper.RemoveOracleRegistrationQueue(ctx, oracleRegistration.UniqueId, oracleRegistration.MustGetOracleAccAddress(), oracleRegistration.VotingPeriod.VotingEndTime)
+		iterator := keeper.GetOracleRegistrationVoteIterator(ctx, oracleRegistration.UniqueId, oracleRegistration.Address)
 
-		// Iterate the OracleRegistrationVote corresponding to the OracleRegistration and calculate the TallyResult.
-		keeper.IterateOracleRegistrationVote(ctx, oracleRegistration.UniqueId, oracleRegistration.Address, func(vote *types.OracleRegistrationVote) bool {
-			iterator := keeper.GetOracleRegistrationVoteIterator(ctx, oracleRegistration.UniqueId, oracleRegistration.Address)
+		defer iterator.Close()
 
-			defer iterator.Close()
+		tallyResult, err := keeper.Tally(ctx, iterator, &types.OracleRegistrationVote{})
+		if err != nil {
+			panic(err)
+		}
 
-			tallyResult, err := keeper.Tally(ctx, iterator, &types.OracleRegistrationVote{})
+		// If ConsensusValue does not exist, consensus has not been passed.
+		if tallyResult.ConsensusValue != nil {
+			oracleRegistration.Status = types.ORACLE_REGISTRATION_STATUS_PASSED
+			oracleRegistration.EncryptedOraclePrivKey = tallyResult.ConsensusValue
+
+			oracle := types.NewOracle(oracleRegistration.Address, types.ORACLE_STATUS_ACTIVE)
+			err := keeper.SetOracle(ctx, oracle)
 			if err != nil {
-				panic("")
+				panic(err)
 			}
+		} else {
+			oracleRegistration.Status = types.ORACLE_REGISTRATION_STATUS_REJECTED
+		}
 
-			// If ConsensusValue does not exist, consensus has not been passed.
-			if tallyResult.ConsensusValue != nil {
-				oracleRegistration.Status = types.ORACLE_REGISTRATION_STATUS_PASSED
-				oracleRegistration.EncryptedOraclePrivKey = tallyResult.ConsensusValue
-			} else {
-				oracleRegistration.Status = types.ORACLE_REGISTRATION_STATUS_REJECTED
-			}
+		oracleRegistration.TallyResult = tallyResult
 
-			oracleRegistration.TallyResult = tallyResult
+		err = keeper.SetOracleRegistration(ctx, oracleRegistration)
+		if err != nil {
+			panic(err)
+		}
 
-			err = keeper.SetOracleRegistration(ctx, oracleRegistration)
-			if err != nil {
-				panic("")
-			}
-
-			return false
-		})
 		return false
 	})
 }
