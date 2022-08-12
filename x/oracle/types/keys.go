@@ -33,8 +33,6 @@ var (
 	IndexSeparator = []byte{0xFF}
 )
 
-var lenTime = len(sdk.FormatTimeBytes(time.Now()))
-
 func GetOracleKey(address sdk.AccAddress) []byte {
 	return append(OraclesKey, address...)
 }
