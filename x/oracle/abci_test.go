@@ -93,7 +93,7 @@ func (suite *abciTestSuite) createOracleValidator(pubKey cryptotypes.PubKey, amo
 	suite.Require().NoError(err)
 }
 
-func (suite abciTestSuite) TestEndBlocker() {
+func (suite abciTestSuite) TestEndBlockerVotePass() {
 	ctx := suite.Ctx
 
 	nodePrivKey, err := btcec.NewPrivateKey(btcec.S256())
@@ -159,4 +159,69 @@ func (suite abciTestSuite) TestEndBlocker() {
 	suite.Require().NoError(err)
 	suite.Require().Equal(suite.newOracleAddr.String(), newOracle.Address)
 	suite.Require().Equal(types.ORACLE_STATUS_ACTIVE, newOracle.Status)
+}
+
+func (suite abciTestSuite) TestEndBlockerVoteReject() {
+	ctx := suite.Ctx
+
+	nodePrivKey, err := btcec.NewPrivateKey(btcec.S256())
+	suite.Require().NoError(err)
+	oracleRegistration := &types.OracleRegistration{
+		UniqueId:               suite.uniqueID,
+		Address:                suite.newOracleAddr.String(),
+		NodePubKey:             nodePrivKey.PubKey().SerializeCompressed(),
+		NodePubKeyRemoteReport: []byte("nodePubKeyRemoteReport"),
+		TrustedBlockHeight:     10,
+		TrustedBlockHash:       []byte("trustedBlockHash"),
+		Status:                 types.ORACLE_REGISTRATION_STATUS_VOTING_PERIOD,
+		VotingPeriod: &types.VotingPeriod{
+			VotingStartTime: time.Now().Add(-2 * time.Second),
+			VotingEndTime:   time.Now().Add(-1 * time.Second),
+		},
+	}
+	err = suite.OracleKeeper.SetOracleRegistration(ctx, oracleRegistration)
+	suite.Require().NoError(err)
+
+	suite.OracleKeeper.AddOracleRegistrationQueue(
+		ctx,
+		suite.uniqueID,
+		suite.newOracleAddr,
+		oracleRegistration.VotingPeriod.VotingEndTime,
+	)
+
+	vote := types.OracleRegistrationVote{
+		UniqueId:            suite.uniqueID,
+		VoterAddress:        suite.oracleAddr.String(),
+		VotingTargetAddress: suite.newOracleAddr.String(),
+		VoteOption:          types.VOTE_OPTION_INVALID,
+	}
+	vote2 := types.OracleRegistrationVote{
+		UniqueId:               suite.uniqueID,
+		VoterAddress:           suite.oracleAddr2.String(),
+		VotingTargetAddress:    suite.newOracleAddr.String(),
+		VoteOption:             types.VOTE_OPTION_VALID,
+		EncryptedOraclePrivKey: []byte("encryptedOraclePrivKey"),
+	}
+	vote3 := types.OracleRegistrationVote{
+		UniqueId:               suite.uniqueID,
+		VoterAddress:           suite.oracleAddr3.String(),
+		VotingTargetAddress:    suite.newOracleAddr.String(),
+		VoteOption:             types.VOTE_OPTION_VALID,
+		EncryptedOraclePrivKey: []byte("encryptedOraclePrivKey"),
+	}
+	err = suite.OracleKeeper.SetOracleRegistrationVote(ctx, &vote)
+	suite.Require().NoError(err)
+	err = suite.OracleKeeper.SetOracleRegistrationVote(ctx, &vote2)
+	suite.Require().NoError(err)
+	err = suite.OracleKeeper.SetOracleRegistrationVote(ctx, &vote3)
+	suite.Require().NoError(err)
+
+	oracle.EndBlocker(suite.Ctx, suite.OracleKeeper)
+
+	oracleRegistration, err = suite.OracleKeeper.GetOracleRegistration(ctx, suite.uniqueID, suite.newOracleAddr.String())
+	suite.Require().NoError(err)
+	suite.Require().Equal(types.ORACLE_REGISTRATION_STATUS_REJECTED, oracleRegistration.Status)
+
+	_, err = suite.OracleKeeper.GetOracle(ctx, suite.newOracleAddr.String())
+	suite.Require().Error(err)
 }
