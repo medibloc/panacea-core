@@ -13,11 +13,12 @@ message Tally {
   string total = 4 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int", (gogoproto.nullable) = false]; // Save the total votingPower of OracleValidators
 }
 
+// ConsensusTally defines the value of the voted consensus
 message ConsensusTally {
-  bytes consensusKey = 1;
-  string voting_amount = 2 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int", (gogoproto.nullable) = false];
+  bytes consensus_key = 1; // Set a consensus key
+  string voting_amount = 2 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int", (gogoproto.nullable) = false]; // Set the voted value
 }
-
+// OracleValidatorInfo defines Oracle and Validator information
 message OracleValidatorInfo {
   string address = 1;
   bool oracle_activated = 2;
