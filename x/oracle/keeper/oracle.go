@@ -179,7 +179,7 @@ func (k Keeper) SetOracle(ctx sdk.Context, oracle *types.Oracle) error {
 
 func (k Keeper) GetAllOracleRegistrationList(ctx sdk.Context) ([]types.OracleRegistration, error) {
 	store := ctx.KVStore(k.storeKey)
-	iterator := sdk.KVStorePrefixIterator(store, types.OracleRegistrationsKey)
+	iterator := sdk.KVStorePrefixIterator(store, types.OracleRegistrationKey)
 	defer iterator.Close()
 
 	oracleRegistrations := make([]types.OracleRegistration, 0)

@@ -23,6 +23,13 @@ type (
 	}
 )
 
+type Tally struct {
+	OracleValidatorInfos map[string]*OracleValidatorInfo
+	Yes                  map[string]*ConsensusTally
+	No                   sdk.Int
+	Total                sdk.Int
+}
+
 func NewTally() *Tally {
 	return &Tally{
 		OracleValidatorInfos: make(map[string]*OracleValidatorInfo),
@@ -115,6 +122,11 @@ func (t Tally) CalculateTallyResult(quorum sdk.Dec) *TallyResult {
 	return tallyResult
 }
 
+type ConsensusTally struct {
+	ConsensusKey []byte
+	VotingAmount sdk.Int
+}
+
 // ConsensusTallyMaxHeap implements by referring to the following site.
 // https://pkg.go.dev/container/heap
 type ConsensusTallyMaxHeap []*ConsensusTally
@@ -147,6 +159,13 @@ func (h *ConsensusTallyMaxHeap) Pop() interface{} {
 	old[n-1] = nil // avoid memory leak
 	*h = old[0 : n-1]
 	return tally
+}
+
+type OracleValidatorInfo struct {
+	Address         string
+	OracleActivated bool
+	BondedTokens    sdk.Int
+	ValidatorJailed bool
 }
 
 func (o *OracleValidatorInfo) IsPossibleVote() bool {
