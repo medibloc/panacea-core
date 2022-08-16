@@ -31,11 +31,7 @@ func (k Keeper) RegisterOracle(ctx sdk.Context, msg *types.MsgRegisterOracle) er
 
 	// TODO: Add active queue of Oracle Registration
 
-	ctx.EventManager().EmitEvents(sdk.Events{
-		sdk.NewEvent(
-			types.EventTypeRegisterOracle,
-			sdk.NewAttribute(types.AttributeKeyRegisterOracle, types.AttributeValueRegisterOracle)),
-	})
+	// TODO: emit RegisterOracle event
 	return nil
 }
 
@@ -104,7 +100,6 @@ func (k Keeper) validateOracleRegistrationVote(ctx sdk.Context, vote *types.Orac
 	if err != nil {
 		return err
 	}
-
 	if oracle.Status != types.ORACLE_STATUS_ACTIVE {
 		return fmt.Errorf("this oracle is not in 'ACTIVE' state")
 	}
@@ -172,7 +167,6 @@ func (k Keeper) SetOracle(ctx sdk.Context, oracle *types.Oracle) error {
 		return err
 	}
 	key := types.GetOracleKey(accAddr)
-
 	bz, err := k.cdc.MarshalLengthPrefixed(oracle)
 	if err != nil {
 		return err
@@ -235,7 +229,6 @@ func (k Keeper) SetOracleRegistration(ctx sdk.Context, regOracle *types.OracleRe
 		return err
 	}
 	key := types.GetOracleRegistrationKey(accAddr)
-
 	bz, err := k.cdc.MarshalLengthPrefixed(regOracle)
 	if err != nil {
 		return err
