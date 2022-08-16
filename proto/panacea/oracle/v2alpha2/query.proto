@@ -27,7 +27,7 @@ service Query {
   }
 
   // Params returns params of oracle module.
-  rpc Params(QueryOracleParamsRequest) returns (QueryOracleParamsResponse) {
+  rpc Params(QueryOracleParamsRequest) returns (QueryParamsResponse) {
     option (google.api.http).get = "/panacea/oracle/v2alpha2/params";
   }
 }
@@ -67,7 +67,7 @@ message QueryOracleRegistrationResponse {
 // QueryOracleParamsRequest is the request type for the Query/OracleParams RPC method.
 message QueryOracleParamsRequest {}
 
-// QueryOracleParamsResponse is the response type for the Query/OracleParams RPC method.
-message QueryOracleParamsResponse {
+// QueryParamsResponse is the response type for the Query/OracleParams RPC method.
+message QueryParamsResponse {
   Params params = 1;
 }
