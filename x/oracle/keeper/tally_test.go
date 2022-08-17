@@ -102,7 +102,7 @@ func (suite *tallyTestSuite) TestTally() {
 		UniqueId:               uniqueID,
 		VoterAddress:           oracleAccAddr.String(),
 		VotingTargetAddress:    newOracleAccAddr.String(),
-		VoteOption:             types.VOTE_OPTION_VALID,
+		VoteOption:             types.VOTE_OPTION_YES,
 		EncryptedOraclePrivKey: consensusValue,
 	}
 	err = suite.OracleKeeper.SetOracleRegistrationVote(suite.Ctx, vote)

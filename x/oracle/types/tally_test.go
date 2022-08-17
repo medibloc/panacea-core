@@ -42,11 +42,11 @@ func TestTallyResultAllValid(t *testing.T) {
 	consensusValue := []byte("encPriv1")
 
 	votes := makeSampleVotes(3, uniqueID)
-	votes[0].VoteOption = types.VOTE_OPTION_VALID
+	votes[0].VoteOption = types.VOTE_OPTION_YES
 	votes[0].EncryptedOraclePrivKey = consensusValue
-	votes[1].VoteOption = types.VOTE_OPTION_VALID
+	votes[1].VoteOption = types.VOTE_OPTION_YES
 	votes[1].EncryptedOraclePrivKey = consensusValue
-	votes[2].VoteOption = types.VOTE_OPTION_VALID
+	votes[2].VoteOption = types.VOTE_OPTION_YES
 	votes[2].EncryptedOraclePrivKey = consensusValue
 
 	infos := makeSampleOracleValidatorInfoMap(votes)
@@ -75,9 +75,9 @@ func TestTallyResultAllInValid(t *testing.T) {
 	uniqueID := "unique"
 
 	votes := makeSampleVotes(3, uniqueID)
-	votes[0].VoteOption = types.VOTE_OPTION_INVALID
-	votes[1].VoteOption = types.VOTE_OPTION_INVALID
-	votes[2].VoteOption = types.VOTE_OPTION_INVALID
+	votes[0].VoteOption = types.VOTE_OPTION_NO
+	votes[1].VoteOption = types.VOTE_OPTION_NO
+	votes[2].VoteOption = types.VOTE_OPTION_NO
 
 	infos := makeSampleOracleValidatorInfoMap(votes)
 	infos[votes[0].VoterAddress].BondedTokens = sdk.NewInt(30)
@@ -108,11 +108,11 @@ func TestTallyResultDifferentConsensusValueSuccessConsensus(t *testing.T) {
 	consensusValue3 := []byte("encPriv3")
 
 	votes := makeSampleVotes(3, uniqueID)
-	votes[0].VoteOption = types.VOTE_OPTION_VALID
+	votes[0].VoteOption = types.VOTE_OPTION_YES
 	votes[0].EncryptedOraclePrivKey = consensusValue
-	votes[1].VoteOption = types.VOTE_OPTION_VALID
+	votes[1].VoteOption = types.VOTE_OPTION_YES
 	votes[1].EncryptedOraclePrivKey = consensusValue2
-	votes[2].VoteOption = types.VOTE_OPTION_VALID
+	votes[2].VoteOption = types.VOTE_OPTION_YES
 	votes[2].EncryptedOraclePrivKey = consensusValue3
 
 	infos := makeSampleOracleValidatorInfoMap(votes)
@@ -150,11 +150,11 @@ func TestTallyResultDifferentConsensusValueFailedConsensus(t *testing.T) {
 	consensusValue3 := []byte("encPriv3")
 
 	votes := makeSampleVotes(3, uniqueID)
-	votes[0].VoteOption = types.VOTE_OPTION_VALID
+	votes[0].VoteOption = types.VOTE_OPTION_YES
 	votes[0].EncryptedOraclePrivKey = consensusValue
-	votes[1].VoteOption = types.VOTE_OPTION_VALID
+	votes[1].VoteOption = types.VOTE_OPTION_YES
 	votes[1].EncryptedOraclePrivKey = consensusValue2
-	votes[2].VoteOption = types.VOTE_OPTION_VALID
+	votes[2].VoteOption = types.VOTE_OPTION_YES
 	votes[2].EncryptedOraclePrivKey = consensusValue3
 
 	infos := makeSampleOracleValidatorInfoMap(votes)
@@ -192,7 +192,7 @@ func TestTallyResultLessThenQuorum(t *testing.T) {
 	consensusValue := []byte("encPriv1")
 
 	votes := makeSampleVotes(3, uniqueID)
-	votes[2].VoteOption = types.VOTE_OPTION_VALID
+	votes[2].VoteOption = types.VOTE_OPTION_YES
 	votes[2].EncryptedOraclePrivKey = consensusValue
 
 	infos := makeSampleOracleValidatorInfoMap(votes)
@@ -221,10 +221,10 @@ func TestTallyResultNumberOfAllVotes(t *testing.T) {
 	consensusValue2 := []byte("encPriv2")
 
 	votes := makeSampleVotes(4, uniqueID)
-	votes[0].VoteOption = types.VOTE_OPTION_VALID
+	votes[0].VoteOption = types.VOTE_OPTION_YES
 	votes[0].EncryptedOraclePrivKey = consensusValue
-	votes[1].VoteOption = types.VOTE_OPTION_INVALID
-	votes[2].VoteOption = types.VOTE_OPTION_VALID
+	votes[1].VoteOption = types.VOTE_OPTION_NO
+	votes[2].VoteOption = types.VOTE_OPTION_YES
 	votes[2].EncryptedOraclePrivKey = consensusValue2
 
 	infos := makeSampleOracleValidatorInfoMap(votes)

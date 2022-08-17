@@ -158,8 +158,8 @@ func validateTrustedBlockHash(hash []byte) error {
 }
 
 func (m VoteOption) ValidateBasic() error {
-	if m == VOTE_OPTION_VALID ||
-		m == VOTE_OPTION_INVALID {
+	if m == VOTE_OPTION_YES ||
+		m == VOTE_OPTION_NO {
 		return nil
 	}
 

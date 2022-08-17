@@ -70,7 +70,7 @@ func makeSampleDate() (types.Oracle, types.OracleRegistration, types.OracleRegis
 			UniqueId:               uniqueID,
 			VoterAddress:           oracleAcc.String(),
 			VotingTargetAddress:    oracle2Acc.String(),
-			VoteOption:             types.VOTE_OPTION_VALID,
+			VoteOption:             types.VOTE_OPTION_YES,
 			EncryptedOraclePrivKey: []byte("encryptedOraclePrivKey"),
 		}
 }

@@ -51,9 +51,9 @@ func (t *Tally) Add(vote Vote) error {
 
 	bondedTokens := oracleValidatorInfo.BondedTokens
 	switch vote.GetVoteOption() {
-	case VOTE_OPTION_VALID:
+	case VOTE_OPTION_YES:
 		t.addYes(vote.GetConsensusValue(), bondedTokens)
-	case VOTE_OPTION_INVALID:
+	case VOTE_OPTION_NO:
 		t.addNo(bondedTokens)
 	default:
 		return fmt.Errorf("unsupported voteOption. value: %s", vote.GetVoteOption())
