@@ -80,6 +80,7 @@ message TallyResult {
   bytes consensus_value = 5;
 }
 
+// ConsensusTally defines the consensus value and the vote amount.
 message ConsensusTally {
   bytes consensus_value = 1;
   string voting_amount = 2[(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int", (gogoproto.nullable) = false];

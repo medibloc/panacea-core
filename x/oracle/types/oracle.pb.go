@@ -383,6 +383,7 @@ func (m *TallyResult) GetConsensusValue() []byte {
 	return nil
 }
 
+// ConsensusTally defines the consensus value and the vote amount.
 type ConsensusTally struct {
 	ConsensusValue []byte                                 `protobuf:"bytes,1,opt,name=consensus_value,json=consensusValue,proto3" json:"consensus_value,omitempty"`
 	VotingAmount   github_com_cosmos_cosmos_sdk_types.Int `protobuf:"bytes,2,opt,name=voting_amount,json=votingAmount,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Int" json:"voting_amount"`
