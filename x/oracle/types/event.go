@@ -1,8 +1,9 @@
 package types
 
 const (
-	EventTypeRegisterOracle = "register"
+	EventTypeVote        = "vote"
+	AttributeKeyVoteType = "voteType"
 
-	AttributeKeyOracle   = "oracle"
-	AttributeValueOracle = "RegisterOracleEvent"
+	VOTE_TYPE_REGISTER_ORACLE          = "RegisterOracle"
+	VOTE_TYPE_REGISTER_ORACLE_COMPLETE = "RegisterOracleComplete"
 )
