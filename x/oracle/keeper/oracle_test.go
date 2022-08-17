@@ -59,7 +59,7 @@ func (suite *oracleTestSuite) BeforeTest(_, _ string) {
 		VoteParams: types.VoteParams{
 			VotingPeriod: 100,
 			JailPeriod:   60,
-			Quorum:       sdk.NewDecWithPrec(1, 3),
+			Quorum:       sdk.NewDecWithPrec(2, 3),
 		},
 		SlashParams: types.SlashParams{
 			SlashFractionDowntime: sdk.NewDecWithPrec(3, 1),

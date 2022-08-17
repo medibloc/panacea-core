@@ -55,9 +55,14 @@ func makeSampleDate() (types.Oracle, types.OracleRegistration, types.OracleRegis
 				VotingEndTime:   time.Now().Add(5 * time.Second),
 			},
 			TallyResult: &types.TallyResult{
-				Yes:            sdk.NewInt(5),
-				No:             sdk.NewInt(1),
-				InvalidYes:     sdk.NewInt(1),
+				Yes: sdk.NewInt(5),
+				No:  sdk.NewInt(1),
+				InvalidYes: []*types.ConsensusTally{
+					{
+						ConsensusValue: []byte("invalidConsensusValue"),
+						VotingAmount:   sdk.NewInt(1),
+					},
+				},
 				ConsensusValue: []byte("encryptedOraclePrivKey"),
 			},
 		},

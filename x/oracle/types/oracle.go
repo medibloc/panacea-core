@@ -67,12 +67,18 @@ func (m OracleRegistration) ValidateBasic() error {
 			return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "no in TallyResult must not be negative: %s", m.TallyResult.Yes)
 		}
 
-		if m.TallyResult.InvalidYes.IsNegative() {
-			return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalidYes in TallyResult must not be negative: %s", m.TallyResult.Yes)
+		if len(m.TallyResult.InvalidYes) > 0 {
+			for _, invalidYes := range m.TallyResult.InvalidYes {
+				if invalidYes.ConsensusValue == nil {
+					return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalidConsensusValue in ConsensusValue must not be nil")
+				}
+				if invalidYes.VotingAmount.IsNegative() {
+					return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "votingAmount in ConsensusValue must not be negative: %s", m.TallyResult.Yes)
+				}
+			}
 		}
-
-		if m.TallyResult.ConsensusValue == nil {
-			return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "consensusValue in TallyResult must not be nil: %s", m.TallyResult.Yes)
+		if m.TallyResult.InvalidYes == nil {
+			return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalidYes in TallyResult must not be negative: %s", m.TallyResult.Yes)
 		}
 	}
 
@@ -164,8 +170,12 @@ func NewTallyResult() *TallyResult {
 	return &TallyResult{
 		Yes:            sdk.ZeroInt(),
 		No:             sdk.ZeroInt(),
-		InvalidYes:     sdk.ZeroInt(),
+		InvalidYes:     make([]*ConsensusTally, 0),
 		ConsensusValue: nil,
 		Total:          sdk.ZeroInt(),
 	}
+}
+
+func (t *TallyResult) AddInvalidYes(tally *ConsensusTally) {
+	t.InvalidYes = append(t.InvalidYes, tally)
 }
