@@ -74,12 +74,18 @@ func (m OracleRegistration) ValidateBasic() error {
 			return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "no in TallyResult must not be negative: %s", m.TallyResult.Yes)
 		}
 
-		if m.TallyResult.InvalidYes.IsNegative() {
-			return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalidYes in TallyResult must not be negative: %s", m.TallyResult.Yes)
+		if len(m.TallyResult.InvalidYes) > 0 {
+			for _, invalidYes := range m.TallyResult.InvalidYes {
+				if invalidYes.ConsensusValue == nil {
+					return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalidConsensusValue in ConsensusValue must not be nil")
+				}
+				if invalidYes.VotingAmount.IsNegative() {
+					return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "votingAmount in ConsensusValue must not be negative: %s", m.TallyResult.Yes)
+				}
+			}
 		}
-
-		if m.TallyResult.ConsensusValue == nil {
-			return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "consensusValue in TallyResult must not be nil: %s", m.TallyResult.Yes)
+		if m.TallyResult.InvalidYes == nil {
+			return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalidYes in TallyResult must not be negative: %s", m.TallyResult.Yes)
 		}
 	}
 
@@ -159,8 +165,8 @@ func validateTrustedBlockHash(hash []byte) error {
 }
 
 func (m VoteOption) ValidateBasic() error {
-	if m == VOTE_OPTION_VALID ||
-		m == VOTE_OPTION_INVALID {
+	if m == VOTE_OPTION_YES ||
+		m == VOTE_OPTION_NO {
 		return nil
 	}
 
@@ -171,14 +177,16 @@ func NewTallyResult() *TallyResult {
 	return &TallyResult{
 		Yes:            sdk.ZeroInt(),
 		No:             sdk.ZeroInt(),
-		InvalidYes:     sdk.ZeroInt(),
+		InvalidYes:     make([]*ConsensusTally, 0),
 		ConsensusValue: nil,
 		Total:          sdk.ZeroInt(),
 	}
 }
 
+func (t *TallyResult) AddInvalidYes(tally *ConsensusTally) {
+	t.InvalidYes = append(t.InvalidYes, tally)
+}
+
 func (m TallyResult) IsPassed() bool {
-	return m.ConsensusValue != nil &&
-		m.Yes.GT(m.No) &&
-		m.Yes.GT(m.InvalidYes)
+	return m.ConsensusValue != nil
 }

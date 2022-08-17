@@ -32,7 +32,7 @@ func (suite *tallyTestSuite) BeforeTest(_, _ string) {
 		VoteParams: types.VoteParams{
 			VotingPeriod: 100,
 			JailPeriod:   60,
-			Quorum:       sdk.NewDecWithPrec(1, 3),
+			Quorum:       sdk.NewDecWithPrec(2, 3),
 		},
 		SlashParams: types.SlashParams{
 			SlashFractionDowntime: sdk.NewDecWithPrec(3, 1),
@@ -97,12 +97,13 @@ func (suite *tallyTestSuite) TestTally() {
 	err = suite.OracleKeeper.SetOracleRegistration(ctx, oracleRegistration)
 	suite.Require().NoError(err)
 
+	consensusValue := []byte("encPriv1")
 	vote := &types.OracleRegistrationVote{
 		UniqueId:               uniqueID,
 		VoterAddress:           oracleAccAddr.String(),
 		VotingTargetAddress:    newOracleAccAddr.String(),
-		VoteOption:             types.VOTE_OPTION_VALID,
-		EncryptedOraclePrivKey: []byte("encPriv1"),
+		VoteOption:             types.VOTE_OPTION_YES,
+		EncryptedOraclePrivKey: consensusValue,
 	}
 	err = suite.OracleKeeper.SetOracleRegistrationVote(suite.Ctx, vote)
 	require.NoError(suite.T(), err)
@@ -113,6 +114,6 @@ func (suite *tallyTestSuite) TestTally() {
 
 	suite.Require().Equal(oracleTokens, tallyResult.Yes)
 	suite.Require().Equal(sdk.ZeroInt(), tallyResult.No)
-	suite.Require().Equal(sdk.ZeroInt(), tallyResult.InvalidYes)
-	suite.Require().Equal([]byte("encPriv1"), tallyResult.ConsensusValue)
+	suite.Require().Equal(0, len(tallyResult.InvalidYes))
+	suite.Require().Equal(consensusValue, tallyResult.ConsensusValue)
 }

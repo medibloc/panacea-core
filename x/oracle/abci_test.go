@@ -45,8 +45,8 @@ func (suite *abciTestSuite) BeforeTest(_, _ string) {
 	suite.oraclePubKey3 = secp256k1.GenPrivKey().PubKey()
 	suite.oracleAddr3 = sdk.AccAddress(suite.oraclePubKey3.Address())
 
-	suite.createOracleValidator(suite.oraclePubKey, sdk.NewInt(50))
-	suite.createOracleValidator(suite.oraclePubKey2, sdk.NewInt(30))
+	suite.createOracleValidator(suite.oraclePubKey, sdk.NewInt(70))
+	suite.createOracleValidator(suite.oraclePubKey2, sdk.NewInt(20))
 	suite.createOracleValidator(suite.oraclePubKey3, sdk.NewInt(10))
 
 	suite.newOraclePubKey = secp256k1.GenPrivKey().PubKey()
@@ -61,7 +61,7 @@ func (suite *abciTestSuite) BeforeTest(_, _ string) {
 		VoteParams: types.VoteParams{
 			VotingPeriod: 100,
 			JailPeriod:   60,
-			Quorum:       sdk.NewDecWithPrec(1, 3),
+			Quorum:       sdk.NewDec(2).Quo(sdk.NewDec(3)),
 		},
 		SlashParams: types.SlashParams{
 			SlashFractionDowntime: sdk.NewDecWithPrec(3, 1),
@@ -125,21 +125,21 @@ func (suite abciTestSuite) TestEndBlockerVotePass() {
 		UniqueId:               suite.uniqueID,
 		VoterAddress:           suite.oracleAddr.String(),
 		VotingTargetAddress:    suite.newOracleAddr.String(),
-		VoteOption:             types.VOTE_OPTION_VALID,
+		VoteOption:             types.VOTE_OPTION_YES,
 		EncryptedOraclePrivKey: []byte("encryptedOraclePrivKey"),
 	}
 	vote2 := types.OracleRegistrationVote{
 		UniqueId:               suite.uniqueID,
 		VoterAddress:           suite.oracleAddr2.String(),
 		VotingTargetAddress:    suite.newOracleAddr.String(),
-		VoteOption:             types.VOTE_OPTION_VALID,
+		VoteOption:             types.VOTE_OPTION_YES,
 		EncryptedOraclePrivKey: []byte("encryptedOraclePrivKey"),
 	}
 	vote3 := types.OracleRegistrationVote{
 		UniqueId:               suite.uniqueID,
 		VoterAddress:           suite.oracleAddr3.String(),
 		VotingTargetAddress:    suite.newOracleAddr.String(),
-		VoteOption:             types.VOTE_OPTION_VALID,
+		VoteOption:             types.VOTE_OPTION_YES,
 		EncryptedOraclePrivKey: []byte("encryptedOraclePrivKey"),
 	}
 	err = suite.OracleKeeper.SetOracleRegistrationVote(ctx, &vote)
@@ -193,20 +193,20 @@ func (suite abciTestSuite) TestEndBlockerVoteReject() {
 		UniqueId:            suite.uniqueID,
 		VoterAddress:        suite.oracleAddr.String(),
 		VotingTargetAddress: suite.newOracleAddr.String(),
-		VoteOption:          types.VOTE_OPTION_INVALID,
+		VoteOption:          types.VOTE_OPTION_NO,
 	}
 	vote2 := types.OracleRegistrationVote{
 		UniqueId:               suite.uniqueID,
 		VoterAddress:           suite.oracleAddr2.String(),
 		VotingTargetAddress:    suite.newOracleAddr.String(),
-		VoteOption:             types.VOTE_OPTION_VALID,
+		VoteOption:             types.VOTE_OPTION_YES,
 		EncryptedOraclePrivKey: []byte("encryptedOraclePrivKey"),
 	}
 	vote3 := types.OracleRegistrationVote{
 		UniqueId:               suite.uniqueID,
 		VoterAddress:           suite.oracleAddr3.String(),
 		VotingTargetAddress:    suite.newOracleAddr.String(),
-		VoteOption:             types.VOTE_OPTION_VALID,
+		VoteOption:             types.VOTE_OPTION_YES,
 		EncryptedOraclePrivKey: []byte("encryptedOraclePrivKey"),
 	}
 	err = suite.OracleKeeper.SetOracleRegistrationVote(ctx, &vote)
