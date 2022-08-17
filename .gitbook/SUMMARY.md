@@ -4,7 +4,7 @@
 
 ## Overview
 
-* [Tech Stack](overview/tech-stack.md)
+* [Panacea Ecosystem](overview/panacea-ecosystem.md)
 * [Roadmap](overview/roadmap.md)
 
 ## Guide
