@@ -108,6 +108,10 @@ func (suite *tallyTestSuite) TestTally() {
 	err = suite.OracleKeeper.SetOracleRegistrationVote(suite.Ctx, vote)
 	require.NoError(suite.T(), err)
 
+	oracleVotes, err := suite.OracleKeeper.GetAllOracleRegistrationVoteList(suite.Ctx)
+	suite.Require().NoError(err)
+	suite.Require().Equal(1, len(oracleVotes))
+
 	iter := suite.OracleKeeper.GetOracleRegistrationVoteIterator(suite.Ctx, uniqueID, newOracleAccAddr.String())
 	tallyResult, err := suite.GetTallyKeeper().Tally(
 		suite.Ctx,
@@ -124,7 +128,7 @@ func (suite *tallyTestSuite) TestTally() {
 	suite.Require().Equal(0, len(tallyResult.InvalidYes))
 	suite.Require().Equal(consensusValue, tallyResult.ConsensusValue)
 
-	voteList, err := suite.OracleKeeper.GetAllOracleRegistrationVoteList(suite.Ctx)
+	oracleVotes, err = suite.OracleKeeper.GetAllOracleRegistrationVoteList(suite.Ctx)
 	suite.Require().NoError(err)
-	suite.Require().Equal(0, len(voteList))
+	suite.Require().Equal(0, len(oracleVotes))
 }
