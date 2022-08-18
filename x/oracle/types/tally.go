@@ -19,7 +19,7 @@ type (
 	}
 
 	TallyKeeper interface {
-		Tally(sdk.Context, sdk.Iterator, Vote) (*TallyResult, error)
+		Tally(sdk.Context, sdk.Iterator, Vote, func(Vote) error) (*TallyResult, error)
 	}
 )
 

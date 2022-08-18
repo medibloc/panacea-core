@@ -7,7 +7,8 @@ import (
 
 // Tally calculates the result by aggregating the votes taken from the iterator.
 // 'voteType' is an unmarshal type of 'voteIterator'.
-func (k Keeper) Tally(ctx sdk.Context, voteIterator sdk.Iterator, voteType types.Vote) (*types.TallyResult, error) {
+// If there is something to be processed for each vote obtained from the iterator, add the cb function
+func (k Keeper) Tally(ctx sdk.Context, voteIterator sdk.Iterator, voteType types.Vote, cb func(types.Vote) error) (*types.TallyResult, error) {
 	// If the Iterator is empty, it returns with a default value.
 	if !voteIterator.Valid() {
 		return types.NewTallyResult(), nil
@@ -18,15 +19,21 @@ func (k Keeper) Tally(ctx sdk.Context, voteIterator sdk.Iterator, voteType types
 
 	for ; voteIterator.Valid(); voteIterator.Next() {
 		bz := voteIterator.Value()
-		err := k.cdc.UnmarshalLengthPrefixed(bz, voteType)
-		if err != nil {
+
+		if err := k.cdc.UnmarshalLengthPrefixed(bz, voteType); err != nil {
 			return nil, err
 		}
 
-		err = tally.Add(voteType)
-		if err != nil {
+		if err := tally.Add(voteType); err != nil {
 			return nil, err
 		}
+
+		if cb != nil {
+			if err := cb(voteType); err != nil {
+				return nil, err
+			}
+		}
+
 	}
 
 	tallyResult := k.calculateTallyResult(ctx, tally)
