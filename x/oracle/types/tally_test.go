@@ -9,6 +9,8 @@ import (
 	"testing"
 )
 
+var threshold = sdk.NewDec(2).Quo(sdk.NewDec(3))
+
 func makeSampleVotes(count int, uniqueID string) []*types.OracleRegistrationVote {
 	votes := make([]*types.OracleRegistrationVote, 0)
 	for i := 0; i < count; i++ {
@@ -50,7 +52,7 @@ func TestTallyResultAllValid(t *testing.T) {
 	votes[2].EncryptedOraclePrivKey = consensusValue
 
 	infos := makeSampleOracleValidatorInfoMap(votes)
-	infos[votes[0].VoterAddress].BondedTokens = sdk.NewInt(30)
+	infos[votes[0].VoterAddress].BondedTokens = sdk.NewInt(70)
 	infos[votes[1].VoterAddress].BondedTokens = sdk.NewInt(20)
 	infos[votes[2].VoterAddress].BondedTokens = sdk.NewInt(10)
 
@@ -63,12 +65,12 @@ func TestTallyResultAllValid(t *testing.T) {
 	err = tally.Add(votes[2])
 	require.NoError(t, err)
 
-	tallyResult := tally.CalculateTallyResult(sdk.NewDec(1).Quo(sdk.NewDec(3)))
-	require.Equal(t, sdk.NewInt(60), tallyResult.Yes)
+	tallyResult := tally.CalculateTallyResult(threshold)
+	require.Equal(t, sdk.NewInt(100), tallyResult.Yes)
 	require.True(t, tallyResult.No.IsZero())
 	require.Equal(t, 0, len(tallyResult.InvalidYes))
 	require.Equal(t, consensusValue, tallyResult.ConsensusValue)
-	require.Equal(t, sdk.NewInt(60), tallyResult.Total)
+	require.Equal(t, sdk.NewInt(100), tallyResult.Total)
 }
 
 func TestTallyResultAllInValid(t *testing.T) {
@@ -80,7 +82,7 @@ func TestTallyResultAllInValid(t *testing.T) {
 	votes[2].VoteOption = types.VOTE_OPTION_NO
 
 	infos := makeSampleOracleValidatorInfoMap(votes)
-	infos[votes[0].VoterAddress].BondedTokens = sdk.NewInt(30)
+	infos[votes[0].VoterAddress].BondedTokens = sdk.NewInt(70)
 	infos[votes[1].VoterAddress].BondedTokens = sdk.NewInt(20)
 	infos[votes[2].VoterAddress].BondedTokens = sdk.NewInt(10)
 
@@ -93,12 +95,12 @@ func TestTallyResultAllInValid(t *testing.T) {
 	err = tally.Add(votes[2])
 	require.NoError(t, err)
 
-	tallyResult := tally.CalculateTallyResult(sdk.NewDec(1).Quo(sdk.NewDec(3)))
+	tallyResult := tally.CalculateTallyResult(threshold)
 	require.True(t, tallyResult.Yes.IsZero())
-	require.Equal(t, sdk.NewInt(60), tallyResult.No)
+	require.Equal(t, sdk.NewInt(100), tallyResult.No)
 	require.Equal(t, 0, len(tallyResult.InvalidYes))
 	require.Nil(t, tallyResult.ConsensusValue)
-	require.Equal(t, sdk.NewInt(60), tallyResult.Total)
+	require.Equal(t, sdk.NewInt(100), tallyResult.Total)
 }
 
 func TestTallyResultDifferentConsensusValueSuccessConsensus(t *testing.T) {
@@ -130,7 +132,6 @@ func TestTallyResultDifferentConsensusValueSuccessConsensus(t *testing.T) {
 	require.NoError(t, err)
 
 	// If the consensusValue exceeds the threshold, the consensus is successful.
-	threshold := sdk.NewDec(2).Quo(sdk.NewDec(3))
 	tallyResult := tally.CalculateTallyResult(threshold)
 	require.Equal(t, sdk.NewInt(70), tallyResult.Yes)
 	require.True(t, tallyResult.No.IsZero())
@@ -172,7 +173,6 @@ func TestTallyResultDifferentConsensusValueFailedConsensus(t *testing.T) {
 	require.NoError(t, err)
 
 	// If the consensusValue exceeds the threshold, the consensus is successful.
-	threshold := sdk.NewDec(2).Quo(sdk.NewDec(3))
 	tallyResult := tally.CalculateTallyResult(threshold)
 	require.True(t, tallyResult.Yes.IsZero())
 	require.True(t, tallyResult.No.IsZero())
@@ -205,7 +205,7 @@ func TestTallyResultLessThenThreshold(t *testing.T) {
 	err := tally.Add(votes[2])
 	require.NoError(t, err)
 
-	tallyResult := tally.CalculateTallyResult(sdk.NewDec(1).Quo(sdk.NewDec(3)))
+	tallyResult := tally.CalculateTallyResult(threshold)
 	require.True(t, tallyResult.Yes.IsZero())
 	require.True(t, tallyResult.No.IsZero())
 	require.Equal(t, 1, len(tallyResult.InvalidYes))
@@ -244,7 +244,7 @@ func TestTallyResultNumberOfAllVotes(t *testing.T) {
 
 	// ConsensusValue with the highest number of Yes votes selected.
 	// All others counted as invalid votes
-	tallyResult := tally.CalculateTallyResult(sdk.NewDec(1).Quo(sdk.NewDec(3)))
+	tallyResult := tally.CalculateTallyResult(threshold)
 	require.Equal(t, sdk.NewInt(70), tallyResult.Yes)
 	require.Equal(t, sdk.NewInt(15), tallyResult.No)
 	require.Equal(t, 1, len(tallyResult.InvalidYes))
