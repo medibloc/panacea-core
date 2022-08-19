@@ -129,9 +129,9 @@ func TestTallyResultDifferentConsensusValueSuccessConsensus(t *testing.T) {
 	err = tally.Add(votes[2])
 	require.NoError(t, err)
 
-	// If the consensusValue exceeds the quorum, the consensus is successful.
-	quorum := sdk.NewDec(2).Quo(sdk.NewDec(3))
-	tallyResult := tally.CalculateTallyResult(quorum)
+	// If the consensusValue exceeds the threshold, the consensus is successful.
+	threshold := sdk.NewDec(2).Quo(sdk.NewDec(3))
+	tallyResult := tally.CalculateTallyResult(threshold)
 	require.Equal(t, sdk.NewInt(70), tallyResult.Yes)
 	require.True(t, tallyResult.No.IsZero())
 	require.Equal(t, 2, len(tallyResult.InvalidYes))
@@ -171,9 +171,9 @@ func TestTallyResultDifferentConsensusValueFailedConsensus(t *testing.T) {
 	err = tally.Add(votes[2])
 	require.NoError(t, err)
 
-	// If the consensusValue exceeds the quorum, the consensus is successful.
-	quorum := sdk.NewDec(2).Quo(sdk.NewDec(3))
-	tallyResult := tally.CalculateTallyResult(quorum)
+	// If the consensusValue exceeds the threshold, the consensus is successful.
+	threshold := sdk.NewDec(2).Quo(sdk.NewDec(3))
+	tallyResult := tally.CalculateTallyResult(threshold)
 	require.True(t, tallyResult.Yes.IsZero())
 	require.True(t, tallyResult.No.IsZero())
 	require.Equal(t, 3, len(tallyResult.InvalidYes))
@@ -187,7 +187,7 @@ func TestTallyResultDifferentConsensusValueFailedConsensus(t *testing.T) {
 	require.Equal(t, sdk.NewInt(100), tallyResult.Total)
 }
 
-func TestTallyResultLessThenQuorum(t *testing.T) {
+func TestTallyResultLessThenThreshold(t *testing.T) {
 	uniqueID := "unique"
 	consensusValue := []byte("encPriv1")
 

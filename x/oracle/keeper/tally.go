@@ -44,7 +44,7 @@ func (k Keeper) setOracleValidatorInfosInTally(ctx sdk.Context, tally *types.Tal
 }
 
 func (k Keeper) calculateTallyResult(ctx sdk.Context, tally *types.Tally) *types.TallyResult {
-	quorum := k.GetParams(ctx).VoteParams.Quorum
+	threshold := k.GetParams(ctx).VoteParams.Threshold
 
-	return tally.CalculateTallyResult(quorum)
+	return tally.CalculateTallyResult(threshold)
 }

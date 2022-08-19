@@ -42,7 +42,7 @@ message VoteParams {
     (gogoproto.stdduration) = true,
     (gogoproto.moretags) = "yaml:\"jail_period\""
   ];
-  string quorum = 3 [
+  string threshold = 3 [
     (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
     (gogoproto.nullable) = false
   ];

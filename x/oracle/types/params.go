@@ -31,7 +31,7 @@ func DefaultParams() Params {
 		VoteParams: VoteParams{
 			VotingPeriod: 30 * time.Second,
 			JailPeriod:   10 * time.Minute,
-			Quorum:       sdk.NewDec(2).Quo(sdk.NewDec(3)),
+			Threshold:    sdk.NewDec(2).Quo(sdk.NewDec(3)),
 		},
 		SlashParams: SlashParams{
 			SlashFractionDowntime: sdk.NewDecWithPrec(2, 1),
@@ -115,8 +115,8 @@ func validateVoteParams(i interface{}) error {
 		return fmt.Errorf("'jailPeriod' cannot be set to zero")
 	}
 
-	if sdk.NewDec(0).Equal(voteParams.Quorum) {
-		return fmt.Errorf("'quorum' cannot be set to zero")
+	if sdk.NewDec(0).Equal(voteParams.Threshold) {
+		return fmt.Errorf("'threshold' cannot be set to zero")
 	}
 
 	return nil
