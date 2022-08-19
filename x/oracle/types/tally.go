@@ -84,7 +84,9 @@ func (t *Tally) addTotal(amount sdk.Int) {
 // calculateTotal calculates the total share based on the registered OracleValidatorInfo.
 func (t *Tally) calculateTotal() {
 	for _, info := range t.OracleValidatorInfos {
-		t.addTotal(info.BondedTokens)
+		if info.IsPossibleVote() {
+			t.addTotal(info.BondedTokens)
+		}
 	}
 }
 
