@@ -175,25 +175,25 @@ func (suite oracleTestSuite) TestRegisterOracleFailedValidatorJailed() {
 	suite.Require().Error(err, types.ErrJailedValidator)
 }
 
-func (suite oracleTestSuite) TestRegisterOracleFailedInvalidUniqueID() {
-	ctx := suite.Ctx
-
-	// set validator
-	validator := suite.makeNewValidator(sdk.ValAddress(valAddr), valPubKey)
-	suite.StakingKeeper.SetValidator(ctx, *validator)
-
-	msgRegisterOracle := &types.MsgRegisterOracle{
-		UniqueId:               "invalidUniqueID",
-		OracleAddress:          sdk.AccAddress(valAddr).String(),
-		NodePubKey:             nodePubKey.SerializeCompressed(),
-		NodePubKeyRemoteReport: nodePubKeyRemoteReport,
-		TrustedBlockHeight:     trustedBlockHeight,
-		TrustedBlockHash:       trustedBlockHash,
-	}
-
-	err := suite.OracleKeeper.RegisterOracle(ctx, msgRegisterOracle)
-	suite.Require().Error(err, types.ErrRegisterOracle)
-}
+//func (suite oracleTestSuite) TestRegisterOracleFailedInvalidUniqueID() {
+//	ctx := suite.Ctx
+//
+//	// set validator
+//	validator := suite.makeNewValidator(sdk.ValAddress(valAddr), valPubKey)
+//	suite.StakingKeeper.SetValidator(ctx, *validator)
+//
+//	msgRegisterOracle := &types.MsgRegisterOracle{
+//		UniqueId:               "invalidUniqueID",
+//		OracleAddress:          sdk.AccAddress(valAddr).String(),
+//		NodePubKey:             nodePubKey.SerializeCompressed(),
+//		NodePubKeyRemoteReport: nodePubKeyRemoteReport,
+//		TrustedBlockHeight:     trustedBlockHeight,
+//		TrustedBlockHash:       trustedBlockHash,
+//	}
+//
+//	err := suite.OracleKeeper.RegisterOracle(ctx, msgRegisterOracle)
+//	suite.Require().Error(err, types.ErrRegisterOracle)
+//}
 
 func (suite *oracleTestSuite) TestOracleRegistrationVoteSuccess() {
 	ctx := suite.Ctx
