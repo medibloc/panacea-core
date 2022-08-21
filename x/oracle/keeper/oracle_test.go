@@ -1,6 +1,7 @@
 package keeper_test
 
 import (
+	"encoding/base64"
 	"fmt"
 	"testing"
 	"time"
@@ -118,6 +119,9 @@ func (suite oracleTestSuite) TestRegisterOracleSuccess() {
 	err := suite.OracleKeeper.RegisterOracle(ctx, msgRegisterOracle)
 	suite.Require().NoError(err)
 
+	fmt.Println(msgRegisterOracle.UniqueId)
+	fmt.Println(base64.StdEncoding.EncodeToString(msgRegisterOracle.NodePubKey))
+	fmt.Println(base64.StdEncoding.EncodeToString(msgRegisterOracle.NodePubKeyRemoteReport))
 	votingPeriod := suite.OracleKeeper.GetVotingPeriod(ctx)
 
 	oracleFromKeeper, err := suite.OracleKeeper.GetOracleRegistration(ctx, sdk.AccAddress(valAddr).String())

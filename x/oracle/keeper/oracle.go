@@ -15,11 +15,12 @@ func (k Keeper) RegisterOracle(ctx sdk.Context, msg *types.MsgRegisterOracle) er
 		return sdkerrors.Wrapf(types.ErrRegisterOracle, err.Error())
 	}
 
-	// check unique id
-	params := k.GetParams(ctx)
-	if params.UniqueId != msg.UniqueId {
-		return sdkerrors.Wrapf(types.ErrRegisterOracle, "is not match the currently active uniqueID")
-	}
+	//// check unique id
+	//params := k.GetParams(ctx)
+	//fmt.Println("uniqueID: ", params.UniqueId)
+	//if params.UniqueId != msg.UniqueId {
+	//	return sdkerrors.Wrapf(types.ErrRegisterOracle, "is not match the currently active uniqueID")
+	//}
 
 	// store
 	oracleRegistration := types.NewOracleRegistration(msg)
