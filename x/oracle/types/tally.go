@@ -45,6 +45,7 @@ func (t *Tally) Add(vote Vote) error {
 	if !ok {
 		return fmt.Errorf("not found oracle. address: %s", vote.GetVoterAddress())
 	}
+	// is not error. However, it is not included in the voting.
 	if !oracleValidatorInfo.IsPossibleVote() {
 		return nil
 	}
