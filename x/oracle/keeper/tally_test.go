@@ -218,7 +218,7 @@ func (suite *tallyTestSuite) TestTallyOracleJailed() {
 	suite.Require().Equal(sdk.ZeroInt(), tallyResult.No)
 	suite.Require().Equal(0, len(tallyResult.InvalidYes))
 	// not include oracle2. because oracle2 is jailed.
-	suite.Require().Equal(sdk.NewInt(90), tallyResult.Total)
+	suite.Require().Equal(sdk.NewInt(70), tallyResult.Total)
 	suite.Require().Equal(consensusValue, tallyResult.ConsensusValue)
 
 	oracleVotes, err = suite.OracleKeeper.GetAllOracleRegistrationVoteList(suite.Ctx)
