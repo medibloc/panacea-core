@@ -2,47 +2,41 @@ package keeper_test
 
 import (
 	"fmt"
+	"github.com/medibloc/panacea-core/v2/x/oracle/testutil"
 	"testing"
 	"time"
-
-	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 
 	"github.com/btcsuite/btcd/btcec"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/medibloc/panacea-core/v2/types/testsuite"
 	"github.com/medibloc/panacea-core/v2/x/oracle/types"
 	"github.com/stretchr/testify/suite"
 )
 
-var (
-	uniqueID             = "correctUniqueID"
-	genesisOraclePrivKey = secp256k1.GenPrivKey()
-	genesisOraclePubKey  = genesisOraclePrivKey.PubKey()
-	genesisOracleAcc     = sdk.AccAddress(genesisOraclePubKey.Address())
-
-	newOraclePrivKey = secp256k1.GenPrivKey()
-	newOraclePubKey  = newOraclePrivKey.PubKey()
-	newOracleAcc     = sdk.AccAddress(newOraclePubKey.Address())
-
-	oraclePrivKey, _ = btcec.NewPrivateKey(btcec.S256())
-	oraclePubKey     = oraclePrivKey.PubKey()
-
-	nodePrivKey, _ = btcec.NewPrivateKey(btcec.S256())
-	nodePubKey     = nodePrivKey.PubKey()
-
-	nodePubKeyRemoteReport = []byte("nodePubKeyRemoteReport")
-
-	valPubKey = secp256k1.GenPrivKey().PubKey()
-	valAddr   = valPubKey.Address()
-
-	trustedBlockHeight = int64(1)
-	trustedBlockHash   = []byte("trustedBlockHash")
-)
-
 type oracleTestSuite struct {
-	testsuite.TestSuite
+	testutil.OracleBaseTestSuite
+
+	uniqueID string
+
+	oracleAccPrivKey cryptotypes.PrivKey
+	oracleAccPubKey  cryptotypes.PubKey
+	oracleAccAddr    sdk.AccAddress
+
+	newOracleAccPrivKey cryptotypes.PrivKey
+	newOracleAccPubKey  cryptotypes.PubKey
+	newOracleAccAddr    sdk.AccAddress
+
+	oraclePrivKey *btcec.PrivateKey
+	oraclePubKey  *btcec.PublicKey
+
+	nodePrivKey *btcec.PrivateKey
+	nodePubKey  *btcec.PublicKey
+
+	nodePubKeyRemoteReport []byte
+
+	trustedBlockHeight int64
+	trustedBlockHash   []byte
 }
 
 func TestOracleTestSuite(t *testing.T) {
@@ -52,10 +46,30 @@ func TestOracleTestSuite(t *testing.T) {
 func (suite *oracleTestSuite) BeforeTest(_, _ string) {
 	ctx := suite.Ctx
 
+	suite.uniqueID = "correctUniqueID"
+	suite.oracleAccPrivKey = secp256k1.GenPrivKey()
+	suite.oracleAccPubKey = suite.oracleAccPrivKey.PubKey()
+	suite.oracleAccAddr = sdk.AccAddress(suite.oracleAccPubKey.Address())
+
+	suite.newOracleAccPrivKey = secp256k1.GenPrivKey()
+	suite.newOracleAccPubKey = suite.newOracleAccPrivKey.PubKey()
+	suite.newOracleAccAddr = sdk.AccAddress(suite.newOracleAccPubKey.Address())
+
+	suite.oraclePrivKey, _ = btcec.NewPrivateKey(btcec.S256())
+	suite.oraclePubKey = suite.oraclePrivKey.PubKey()
+
+	suite.nodePrivKey, _ = btcec.NewPrivateKey(btcec.S256())
+	suite.nodePubKey = suite.nodePrivKey.PubKey()
+
+	suite.nodePubKeyRemoteReport = []byte("nodePubKeyRemoteReport")
+
+	suite.trustedBlockHeight = int64(1)
+	suite.trustedBlockHash = []byte("trustedBlockHash")
+
 	suite.OracleKeeper.SetParams(ctx, types.Params{
-		OraclePublicKey:          oraclePubKey.SerializeCompressed(),
+		OraclePublicKey:          suite.oraclePubKey.SerializeCompressed(),
 		OraclePubKeyRemoteReport: nil,
-		UniqueId:                 uniqueID,
+		UniqueId:                 suite.uniqueID,
 		VoteParams: types.VoteParams{
 			VotingPeriod: 100,
 			JailPeriod:   60,
@@ -68,19 +82,11 @@ func (suite *oracleTestSuite) BeforeTest(_, _ string) {
 	})
 }
 
-func (suite *oracleTestSuite) setOracleAccount(pubKey cryptotypes.PubKey) {
-	address := sdk.AccAddress(pubKey.Address())
-	oracleAccount := suite.AccountKeeper.NewAccountWithAddress(suite.Ctx, address)
-	err := oracleAccount.SetPubKey(pubKey)
-	suite.Require().NoError(err)
-	suite.AccountKeeper.SetAccount(suite.Ctx, oracleAccount)
-}
-
-func makeNewOracleRegistration() *types.OracleRegistration {
+func (suite oracleTestSuite) makeNewOracleRegistration() *types.OracleRegistration {
 	return &types.OracleRegistration{
-		UniqueId:               uniqueID,
-		Address:                newOracleAcc.String(),
-		NodePubKey:             nodePubKey.SerializeCompressed(),
+		UniqueId:               suite.uniqueID,
+		Address:                suite.newOracleAccAddr.String(),
+		NodePubKey:             suite.nodePubKey.SerializeCompressed(),
 		NodePubKeyRemoteReport: nil,
 		TrustedBlockHeight:     0,
 		TrustedBlockHash:       nil,
@@ -93,26 +99,19 @@ func makeNewOracleRegistration() *types.OracleRegistration {
 	}
 }
 
-func (suite oracleTestSuite) makeNewValidator(operator sdk.ValAddress, pubKey cryptotypes.PubKey) *stakingtypes.Validator {
-	v, err := stakingtypes.NewValidator(operator, pubKey, stakingtypes.Description{})
-	suite.Require().NoError(err)
-	return &v
-}
-
 func (suite oracleTestSuite) TestRegisterOracleSuccess() {
 	ctx := suite.Ctx
 
 	// set validator
-	validator := suite.makeNewValidator(sdk.ValAddress(valAddr), valPubKey)
-	suite.StakingKeeper.SetValidator(ctx, *validator)
+	suite.SetValidator(suite.oracleAccPubKey, sdk.NewInt(70))
 
 	msgRegisterOracle := &types.MsgRegisterOracle{
-		UniqueId:               uniqueID,
-		OracleAddress:          sdk.AccAddress(valAddr).String(),
-		NodePubKey:             nodePubKey.SerializeCompressed(),
-		NodePubKeyRemoteReport: nodePubKeyRemoteReport,
-		TrustedBlockHeight:     trustedBlockHeight,
-		TrustedBlockHash:       trustedBlockHash,
+		UniqueId:               suite.uniqueID,
+		OracleAddress:          suite.oracleAccAddr.String(),
+		NodePubKey:             suite.nodePubKey.SerializeCompressed(),
+		NodePubKeyRemoteReport: suite.nodePubKeyRemoteReport,
+		TrustedBlockHeight:     suite.trustedBlockHeight,
+		TrustedBlockHash:       suite.trustedBlockHash,
 	}
 
 	err := suite.OracleKeeper.RegisterOracle(ctx, msgRegisterOracle)
@@ -120,14 +119,14 @@ func (suite oracleTestSuite) TestRegisterOracleSuccess() {
 
 	votingPeriod := suite.OracleKeeper.GetVotingPeriod(ctx)
 
-	oracleFromKeeper, err := suite.OracleKeeper.GetOracleRegistration(ctx, uniqueID, sdk.AccAddress(valAddr).String())
+	oracleFromKeeper, err := suite.OracleKeeper.GetOracleRegistration(ctx, suite.uniqueID, suite.oracleAccAddr.String())
 	suite.Require().NoError(err)
-	suite.Require().Equal(uniqueID, oracleFromKeeper.UniqueId)
-	suite.Require().Equal(sdk.AccAddress(valAddr).String(), oracleFromKeeper.Address)
-	suite.Require().Equal(nodePubKey.SerializeCompressed(), oracleFromKeeper.NodePubKey)
-	suite.Require().Equal(nodePubKeyRemoteReport, oracleFromKeeper.NodePubKeyRemoteReport)
-	suite.Require().Equal(trustedBlockHeight, oracleFromKeeper.TrustedBlockHeight)
-	suite.Require().Equal(trustedBlockHash, oracleFromKeeper.TrustedBlockHash)
+	suite.Require().Equal(suite.uniqueID, oracleFromKeeper.UniqueId)
+	suite.Require().Equal(suite.oracleAccAddr.String(), oracleFromKeeper.Address)
+	suite.Require().Equal(suite.nodePubKey.SerializeCompressed(), oracleFromKeeper.NodePubKey)
+	suite.Require().Equal(suite.nodePubKeyRemoteReport, oracleFromKeeper.NodePubKeyRemoteReport)
+	suite.Require().Equal(suite.trustedBlockHeight, oracleFromKeeper.TrustedBlockHeight)
+	suite.Require().Equal(suite.trustedBlockHash, oracleFromKeeper.TrustedBlockHash)
 	suite.Require().Nil(oracleFromKeeper.EncryptedOraclePrivKey)
 	suite.Require().Equal(types.ORACLE_REGISTRATION_STATUS_VOTING_PERIOD, oracleFromKeeper.Status)
 	suite.Require().Equal(votingPeriod, oracleFromKeeper.VotingPeriod)
@@ -138,12 +137,12 @@ func (suite oracleTestSuite) TestRegisterOracleFailedValidatorNotFound() {
 	ctx := suite.Ctx
 
 	msgRegisterOracle := &types.MsgRegisterOracle{
-		UniqueId:               uniqueID,
-		OracleAddress:          sdk.AccAddress(valAddr).String(),
-		NodePubKey:             nodePubKey.SerializeCompressed(),
-		NodePubKeyRemoteReport: nodePubKeyRemoteReport,
-		TrustedBlockHeight:     trustedBlockHeight,
-		TrustedBlockHash:       trustedBlockHash,
+		UniqueId:               suite.uniqueID,
+		OracleAddress:          suite.oracleAccAddr.String(),
+		NodePubKey:             suite.nodePubKey.SerializeCompressed(),
+		NodePubKeyRemoteReport: suite.nodePubKeyRemoteReport,
+		TrustedBlockHeight:     suite.trustedBlockHeight,
+		TrustedBlockHash:       suite.trustedBlockHash,
 	}
 
 	err := suite.OracleKeeper.RegisterOracle(ctx, msgRegisterOracle)
@@ -154,17 +153,16 @@ func (suite oracleTestSuite) TestRegisterOracleFailedValidatorJailed() {
 	ctx := suite.Ctx
 
 	// set jailed validator
-	validator := suite.makeNewValidator(sdk.ValAddress(valAddr), valPubKey)
-	validator.Jailed = true
-	suite.StakingKeeper.SetValidator(ctx, *validator)
+	suite.SetValidator(suite.oracleAccPubKey, sdk.NewInt(70))
+	suite.StakingKeeper.Jail(ctx, suite.oracleAccAddr.Bytes())
 
 	msgRegisterOracle := &types.MsgRegisterOracle{
-		UniqueId:               uniqueID,
-		OracleAddress:          sdk.AccAddress(valAddr).String(),
-		NodePubKey:             nodePubKey.SerializeCompressed(),
-		NodePubKeyRemoteReport: nodePubKeyRemoteReport,
-		TrustedBlockHeight:     trustedBlockHeight,
-		TrustedBlockHash:       trustedBlockHash,
+		UniqueId:               suite.uniqueID,
+		OracleAddress:          suite.oracleAccAddr.String(),
+		NodePubKey:             suite.nodePubKey.SerializeCompressed(),
+		NodePubKeyRemoteReport: suite.nodePubKeyRemoteReport,
+		TrustedBlockHeight:     suite.trustedBlockHeight,
+		TrustedBlockHash:       suite.trustedBlockHash,
 	}
 
 	err := suite.OracleKeeper.RegisterOracle(ctx, msgRegisterOracle)
@@ -175,16 +173,16 @@ func (suite oracleTestSuite) TestRegisterOracleFailedInvalidUniqueID() {
 	ctx := suite.Ctx
 
 	// set validator
-	validator := suite.makeNewValidator(sdk.ValAddress(valAddr), valPubKey)
-	suite.StakingKeeper.SetValidator(ctx, *validator)
+
+	suite.SetValidator(suite.oracleAccPubKey, sdk.NewInt(70))
 
 	msgRegisterOracle := &types.MsgRegisterOracle{
 		UniqueId:               "invalidUniqueID",
-		OracleAddress:          sdk.AccAddress(valAddr).String(),
-		NodePubKey:             nodePubKey.SerializeCompressed(),
-		NodePubKeyRemoteReport: nodePubKeyRemoteReport,
-		TrustedBlockHeight:     trustedBlockHeight,
-		TrustedBlockHash:       trustedBlockHash,
+		OracleAddress:          suite.oracleAccAddr.String(),
+		NodePubKey:             suite.nodePubKey.SerializeCompressed(),
+		NodePubKeyRemoteReport: suite.nodePubKeyRemoteReport,
+		TrustedBlockHeight:     suite.trustedBlockHeight,
+		TrustedBlockHash:       suite.trustedBlockHash,
 	}
 
 	err := suite.OracleKeeper.RegisterOracle(ctx, msgRegisterOracle)
@@ -194,32 +192,22 @@ func (suite oracleTestSuite) TestRegisterOracleFailedInvalidUniqueID() {
 func (suite *oracleTestSuite) TestOracleRegistrationVoteSuccess() {
 	ctx := suite.Ctx
 
-	suite.setOracleAccount(genesisOraclePubKey)
-	suite.setOracleAccount(newOraclePubKey)
+	suite.CreateOracleValidator(suite.oracleAccPubKey, sdk.NewInt(70))
+	suite.SetAccount(suite.newOracleAccPubKey)
+	suite.SetValidator(suite.newOracleAccPubKey, sdk.NewInt(20))
 
-	// make the correct genesis oracle
-	oracle := &types.Oracle{
-		Address:  genesisOracleAcc.String(),
-		Status:   types.ORACLE_STATUS_ACTIVE,
-		Uptime:   0,
-		JailedAt: nil,
-	}
-
-	err := suite.OracleKeeper.SetOracle(ctx, oracle)
-	suite.Require().NoError(err)
-
-	oracleRegistration := makeNewOracleRegistration()
-	err = suite.OracleKeeper.SetOracleRegistration(ctx, oracleRegistration)
+	oracleRegistration := suite.makeNewOracleRegistration()
+	err := suite.OracleKeeper.SetOracleRegistration(ctx, oracleRegistration)
 	suite.Require().NoError(err)
 
 	// make the correct encryptedOraclePrivKey
-	encryptedOraclePrivKey, err := btcec.Encrypt(nodePubKey, oraclePrivKey.Serialize())
+	encryptedOraclePrivKey, err := btcec.Encrypt(suite.nodePubKey, suite.oraclePrivKey.Serialize())
 	suite.Require().NoError(err)
 	// make the correct vote info
 	oracleRegistrationVote := &types.OracleRegistrationVote{
-		UniqueId:               uniqueID,
-		VoterAddress:           genesisOracleAcc.String(),
-		VotingTargetAddress:    newOracleAcc.String(),
+		UniqueId:               suite.uniqueID,
+		VoterAddress:           suite.oracleAccAddr.String(),
+		VotingTargetAddress:    suite.newOracleAccAddr.String(),
 		VoteOption:             types.VOTE_OPTION_YES,
 		EncryptedOraclePrivKey: encryptedOraclePrivKey,
 	}
@@ -228,7 +216,7 @@ func (suite *oracleTestSuite) TestOracleRegistrationVoteSuccess() {
 	voteBz, err := suite.Cdc.Marshaler.Marshal(oracleRegistrationVote)
 	suite.Require().NoError(err)
 	oraclePrivKeySecp256k1 := secp256k1.PrivKey{
-		Key: oraclePrivKey.Serialize(),
+		Key: suite.oraclePrivKey.Serialize(),
 	}
 	signature, err := oraclePrivKeySecp256k1.Sign(voteBz)
 	suite.Require().NoError(err)
@@ -236,7 +224,12 @@ func (suite *oracleTestSuite) TestOracleRegistrationVoteSuccess() {
 	err = suite.OracleKeeper.VoteOracleRegistration(ctx, oracleRegistrationVote, signature)
 	suite.Require().NoError(err)
 
-	getOracleRegistrationVote, err := suite.OracleKeeper.GetOracleRegistrationVote(ctx, uniqueID, newOracleAcc.String(), genesisOracleAcc.String())
+	getOracleRegistrationVote, err := suite.OracleKeeper.GetOracleRegistrationVote(
+		ctx,
+		suite.uniqueID,
+		suite.newOracleAccAddr.String(),
+		suite.oracleAccAddr.String(),
+	)
 	suite.Require().NoError(err)
 	suite.Require().Equal(oracleRegistrationVote, getOracleRegistrationVote)
 }
@@ -244,32 +237,22 @@ func (suite *oracleTestSuite) TestOracleRegistrationVoteSuccess() {
 func (suite *oracleTestSuite) TestOracleRegistrationVoteFailedVerifySignature() {
 	ctx := suite.Ctx
 
-	suite.setOracleAccount(genesisOraclePubKey)
-	suite.setOracleAccount(newOraclePubKey)
+	suite.CreateOracleValidator(suite.oracleAccPubKey, sdk.NewInt(70))
+	suite.SetAccount(suite.newOracleAccPubKey)
+	suite.SetValidator(suite.newOracleAccPubKey, sdk.NewInt(20))
 
-	// make the correct genesis oracle
-	oracle := &types.Oracle{
-		Address:  genesisOracleAcc.String(),
-		Status:   types.ORACLE_STATUS_ACTIVE,
-		Uptime:   0,
-		JailedAt: nil,
-	}
-
-	err := suite.OracleKeeper.SetOracle(ctx, oracle)
-	suite.Require().NoError(err)
-
-	oracleRegistration := makeNewOracleRegistration()
-	err = suite.OracleKeeper.SetOracleRegistration(ctx, oracleRegistration)
+	oracleRegistration := suite.makeNewOracleRegistration()
+	err := suite.OracleKeeper.SetOracleRegistration(ctx, oracleRegistration)
 	suite.Require().NoError(err)
 
 	// make the correct encryptedOraclePrivKey
-	encryptedOraclePrivKey, err := btcec.Encrypt(nodePubKey, oraclePrivKey.Serialize())
+	encryptedOraclePrivKey, err := btcec.Encrypt(suite.nodePubKey, suite.oraclePrivKey.Serialize())
 	suite.Require().NoError(err)
 	// make the correct vote info
 	oracleRegistrationVote := &types.OracleRegistrationVote{
-		UniqueId:               uniqueID,
-		VoterAddress:           genesisOracleAcc.String(),
-		VotingTargetAddress:    newOracleAcc.String(),
+		UniqueId:               suite.uniqueID,
+		VoterAddress:           suite.oracleAccAddr.String(),
+		VotingTargetAddress:    suite.newOracleAccAddr.String(),
 		VoteOption:             types.VOTE_OPTION_YES,
 		EncryptedOraclePrivKey: encryptedOraclePrivKey,
 	}
@@ -292,33 +275,23 @@ func (suite *oracleTestSuite) TestOracleRegistrationVoteFailedVerifySignature() 
 func (suite *oracleTestSuite) TestOracleRegistrationVoteInvalidUniqueID() {
 	ctx := suite.Ctx
 
-	suite.setOracleAccount(genesisOraclePubKey)
-	suite.setOracleAccount(newOraclePubKey)
+	suite.CreateOracleValidator(suite.oracleAccPubKey, sdk.NewInt(70))
+	suite.SetAccount(suite.newOracleAccPubKey)
+	suite.SetValidator(suite.newOracleAccPubKey, sdk.NewInt(20))
 
-	// make the correct genesis oracle
-	oracle := &types.Oracle{
-		Address:  genesisOracleAcc.String(),
-		Status:   types.ORACLE_STATUS_ACTIVE,
-		Uptime:   0,
-		JailedAt: nil,
-	}
-
-	err := suite.OracleKeeper.SetOracle(ctx, oracle)
-	suite.Require().NoError(err)
-
-	oracleRegistration := makeNewOracleRegistration()
-	err = suite.OracleKeeper.SetOracleRegistration(ctx, oracleRegistration)
+	oracleRegistration := suite.makeNewOracleRegistration()
+	err := suite.OracleKeeper.SetOracleRegistration(ctx, oracleRegistration)
 	suite.Require().NoError(err)
 
 	// make the correct encryptedOraclePrivKey
-	encryptedOraclePrivKey, err := btcec.Encrypt(nodePubKey, oraclePrivKey.Serialize())
+	encryptedOraclePrivKey, err := btcec.Encrypt(suite.nodePubKey, suite.oraclePrivKey.Serialize())
 	suite.Require().NoError(err)
 	// make vote with invalid uniqueID
 	invalidUniqueID := "invalidUniqueID"
 	oracleRegistrationVote := &types.OracleRegistrationVote{
 		UniqueId:               invalidUniqueID,
-		VoterAddress:           genesisOracleAcc.String(),
-		VotingTargetAddress:    newOracleAcc.String(),
+		VoterAddress:           suite.oracleAccAddr.String(),
+		VotingTargetAddress:    suite.newOracleAccAddr.String(),
 		VoteOption:             types.VOTE_OPTION_YES,
 		EncryptedOraclePrivKey: encryptedOraclePrivKey,
 	}
@@ -327,45 +300,44 @@ func (suite *oracleTestSuite) TestOracleRegistrationVoteInvalidUniqueID() {
 	voteBz, err := suite.Cdc.Marshaler.Marshal(oracleRegistrationVote)
 	suite.Require().NoError(err)
 	oraclePrivKeySecp256k1 := secp256k1.PrivKey{
-		Key: oraclePrivKey.Serialize(),
+		Key: suite.oraclePrivKey.Serialize(),
 	}
 	signature, err := oraclePrivKeySecp256k1.Sign(voteBz)
 	suite.Require().NoError(err)
 
 	err = suite.OracleKeeper.VoteOracleRegistration(ctx, oracleRegistrationVote, signature)
 	suite.Require().ErrorIs(err, types.ErrOracleRegistrationVote)
-	suite.Require().ErrorContains(err, fmt.Sprintf("not matched with the currently active uniqueID. expected %s, got %s", uniqueID, invalidUniqueID))
+	suite.Require().ErrorContains(err, fmt.Sprintf("not matched with the currently active uniqueID. expected %s, got %s", suite.uniqueID, invalidUniqueID))
 }
 
 func (suite *oracleTestSuite) TestOracleRegistrationVoteInvalidGenesisOracleStatus() {
 	ctx := suite.Ctx
 
-	suite.setOracleAccount(genesisOraclePubKey)
-	suite.setOracleAccount(newOraclePubKey)
-
-	// make the correct genesis oracle
-	oracle := &types.Oracle{
-		Address:  genesisOracleAcc.String(),
+	suite.SetAccount(suite.oracleAccPubKey)
+	suite.SetValidator(suite.oracleAccPubKey, sdk.NewInt(70))
+	err := suite.OracleKeeper.SetOracle(ctx, &types.Oracle{
+		Address:  suite.oracleAccAddr.String(),
 		Status:   types.ORACLE_STATUS_JAILED,
 		Uptime:   0,
 		JailedAt: nil,
-	}
-
-	err := suite.OracleKeeper.SetOracle(ctx, oracle)
+	})
 	suite.Require().NoError(err)
 
-	oracleRegistration := makeNewOracleRegistration()
+	suite.SetAccount(suite.newOracleAccPubKey)
+	suite.SetValidator(suite.newOracleAccPubKey, sdk.NewInt(20))
+
+	oracleRegistration := suite.makeNewOracleRegistration()
 	err = suite.OracleKeeper.SetOracleRegistration(ctx, oracleRegistration)
 	suite.Require().NoError(err)
 
 	// make the correct encryptedOraclePrivKey
-	encryptedOraclePrivKey, err := btcec.Encrypt(nodePubKey, oraclePrivKey.Serialize())
+	encryptedOraclePrivKey, err := btcec.Encrypt(suite.nodePubKey, suite.oraclePrivKey.Serialize())
 	suite.Require().NoError(err)
 	// make vote with invalid uniqueID
 	oracleRegistrationVote := &types.OracleRegistrationVote{
-		UniqueId:               uniqueID,
-		VoterAddress:           genesisOracleAcc.String(),
-		VotingTargetAddress:    newOracleAcc.String(),
+		UniqueId:               suite.uniqueID,
+		VoterAddress:           suite.oracleAccAddr.String(),
+		VotingTargetAddress:    suite.newOracleAccAddr.String(),
 		VoteOption:             types.VOTE_OPTION_YES,
 		EncryptedOraclePrivKey: encryptedOraclePrivKey,
 	}
@@ -374,7 +346,7 @@ func (suite *oracleTestSuite) TestOracleRegistrationVoteInvalidGenesisOracleStat
 	voteBz, err := suite.Cdc.Marshaler.Marshal(oracleRegistrationVote)
 	suite.Require().NoError(err)
 	oraclePrivKeySecp256k1 := secp256k1.PrivKey{
-		Key: oraclePrivKey.Serialize(),
+		Key: suite.oraclePrivKey.Serialize(),
 	}
 	signature, err := oraclePrivKeySecp256k1.Sign(voteBz)
 	suite.Require().NoError(err)
@@ -387,12 +359,13 @@ func (suite *oracleTestSuite) TestOracleRegistrationVoteInvalidGenesisOracleStat
 func (suite *oracleTestSuite) TestOracleRegistrationVoteInvalidOracleRegistrationStatus() {
 	ctx := suite.Ctx
 
-	suite.setOracleAccount(genesisOraclePubKey)
-	suite.setOracleAccount(newOraclePubKey)
+	suite.CreateOracleValidator(suite.oracleAccPubKey, sdk.NewInt(70))
+	suite.SetAccount(suite.newOracleAccPubKey)
+	suite.SetValidator(suite.newOracleAccPubKey, sdk.NewInt(20))
 
 	// make the correct genesis oracle
 	oracle := &types.Oracle{
-		Address:  genesisOracleAcc.String(),
+		Address:  suite.oracleAccAddr.String(),
 		Status:   types.ORACLE_STATUS_ACTIVE,
 		Uptime:   0,
 		JailedAt: nil,
@@ -401,19 +374,19 @@ func (suite *oracleTestSuite) TestOracleRegistrationVoteInvalidOracleRegistratio
 	err := suite.OracleKeeper.SetOracle(ctx, oracle)
 	suite.Require().NoError(err)
 
-	oracleRegistration := makeNewOracleRegistration()
+	oracleRegistration := suite.makeNewOracleRegistration()
 	oracleRegistration.Status = types.ORACLE_REGISTRATION_STATUS_REJECTED
 	err = suite.OracleKeeper.SetOracleRegistration(ctx, oracleRegistration)
 	suite.Require().NoError(err)
 
 	// make the correct encryptedOraclePrivKey
-	encryptedOraclePrivKey, err := btcec.Encrypt(nodePubKey, oraclePrivKey.Serialize())
+	encryptedOraclePrivKey, err := btcec.Encrypt(suite.nodePubKey, suite.oraclePrivKey.Serialize())
 	suite.Require().NoError(err)
 	// make vote with invalid uniqueID
 	oracleRegistrationVote := &types.OracleRegistrationVote{
-		UniqueId:               uniqueID,
-		VoterAddress:           genesisOracleAcc.String(),
-		VotingTargetAddress:    newOracleAcc.String(),
+		UniqueId:               suite.uniqueID,
+		VoterAddress:           suite.oracleAccAddr.String(),
+		VotingTargetAddress:    suite.newOracleAccAddr.String(),
 		VoteOption:             types.VOTE_OPTION_YES,
 		EncryptedOraclePrivKey: encryptedOraclePrivKey,
 	}
@@ -422,7 +395,7 @@ func (suite *oracleTestSuite) TestOracleRegistrationVoteInvalidOracleRegistratio
 	voteBz, err := suite.Cdc.Marshaler.Marshal(oracleRegistrationVote)
 	suite.Require().NoError(err)
 	oraclePrivKeySecp256k1 := secp256k1.PrivKey{
-		Key: oraclePrivKey.Serialize(),
+		Key: suite.oraclePrivKey.Serialize(),
 	}
 	signature, err := oraclePrivKeySecp256k1.Sign(voteBz)
 	suite.Require().NoError(err)
