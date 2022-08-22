@@ -123,8 +123,19 @@ func (suite *tallyTestSuite) TestTally() {
 	err = suite.OracleKeeper.SetOracleRegistrationVote(suite.Ctx, vote2)
 	suite.Require().NoError(err)
 
+	oracleVotes, err := suite.OracleKeeper.GetAllOracleRegistrationVoteList(suite.Ctx)
+	suite.Require().NoError(err)
+	suite.Require().Equal(2, len(oracleVotes))
+
 	iter := suite.OracleKeeper.GetOracleRegistrationVoteIterator(suite.Ctx, suite.uniqueID, newOracleAccAddr.String())
-	tallyResult, err := suite.GetTallyKeeper().Tally(suite.Ctx, iter, &types.OracleRegistrationVote{})
+	tallyResult, err := suite.GetTallyKeeper().Tally(
+		suite.Ctx,
+		iter,
+		&types.OracleRegistrationVote{},
+		func(vote types.Vote) error {
+			return suite.OracleKeeper.RemoveOracleRegistrationVote(suite.Ctx, vote.(*types.OracleRegistrationVote))
+		},
+	)
 	suite.Require().NoError(err)
 
 	suite.Require().Equal(sdk.NewInt(90), tallyResult.Yes)
@@ -132,6 +143,10 @@ func (suite *tallyTestSuite) TestTally() {
 	suite.Require().Equal(0, len(tallyResult.InvalidYes))
 	suite.Require().Equal(sdk.NewInt(90), tallyResult.Total)
 	suite.Require().Equal(consensusValue, tallyResult.ConsensusValue)
+
+	oracleVotes, err = suite.OracleKeeper.GetAllOracleRegistrationVoteList(suite.Ctx)
+	suite.Require().NoError(err)
+	suite.Require().Equal(0, len(oracleVotes))
 }
 
 func (suite *tallyTestSuite) TestTallyOracleJailed() {
@@ -192,8 +207,19 @@ func (suite *tallyTestSuite) TestTallyOracleJailed() {
 	err = suite.OracleKeeper.SetOracleRegistrationVote(suite.Ctx, vote2)
 	suite.Require().NoError(err)
 
+	oracleVotes, err := suite.OracleKeeper.GetAllOracleRegistrationVoteList(suite.Ctx)
+	suite.Require().NoError(err)
+	suite.Require().Equal(2, len(oracleVotes))
+
 	iter := suite.OracleKeeper.GetOracleRegistrationVoteIterator(suite.Ctx, suite.uniqueID, newOracleAccAddr.String())
-	tallyResult, err := suite.GetTallyKeeper().Tally(suite.Ctx, iter, &types.OracleRegistrationVote{})
+	tallyResult, err := suite.GetTallyKeeper().Tally(
+		suite.Ctx,
+		iter,
+		&types.OracleRegistrationVote{},
+		func(vote types.Vote) error {
+			return suite.OracleKeeper.RemoveOracleRegistrationVote(suite.Ctx, vote.(*types.OracleRegistrationVote))
+		},
+	)
 	suite.Require().NoError(err)
 
 	suite.Require().Equal(suite.oracleToken, tallyResult.Yes)
@@ -202,4 +228,8 @@ func (suite *tallyTestSuite) TestTallyOracleJailed() {
 	// not include oracle2. because oracle2 is jailed.
 	suite.Require().Equal(sdk.NewInt(90), tallyResult.Total)
 	suite.Require().Equal(consensusValue, tallyResult.ConsensusValue)
+
+	oracleVotes, err = suite.OracleKeeper.GetAllOracleRegistrationVoteList(suite.Ctx)
+	suite.Require().NoError(err)
+	suite.Require().Equal(0, len(oracleVotes))
 }
