@@ -49,6 +49,14 @@ func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) {
 			panic(err)
 		}
 
+		ctx.EventManager().EmitEvent(
+			sdk.NewEvent(
+				types.EventTypeOracleRegistration,
+				sdk.NewAttribute(types.AttributeKeyVoteStatus, types.AttributeValueStatusCompleted),
+				sdk.NewAttribute(types.AttributeKeyVotingTarget, oracleRegistration.Address),
+			),
+		)
+
 		return false
 	})
 }
