@@ -59,7 +59,7 @@ func (suite *oracleTestSuite) BeforeTest(_, _ string) {
 		VoteParams: types.VoteParams{
 			VotingPeriod: 100,
 			JailPeriod:   60,
-			Quorum:       sdk.NewDecWithPrec(1, 3),
+			Threshold:    sdk.NewDecWithPrec(2, 3),
 		},
 		SlashParams: types.SlashParams{
 			SlashFractionDowntime: sdk.NewDecWithPrec(3, 1),
@@ -120,7 +120,7 @@ func (suite oracleTestSuite) TestRegisterOracleSuccess() {
 
 	votingPeriod := suite.OracleKeeper.GetVotingPeriod(ctx)
 
-	oracleFromKeeper, err := suite.OracleKeeper.GetOracleRegistration(ctx, sdk.AccAddress(valAddr).String())
+	oracleFromKeeper, err := suite.OracleKeeper.GetOracleRegistration(ctx, uniqueID, sdk.AccAddress(valAddr).String())
 	suite.Require().NoError(err)
 	suite.Require().Equal(uniqueID, oracleFromKeeper.UniqueId)
 	suite.Require().Equal(sdk.AccAddress(valAddr).String(), oracleFromKeeper.Address)
@@ -220,7 +220,7 @@ func (suite *oracleTestSuite) TestOracleRegistrationVoteSuccess() {
 		UniqueId:               uniqueID,
 		VoterAddress:           genesisOracleAcc.String(),
 		VotingTargetAddress:    newOracleAcc.String(),
-		VoteOption:             types.VOTE_OPTION_VALID,
+		VoteOption:             types.VOTE_OPTION_YES,
 		EncryptedOraclePrivKey: encryptedOraclePrivKey,
 	}
 
@@ -270,7 +270,7 @@ func (suite *oracleTestSuite) TestOracleRegistrationVoteFailedVerifySignature() 
 		UniqueId:               uniqueID,
 		VoterAddress:           genesisOracleAcc.String(),
 		VotingTargetAddress:    newOracleAcc.String(),
-		VoteOption:             types.VOTE_OPTION_VALID,
+		VoteOption:             types.VOTE_OPTION_YES,
 		EncryptedOraclePrivKey: encryptedOraclePrivKey,
 	}
 
@@ -319,7 +319,7 @@ func (suite *oracleTestSuite) TestOracleRegistrationVoteInvalidUniqueID() {
 		UniqueId:               invalidUniqueID,
 		VoterAddress:           genesisOracleAcc.String(),
 		VotingTargetAddress:    newOracleAcc.String(),
-		VoteOption:             types.VOTE_OPTION_VALID,
+		VoteOption:             types.VOTE_OPTION_YES,
 		EncryptedOraclePrivKey: encryptedOraclePrivKey,
 	}
 
@@ -366,7 +366,7 @@ func (suite *oracleTestSuite) TestOracleRegistrationVoteInvalidGenesisOracleStat
 		UniqueId:               uniqueID,
 		VoterAddress:           genesisOracleAcc.String(),
 		VotingTargetAddress:    newOracleAcc.String(),
-		VoteOption:             types.VOTE_OPTION_VALID,
+		VoteOption:             types.VOTE_OPTION_YES,
 		EncryptedOraclePrivKey: encryptedOraclePrivKey,
 	}
 
@@ -414,7 +414,7 @@ func (suite *oracleTestSuite) TestOracleRegistrationVoteInvalidOracleRegistratio
 		UniqueId:               uniqueID,
 		VoterAddress:           genesisOracleAcc.String(),
 		VotingTargetAddress:    newOracleAcc.String(),
-		VoteOption:             types.VOTE_OPTION_VALID,
+		VoteOption:             types.VOTE_OPTION_YES,
 		EncryptedOraclePrivKey: encryptedOraclePrivKey,
 	}
 

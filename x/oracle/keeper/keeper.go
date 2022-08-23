@@ -48,17 +48,49 @@ func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 	return ctx.Logger().With("module", fmt.Sprintf("x/%s", types.ModuleName))
 }
 
-func (k Keeper) AddOracleRegistrationVoteQueue(ctx sdk.Context, uniqueID string, addr sdk.AccAddress, endTime time.Time) {
+func (k Keeper) AddOracleRegistrationQueue(ctx sdk.Context, uniqueID string, addr sdk.AccAddress, endTime time.Time) {
 	store := ctx.KVStore(k.storeKey)
-	store.Set(types.GetOracleRegistrationVoteQueueKey(uniqueID, addr, endTime), addr)
+	store.Set(types.GetOracleRegistrationQueueKey(uniqueID, addr, endTime), addr)
 }
 
-func (k Keeper) GetClosedOracleRegistrationVoteQueueIterator(ctx sdk.Context, endTime time.Time) sdk.Iterator {
+func (k Keeper) GetClosedOracleRegistrationQueueIterator(ctx sdk.Context, endTime time.Time) sdk.Iterator {
 	store := ctx.KVStore(k.storeKey)
-	return store.Iterator(types.OracleRegistrationVotesQueueKey, sdk.PrefixEndBytes(types.GetOracleRegistrationVoteQueueByTimeKey(endTime)))
+	return store.Iterator(types.OracleRegistrationsQueueKey, sdk.PrefixEndBytes(types.GetOracleRegistrationVoteQueueByTimeKey(endTime)))
 }
 
-func (k Keeper) RemoveOracleRegistrationVoteQueue(ctx sdk.Context, uniqueID string, addr sdk.AccAddress, endTime time.Time) {
+func (k Keeper) RemoveOracleRegistrationQueue(ctx sdk.Context, uniqueID string, addr sdk.AccAddress, endTime time.Time) {
 	store := ctx.KVStore(k.storeKey)
-	store.Delete(types.GetOracleRegistrationVoteQueueKey(uniqueID, addr, endTime))
+	store.Delete(types.GetOracleRegistrationQueueKey(uniqueID, addr, endTime))
+}
+
+func (k Keeper) IterateOracleValidator(ctx sdk.Context, cb func(info *types.OracleValidatorInfo) bool) {
+	oracles, err := k.GetAllOracleList(ctx)
+	if err != nil {
+		panic(err)
+	}
+
+	for _, oracle := range oracles {
+		accAddr, err := sdk.AccAddressFromBech32(oracle.Address)
+		if err != nil {
+			panic(err)
+		}
+
+		oracleValAddr := sdk.ValAddress(accAddr.Bytes())
+
+		validator, ok := k.stakingKeeper.GetValidator(ctx, oracleValAddr)
+		if !ok {
+			panic(fmt.Sprintf("failed to retrieve validator information. address: %s", oracle.Address))
+		}
+
+		oracleValidatorInfo := &types.OracleValidatorInfo{
+			Address:         oracle.Address,
+			OracleActivated: oracle.IsActivated(),
+			BondedTokens:    validator.BondedTokens(),
+			ValidatorJailed: validator.IsJailed(),
+		}
+
+		if cb(oracleValidatorInfo) {
+			break
+		}
+	}
 }

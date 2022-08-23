@@ -74,9 +74,16 @@ message TallyResult {
   string yes = 1 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int", (gogoproto.nullable) = false];
   string no = 2 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int", (gogoproto.nullable) = false];
   // Votes yes, but the value is different with the consensus value
-  string invalid_yes = 3 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int", (gogoproto.nullable) = false];
+  repeated ConsensusTally invalid_yes = 3;
+  string total = 4 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int", (gogoproto.nullable) = false];
   // The consensus value between oracles
-  bytes consensus_value = 4;
+  bytes consensus_value = 5;
+}
+
+// ConsensusTally defines the consensus value and the vote amount.
+message ConsensusTally {
+  bytes consensus_value = 1;
+  string voting_amount = 2[(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int", (gogoproto.nullable) = false];
 }
 
 // VotingPeriod defines the voting period of transactions governed by oracles.
@@ -110,8 +117,8 @@ enum VoteOption {
   VOTE_OPTION_UNSPECIFIED = 0;
 
   // VOTE_OPTION_VALID
-  VOTE_OPTION_VALID = 1;
+  VOTE_OPTION_YES = 1;
 
   // VOTE_OPTION_INVALID
-  VOTE_OPTION_INVALID = 2;
+  VOTE_OPTION_NO = 2;
 }

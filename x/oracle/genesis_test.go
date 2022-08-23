@@ -55,9 +55,14 @@ func makeSampleDate() (types.Oracle, types.OracleRegistration, types.OracleRegis
 				VotingEndTime:   time.Now().Add(5 * time.Second),
 			},
 			TallyResult: &types.TallyResult{
-				Yes:            sdk.NewInt(5),
-				No:             sdk.NewInt(1),
-				InvalidYes:     sdk.NewInt(1),
+				Yes: sdk.NewInt(5),
+				No:  sdk.NewInt(1),
+				InvalidYes: []*types.ConsensusTally{
+					{
+						ConsensusValue: []byte("invalidConsensusValue"),
+						VotingAmount:   sdk.NewInt(1),
+					},
+				},
 				ConsensusValue: []byte("encryptedOraclePrivKey"),
 			},
 		},
@@ -65,7 +70,7 @@ func makeSampleDate() (types.Oracle, types.OracleRegistration, types.OracleRegis
 			UniqueId:               uniqueID,
 			VoterAddress:           oracleAcc.String(),
 			VotingTargetAddress:    oracle2Acc.String(),
-			VoteOption:             types.VOTE_OPTION_VALID,
+			VoteOption:             types.VOTE_OPTION_YES,
 			EncryptedOraclePrivKey: []byte("encryptedOraclePrivKey"),
 		}
 }

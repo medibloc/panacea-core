@@ -12,6 +12,7 @@ type AccountKeeper interface {
 	GetPubKey(sdk.Context, sdk.AccAddress) (cryptotypes.PubKey, error)
 }
 
+// StakingKeeper expected staking keeper (Validator and Delegator sets) (noalias)
 type StakingKeeper interface {
-	GetValidator(ctx sdk.Context, addr sdk.ValAddress) (validator stakingtypes.Validator, found bool)
+	GetValidator(sdk.Context, sdk.ValAddress) (stakingtypes.Validator, bool)
 }

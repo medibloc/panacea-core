@@ -8,6 +8,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	cryptocodec "github.com/cosmos/cosmos-sdk/crypto/codec"
+	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 	"github.com/cosmos/cosmos-sdk/store"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
@@ -40,7 +41,6 @@ import (
 	oraclekeeper "github.com/medibloc/panacea-core/v2/x/oracle/keeper"
 	oracletypes "github.com/medibloc/panacea-core/v2/x/oracle/types"
 	"github.com/stretchr/testify/suite"
-	"github.com/tendermint/tendermint/crypto/secp256k1"
 	"github.com/tendermint/tendermint/libs/log"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 	"github.com/tendermint/tendermint/types/time"
@@ -110,6 +110,8 @@ func (suite *TestSuite) SetupTest() {
 	}
 
 	sdk.GetConfig().SetBech32PrefixForAccount("panacea", "panaceapub")
+	sdk.GetConfig().SetBech32PrefixForValidator("panaceavaloper", "panaceavaloperpub")
+	sdk.GetConfig().SetBech32PrefixForConsensusNode("panaceavalcons", "panaceavalconspub")
 
 	suite.Require().NoError(ms.LoadLatestVersion())
 
@@ -270,6 +272,10 @@ func newTestCodec() params.EncodingConfig {
 		Amino:             cdc,
 	}
 
+}
+
+func (suite *TestSuite) GetTallyKeeper() oracletypes.TallyKeeper {
+	return suite.OracleKeeper
 }
 
 func (suite *TestSuite) GetAccAddress() sdk.AccAddress {
