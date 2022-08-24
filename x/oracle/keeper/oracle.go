@@ -31,7 +31,12 @@ func (k Keeper) RegisterOracle(ctx sdk.Context, msg *types.MsgRegisterOracle) er
 
 	// TODO: Add active queue of Oracle Registration
 
-	// TODO: emit RegisterOracle event
+	ctx.EventManager().EmitEvent(
+		sdk.NewEvent(types.EventTypeRegister,
+			sdk.NewAttribute(types.AttributeKeyOracleAddress, msg.OracleAddress),
+		),
+	)
+
 	return nil
 }
 
