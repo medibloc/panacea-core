@@ -23,6 +23,13 @@ type (
 	}
 )
 
+type Tally struct {
+	OracleValidatorInfos map[string]*OracleValidatorInfo
+	Yes                  map[string]*ConsensusTally
+	No                   sdk.Int
+	Total                sdk.Int
+}
+
 func NewTally() *Tally {
 	return &Tally{
 		OracleValidatorInfos: make(map[string]*OracleValidatorInfo),
@@ -44,9 +51,9 @@ func (t *Tally) Add(vote Vote) error {
 
 	bondedTokens := oracleValidatorInfo.BondedTokens
 	switch vote.GetVoteOption() {
-	case VOTE_OPTION_VALID:
+	case VOTE_OPTION_YES:
 		t.addYes(vote.GetConsensusValue(), bondedTokens)
-	case VOTE_OPTION_INVALID:
+	case VOTE_OPTION_NO:
 		t.addNo(bondedTokens)
 	default:
 		return fmt.Errorf("unsupported voteOption. value: %s", vote.GetVoteOption())
@@ -55,13 +62,13 @@ func (t *Tally) Add(vote Vote) error {
 }
 
 // addYes defines to be divided and set by ConsensusValue
-func (t *Tally) addYes(key []byte, amount sdk.Int) {
-	if val, ok := t.Yes[string(key)]; ok {
+func (t *Tally) addYes(consensusValue []byte, amount sdk.Int) {
+	if val, ok := t.Yes[string(consensusValue)]; ok {
 		val.VotingAmount = val.VotingAmount.Add(amount)
 	} else {
-		t.Yes[string(key)] = &ConsensusTally{
-			ConsensusKey: key,
-			VotingAmount: amount,
+		t.Yes[string(consensusValue)] = &ConsensusTally{
+			ConsensusValue: consensusValue,
+			VotingAmount:   amount,
 		}
 	}
 }
@@ -81,29 +88,31 @@ func (t *Tally) calculateTotal() {
 	}
 }
 
-// CalculateTallyResult calculates the voting result based on the received quorum, creates and returns a TallyResult.
-func (t Tally) CalculateTallyResult(quorum sdk.Dec) *TallyResult {
+// CalculateTallyResult calculates the voting result based on the received threshold, creates and returns a TallyResult.
+func (t Tally) CalculateTallyResult(threshold sdk.Dec) *TallyResult {
 	t.calculateTotal()
 
 	tallyHeap := NewConsensusTallyMaxHeap()
 	for _, tally := range t.Yes {
-		heap.Push(&tallyHeap, tally)
+		tallyHeap.PushConsensusTally(tally)
 	}
 
 	tallyResult := NewTallyResult()
 
 	if tallyHeap.Len() > 0 {
-		maxTally := heap.Pop(&tallyHeap).(*ConsensusTally)
-		tallyResult.Yes = maxTally.VotingAmount
+		maxTally := tallyHeap.PopConsensusTally()
 
 		voteRate := maxTally.VotingAmount.ToDec().Quo(t.Total.ToDec())
-		if voteRate.GTE(quorum) {
-			tallyResult.ConsensusValue = maxTally.ConsensusKey
+		if voteRate.GTE(threshold) {
+			tallyResult.Yes = maxTally.VotingAmount
+			tallyResult.ConsensusValue = maxTally.ConsensusValue
+		} else {
+			tallyResult.AddInvalidYes(maxTally)
 		}
 
 		for tallyHeap.Len() > 0 {
-			invalidYesTally := heap.Pop(&tallyHeap).(*ConsensusTally)
-			tallyResult.InvalidYes = tallyResult.InvalidYes.Add(invalidYesTally.VotingAmount)
+			invalidYesTally := tallyHeap.PopConsensusTally()
+			tallyResult.AddInvalidYes(invalidYesTally)
 		}
 
 	}
@@ -147,6 +156,21 @@ func (h *ConsensusTallyMaxHeap) Pop() interface{} {
 	old[n-1] = nil // avoid memory leak
 	*h = old[0 : n-1]
 	return tally
+}
+
+func (h *ConsensusTallyMaxHeap) PushConsensusTally(tally *ConsensusTally) {
+	heap.Push(h, tally)
+}
+
+func (h *ConsensusTallyMaxHeap) PopConsensusTally() *ConsensusTally {
+	return heap.Pop(h).(*ConsensusTally)
+}
+
+type OracleValidatorInfo struct {
+	Address         string
+	OracleActivated bool
+	BondedTokens    sdk.Int
+	ValidatorJailed bool
 }
 
 func (o *OracleValidatorInfo) IsPossibleVote() bool {

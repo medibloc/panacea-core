@@ -9,6 +9,8 @@ import (
 	"testing"
 )
 
+var threshold = sdk.NewDec(2).Quo(sdk.NewDec(3))
+
 func makeSampleVotes(count int, uniqueID string) []*types.OracleRegistrationVote {
 	votes := make([]*types.OracleRegistrationVote, 0)
 	for i := 0; i < count; i++ {
@@ -42,15 +44,15 @@ func TestTallyResultAllValid(t *testing.T) {
 	consensusValue := []byte("encPriv1")
 
 	votes := makeSampleVotes(3, uniqueID)
-	votes[0].VoteOption = types.VOTE_OPTION_VALID
+	votes[0].VoteOption = types.VOTE_OPTION_YES
 	votes[0].EncryptedOraclePrivKey = consensusValue
-	votes[1].VoteOption = types.VOTE_OPTION_VALID
+	votes[1].VoteOption = types.VOTE_OPTION_YES
 	votes[1].EncryptedOraclePrivKey = consensusValue
-	votes[2].VoteOption = types.VOTE_OPTION_VALID
+	votes[2].VoteOption = types.VOTE_OPTION_YES
 	votes[2].EncryptedOraclePrivKey = consensusValue
 
 	infos := makeSampleOracleValidatorInfoMap(votes)
-	infos[votes[0].VoterAddress].BondedTokens = sdk.NewInt(30)
+	infos[votes[0].VoterAddress].BondedTokens = sdk.NewInt(70)
 	infos[votes[1].VoterAddress].BondedTokens = sdk.NewInt(20)
 	infos[votes[2].VoterAddress].BondedTokens = sdk.NewInt(10)
 
@@ -63,24 +65,24 @@ func TestTallyResultAllValid(t *testing.T) {
 	err = tally.Add(votes[2])
 	require.NoError(t, err)
 
-	tallyResult := tally.CalculateTallyResult(sdk.NewDec(1).Quo(sdk.NewDec(3)))
-	require.Equal(t, sdk.NewInt(60), tallyResult.Yes)
+	tallyResult := tally.CalculateTallyResult(threshold)
+	require.Equal(t, sdk.NewInt(100), tallyResult.Yes)
 	require.True(t, tallyResult.No.IsZero())
-	require.True(t, tallyResult.InvalidYes.IsZero())
+	require.Equal(t, 0, len(tallyResult.InvalidYes))
 	require.Equal(t, consensusValue, tallyResult.ConsensusValue)
-	require.Equal(t, sdk.NewInt(60), tallyResult.Total)
+	require.Equal(t, sdk.NewInt(100), tallyResult.Total)
 }
 
 func TestTallyResultAllInValid(t *testing.T) {
 	uniqueID := "unique"
 
 	votes := makeSampleVotes(3, uniqueID)
-	votes[0].VoteOption = types.VOTE_OPTION_INVALID
-	votes[1].VoteOption = types.VOTE_OPTION_INVALID
-	votes[2].VoteOption = types.VOTE_OPTION_INVALID
+	votes[0].VoteOption = types.VOTE_OPTION_NO
+	votes[1].VoteOption = types.VOTE_OPTION_NO
+	votes[2].VoteOption = types.VOTE_OPTION_NO
 
 	infos := makeSampleOracleValidatorInfoMap(votes)
-	infos[votes[0].VoterAddress].BondedTokens = sdk.NewInt(30)
+	infos[votes[0].VoterAddress].BondedTokens = sdk.NewInt(70)
 	infos[votes[1].VoterAddress].BondedTokens = sdk.NewInt(20)
 	infos[votes[2].VoterAddress].BondedTokens = sdk.NewInt(10)
 
@@ -93,27 +95,30 @@ func TestTallyResultAllInValid(t *testing.T) {
 	err = tally.Add(votes[2])
 	require.NoError(t, err)
 
-	tallyResult := tally.CalculateTallyResult(sdk.NewDec(1).Quo(sdk.NewDec(3)))
+	tallyResult := tally.CalculateTallyResult(threshold)
 	require.True(t, tallyResult.Yes.IsZero())
-	require.Equal(t, sdk.NewInt(60), tallyResult.No)
-	require.True(t, tallyResult.InvalidYes.IsZero())
+	require.Equal(t, sdk.NewInt(100), tallyResult.No)
+	require.Equal(t, 0, len(tallyResult.InvalidYes))
 	require.Nil(t, tallyResult.ConsensusValue)
-	require.Equal(t, sdk.NewInt(60), tallyResult.Total)
+	require.Equal(t, sdk.NewInt(100), tallyResult.Total)
 }
 
-func TestTallyResultDifferentConsensusValue(t *testing.T) {
+func TestTallyResultDifferentConsensusValueSuccessConsensus(t *testing.T) {
 	uniqueID := "unique"
+	consensusValue := []byte("encPriv1")
+	consensusValue2 := []byte("encPriv2")
+	consensusValue3 := []byte("encPriv3")
 
 	votes := makeSampleVotes(3, uniqueID)
-	votes[0].VoteOption = types.VOTE_OPTION_VALID
-	votes[0].EncryptedOraclePrivKey = []byte("encPriv1")
-	votes[1].VoteOption = types.VOTE_OPTION_VALID
-	votes[1].EncryptedOraclePrivKey = []byte("encPriv2")
-	votes[2].VoteOption = types.VOTE_OPTION_VALID
-	votes[2].EncryptedOraclePrivKey = []byte("encPriv3")
+	votes[0].VoteOption = types.VOTE_OPTION_YES
+	votes[0].EncryptedOraclePrivKey = consensusValue
+	votes[1].VoteOption = types.VOTE_OPTION_YES
+	votes[1].EncryptedOraclePrivKey = consensusValue2
+	votes[2].VoteOption = types.VOTE_OPTION_YES
+	votes[2].EncryptedOraclePrivKey = consensusValue3
 
 	infos := makeSampleOracleValidatorInfoMap(votes)
-	infos[votes[0].VoterAddress].BondedTokens = sdk.NewInt(30)
+	infos[votes[0].VoterAddress].BondedTokens = sdk.NewInt(70)
 	infos[votes[1].VoterAddress].BondedTokens = sdk.NewInt(20)
 	infos[votes[2].VoterAddress].BondedTokens = sdk.NewInt(10)
 
@@ -126,22 +131,69 @@ func TestTallyResultDifferentConsensusValue(t *testing.T) {
 	err = tally.Add(votes[2])
 	require.NoError(t, err)
 
-	// ConsensusValue with the highest number of Yes votes selected.
-	// All others counted as invalid votes
-	tallyResult := tally.CalculateTallyResult(sdk.NewDec(1).Quo(sdk.NewDec(3)))
-	require.Equal(t, sdk.NewInt(30), tallyResult.Yes)
+	// If the consensusValue exceeds the threshold, the consensus is successful.
+	tallyResult := tally.CalculateTallyResult(threshold)
+	require.Equal(t, sdk.NewInt(70), tallyResult.Yes)
 	require.True(t, tallyResult.No.IsZero())
-	require.Equal(t, sdk.NewInt(30), tallyResult.InvalidYes)
-	require.Equal(t, votes[0].EncryptedOraclePrivKey, tallyResult.ConsensusValue)
-	require.Equal(t, sdk.NewInt(60), tallyResult.Total)
+	require.Equal(t, 2, len(tallyResult.InvalidYes))
+	require.Equal(t, consensusValue2, tallyResult.InvalidYes[0].ConsensusValue)
+	require.Equal(t, sdk.NewInt(20), tallyResult.InvalidYes[0].VotingAmount)
+	require.Equal(t, consensusValue3, tallyResult.InvalidYes[1].ConsensusValue)
+	require.Equal(t, sdk.NewInt(10), tallyResult.InvalidYes[1].VotingAmount)
+	require.Equal(t, consensusValue, tallyResult.ConsensusValue)
+	require.Equal(t, sdk.NewInt(100), tallyResult.Total)
 }
 
-func TestTallyResultLessThenQuorum(t *testing.T) {
+func TestTallyResultDifferentConsensusValueFailedConsensus(t *testing.T) {
 	uniqueID := "unique"
+	consensusValue := []byte("encPriv1")
+	consensusValue2 := []byte("encPriv2")
+	consensusValue3 := []byte("encPriv3")
 
 	votes := makeSampleVotes(3, uniqueID)
-	votes[2].VoteOption = types.VOTE_OPTION_VALID
-	votes[2].EncryptedOraclePrivKey = []byte("encPriv1")
+	votes[0].VoteOption = types.VOTE_OPTION_YES
+	votes[0].EncryptedOraclePrivKey = consensusValue
+	votes[1].VoteOption = types.VOTE_OPTION_YES
+	votes[1].EncryptedOraclePrivKey = consensusValue2
+	votes[2].VoteOption = types.VOTE_OPTION_YES
+	votes[2].EncryptedOraclePrivKey = consensusValue3
+
+	infos := makeSampleOracleValidatorInfoMap(votes)
+	infos[votes[0].VoterAddress].BondedTokens = sdk.NewInt(50)
+	infos[votes[1].VoterAddress].BondedTokens = sdk.NewInt(30)
+	infos[votes[2].VoterAddress].BondedTokens = sdk.NewInt(20)
+
+	tally := types.NewTally()
+	tally.OracleValidatorInfos = infos
+	err := tally.Add(votes[0])
+	require.NoError(t, err)
+	err = tally.Add(votes[1])
+	require.NoError(t, err)
+	err = tally.Add(votes[2])
+	require.NoError(t, err)
+
+	// If the consensusValue exceeds the threshold, the consensus is successful.
+	tallyResult := tally.CalculateTallyResult(threshold)
+	require.True(t, tallyResult.Yes.IsZero())
+	require.True(t, tallyResult.No.IsZero())
+	require.Equal(t, 3, len(tallyResult.InvalidYes))
+	require.Equal(t, consensusValue, tallyResult.InvalidYes[0].ConsensusValue)
+	require.Equal(t, sdk.NewInt(50), tallyResult.InvalidYes[0].VotingAmount)
+	require.Equal(t, consensusValue2, tallyResult.InvalidYes[1].ConsensusValue)
+	require.Equal(t, sdk.NewInt(30), tallyResult.InvalidYes[1].VotingAmount)
+	require.Equal(t, consensusValue3, tallyResult.InvalidYes[2].ConsensusValue)
+	require.Equal(t, sdk.NewInt(20), tallyResult.InvalidYes[2].VotingAmount)
+	require.Nil(t, tallyResult.ConsensusValue)
+	require.Equal(t, sdk.NewInt(100), tallyResult.Total)
+}
+
+func TestTallyResultLessThenThreshold(t *testing.T) {
+	uniqueID := "unique"
+	consensusValue := []byte("encPriv1")
+
+	votes := makeSampleVotes(3, uniqueID)
+	votes[2].VoteOption = types.VOTE_OPTION_YES
+	votes[2].EncryptedOraclePrivKey = consensusValue
 
 	infos := makeSampleOracleValidatorInfoMap(votes)
 	infos[votes[0].VoterAddress].BondedTokens = sdk.NewInt(30)
@@ -153,27 +205,31 @@ func TestTallyResultLessThenQuorum(t *testing.T) {
 	err := tally.Add(votes[2])
 	require.NoError(t, err)
 
-	tallyResult := tally.CalculateTallyResult(sdk.NewDec(1).Quo(sdk.NewDec(3)))
-	require.Equal(t, sdk.NewInt(10), tallyResult.Yes)
+	tallyResult := tally.CalculateTallyResult(threshold)
+	require.True(t, tallyResult.Yes.IsZero())
 	require.True(t, tallyResult.No.IsZero())
-	require.True(t, tallyResult.InvalidYes.IsZero())
+	require.Equal(t, 1, len(tallyResult.InvalidYes))
+	require.Equal(t, consensusValue, tallyResult.InvalidYes[0].ConsensusValue)
+	require.Equal(t, sdk.NewInt(10), tallyResult.InvalidYes[0].VotingAmount)
 	require.Nil(t, tallyResult.ConsensusValue)
 	require.Equal(t, sdk.NewInt(60), tallyResult.Total)
 }
 
 func TestTallyResultNumberOfAllVotes(t *testing.T) {
 	uniqueID := "unique"
+	consensusValue := []byte("encPriv1")
+	consensusValue2 := []byte("encPriv2")
 
 	votes := makeSampleVotes(4, uniqueID)
-	votes[0].VoteOption = types.VOTE_OPTION_VALID
-	votes[0].EncryptedOraclePrivKey = []byte("encPriv1")
-	votes[1].VoteOption = types.VOTE_OPTION_INVALID
-	votes[2].VoteOption = types.VOTE_OPTION_VALID
-	votes[2].EncryptedOraclePrivKey = []byte("encPriv3")
+	votes[0].VoteOption = types.VOTE_OPTION_YES
+	votes[0].EncryptedOraclePrivKey = consensusValue
+	votes[1].VoteOption = types.VOTE_OPTION_NO
+	votes[2].VoteOption = types.VOTE_OPTION_YES
+	votes[2].EncryptedOraclePrivKey = consensusValue2
 
 	infos := makeSampleOracleValidatorInfoMap(votes)
-	infos[votes[0].VoterAddress].BondedTokens = sdk.NewInt(30)
-	infos[votes[1].VoterAddress].BondedTokens = sdk.NewInt(20)
+	infos[votes[0].VoterAddress].BondedTokens = sdk.NewInt(70)
+	infos[votes[1].VoterAddress].BondedTokens = sdk.NewInt(15)
 	infos[votes[2].VoterAddress].BondedTokens = sdk.NewInt(10)
 	infos[votes[3].VoterAddress].BondedTokens = sdk.NewInt(5)
 
@@ -188,34 +244,36 @@ func TestTallyResultNumberOfAllVotes(t *testing.T) {
 
 	// ConsensusValue with the highest number of Yes votes selected.
 	// All others counted as invalid votes
-	tallyResult := tally.CalculateTallyResult(sdk.NewDec(1).Quo(sdk.NewDec(3)))
-	require.Equal(t, sdk.NewInt(30), tallyResult.Yes)
-	require.Equal(t, sdk.NewInt(20), tallyResult.No)
-	require.Equal(t, sdk.NewInt(10), tallyResult.InvalidYes)
-	require.Equal(t, votes[0].EncryptedOraclePrivKey, tallyResult.ConsensusValue)
-	require.Equal(t, sdk.NewInt(65), tallyResult.Total)
+	tallyResult := tally.CalculateTallyResult(threshold)
+	require.Equal(t, sdk.NewInt(70), tallyResult.Yes)
+	require.Equal(t, sdk.NewInt(15), tallyResult.No)
+	require.Equal(t, 1, len(tallyResult.InvalidYes))
+	require.Equal(t, consensusValue2, tallyResult.InvalidYes[0].ConsensusValue)
+	require.Equal(t, sdk.NewInt(10), tallyResult.InvalidYes[0].VotingAmount)
+	require.Equal(t, consensusValue, tallyResult.ConsensusValue)
+	require.Equal(t, sdk.NewInt(100), tallyResult.Total)
 }
 
 func TestConsensusTallyMaxHeap(t *testing.T) {
 	tally1 := &types.ConsensusTally{
-		ConsensusKey: []byte("key1"),
-		VotingAmount: sdk.NewInt(1000),
+		ConsensusValue: []byte("key1"),
+		VotingAmount:   sdk.NewInt(1000),
 	}
 	tally2 := &types.ConsensusTally{
-		ConsensusKey: []byte("key2"),
-		VotingAmount: sdk.NewInt(500),
+		ConsensusValue: []byte("key2"),
+		VotingAmount:   sdk.NewInt(500),
 	}
 	tally3 := &types.ConsensusTally{
-		ConsensusKey: []byte("key3"),
-		VotingAmount: sdk.NewInt(400),
+		ConsensusValue: []byte("key3"),
+		VotingAmount:   sdk.NewInt(400),
 	}
 	tally4 := &types.ConsensusTally{
-		ConsensusKey: []byte("key4"),
-		VotingAmount: sdk.NewInt(2000),
+		ConsensusValue: []byte("key4"),
+		VotingAmount:   sdk.NewInt(2000),
 	}
 	tally5 := &types.ConsensusTally{
-		ConsensusKey: []byte("key5"),
-		VotingAmount: sdk.NewInt(1001),
+		ConsensusValue: []byte("key5"),
+		VotingAmount:   sdk.NewInt(1001),
 	}
 	items := []*types.ConsensusTally{tally1, tally2, tally3, tally4, tally5}
 

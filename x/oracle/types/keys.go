@@ -26,7 +26,7 @@ const (
 var (
 	// OraclesKey defines key to store oracle
 	OraclesKey                  = []byte{0x01}
-	OracleRegistrationsKey      = []byte{0x02}
+	OracleRegistrationKey       = []byte{0x02}
 	OracleRegistrationVotesKey  = []byte{0x03}
 	OracleRegistrationsQueueKey = []byte{0x04}
 
@@ -38,7 +38,7 @@ func GetOracleKey(address sdk.AccAddress) []byte {
 }
 
 func GetOracleRegistrationKey(uniqueID string, address sdk.AccAddress) []byte {
-	return append(OracleRegistrationsKey, CombineKeys([]byte(uniqueID), address)...)
+	return append(OracleRegistrationKey, CombineKeys([]byte(uniqueID), address)...)
 }
 
 func GetOracleRegistrationVotesKey(uniqueID string, votingTargetAddress sdk.AccAddress) []byte {
