@@ -5,9 +5,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
-	"github.com/medibloc/panacea-core/v2/types/testsuite"
 	"github.com/medibloc/panacea-core/v2/x/oracle"
+	"github.com/medibloc/panacea-core/v2/x/oracle/testutil"
 	"github.com/medibloc/panacea-core/v2/x/oracle/types"
 	"github.com/stretchr/testify/suite"
 	"testing"
@@ -15,7 +14,7 @@ import (
 )
 
 type abciTestSuite struct {
-	testsuite.TestSuite
+	testutil.OracleBaseTestSuite
 
 	uniqueID string
 
@@ -45,9 +44,9 @@ func (suite *abciTestSuite) BeforeTest(_, _ string) {
 	suite.oraclePubKey3 = secp256k1.GenPrivKey().PubKey()
 	suite.oracleAddr3 = sdk.AccAddress(suite.oraclePubKey3.Address())
 
-	suite.createOracleValidator(suite.oraclePubKey, sdk.NewInt(70))
-	suite.createOracleValidator(suite.oraclePubKey2, sdk.NewInt(20))
-	suite.createOracleValidator(suite.oraclePubKey3, sdk.NewInt(10))
+	suite.CreateOracleValidator(suite.oraclePubKey, sdk.NewInt(70))
+	suite.CreateOracleValidator(suite.oraclePubKey2, sdk.NewInt(20))
+	suite.CreateOracleValidator(suite.oraclePubKey3, sdk.NewInt(10))
 
 	suite.newOraclePubKey = secp256k1.GenPrivKey().PubKey()
 	suite.newOracleAddr = sdk.AccAddress(suite.newOraclePubKey.Address())
@@ -61,36 +60,13 @@ func (suite *abciTestSuite) BeforeTest(_, _ string) {
 		VoteParams: types.VoteParams{
 			VotingPeriod: 100,
 			JailPeriod:   60,
-			Quorum:       sdk.NewDec(2).Quo(sdk.NewDec(3)),
+			Threshold:    sdk.NewDec(2).Quo(sdk.NewDec(3)),
 		},
 		SlashParams: types.SlashParams{
 			SlashFractionDowntime: sdk.NewDecWithPrec(3, 1),
 			SlashFractionForgery:  sdk.NewDecWithPrec(1, 1),
 		},
 	})
-}
-
-func (suite *abciTestSuite) createOracleValidator(pubKey cryptotypes.PubKey, amount sdk.Int) {
-	oracleAccAddr := sdk.AccAddress(pubKey.Address().Bytes())
-	oracleAccount := suite.AccountKeeper.NewAccountWithAddress(suite.Ctx, oracleAccAddr)
-	err := oracleAccount.SetPubKey(pubKey)
-	suite.Require().NoError(err)
-	suite.AccountKeeper.SetAccount(suite.Ctx, oracleAccount)
-	varAddr := sdk.ValAddress(pubKey.Address().Bytes())
-	validator, err := stakingtypes.NewValidator(varAddr, pubKey, stakingtypes.Description{})
-	suite.Require().NoError(err)
-	validator = validator.UpdateStatus(stakingtypes.Bonded)
-	validator, _ = validator.AddTokensFromDel(amount)
-
-	suite.StakingKeeper.SetValidator(suite.Ctx, validator)
-
-	err = suite.OracleKeeper.SetOracle(suite.Ctx, &types.Oracle{
-		Address:  oracleAccAddr.String(),
-		Status:   types.ORACLE_STATUS_ACTIVE,
-		Uptime:   0,
-		JailedAt: nil,
-	})
-	suite.Require().NoError(err)
 }
 
 func (suite abciTestSuite) TestEndBlockerVotePass() {

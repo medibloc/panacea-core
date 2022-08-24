@@ -91,8 +91,8 @@ func (t *Tally) calculateTotal() {
 	}
 }
 
-// CalculateTallyResult calculates the voting result based on the received quorum, creates and returns a TallyResult.
-func (t Tally) CalculateTallyResult(quorum sdk.Dec) *TallyResult {
+// CalculateTallyResult calculates the voting result based on the received threshold, creates and returns a TallyResult.
+func (t Tally) CalculateTallyResult(threshold sdk.Dec) *TallyResult {
 	t.calculateTotal()
 
 	tallyHeap := NewConsensusTallyMaxHeap()
@@ -106,7 +106,7 @@ func (t Tally) CalculateTallyResult(quorum sdk.Dec) *TallyResult {
 		maxTally := tallyHeap.PopConsensusTally()
 
 		voteRate := maxTally.VotingAmount.ToDec().Quo(t.Total.ToDec())
-		if voteRate.GTE(quorum) {
+		if voteRate.GTE(threshold) {
 			tallyResult.Yes = maxTally.VotingAmount
 			tallyResult.ConsensusValue = maxTally.ConsensusValue
 		} else {
