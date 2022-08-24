@@ -2,6 +2,7 @@ package cli
 
 import (
 	"fmt"
+
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/medibloc/panacea-core/v2/x/oracle/types"
 	"github.com/spf13/cobra"
@@ -18,6 +19,7 @@ func GetQueryCmd(queryRoute string) *cobra.Command {
 		RunE:                       client.ValidateCmd,
 	}
 	cmd.AddCommand(CmdGetParams())
+	cmd.AddCommand(CmdGetOracleRegistration())
 
 	return cmd
 }
