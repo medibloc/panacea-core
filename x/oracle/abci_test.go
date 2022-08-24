@@ -151,7 +151,7 @@ func (suite abciTestSuite) TestEndBlockerVotePass() {
 	suite.Require().Equal(2, len(eventAttributes))
 	suite.Require().Equal(types.AttributeKeyVoteStatus, string(eventAttributes[0].Key))
 	suite.Require().Equal(types.AttributeValueVoteStatusEnded, string(eventAttributes[0].Value))
-	suite.Require().Equal(types.AttributeKeyVotingTarget, string(eventAttributes[1].Key))
+	suite.Require().Equal(types.AttributeKeyOracleAddress, string(eventAttributes[1].Key))
 	suite.Require().Equal(oracleRegistration.Address, string(eventAttributes[1].Value))
 }
 
@@ -234,6 +234,6 @@ func (suite abciTestSuite) TestEndBlockerVoteReject() {
 	suite.Require().Equal(2, len(eventAttributes))
 	suite.Require().Equal(types.AttributeKeyVoteStatus, string(eventAttributes[0].Key))
 	suite.Require().Equal(types.AttributeValueVoteStatusEnded, string(eventAttributes[0].Value))
-	suite.Require().Equal(types.AttributeKeyVotingTarget, string(eventAttributes[1].Key))
+	suite.Require().Equal(types.AttributeKeyOracleAddress, string(eventAttributes[1].Key))
 	suite.Require().Equal(oracleRegistration.Address, string(eventAttributes[1].Value))
 }

@@ -40,7 +40,7 @@ func (k Keeper) RegisterOracle(ctx sdk.Context, msg *types.MsgRegisterOracle) er
 		sdk.NewEvent(
 			types.EventTypeOracleRegistration,
 			sdk.NewAttribute(types.AttributeKeyVoteStatus, types.AttributeValueVoteStatusStarted),
-			sdk.NewAttribute(types.AttributeKeyVotingTarget, oracleRegistration.Address),
+			sdk.NewAttribute(types.AttributeKeyOracleAddress, oracleRegistration.Address),
 		),
 	)
 	return nil
