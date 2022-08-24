@@ -7,6 +7,13 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
+func NewOracle(address string, status OracleStatus) *Oracle {
+	return &Oracle{
+		Address: address,
+		Status:  status,
+	}
+}
+
 func NewOracleRegistration(msg *MsgRegisterOracle) *OracleRegistration {
 	return &OracleRegistration{
 		UniqueId:               msg.UniqueId,
@@ -178,4 +185,8 @@ func NewTallyResult() *TallyResult {
 
 func (t *TallyResult) AddInvalidYes(tally *ConsensusTally) {
 	t.InvalidYes = append(t.InvalidYes, tally)
+}
+
+func (m TallyResult) IsPassed() bool {
+	return m.ConsensusValue != nil
 }

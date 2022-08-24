@@ -63,6 +63,46 @@ func (k Keeper) RemoveOracleRegistrationQueue(ctx sdk.Context, uniqueID string, 
 	store.Delete(types.GetOracleRegistrationQueueKey(uniqueID, addr, endTime))
 }
 
+func (k Keeper) IterateClosedOracleRegistrationQueue(ctx sdk.Context, endTime time.Time, cb func(oracleRegistration *types.OracleRegistration) (stop bool)) {
+	iter := k.GetClosedOracleRegistrationQueueIterator(ctx, endTime)
+
+	defer iter.Close()
+
+	for ; iter.Valid(); iter.Next() {
+		uniqueID, accAddr := types.SplitOracleRegistrationVoteQueueKey(iter.Key())
+		votingTargetAddress := accAddr.String()
+
+		oracleRegistration, err := k.GetOracleRegistration(ctx, uniqueID, votingTargetAddress)
+
+		if err != nil {
+			panic(fmt.Errorf("failed get oracleRegistration. err: %w", err))
+		}
+
+		if cb(oracleRegistration) {
+			break
+		}
+	}
+}
+
+func (k Keeper) IterateOracleRegistrationVote(ctx sdk.Context, uniqueID, votingTargetAddress string, cb func(vote *types.OracleRegistrationVote) (stop bool)) {
+	iter := k.GetOracleRegistrationVoteIterator(ctx, uniqueID, votingTargetAddress)
+
+	defer iter.Close()
+
+	for ; iter.Valid(); iter.Next() {
+		bz := iter.Value()
+		var oracleRegistrationVote types.OracleRegistrationVote
+		err := k.cdc.UnmarshalLengthPrefixed(bz, &oracleRegistrationVote)
+		if err != nil {
+			panic(fmt.Errorf("failed get oracleRegistrationVote. err: %w", err))
+		}
+
+		if cb(&oracleRegistrationVote) {
+			break
+		}
+	}
+}
+
 func (k Keeper) IterateOracleValidator(ctx sdk.Context, cb func(info *types.OracleValidatorInfo) bool) {
 	oracles, err := k.GetAllOracleList(ctx)
 	if err != nil {

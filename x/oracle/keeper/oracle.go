@@ -10,8 +10,13 @@ import (
 )
 
 func (k Keeper) RegisterOracle(ctx sdk.Context, msg *types.MsgRegisterOracle) error {
+	oracleAccAddr, err := sdk.AccAddressFromBech32(msg.OracleAddress)
+	if err != nil {
+		return err
+	}
+
 	// check if the oracle is active validator
-	if err := k.CheckValidatorStatus(ctx, msg.OracleAddress); err != nil {
+	if err := k.CheckValidatorStatus(ctx, oracleAccAddr); err != nil {
 		return sdkerrors.Wrapf(types.ErrRegisterOracle, err.Error())
 	}
 
@@ -29,20 +34,15 @@ func (k Keeper) RegisterOracle(ctx sdk.Context, msg *types.MsgRegisterOracle) er
 		return sdkerrors.Wrapf(types.ErrRegisterOracle, err.Error())
 	}
 
-	// TODO: Add active queue of Oracle Registration
+	k.AddOracleRegistrationQueue(ctx, oracleRegistration.UniqueId, oracleAccAddr, oracleRegistration.VotingPeriod.VotingEndTime)
 
 	// TODO: emit RegisterOracle event
 	return nil
 }
 
 // CheckValidatorStatus gets validator and check its status if it's eligible to be an oracle
-func (k Keeper) CheckValidatorStatus(ctx sdk.Context, oracleAddress string) error {
-	valAccAddr, err := sdk.AccAddressFromBech32(oracleAddress)
-	if err != nil {
-		return err
-	}
-
-	validator, found := k.stakingKeeper.GetValidator(ctx, sdk.ValAddress(valAccAddr))
+func (k Keeper) CheckValidatorStatus(ctx sdk.Context, oracleAccAddr sdk.AccAddress) error {
+	validator, found := k.stakingKeeper.GetValidator(ctx, sdk.ValAddress(oracleAccAddr))
 	if !found {
 		return types.ErrValidatorNotFound
 	}
@@ -312,6 +312,23 @@ func (k Keeper) SetOracleRegistrationVote(ctx sdk.Context, vote *types.OracleReg
 	}
 
 	store.Set(key, bz)
+
+	return nil
+}
+
+func (k Keeper) RemoveOracleRegistrationVote(ctx sdk.Context, vote *types.OracleRegistrationVote) error {
+	store := ctx.KVStore(k.storeKey)
+	votingTargetAccAddr, err := sdk.AccAddressFromBech32(vote.VotingTargetAddress)
+	if err != nil {
+		return err
+	}
+	voterAccAddr, err := sdk.AccAddressFromBech32(vote.VoterAddress)
+	if err != nil {
+		return err
+	}
+	key := types.GetOracleRegistrationVoteKey(vote.UniqueId, votingTargetAccAddr, voterAccAddr)
+
+	store.Delete(key)
 
 	return nil
 }
