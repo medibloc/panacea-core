@@ -61,7 +61,7 @@ func (suite *abciTestSuite) BeforeTest(_, _ string) {
 		VoteParams: types.VoteParams{
 			VotingPeriod: 100,
 			JailPeriod:   60,
-			Quorum:       sdk.NewDec(2).Quo(sdk.NewDec(3)),
+			Threshold:    sdk.NewDec(2).Quo(sdk.NewDec(3)),
 		},
 		SlashParams: types.SlashParams{
 			SlashFractionDowntime: sdk.NewDecWithPrec(3, 1),
