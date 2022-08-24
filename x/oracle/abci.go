@@ -52,7 +52,7 @@ func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) {
 		ctx.EventManager().EmitEvent(
 			sdk.NewEvent(
 				types.EventTypeOracleRegistration,
-				sdk.NewAttribute(types.AttributeKeyVoteStatus, types.AttributeValueStatusCompleted),
+				sdk.NewAttribute(types.AttributeKeyVoteStatus, types.AttributeValueVoteStatusCompleted),
 				sdk.NewAttribute(types.AttributeKeyVotingTarget, oracleRegistration.Address),
 			),
 		)
