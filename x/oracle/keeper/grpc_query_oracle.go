@@ -28,5 +28,6 @@ func (k Keeper) OracleRegistration(goCtx context.Context, req *types.QueryOracle
 
 // Params returns params of oracle module.
 func (k Keeper) Params(goCtx context.Context, req *types.QueryOracleParamsRequest) (*types.QueryParamsResponse, error) {
-	panic("implements me")
+	params := k.GetParams(sdk.UnwrapSDKContext(goCtx))
+	return &types.QueryParamsResponse{Params: &params}, nil
 }
