@@ -321,6 +321,23 @@ func (k Keeper) SetOracleRegistrationVote(ctx sdk.Context, vote *types.OracleReg
 	return nil
 }
 
+func (k Keeper) RemoveOracleRegistrationVote(ctx sdk.Context, vote *types.OracleRegistrationVote) error {
+	store := ctx.KVStore(k.storeKey)
+	votingTargetAccAddr, err := sdk.AccAddressFromBech32(vote.VotingTargetAddress)
+	if err != nil {
+		return err
+	}
+	voterAccAddr, err := sdk.AccAddressFromBech32(vote.VoterAddress)
+	if err != nil {
+		return err
+	}
+	key := types.GetOracleRegistrationVoteKey(vote.UniqueId, votingTargetAccAddr, voterAccAddr)
+
+	store.Delete(key)
+
+	return nil
+}
+
 // GetVotingPeriod gets voting period based on the current block time
 func (k Keeper) GetVotingPeriod(ctx sdk.Context) *types.VotingPeriod {
 	params := k.GetParams(ctx)
