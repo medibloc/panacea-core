@@ -18,7 +18,14 @@ func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) {
 
 		defer iterator.Close()
 
-		tallyResult, err := keeper.Tally(ctx, iterator, &types.OracleRegistrationVote{})
+		tallyResult, err := keeper.Tally(
+			ctx,
+			iterator,
+			&types.OracleRegistrationVote{},
+			func(vote types.Vote) error {
+				return keeper.RemoveOracleRegistrationVote(ctx, vote.(*types.OracleRegistrationVote))
+			},
+		)
 		if err != nil {
 			panic(err)
 		}

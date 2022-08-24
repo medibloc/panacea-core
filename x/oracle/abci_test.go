@@ -149,6 +149,10 @@ func (suite abciTestSuite) TestEndBlockerVotePass() {
 	err = suite.OracleKeeper.SetOracleRegistrationVote(ctx, &vote3)
 	suite.Require().NoError(err)
 
+	oracleVotes, err := suite.OracleKeeper.GetAllOracleRegistrationVoteList(ctx)
+	suite.Require().NoError(err)
+	suite.Require().Equal(3, len(oracleVotes))
+
 	oracle.EndBlocker(suite.Ctx, suite.OracleKeeper)
 
 	oracleRegistration, err = suite.OracleKeeper.GetOracleRegistration(ctx, suite.uniqueID, suite.newOracleAddr.String())
@@ -159,6 +163,10 @@ func (suite abciTestSuite) TestEndBlockerVotePass() {
 	suite.Require().NoError(err)
 	suite.Require().Equal(suite.newOracleAddr.String(), newOracle.Address)
 	suite.Require().Equal(types.ORACLE_STATUS_ACTIVE, newOracle.Status)
+
+	oracleVotes, err = suite.OracleKeeper.GetAllOracleRegistrationVoteList(ctx)
+	suite.Require().NoError(err)
+	suite.Require().Equal(0, len(oracleVotes))
 }
 
 func (suite abciTestSuite) TestEndBlockerVoteReject() {
@@ -216,6 +224,10 @@ func (suite abciTestSuite) TestEndBlockerVoteReject() {
 	err = suite.OracleKeeper.SetOracleRegistrationVote(ctx, &vote3)
 	suite.Require().NoError(err)
 
+	oracleVotes, err := suite.OracleKeeper.GetAllOracleRegistrationVoteList(ctx)
+	suite.Require().NoError(err)
+	suite.Require().Equal(3, len(oracleVotes))
+
 	oracle.EndBlocker(suite.Ctx, suite.OracleKeeper)
 
 	oracleRegistration, err = suite.OracleKeeper.GetOracleRegistration(ctx, suite.uniqueID, suite.newOracleAddr.String())
@@ -224,4 +236,8 @@ func (suite abciTestSuite) TestEndBlockerVoteReject() {
 
 	_, err = suite.OracleKeeper.GetOracle(ctx, suite.newOracleAddr.String())
 	suite.Require().Error(err)
+
+	oracleVotes, err = suite.OracleKeeper.GetAllOracleRegistrationVoteList(ctx)
+	suite.Require().NoError(err)
+	suite.Require().Equal(0, len(oracleVotes))
 }
