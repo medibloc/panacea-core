@@ -135,11 +135,13 @@ func (suite oracleTestSuite) TestRegisterOracleSuccess() {
 
 	events := suite.Ctx.EventManager().Events()
 	suite.Require().Equal(1, len(events))
-	suite.Require().Equal(types.ErrOracleRegistrationVote, events[0].Type)
+	suite.Require().Equal(types.EventTypeRegistrationVote, events[0].Type)
 
-	eventAttributes := events[0].Attributes
-	suite.Require().Equal(types.AttributeKeyOracleAddress, string(eventAttributes[0].Key))
-	suite.Require().Equal(suite.oracleAccAddr.String(), string(eventAttributes[0].Value))
+	eventVoteAttributes := events[0].Attributes
+	suite.Require().Equal(types.AttributeKeyVoteStatus, string(eventVoteAttributes[0].Key))
+	suite.Require().Equal(types.AttributeValueVoteStatusStarted, string(eventVoteAttributes[0].Value))
+	suite.Require().Equal(types.AttributeKeyOracleAddress, string(eventVoteAttributes[1].Key))
+	suite.Require().Equal(suite.oracleAccAddr.String(), string(eventVoteAttributes[1].Value))
 }
 
 func (suite oracleTestSuite) TestRegisterOracleFailedValidatorNotFound() {
