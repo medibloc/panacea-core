@@ -10,8 +10,7 @@ import (
 func (m msgServer) RegisterOracle(goCtx context.Context, msg *types.MsgRegisterOracle) (*types.MsgRegisterOracleResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	err := m.Keeper.RegisterOracle(ctx, msg)
-	if err != nil {
+	if err := m.Keeper.RegisterOracle(ctx, msg); err != nil {
 		return nil, err
 	}
 
