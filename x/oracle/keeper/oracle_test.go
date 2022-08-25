@@ -363,20 +363,9 @@ func (suite *oracleTestSuite) TestOracleRegistrationVoteInvalidOracleRegistratio
 	suite.SetAccount(suite.newOracleAccPubKey)
 	suite.SetValidator(suite.newOracleAccPubKey, sdk.NewInt(20))
 
-	// make the correct genesis oracle
-	oracle := &types.Oracle{
-		Address:  suite.oracleAccAddr.String(),
-		Status:   types.ORACLE_STATUS_ACTIVE,
-		Uptime:   0,
-		JailedAt: nil,
-	}
-
-	err := suite.OracleKeeper.SetOracle(ctx, oracle)
-	suite.Require().NoError(err)
-
 	oracleRegistration := suite.makeNewOracleRegistration()
 	oracleRegistration.Status = types.ORACLE_REGISTRATION_STATUS_REJECTED
-	err = suite.OracleKeeper.SetOracleRegistration(ctx, oracleRegistration)
+	err := suite.OracleKeeper.SetOracleRegistration(ctx, oracleRegistration)
 	suite.Require().NoError(err)
 
 	// make the correct encryptedOraclePrivKey
@@ -403,4 +392,43 @@ func (suite *oracleTestSuite) TestOracleRegistrationVoteInvalidOracleRegistratio
 	err = suite.OracleKeeper.VoteOracleRegistration(ctx, oracleRegistrationVote, signature)
 	suite.Require().ErrorIs(err, types.ErrOracleRegistrationVote)
 	suite.Require().ErrorContains(err, "the currently voted oracle's status is not 'VOTING_PERIOD'")
+}
+
+func (suite *oracleTestSuite) TestOracleRegistrationEmittedEvent() {
+	ctx := suite.Ctx
+
+	suite.CreateOracleValidator(suite.oracleAccPubKey, sdk.NewInt(70))
+	suite.SetAccount(suite.newOracleAccPubKey)
+	suite.SetValidator(suite.newOracleAccPubKey, sdk.NewInt(20))
+
+	msg := &types.MsgRegisterOracle{
+		UniqueId:               suite.uniqueID,
+		OracleAddress:          suite.newOracleAccAddr.String(),
+		NodePubKey:             suite.nodePubKey.SerializeCompressed(),
+		NodePubKeyRemoteReport: suite.nodePubKeyRemoteReport,
+		TrustedBlockHeight:     1,
+		TrustedBlockHash:       []byte("trustedBlockHash"),
+	}
+
+	err := suite.OracleKeeper.RegisterOracle(ctx, msg)
+	suite.Require().NoError(err)
+
+	oracleRegistration, err := suite.OracleKeeper.GetOracleRegistration(ctx, msg.UniqueId, msg.OracleAddress)
+	suite.Require().NoError(err)
+	suite.Require().Equal(msg.UniqueId, oracleRegistration.UniqueId)
+	suite.Require().Equal(msg.OracleAddress, oracleRegistration.Address)
+	suite.Require().Equal(msg.NodePubKey, oracleRegistration.NodePubKey)
+	suite.Require().Equal(msg.NodePubKeyRemoteReport, oracleRegistration.NodePubKeyRemoteReport)
+	suite.Require().Equal(msg.TrustedBlockHeight, oracleRegistration.TrustedBlockHeight)
+	suite.Require().Equal(msg.TrustedBlockHash, oracleRegistration.TrustedBlockHash)
+
+	events := ctx.EventManager().Events()
+	suite.Require().Equal(1, len(events))
+	suite.Require().Equal(types.EventTypeRegistrationVote, events[0].Type)
+	eventAttributes := events[0].Attributes
+	suite.Require().Equal(2, len(eventAttributes))
+	suite.Require().Equal(types.AttributeKeyVoteStatus, string(eventAttributes[0].Key))
+	suite.Require().Equal(types.AttributeValueVoteStatusStarted, string(eventAttributes[0].Value))
+	suite.Require().Equal(types.AttributeKeyOracleAddress, string(eventAttributes[1].Key))
+	suite.Require().Equal(msg.OracleAddress, string(eventAttributes[1].Value))
 }

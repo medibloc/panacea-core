@@ -143,6 +143,16 @@ func (suite abciTestSuite) TestEndBlockerVotePass() {
 	oracleVotes, err = suite.OracleKeeper.GetAllOracleRegistrationVoteList(ctx)
 	suite.Require().NoError(err)
 	suite.Require().Equal(0, len(oracleVotes))
+
+	events := ctx.EventManager().Events()
+	suite.Require().Equal(1, len(events))
+	suite.Require().Equal(types.EventTypeRegistrationVote, events[0].Type)
+	eventAttributes := events[0].Attributes
+	suite.Require().Equal(2, len(eventAttributes))
+	suite.Require().Equal(types.AttributeKeyVoteStatus, string(eventAttributes[0].Key))
+	suite.Require().Equal(types.AttributeValueVoteStatusEnded, string(eventAttributes[0].Value))
+	suite.Require().Equal(types.AttributeKeyOracleAddress, string(eventAttributes[1].Key))
+	suite.Require().Equal(oracleRegistration.Address, string(eventAttributes[1].Value))
 }
 
 func (suite abciTestSuite) TestEndBlockerVoteReject() {
@@ -216,4 +226,14 @@ func (suite abciTestSuite) TestEndBlockerVoteReject() {
 	oracleVotes, err = suite.OracleKeeper.GetAllOracleRegistrationVoteList(ctx)
 	suite.Require().NoError(err)
 	suite.Require().Equal(0, len(oracleVotes))
+
+	events := ctx.EventManager().Events()
+	suite.Require().Equal(1, len(events))
+	suite.Require().Equal(types.EventTypeRegistrationVote, events[0].Type)
+	eventAttributes := events[0].Attributes
+	suite.Require().Equal(2, len(eventAttributes))
+	suite.Require().Equal(types.AttributeKeyVoteStatus, string(eventAttributes[0].Key))
+	suite.Require().Equal(types.AttributeValueVoteStatusEnded, string(eventAttributes[0].Value))
+	suite.Require().Equal(types.AttributeKeyOracleAddress, string(eventAttributes[1].Key))
+	suite.Require().Equal(oracleRegistration.Address, string(eventAttributes[1].Value))
 }

@@ -36,7 +36,13 @@ func (k Keeper) RegisterOracle(ctx sdk.Context, msg *types.MsgRegisterOracle) er
 
 	k.AddOracleRegistrationQueue(ctx, oracleRegistration.UniqueId, oracleAccAddr, oracleRegistration.VotingPeriod.VotingEndTime)
 
-	// TODO: emit RegisterOracle event
+	ctx.EventManager().EmitEvent(
+		sdk.NewEvent(
+			types.EventTypeRegistrationVote,
+			sdk.NewAttribute(types.AttributeKeyVoteStatus, types.AttributeValueVoteStatusStarted),
+			sdk.NewAttribute(types.AttributeKeyOracleAddress, oracleRegistration.Address),
+		),
+	)
 	return nil
 }
 
