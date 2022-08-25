@@ -1,6 +1,10 @@
 package types
 
 const (
-	EventTypeRegister         = "oracle_registered"
-	AttributeKeyOracleAddress = "oracle_address"
+	EventTypeRegistrationVote = "oracle_registration"
+
+	AttributeKeyVoteStatus          = "vote_status"
+	AttributeKeyOracleAddress       = "oracle_address"
+	AttributeValueVoteStatusStarted = "started"
+	AttributeValueVoteStatusEnded   = "ended"
 )
