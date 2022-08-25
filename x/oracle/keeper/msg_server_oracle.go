@@ -8,10 +8,18 @@ import (
 )
 
 func (m msgServer) RegisterOracle(goCtx context.Context, msg *types.MsgRegisterOracle) (*types.MsgRegisterOracleResponse, error) {
-	err := m.Keeper.RegisterOracle(sdk.UnwrapSDKContext(goCtx), msg)
-	if err != nil {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	if err := m.Keeper.RegisterOracle(ctx, msg); err != nil {
 		return nil, err
 	}
+
+	ctx.EventManager().EmitEvent(
+		sdk.NewEvent(
+			sdk.EventTypeMessage,
+			sdk.NewAttribute(sdk.AttributeKeyModule, types.ModuleName),
+		),
+	)
 
 	return &types.MsgRegisterOracleResponse{}, nil
 }
