@@ -18,6 +18,9 @@ func CmdGetOracles() *cobra.Command {
 			}
 
 			pageReq, err := client.ReadPageRequest(cmd.Flags())
+			if err != nil {
+				return err
+			}
 
 			queryClient := types.NewQueryClient(clientCtx)
 
