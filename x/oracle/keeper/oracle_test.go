@@ -424,7 +424,7 @@ func (suite *oracleTestSuite) TestOracleRegistrationEmittedEvent() {
 
 	events := ctx.EventManager().Events()
 	suite.Require().Equal(1, len(events))
-	suite.Require().Equal(types.EventTypeOracleRegistration, events[0].Type)
+	suite.Require().Equal(types.EventTypeRegistrationVote, events[0].Type)
 	eventAttributes := events[0].Attributes
 	suite.Require().Equal(2, len(eventAttributes))
 	suite.Require().Equal(types.AttributeKeyVoteStatus, string(eventAttributes[0].Key))

@@ -38,7 +38,7 @@ func (k Keeper) RegisterOracle(ctx sdk.Context, msg *types.MsgRegisterOracle) er
 
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(
-			types.EventTypeOracleRegistration,
+			types.EventTypeRegistrationVote,
 			sdk.NewAttribute(types.AttributeKeyVoteStatus, types.AttributeValueVoteStatusStarted),
 			sdk.NewAttribute(types.AttributeKeyOracleAddress, oracleRegistration.Address),
 		),
