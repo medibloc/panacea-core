@@ -23,7 +23,11 @@ service Query {
 
   // OracleRegistration returns a OracleRegistration details.
   rpc OracleRegistration(QueryOracleRegistrationRequest) returns (QueryOracleRegistrationResponse) {
-    option (google.api.http).get = "/panacea/oracle/v2alpha2/oracle_registrations/unique_id/{unique_id}/addresses/{address}";
+    option (google.api.http).get = "/panacea/oracle/v2alpha2/oracle-registrations/{unique_id}/{address}";
+  }
+
+  rpc OracleRegistrationVote(QueryOracleRegistrationVoteRequest) returns (QueryOracleRegistrationVoteResponse) {
+    option (google.api.http).get = "/panacea/oracle/v2alpha2/oracle-registration-votes/{unique_id}/{voting_target_address}/{voter_address}";
   }
 
   // Params returns params of oracle module.
@@ -62,6 +66,18 @@ message QueryOracleRegistrationRequest {
 // QueryOracleRegistrationResponse is the response type for the Query/OracleRegistration RPC method.
 message QueryOracleRegistrationResponse {
   OracleRegistration oracle_registration = 1;
+}
+
+// QueryOracleRegistrationVoteRequest is the request type for Query/OracleRegistrationVote RPC method.
+message QueryOracleRegistrationVoteRequest {
+  string unique_id = 1;
+  string voter_address = 2;
+  string voting_target_address = 3;
+}
+
+// QueryOracleRegistrationVoteResponse is the response type for the Query/OracleRegistrationVote RPC method.
+message QueryOracleRegistrationVoteResponse {
+  OracleRegistrationVote oracle_registration_vote = 1;
 }
 
 // QueryOracleParamsRequest is the request type for the Query/OracleParams RPC method.

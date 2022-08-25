@@ -2,7 +2,9 @@ package types_test
 
 import (
 	"container/heap"
+	"encoding/base64"
 	"fmt"
+	"github.com/btcsuite/btcd/btcec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/medibloc/panacea-core/v2/x/oracle/types"
 	"github.com/stretchr/testify/require"
@@ -287,4 +289,11 @@ func TestConsensusTallyMaxHeap(t *testing.T) {
 	require.Equal(t, tally1, heap.Pop(&consensusHeap).(*types.ConsensusTally))
 	require.Equal(t, tally2, heap.Pop(&consensusHeap).(*types.ConsensusTally))
 	require.Equal(t, tally3, heap.Pop(&consensusHeap).(*types.ConsensusTally))
+}
+
+func Test(t *testing.T) {
+	priv, err := btcec.NewPrivateKey(btcec.S256())
+	require.NoError(t, err)
+	fmt.Println("priv: ", base64.StdEncoding.EncodeToString(priv.Serialize()))
+	fmt.Println("pub: ", base64.StdEncoding.EncodeToString(priv.PubKey().SerializeCompressed()))
 }
