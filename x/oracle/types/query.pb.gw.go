@@ -568,9 +568,9 @@ var (
 
 	pattern_Query_Oracle_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"panacea", "oracle", "v2alpha2", "oracles", "address"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_OracleRegistration_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5}, []string{"panacea", "oracle", "v2alpha2", "oracle-registrations", "unique_id", "address"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_OracleRegistration_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5}, []string{"panacea", "oracle", "v2alpha2", "oracle_registrations", "unique_id", "address"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_OracleRegistrationVote_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6}, []string{"panacea", "oracle", "v2alpha2", "oracle-registration-votes", "unique_id", "voting_target_address", "voter_address"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_OracleRegistrationVote_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6}, []string{"panacea", "oracle", "v2alpha2", "oracle_registration-votes", "unique_id", "voting_target_address", "voter_address"}, "", runtime.AssumeColonVerbOpt(true)))
 
 	pattern_Query_Params_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"panacea", "oracle", "v2alpha2", "params"}, "", runtime.AssumeColonVerbOpt(true)))
 )
