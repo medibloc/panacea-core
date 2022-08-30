@@ -114,6 +114,7 @@ func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
 		debug.Cmd(),
 		// this line is used by starport scaffolding # stargate/root/commands
 		AddGenesisWasmMsgCmd(app.DefaultNodeHome),
+		AddGenesisOracleCmd(app.DefaultNodeHome),
 	)
 
 	a := appCreator{encodingConfig}

@@ -1,6 +1,10 @@
 package types
 
-import sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+import (
+	"encoding/json"
+	"github.com/cosmos/cosmos-sdk/codec"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+)
 
 // DefaultGenesis returns the default Capability genesis state
 func DefaultGenesis() *GenesisState {
@@ -11,6 +15,16 @@ func DefaultGenesis() *GenesisState {
 		Params:                  DefaultParams(),
 		OracleUpgradeInfo:       OracleUpgradeInfo{},
 	}
+}
+
+func GetGenesisStateFromAppState(cdc codec.Codec, appState map[string]json.RawMessage) *GenesisState {
+	var genesisState GenesisState
+
+	if appState[ModuleName] != nil {
+		cdc.MustUnmarshalJSON(appState[ModuleName], &genesisState)
+	}
+
+	return &genesisState
 }
 
 // Validate performs basic genesis state validation returning an error upon any
