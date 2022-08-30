@@ -2,9 +2,10 @@ package keeper_test
 
 import (
 	"fmt"
-	"github.com/medibloc/panacea-core/v2/x/oracle/testutil"
 	"testing"
 	"time"
+
+	"github.com/medibloc/panacea-core/v2/x/oracle/testutil"
 
 	"github.com/btcsuite/btcd/btcec"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
@@ -131,6 +132,16 @@ func (suite oracleTestSuite) TestRegisterOracleSuccess() {
 	suite.Require().Equal(types.ORACLE_REGISTRATION_STATUS_VOTING_PERIOD, oracleFromKeeper.Status)
 	suite.Require().Equal(votingPeriod, oracleFromKeeper.VotingPeriod)
 	suite.Require().Nil(oracleFromKeeper.TallyResult)
+
+	events := suite.Ctx.EventManager().Events()
+	suite.Require().Equal(1, len(events))
+	suite.Require().Equal(types.EventTypeRegistrationVote, events[0].Type)
+
+	eventVoteAttributes := events[0].Attributes
+	suite.Require().Equal(types.AttributeKeyVoteStatus, string(eventVoteAttributes[0].Key))
+	suite.Require().Equal(types.AttributeValueVoteStatusStarted, string(eventVoteAttributes[0].Value))
+	suite.Require().Equal(types.AttributeKeyOracleAddress, string(eventVoteAttributes[1].Key))
+	suite.Require().Equal(suite.oracleAccAddr.String(), string(eventVoteAttributes[1].Value))
 }
 
 func (suite oracleTestSuite) TestRegisterOracleFailedValidatorNotFound() {
@@ -173,7 +184,6 @@ func (suite oracleTestSuite) TestRegisterOracleFailedInvalidUniqueID() {
 	ctx := suite.Ctx
 
 	// set validator
-
 	suite.SetValidator(suite.oracleAccPubKey, sdk.NewInt(70))
 
 	msgRegisterOracle := &types.MsgRegisterOracle{
