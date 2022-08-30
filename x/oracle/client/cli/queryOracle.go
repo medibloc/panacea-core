@@ -10,7 +10,7 @@ import (
 func CmdGetOracles() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "oracles",
-		Short: "Query a oracles info",
+		Short: "Query oracles info",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientQueryContext(cmd)
 			if err != nil {
