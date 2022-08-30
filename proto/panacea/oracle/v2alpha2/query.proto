@@ -23,12 +23,12 @@ service Query {
 
   // OracleRegistration returns a OracleRegistration details.
   rpc OracleRegistration(QueryOracleRegistrationRequest) returns (QueryOracleRegistrationResponse) {
-    option (google.api.http).get = "/panacea/oracle/v2alpha2/oracle-registrations/{unique_id}/{address}";
+    option (google.api.http).get = "/panacea/oracle/v2alpha2/oracle_registrations/{unique_id}/{address}";
   }
 
   // OracleRegistrationVote a OracleRegistrationVote details.
   rpc OracleRegistrationVote(QueryOracleRegistrationVoteRequest) returns (QueryOracleRegistrationVoteResponse) {
-    option (google.api.http).get = "/panacea/oracle/v2alpha2/oracle-registration-votes/{unique_id}/{voting_target_address}/{voter_address}";
+    option (google.api.http).get = "/panacea/oracle/v2alpha2/oracle_registration-votes/{unique_id}/{voting_target_address}/{voter_address}";
   }
 
   // Params returns params of oracle module.
