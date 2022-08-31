@@ -15,14 +15,22 @@ import (
 	genutiltypes "github.com/cosmos/cosmos-sdk/x/genutil/types"
 	oracletypes "github.com/medibloc/panacea-core/v2/x/oracle/types"
 	"github.com/spf13/cobra"
+	"io/ioutil"
 )
 
 const (
-	flagUniqueID           = "oracle-unique-id"
-	flagOraclePublicKey    = "oracle-public-key"
-	flagOracleRemoteReport = "oracle-remote-report"
-	flagOracleAccount      = "oracle-account"
+	flagUniqueID            = "oracle-unique-id"
+	flagOraclePublicKey     = "oracle-public-key"
+	flagOracleRemoteReport  = "oracle-remote-report"
+	flagOracleAccount       = "oracle-account"
+	flagOraclePublicKeyPath = "oracle-public-key-path"
 )
+
+// OraclePubKeyInfo is a struct to store oracle public key and its remote report
+type OraclePubKeyInfo struct {
+	PublicKeyBase64    string `json:"public_key_base_64"`
+	RemoteReportBase64 string `json:"remote_report_base_64"`
+}
 
 func AddGenesisOracleCmd(defaultNodeHome string) *cobra.Command {
 	cmd := &cobra.Command{
@@ -76,6 +84,7 @@ func AddGenesisOracleCmd(defaultNodeHome string) *cobra.Command {
 	cmd.Flags().String(flagOraclePublicKey, "", "base64 encoded oracle public key")
 	cmd.Flags().String(flagOracleRemoteReport, "", "base64 encoded remoteReport with oracle public key")
 	cmd.Flags().String(flagOracleAccount, "", "address or keyName")
+	cmd.Flags().String(flagOraclePublicKeyPath, "", "File path where 'oraclePublicKey' and 'oraclePublicKeyRemoteReport' are stored")
 	cmd.Flags().String(flags.FlagHome, defaultNodeHome, "The application home directory")
 	flags.AddQueryFlagsToCmd(cmd)
 
@@ -137,25 +146,54 @@ func setOracleParams(cmd *cobra.Command, genState *oracletypes.GenesisState) err
 		genState.Params.UniqueId = uniqueID
 	}
 
-	oraclePublicKeyBz, err := getBytesFromBase64(cmd, flagOraclePublicKey)
+	path, err := cmd.Flags().GetString(flagOraclePublicKeyPath)
 	if err != nil {
 		return err
 	}
+	if len(path) > 0 {
+		contentBz, err := ioutil.ReadFile(path)
+		if err != nil {
+			return err
+		}
 
-	if len(oraclePublicKeyBz) > 0 {
-		if _, err = btcec.ParsePubKey(oraclePublicKeyBz, btcec.S256()); err != nil {
+		var oraclePubKeyInfo OraclePubKeyInfo
+		if err := json.Unmarshal(contentBz, &oraclePubKeyInfo); err != nil {
+			return err
+		}
+
+		oraclePublicKeyBz, err := base64.StdEncoding.DecodeString(oraclePubKeyInfo.PublicKeyBase64)
+		if err != nil {
 			return err
 		}
 		genState.Params.OraclePublicKey = oraclePublicKeyBz
-	}
 
-	reportBz, err := getBytesFromBase64(cmd, flagOracleRemoteReport)
-	if err != nil {
-		return err
-	}
+		remoteReportBz, err := base64.StdEncoding.DecodeString(oraclePubKeyInfo.RemoteReportBase64)
+		if err != nil {
+			return err
+		}
+		genState.Params.OraclePubKeyRemoteReport = remoteReportBz
+	} else {
+		oraclePublicKeyBz, err := getBytesFromBase64(cmd, flagOraclePublicKey)
+		if err != nil {
+			return err
+		}
 
-	if len(reportBz) > 0 {
-		genState.Params.OraclePubKeyRemoteReport = reportBz
+		if len(oraclePublicKeyBz) > 0 {
+			if _, err = btcec.ParsePubKey(oraclePublicKeyBz, btcec.S256()); err != nil {
+				return err
+			}
+			genState.Params.OraclePublicKey = oraclePublicKeyBz
+		}
+
+		reportBz, err := getBytesFromBase64(cmd, flagOracleRemoteReport)
+		if err != nil {
+			return err
+		}
+
+		if len(reportBz) > 0 {
+			genState.Params.OraclePubKeyRemoteReport = reportBz
+		}
+
 	}
 
 	return nil
