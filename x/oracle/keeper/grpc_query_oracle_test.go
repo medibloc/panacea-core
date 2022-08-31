@@ -4,6 +4,8 @@ import (
 	"github.com/btcsuite/btcd/btcec"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
+	"github.com/cosmos/cosmos-sdk/types/query"
+	"github.com/medibloc/panacea-core/v2/x/oracle/testutil"
 	"testing"
 	"time"
 
@@ -11,12 +13,10 @@ import (
 	"github.com/medibloc/panacea-core/v2/x/oracle/types"
 
 	"github.com/stretchr/testify/suite"
-
-	"github.com/medibloc/panacea-core/v2/types/testsuite"
 )
 
 type queryOracleTestSuite struct {
-	testsuite.TestSuite
+	testutil.OracleBaseTestSuite
 
 	uniqueID string
 
@@ -68,6 +68,55 @@ func (suite queryOracleTestSuite) makeNewOracleRegistration() *types.OracleRegis
 	}
 }
 
+func (suite queryOracleTestSuite) TestOracle() {
+	ctx := suite.Ctx
+	oracleKeeper := suite.OracleKeeper
+
+	suite.CreateOracleValidator(suite.oracleAccPubKey, sdk.NewInt(100))
+
+	req := types.QueryOracleRequest{
+		Address: suite.oracleAccAddr.String(),
+	}
+	res, err := oracleKeeper.Oracle(sdk.WrapSDKContext(ctx), &req)
+	suite.Require().NoError(err)
+	suite.Require().Equal(suite.oracleAccAddr.String(), res.Oracle.Address)
+	suite.Require().Equal(types.ORACLE_STATUS_ACTIVE, res.Oracle.Status)
+	suite.Require().Equal(uint64(0), res.Oracle.Uptime)
+	suite.Require().Nil(res.Oracle.JailedAt)
+}
+
+func (suite queryOracleTestSuite) TestOracles() {
+	ctx := suite.Ctx
+	oracleKeeper := suite.OracleKeeper
+
+	suite.CreateOracleValidator(suite.oracleAccPubKey, sdk.NewInt(70))
+	suite.CreateOracleValidator(suite.newOracleAccPubKey, sdk.NewInt(30))
+
+	req := types.QueryOraclesRequest{
+		Pagination: &query.PageRequest{},
+	}
+
+	res, err := oracleKeeper.Oracles(sdk.WrapSDKContext(ctx), &req)
+	suite.Require().NoError(err)
+	suite.Require().Equal(2, len(res.Oracles))
+	for _, oracle := range res.Oracles {
+		switch oracle.Address {
+		case suite.oracleAccAddr.String():
+			suite.Require().Equal(suite.oracleAccAddr.String(), oracle.Address)
+			suite.Require().Equal(types.ORACLE_STATUS_ACTIVE, oracle.Status)
+			suite.Require().Equal(uint64(0), oracle.Uptime)
+			suite.Require().Nil(oracle.JailedAt)
+		case suite.newOracleAccAddr.String():
+			suite.Require().Equal(suite.newOracleAccAddr.String(), oracle.Address)
+			suite.Require().Equal(types.ORACLE_STATUS_ACTIVE, oracle.Status)
+			suite.Require().Equal(uint64(0), oracle.Uptime)
+			suite.Require().Nil(oracle.JailedAt)
+		default:
+			panic("not found oracle address. address: " + oracle.Address)
+		}
+	}
+}
+
 func (suite queryOracleTestSuite) TestOracleRegistration() {
 	ctx := suite.Ctx
 	oracleKeeper := suite.OracleKeeper
@@ -90,6 +139,32 @@ func (suite queryOracleTestSuite) TestOracleRegistration() {
 	suite.Require().Equal(newOracleRegistration.NodePubKeyRemoteReport, res.OracleRegistration.NodePubKeyRemoteReport)
 	suite.Require().Equal(newOracleRegistration.TrustedBlockHash, res.OracleRegistration.TrustedBlockHash)
 	suite.Require().Equal(newOracleRegistration.TrustedBlockHeight, res.OracleRegistration.TrustedBlockHeight)
+}
+
+func (suite queryOracleTestSuite) TestOracleRegistrationVote() {
+	ctx := suite.Ctx
+	oracleKeeper := suite.OracleKeeper
+
+	vote := types.OracleRegistrationVote{
+		UniqueId:               suite.uniqueID,
+		VoterAddress:           suite.oracleAccAddr.String(),
+		VotingTargetAddress:    suite.newOracleAccAddr.String(),
+		VoteOption:             types.VOTE_OPTION_YES,
+		EncryptedOraclePrivKey: []byte("encryptedOraclePrivKey"),
+	}
+	err := oracleKeeper.SetOracleRegistrationVote(ctx, &vote)
+	suite.Require().NoError(err)
+
+	req := types.QueryOracleRegistrationVoteRequest{
+		UniqueId:            suite.uniqueID,
+		VoterAddress:        suite.oracleAccAddr.String(),
+		VotingTargetAddress: suite.newOracleAccAddr.String(),
+	}
+	res, err := oracleKeeper.OracleRegistrationVote(sdk.WrapSDKContext(ctx), &req)
+	suite.Require().NoError(err)
+	suite.Require().Equal(vote.UniqueId, res.OracleRegistrationVote.UniqueId)
+	suite.Require().Equal(vote.VoterAddress, res.OracleRegistrationVote.VoterAddress)
+	suite.Require().Equal(vote.VotingTargetAddress, res.OracleRegistrationVote.VotingTargetAddress)
 }
 
 func (suite queryOracleTestSuite) TestOracleParams() {

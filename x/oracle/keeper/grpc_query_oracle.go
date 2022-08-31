@@ -2,18 +2,56 @@ package keeper
 
 import (
 	"context"
+	"github.com/cosmos/cosmos-sdk/store/prefix"
+	"github.com/cosmos/cosmos-sdk/types/query"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/medibloc/panacea-core/v2/x/oracle/types"
 )
 
 func (k Keeper) Oracle(goCtx context.Context, req *types.QueryOracleRequest) (*types.QueryOracleResponse, error) {
-	panic("implements me")
+	oracle, err := k.GetOracle(sdk.UnwrapSDKContext(goCtx), req.GetAddress())
+	if err != nil {
+		return nil, err
+	}
+
+	return &types.QueryOracleResponse{
+		Oracle: oracle,
+	}, nil
 }
 
 // Oracles returns a list of oracles.
 func (k Keeper) Oracles(goCtx context.Context, req *types.QueryOraclesRequest) (*types.QueryOraclesResponse, error) {
-	panic("implements me")
+	if req == nil {
+		return nil, status.Error(codes.InvalidArgument, "invalid request")
+	}
+
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	store := ctx.KVStore(k.storeKey)
+	oracleStore := prefix.NewStore(store, types.OraclesKey)
+
+	var oracles []*types.Oracle
+	pageRes, err := query.Paginate(oracleStore, req.Pagination, func(_, value []byte) error {
+		var oracle types.Oracle
+		if err := k.cdc.UnmarshalLengthPrefixed(value, &oracle); err != nil {
+			return err
+		}
+
+		oracles = append(oracles, &oracle)
+		return nil
+	})
+
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	return &types.QueryOraclesResponse{
+		Oracles:    oracles,
+		Pagination: pageRes,
+	}, nil
 }
 
 // OracleRegistration returns a OracleRegistration details.
@@ -24,6 +62,23 @@ func (k Keeper) OracleRegistration(goCtx context.Context, req *types.QueryOracle
 	}
 
 	return &types.QueryOracleRegistrationResponse{OracleRegistration: oracleRegistration}, nil
+}
+
+func (k Keeper) OracleRegistrationVote(goCtx context.Context, request *types.QueryOracleRegistrationVoteRequest) (*types.QueryOracleRegistrationVoteResponse, error) {
+	vote, err := k.GetOracleRegistrationVote(
+		sdk.UnwrapSDKContext(goCtx),
+		request.UniqueId,
+		request.VotingTargetAddress,
+		request.VoterAddress,
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &types.QueryOracleRegistrationVoteResponse{
+		OracleRegistrationVote: vote,
+	}, nil
 }
 
 // Params returns params of oracle module.
