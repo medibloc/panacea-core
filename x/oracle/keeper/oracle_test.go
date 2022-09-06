@@ -199,6 +199,78 @@ func (suite oracleTestSuite) TestRegisterOracleFailedInvalidUniqueID() {
 	suite.Require().Error(err, types.ErrRegisterOracle)
 }
 
+func (suite oracleTestSuite) TestRegisterOracleFailedStatusVotingPeriod() {
+	ctx := suite.Ctx
+
+	suite.SetValidator(suite.oracleAccPubKey, sdk.NewInt(70))
+
+	votingOracleRegistration := &types.OracleRegistration{
+		UniqueId:               suite.uniqueID,
+		Address:                suite.oracleAccAddr.String(),
+		NodePubKey:             suite.nodePubKey.SerializeCompressed(),
+		NodePubKeyRemoteReport: suite.nodePubKeyRemoteReport,
+		TrustedBlockHeight:     suite.trustedBlockHeight,
+		TrustedBlockHash:       suite.trustedBlockHash,
+		Status:                 types.ORACLE_REGISTRATION_STATUS_VOTING_PERIOD,
+		VotingPeriod:           suite.OracleKeeper.GetVotingPeriod(ctx),
+	}
+
+	err := suite.OracleKeeper.SetOracleRegistration(ctx, votingOracleRegistration)
+	suite.Require().NoError(err)
+
+	msgRegisterOracle := &types.MsgRegisterOracle{
+		UniqueId:               suite.uniqueID,
+		OracleAddress:          suite.oracleAccAddr.String(),
+		NodePubKey:             suite.nodePubKey.SerializeCompressed(),
+		NodePubKeyRemoteReport: suite.nodePubKeyRemoteReport,
+		TrustedBlockHeight:     suite.trustedBlockHeight,
+		TrustedBlockHash:       suite.trustedBlockHash,
+	}
+
+	err = suite.OracleKeeper.RegisterOracle(ctx, msgRegisterOracle)
+	suite.Require().Error(err, types.ErrRegisterOracle)
+}
+
+func (suite oracleTestSuite) TestRegisterOracleFailedStatusPassedNotJailed() {
+	ctx := suite.Ctx
+
+	suite.SetValidator(suite.oracleAccPubKey, sdk.NewInt(70))
+
+	existingOracleRegistration := &types.OracleRegistration{
+		UniqueId:               suite.uniqueID,
+		Address:                suite.oracleAccAddr.String(),
+		NodePubKey:             suite.nodePubKey.SerializeCompressed(),
+		NodePubKeyRemoteReport: suite.nodePubKeyRemoteReport,
+		TrustedBlockHeight:     suite.trustedBlockHeight,
+		TrustedBlockHash:       suite.trustedBlockHash,
+		Status:                 types.ORACLE_REGISTRATION_STATUS_PASSED,
+		VotingPeriod:           suite.OracleKeeper.GetVotingPeriod(ctx),
+	}
+
+	err := suite.OracleKeeper.SetOracleRegistration(ctx, existingOracleRegistration)
+	suite.Require().NoError(err)
+
+	existingOracle := &types.Oracle{
+		Address: suite.oracleAccAddr.String(),
+		Status:  types.ORACLE_STATUS_ACTIVE,
+	}
+
+	err = suite.OracleKeeper.SetOracle(ctx, existingOracle)
+	suite.Require().NoError(err)
+
+	msgRegisterOracle := &types.MsgRegisterOracle{
+		UniqueId:               suite.uniqueID,
+		OracleAddress:          suite.oracleAccAddr.String(),
+		NodePubKey:             suite.nodePubKey.SerializeCompressed(),
+		NodePubKeyRemoteReport: suite.nodePubKeyRemoteReport,
+		TrustedBlockHeight:     suite.trustedBlockHeight,
+		TrustedBlockHash:       suite.trustedBlockHash,
+	}
+
+	err = suite.OracleKeeper.RegisterOracle(ctx, msgRegisterOracle)
+	suite.Require().Error(err, types.ErrRegisterOracle)
+}
+
 func (suite *oracleTestSuite) TestOracleRegistrationVoteSuccess() {
 	ctx := suite.Ctx
 

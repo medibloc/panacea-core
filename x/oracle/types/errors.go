@@ -17,4 +17,5 @@ var (
 	ErrRegisterOracle              = sdkerrors.Register(ModuleName, 10, "error while registering a oracle")
 	ErrValidatorNotFound           = sdkerrors.Register(ModuleName, 11, "validator not found")
 	ErrJailedValidator             = sdkerrors.Register(ModuleName, 12, "jailed validator cannot be a oracle")
+	ErrOracleRegistrationNotFound  = sdkerrors.Register(ModuleName, 13, "oracle registration not found")
 )
