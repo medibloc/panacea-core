@@ -11,7 +11,7 @@ import (
 
 func CmdGetOracleRegistrationVote() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "oracle [unique_id] [voting_target_address] [voter_address]",
+		Use:   "oracle-registration-vote [unique_id] [voting_target_address] [voter_address]",
 		Short: "Query a oracleRegistration vote info",
 		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {

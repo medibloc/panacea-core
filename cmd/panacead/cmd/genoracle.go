@@ -28,8 +28,8 @@ const (
 
 // OraclePubKeyInfo is a struct to store oracle public key and its remote report
 type OraclePubKeyInfo struct {
-	PublicKeyBase64    string `json:"public_key_base_64"`
-	RemoteReportBase64 string `json:"remote_report_base_64"`
+	PublicKeyBase64    string `json:"public_key_base64"`
+	RemoteReportBase64 string `json:"remote_report_base64"`
 }
 
 func AddGenesisOracleCmd(defaultNodeHome string) *cobra.Command {
