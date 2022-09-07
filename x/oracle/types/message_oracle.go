@@ -76,13 +76,34 @@ func (msg *MsgVoteOracleRegistration) Type() string {
 }
 
 func (msg *MsgVoteOracleRegistration) ValidateBasic() error {
-	panic("implemenets me")
+	if msg.OracleRegistrationVote == nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "oracleRegistrationVote cannot be nil")
+	}
+
+	if len(msg.OracleRegistrationVote.UniqueId) == 0 {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "unique ID cannot be empty")
+	}
+	if _, err := sdk.AccAddressFromBech32(msg.OracleRegistrationVote.VoterAddress); err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid voter address (%s)", err)
+	}
+	if _, err := sdk.AccAddressFromBech32(msg.OracleRegistrationVote.VotingTargetAddress); err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid voting target address (%s)", err)
+	}
+	if msg.Signature == nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "signature cannot be nil")
+	}
+	return nil
 }
 
 func (msg *MsgVoteOracleRegistration) GetSignBytes() []byte {
-	panic("implemenets me")
+	bz := ModuleCdc.MustMarshalJSON(msg)
+	return sdk.MustSortJSON(bz)
 }
 
 func (msg *MsgVoteOracleRegistration) GetSigners() []sdk.AccAddress {
-	panic("implemenets me")
+	oracleAddress, err := sdk.AccAddressFromBech32(msg.OracleRegistrationVote.VoterAddress)
+	if err != nil {
+		panic(err)
+	}
+	return []sdk.AccAddress{oracleAddress}
 }
