@@ -76,22 +76,23 @@ func (k Keeper) checkOracleRegistrationStatus(ctx sdk.Context, uniqueID, oracleA
 		return err
 	}
 
-	if existing.Status == types.ORACLE_REGISTRATION_STATUS_VOTING_PERIOD {
-		return fmt.Errorf("in voting period")
-	}
-
-	if existing.Status == types.ORACLE_REGISTRATION_STATUS_PASSED {
+	switch existing.Status {
+	case types.ORACLE_REGISTRATION_STATUS_PASSED:
 		oracle, err := k.GetOracle(ctx, oracleAddress)
 		if err != nil {
 			return err
 		}
-
 		if oracle.Status != types.ORACLE_STATUS_JAILED {
 			return fmt.Errorf("only jailed oracle can re-register oracle")
 		}
+		return nil
+	case types.ORACLE_REGISTRATION_STATUS_VOTING_PERIOD:
+		return fmt.Errorf("in voting period")
+	case types.ORACLE_REGISTRATION_STATUS_REJECTED:
+		return nil
+	default:
+		return fmt.Errorf("unexpected state. status: %s", existing.Status)
 	}
-
-	return nil
 }
 
 // VoteOracleRegistration defines to vote for the new oracle's verification results.
