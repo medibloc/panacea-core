@@ -3,6 +3,7 @@ package keeper
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/medibloc/panacea-core/v2/x/oracle/types"
+	"reflect"
 )
 
 // Tally calculates the result by aggregating the votes taken from the iterator.
@@ -18,18 +19,20 @@ func (k Keeper) Tally(ctx sdk.Context, voteIterator sdk.Iterator, voteType types
 	k.setOracleValidatorInfosInTally(ctx, tally)
 
 	for ; voteIterator.Valid(); voteIterator.Next() {
+		vote := reflect.New(reflect.ValueOf(voteType).Elem().Type()).Interface().(types.Vote)
+
 		bz := voteIterator.Value()
 
-		if err := k.cdc.UnmarshalLengthPrefixed(bz, voteType); err != nil {
+		if err := k.cdc.UnmarshalLengthPrefixed(bz, vote); err != nil {
 			return nil, err
 		}
 
-		if err := tally.Add(voteType); err != nil {
+		if err := tally.Add(vote); err != nil {
 			return nil, err
 		}
 
 		if cb != nil {
-			if err := cb(voteType); err != nil {
+			if err := cb(vote); err != nil {
 				return nil, err
 			}
 		}
