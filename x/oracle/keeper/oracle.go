@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	"errors"
 	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -16,7 +17,7 @@ func (k Keeper) RegisterOracle(ctx sdk.Context, msg *types.MsgRegisterOracle) er
 	}
 
 	// check if the oracle is active validator
-	if err := k.CheckValidatorStatus(ctx, oracleAccAddr); err != nil {
+	if err := k.checkValidatorStatus(ctx, oracleAccAddr); err != nil {
 		return sdkerrors.Wrapf(types.ErrRegisterOracle, err.Error())
 	}
 
@@ -24,6 +25,11 @@ func (k Keeper) RegisterOracle(ctx sdk.Context, msg *types.MsgRegisterOracle) er
 	params := k.GetParams(ctx)
 	if params.UniqueId != msg.UniqueId {
 		return sdkerrors.Wrapf(types.ErrRegisterOracle, "is not match the currently active uniqueID")
+	}
+
+	// check oracle status
+	if err := k.checkOracleRegistrationStatus(ctx, msg.UniqueId, msg.OracleAddress); err != nil {
+		return sdkerrors.Wrapf(types.ErrRegisterOracle, err.Error())
 	}
 
 	// store
@@ -46,8 +52,8 @@ func (k Keeper) RegisterOracle(ctx sdk.Context, msg *types.MsgRegisterOracle) er
 	return nil
 }
 
-// CheckValidatorStatus gets validator and check its status if it's eligible to be an oracle
-func (k Keeper) CheckValidatorStatus(ctx sdk.Context, oracleAccAddr sdk.AccAddress) error {
+// checkValidatorStatus gets validator and check its status if it's eligible to be an oracle
+func (k Keeper) checkValidatorStatus(ctx sdk.Context, oracleAccAddr sdk.AccAddress) error {
 	validator, found := k.stakingKeeper.GetValidator(ctx, sdk.ValAddress(oracleAccAddr))
 	if !found {
 		return types.ErrValidatorNotFound
@@ -58,6 +64,35 @@ func (k Keeper) CheckValidatorStatus(ctx sdk.Context, oracleAccAddr sdk.AccAddre
 	}
 
 	return nil
+}
+
+// checkOracleRegistrationStatus checks the status of OracleRegistration and Oracle.
+func (k Keeper) checkOracleRegistrationStatus(ctx sdk.Context, uniqueID, oracleAddress string) error {
+	existing, err := k.GetOracleRegistration(ctx, uniqueID, oracleAddress)
+	if err != nil {
+		if errors.Is(err, types.ErrOracleRegistrationNotFound) {
+			return nil
+		}
+		return err
+	}
+
+	switch existing.Status {
+	case types.ORACLE_REGISTRATION_STATUS_PASSED:
+		oracle, err := k.GetOracle(ctx, oracleAddress)
+		if err != nil {
+			return err
+		}
+		if oracle.Status != types.ORACLE_STATUS_JAILED {
+			return fmt.Errorf("only jailed oracle can re-register oracle")
+		}
+		return nil
+	case types.ORACLE_REGISTRATION_STATUS_VOTING_PERIOD:
+		return fmt.Errorf("in voting period")
+	case types.ORACLE_REGISTRATION_STATUS_REJECTED:
+		return nil
+	default:
+		return fmt.Errorf("unexpected state. status: %s", existing.Status)
+	}
 }
 
 // VoteOracleRegistration defines to vote for the new oracle's verification results.
@@ -153,7 +188,7 @@ func (k Keeper) GetOracle(ctx sdk.Context, address string) (*types.Oracle, error
 	key := types.GetOracleKey(accAddr)
 	bz := store.Get(key)
 	if bz == nil {
-		return nil, fmt.Errorf(fmt.Sprintf("'%s' is not exist oracle", address))
+		return nil, fmt.Errorf(fmt.Sprintf("oracle '%s' does not exist", address))
 	}
 
 	oracle := &types.Oracle{}
@@ -214,7 +249,7 @@ func (k Keeper) GetOracleRegistration(ctx sdk.Context, uniqueID, address string)
 	key := types.GetOracleRegistrationKey(uniqueID, accAddr)
 	bz := store.Get(key)
 	if bz == nil {
-		return nil, fmt.Errorf("is not exist oracleRegistration with the address of '%s'", address)
+		return nil, types.ErrOracleRegistrationNotFound
 	}
 
 	oracleRegistration := &types.OracleRegistration{}
