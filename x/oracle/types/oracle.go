@@ -7,6 +7,8 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
+const NonceSize = 12
+
 func NewOracle(address string, status OracleStatus) *Oracle {
 	return &Oracle{
 		Address: address,
@@ -87,6 +89,12 @@ func (m OracleRegistration) ValidateBasic() error {
 		if m.TallyResult.InvalidYes == nil {
 			return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalidYes in TallyResult must not be negative: %s", m.TallyResult.Yes)
 		}
+	}
+
+	if len(m.Nonce) == 0 {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "nonce is empty")
+	} else if len(m.Nonce) != NonceSize {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "nonce length must be %v", NonceSize)
 	}
 
 	return nil
