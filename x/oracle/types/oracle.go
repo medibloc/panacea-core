@@ -26,6 +26,7 @@ func NewOracleRegistration(msg *MsgRegisterOracle) *OracleRegistration {
 		TrustedBlockHeight:     msg.TrustedBlockHeight,
 		TrustedBlockHash:       msg.TrustedBlockHash,
 		Status:                 ORACLE_REGISTRATION_STATUS_VOTING_PERIOD,
+		Nonce:                  msg.Nonce,
 	}
 }
 
