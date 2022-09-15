@@ -21,7 +21,9 @@ func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) {
 		tallyResult, err := keeper.Tally(
 			ctx,
 			iterator,
-			&types.OracleRegistrationVote{},
+			func() types.Vote {
+				return &types.OracleRegistrationVote{}
+			},
 			func(vote types.Vote) error {
 				return keeper.RemoveOracleRegistrationVote(ctx, vote.(*types.OracleRegistrationVote))
 			},

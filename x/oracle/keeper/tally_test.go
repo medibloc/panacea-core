@@ -1,6 +1,9 @@
 package keeper_test
 
 import (
+	"testing"
+	"time"
+
 	"github.com/btcsuite/btcd/btcec"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
@@ -8,8 +11,6 @@ import (
 	"github.com/medibloc/panacea-core/v2/x/oracle/testutil"
 	"github.com/medibloc/panacea-core/v2/x/oracle/types"
 	"github.com/stretchr/testify/suite"
-	"testing"
-	"time"
 )
 
 type tallyTestSuite struct {
@@ -127,7 +128,9 @@ func (suite *tallyTestSuite) TestTally() {
 	tallyResult, err := suite.GetTallyKeeper().Tally(
 		suite.Ctx,
 		iter,
-		&types.OracleRegistrationVote{},
+		func() types.Vote {
+			return &types.OracleRegistrationVote{}
+		},
 		func(vote types.Vote) error {
 			return suite.OracleKeeper.RemoveOracleRegistrationVote(suite.Ctx, vote.(*types.OracleRegistrationVote))
 		},
@@ -207,7 +210,9 @@ func (suite *tallyTestSuite) TestTallyOracleJailed() {
 	tallyResult, err := suite.GetTallyKeeper().Tally(
 		suite.Ctx,
 		iter,
-		&types.OracleRegistrationVote{},
+		func() types.Vote {
+			return &types.OracleRegistrationVote{}
+		},
 		func(vote types.Vote) error {
 			return suite.OracleKeeper.RemoveOracleRegistrationVote(suite.Ctx, vote.(*types.OracleRegistrationVote))
 		},

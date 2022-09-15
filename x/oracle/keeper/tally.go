@@ -8,7 +8,7 @@ import (
 // Tally calculates the result by aggregating the votes taken from the iterator.
 // 'voteType' is an unmarshal type of 'voteIterator'.
 // If there is something to be processed for each vote obtained from the iterator, add the cb function
-func (k Keeper) Tally(ctx sdk.Context, voteIterator sdk.Iterator, voteType types.Vote, cb func(types.Vote) error) (*types.TallyResult, error) {
+func (k Keeper) Tally(ctx sdk.Context, voteIterator sdk.Iterator, newEmptyVote func() types.Vote, cb func(types.Vote) error) (*types.TallyResult, error) {
 	// If the Iterator is empty, it returns with a default value.
 	if !voteIterator.Valid() {
 		return types.NewTallyResult(), nil
@@ -18,18 +18,20 @@ func (k Keeper) Tally(ctx sdk.Context, voteIterator sdk.Iterator, voteType types
 	k.setOracleValidatorInfosInTally(ctx, tally)
 
 	for ; voteIterator.Valid(); voteIterator.Next() {
+		vote := newEmptyVote()
+
 		bz := voteIterator.Value()
 
-		if err := k.cdc.UnmarshalLengthPrefixed(bz, voteType); err != nil {
+		if err := k.cdc.UnmarshalLengthPrefixed(bz, vote); err != nil {
 			return nil, err
 		}
 
-		if err := tally.Add(voteType); err != nil {
+		if err := tally.Add(vote); err != nil {
 			return nil, err
 		}
 
 		if cb != nil {
-			if err := cb(voteType); err != nil {
+			if err := cb(vote); err != nil {
 				return nil, err
 			}
 		}
