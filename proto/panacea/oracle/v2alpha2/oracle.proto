@@ -67,6 +67,8 @@ message OracleRegistration {
   OracleRegistrationStatus status = 8;
   VotingPeriod voting_period = 9;
   TallyResult tally_result = 10;
+  // Nonce required for AES256-GCM encryption
+  bytes nonce = 11;
 }
 
 // TallyResult defines the tally result of the votes.
