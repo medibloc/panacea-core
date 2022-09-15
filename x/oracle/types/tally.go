@@ -3,6 +3,7 @@ package types
 import (
 	"container/heap"
 	"fmt"
+
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -19,7 +20,7 @@ type (
 	}
 
 	TallyKeeper interface {
-		Tally(sdk.Context, sdk.Iterator, Vote, func(Vote) error) (*TallyResult, error)
+		Tally(sdk.Context, sdk.Iterator, func() Vote, func(Vote) error) (*TallyResult, error)
 	}
 )
 

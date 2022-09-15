@@ -3,13 +3,12 @@ package keeper
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/medibloc/panacea-core/v2/x/oracle/types"
-	"reflect"
 )
 
 // Tally calculates the result by aggregating the votes taken from the iterator.
 // 'voteType' is an unmarshal type of 'voteIterator'.
 // If there is something to be processed for each vote obtained from the iterator, add the cb function
-func (k Keeper) Tally(ctx sdk.Context, voteIterator sdk.Iterator, voteType types.Vote, cb func(types.Vote) error) (*types.TallyResult, error) {
+func (k Keeper) Tally(ctx sdk.Context, voteIterator sdk.Iterator, newEmptyVote func() types.Vote, cb func(types.Vote) error) (*types.TallyResult, error) {
 	// If the Iterator is empty, it returns with a default value.
 	if !voteIterator.Valid() {
 		return types.NewTallyResult(), nil
@@ -19,7 +18,7 @@ func (k Keeper) Tally(ctx sdk.Context, voteIterator sdk.Iterator, voteType types
 	k.setOracleValidatorInfosInTally(ctx, tally)
 
 	for ; voteIterator.Valid(); voteIterator.Next() {
-		vote := reflect.New(reflect.ValueOf(voteType).Elem().Type()).Interface().(types.Vote)
+		vote := newEmptyVote()
 
 		bz := voteIterator.Value()
 
