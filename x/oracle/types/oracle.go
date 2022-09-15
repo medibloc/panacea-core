@@ -2,10 +2,13 @@ package types
 
 import (
 	"fmt"
+
 	"github.com/btcsuite/btcd/btcec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
+
+const NonceSize = 12
 
 func NewOracle(address string, status OracleStatus) *Oracle {
 	return &Oracle{
@@ -23,6 +26,7 @@ func NewOracleRegistration(msg *MsgRegisterOracle) *OracleRegistration {
 		TrustedBlockHeight:     msg.TrustedBlockHeight,
 		TrustedBlockHash:       msg.TrustedBlockHash,
 		Status:                 ORACLE_REGISTRATION_STATUS_VOTING_PERIOD,
+		Nonce:                  msg.Nonce,
 	}
 }
 
@@ -87,6 +91,12 @@ func (m OracleRegistration) ValidateBasic() error {
 		if m.TallyResult.InvalidYes == nil {
 			return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalidYes in TallyResult must not be negative: %s", m.TallyResult.Yes)
 		}
+	}
+
+	if len(m.Nonce) == 0 {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "nonce is empty")
+	} else if len(m.Nonce) != NonceSize {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "nonce length must be %v", NonceSize)
 	}
 
 	return nil

@@ -24,6 +24,7 @@ message MsgRegisterOracle {
   bytes node_pub_key_remote_report = 4;
   int64 trusted_block_height = 5;
   bytes trusted_block_hash = 6;
+  bytes nonce = 7;
 }
 
 // MsgRegisterOracleResponse defines the Msg/RegisterOracle response type.
