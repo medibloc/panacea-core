@@ -7,7 +7,7 @@ import (
 
 var _ sdk.Msg = &MsgRegisterOracle{}
 
-func NewMsgRegisterOracle(uniqueID, oracleAddress string, nodePubKey, nodePubKeyRemoteReport []byte, trustedBlockHeight int64, trustedBlockHash []byte) *MsgRegisterOracle {
+func NewMsgRegisterOracle(uniqueID, oracleAddress string, nodePubKey, nodePubKeyRemoteReport []byte, trustedBlockHeight int64, trustedBlockHash, nonce []byte) *MsgRegisterOracle {
 	return &MsgRegisterOracle{
 		UniqueId:               uniqueID,
 		OracleAddress:          oracleAddress,
@@ -15,6 +15,7 @@ func NewMsgRegisterOracle(uniqueID, oracleAddress string, nodePubKey, nodePubKey
 		NodePubKeyRemoteReport: nodePubKeyRemoteReport,
 		TrustedBlockHeight:     trustedBlockHeight,
 		TrustedBlockHash:       trustedBlockHash,
+		Nonce:                  nonce,
 	}
 }
 
