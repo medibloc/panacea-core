@@ -1,7 +1,10 @@
 package cli
 
 import (
+	"crypto/rand"
 	"encoding/base64"
+	"fmt"
+	"io"
 	"strconv"
 
 	"github.com/cosmos/cosmos-sdk/client"
@@ -43,7 +46,13 @@ func CmdRegisterOracle() *cobra.Command {
 				return err
 			}
 
-			msg := types.NewMsgRegisterOracle(args[0], oracleAddress, nodePubKey, nodePubKeyRemoteReport, trustedBlockHeight, trustedBlockHash)
+			nonce := make([]byte, 12)
+			_, err = io.ReadFull(rand.Reader, nonce)
+			if err != nil {
+				return fmt.Errorf("failed to make nonce: %w", err)
+			}
+
+			msg := types.NewMsgRegisterOracle(args[0], oracleAddress, nodePubKey, nodePubKeyRemoteReport, trustedBlockHeight, trustedBlockHash, nonce)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
