@@ -25,8 +25,8 @@ func ParamKeyTable() paramtypes.KeyTable {
 
 func DefaultParams() Params {
 	return Params{
-		OraclePublicKey:          nil,
-		OraclePubKeyRemoteReport: nil,
+		OraclePublicKey:          "",
+		OraclePubKeyRemoteReport: "",
 		UniqueId:                 "",
 		VoteParams: VoteParams{
 			VotingPeriod: 30 * time.Second,

@@ -19,11 +19,12 @@ message GenesisState {
 
 // Params defines the oracle module's params.
 message Params {
-  // Oracle public key is a pair with an oracle private key which is generated in SGX by the first oracle.
-  // This key is used to encrypt data, which enables to decrypt and verify the data securely only in SGX
-  bytes oracle_public_key = 1;
-  // Anyone can validate that the oracle key pair is generated in SGX using this oracle key remote report.
-  bytes oracle_pub_key_remote_report = 2;
+  // A base64-encoded oracle public key which is paired with an oracle private key generated in SGX by the first oracle.
+  // This key is used to encrypt data, so that the data can be decrypted and verified securely only in SGX
+  string oracle_public_key = 1;
+  // A base64-encoded SGX remote report which contains an oracle public key.
+  // Using this report, anyone can validate that the oracle key pair was generated in SGX.
+  string oracle_pub_key_remote_report = 2;
   // The unique ID of current version of oracle.
   string unique_id = 3;
   VoteParams vote_params = 4 [(gogoproto.nullable)   = false];

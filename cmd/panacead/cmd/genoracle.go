@@ -5,7 +5,8 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"github.com/btcsuite/btcd/btcec"
+	"io/ioutil"
+
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
@@ -15,7 +16,6 @@ import (
 	genutiltypes "github.com/cosmos/cosmos-sdk/x/genutil/types"
 	oracletypes "github.com/medibloc/panacea-core/v2/x/oracle/types"
 	"github.com/spf13/cobra"
-	"io/ioutil"
 )
 
 const (
@@ -161,39 +161,20 @@ func setOracleParams(cmd *cobra.Command, genState *oracletypes.GenesisState) err
 			return err
 		}
 
-		oraclePublicKeyBz, err := base64.StdEncoding.DecodeString(oraclePubKeyInfo.PublicKeyBase64)
-		if err != nil {
-			return err
-		}
-		genState.Params.OraclePublicKey = oraclePublicKeyBz
-
-		remoteReportBz, err := base64.StdEncoding.DecodeString(oraclePubKeyInfo.RemoteReportBase64)
-		if err != nil {
-			return err
-		}
-		genState.Params.OraclePubKeyRemoteReport = remoteReportBz
+		genState.Params.OraclePublicKey = oraclePubKeyInfo.PublicKeyBase64
+		genState.Params.OraclePubKeyRemoteReport = oraclePubKeyInfo.RemoteReportBase64
 	} else {
-		oraclePublicKeyBz, err := getBytesFromBase64(cmd, flagOraclePublicKey)
+		pubKeyBase64, err := cmd.Flags().GetString(flagOraclePublicKey)
 		if err != nil {
 			return err
 		}
+		genState.Params.OraclePublicKey = pubKeyBase64
 
-		if len(oraclePublicKeyBz) > 0 {
-			if _, err = btcec.ParsePubKey(oraclePublicKeyBz, btcec.S256()); err != nil {
-				return err
-			}
-			genState.Params.OraclePublicKey = oraclePublicKeyBz
-		}
-
-		reportBz, err := getBytesFromBase64(cmd, flagOracleRemoteReport)
+		remoteReportBase64, err := cmd.Flags().GetString(flagOracleRemoteReport)
 		if err != nil {
 			return err
 		}
-
-		if len(reportBz) > 0 {
-			genState.Params.OraclePubKeyRemoteReport = reportBz
-		}
-
+		genState.Params.OraclePubKeyRemoteReport = remoteReportBase64
 	}
 
 	return nil
