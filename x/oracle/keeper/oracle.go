@@ -101,7 +101,7 @@ func (k Keeper) VoteOracleRegistration(ctx sdk.Context, vote *types.OracleRegist
 		return sdkerrors.Wrap(types.ErrOracleRegistrationVote, err.Error())
 	}
 
-	if k.verifyVoteSignature(ctx, vote, signature) {
+	if !k.verifyVoteSignature(ctx, vote, signature) {
 		// TODO implements request slashing
 		return sdkerrors.Wrap(types.ErrDetectionMaliciousBehavior, "")
 	}
@@ -123,10 +123,10 @@ func (k Keeper) VoteOracleRegistration(ctx sdk.Context, vote *types.OracleRegist
 // verifyVoteSignature defines to check for malicious requests.
 func (k Keeper) verifyVoteSignature(ctx sdk.Context, vote *types.OracleRegistrationVote, signature []byte) bool {
 	voteBz := k.cdc.MustMarshal(vote)
-	// Verifies that voting requests are signed with oraclePrivKey.
-	ok := secp256k1.PubKey(k.GetParams(ctx).OraclePublicKey).VerifySignature(voteBz, signature)
 
-	return !ok
+	// Verifies that voting requests are signed with oraclePrivKey.
+	oraclePubKeyBz := k.GetParams(ctx).MustDecodeOraclePublicKey()
+	return secp256k1.PubKey(oraclePubKeyBz).VerifySignature(voteBz, signature)
 }
 
 // validateOracleRegistrationVote checks the oracle/registration status in the Panacea to ensure that the oracle can be voted to be registered.
