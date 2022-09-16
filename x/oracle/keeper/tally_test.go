@@ -1,6 +1,7 @@
 package keeper_test
 
 import (
+	"encoding/base64"
 	"testing"
 	"time"
 
@@ -57,8 +58,8 @@ func (suite *tallyTestSuite) BeforeTest(_, _ string) {
 	suite.oraclePubKey = suite.oraclePrivKey.PubKey()
 
 	suite.OracleKeeper.SetParams(ctx, types.Params{
-		OraclePublicKey:          suite.oraclePubKey.SerializeCompressed(),
-		OraclePubKeyRemoteReport: nil,
+		OraclePublicKey:          base64.StdEncoding.EncodeToString(suite.oraclePubKey.SerializeCompressed()),
+		OraclePubKeyRemoteReport: "",
 		UniqueId:                 suite.uniqueID,
 		VoteParams: types.VoteParams{
 			VotingPeriod: 100,

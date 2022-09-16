@@ -1,6 +1,7 @@
 package types
 
 import (
+	"encoding/base64"
 	"fmt"
 	"time"
 
@@ -71,13 +72,18 @@ func (p Params) Validate() error {
 }
 
 func validateOraclePublicKey(i interface{}) error {
-	oraclePubKey, ok := i.([]byte)
+	pubKeyBase64, ok := i.(string)
 	if !ok {
 		return fmt.Errorf("invalid parameter type: %T", i)
 	}
-	if oraclePubKey != nil {
-		_, err := btcec.ParsePubKey(oraclePubKey, btcec.S256())
+
+	if pubKeyBase64 != "" {
+		oraclePubKeyBz, err := base64.StdEncoding.DecodeString(pubKeyBase64)
 		if err != nil {
+			return err
+		}
+
+		if _, err := btcec.ParsePubKey(oraclePubKeyBz, btcec.S256()); err != nil {
 			return err
 		}
 	}
@@ -86,10 +92,17 @@ func validateOraclePublicKey(i interface{}) error {
 }
 
 func validateOraclePubKeyRemoteReport(i interface{}) error {
-	_, ok := i.([]byte)
+	reportBase64, ok := i.(string)
 	if !ok {
 		return fmt.Errorf("invalid parameter type: %T", i)
 	}
+
+	if reportBase64 != "" {
+		if _, err := base64.StdEncoding.DecodeString(reportBase64); err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
 

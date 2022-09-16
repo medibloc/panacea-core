@@ -2,7 +2,11 @@ package oracle_test
 
 import (
 	"bytes"
+	"encoding/base64"
 	"fmt"
+	"testing"
+	"time"
+
 	"github.com/btcsuite/btcd/btcec"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
@@ -11,8 +15,6 @@ import (
 	"github.com/medibloc/panacea-core/v2/x/oracle/testutil"
 	"github.com/medibloc/panacea-core/v2/x/oracle/types"
 	"github.com/stretchr/testify/suite"
-	"testing"
-	"time"
 )
 
 type abciTestSuite struct {
@@ -51,8 +53,8 @@ func (suite *abciTestSuite) BeforeTest(_, _ string) {
 	oraclePrivKey, err := btcec.NewPrivateKey(btcec.S256())
 	suite.Require().NoError(err)
 	suite.OracleKeeper.SetParams(ctx, types.Params{
-		OraclePublicKey:          oraclePrivKey.PubKey().SerializeCompressed(),
-		OraclePubKeyRemoteReport: []byte("oraclePubKeyRemoteReport"),
+		OraclePublicKey:          base64.StdEncoding.EncodeToString(oraclePrivKey.PubKey().SerializeCompressed()),
+		OraclePubKeyRemoteReport: base64.StdEncoding.EncodeToString([]byte("oraclePubKeyRemoteReport")),
 		UniqueId:                 uniqueID,
 		VoteParams: types.VoteParams{
 			VotingPeriod: 100,
