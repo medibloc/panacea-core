@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"bufio"
-	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -178,22 +177,4 @@ func setOracleParams(cmd *cobra.Command, genState *oracletypes.GenesisState) err
 	}
 
 	return nil
-}
-
-func getBytesFromBase64(cmd *cobra.Command, key string) ([]byte, error) {
-	content, err := cmd.Flags().GetString(key)
-	if err != nil {
-		return nil, err
-	}
-
-	if len(content) > 0 {
-		contentBz, err := base64.StdEncoding.DecodeString(content)
-		if err != nil {
-			return nil, err
-		}
-
-		return contentBz, nil
-	}
-
-	return nil, nil
 }
