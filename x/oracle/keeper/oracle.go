@@ -1,7 +1,6 @@
 package keeper
 
 import (
-	"encoding/base64"
 	"errors"
 	"fmt"
 
@@ -102,8 +101,7 @@ func (k Keeper) VoteOracleRegistration(ctx sdk.Context, vote *types.OracleRegist
 		return sdkerrors.Wrap(types.ErrOracleRegistrationVote, err.Error())
 	}
 
-	ok, err := k.verifyVoteSignature(ctx, vote, signature)
-	if err != nil || !ok {
+	if !k.verifyVoteSignature(ctx, vote, signature) {
 		// TODO implements request slashing
 		return sdkerrors.Wrap(types.ErrDetectionMaliciousBehavior, "")
 	}
@@ -123,16 +121,12 @@ func (k Keeper) VoteOracleRegistration(ctx sdk.Context, vote *types.OracleRegist
 }
 
 // verifyVoteSignature defines to check for malicious requests.
-func (k Keeper) verifyVoteSignature(ctx sdk.Context, vote *types.OracleRegistrationVote, signature []byte) (bool, error) {
+func (k Keeper) verifyVoteSignature(ctx sdk.Context, vote *types.OracleRegistrationVote, signature []byte) bool {
 	voteBz := k.cdc.MustMarshal(vote)
 
 	// Verifies that voting requests are signed with oraclePrivKey.
-	oraclePubKeyBz, err := base64.StdEncoding.DecodeString(k.GetParams(ctx).OraclePublicKey)
-	if err != nil {
-		return false, err
-	}
-
-	return secp256k1.PubKey(oraclePubKeyBz).VerifySignature(voteBz, signature), nil
+	oraclePubKeyBz := k.GetParams(ctx).MustDecodeOraclePublicKey()
+	return secp256k1.PubKey(oraclePubKeyBz).VerifySignature(voteBz, signature)
 }
 
 // validateOracleRegistrationVote checks the oracle/registration status in the Panacea to ensure that the oracle can be voted to be registered.

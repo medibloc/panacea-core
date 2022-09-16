@@ -176,5 +176,5 @@ func setOracleParams(cmd *cobra.Command, genState *oracletypes.GenesisState) err
 		genState.Params.OraclePubKeyRemoteReport = remoteReportBase64
 	}
 
-	return nil
+	return genState.Params.Validate()
 }

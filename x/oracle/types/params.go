@@ -155,3 +155,23 @@ func validateSlashParams(i interface{}) error {
 
 	return nil
 }
+
+// MustDecodeOraclePublicKey decodes a base64-encoded Params.OraclePublicKey.
+// It panics if the decoding is failed, assuming that the Params was already validated by Params.Validate().
+func (p Params) MustDecodeOraclePublicKey() []byte {
+	return mustDecodeBase64Str(p.OraclePublicKey)
+}
+
+// MustDecodeOraclePubKeyRemoteReport decodes a base64-encoded Params.OraclePubKeyRemoteReport.
+// It panics if the decoding is failed, assuming that the Params was already validated by Params.Validate().
+func (p Params) MustDecodeOraclePubKeyRemoteReport() []byte {
+	return mustDecodeBase64Str(p.OraclePubKeyRemoteReport)
+}
+
+func mustDecodeBase64Str(s string) []byte {
+	decoded, err := base64.StdEncoding.DecodeString(s)
+	if err != nil {
+		panic(err)
+	}
+	return decoded
+}
