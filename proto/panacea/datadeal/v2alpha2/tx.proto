@@ -43,7 +43,7 @@ message MsgCreateDealResponse {
 // MsgSellData defines the Msg/SellData request type.
 message MsgSellData {
   uint64 deal_id = 1;
-  string verifiable_cid = 2;
+  bytes verifiable_cid = 2;
   string seller_address = 3;
 }
 
