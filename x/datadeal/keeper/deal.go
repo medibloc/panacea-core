@@ -1,8 +1,6 @@
 package keeper
 
 import (
-	"fmt"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/medibloc/panacea-core/v2/x/datadeal/types"
@@ -17,12 +15,11 @@ func (k Keeper) SellData(ctx sdk.Context, msg *types.MsgSellData) error {
 	//TODO: Check the Deal which seller want to sell data to the deal exists
 	//k.GetDeal()
 
-	if err = k.checkDataSaleStatus(ctx, msg.VerifiableCid, msg.DealId); err != nil {
-		return sdkerrors.Wrapf(types.ErrSellData, err.Error())
-	}
-
 	getDataSale, _ := k.GetDataSale(ctx, msg.VerifiableCid, msg.DealId)
 	if getDataSale != nil {
+		if getDataSale.Status != types.DATA_SALE_STATUS_FAILED {
+			return sdkerrors.Wrapf(types.ErrSellData, "data already exists")
+		}
 		return sdkerrors.Wrapf(types.ErrSellData, "data already exists")
 	}
 
@@ -70,24 +67,4 @@ func (k Keeper) SetDataSale(ctx sdk.Context, dataSale *types.DataSale) error {
 	store.Set(key, bz)
 
 	return nil
-}
-
-func (k Keeper) checkDataSaleStatus(ctx sdk.Context, verifiableCID []byte, dealID uint64) error {
-	existDataSale, err := k.GetDataSale(ctx, verifiableCID, dealID)
-	if err != nil {
-		return err
-	}
-
-	switch existDataSale.Status {
-	case types.DATA_SALE_STATUS_COMPLETED:
-		return nil
-	case types.DATA_SALE_STATUS_VERIFICATION_VOTING_PERIOD:
-		return fmt.Errorf("in verification voting period")
-	case types.DATA_SALE_STATUS_DELIVERY_VOTING_PERIOD:
-		return fmt.Errorf("in delivery voting period")
-	case types.DATA_SALE_STATUS_FAILED:
-		return nil
-	default:
-		return fmt.Errorf("unexpected state. status: %s", existDataSale.Status)
-	}
 }
