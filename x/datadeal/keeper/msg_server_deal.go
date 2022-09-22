@@ -20,6 +20,13 @@ func (m msgServer) SellData(goCtx context.Context, msg *types.MsgSellData) (*typ
 		return nil, err
 	}
 
+	ctx.EventManager().EmitEvent(
+		sdk.NewEvent(
+			sdk.EventTypeMessage,
+			sdk.NewAttribute(sdk.AttributeKeyModule, types.ModuleName),
+		),
+	)
+
 	return &types.MsgSellDataResponse{}, nil
 }
 
