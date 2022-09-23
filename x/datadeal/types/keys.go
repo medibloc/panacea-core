@@ -1,7 +1,7 @@
 package types
 
 import (
-	"bytes"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 const (
@@ -22,10 +22,20 @@ const (
 )
 
 var (
+	// KeyDealNextNumber defines key to store the next Deal ID to be used
+	KeyDealNextNumber = []byte{0x01}
+
+	// KeyPrefixDeals defines key to store deals
+	KeyPrefixDeals = []byte{0x02}
+
 	KeyIndexSeparator = []byte{0xFF}
 )
 
 // CombineKeys function defines combines deal_id with data_hash.
-func CombineKeys(keys ...[]byte) []byte {
-	return bytes.Join(keys, KeyIndexSeparator)
+//func CombineKeys(keys ...[]byte) []byte {
+//	return bytes.Join(keys, KeyIndexSeparator)
+//}
+
+func GetKeyPrefixDeals(dealID uint64) []byte {
+	return append(KeyPrefixDeals, sdk.Uint64ToBigEndian(dealID)...)
 }

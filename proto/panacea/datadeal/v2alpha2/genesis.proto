@@ -8,7 +8,7 @@ import "panacea/datadeal/v2alpha2/deal.proto";
 
 // GenesisState defines the datadeal module's genesis state.
 message GenesisState {
-  map<uint64, Deal> deals = 1 [(gogoproto.nullable) = false];
+  repeated Deal deals = 1 [(gogoproto.nullable) = false];
   uint64 next_deal_number = 2;
 }
 

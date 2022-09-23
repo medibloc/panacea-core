@@ -7,15 +7,6 @@ import (
 
 var _ sdk.Msg = &MsgCreateDeal{}
 
-func NewMsgCreateDeal(dataSchema []string, budget *sdk.Coin, maxNumData uint64, buyerAddress string) *MsgCreateDeal {
-	return &MsgCreateDeal{
-		DataSchema:   dataSchema,
-		Budget:       budget,
-		MaxNumData:   maxNumData,
-		BuyerAddress: buyerAddress,
-	}
-}
-
 func (msg *MsgCreateDeal) Route() string {
 	return RouterKey
 }
