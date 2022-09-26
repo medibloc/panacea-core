@@ -1,0 +1,64 @@
+package keeper_test
+
+import (
+	"testing"
+	"time"
+
+	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
+	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/medibloc/panacea-core/v2/types/testsuite"
+	"github.com/medibloc/panacea-core/v2/x/datadeal/types"
+	oracletypes "github.com/medibloc/panacea-core/v2/x/oracle/types"
+	"github.com/stretchr/testify/suite"
+)
+
+type queryDealTestSuite struct {
+	testsuite.TestSuite
+
+	sellerAccPrivKey cryptotypes.PrivKey
+	sellerAccPubKey  cryptotypes.PubKey
+	sellerAccAddr    sdk.AccAddress
+
+	verifiableCID []byte
+}
+
+func TestQueryDealTestSuite(t *testing.T) {
+	suite.Run(t, new(queryDealTestSuite))
+}
+
+func (suite queryDealTestSuite) BeforeTest(_, _ string) {
+	suite.verifiableCID = []byte("verifiableCID")
+
+	suite.sellerAccPrivKey = secp256k1.GenPrivKey()
+	suite.sellerAccPubKey = suite.sellerAccPrivKey.PubKey()
+	suite.sellerAccAddr = sdk.AccAddress(suite.sellerAccPubKey.Address())
+
+}
+
+func (suite queryDealTestSuite) makeNewDataSale() *types.DataSale {
+	return &types.DataSale{
+		SellerAddress: suite.sellerAccAddr.String(),
+		DealId:        1,
+		VerifiableCid: suite.verifiableCID,
+		DeliveredCid:  nil,
+		Status:        types.DATA_SALE_STATUS_VERIFICATION_VOTING_PERIOD,
+		VotingPeriod: &oracletypes.VotingPeriod{
+			VotingStartTime: time.Now(),
+			VotingEndTime:   time.Now().Add(5 * time.Second),
+		},
+		VerificationTallyResult: nil,
+		DeliveryTallyResult:     nil,
+	}
+}
+
+func (suite queryDealTestSuite) TestDataSale() {
+	req := types.QueryDataSaleRequest{
+		DealId:        1,
+		VerifiableCid: suite.verifiableCID,
+	}
+
+	res, err := suite.DataDealKeeper.DataSale(sdk.WrapSDKContext(suite.Ctx), &req)
+	suite.Require().NoError(err)
+	suite.Require()
+}
