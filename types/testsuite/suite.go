@@ -71,10 +71,10 @@ type TestSuite struct {
 	TransferKeeper    ibctransferkeeper.Keeper
 	DIDMsgServer      didtypes.MsgServer
 	DIDKeeper         didkeeper.Keeper
-	DataDealKeeper    datadealkeeper.Keeper
-	DataDealMsgServer datadealtypes.MsgServer
 	OracleKeeper      oraclekeeper.Keeper
 	OracleMsgServer   oracletypes.MsgServer
+	DataDealKeeper    datadealkeeper.Keeper
+	DataDealMsgServer datadealtypes.MsgServer
 	WasmKeeper        wasm.Keeper
 	UpgradeKeeper     upgradekeeper.Keeper
 }
