@@ -27,7 +27,7 @@ func TestQueryDealTestSuite(t *testing.T) {
 	suite.Run(t, new(queryDealTestSuite))
 }
 
-func (suite queryDealTestSuite) BeforeTest(_, _ string) {
+func (suite *queryDealTestSuite) BeforeTest(_, _ string) {
 	suite.verifiableCID = []byte("verifiableCID")
 
 	suite.sellerAccPrivKey = secp256k1.GenPrivKey()
