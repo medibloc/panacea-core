@@ -53,6 +53,10 @@ func (suite queryDealTestSuite) makeNewDataSale() *types.DataSale {
 }
 
 func (suite queryDealTestSuite) TestDataSale() {
+	newDataSale := suite.makeNewDataSale()
+	err := suite.DataDealKeeper.SetDataSale(suite.Ctx, newDataSale)
+	suite.Require().NoError(err)
+
 	req := types.QueryDataSaleRequest{
 		DealId:        1,
 		VerifiableCid: suite.verifiableCID,
@@ -60,5 +64,6 @@ func (suite queryDealTestSuite) TestDataSale() {
 
 	res, err := suite.DataDealKeeper.DataSale(sdk.WrapSDKContext(suite.Ctx), &req)
 	suite.Require().NoError(err)
-	suite.Require()
+	suite.Require().Equal(newDataSale.DealId, res.DataSale.DealId)
+	suite.Require().Equal(newDataSale.VerifiableCid, res.DataSale.VerifiableCid)
 }
