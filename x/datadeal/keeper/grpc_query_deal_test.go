@@ -1,6 +1,7 @@
 package keeper_test
 
 import (
+	"encoding/base64"
 	"testing"
 	"time"
 
@@ -20,7 +21,7 @@ type queryDealTestSuite struct {
 	sellerAccPubKey  cryptotypes.PubKey
 	sellerAccAddr    sdk.AccAddress
 
-	verifiableCID []byte
+	verifiableCID string
 }
 
 func TestQueryDealTestSuite(t *testing.T) {
@@ -28,7 +29,8 @@ func TestQueryDealTestSuite(t *testing.T) {
 }
 
 func (suite *queryDealTestSuite) BeforeTest(_, _ string) {
-	suite.verifiableCID = []byte("verifiableCID")
+	verifiableCIDbz := []byte("verifiableCID")
+	suite.verifiableCID = base64.StdEncoding.EncodeToString(verifiableCIDbz)
 
 	suite.sellerAccPrivKey = secp256k1.GenPrivKey()
 	suite.sellerAccPubKey = suite.sellerAccPrivKey.PubKey()
@@ -41,7 +43,7 @@ func (suite queryDealTestSuite) makeNewDataSale() *types.DataSale {
 		SellerAddress: suite.sellerAccAddr.String(),
 		DealId:        1,
 		VerifiableCid: suite.verifiableCID,
-		DeliveredCid:  nil,
+		DeliveredCid:  "",
 		Status:        types.DATA_SALE_STATUS_VERIFICATION_VOTING_PERIOD,
 		VotingPeriod: &oracletypes.VotingPeriod{
 			VotingStartTime: time.Now(),

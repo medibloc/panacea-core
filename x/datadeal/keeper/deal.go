@@ -1,6 +1,8 @@
 package keeper
 
 import (
+	"encoding/base64"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/medibloc/panacea-core/v2/x/datadeal/types"
@@ -16,10 +18,7 @@ func (k Keeper) SellData(ctx sdk.Context, msg *types.MsgSellData) error {
 	//k.GetDeal()
 
 	getDataSale, _ := k.GetDataSale(ctx, msg.VerifiableCid, msg.DealId)
-	if getDataSale != nil {
-		if getDataSale.Status != types.DATA_SALE_STATUS_FAILED {
-			return sdkerrors.Wrapf(types.ErrSellData, "data already exists")
-		}
+	if getDataSale != nil && getDataSale.Status != types.DATA_SALE_STATUS_FAILED {
 		return sdkerrors.Wrapf(types.ErrSellData, "data already exists")
 	}
 
@@ -36,9 +35,14 @@ func (k Keeper) SellData(ctx sdk.Context, msg *types.MsgSellData) error {
 	return nil
 }
 
-func (k Keeper) GetDataSale(ctx sdk.Context, verifiableCID []byte, dealID uint64) (*types.DataSale, error) {
+func (k Keeper) GetDataSale(ctx sdk.Context, verifiableCID string, dealID uint64) (*types.DataSale, error) {
 	store := ctx.KVStore(k.storeKey)
-	key := types.GetDataSaleKey(verifiableCID, dealID)
+	verifiableCIDbz, err := base64.StdEncoding.DecodeString(verifiableCID)
+	if err != nil {
+		return nil, err
+	}
+
+	key := types.GetDataSaleKey(verifiableCIDbz, dealID)
 
 	bz := store.Get(key)
 	if bz == nil {
@@ -47,7 +51,7 @@ func (k Keeper) GetDataSale(ctx sdk.Context, verifiableCID []byte, dealID uint64
 
 	dataSale := &types.DataSale{}
 
-	err := k.cdc.UnmarshalLengthPrefixed(bz, dataSale)
+	err = k.cdc.UnmarshalLengthPrefixed(bz, dataSale)
 	if err != nil {
 		return nil, sdkerrors.Wrapf(types.ErrGetDataSale, err.Error())
 	}
@@ -57,7 +61,12 @@ func (k Keeper) GetDataSale(ctx sdk.Context, verifiableCID []byte, dealID uint64
 
 func (k Keeper) SetDataSale(ctx sdk.Context, dataSale *types.DataSale) error {
 	store := ctx.KVStore(k.storeKey)
-	key := types.GetDataSaleKey(dataSale.VerifiableCid, dataSale.DealId)
+	verifiableCID, err := base64.StdEncoding.DecodeString(dataSale.VerifiableCid)
+	if err != nil {
+		return err
+	}
+
+	key := types.GetDataSaleKey(verifiableCID, dataSale.DealId)
 
 	bz, err := k.cdc.MarshalLengthPrefixed(dataSale)
 	if err != nil {
