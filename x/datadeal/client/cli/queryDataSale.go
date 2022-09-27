@@ -1,7 +1,6 @@
 package cli
 
 import (
-	"encoding/base64"
 	"strconv"
 
 	"github.com/cosmos/cosmos-sdk/client"
@@ -28,14 +27,9 @@ func GetCmdDataSale() *cobra.Command {
 				return err
 			}
 
-			verifiableCID, err := base64.StdEncoding.DecodeString(args[1])
-			if err != nil {
-				return err
-			}
-
 			req := &types.QueryDataSaleRequest{
 				DealId:        dealID,
-				VerifiableCid: verifiableCID,
+				VerifiableCid: args[1],
 			}
 			res, err := queryClient.DataSale(cmd.Context(), req)
 			if err != nil {

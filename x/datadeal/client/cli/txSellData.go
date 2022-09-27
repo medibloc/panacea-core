@@ -1,7 +1,6 @@
 package cli
 
 import (
-	"encoding/base64"
 	"strconv"
 
 	"github.com/cosmos/cosmos-sdk/client"
@@ -29,12 +28,7 @@ func CmdSellData() *cobra.Command {
 				return err
 			}
 
-			verifiableCID, err := base64.StdEncoding.DecodeString(args[1])
-			if err != nil {
-				return err
-			}
-
-			msg := types.NewMsgSellData(dealID, verifiableCID, sellerAddress)
+			msg := types.NewMsgSellData(dealID, args[1], sellerAddress)
 			if err = msg.ValidateBasic(); err != nil {
 				return err
 			}
