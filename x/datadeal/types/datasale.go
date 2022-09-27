@@ -23,16 +23,8 @@ func (m DataSale) ValidateBasic() error {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "dealID should be bigger than 0")
 	}
 
-	if m.VerifiableCid == nil {
+	if m.VerifiableCid == "" {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "verifiable CID is empty")
-	}
-
-	if m.DeliveredCid == nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "delivered CID is empty")
-	}
-
-	if m.VotingPeriod == nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "votingPeriod is nil")
 	}
 
 	if m.VerificationTallyResult != nil {

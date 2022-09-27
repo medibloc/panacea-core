@@ -1,7 +1,9 @@
 package keeper_test
 
 import (
+	"encoding/base64"
 	"testing"
+	"time"
 
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
@@ -19,7 +21,7 @@ type dealTestSuite struct {
 	sellerAccPubKey  cryptotypes.PubKey
 	sellerAccAddr    sdk.AccAddress
 
-	verifiableCID []byte
+	verifiableCID string
 }
 
 func TestDataDealTestSuite(t *testing.T) {
@@ -27,7 +29,8 @@ func TestDataDealTestSuite(t *testing.T) {
 }
 
 func (suite *dealTestSuite) BeforeTest(_, _ string) {
-	suite.verifiableCID = []byte("verifiableCID")
+	verifiableCIDbz := []byte("verifiableCID")
+	suite.verifiableCID = base64.StdEncoding.EncodeToString(verifiableCIDbz)
 
 	suite.sellerAccPrivKey = secp256k1.GenPrivKey()
 	suite.sellerAccPubKey = suite.sellerAccPrivKey.PubKey()
@@ -49,6 +52,22 @@ func (suite *dealTestSuite) BeforeTest(_, _ string) {
 	})
 }
 
+func (suite dealTestSuite) makeNewDataSale() *types.DataSale {
+	return &types.DataSale{
+		SellerAddress: suite.sellerAccAddr.String(),
+		DealId:        1,
+		VerifiableCid: suite.verifiableCID,
+		DeliveredCid:  "",
+		Status:        types.DATA_SALE_STATUS_VERIFICATION_VOTING_PERIOD,
+		VotingPeriod: &oracletypes.VotingPeriod{
+			VotingStartTime: time.Now(),
+			VotingEndTime:   time.Now().Add(5 * time.Second),
+		},
+		VerificationTallyResult: nil,
+		DeliveryTallyResult:     nil,
+	}
+}
+
 //TODO: The test will be complemented when CreateDeal and VoteDataSale done.
 func (suite dealTestSuite) TestSellDataSuccess() {
 	msgSellData := &types.MsgSellData{
@@ -68,4 +87,21 @@ func (suite dealTestSuite) TestSellDataSuccess() {
 	suite.Require().Equal(dataSale.VotingPeriod, suite.OracleKeeper.GetVotingPeriod(suite.Ctx))
 	suite.Require().Equal(dataSale.Status, types.DATA_SALE_STATUS_VERIFICATION_VOTING_PERIOD)
 	suite.Require().Equal(dataSale.SellerAddress, suite.sellerAccAddr.String())
+}
+
+func (suite dealTestSuite) TestSellDataStatusFailed() {
+	newDataSale := suite.makeNewDataSale()
+	newDataSale.Status = types.DATA_SALE_STATUS_FAILED
+
+	err := suite.DataDealKeeper.SetDataSale(suite.Ctx, newDataSale)
+	suite.Require().NoError(err)
+
+	msgSellData := &types.MsgSellData{
+		DealId:        1,
+		VerifiableCid: newDataSale.VerifiableCid,
+		SellerAddress: newDataSale.SellerAddress,
+	}
+
+	err = suite.DataDealKeeper.SellData(suite.Ctx, msgSellData)
+	suite.Require().NoError(err)
 }
