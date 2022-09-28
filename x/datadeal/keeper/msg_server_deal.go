@@ -25,21 +25,34 @@ func (m msgServer) CreateDeal(goCtx context.Context, msg *types.MsgCreateDeal) (
 }
 
 // SellData defines a method for selling a data.
-func (k Keeper) SellData(goCtx context.Context, msg *types.MsgSellData) (*types.MsgSellDataResponse, error) {
-	panic("implements me")
+func (m msgServer) SellData(goCtx context.Context, msg *types.MsgSellData) (*types.MsgSellDataResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	if err := m.Keeper.SellData(ctx, msg); err != nil {
+		return nil, err
+	}
+
+	ctx.EventManager().EmitEvent(
+		sdk.NewEvent(
+			sdk.EventTypeMessage,
+			sdk.NewAttribute(sdk.AttributeKeyModule, types.ModuleName),
+		),
+	)
+
+	return &types.MsgSellDataResponse{}, nil
 }
 
 // VoteDataVerification defines a method for voting data verification.
-func (k Keeper) VoteDataVerification(goCtx context.Context, msg *types.MsgVoteDataVerification) (*types.MsgVoteDataVerificationResponse, error) {
+func (m msgServer) VoteDataVerification(goCtx context.Context, msg *types.MsgVoteDataVerification) (*types.MsgVoteDataVerificationResponse, error) {
 	panic("implements me")
 }
 
 // VoteDataDelivery defines a method for voting data delivery.
-func (k Keeper) VoteDataDelivery(goCtx context.Context, msg *types.MsgVoteDataDelivery) (*types.MsgVoteDataDeliveryResponse, error) {
+func (m msgServer) VoteDataDelivery(goCtx context.Context, msg *types.MsgVoteDataDelivery) (*types.MsgVoteDataDeliveryResponse, error) {
 	panic("implements me")
 }
 
 // DeactivateDeal defines a method for deactivating the deal.
-func (k Keeper) DeactivateDeal(goCtx context.Context, msg *types.MsgDeactivateDeal) (*types.MsgDeactivateDealResponse, error) {
+func (m msgServer) DeactivateDeal(goCtx context.Context, msg *types.MsgDeactivateDeal) (*types.MsgDeactivateDealResponse, error) {
 	panic("implements me")
 }

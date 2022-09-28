@@ -11,4 +11,7 @@ var (
 	ErrDealNotFound       = sdkerrors.Register(ModuleName, 3, "deal is not found")
 	ErrInvalidGenesisDeal = sdkerrors.Register(ModuleName, 4, "invalid genesis state of deal")
 	ErrGetDeal            = sdkerrors.Register(ModuleName, 5, "error while get deal")
+	ErrSellData         = sdkerrors.Register(ModuleName, 6, "error while selling a data")
+	ErrGetDataSale      = sdkerrors.Register(ModuleName, 7, "error while get data sale")
+	ErrDataSaleNotFound = sdkerrors.Register(ModuleName, 8, "data sale not found")
 )

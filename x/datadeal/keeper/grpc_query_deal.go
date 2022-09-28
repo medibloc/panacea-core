@@ -58,5 +58,12 @@ func (k Keeper) Deals(goCtx context.Context, req *types.QueryDealsRequest) (*typ
 }
 
 func (k Keeper) DataSale(goCtx context.Context, req *types.QueryDataSaleRequest) (*types.QueryDataSaleResponse, error) {
-	panic("implements me")
+	dataSale, err := k.GetDataSale(sdk.UnwrapSDKContext(goCtx), req.VerifiableCid, req.DealId)
+	if err != nil {
+		return nil, err
+	}
+
+	return &types.QueryDataSaleResponse{
+		DataSale: dataSale,
+	}, nil
 }

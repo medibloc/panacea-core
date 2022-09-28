@@ -1,6 +1,8 @@
 package types
 
 import (
+	"bytes"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -29,12 +31,18 @@ var (
 	KeyPrefixDeals = []byte{0x02}
 
 	KeyIndexSeparator = []byte{0xFF}
+
+	DataSaleKey = []byte{0x02}
 )
 
+func GetDataSaleKey(verifiableCID string, dealID uint64) []byte {
+	return append(DataSaleKey, CombineKeys(sdk.Uint64ToBigEndian(dealID), []byte(verifiableCID))...)
+}
+
 // CombineKeys function defines combines deal_id with data_hash.
-//func CombineKeys(keys ...[]byte) []byte {
-//	return bytes.Join(keys, KeyIndexSeparator)
-//}
+func CombineKeys(keys ...[]byte) []byte {
+	return bytes.Join(keys, KeyIndexSeparator)
+}
 
 func GetDealKey(dealID uint64) []byte {
 	return append(KeyPrefixDeals, sdk.Uint64ToBigEndian(dealID)...)
