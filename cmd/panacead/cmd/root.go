@@ -37,7 +37,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/crisis"
 	genutilcli "github.com/cosmos/cosmos-sdk/x/genutil/client/cli"
 	"github.com/medibloc/panacea-core/v2/app"
-	"github.com/medibloc/panacea-core/v2/client/decrypt"
+	"github.com/medibloc/panacea-core/v2/client/crypto"
 
 	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
 )
@@ -126,7 +126,7 @@ func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
 		queryCommand(),
 		txCommand(),
 		keys.Commands(app.DefaultNodeHome),
-		decrypt.Command(app.DefaultNodeHome),
+		crypto.Command(app.DefaultNodeHome),
 	)
 }
 
