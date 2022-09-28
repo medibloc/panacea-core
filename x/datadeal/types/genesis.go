@@ -12,6 +12,10 @@ func DefaultGenesis() *GenesisState {
 // Validate performs basic genesis state validation returning an error upon any
 // failure.
 func (gs GenesisState) Validate() error {
-	//panic("implements me")
+	for _, dataSale := range gs.DataSales {
+		if err := dataSale.ValidateBasic(); err != nil {
+			return err
+		}
+	}
 	return nil
 }

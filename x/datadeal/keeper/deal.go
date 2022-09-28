@@ -77,3 +77,25 @@ func (k Keeper) SetDataSale(ctx sdk.Context, dataSale *types.DataSale) error {
 
 	return nil
 }
+
+func (k Keeper) GetAllDataSaleList(ctx sdk.Context) ([]types.DataSale, error) {
+	store := ctx.KVStore(k.storeKey)
+	iterator := sdk.KVStorePrefixIterator(store, types.DataSaleKey)
+	defer iterator.Close()
+
+	dataSales := make([]types.DataSale, 0)
+
+	for ; iterator.Valid(); iterator.Next() {
+		bz := iterator.Value()
+		var dataSale types.DataSale
+
+		err := k.cdc.UnmarshalLengthPrefixed(bz, &dataSale)
+		if err != nil {
+			return nil, sdkerrors.Wrapf(types.ErrGetDataSale, err.Error())
+		}
+
+		dataSales = append(dataSales, dataSale)
+	}
+
+	return dataSales, nil
+}
