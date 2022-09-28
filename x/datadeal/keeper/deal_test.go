@@ -105,3 +105,20 @@ func (suite dealTestSuite) TestSellDataStatusFailed() {
 	err = suite.DataDealKeeper.SellData(suite.Ctx, msgSellData)
 	suite.Require().NoError(err)
 }
+
+func (suite dealTestSuite) TestSellDataStatusVotingPeriod() {
+	newDataSale := suite.makeNewDataSale()
+	newDataSale.Status = types.DATA_SALE_STATUS_VERIFICATION_VOTING_PERIOD
+
+	err := suite.DataDealKeeper.SetDataSale(suite.Ctx, newDataSale)
+	suite.Require().NoError(err)
+
+	msgSellData := &types.MsgSellData{
+		DealId:        1,
+		VerifiableCid: newDataSale.VerifiableCid,
+		SellerAddress: newDataSale.SellerAddress,
+	}
+
+	err = suite.DataDealKeeper.SellData(suite.Ctx, msgSellData)
+	suite.Require().Error(err, types.ErrSellData)
+}
