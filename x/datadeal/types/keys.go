@@ -29,8 +29,8 @@ var (
 	DataSaleKey = []byte{0x02}
 )
 
-func GetDataSaleKey(verifiableCID []byte, dealID uint64) []byte {
-	return append(DataSaleKey, CombineKeys(sdk.Uint64ToBigEndian(dealID), verifiableCID)...)
+func GetDataSaleKey(verifiableCID string, dealID uint64) []byte {
+	return append(DataSaleKey, CombineKeys(sdk.Uint64ToBigEndian(dealID), []byte(verifiableCID))...)
 }
 
 // CombineKeys function defines combines deal_id with data_hash.

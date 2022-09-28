@@ -1,7 +1,6 @@
 package keeper_test
 
 import (
-	"encoding/base64"
 	"testing"
 	"time"
 
@@ -29,8 +28,7 @@ func TestQueryDealTestSuite(t *testing.T) {
 }
 
 func (suite *queryDealTestSuite) BeforeTest(_, _ string) {
-	verifiableCIDbz := []byte("verifiableCID")
-	suite.verifiableCID = base64.StdEncoding.EncodeToString(verifiableCIDbz)
+	suite.verifiableCID = "verifiableCID"
 
 	suite.sellerAccPrivKey = secp256k1.GenPrivKey()
 	suite.sellerAccPubKey = suite.sellerAccPrivKey.PubKey()
