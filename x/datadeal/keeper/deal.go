@@ -1,6 +1,8 @@
 package keeper
 
 import (
+	"strconv"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
@@ -34,7 +36,7 @@ func (k Keeper) CreateDeal(ctx sdk.Context, buyerAddress sdk.AccAddress, msg *ty
 		authtypes.NewBaseAccountWithAddress(
 			dealAddress,
 		),
-		newDeal.Address),
+		strconv.FormatUint(newDeal.Id, 10)),
 	)
 	k.accountKeeper.SetAccount(ctx, acc)
 
@@ -95,7 +97,7 @@ func (k Keeper) GetNextDealNumberAndIncrement(ctx sdk.Context) (uint64, error) {
 
 func (k Keeper) GetDeal(ctx sdk.Context, dealID uint64) (types.Deal, error) {
 	store := ctx.KVStore(k.storeKey)
-	dealKey := types.GetKeyPrefixDeals(dealID)
+	dealKey := types.GetDealKey(dealID)
 
 	bz := store.Get(dealKey)
 	if bz == nil {
@@ -111,7 +113,7 @@ func (k Keeper) GetDeal(ctx sdk.Context, dealID uint64) (types.Deal, error) {
 
 func (k Keeper) SetDeal(ctx sdk.Context, deal types.Deal) error {
 	store := ctx.KVStore(k.storeKey)
-	dealKey := types.GetKeyPrefixDeals(deal.GetId())
+	dealKey := types.GetDealKey(deal.GetId())
 	bz, err := k.cdc.MarshalLengthPrefixed(&deal)
 	if err != nil {
 		return sdkerrors.Wrapf(err, "Failed to set deal")
