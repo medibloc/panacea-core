@@ -87,8 +87,8 @@ func (suite dealTestSuite) TestSellDataSuccess() {
 
 	dataSale, err := suite.DataDealKeeper.GetDataSale(suite.Ctx, suite.verifiableCID1, uint64(1))
 	suite.Require().NoError(err)
-
 	suite.Require().Equal(dataSale.VerifiableCid, suite.verifiableCID1)
+
 	suite.Require().Equal(dataSale.DealId, uint64(1))
 	suite.Require().Equal(dataSale.VotingPeriod, suite.OracleKeeper.GetVotingPeriod(suite.Ctx))
 	suite.Require().Equal(dataSale.Status, types.DATA_SALE_STATUS_VERIFICATION_VOTING_PERIOD)
