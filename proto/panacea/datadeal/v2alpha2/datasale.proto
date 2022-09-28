@@ -10,8 +10,8 @@ import "panacea/oracle/v2alpha2/oracle.proto";
 message DataSale {
   string seller_address = 1;
   uint64 deal_id = 2;
-  bytes verifiable_cid = 3;
-  bytes delivered_cid = 4;
+  string verifiable_cid = 3;
+  string delivered_cid = 4;
   DataSaleStatus status = 5;
   panacea.oracle.v2alpha2.VotingPeriod voting_period = 6;
   panacea.oracle.v2alpha2.TallyResult verification_tally_result = 7;
