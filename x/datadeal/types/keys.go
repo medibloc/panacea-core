@@ -36,6 +36,6 @@ var (
 //	return bytes.Join(keys, KeyIndexSeparator)
 //}
 
-func GetKeyPrefixDeals(dealID uint64) []byte {
+func GetDealKey(dealID uint64) []byte {
 	return append(KeyPrefixDeals, sdk.Uint64ToBigEndian(dealID)...)
 }

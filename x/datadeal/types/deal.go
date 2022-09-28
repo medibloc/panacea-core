@@ -50,5 +50,10 @@ func (m Deal) ValidateBasic() error {
 	if !m.Budget.IsValid() {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "budget is not a valid Coin object")
 	}
+
+	if m.CurNumData < 0 {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "curNumData can not be negative")
+	}
+
 	return nil
 }
