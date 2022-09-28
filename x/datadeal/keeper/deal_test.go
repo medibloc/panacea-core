@@ -122,3 +122,20 @@ func (suite dealTestSuite) TestSellDataStatusVotingPeriod() {
 	err = suite.DataDealKeeper.SellData(suite.Ctx, msgSellData)
 	suite.Require().Error(err, types.ErrSellData)
 }
+
+func (suite dealTestSuite) TestSellDataStatusCompleted() {
+	newDataSale := suite.makeNewDataSale()
+	newDataSale.Status = types.DATA_SALE_STATUS_COMPLETED
+
+	err := suite.DataDealKeeper.SetDataSale(suite.Ctx, newDataSale)
+	suite.Require().NoError(err)
+
+	msgSellData := &types.MsgSellData{
+		DealId:        1,
+		VerifiableCid: newDataSale.VerifiableCid,
+		SellerAddress: newDataSale.SellerAddress,
+	}
+
+	err = suite.DataDealKeeper.SellData(suite.Ctx, msgSellData)
+	suite.Require().Error(err, types.ErrSellData)
+}
