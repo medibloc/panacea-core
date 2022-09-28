@@ -30,7 +30,7 @@ var (
 )
 
 func GetDataSaleKey(verifiableCID []byte, dealID uint64) []byte {
-	return append(DataSaleKey, CombineKeys(verifiableCID, sdk.Uint64ToBigEndian(dealID))...)
+	return append(DataSaleKey, CombineKeys(sdk.Uint64ToBigEndian(dealID), verifiableCID)...)
 }
 
 // CombineKeys function defines combines deal_id with data_hash.
