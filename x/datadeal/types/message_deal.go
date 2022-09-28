@@ -87,11 +87,15 @@ func (msg *MsgSellData) Type() string {
 func (msg *MsgSellData) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.SellerAddress)
 	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid seller address (%s)", err)
+	}
+
+	if msg.DealId == 0 {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "empty deal ID")
 	}
 
 	if len(msg.VerifiableCid) == 0 {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "empty sellerCID")
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "empty verifiableCID")
 	}
 
 	return nil
