@@ -8,10 +8,12 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 )
 
+const NonceSize = 12
+
 func NewDeal(dealID uint64, msg *MsgCreateDeal) *Deal {
 
 	dealAddress := NewDealAddress(dealID)
-
+	nonce := make([]byte, 12)
 	return &Deal{
 		Id:           dealID,
 		Address:      dealAddress.String(),
@@ -21,6 +23,7 @@ func NewDeal(dealID uint64, msg *MsgCreateDeal) *Deal {
 		CurNumData:   0,
 		BuyerAddress: msg.BuyerAddress,
 		Status:       DEAL_STATUS_ACTIVE,
+		Nonce:        nonce,
 	}
 }
 
@@ -51,8 +54,18 @@ func (m Deal) ValidateBasic() error {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "budget is not a valid Coin object")
 	}
 
+	if m.CurNumData <= 0 {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "CurNumData should be bigger than 0")
+	}
+
 	if m.CurNumData > m.MaxNumData {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "CurNumData can not be bigger than MaxNumData")
+	}
+
+	if len(m.Nonce) == 0 {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "nonce is empty")
+	} else if len(m.Nonce) != NonceSize {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "nonce length must be %v", NonceSize)
 	}
 
 	return nil

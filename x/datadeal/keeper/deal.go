@@ -36,7 +36,7 @@ func (k Keeper) CreateDeal(ctx sdk.Context, buyerAddress sdk.AccAddress, msg *ty
 		authtypes.NewBaseAccountWithAddress(
 			dealAddress,
 		),
-		strconv.FormatUint(newDeal.Id, 10)),
+		"deal"+strconv.FormatUint(newDeal.Id, 10)),
 	)
 	k.accountKeeper.SetAccount(ctx, acc)
 
