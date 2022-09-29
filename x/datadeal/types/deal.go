@@ -54,10 +54,6 @@ func (m Deal) ValidateBasic() error {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "budget is not a valid Coin object")
 	}
 
-	if m.CurNumData < 0 {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "CurNumData should be bigger than 0")
-	}
-
 	if m.CurNumData > m.MaxNumData {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "CurNumData can not be bigger than MaxNumData")
 	}
