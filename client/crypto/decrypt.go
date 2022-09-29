@@ -15,6 +15,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	datadealkeeper "github.com/medibloc/panacea-core/v2/x/datadeal/keeper"
 	oraclekeeper "github.com/medibloc/panacea-core/v2/x/oracle/keeper"
 	"github.com/spf13/cobra"
 	"github.com/tendermint/tendermint/libs/cli"
@@ -96,8 +97,12 @@ func Decrypt(clientCtx client.Context, cmd *cobra.Command, filePath, keyName str
 		return nil, err
 	}
 
-	//TODO: Nonce will be implemented after CreateDeal merged
-	decryptedData, err := decryptWithAES256(sharedKey, nil, encryptedData)
+	deal, err := datadealkeeper.Keeper{}.GetDeal(ctx, dealID)
+	if err != nil {
+		return nil, err
+	}
+
+	decryptedData, err := decryptWithAES256(sharedKey, deal.Nonce, encryptedData)
 	if err != nil {
 		return nil, err
 	}
