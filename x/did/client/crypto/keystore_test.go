@@ -32,7 +32,7 @@ func (suite keyStoreTestSuite) AfterTest(_, _ string) {
 	suite.Require().NoError(err)
 }
 
-// Check if the keystore can crypto a JSON provided by Web3 Secret Storage Definition
+// Check if the keystore can decrypt a JSON provided by Web3 Secret Storage Definition
 // https://github.com/ethereum/wiki/wiki/Web3-Secret-Storage-Definition#test-vectors
 func (suite keyStoreTestSuite) TestKeyStore_DecryptWeb3() {
 	ks := newKeyStore(suite)

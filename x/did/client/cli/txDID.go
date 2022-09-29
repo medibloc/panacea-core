@@ -304,7 +304,7 @@ func readDIDDocFrom(path string) (types.DIDDocument, error) {
 
 // getPrivKeyFromKeyStore loads a privKey using a password which is read from the reader.
 func getPrivKeyFromKeyStore(verificationMethodID string, reader *bufio.Reader) (secp256k1.PrivKey, error) {
-	passwd, err := input.GetPassword("Enter a password to crypto your key for DID on disk:", reader)
+	passwd, err := input.GetPassword("Enter a password to decrypt your key for DID on disk:", reader)
 	if err != nil {
 		return secp256k1.PrivKey{}, err
 	}
