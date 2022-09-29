@@ -23,7 +23,7 @@ const (
 
 func Command(defaultNodeHome string) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "crypto-data [file-path] [dealID] [key-name]",
+		Use:   "decrypt-data [file-path] [dealID] [key-name]",
 		Short: "Decrypt and output the data file encrypted with shared key which consists of oracle public key and buyer private key.",
 		Long: `This command can decrypt encrypted data with shared key which consists of oracle public key and buyer private key.
 				And your key should be stored in the localStore.
@@ -32,40 +32,8 @@ func Command(defaultNodeHome string) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 
-			privKeyHex, err := keyring.NewUnsafe(clientCtx.Keyring).UnsafeExportPrivKeyHex(args[3])
-			if err != nil {
-				return err
-			}
-
-			privKeyBz, err := hex.DecodeString(privKeyHex)
-			if err != nil {
-				return err
-			}
-
-			buyerPrivKey, _ := btcec.PrivKeyFromBytes(btcec.S256(), privKeyBz)
-
-			ctx := sdk.UnwrapSDKContext(cmd.Context())
-			params := oraclekeeper.Keeper{}.GetParams(ctx)
-
-			pubKeybz, err := base64.StdEncoding.DecodeString(params.OraclePublicKey)
-			if err != nil {
-				return err
-			}
-
-			oraclePubkey, err := btcec.ParsePubKey(pubKeybz, btcec.S256())
-			if err != nil {
-				return nil
-			}
-
-			sharedKey := crypto.DeriveSharedKey(buyerPrivKey, oraclePubkey, crypto.KDFSHA256)
-
-			encryptedData, err := ioutil.ReadFile(args[0])
-			if err != nil {
-				return err
-			}
-
-			//TODO: Nonce will be implemented after CreateDeal merged
-			decryptedData, err := crypto.DecryptWithAES256(sharedKey, nil, encryptedData)
+			//TODO: args[1] will be used for getting a deal's nonce
+			decryptedData, err := Decrypt(clientCtx, cmd, args[0], args[3])
 			if err != nil {
 				return err
 			}
@@ -84,4 +52,46 @@ func Command(defaultNodeHome string) *cobra.Command {
 	cmd.Flags().String(FlagCipherTextPath, "", "Path to the file where the cipher text in the form of a byte array is stored")
 
 	return cmd
+}
+
+func Decrypt(clientCtx client.Context, cmd *cobra.Command, filePath, keyName string) ([]byte, error) {
+	privKeyHex, err := keyring.NewUnsafe(clientCtx.Keyring).UnsafeExportPrivKeyHex(keyName)
+	if err != nil {
+		return nil, err
+	}
+
+	privKeyBz, err := hex.DecodeString(privKeyHex)
+	if err != nil {
+		return nil, err
+	}
+
+	buyerPrivKey, _ := btcec.PrivKeyFromBytes(btcec.S256(), privKeyBz)
+
+	ctx := sdk.UnwrapSDKContext(cmd.Context())
+	params := oraclekeeper.Keeper{}.GetParams(ctx)
+
+	pubKeybz, err := base64.StdEncoding.DecodeString(params.OraclePublicKey)
+	if err != nil {
+		return nil, err
+	}
+
+	oraclePubkey, err := btcec.ParsePubKey(pubKeybz, btcec.S256())
+	if err != nil {
+		return nil, err
+	}
+
+	sharedKey := crypto.DeriveSharedKey(buyerPrivKey, oraclePubkey, crypto.KDFSHA256)
+
+	encryptedData, err := ioutil.ReadFile(filePath)
+	if err != nil {
+		return nil, err
+	}
+
+	//TODO: Nonce will be implemented after CreateDeal merged
+	decryptedData, err := crypto.DecryptWithAES256(sharedKey, nil, encryptedData)
+	if err != nil {
+		return nil, err
+	}
+
+	return decryptedData, nil
 }
