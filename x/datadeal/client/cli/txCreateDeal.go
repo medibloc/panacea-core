@@ -13,7 +13,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-
 func CmdCreateDeal() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "create-deal [deal-file-path]",
