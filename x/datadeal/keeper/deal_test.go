@@ -2,8 +2,6 @@ package keeper_test
 
 import (
 	"sort"
-	"time"
-
 	"testing"
 
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
@@ -72,22 +70,6 @@ func (suite *dealTestSuite) BeforeTest(_, _ string) {
 	})
 }
 
-func (suite dealTestSuite) makeNewDataSale(verifiableCID string) *types.DataSale {
-	return &types.DataSale{
-		SellerAddress: suite.sellerAccAddr.String(),
-		DealId:        1,
-		VerifiableCid: verifiableCID,
-		DeliveredCid:  "",
-		Status:        types.DATA_SALE_STATUS_VERIFICATION_VOTING_PERIOD,
-		VotingPeriod: &oracletypes.VotingPeriod{
-			VotingStartTime: time.Now(),
-			VotingEndTime:   time.Now().Add(5 * time.Second),
-		},
-		VerificationTallyResult: nil,
-		DeliveryTallyResult:     nil,
-	}
-}
-
 func (suite *dealTestSuite) TestCreateNewDeal() {
 
 	err := suite.FundAccount(suite.Ctx, suite.buyerAccAddr, suite.defaultFunds)
@@ -121,7 +103,7 @@ func (suite *dealTestSuite) TestCreateNewDeal() {
 	suite.Require().Equal(deal.GetStatus(), types.DEAL_STATUS_ACTIVE)
 }
 
-//TODO: The test will be complemented when CreateDeal and VoteDataSale done.
+//TODO: The test will be complemented when VoteDataSale done.
 func (suite dealTestSuite) TestSellDataSuccess() {
 	msgSellData := &types.MsgSellData{
 		DealId:        1,
@@ -143,7 +125,7 @@ func (suite dealTestSuite) TestSellDataSuccess() {
 }
 
 func (suite dealTestSuite) TestSellDataStatusFailed() {
-	newDataSale := suite.makeNewDataSale(suite.verifiableCID1)
+	newDataSale := suite.MakeNewDataSale(suite.sellerAccAddr, suite.verifiableCID1)
 
 	newDataSale.Status = types.DATA_SALE_STATUS_FAILED
 
@@ -161,7 +143,7 @@ func (suite dealTestSuite) TestSellDataStatusFailed() {
 }
 
 func (suite dealTestSuite) TestSellDataStatusVotingPeriod() {
-	newDataSale := suite.makeNewDataSale(suite.verifiableCID1)
+	newDataSale := suite.MakeNewDataSale(suite.sellerAccAddr, suite.verifiableCID1)
 	newDataSale.Status = types.DATA_SALE_STATUS_VERIFICATION_VOTING_PERIOD
 
 	err := suite.DataDealKeeper.SetDataSale(suite.Ctx, newDataSale)
@@ -178,7 +160,7 @@ func (suite dealTestSuite) TestSellDataStatusVotingPeriod() {
 }
 
 func (suite dealTestSuite) TestSellDataStatusCompleted() {
-	newDataSale := suite.makeNewDataSale(suite.verifiableCID1)
+	newDataSale := suite.MakeNewDataSale(suite.sellerAccAddr, suite.verifiableCID1)
 	newDataSale.Status = types.DATA_SALE_STATUS_COMPLETED
 
 	err := suite.DataDealKeeper.SetDataSale(suite.Ctx, newDataSale)
@@ -194,6 +176,42 @@ func (suite dealTestSuite) TestSellDataStatusCompleted() {
 	suite.Require().Error(err, types.ErrSellData)
 }
 
+func (suite dealTestSuite) TestSellDataDealNotExists() {
+	msgSellData := &types.MsgSellData{
+		DealId:        2,
+		VerifiableCid: suite.verifiableCID1,
+		SellerAddress: suite.sellerAccAddr.String(),
+	}
+
+	err := suite.DataDealKeeper.SellData(suite.Ctx, msgSellData)
+	suite.Require().Error(err, types.ErrSellData)
+}
+
+func (suite dealTestSuite) TestSellDataDealStatusNotActive() {
+	msgSellData := &types.MsgSellData{
+		DealId:        1,
+		VerifiableCid: suite.verifiableCID1,
+		SellerAddress: suite.sellerAccAddr.String(),
+	}
+
+	deal, err := suite.DataDealKeeper.GetDeal(suite.Ctx, msgSellData.DealId)
+	suite.Require().NoError(err)
+
+	deal.Status = types.DEAL_STATUS_INACTIVE
+	err = suite.DataDealKeeper.SetDeal(suite.Ctx, deal)
+	suite.Require().NoError(err)
+
+	err = suite.DataDealKeeper.SellData(suite.Ctx, msgSellData)
+	suite.Require().Error(err, types.ErrSellData)
+
+	deal.Status = types.DEAL_STATUS_COMPLETED
+	err = suite.DataDealKeeper.SetDeal(suite.Ctx, deal)
+	suite.Require().NoError(err)
+
+	err = suite.DataDealKeeper.SellData(suite.Ctx, msgSellData)
+	suite.Require().Error(err, types.ErrSellData)
+}
+
 func (suite dealTestSuite) TestGetAllDataSalesList() {
 	type dataSaleKey struct {
 		verifiableCID string
@@ -201,17 +219,17 @@ func (suite dealTestSuite) TestGetAllDataSalesList() {
 	}
 	dataSaleKeys := make([]dataSaleKey, 0)
 
-	dataSale1 := suite.makeNewDataSale(suite.verifiableCID1)
+	dataSale1 := suite.MakeNewDataSale(suite.sellerAccAddr, suite.verifiableCID1)
 	err := suite.DataDealKeeper.SetDataSale(suite.Ctx, dataSale1)
 	suite.Require().NoError(err)
 	dataSaleKeys = append(dataSaleKeys, dataSaleKey{dataSale1.VerifiableCid, dataSale1.DealId})
 
-	dataSale2 := suite.makeNewDataSale(suite.verifiableCID2)
+	dataSale2 := suite.MakeNewDataSale(suite.sellerAccAddr, suite.verifiableCID2)
 	err = suite.DataDealKeeper.SetDataSale(suite.Ctx, dataSale2)
 	suite.Require().NoError(err)
 	dataSaleKeys = append(dataSaleKeys, dataSaleKey{dataSale2.VerifiableCid, dataSale2.DealId})
 
-	dataSale3 := suite.makeNewDataSale(suite.verifiableCID3)
+	dataSale3 := suite.MakeNewDataSale(suite.sellerAccAddr, suite.verifiableCID3)
 	err = suite.DataDealKeeper.SetDataSale(suite.Ctx, dataSale3)
 	suite.Require().NoError(err)
 	dataSaleKeys = append(dataSaleKeys, dataSaleKey{dataSale3.VerifiableCid, dataSale3.DealId})
