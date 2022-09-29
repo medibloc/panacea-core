@@ -2,24 +2,23 @@ package keeper_test
 
 import (
 	"testing"
-	"time"
 
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/medibloc/panacea-core/v2/x/datadeal/testutil"
 	"github.com/medibloc/panacea-core/v2/x/datadeal/types"
-	oracletypes "github.com/medibloc/panacea-core/v2/x/oracle/types"
 	"github.com/stretchr/testify/suite"
 )
 
 type queryDealTestSuite struct {
 	testutil.DataDealBaseTestSuite
-	acc1 sdk.AccAddress
 
 	sellerAccPrivKey cryptotypes.PrivKey
 	sellerAccPubKey  cryptotypes.PubKey
 	sellerAccAddr    sdk.AccAddress
+
+	buyerAccAddr sdk.AccAddress
 
 	verifiableCID string
 }
@@ -30,7 +29,7 @@ func TestQueryDealTest(t *testing.T) {
 
 func (suite *queryDealTestSuite) BeforeTest(_, _ string) {
 
-	suite.acc1 = sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address())
+	suite.buyerAccAddr = sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address())
 
 	suite.verifiableCID = "verifiableCID"
 
@@ -40,7 +39,7 @@ func (suite *queryDealTestSuite) BeforeTest(_, _ string) {
 }
 
 func (suite *queryDealTestSuite) TestQueryDeal() {
-	deal := suite.MakeTestDeal(1, suite.acc1)
+	deal := suite.MakeTestDeal(1, suite.buyerAccAddr)
 	err := suite.DataDealKeeper.SetDeal(suite.Ctx, deal)
 	suite.Require().NoError(err)
 	err = suite.DataDealKeeper.SetNextDealNumber(suite.Ctx, 2)
@@ -57,15 +56,15 @@ func (suite *queryDealTestSuite) TestQueryDeal() {
 
 func (suite queryDealTestSuite) TestQueryDeals() {
 	// set deals
-	deal1 := suite.MakeTestDeal(1, suite.acc1)
+	deal1 := suite.MakeTestDeal(1, suite.buyerAccAddr)
 	err := suite.DataDealKeeper.SetDeal(suite.Ctx, deal1)
 	suite.Require().NoError(err)
 
-	deal2 := suite.MakeTestDeal(2, suite.acc1)
+	deal2 := suite.MakeTestDeal(2, suite.buyerAccAddr)
 	err = suite.DataDealKeeper.SetDeal(suite.Ctx, deal2)
 	suite.Require().NoError(err)
 
-	deal3 := suite.MakeTestDeal(3, suite.acc1)
+	deal3 := suite.MakeTestDeal(3, suite.buyerAccAddr)
 	err = suite.DataDealKeeper.SetDeal(suite.Ctx, deal3)
 	suite.Require().NoError(err)
 
@@ -79,24 +78,8 @@ func (suite queryDealTestSuite) TestQueryDeals() {
 	suite.Require().Equal(res.Deal[2].Address, deal3.Address)
 }
 
-func (suite queryDealTestSuite) makeNewDataSale() *types.DataSale {
-	return &types.DataSale{
-		SellerAddress: suite.sellerAccAddr.String(),
-		DealId:        1,
-		VerifiableCid: suite.verifiableCID,
-		DeliveredCid:  "",
-		Status:        types.DATA_SALE_STATUS_VERIFICATION_VOTING_PERIOD,
-		VotingPeriod: &oracletypes.VotingPeriod{
-			VotingStartTime: time.Now(),
-			VotingEndTime:   time.Now().Add(5 * time.Second),
-		},
-		VerificationTallyResult: nil,
-		DeliveryTallyResult:     nil,
-	}
-}
-
 func (suite queryDealTestSuite) TestDataSale() {
-	newDataSale := suite.makeNewDataSale()
+	newDataSale := suite.MakeNewDataSale(suite.sellerAccAddr, suite.verifiableCID)
 	err := suite.DataDealKeeper.SetDataSale(suite.Ctx, newDataSale)
 	suite.Require().NoError(err)
 

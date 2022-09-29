@@ -14,7 +14,7 @@ import (
 
 type genesisTestSuite struct {
 	testutil.DataDealBaseTestSuite
-	acc1         sdk.AccAddress
+	buyerAccAddr sdk.AccAddress
 	defaultFunds sdk.Coins
 }
 
@@ -24,13 +24,13 @@ func TestGenesisTestSuite(t *testing.T) {
 
 func (suite *genesisTestSuite) BeforeTest(_, _ string) {
 
-	suite.acc1 = sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address())
+	suite.buyerAccAddr = sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address())
 	suite.defaultFunds = sdk.NewCoins(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(10000000000)))
 }
 
 func (suite *genesisTestSuite) TestInitGenesis() {
-	deal1 := suite.MakeTestDeal(1, suite.acc1)
-	deal2 := suite.MakeTestDeal(2, suite.acc1)
+	deal1 := suite.MakeTestDeal(1, suite.buyerAccAddr)
+	deal2 := suite.MakeTestDeal(2, suite.buyerAccAddr)
 
 	genesis := types.GenesisState{
 		Deals:          []types.Deal{deal1, deal2},
@@ -50,8 +50,8 @@ func (suite *genesisTestSuite) TestInitGenesis() {
 }
 
 func (suite *genesisTestSuite) TestExportGenesis() {
-	deal1 := suite.MakeTestDeal(1, suite.acc1)
-	deal2 := suite.MakeTestDeal(2, suite.acc1)
+	deal1 := suite.MakeTestDeal(1, suite.buyerAccAddr)
+	deal2 := suite.MakeTestDeal(2, suite.buyerAccAddr)
 
 	genesis := types.GenesisState{
 		Deals:          []types.Deal{deal1},
@@ -67,10 +67,10 @@ func (suite *genesisTestSuite) TestExportGenesis() {
 
 	datadeal.InitGenesis(suite.Ctx, suite.DataDealKeeper, genesis)
 
-	err := suite.FundAccount(suite.Ctx, suite.acc1, suite.defaultFunds)
+	err := suite.FundAccount(suite.Ctx, suite.buyerAccAddr, suite.defaultFunds)
 	suite.Require().NoError(err)
 
-	_, err = suite.DataDealKeeper.CreateDeal(suite.Ctx, suite.acc1, msgCreateDeal)
+	_, err = suite.DataDealKeeper.CreateDeal(suite.Ctx, suite.buyerAccAddr, msgCreateDeal)
 	suite.Require().NoError(err)
 
 	genesisStatus := datadeal.ExportGenesis(suite.Ctx, suite.DataDealKeeper)

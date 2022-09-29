@@ -1,10 +1,13 @@
 package testutil
 
 import (
+	"time"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/medibloc/panacea-core/v2/types/assets"
 	"github.com/medibloc/panacea-core/v2/types/testsuite"
 	"github.com/medibloc/panacea-core/v2/x/datadeal/types"
+	oracletypes "github.com/medibloc/panacea-core/v2/x/oracle/types"
 )
 
 type DataDealBaseTestSuite struct {
@@ -21,5 +24,21 @@ func (suite *DataDealBaseTestSuite) MakeTestDeal(dealID uint64, buyerAddr sdk.Ac
 		CurNumData:   0,
 		BuyerAddress: buyerAddr.String(),
 		Status:       types.DEAL_STATUS_ACTIVE,
+	}
+}
+
+func (suite *DataDealBaseTestSuite) MakeNewDataSale(sellerAddr sdk.AccAddress, verifiableCID string) *types.DataSale {
+	return &types.DataSale{
+		SellerAddress: sellerAddr.String(),
+		DealId:        1,
+		VerifiableCid: verifiableCID,
+		DeliveredCid:  "",
+		Status:        types.DATA_SALE_STATUS_VERIFICATION_VOTING_PERIOD,
+		VotingPeriod: &oracletypes.VotingPeriod{
+			VotingStartTime: time.Now(),
+			VotingEndTime:   time.Now().Add(5 * time.Second),
+		},
+		VerificationTallyResult: nil,
+		DeliveryTallyResult:     nil,
 	}
 }

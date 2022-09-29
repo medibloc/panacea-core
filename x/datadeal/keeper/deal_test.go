@@ -2,7 +2,6 @@ package keeper_test
 
 import (
 	"testing"
-	"time"
 
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
@@ -16,12 +15,14 @@ import (
 
 type dealTestSuite struct {
 	testutil.DataDealBaseTestSuite
-	acc1         sdk.AccAddress
+
 	defaultFunds sdk.Coins
 
 	sellerAccPrivKey cryptotypes.PrivKey
 	sellerAccPubKey  cryptotypes.PubKey
 	sellerAccAddr    sdk.AccAddress
+
+	buyerAccAddr sdk.AccAddress
 
 	verifiableCID string
 }
@@ -33,10 +34,10 @@ func TestDealTestSuite(t *testing.T) {
 func (suite *dealTestSuite) BeforeTest(_, _ string) {
 	suite.verifiableCID = "verifiableCID"
 
-	suite.acc1 = sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address())
+	suite.buyerAccAddr = sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address())
 	suite.defaultFunds = sdk.NewCoins(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(10000000000)))
 
-	testDeal := suite.MakeTestDeal(1, suite.acc1)
+	testDeal := suite.MakeTestDeal(1, suite.buyerAccAddr)
 	err := suite.DataDealKeeper.SetNextDealNumber(suite.Ctx, 2)
 	suite.Require().NoError(err)
 	err = suite.DataDealKeeper.SetDeal(suite.Ctx, testDeal)
@@ -62,25 +63,9 @@ func (suite *dealTestSuite) BeforeTest(_, _ string) {
 	})
 }
 
-func (suite dealTestSuite) makeNewDataSale() *types.DataSale {
-	return &types.DataSale{
-		SellerAddress: suite.sellerAccAddr.String(),
-		DealId:        1,
-		VerifiableCid: suite.verifiableCID,
-		DeliveredCid:  "",
-		Status:        types.DATA_SALE_STATUS_VERIFICATION_VOTING_PERIOD,
-		VotingPeriod: &oracletypes.VotingPeriod{
-			VotingStartTime: time.Now(),
-			VotingEndTime:   time.Now().Add(5 * time.Second),
-		},
-		VerificationTallyResult: nil,
-		DeliveryTallyResult:     nil,
-	}
-}
-
 func (suite *dealTestSuite) TestCreateNewDeal() {
 
-	err := suite.FundAccount(suite.Ctx, suite.acc1, suite.defaultFunds)
+	err := suite.FundAccount(suite.Ctx, suite.buyerAccAddr, suite.defaultFunds)
 	suite.Require().NoError(err)
 
 	budget := &sdk.Coin{Denom: assets.MicroMedDenom, Amount: sdk.NewInt(10000000)}
@@ -89,7 +74,7 @@ func (suite *dealTestSuite) TestCreateNewDeal() {
 		DataSchema:   []string{"http://jsonld.com"},
 		Budget:       budget,
 		MaxNumData:   10000,
-		BuyerAddress: suite.acc1.String(),
+		BuyerAddress: suite.buyerAccAddr.String(),
 	}
 
 	buyer, err := sdk.AccAddressFromBech32(msgCreateDeal.BuyerAddress)
@@ -133,7 +118,7 @@ func (suite dealTestSuite) TestSellDataSuccess() {
 }
 
 func (suite dealTestSuite) TestSellDataStatusFailed() {
-	newDataSale := suite.makeNewDataSale()
+	newDataSale := suite.MakeNewDataSale(suite.sellerAccAddr, suite.verifiableCID)
 	newDataSale.Status = types.DATA_SALE_STATUS_FAILED
 
 	err := suite.DataDealKeeper.SetDataSale(suite.Ctx, newDataSale)
@@ -150,7 +135,7 @@ func (suite dealTestSuite) TestSellDataStatusFailed() {
 }
 
 func (suite dealTestSuite) TestSellDataStatusVotingPeriod() {
-	newDataSale := suite.makeNewDataSale()
+	newDataSale := suite.MakeNewDataSale(suite.sellerAccAddr, suite.verifiableCID)
 	newDataSale.Status = types.DATA_SALE_STATUS_VERIFICATION_VOTING_PERIOD
 
 	err := suite.DataDealKeeper.SetDataSale(suite.Ctx, newDataSale)
@@ -167,7 +152,7 @@ func (suite dealTestSuite) TestSellDataStatusVotingPeriod() {
 }
 
 func (suite dealTestSuite) TestSellDataStatusCompleted() {
-	newDataSale := suite.makeNewDataSale()
+	newDataSale := suite.MakeNewDataSale(suite.sellerAccAddr, suite.verifiableCID)
 	newDataSale.Status = types.DATA_SALE_STATUS_COMPLETED
 
 	err := suite.DataDealKeeper.SetDataSale(suite.Ctx, newDataSale)
