@@ -5,12 +5,12 @@ import (
 	"time"
 
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/medibloc/panacea-core/v2/x/datadeal/testutil"
 	"github.com/medibloc/panacea-core/v2/x/datadeal/types"
-	"github.com/stretchr/testify/suite"
 	oracletypes "github.com/medibloc/panacea-core/v2/x/oracle/types"
+	"github.com/stretchr/testify/suite"
 )
 
 type queryDealTestSuite struct {
@@ -22,7 +22,6 @@ type queryDealTestSuite struct {
 	sellerAccAddr    sdk.AccAddress
 
 	verifiableCID string
-
 }
 
 func TestQueryDealTest(t *testing.T) {
