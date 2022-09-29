@@ -23,7 +23,7 @@ const (
 
 func Command(defaultNodeHome string) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "decrypt-data [file-path] [dealID] [key-name]",
+		Use:   "decrypt-data [file-path] [key-name] [dealID]",
 		Short: "Decrypt and output the data file encrypted with shared key which consists of oracle public key and buyer private key.",
 		Long: `This command can decrypt encrypted data with shared key which consists of oracle public key and buyer private key.
 				And your key should be stored in the localStore.
@@ -33,7 +33,7 @@ func Command(defaultNodeHome string) *cobra.Command {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 
 			//TODO: args[1] will be used for getting a deal's nonce
-			decryptedData, err := Decrypt(clientCtx, cmd, args[0], args[3])
+			decryptedData, err := Decrypt(clientCtx, cmd, args[0], args[1])
 			if err != nil {
 				return err
 			}
