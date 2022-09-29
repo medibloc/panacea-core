@@ -14,10 +14,12 @@ import (
 
 type (
 	Keeper struct {
-		cdc          codec.Codec
-		storeKey     sdk.StoreKey
-		memKey       sdk.StoreKey
-		oracleKeeper oraclekeeper.Keeper
+		cdc           codec.Codec
+		storeKey      sdk.StoreKey
+		memKey        sdk.StoreKey
+		oracleKeeper  oraclekeeper.Keeper
+		accountKeeper types.AccountKeeper
+		bankKeeper    types.BankKeeper
 	}
 )
 
@@ -26,12 +28,17 @@ func NewKeeper(
 	storeKey,
 	memKey sdk.StoreKey,
 	oracleKeeper oraclekeeper.Keeper,
+	accountKeeper types.AccountKeeper,
+	bankKeeper types.BankKeeper,
+
 ) *Keeper {
 	return &Keeper{
-		cdc:          cdc,
-		storeKey:     storeKey,
-		memKey:       memKey,
-		oracleKeeper: oracleKeeper,
+		cdc:           cdc,
+		storeKey:      storeKey,
+		memKey:        memKey,
+		oracleKeeper:  oracleKeeper,
+		accountKeeper: accountKeeper,
+		bankKeeper:    bankKeeper,
 	}
 }
 

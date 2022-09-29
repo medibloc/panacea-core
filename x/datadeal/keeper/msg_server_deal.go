@@ -8,8 +8,20 @@ import (
 )
 
 // CreateDeal defines a method for creating a deal.
-func (k Keeper) CreateDeal(goCtx context.Context, msg *types.MsgCreateDeal) (*types.MsgCreateDealResponse, error) {
-	panic("implements me")
+func (m msgServer) CreateDeal(goCtx context.Context, msg *types.MsgCreateDeal) (*types.MsgCreateDealResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	buyer, err := sdk.AccAddressFromBech32(msg.BuyerAddress)
+	if err != nil {
+		return nil, err
+	}
+	newDealID, err := m.Keeper.CreateDeal(ctx, buyer, msg)
+	if err != nil {
+		return nil, err
+	}
+
+	return &types.MsgCreateDealResponse{DealId: newDealID}, nil
+
 }
 
 // SellData defines a method for selling a data.
