@@ -8,6 +8,8 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 )
 
+const NonceSize = 12
+
 func NewDeal(dealID uint64, msg *MsgCreateDeal) *Deal {
 
 	dealAddress := NewDealAddress(dealID)
@@ -21,6 +23,7 @@ func NewDeal(dealID uint64, msg *MsgCreateDeal) *Deal {
 		CurNumData:   0,
 		BuyerAddress: msg.BuyerAddress,
 		Status:       DEAL_STATUS_ACTIVE,
+		Nonce:        msg.Nonce,
 	}
 }
 
@@ -53,6 +56,12 @@ func (m Deal) ValidateBasic() error {
 
 	if m.CurNumData > m.MaxNumData {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "CurNumData can not be bigger than MaxNumData")
+	}
+
+	if len(m.Nonce) == 0 {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "nonce is empty")
+	} else if len(m.Nonce) != NonceSize {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "nonce length must be %v", NonceSize)
 	}
 
 	return nil
