@@ -55,7 +55,7 @@ func newCreateDealMsg(file string) (sdk.Msg, error) {
 		return nil, err
 	}
 
-	nonce := make([]byte, 12)
+	nonce := make([]byte, types.NonceSize)
 	_, err = io.ReadFull(rand.Reader, nonce)
 	if err != nil {
 		return nil, err
