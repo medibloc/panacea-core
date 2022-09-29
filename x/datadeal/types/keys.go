@@ -32,7 +32,7 @@ var (
 
 	KeyIndexSeparator = []byte{0xFF}
 
-	DataSaleKey = []byte{0x02}
+	DataSaleKey = []byte{0x03}
 )
 
 func GetDealKey(dealID uint64) []byte {
