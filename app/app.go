@@ -475,6 +475,8 @@ func New(
 		keys[datadealtypes.StoreKey],
 		keys[datadealtypes.MemStoreKey],
 		app.oracleKeeper,
+		app.AccountKeeper,
+		app.BankKeeper,
 	)
 
 	// The gov proposal types can be individually enabled
