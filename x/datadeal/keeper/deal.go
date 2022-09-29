@@ -74,7 +74,7 @@ func (k Keeper) GetNextDealNumber(ctx sdk.Context) (uint64, error) {
 	val := gogotypes.UInt64Value{}
 
 	if err := k.cdc.UnmarshalLengthPrefixed(bz, &val); err != nil {
-		return 0, err
+		return 0, sdkerrors.Wrapf(err, "Failed to get next deal number")
 	}
 
 	dealNumber = val.GetValue()
