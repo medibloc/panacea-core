@@ -176,6 +176,35 @@ func (suite dealTestSuite) TestSellDataStatusCompleted() {
 	suite.Require().Error(err, types.ErrSellData)
 }
 
+func (suite dealTestSuite) TestSellDataDealNotExists() {
+	msgSellData := &types.MsgSellData{
+		DealId:        2,
+		VerifiableCid: suite.verifiableCID1,
+		SellerAddress: suite.sellerAccAddr.String(),
+	}
+
+	err := suite.DataDealKeeper.SellData(suite.Ctx, msgSellData)
+	suite.Require().Error(err, types.ErrSellData)
+}
+
+func (suite dealTestSuite) TestSellDataDealStatusInactive() {
+	msgSellData := &types.MsgSellData{
+		DealId:        1,
+		VerifiableCid: suite.verifiableCID1,
+		SellerAddress: suite.sellerAccAddr.String(),
+	}
+
+	deal, err := suite.DataDealKeeper.GetDeal(suite.Ctx, msgSellData.DealId)
+	suite.Require().NoError(err)
+
+	deal.Status = types.DEAL_STATUS_INACTIVE
+	err = suite.DataDealKeeper.SetDeal(suite.Ctx, deal)
+	suite.Require().NoError(err)
+
+	err = suite.DataDealKeeper.SellData(suite.Ctx, msgSellData)
+	suite.Require().Error(err, types.ErrSellData)
+}
+
 func (suite dealTestSuite) TestGetAllDataSalesList() {
 	type dataSaleKey struct {
 		verifiableCID string

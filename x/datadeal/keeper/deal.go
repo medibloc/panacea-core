@@ -149,8 +149,6 @@ func (k Keeper) SellData(ctx sdk.Context, msg *types.MsgSellData) error {
 		return err
 	}
 
-	//TODO: Check the Deal which seller want to sell data to the deal exists
-	//k.GetDeal()
 	deal, err := k.GetDeal(ctx, msg.DealId)
 	if err != nil {
 		return sdkerrors.Wrapf(types.ErrSellData, err.Error())
