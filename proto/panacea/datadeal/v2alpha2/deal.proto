@@ -16,6 +16,7 @@ message Deal {
   uint64 cur_num_data = 6;
   string buyer_address = 7;
   DealStatus status = 8;
+  bytes nonce = 9;
 }
 
 // DealStatus enumerates the status of deal.

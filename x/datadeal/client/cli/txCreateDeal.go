@@ -1,8 +1,10 @@
 package cli
 
 import (
+	"crypto/rand"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 
 	"github.com/cosmos/cosmos-sdk/client"
@@ -52,6 +54,13 @@ func newCreateDealMsg(file string) (sdk.Msg, error) {
 	if err := json.Unmarshal(contents, &msg); err != nil {
 		return nil, err
 	}
+
+	nonce := make([]byte, types.NonceSize)
+	_, err = io.ReadFull(rand.Reader, nonce)
+	if err != nil {
+		return nil, err
+	}
+	msg.Nonce = nonce
 
 	return msg, nil
 }
