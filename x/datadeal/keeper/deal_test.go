@@ -187,7 +187,7 @@ func (suite dealTestSuite) TestSellDataDealNotExists() {
 	suite.Require().Error(err, types.ErrSellData)
 }
 
-func (suite dealTestSuite) TestSellDataDealStatusInactive() {
+func (suite dealTestSuite) TestSellDataDealStatusNotActive() {
 	msgSellData := &types.MsgSellData{
 		DealId:        1,
 		VerifiableCid: suite.verifiableCID1,
@@ -198,6 +198,13 @@ func (suite dealTestSuite) TestSellDataDealStatusInactive() {
 	suite.Require().NoError(err)
 
 	deal.Status = types.DEAL_STATUS_INACTIVE
+	err = suite.DataDealKeeper.SetDeal(suite.Ctx, deal)
+	suite.Require().NoError(err)
+
+	err = suite.DataDealKeeper.SellData(suite.Ctx, msgSellData)
+	suite.Require().Error(err, types.ErrSellData)
+
+	deal.Status = types.DEAL_STATUS_COMPLETED
 	err = suite.DataDealKeeper.SetDeal(suite.Ctx, deal)
 	suite.Require().NoError(err)
 
