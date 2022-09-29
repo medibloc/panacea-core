@@ -33,6 +33,7 @@ message MsgCreateDeal {
   cosmos.base.v1beta1.Coin budget = 2;
   uint64 max_num_data = 3;
   string buyer_address = 4;
+  bytes nonce =5;
 }
 
 // MsgCreateDealResponse defines the Msg/CreateDeal response type.

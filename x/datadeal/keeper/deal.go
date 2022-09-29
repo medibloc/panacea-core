@@ -18,10 +18,7 @@ func (k Keeper) CreateDeal(ctx sdk.Context, buyerAddress sdk.AccAddress, msg *ty
 		return 0, sdkerrors.Wrapf(err, "failed to get next deal num")
 	}
 
-	newDeal, err := types.NewDeal(dealID, msg)
-	if err != nil {
-		return 0, sdkerrors.Wrapf(err, "failed to make new deal")
-	}
+	newDeal := types.NewDeal(dealID, msg)
 
 	coins := sdk.NewCoins(*msg.Budget)
 

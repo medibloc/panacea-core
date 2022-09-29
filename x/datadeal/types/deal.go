@@ -1,8 +1,6 @@
 package types
 
 import (
-	"crypto/rand"
-	"io"
 	"strconv"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -12,14 +10,9 @@ import (
 
 const NonceSize = 12
 
-func NewDeal(dealID uint64, msg *MsgCreateDeal) (*Deal, error) {
+func NewDeal(dealID uint64, msg *MsgCreateDeal) *Deal {
 
 	dealAddress := NewDealAddress(dealID)
-	nonce := make([]byte, 12)
-	_, err := io.ReadFull(rand.Reader, nonce)
-	if err != nil {
-		return nil, err
-	}
 
 	return &Deal{
 		Id:           dealID,
@@ -30,8 +23,8 @@ func NewDeal(dealID uint64, msg *MsgCreateDeal) (*Deal, error) {
 		CurNumData:   0,
 		BuyerAddress: msg.BuyerAddress,
 		Status:       DEAL_STATUS_ACTIVE,
-		Nonce:        nonce,
-	}, nil
+		Nonce:        msg.Nonce,
+	}
 }
 
 func NewDealAddress(dealID uint64) sdk.AccAddress {
