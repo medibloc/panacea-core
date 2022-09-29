@@ -151,6 +151,14 @@ func (k Keeper) SellData(ctx sdk.Context, msg *types.MsgSellData) error {
 
 	//TODO: Check the Deal which seller want to sell data to the deal exists
 	//k.GetDeal()
+	deal, err := k.GetDeal(ctx, msg.DealId)
+	if err != nil {
+		return sdkerrors.Wrapf(types.ErrSellData, err.Error())
+	}
+
+	if deal.Status == types.DEAL_STATUS_INACTIVE {
+		return sdkerrors.Wrapf(types.ErrSellData, "deal status is INACTIVE")
+	}
 
 	getDataSale, _ := k.GetDataSale(ctx, msg.VerifiableCid, msg.DealId)
 	if getDataSale != nil && getDataSale.Status != types.DATA_SALE_STATUS_FAILED {
