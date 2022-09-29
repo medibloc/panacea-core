@@ -148,7 +148,7 @@ func request_Query_DataSale_0(ctx context.Context, marshaler runtime.Marshaler, 
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "verifiable_cid")
 	}
 
-	protoReq.VerifiableCid, err = runtime.Bytes(val)
+	protoReq.VerifiableCid, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "verifiable_cid", err)
@@ -186,7 +186,7 @@ func local_request_Query_DataSale_0(ctx context.Context, marshaler runtime.Marsh
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "verifiable_cid")
 	}
 
-	protoReq.VerifiableCid, err = runtime.Bytes(val)
+	protoReq.VerifiableCid, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "verifiable_cid", err)

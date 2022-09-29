@@ -2,6 +2,7 @@ package cli
 
 import (
 	"fmt"
+
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/medibloc/panacea-core/v2/x/datadeal/types"
 	"github.com/spf13/cobra"
@@ -16,5 +17,9 @@ func GetTxCmd() *cobra.Command {
 		SuggestionsMinimumDistance: 2,
 		RunE:                       client.ValidateCmd,
 	}
+
+	cmd.AddCommand(CmdCreateDeal())
+	cmd.AddCommand(CmdSellData())
+
 	return cmd
 }

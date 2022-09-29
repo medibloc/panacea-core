@@ -23,5 +23,10 @@ func GetQueryCmd(queryRoute string) *cobra.Command {
 		SuggestionsMinimumDistance: 2,
 		RunE:                       client.ValidateCmd,
 	}
+
+	cmd.AddCommand(CmdGetDeals())
+	cmd.AddCommand(CmdGetDeal())
+	cmd.AddCommand(GetCmdDataSale())
+
 	return cmd
 }

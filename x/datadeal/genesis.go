@@ -9,10 +9,46 @@ import (
 // InitGenesis initializes the capability module's state from a provided genesis
 // state.
 func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) {
-	//panic("implements me")
+	for _, dataSale := range genState.DataSales {
+		if err := k.SetDataSale(ctx, &dataSale); err != nil {
+			panic(err)
+		}
+	}
+
+	if err := k.SetNextDealNumber(ctx, genState.NextDealNumber); err != nil {
+		panic(err)
+	}
+
+	for _, deal := range genState.Deals {
+		if err := k.SetDeal(ctx, deal); err != nil {
+			panic(err)
+		}
+	}
 }
 
 // ExportGenesis returns the capability module's exported genesis.
 func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
-	panic("implements me")
+	genesis := types.DefaultGenesis()
+
+	dataSales, err := k.GetAllDataSaleList(ctx)
+	if err != nil {
+		panic(err)
+	}
+
+	deals, err := k.GetAllDeals(ctx)
+	if err != nil {
+		panic(err)
+	}
+
+	genesis.DataSales = dataSales
+
+	nextDealNum, err := k.GetNextDealNumber(ctx)
+	if err != nil {
+		panic(err)
+	}
+
+	return &types.GenesisState{
+		Deals:          deals,
+		NextDealNumber: nextDealNum,
+	}
 }
