@@ -23,8 +23,8 @@ func KDFSHA256(in []byte) []byte {
 	return out[:]
 }
 
-// EncryptWithAES256 encrypts data using a AES256 cryptography.
-func EncryptWithAES256(secretKey, nonce, data []byte) ([]byte, error) {
+// Encrypt encrypts data using a AES256 cryptography.
+func Encrypt(secretKey, nonce, data []byte) ([]byte, error) {
 	if len(secretKey) != 32 {
 		return nil, fmt.Errorf("secret key is not for AES-256: total %d bits", 8*len(secretKey))
 	}
@@ -48,8 +48,8 @@ func EncryptWithAES256(secretKey, nonce, data []byte) ([]byte, error) {
 	return cipherText, nil
 }
 
-// DecryptWithAES256 decrypts data using a AES256 cryptography.
-func DecryptWithAES256(secretKey, nonce, ciphertext []byte) ([]byte, error) {
+// Decrypt decrypts data using a AES256 cryptography.
+func Decrypt(secretKey, nonce, ciphertext []byte) ([]byte, error) {
 	if len(secretKey) != 32 {
 		return nil, fmt.Errorf("secret key is not for AES-256: total %d bits", 8*len(secretKey))
 	}

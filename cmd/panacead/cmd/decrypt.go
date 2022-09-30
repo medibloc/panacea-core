@@ -106,7 +106,7 @@ func decrypt(clientCtx client.Context, keyName string, encryptedData []byte, ora
 
 	sharedKey := crypto.DeriveSharedKey(buyerPrivKey, oraclePubkey, crypto.KDFSHA256)
 
-	decryptedData, err := crypto.DecryptWithAES256(sharedKey, nonce, encryptedData)
+	decryptedData, err := crypto.Decrypt(sharedKey, nonce, encryptedData)
 	if err != nil {
 		return nil, err
 	}
