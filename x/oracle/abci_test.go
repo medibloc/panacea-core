@@ -56,6 +56,7 @@ func (suite *abciTestSuite) BeforeTest(_, _ string) {
 		OraclePublicKey:          base64.StdEncoding.EncodeToString(oraclePrivKey.PubKey().SerializeCompressed()),
 		OraclePubKeyRemoteReport: base64.StdEncoding.EncodeToString([]byte("oraclePubKeyRemoteReport")),
 		UniqueId:                 uniqueID,
+		OracleCommissionRate:     sdk.NewDecWithPrec(1, 1),
 		VoteParams: types.VoteParams{
 			VotingPeriod: 100,
 			JailPeriod:   60,
