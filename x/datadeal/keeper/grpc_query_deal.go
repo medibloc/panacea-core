@@ -67,3 +67,14 @@ func (k Keeper) DataSale(goCtx context.Context, req *types.QueryDataSaleRequest)
 		DataSale: dataSale,
 	}, nil
 }
+
+func (k Keeper) DataVerificationVOte(goCtx context.Context, req *types.QueryDataVerificationVoteRequest) (*types.QueryDataVerificationVoteResponse, error) {
+	dataVerificationVote, err := k.GetDataVerificationVote(sdk.UnwrapSDKContext(goCtx), req.VerifiableCid, req.VoterAddress, req.DealId)
+	if err != nil {
+		return nil, err
+	}
+
+	return &types.QueryDataVerificationVoteResponse{
+		DataVerificationVote: dataVerificationVote,
+	}, nil
+}

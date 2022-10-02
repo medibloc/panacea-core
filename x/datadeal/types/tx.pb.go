@@ -250,7 +250,7 @@ func (m *MsgSellDataResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgSellDataResponse proto.InternalMessageInfo
 
-// MsgVoteDataVerification defines the DataVerificationVote with signature.
+// MsgVoteDataVerification defines the Msg/VoteDataVerification request type.
 type MsgVoteDataVerification struct {
 	DataVerificationVote *DataVerificationVote `protobuf:"bytes,1,opt,name=data_verification_vote,json=dataVerificationVote,proto3" json:"data_verification_vote,omitempty"`
 	Signature            []byte                `protobuf:"bytes,2,opt,name=signature,proto3" json:"signature,omitempty"`

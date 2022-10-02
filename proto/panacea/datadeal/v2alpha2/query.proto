@@ -6,6 +6,7 @@ import "cosmos/base/query/v1beta1/pagination.proto";
 
 import "panacea/datadeal/v2alpha2/deal.proto";
 import "panacea/datadeal/v2alpha2/datasale.proto";
+import "panacea/datadeal/v2alpha2/tx.proto";
 
 option go_package = "github.com/medibloc/panacea-core/v2/x/datadeal/types";
 
@@ -22,6 +23,10 @@ service Query {
   // DataSale returns a DataSale.
   rpc DataSale(QueryDataSaleRequest) returns (QueryDataSaleResponse) {
     option (google.api.http).get = "/panacea/datadeal/v2alpha2/datasales/{deal_id}/{verifiable_cid}";
+  }
+  // DataVerificationVote returns a DataVerificationVote.
+  rpc DataVerificationVote(QueryDataVerificationVoteRequest) returns (QueryDataVerificationVoteResponse) {
+      option (google.api.http).get = "/panacea/datadeal/v2alpha2/data_verification_votes/{deal_id}/{verifiable_cid}/{voter_address}";
   }
 }
 
@@ -55,4 +60,16 @@ message QueryDataSaleRequest {
 // QueryDataSaleResponse defines the response type for the Query/DataSale RPC method.
 message QueryDataSaleResponse {
   DataSale data_sale = 1;
+}
+
+// QueryDataVerificationRequest defines the request type for the Query/DataVerificationVote RPC method.
+message QueryDataVerificationVoteRequest {
+  uint64 deal_id = 1;
+  string verifiable_cid = 2;
+  string voter_address = 3;
+}
+
+// QueryDataVerificationVoteResponse defines the response type for the Query/DataVerificationVote RPC method.
+message QueryDataVerificationVoteResponse {
+  DataVerificationVote data_verification_vote = 1;
 }
