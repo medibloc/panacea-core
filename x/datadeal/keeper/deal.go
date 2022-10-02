@@ -1,11 +1,15 @@
 package keeper
 
 import (
+	"fmt"
 	"strconv"
 
+	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	oracletypes "github.com/medibloc/panacea-core/v2/x/oracle/types"
+	"github.com/tendermint/tendermint/crypto/secp256k1"
 
 	gogotypes "github.com/gogo/protobuf/types"
 	"github.com/medibloc/panacea-core/v2/x/datadeal/types"
@@ -170,8 +174,15 @@ func (k Keeper) SellData(ctx sdk.Context, msg *types.MsgSellData) error {
 		return sdkerrors.Wrapf(types.ErrSellData, err.Error())
 	}
 
-	//TODO: Add DataSale to VoteDataSale Queue
-	//k.AddDataSaleQueue()
+	k.AddDataSaleQueue(ctx, dataSale.VerifiableCid, dataSale.DealId, dataSale.VotingPeriod.VotingEndTime)
+
+	ctx.EventManager().EmitEvent(
+		sdk.NewEvent(
+			types.EventTypeDataVerificationVote,
+			sdk.NewAttribute(types.AttributeKeyVoteStatus, types.AttributeValueVoteStatusStarted),
+			sdk.NewAttribute(types.AttributeKeyVerifiableCID, dataSale.VerifiableCid),
+		),
+	)
 
 	return nil
 }
@@ -229,4 +240,95 @@ func (k Keeper) GetAllDataSaleList(ctx sdk.Context) ([]types.DataSale, error) {
 	}
 
 	return dataSales, nil
+}
+
+func (k Keeper) VoteDataVerification(ctx sdk.Context, vote *types.DataVerificationVote, signature []byte) error {
+	if err := vote.ValidateBasic(); err != nil {
+		return sdkerrors.Wrapf(types.ErrDataVerificationVote, err.Error())
+	}
+
+	sellerAcc, err := sdk.AccAddressFromBech32(vote.SellerAddress)
+	if err != nil {
+		return err
+	}
+
+	sellerPubKey, err := k.accountKeeper.GetPubKey(ctx, sellerAcc)
+	if err != nil {
+		return err
+	}
+
+	if !k.verifyVoteSignature(vote, sellerPubKey, signature) {
+		return sdkerrors.Wrap(oracletypes.ErrDetectionMaliciousBehavior, "")
+	}
+
+	if err = k.validateDataVerificationVote(ctx, vote); err != nil {
+		return sdkerrors.Wrap(types.ErrDataVerificationVote, err.Error())
+	}
+
+	if err = k.SetDataVerificationVote(ctx, vote); err != nil {
+		return sdkerrors.Wrap(types.ErrDataVerificationVote, err.Error())
+	}
+
+	return nil
+}
+
+// verifyVoteSignature defines to check for malicious requests.
+func (k Keeper) verifyVoteSignature(vote *types.DataVerificationVote, sellerPubKey cryptotypes.PubKey, signature []byte) bool {
+	voteBz := k.cdc.MustMarshal(vote)
+
+	return secp256k1.PubKey(sellerPubKey.Bytes()).VerifySignature(voteBz, signature)
+}
+
+// validateDataVerificationVote checks the data/verification status in the Panacea to ensure that the data can be voted to be verified.
+func (k Keeper) validateDataVerificationVote(ctx sdk.Context, vote *types.DataVerificationVote) error {
+	dataSale, err := k.GetDataSale(ctx, vote.VerifiableCid, vote.DealId)
+	if err != nil {
+		return err
+	}
+
+	if dataSale.Status != types.DATA_SALE_STATUS_VERIFICATION_VOTING_PERIOD {
+		return fmt.Errorf("the current voted data's status is not 'VERIFICATION_VOTING_PERIOD'")
+	}
+
+	return err
+}
+
+func (k Keeper) GetDataVerificationVote(ctx sdk.Context, verifiableCID, voterAddress string, dealID uint64) (*types.DataVerificationVote, error) {
+	store := ctx.KVStore(k.storeKey)
+	voterAccAddr, err := sdk.AccAddressFromBech32(voterAddress)
+	if err != nil {
+		return nil, err
+	}
+	key := types.GetDataVerificationVoteKey(verifiableCID, voterAccAddr, dealID)
+	bz := store.Get(key)
+	if bz == nil {
+		return nil, fmt.Errorf("oracle does not exist. verifiableCID: %s, voterAddress: %s, dealID: %d", verifiableCID, voterAddress, dealID)
+	}
+
+	vote := &types.DataVerificationVote{}
+	err = k.cdc.UnmarshalLengthPrefixed(bz, vote)
+	if err != nil {
+		return nil, err
+	}
+
+	return vote, nil
+}
+
+func (k Keeper) SetDataVerificationVote(ctx sdk.Context, vote *types.DataVerificationVote) error {
+	store := ctx.KVStore(k.storeKey)
+
+	voterAccAddr, err := sdk.AccAddressFromBech32(vote.VoterAddress)
+	if err != nil {
+		return err
+	}
+
+	key := types.GetDataVerificationVoteKey(vote.VerifiableCid, voterAccAddr, vote.DealId)
+	bz, err := k.cdc.MarshalLengthPrefixed(vote)
+	if err != nil {
+		return err
+	}
+
+	store.Set(key, bz)
+
+	return nil
 }

@@ -52,19 +52,14 @@ message MsgSellData {
 message MsgSellDataResponse {
 }
 
-// MsgVoteDataVerification defines the Msg/VoteDataVerification request type.
+// MsgVoteDataVerification defines the DataVerificationVote with signature.
 message MsgVoteDataVerification {
-  SignedDataVerificationVote signed_data_verification_vote = 1;
+  DataVerificationVote data_verification_vote = 1;
+  bytes signature = 2;
 }
 
 // MsgVoteDataVerificationResponse defines the Msg/VoteDataVerification response type.
 message MsgVoteDataVerificationResponse {
-}
-
-// SignedDataVerificationVote defines the DataVerificationVote with signature.
-message SignedDataVerificationVote {
-  DataVerificationVote data_verification_vote = 1;
-  bytes signature = 2;
 }
 
 // DataVerificationVote defines the vote info for verifying data.
@@ -72,8 +67,8 @@ message DataVerificationVote {
   string voter_address = 1;
   string seller_address = 2;
   uint64 deal_id = 3;
-  bytes verifiable_cid = 4;
-  panacea.oracle.v2alpha2.VoteOption valid = 5;
+  string verifiable_cid = 4;
+  panacea.oracle.v2alpha2.VoteOption vote_option = 5;
 }
 
 // MsgVoteDataDelivery defines the Msg/VoteDataDelivery request type.

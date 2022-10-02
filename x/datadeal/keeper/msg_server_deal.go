@@ -44,7 +44,12 @@ func (m msgServer) SellData(goCtx context.Context, msg *types.MsgSellData) (*typ
 
 // VoteDataVerification defines a method for voting data verification.
 func (m msgServer) VoteDataVerification(goCtx context.Context, msg *types.MsgVoteDataVerification) (*types.MsgVoteDataVerificationResponse, error) {
-	panic("implements me")
+	err := m.Keeper.VoteDataVerification(sdk.UnwrapSDKContext(goCtx), msg.DataVerificationVote, msg.Signature)
+	if err != nil {
+		return nil, err
+	}
+
+	return &types.MsgVoteDataVerificationResponse{}, nil
 }
 
 // VoteDataDelivery defines a method for voting data delivery.
