@@ -52,7 +52,7 @@ message MsgSellData {
 message MsgSellDataResponse {
 }
 
-// MsgVoteDataVerification defines the DataVerificationVote with signature.
+// MsgVoteDataVerification defines the Msg/VoteDataVerification with signature.
 message MsgVoteDataVerification {
   DataVerificationVote data_verification_vote = 1;
   bytes signature = 2;
