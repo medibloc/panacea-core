@@ -341,3 +341,24 @@ func (k Keeper) SetDataVerificationVote(ctx sdk.Context, vote *types.DataVerific
 
 	return nil
 }
+
+func (k Keeper) GetAllDataVerificationVoteList(ctx sdk.Context) ([]types.DataVerificationVote, error) {
+	store := ctx.KVStore(k.storeKey)
+	iterator := sdk.KVStorePrefixIterator(store, types.DataVerificationVoteKey)
+	defer iterator.Close()
+
+	dataVerificationVotes := make([]types.DataVerificationVote, 0)
+
+	for ; iterator.Valid(); iterator.Next() {
+		bz := iterator.Value()
+		var dataVerificationVote types.DataVerificationVote
+		err := k.cdc.UnmarshalLengthPrefixed(bz, &dataVerificationVote)
+		if err != nil {
+			return nil, sdkerrors.Wrapf(types.ErrDataVerificationVote, err.Error())
+		}
+
+		dataVerificationVotes = append(dataVerificationVotes, dataVerificationVote)
+	}
+
+	return dataVerificationVotes, nil
+}
