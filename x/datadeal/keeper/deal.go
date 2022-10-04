@@ -1,11 +1,15 @@
 package keeper
 
 import (
+	"fmt"
 	"strconv"
 
+	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	oracletypes "github.com/medibloc/panacea-core/v2/x/oracle/types"
+	"github.com/tendermint/tendermint/crypto/secp256k1"
 
 	gogotypes "github.com/gogo/protobuf/types"
 	"github.com/medibloc/panacea-core/v2/x/datadeal/types"
@@ -229,4 +233,92 @@ func (k Keeper) GetAllDataSaleList(ctx sdk.Context) ([]types.DataSale, error) {
 	}
 
 	return dataSales, nil
+}
+
+func (k Keeper) VoteDataDelivery(ctx sdk.Context, vote *types.DataDeliveryVote, signature []byte) error {
+	if err := vote.ValidateBasic(); err != nil {
+		return sdkerrors.Wrap(types.ErrDataDeliveryVote, err.Error())
+	}
+
+	voterAcc, err := sdk.AccAddressFromBech32(vote.VoterAddress)
+	if err != nil {
+		return err
+	}
+
+	voterPubKey, err := k.accountKeeper.GetPubKey(ctx, voterAcc)
+	if err != nil {
+		return err
+	}
+
+	if !k.verifyVoteSignature(vote, voterPubKey, signature) {
+		return sdkerrors.Wrap(oracletypes.ErrDetectionMaliciousBehavior, "")
+	}
+
+	// Check if the dataSale vote status
+	if err := k.validateDataDeliveryVote(ctx, vote); err != nil {
+		return sdkerrors.Wrap(types.ErrDataDeliveryVote, err.Error())
+	}
+
+	// When all validations pass, the vote is saved.
+	if err := k.SetDataDeliveryVote(ctx, vote); err != nil {
+		return sdkerrors.Wrap(types.ErrDataDeliveryVote, err.Error())
+	}
+
+	return nil
+}
+
+func (k Keeper) verifyVoteSignature(vote *types.DataDeliveryVote, voterPubKey cryptotypes.PubKey, signature []byte) bool {
+	voteBz := k.cdc.MustMarshal(vote)
+
+	return secp256k1.PubKey(voterPubKey.Bytes()).VerifySignature(voteBz, signature)
+}
+
+func (k Keeper) validateDataDeliveryVote(ctx sdk.Context, vote *types.DataDeliveryVote) error {
+	dataSale, err := k.GetDataSale(ctx, vote.VerifiableCid, vote.DealId)
+	if err != nil {
+		return err
+	}
+	if dataSale.Status != types.DATA_SALE_STATUS_DELIVERY_VOTING_PERIOD {
+		return fmt.Errorf("the current voted data's status is not 'DELIVERT_VOTING_PERIOD'")
+	}
+	return nil
+}
+
+func (k Keeper) SetDataDeliveryVote(ctx sdk.Context, vote *types.DataDeliveryVote) error {
+	store := ctx.KVStore(k.storeKey)
+
+	voterAccAddr, err := sdk.AccAddressFromBech32(vote.VoterAddress)
+	if err != nil {
+		return err
+	}
+	key := types.GetDataDeliveryVoteKey(vote.VerifiableCid, voterAccAddr, vote.DealId)
+
+	bz, err := k.cdc.MarshalLengthPrefixed(vote)
+	if err != nil {
+		return err
+	}
+	store.Set(key, bz)
+
+	return nil
+}
+
+func (k Keeper) GetDataDeliveryVote(ctx sdk.Context, veifiableCID, voterAddress string, dealID uint64) (*types.DataDeliveryVote, error) {
+	store := ctx.KVStore(k.storeKey)
+	voterAccAddr, err := sdk.AccAddressFromBech32(voterAddress)
+	if err != nil {
+		return nil, err
+	}
+	key := types.GetDataDeliveryVoteKey(veifiableCID, voterAccAddr, dealID)
+	bz := store.Get(key)
+	if bz == nil {
+		return nil, fmt.Errorf("DataSale does not exist. dealID: %d, voterAddress: %s, verifiableCID: %s", dealID, voterAddress, veifiableCID)
+	}
+	vote := &types.DataDeliveryVote{}
+	err = k.cdc.UnmarshalLengthPrefixed(bz, vote)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return vote, nil
 }

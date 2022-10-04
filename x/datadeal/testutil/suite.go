@@ -3,6 +3,7 @@ package testutil
 import (
 	"time"
 
+	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/medibloc/panacea-core/v2/types/assets"
 	"github.com/medibloc/panacea-core/v2/types/testsuite"
@@ -41,4 +42,27 @@ func (suite *DataDealBaseTestSuite) MakeNewDataSale(sellerAddr sdk.AccAddress, v
 		VerificationTallyResult: nil,
 		DeliveryTallyResult:     nil,
 	}
+}
+
+func (suite *DataDealBaseTestSuite) MakeNewDataSaleDeliveryVoting(sellerAddr sdk.AccAddress, verifiableCID string) *types.DataSale {
+	return &types.DataSale{
+		SellerAddress: sellerAddr.String(),
+		DealId:        1,
+		VerifiableCid: verifiableCID,
+		DeliveredCid:  "",
+		Status:        types.DATA_SALE_STATUS_DELIVERY_VOTING_PERIOD,
+		VotingPeriod: &oracletypes.VotingPeriod{
+			VotingStartTime: time.Now(),
+			VotingEndTime:   time.Now().Add(5 * time.Second),
+		},
+		VerificationTallyResult: nil,
+		DeliveryTallyResult:     nil,
+	}
+}
+
+func (suite *DataDealBaseTestSuite) SetAccount(pubKey cryptotypes.PubKey) {
+	oracleAccAddr := sdk.AccAddress(pubKey.Address().Bytes())
+	oracleAccount := suite.AccountKeeper.NewAccountWithAddress(suite.Ctx, oracleAccAddr)
+	suite.Require().NoError(oracleAccount.SetPubKey(pubKey))
+	suite.AccountKeeper.SetAccount(suite.Ctx, oracleAccount)
 }

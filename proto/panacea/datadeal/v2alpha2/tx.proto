@@ -95,9 +95,9 @@ message SignedDataDeliveryVote {
 message DataDeliveryVote {
   string voter_address = 1;
   uint64 deal_id = 2;
-  bytes verifiable_cid = 3;
-  bytes delivered_cid = 4;
-  panacea.oracle.v2alpha2.VoteOption valid = 5;
+  string verifiable_cid = 3;
+  string delivered_cid = 4;
+  panacea.oracle.v2alpha2.VoteOption vote_option = 5;
 }
 
 // MsgDeactivateDeal defines the Msg/DeactivateDeal request type.
