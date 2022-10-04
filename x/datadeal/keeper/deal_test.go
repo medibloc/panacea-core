@@ -2,7 +2,6 @@ package keeper_test
 
 import (
 	"encoding/base64"
-	"fmt"
 	"sort"
 	"testing"
 
@@ -278,8 +277,16 @@ func (suite dealTestSuite) TestDataVerificationVoteSuccess() {
 	suite.Require().NoError(oracleAccount.SetPubKey(suite.oracleAccPubKey))
 	suite.AccountKeeper.SetAccount(suite.Ctx, oracleAccount)
 
+	err := suite.OracleKeeper.SetOracle(suite.Ctx, &oracletypes.Oracle{
+		Address:  suite.oracleAccAddr.String(),
+		Status:   oracletypes.ORACLE_STATUS_ACTIVE,
+		Uptime:   0,
+		JailedAt: nil,
+	})
+	suite.Require().NoError(err)
+
 	dataSale := suite.MakeNewDataSale(suite.sellerAccAddr, suite.verifiableCID1)
-	err := suite.DataDealKeeper.SetDataSale(suite.Ctx, dataSale)
+	err = suite.DataDealKeeper.SetDataSale(suite.Ctx, dataSale)
 	suite.Require().NoError(err)
 
 	dataVerificationVote := &types.DataVerificationVote{
@@ -346,8 +353,16 @@ func (suite dealTestSuite) TestDataVerificationInvalidDataSaleStatus() {
 	suite.Require().NoError(oracleAccount.SetPubKey(suite.oracleAccPubKey))
 	suite.AccountKeeper.SetAccount(suite.Ctx, oracleAccount)
 
+	err := suite.OracleKeeper.SetOracle(suite.Ctx, &oracletypes.Oracle{
+		Address:  suite.oracleAccAddr.String(),
+		Status:   oracletypes.ORACLE_STATUS_ACTIVE,
+		Uptime:   0,
+		JailedAt: nil,
+	})
+	suite.Require().NoError(err)
+
 	dataSale := suite.MakeNewDataSale(suite.sellerAccAddr, suite.verifiableCID1)
-	err := suite.DataDealKeeper.SetDataSale(suite.Ctx, dataSale)
+	err = suite.DataDealKeeper.SetDataSale(suite.Ctx, dataSale)
 	suite.Require().NoError(err)
 
 	getDataSale, err := suite.DataDealKeeper.GetDataSale(suite.Ctx, suite.verifiableCID1, 1)
@@ -374,7 +389,7 @@ func (suite dealTestSuite) TestDataVerificationInvalidDataSaleStatus() {
 
 	err = suite.DataDealKeeper.VoteDataVerification(suite.Ctx, dataVerificationVote, signature)
 	suite.Require().Error(err, types.ErrDataVerificationVote)
-	suite.Require().ErrorContains(err, fmt.Sprintf("the current voted data's status is not 'VERIFICATION_VOTING_PERIOD'"))
+	suite.Require().ErrorContains(err, "the current voted data's status is not 'VERIFICATION_VOTING_PERIOD'")
 
 	getDataSale.Status = types.DATA_SALE_STATUS_DELIVERY_VOTING_PERIOD
 	err = suite.DataDealKeeper.SetDataSale(suite.Ctx, getDataSale)
@@ -382,7 +397,7 @@ func (suite dealTestSuite) TestDataVerificationInvalidDataSaleStatus() {
 
 	err = suite.DataDealKeeper.VoteDataVerification(suite.Ctx, dataVerificationVote, signature)
 	suite.Require().Error(err, types.ErrDataVerificationVote)
-	suite.Require().ErrorContains(err, fmt.Sprintf("the current voted data's status is not 'VERIFICATION_VOTING_PERIOD'"))
+	suite.Require().ErrorContains(err, "the current voted data's status is not 'VERIFICATION_VOTING_PERIOD'")
 
 	getDataSale.Status = types.DATA_SALE_STATUS_FAILED
 	err = suite.DataDealKeeper.SetDataSale(suite.Ctx, getDataSale)
@@ -390,7 +405,7 @@ func (suite dealTestSuite) TestDataVerificationInvalidDataSaleStatus() {
 
 	err = suite.DataDealKeeper.VoteDataVerification(suite.Ctx, dataVerificationVote, signature)
 	suite.Require().Error(err, types.ErrDataVerificationVote)
-	suite.Require().ErrorContains(err, fmt.Sprintf("the current voted data's status is not 'VERIFICATION_VOTING_PERIOD'"))
+	suite.Require().ErrorContains(err, "the current voted data's status is not 'VERIFICATION_VOTING_PERIOD'")
 }
 
 func (suite dealTestSuite) TestDataVerificationInvalidGenesisOracleStatus() {
