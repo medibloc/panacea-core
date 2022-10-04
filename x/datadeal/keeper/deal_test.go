@@ -277,8 +277,20 @@ func (suite dealTestSuite) TestGetAllDataSalesList() {
 func (suite dealTestSuite) TestDataDeliveryVoteSuccess() {
 	ctx := suite.Ctx
 
+	oracleAccount := suite.AccountKeeper.NewAccountWithAddress(suite.Ctx, suite.oracleAccAddr)
+	suite.Require().NoError(oracleAccount.SetPubKey(suite.oracleAccPubKey))
+	suite.AccountKeeper.SetAccount(suite.Ctx, oracleAccount)
+
+	err := suite.OracleKeeper.SetOracle(suite.Ctx, &oracletypes.Oracle{
+		Address:  suite.oracleAccAddr.String(),
+		Status:   oracletypes.ORACLE_STATUS_ACTIVE,
+		Uptime:   0,
+		JailedAt: nil,
+	})
+	suite.Require().NoError(err)
+
 	dataSale := suite.MakeNewDataSaleDeliveryVoting(suite.sellerAccAddr, suite.verifiableCID1)
-	err := suite.DataDealKeeper.SetDataSale(suite.Ctx, dataSale)
+	err = suite.DataDealKeeper.SetDataSale(suite.Ctx, dataSale)
 	suite.Require().NoError(err)
 
 	dataDeliveryVote := &types.DataDeliveryVote{
@@ -315,8 +327,20 @@ func (suite dealTestSuite) TestDataDeliveryVoteSuccess() {
 func (suite dealTestSuite) TestDataDeliveryVoteFailedVerifySignature() {
 	ctx := suite.Ctx
 
+	oracleAccount := suite.AccountKeeper.NewAccountWithAddress(suite.Ctx, suite.oracleAccAddr)
+	suite.Require().NoError(oracleAccount.SetPubKey(suite.oracleAccPubKey))
+	suite.AccountKeeper.SetAccount(suite.Ctx, oracleAccount)
+
+	err := suite.OracleKeeper.SetOracle(suite.Ctx, &oracletypes.Oracle{
+		Address:  suite.oracleAccAddr.String(),
+		Status:   oracletypes.ORACLE_STATUS_ACTIVE,
+		Uptime:   0,
+		JailedAt: nil,
+	})
+	suite.Require().NoError(err)
+
 	dataSale := suite.MakeNewDataSaleDeliveryVoting(suite.sellerAccAddr, suite.verifiableCID1)
-	err := suite.DataDealKeeper.SetDataSale(suite.Ctx, dataSale)
+	err = suite.DataDealKeeper.SetDataSale(suite.Ctx, dataSale)
 	suite.Require().NoError(err)
 
 	dataDeliveryVote := &types.DataDeliveryVote{
@@ -342,9 +366,21 @@ func (suite dealTestSuite) TestDataDeliveryVoteFailedVerifySignature() {
 func (suite dealTestSuite) TestDataDeliveryVoteFaildInvalidStatus() {
 	ctx := suite.Ctx
 
+	oracleAccount := suite.AccountKeeper.NewAccountWithAddress(suite.Ctx, suite.oracleAccAddr)
+	suite.Require().NoError(oracleAccount.SetPubKey(suite.oracleAccPubKey))
+	suite.AccountKeeper.SetAccount(suite.Ctx, oracleAccount)
+
+	err := suite.OracleKeeper.SetOracle(suite.Ctx, &oracletypes.Oracle{
+		Address:  suite.oracleAccAddr.String(),
+		Status:   oracletypes.ORACLE_STATUS_ACTIVE,
+		Uptime:   0,
+		JailedAt: nil,
+	})
+	suite.Require().NoError(err)
+
 	// dataSale that status is DATA_SALE_STATUS_VERIFICATION_VOTING_PERIOD
 	dataSale := suite.MakeNewDataSale(suite.sellerAccAddr, suite.verifiableCID1)
-	err := suite.DataDealKeeper.SetDataSale(suite.Ctx, dataSale)
+	err = suite.DataDealKeeper.SetDataSale(suite.Ctx, dataSale)
 	suite.Require().NoError(err)
 
 	dataDeliveryVote := &types.DataDeliveryVote{
