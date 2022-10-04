@@ -392,3 +392,42 @@ func (suite dealTestSuite) TestDataVerificationInvalidDataSaleStatus() {
 	suite.Require().Error(err, types.ErrDataVerificationVote)
 	suite.Require().ErrorContains(err, fmt.Sprintf("the current voted data's status is not 'VERIFICATION_VOTING_PERIOD'"))
 }
+
+func (suite dealTestSuite) TestDataVerificationInvalidGenesisOracleStatus() {
+	oracleAccAddr := sdk.AccAddress(suite.oracleAccPubKey.Address().Bytes())
+	oracleAccount := suite.AccountKeeper.NewAccountWithAddress(suite.Ctx, oracleAccAddr)
+	suite.Require().NoError(oracleAccount.SetPubKey(suite.oracleAccPubKey))
+	suite.AccountKeeper.SetAccount(suite.Ctx, oracleAccount)
+
+	err := suite.OracleKeeper.SetOracle(suite.Ctx, &oracletypes.Oracle{
+		Address:  suite.oracleAccAddr.String(),
+		Status:   oracletypes.ORACLE_STATUS_JAILED,
+		Uptime:   0,
+		JailedAt: nil,
+	})
+	suite.Require().NoError(err)
+
+	dataSale := suite.MakeNewDataSale(suite.sellerAccAddr, suite.verifiableCID1)
+	err = suite.DataDealKeeper.SetDataSale(suite.Ctx, dataSale)
+	suite.Require().NoError(err)
+
+	dataVerificationVote := &types.DataVerificationVote{
+		VoterAddress:  suite.oracleAccAddr.String(),
+		SellerAddress: suite.sellerAccAddr.String(),
+		DealId:        1,
+		VerifiableCid: suite.verifiableCID1,
+		VoteOption:    oracletypes.VOTE_OPTION_YES,
+	}
+
+	voteBz, err := suite.Cdc.Marshaler.Marshal(dataVerificationVote)
+	suite.Require().NoError(err)
+	oraclePrivKeySecp256k1 := secp256k1.PrivKey{
+		Key: suite.oraclePrivKey.Serialize(),
+	}
+	signature, err := oraclePrivKeySecp256k1.Sign(voteBz)
+	suite.Require().NoError(err)
+
+	err = suite.DataDealKeeper.VoteDataVerification(suite.Ctx, dataVerificationVote, signature)
+	suite.Require().Error(err, types.ErrDataVerificationVote)
+	suite.Require().ErrorContains(err, "this oracle is not in 'ACTIVE' state")
+}
