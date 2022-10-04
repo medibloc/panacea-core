@@ -247,17 +247,17 @@ func (k Keeper) VoteDataVerification(ctx sdk.Context, vote *types.DataVerificati
 		return sdkerrors.Wrapf(types.ErrDataVerificationVote, err.Error())
 	}
 
-	sellerAcc, err := sdk.AccAddressFromBech32(vote.SellerAddress)
+	voterAcc, err := sdk.AccAddressFromBech32(vote.VoterAddress)
 	if err != nil {
 		return err
 	}
 
-	sellerPubKey, err := k.accountKeeper.GetPubKey(ctx, sellerAcc)
+	voterPubKey, err := k.accountKeeper.GetPubKey(ctx, voterAcc)
 	if err != nil {
 		return err
 	}
 
-	if !k.verifyVoteSignature(vote, sellerPubKey, signature) {
+	if !k.verifyVoteSignature(vote, voterPubKey, signature) {
 		return sdkerrors.Wrap(oracletypes.ErrDetectionMaliciousBehavior, "")
 	}
 
@@ -290,7 +290,7 @@ func (k Keeper) validateDataVerificationVote(ctx sdk.Context, vote *types.DataVe
 		return fmt.Errorf("the current voted data's status is not 'VERIFICATION_VOTING_PERIOD'")
 	}
 
-	return err
+	return nil
 }
 
 func (k Keeper) GetDataVerificationVote(ctx sdk.Context, verifiableCID, voterAddress string, dealID uint64) (*types.DataVerificationVote, error) {
