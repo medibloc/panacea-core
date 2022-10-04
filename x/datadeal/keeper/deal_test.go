@@ -270,10 +270,10 @@ func (suite dealTestSuite) TestGetAllDataSalesList() {
 }
 
 func (suite dealTestSuite) TestDataVerificationVoteSuccess() {
-	sellerAccAddr := sdk.AccAddress(suite.sellerAccPubKey.Address().Bytes())
-	sellerAccount := suite.AccountKeeper.NewAccountWithAddress(suite.Ctx, sellerAccAddr)
-	suite.Require().NoError(sellerAccount.SetPubKey(suite.sellerAccPubKey))
-	suite.AccountKeeper.SetAccount(suite.Ctx, sellerAccount)
+	oracleAccAddr := sdk.AccAddress(suite.oracleAccPubKey.Address().Bytes())
+	oracleAccount := suite.AccountKeeper.NewAccountWithAddress(suite.Ctx, oracleAccAddr)
+	suite.Require().NoError(oracleAccount.SetPubKey(suite.oracleAccPubKey))
+	suite.AccountKeeper.SetAccount(suite.Ctx, oracleAccount)
 
 	dataVerificationVote := &types.DataVerificationVote{
 		VoterAddress:  suite.oracleAccAddr.String(),
