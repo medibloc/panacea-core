@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"strconv"
 
-	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
@@ -239,18 +238,7 @@ func (k Keeper) VoteDataDelivery(ctx sdk.Context, vote *types.DataDeliveryVote, 
 	if err := vote.ValidateBasic(); err != nil {
 		return sdkerrors.Wrap(types.ErrDataDeliveryVote, err.Error())
 	}
-
-	voterAcc, err := sdk.AccAddressFromBech32(vote.VoterAddress)
-	if err != nil {
-		return err
-	}
-
-	voterPubKey, err := k.accountKeeper.GetPubKey(ctx, voterAcc)
-	if err != nil {
-		return err
-	}
-
-	if !k.verifyVoteSignature(vote, voterPubKey, signature) {
+	if !k.verifyVoteSignature(ctx, vote, signature) {
 		return sdkerrors.Wrap(oracletypes.ErrDetectionMaliciousBehavior, "")
 	}
 
@@ -267,10 +255,11 @@ func (k Keeper) VoteDataDelivery(ctx sdk.Context, vote *types.DataDeliveryVote, 
 	return nil
 }
 
-func (k Keeper) verifyVoteSignature(vote *types.DataDeliveryVote, voterPubKey cryptotypes.PubKey, signature []byte) bool {
+func (k Keeper) verifyVoteSignature(ctx sdk.Context, vote *types.DataDeliveryVote, signature []byte) bool {
 	voteBz := k.cdc.MustMarshal(vote)
 
-	return secp256k1.PubKey(voterPubKey.Bytes()).VerifySignature(voteBz, signature)
+	oraclePubKeyBz := k.oracleKeeper.GetParams(ctx).MustDecodeOraclePublicKey()
+	return secp256k1.PubKey(oraclePubKeyBz).VerifySignature(voteBz, signature)
 }
 
 func (k Keeper) validateDataDeliveryVote(ctx sdk.Context, vote *types.DataDeliveryVote) error {

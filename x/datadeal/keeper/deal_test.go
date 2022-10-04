@@ -1,6 +1,7 @@
 package keeper_test
 
 import (
+	"encoding/base64"
 	"sort"
 	"testing"
 
@@ -58,6 +59,9 @@ func (suite *dealTestSuite) BeforeTest(_, _ string) {
 	err = suite.DataDealKeeper.SetDeal(suite.Ctx, testDeal)
 	suite.Require().NoError(err)
 
+	suite.oraclePrivKey, _ = btcec.NewPrivateKey(btcec.S256())
+	suite.oraclePubKey = suite.oraclePrivKey.PubKey()
+
 	suite.oracleAccPrivKey = secp256k1.GenPrivKey()
 	suite.oracleAccPubKey = suite.oracleAccPrivKey.PubKey()
 	suite.oracleAccAddr = sdk.AccAddress(suite.oracleAccPubKey.Address())
@@ -67,7 +71,7 @@ func (suite *dealTestSuite) BeforeTest(_, _ string) {
 	suite.sellerAccAddr = sdk.AccAddress(suite.sellerAccPubKey.Address())
 
 	suite.OracleKeeper.SetParams(suite.Ctx, oracletypes.Params{
-		OraclePublicKey:          "",
+		OraclePublicKey:          base64.StdEncoding.EncodeToString(suite.oraclePubKey.SerializeCompressed()),
 		OraclePubKeyRemoteReport: "",
 		UniqueId:                 "",
 		VoteParams: oracletypes.VoteParams{
@@ -272,7 +276,6 @@ func (suite dealTestSuite) TestGetAllDataSalesList() {
 func (suite dealTestSuite) TestDataDeliveryVoteSuccess() {
 	ctx := suite.Ctx
 
-	suite.SetAccount(suite.oracleAccPubKey)
 	dataSale := suite.MakeNewDataSaleDeliveryVoting(suite.sellerAccAddr, suite.verifiableCID1)
 	err := suite.DataDealKeeper.SetDataSale(suite.Ctx, dataSale)
 	suite.Require().NoError(err)
@@ -288,7 +291,11 @@ func (suite dealTestSuite) TestDataDeliveryVoteSuccess() {
 	voteBz, err := suite.Cdc.Marshaler.Marshal(dataDeliveryVote)
 	suite.Require().NoError(err)
 
-	signature, err := suite.oracleAccPrivKey.Sign(voteBz)
+	oraclePrivKeySecp256k1 := secp256k1.PrivKey{
+		Key: suite.oraclePrivKey.Serialize(),
+	}
+
+	signature, err := oraclePrivKeySecp256k1.Sign(voteBz)
 	suite.Require().NoError(err)
 
 	err = suite.DataDealKeeper.VoteDataDelivery(ctx, dataDeliveryVote, signature)
@@ -307,7 +314,6 @@ func (suite dealTestSuite) TestDataDeliveryVoteSuccess() {
 func (suite dealTestSuite) TestDataDeliveryVoteFailedVerifySignature() {
 	ctx := suite.Ctx
 
-	suite.SetAccount(suite.oracleAccPubKey)
 	dataSale := suite.MakeNewDataSaleDeliveryVoting(suite.sellerAccAddr, suite.verifiableCID1)
 	err := suite.DataDealKeeper.SetDataSale(suite.Ctx, dataSale)
 	suite.Require().NoError(err)
@@ -335,7 +341,6 @@ func (suite dealTestSuite) TestDataDeliveryVoteFailedVerifySignature() {
 func (suite dealTestSuite) TestDataDeliveryVoteFaildInvalidStatus() {
 	ctx := suite.Ctx
 
-	suite.SetAccount(suite.oracleAccPubKey)
 	// dataSale that status is DATA_SALE_STATUS_VERIFICATION_VOTING_PERIOD
 	dataSale := suite.MakeNewDataSale(suite.sellerAccAddr, suite.verifiableCID1)
 	err := suite.DataDealKeeper.SetDataSale(suite.Ctx, dataSale)
@@ -352,7 +357,11 @@ func (suite dealTestSuite) TestDataDeliveryVoteFaildInvalidStatus() {
 	voteBz, err := suite.Cdc.Marshaler.Marshal(dataDeliveryVote)
 	suite.Require().NoError(err)
 
-	signature, err := suite.oracleAccPrivKey.Sign(voteBz)
+	oraclePrivKeySecp256k1 := secp256k1.PrivKey{
+		Key: suite.oraclePrivKey.Serialize(),
+	}
+
+	signature, err := oraclePrivKeySecp256k1.Sign(voteBz)
 	suite.Require().NoError(err)
 
 	err = suite.DataDealKeeper.VoteDataDelivery(ctx, dataDeliveryVote, signature)
