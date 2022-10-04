@@ -282,6 +282,14 @@ func (k Keeper) verifyVoteSignature(ctx sdk.Context, vote *types.DataVerificatio
 
 // validateDataVerificationVote checks the data/verification status in the Panacea to ensure that the data can be voted to be verified.
 func (k Keeper) validateDataVerificationVote(ctx sdk.Context, vote *types.DataVerificationVote) error {
+	oracle, err := k.oracleKeeper.GetOracle(ctx, vote.VoterAddress)
+	if err != nil {
+		return err
+	}
+	if oracle.Status != oracletypes.ORACLE_STATUS_ACTIVE {
+		return fmt.Errorf("this oracle is not in 'ACTIVE' state")
+	}
+
 	dataSale, err := k.GetDataSale(ctx, vote.VerifiableCid, vote.DealId)
 	if err != nil {
 		return err
