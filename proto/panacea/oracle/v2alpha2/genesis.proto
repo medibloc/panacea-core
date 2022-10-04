@@ -27,8 +27,10 @@ message Params {
   string oracle_pub_key_remote_report = 2;
   // The unique ID of current version of oracle.
   string unique_id = 3;
-  VoteParams vote_params = 4 [(gogoproto.nullable)   = false];
-  SlashParams slash_params = 5 [(gogoproto.nullable)   = false];
+  // Oracle commission rate on validating and delivering data
+  string oracle_commission_rate = 4 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false];
+  VoteParams vote_params = 5 [(gogoproto.nullable) = false];
+  SlashParams slash_params = 6 [(gogoproto.nullable) = false];
 }
 
 // Vote Params defines the params related to voting.

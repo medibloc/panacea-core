@@ -58,6 +58,7 @@ func (suite *dealTestSuite) BeforeTest(_, _ string) {
 		OraclePublicKey:          "",
 		OraclePubKeyRemoteReport: "",
 		UniqueId:                 "",
+		OracleCommissionRate:     sdk.NewDecWithPrec(1, 1),
 		VoteParams: oracletypes.VoteParams{
 			VotingPeriod: 100,
 			JailPeriod:   60,

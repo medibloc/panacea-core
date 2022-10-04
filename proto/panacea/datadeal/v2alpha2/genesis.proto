@@ -13,8 +13,3 @@ message GenesisState {
   uint64 next_deal_number = 2;
   repeated DataSale data_sales = 3 [(gogoproto.nullable) = false];
 }
-
-// Params defines the datatdeal module's params.
-message Params {
-  string oracle_commission = 1 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int", (gogoproto.nullable) = false];
-}

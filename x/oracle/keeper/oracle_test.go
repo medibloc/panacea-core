@@ -72,6 +72,7 @@ func (suite *oracleTestSuite) BeforeTest(_, _ string) {
 		OraclePublicKey:          base64.StdEncoding.EncodeToString(suite.oraclePubKey.SerializeCompressed()),
 		OraclePubKeyRemoteReport: "",
 		UniqueId:                 suite.uniqueID,
+		OracleCommissionRate:     sdk.NewDecWithPrec(1, 1),
 		VoteParams: types.VoteParams{
 			VotingPeriod: 100,
 			JailPeriod:   60,
