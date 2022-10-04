@@ -33,7 +33,10 @@ func DecryptData(defaultNodeHome string) *cobra.Command {
 				(According to the following command (panacead keys add ...)`,
 		Args: cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx := client.GetClientContextFromCmd(cmd)
+			clientCtx, err := client.GetClientQueryContext(cmd)
+			if err != nil {
+				return err
+			}
 
 			dealQueryClient := datadealtypes.NewQueryClient(clientCtx)
 			oracleQueryClient := oracletypes.NewQueryClient(clientCtx)
@@ -75,8 +78,11 @@ func DecryptData(defaultNodeHome string) *cobra.Command {
 	cmd.PersistentFlags().String(flags.FlagKeyringDir, "", "The client Keyring directory; if omitted, the default 'home' directory will be used")
 	cmd.PersistentFlags().String(flags.FlagKeyringBackend, flags.DefaultKeyringBackend, "Select keyring's backend (os|file|test)")
 	cmd.PersistentFlags().String(cli.OutputFlag, "text", "Output format (text|json)")
+	cmd.PersistentFlags().String(flags.FlagChainID, "", "The network chain ID")
 	cmd.Flags().String(FlagCipherText, "", "Cipher text in the form of a byte array")
 	cmd.Flags().String(FlagCipherTextPath, "", "Path to the file where the cipher text in the form of a byte array is stored")
+
+	flags.AddQueryFlagsToCmd(cmd)
 
 	return cmd
 }
