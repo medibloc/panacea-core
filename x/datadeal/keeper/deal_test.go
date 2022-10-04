@@ -1,6 +1,8 @@
 package keeper_test
 
 import (
+	"encoding/base64"
+	"fmt"
 	"sort"
 	"testing"
 
@@ -68,6 +70,7 @@ func (suite *dealTestSuite) BeforeTest(_, _ string) {
 	suite.sellerAccAddr = sdk.AccAddress(suite.sellerAccPubKey.Address())
 
 	suite.OracleKeeper.SetParams(suite.Ctx, oracletypes.Params{
+		OraclePublicKey:          base64.StdEncoding.EncodeToString(suite.oraclePubKey.SerializeCompressed()),
 		OraclePubKeyRemoteReport: "",
 		UniqueId:                 "",
 		OracleCommissionRate:     sdk.NewDecWithPrec(1, 1),
@@ -275,6 +278,10 @@ func (suite dealTestSuite) TestDataVerificationVoteSuccess() {
 	suite.Require().NoError(oracleAccount.SetPubKey(suite.oracleAccPubKey))
 	suite.AccountKeeper.SetAccount(suite.Ctx, oracleAccount)
 
+	dataSale := suite.MakeNewDataSale(suite.sellerAccAddr, suite.verifiableCID1)
+	err := suite.DataDealKeeper.SetDataSale(suite.Ctx, dataSale)
+	suite.Require().NoError(err)
+
 	dataVerificationVote := &types.DataVerificationVote{
 		VoterAddress:  suite.oracleAccAddr.String(),
 		SellerAddress: suite.sellerAccAddr.String(),
@@ -298,4 +305,90 @@ func (suite dealTestSuite) TestDataVerificationVoteSuccess() {
 	getDataVerificationVote, err := suite.DataDealKeeper.GetDataVerificationVote(suite.Ctx, suite.verifiableCID1, suite.oracleAccAddr.String(), 1)
 	suite.Require().NoError(err)
 	suite.Require().Equal(dataVerificationVote, getDataVerificationVote)
+}
+
+func (suite dealTestSuite) TestDataVerificationVoteFailedVerifySignature() {
+	oracleAccAddr := sdk.AccAddress(suite.oracleAccPubKey.Address().Bytes())
+	oracleAccount := suite.AccountKeeper.NewAccountWithAddress(suite.Ctx, oracleAccAddr)
+	suite.Require().NoError(oracleAccount.SetPubKey(suite.oracleAccPubKey))
+	suite.AccountKeeper.SetAccount(suite.Ctx, oracleAccount)
+
+	dataSale := suite.MakeNewDataSale(suite.sellerAccAddr, suite.verifiableCID1)
+	err := suite.DataDealKeeper.SetDataSale(suite.Ctx, dataSale)
+	suite.Require().NoError(err)
+
+	dataVerificationVote := &types.DataVerificationVote{
+		VoterAddress:  suite.oracleAccAddr.String(),
+		SellerAddress: suite.sellerAccAddr.String(),
+		DealId:        1,
+		VerifiableCid: suite.verifiableCID1,
+		VoteOption:    oracletypes.VOTE_OPTION_YES,
+	}
+
+	voteBz, err := suite.Cdc.Marshaler.Marshal(dataVerificationVote)
+	suite.Require().NoError(err)
+	invalidVoterPrivKey, err := btcec.NewPrivateKey(btcec.S256())
+	suite.Require().NoError(err)
+
+	oraclePrivKeySecp256k1 := secp256k1.PrivKey{
+		Key: invalidVoterPrivKey.Serialize(),
+	}
+	signature, err := oraclePrivKeySecp256k1.Sign(voteBz)
+	suite.Require().NoError(err)
+
+	err = suite.DataDealKeeper.VoteDataVerification(suite.Ctx, dataVerificationVote, signature)
+	suite.Require().Error(err, oracletypes.ErrDetectionMaliciousBehavior)
+}
+
+func (suite dealTestSuite) TestDataVerificationInvalidDataSaleStatus() {
+	oracleAccAddr := sdk.AccAddress(suite.oracleAccPubKey.Address().Bytes())
+	oracleAccount := suite.AccountKeeper.NewAccountWithAddress(suite.Ctx, oracleAccAddr)
+	suite.Require().NoError(oracleAccount.SetPubKey(suite.oracleAccPubKey))
+	suite.AccountKeeper.SetAccount(suite.Ctx, oracleAccount)
+
+	dataSale := suite.MakeNewDataSale(suite.sellerAccAddr, suite.verifiableCID1)
+	err := suite.DataDealKeeper.SetDataSale(suite.Ctx, dataSale)
+	suite.Require().NoError(err)
+
+	getDataSale, err := suite.DataDealKeeper.GetDataSale(suite.Ctx, suite.verifiableCID1, 1)
+	suite.Require().NoError(err)
+	getDataSale.Status = types.DATA_SALE_STATUS_COMPLETED
+	err = suite.DataDealKeeper.SetDataSale(suite.Ctx, getDataSale)
+	suite.Require().NoError(err)
+
+	dataVerificationVote := &types.DataVerificationVote{
+		VoterAddress:  suite.oracleAccAddr.String(),
+		SellerAddress: suite.sellerAccAddr.String(),
+		DealId:        1,
+		VerifiableCid: suite.verifiableCID1,
+		VoteOption:    oracletypes.VOTE_OPTION_YES,
+	}
+
+	voteBz, err := suite.Cdc.Marshaler.Marshal(dataVerificationVote)
+	suite.Require().NoError(err)
+	oraclePrivKeySecp256k1 := secp256k1.PrivKey{
+		Key: suite.oraclePrivKey.Serialize(),
+	}
+	signature, err := oraclePrivKeySecp256k1.Sign(voteBz)
+	suite.Require().NoError(err)
+
+	err = suite.DataDealKeeper.VoteDataVerification(suite.Ctx, dataVerificationVote, signature)
+	suite.Require().Error(err, types.ErrDataVerificationVote)
+	suite.Require().ErrorContains(err, fmt.Sprintf("the current voted data's status is not 'VERIFICATION_VOTING_PERIOD'"))
+
+	getDataSale.Status = types.DATA_SALE_STATUS_DELIVERY_VOTING_PERIOD
+	err = suite.DataDealKeeper.SetDataSale(suite.Ctx, getDataSale)
+	suite.Require().NoError(err)
+
+	err = suite.DataDealKeeper.VoteDataVerification(suite.Ctx, dataVerificationVote, signature)
+	suite.Require().Error(err, types.ErrDataVerificationVote)
+	suite.Require().ErrorContains(err, fmt.Sprintf("the current voted data's status is not 'VERIFICATION_VOTING_PERIOD'"))
+
+	getDataSale.Status = types.DATA_SALE_STATUS_FAILED
+	err = suite.DataDealKeeper.SetDataSale(suite.Ctx, getDataSale)
+	suite.Require().NoError(err)
+
+	err = suite.DataDealKeeper.VoteDataVerification(suite.Ctx, dataVerificationVote, signature)
+	suite.Require().Error(err, types.ErrDataVerificationVote)
+	suite.Require().ErrorContains(err, fmt.Sprintf("the current voted data's status is not 'VERIFICATION_VOTING_PERIOD'"))
 }
