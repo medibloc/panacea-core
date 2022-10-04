@@ -257,7 +257,7 @@ func (k Keeper) VoteDataVerification(ctx sdk.Context, vote *types.DataVerificati
 		return err
 	}
 
-	if !k.verifyVoteSignature(vote, voterPubKey, signature) {
+	if !k.verifyVoteSignature(ctx, vote, voterPubKey, signature) {
 		return sdkerrors.Wrap(oracletypes.ErrDetectionMaliciousBehavior, "")
 	}
 
@@ -273,10 +273,11 @@ func (k Keeper) VoteDataVerification(ctx sdk.Context, vote *types.DataVerificati
 }
 
 // verifyVoteSignature defines to check for malicious requests.
-func (k Keeper) verifyVoteSignature(vote *types.DataVerificationVote, sellerPubKey cryptotypes.PubKey, signature []byte) bool {
+func (k Keeper) verifyVoteSignature(ctx sdk.Context, vote *types.DataVerificationVote, sellerPubKey cryptotypes.PubKey, signature []byte) bool {
 	voteBz := k.cdc.MustMarshal(vote)
 
-	return secp256k1.PubKey(sellerPubKey.Bytes()).VerifySignature(voteBz, signature)
+	oraclePubKeyBz := k.oracleKeeper.GetParams(ctx).MustDecodeOraclePublicKey()
+	return secp256k1.PubKey(oraclePubKeyBz).VerifySignature(voteBz, signature)
 }
 
 // validateDataVerificationVote checks the data/verification status in the Panacea to ensure that the data can be voted to be verified.
