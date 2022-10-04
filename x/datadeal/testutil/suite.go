@@ -3,7 +3,6 @@ package testutil
 import (
 	"time"
 
-	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/medibloc/panacea-core/v2/types/assets"
 	"github.com/medibloc/panacea-core/v2/types/testsuite"
@@ -58,11 +57,4 @@ func (suite *DataDealBaseTestSuite) MakeNewDataSaleDeliveryVoting(sellerAddr sdk
 		VerificationTallyResult: nil,
 		DeliveryTallyResult:     nil,
 	}
-}
-
-func (suite *DataDealBaseTestSuite) SetAccount(pubKey cryptotypes.PubKey) {
-	oracleAccAddr := sdk.AccAddress(pubKey.Address().Bytes())
-	oracleAccount := suite.AccountKeeper.NewAccountWithAddress(suite.Ctx, oracleAccAddr)
-	suite.Require().NoError(oracleAccount.SetPubKey(pubKey))
-	suite.AccountKeeper.SetAccount(suite.Ctx, oracleAccount)
 }
