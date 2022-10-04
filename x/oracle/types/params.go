@@ -14,6 +14,7 @@ var (
 	KeyOraclePublicKey          = []byte("OraclePublicKey")
 	KeyOraclePubKeyRemoteReport = []byte("OraclePubKeyRemoteReport")
 	KeyUniqueID                 = []byte("UniqueID")
+	KeyOracleCommissionRate     = []byte("OracleCommissionRate")
 	KeyVoteParams               = []byte("VoteParams")
 	KeySlashParams              = []byte("SlashParams")
 )
@@ -29,6 +30,7 @@ func DefaultParams() Params {
 		OraclePublicKey:          "",
 		OraclePubKeyRemoteReport: "",
 		UniqueId:                 "",
+		OracleCommissionRate:     sdk.NewDecWithPrec(1, 1), // 10% of default commission
 		VoteParams: VoteParams{
 			VotingPeriod: 30 * time.Second,
 			JailPeriod:   10 * time.Minute,
@@ -46,6 +48,7 @@ func (p *Params) ParamSetPairs() paramtypes.ParamSetPairs {
 		paramtypes.NewParamSetPair(KeyOraclePublicKey, &p.OraclePublicKey, validateOraclePublicKey),
 		paramtypes.NewParamSetPair(KeyOraclePubKeyRemoteReport, &p.OraclePubKeyRemoteReport, validateOraclePubKeyRemoteReport),
 		paramtypes.NewParamSetPair(KeyUniqueID, &p.UniqueId, validateUniqueID),
+		paramtypes.NewParamSetPair(KeyOracleCommissionRate, &p.OracleCommissionRate, validateOracleCommissionRate),
 		paramtypes.NewParamSetPair(KeyVoteParams, &p.VoteParams, validateVoteParams),
 		paramtypes.NewParamSetPair(KeySlashParams, &p.SlashParams, validateSlashParams),
 	}
@@ -59,6 +62,9 @@ func (p Params) Validate() error {
 		return err
 	}
 	if err := validateUniqueID(p.UniqueId); err != nil {
+		return err
+	}
+	if err := validateOracleCommissionRate(p.OracleCommissionRate); err != nil {
 		return err
 	}
 	if err := validateVoteParams(p.VoteParams); err != nil {
@@ -110,6 +116,23 @@ func validateUniqueID(i interface{}) error {
 	_, ok := i.(string)
 	if !ok {
 		return fmt.Errorf("invalid parameter type: %T", i)
+	}
+
+	return nil
+}
+
+func validateOracleCommissionRate(i interface{}) error {
+	commRate, ok := i.(sdk.Dec)
+	if !ok {
+		return fmt.Errorf("invalid oracle commission rate")
+	}
+
+	if commRate.IsNegative() {
+		return fmt.Errorf("oracle commission rate cannot be negative")
+	}
+
+	if commRate.GT(sdk.OneDec()) {
+		return fmt.Errorf("oracle commission rate cannot be greater than 1")
 	}
 
 	return nil
