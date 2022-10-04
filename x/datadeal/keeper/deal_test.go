@@ -104,7 +104,6 @@ func (suite *dealTestSuite) TestCreateNewDeal() {
 	suite.Require().Equal(deal.GetStatus(), types.DEAL_STATUS_ACTIVE)
 }
 
-//TODO: The test will be complemented when VoteDataSale done.
 func (suite dealTestSuite) TestSellDataSuccess() {
 	msgSellData := &types.MsgSellData{
 		DealId:        1,
@@ -257,3 +256,15 @@ func (suite dealTestSuite) TestGetAllDataSalesList() {
 		suite.Require().Equal(dataSale.SellerAddress, allDataSaleList[i].SellerAddress)
 	}
 }
+
+// TODO: The test will be complemented when PR #438 https://github.com/medibloc/panacea-core/pull/438 merged
+//func (suite dealTestSuite) TestGetAllDataVerificationVoteList() {
+//	type dataVerificationVoteKey struct {
+//		verifiableCID string
+//		voterAddress  sdk.AccAddress
+//		dealID        uint64
+//	}
+//	dataVerificationVoteKeys := make([]dataVerificationVoteKey, 0)
+//
+//	suite.MakeNewDataVerificationVote(suite.verifiableCID1,)
+//}
