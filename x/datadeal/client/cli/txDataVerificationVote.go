@@ -7,14 +7,14 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	"github.com/gogo/protobuf/jsonpb"
-	"github.com/medibloc/panacea-core/v2/x/oracle/types"
+	"github.com/medibloc/panacea-core/v2/x/datadeal/types"
 	"github.com/spf13/cobra"
 )
 
-func CmdRegisterOracleVote() *cobra.Command {
+func CmdDataVerificationVote() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "register-oracle-vote [path]",
-		Short: "Vote for register new oracle",
+		Use:   "data-verification-vote [path]",
+		Short: "Vote for data verification",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
@@ -39,8 +39,8 @@ func CmdRegisterOracleVote() *cobra.Command {
 	return cmd
 }
 
-func readMsgFrom(path string) (*types.MsgVoteOracleRegistration, error) {
-	var msg types.MsgVoteOracleRegistration
+func readMsgFrom(path string) (*types.MsgVoteDataVerification, error) {
+	var msg types.MsgVoteDataVerification
 
 	file, err := os.Open(path)
 	if err != nil {
