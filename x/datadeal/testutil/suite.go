@@ -43,13 +43,11 @@ func (suite *DataDealBaseTestSuite) MakeNewDataSale(sellerAddr sdk.AccAddress, v
 	}
 }
 
-// TODO: MakeNewDataVerificationVote will be used when PR #438 https://github.com/medibloc/panacea-core/pull/438 merged.
-//func (suite *DataDealBaseTestSuite) MakeNewDataVerificationVote(voterAddr, sellerAddr sdk.AccAddress, verifiableCID string) *types.DataVerificationVote {
-//	return &types.DataVerificationVote{
-//		VoterAddress:  voterAddr.String(),
-//		SellerAddress: sellerAddr.String(),
-//		DealId:        1,
-//		VerifiableCid: verifiableCID,
-//		VoteOption:    oracletypes.VOTE_OPTION_YES,
-//	}
-//}
+func (suite *DataDealBaseTestSuite) MakeNewDataVerificationVote(voterAddr sdk.AccAddress, verifiableCID string) *types.DataVerificationVote {
+	return &types.DataVerificationVote{
+		VoterAddress:  voterAddr.String(),
+		DealId:        1,
+		VerifiableCid: verifiableCID,
+		VoteOption:    oracletypes.VOTE_OPTION_YES,
+	}
+}

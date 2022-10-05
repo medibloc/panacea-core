@@ -51,7 +51,7 @@ func GetDataSaleQueueKey(verifiableCID string, dealID uint64, endTime time.Time)
 }
 
 func GetDataVerificationVoteKey(verifiableCID string, voterAddress sdk.AccAddress, dealID uint64) []byte {
-	return append(DataVerificationVoteKey, CombineKeys([]byte(verifiableCID), voterAddress, sdk.Uint64ToBigEndian(dealID))...)
+	return append(DataVerificationVoteKey, CombineKeys(sdk.Uint64ToBigEndian(dealID), []byte(verifiableCID), voterAddress)...)
 }
 
 // CombineKeys function defines combines deal_id with data_hash.
