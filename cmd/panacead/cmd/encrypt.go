@@ -24,12 +24,12 @@ const (
 
 func EncryptData(defaultNodeHome string) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "encrypt-data [file-path] [key-name] [dealID]",
+		Use:   "encrypt-data [input-file-path] [output-file-path] [key-name] [dealID]",
 		Short: "Encrypt the data file with shared key which consists of oracle public key and seller private key.",
 		Long: `This command can encrypt data with shared key which consists of oracle public key and seller private key.
 				And your key should be stored in the localStore.
 				(According to the following command (panacead keys add ...)`,
-		Args: cobra.ExactArgs(3),
+		Args: cobra.ExactArgs(4),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientQueryContext(cmd)
 			if err != nil {
@@ -39,7 +39,7 @@ func EncryptData(defaultNodeHome string) *cobra.Command {
 			dealQueryClient := datadealtypes.NewQueryClient(clientCtx)
 			oracleQueryClient := oracletypes.NewQueryClient(clientCtx)
 
-			dealID, err := strconv.ParseUint(args[2], 10, 64)
+			dealID, err := strconv.ParseUint(args[3], 10, 64)
 			if err != nil {
 				return err
 			}
@@ -61,12 +61,15 @@ func EncryptData(defaultNodeHome string) *cobra.Command {
 			}
 			nonce := dealResp.GetDeal().GetNonce()
 
-			encryptedData, err := encrypt(clientCtx, args[1], originData, oraclePubKey, nonce)
+			encryptedData, err := encrypt(clientCtx, args[2], originData, oraclePubKey, nonce)
 			if err != nil {
 				return err
 			}
 
-			cmd.Println(encryptedData)
+			err = ioutil.WriteFile(args[1], encryptedData, 0644)
+			if err != nil {
+				return err
+			}
 
 			return nil
 		},
