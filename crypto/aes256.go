@@ -43,7 +43,7 @@ func Encrypt(secretKey, nonce, data []byte) ([]byte, error) {
 		return nil, fmt.Errorf("nonce length must be %v", aesgcm.NonceSize())
 	}
 
-	cipherText := aesgcm.Seal(data[:0], nonce, data, nil)
+	cipherText := aesgcm.Seal(nil, nonce, data, nil)
 
 	return cipherText, nil
 }
@@ -64,7 +64,7 @@ func Decrypt(secretKey, nonce, ciphertext []byte) ([]byte, error) {
 		return nil, err
 	}
 
-	plainText, err := aesgcm.Open(ciphertext[:0], nonce, ciphertext, nil)
+	plainText, err := aesgcm.Open(nil, nonce, ciphertext, nil)
 	if err != nil {
 		return nil, err
 	}

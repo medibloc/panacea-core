@@ -63,7 +63,7 @@ func DecryptData(defaultNodeHome string) *cobra.Command {
 				return err
 			}
 
-			cmd.Println(string(decryptedData))
+			cmd.Println(decryptedData)
 
 			return nil
 		},
