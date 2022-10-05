@@ -291,7 +291,6 @@ func (suite dealTestSuite) TestDataVerificationVoteSuccess() {
 
 	dataVerificationVote := &types.DataVerificationVote{
 		VoterAddress:  suite.oracleAccAddr.String(),
-		SellerAddress: suite.sellerAccAddr.String(),
 		DealId:        1,
 		VerifiableCid: suite.verifiableCID1,
 		VoteOption:    oracletypes.VOTE_OPTION_YES,
@@ -326,7 +325,6 @@ func (suite dealTestSuite) TestDataVerificationVoteFailedVerifySignature() {
 
 	dataVerificationVote := &types.DataVerificationVote{
 		VoterAddress:  suite.oracleAccAddr.String(),
-		SellerAddress: suite.sellerAccAddr.String(),
 		DealId:        1,
 		VerifiableCid: suite.verifiableCID1,
 		VoteOption:    oracletypes.VOTE_OPTION_YES,
@@ -373,7 +371,6 @@ func (suite dealTestSuite) TestDataVerificationInvalidDataSaleStatus() {
 
 	dataVerificationVote := &types.DataVerificationVote{
 		VoterAddress:  suite.oracleAccAddr.String(),
-		SellerAddress: suite.sellerAccAddr.String(),
 		DealId:        1,
 		VerifiableCid: suite.verifiableCID1,
 		VoteOption:    oracletypes.VOTE_OPTION_YES,
@@ -428,7 +425,6 @@ func (suite dealTestSuite) TestDataVerificationInvalidGenesisOracleStatus() {
 
 	dataVerificationVote := &types.DataVerificationVote{
 		VoterAddress:  suite.oracleAccAddr.String(),
-		SellerAddress: suite.sellerAccAddr.String(),
 		DealId:        1,
 		VerifiableCid: suite.verifiableCID1,
 		VoteOption:    oracletypes.VOTE_OPTION_YES,
