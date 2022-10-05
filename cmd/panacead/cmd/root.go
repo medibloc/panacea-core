@@ -38,6 +38,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/crisis"
 	genutilcli "github.com/cosmos/cosmos-sdk/x/genutil/client/cli"
 	"github.com/medibloc/panacea-core/v2/app"
+
 )
 
 var ChainID string
@@ -114,6 +115,7 @@ func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
 		AddGenesisWasmMsgCmd(app.DefaultNodeHome),
 		AddGenesisOracleCmd(app.DefaultNodeHome),
 		EncryptData(app.DefaultNodeHome),
+		DecryptData(app.DefaultNodeHome),
 	)
 
 	a := appCreator{encodingConfig}
