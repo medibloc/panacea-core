@@ -268,7 +268,7 @@ func (k Keeper) validateDataDeliveryVote(ctx sdk.Context, vote *types.DataDelive
 		return err
 	}
 	if oracle.Status != oracletypes.ORACLE_STATUS_ACTIVE {
-		return fmt.Errorf("this oracle is not in 'ACTIVE' state")
+		return sdkerrors.Wrap(types.ErrOracleNotActive, "")
 	}
 
 	dataSale, err := k.GetDataSale(ctx, vote.VerifiableCid, vote.DealId)
@@ -276,7 +276,7 @@ func (k Keeper) validateDataDeliveryVote(ctx sdk.Context, vote *types.DataDelive
 		return err
 	}
 	if dataSale.Status != types.DATA_SALE_STATUS_DELIVERY_VOTING_PERIOD {
-		return fmt.Errorf("the current voted data's status is not 'DELIVERT_VOTING_PERIOD'")
+		return fmt.Errorf("the current voted data's status is not 'DELIVERY_VOTING_PERIOD'")
 	}
 	return nil
 }

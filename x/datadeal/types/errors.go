@@ -16,4 +16,5 @@ var (
 	ErrDataSaleNotFound = sdkerrors.Register(ModuleName, 8, "data sale not found")
 	//ErrDataVerificationVote = sdkerrors.Register(ModuleName, 9, "error while voting for DataVerification")
 	ErrDataDeliveryVote = sdkerrors.Register(ModuleName, 10, "error while voting for DataDelivery")
+	ErrOracleNotActive  = sdkerrors.Register(ModuleName, 11, "oracle is not in 'ACTIVE' state")
 )

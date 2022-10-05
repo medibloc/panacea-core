@@ -79,8 +79,8 @@ func (m DataSale) ValidateBasic() error {
 }
 
 func (m DataDeliveryVote) ValidateBasic() error {
-	if m.DealId <= 0 {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "dealID should be bigger than 0")
+	if m.DealId == 0 {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "dealID can not be 0")
 	}
 
 	if _, err := sdk.AccAddressFromBech32(m.VoterAddress); err != nil {
