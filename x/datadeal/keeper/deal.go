@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"strconv"
 
-	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
@@ -247,25 +246,15 @@ func (k Keeper) VoteDataVerification(ctx sdk.Context, vote *types.DataVerificati
 		return sdkerrors.Wrapf(types.ErrDataVerificationVote, err.Error())
 	}
 
-	voterAcc, err := sdk.AccAddressFromBech32(vote.VoterAddress)
-	if err != nil {
-		return err
-	}
-
-	voterPubKey, err := k.accountKeeper.GetPubKey(ctx, voterAcc)
-	if err != nil {
-		return err
-	}
-
-	if !k.verifyVoteSignature(ctx, vote, voterPubKey, signature) {
+	if !k.verifyVoteSignature(ctx, vote, signature) {
 		return sdkerrors.Wrap(oracletypes.ErrDetectionMaliciousBehavior, "")
 	}
 
-	if err = k.validateDataVerificationVote(ctx, vote); err != nil {
+	if err := k.validateDataVerificationVote(ctx, vote); err != nil {
 		return sdkerrors.Wrap(types.ErrDataVerificationVote, err.Error())
 	}
 
-	if err = k.SetDataVerificationVote(ctx, vote); err != nil {
+	if err := k.SetDataVerificationVote(ctx, vote); err != nil {
 		return sdkerrors.Wrap(types.ErrDataVerificationVote, err.Error())
 	}
 
@@ -273,7 +262,7 @@ func (k Keeper) VoteDataVerification(ctx sdk.Context, vote *types.DataVerificati
 }
 
 // verifyVoteSignature defines to check for malicious requests.
-func (k Keeper) verifyVoteSignature(ctx sdk.Context, vote *types.DataVerificationVote, sellerPubKey cryptotypes.PubKey, signature []byte) bool {
+func (k Keeper) verifyVoteSignature(ctx sdk.Context, vote *types.DataVerificationVote, signature []byte) bool {
 	voteBz := k.cdc.MustMarshal(vote)
 
 	oraclePubKeyBz := k.oracleKeeper.GetParams(ctx).MustDecodeOraclePublicKey()

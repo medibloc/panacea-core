@@ -65,7 +65,6 @@ message MsgVoteDataVerificationResponse {
 // DataVerificationVote defines the vote info for verifying data.
 message DataVerificationVote {
   string voter_address = 1;
-  string seller_address = 2;
   uint64 deal_id = 3;
   string verifiable_cid = 4;
   panacea.oracle.v2alpha2.VoteOption vote_option = 5;

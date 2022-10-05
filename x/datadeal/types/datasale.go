@@ -83,11 +83,7 @@ func (m DataVerificationVote) ValidateBasic() error {
 		return sdkerrors.Wrapf(err, "voterAddress is invalid. address: %s", m.VoterAddress)
 	}
 
-	if _, err := sdk.AccAddressFromBech32(m.SellerAddress); err != nil {
-		return sdkerrors.Wrapf(err, "sellerAddress is invalid. address: %s", m.VoterAddress)
-	}
-
-	if m.DealId <= 0 {
+	if m.DealId == 0 {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "dealID should be bigger than 0")
 	}
 

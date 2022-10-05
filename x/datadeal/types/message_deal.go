@@ -123,13 +123,10 @@ func (msg *MsgVoteDataVerification) ValidateBasic() error {
 	if _, err := sdk.AccAddressFromBech32(msg.DataVerificationVote.VoterAddress); err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid voter address (%s)", err)
 	}
-	if _, err := sdk.AccAddressFromBech32(msg.DataVerificationVote.SellerAddress); err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid seller address (%s)", err)
-	}
 	if len(msg.DataVerificationVote.VerifiableCid) == 0 {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "verifiable CID cannot be empty")
 	}
-	if msg.DataVerificationVote.DealId <= 0 {
+	if msg.DataVerificationVote.DealId == 0 {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "deal ID must be bigger than zero(0)")
 	}
 
