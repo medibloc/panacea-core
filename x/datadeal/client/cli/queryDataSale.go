@@ -11,8 +11,8 @@ import (
 
 func GetCmdDataSale() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "datasale [dealID] [verifiableCID]",
-		Short: "Query a datasale",
+		Use:   "datasale [deal_id] [verifiable_cid]",
+		Short: "Query a datasale info",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientQueryContext(cmd)
