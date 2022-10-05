@@ -78,17 +78,12 @@ message DataVerificationVote {
 
 // MsgVoteDataDelivery defines the Msg/VoteDataDelivery request type.
 message MsgVoteDataDelivery {
-  SignedDataDeliveryVote signed_data_delivery_vote = 1;
+  DataDeliveryVote data_delivery_vote = 1;
+  bytes signature = 2;
 }
 
 // MsgVoteDataDeliveryResponse defines the Msg/VoteDataDelivery response type.
 message MsgVoteDataDeliveryResponse {
-}
-
-// SignedDataDeliveryVote defines the DataDeliveryVote with signature.
-message SignedDataDeliveryVote {
-  DataDeliveryVote data_delivery_vote = 1;
-  bytes signature = 2;
 }
 
 // DataDeliveryVote defines the vote info for delivering data.
