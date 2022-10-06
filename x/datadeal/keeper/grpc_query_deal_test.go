@@ -51,7 +51,7 @@ func (suite *queryDealTestSuite) TestQueryDeal() {
 	res, err := suite.DataDealKeeper.Deal(sdk.WrapSDKContext(suite.Ctx), &req)
 	suite.Require().NoError(err)
 	suite.Require().NotNil(res)
-	suite.Require().Equal(deal, *res.Deal)
+	suite.Require().Equal(deal, res.Deal)
 }
 
 func (suite queryDealTestSuite) TestQueryDeals() {

@@ -14,8 +14,8 @@ type DataDealBaseTestSuite struct {
 	testsuite.TestSuite
 }
 
-func (suite *DataDealBaseTestSuite) MakeTestDeal(dealID uint64, buyerAddr sdk.AccAddress) types.Deal {
-	return types.Deal{
+func (suite *DataDealBaseTestSuite) MakeTestDeal(dealID uint64, buyerAddr sdk.AccAddress) *types.Deal {
+	return &types.Deal{
 		Id:           dealID,
 		Address:      types.NewDealAddress(dealID).String(),
 		DataSchema:   []string{"http://jsonld.com"},

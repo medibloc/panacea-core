@@ -9,6 +9,11 @@ import (
 // InitGenesis initializes the capability module's state from a provided genesis
 // state.
 func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) {
+	for _, deal := range genState.Deals {
+		if err := k.SetDeal(ctx, &deal); err != nil {
+			panic(err)
+		}
+	}
 	for _, dataSale := range genState.DataSales {
 		if err := k.SetDataSale(ctx, &dataSale); err != nil {
 			panic(err)
@@ -19,8 +24,8 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 		panic(err)
 	}
 
-	for _, deal := range genState.Deals {
-		if err := k.SetDeal(ctx, deal); err != nil {
+	for _, dataDeliveryVote := range genState.DataDeliveryVotes {
+		if err := k.SetDataDeliveryVote(ctx, &dataDeliveryVote); err != nil {
 			panic(err)
 		}
 	}
@@ -30,25 +35,29 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	genesis := types.DefaultGenesis()
 
-	dataSales, err := k.GetAllDataSaleList(ctx)
-	if err != nil {
-		panic(err)
-	}
-
 	deals, err := k.GetAllDeals(ctx)
 	if err != nil {
 		panic(err)
 	}
+	genesis.Deals = deals
 
+	dataSales, err := k.GetAllDataSaleList(ctx)
+	if err != nil {
+		panic(err)
+	}
 	genesis.DataSales = dataSales
 
 	nextDealNum, err := k.GetNextDealNumber(ctx)
 	if err != nil {
 		panic(err)
 	}
+	genesis.NextDealNumber = nextDealNum
 
-	return &types.GenesisState{
-		Deals:          deals,
-		NextDealNumber: nextDealNum,
+	dataDeliveryVotes, err := k.GetAllDataDeliveryVoteList(ctx)
+	if err != nil {
+		panic(err)
 	}
+	genesis.DataDeliveryVotes = dataDeliveryVotes
+
+	return genesis
 }
