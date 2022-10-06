@@ -20,6 +20,10 @@ type queryDealTestSuite struct {
 
 	buyerAccAddr sdk.AccAddress
 
+	oracleAccPrivKey cryptotypes.PrivKey
+	oracleAccPubKey  cryptotypes.PubKey
+	oracleAccAddr    sdk.AccAddress
+
 	verifiableCID string
 }
 
@@ -36,6 +40,10 @@ func (suite *queryDealTestSuite) BeforeTest(_, _ string) {
 	suite.sellerAccPrivKey = secp256k1.GenPrivKey()
 	suite.sellerAccPubKey = suite.sellerAccPrivKey.PubKey()
 	suite.sellerAccAddr = sdk.AccAddress(suite.sellerAccPubKey.Address())
+
+	suite.oracleAccPrivKey = secp256k1.GenPrivKey()
+	suite.oracleAccPubKey = suite.oracleAccPrivKey.PubKey()
+	suite.oracleAccAddr = sdk.AccAddress(suite.oracleAccPubKey.Address())
 }
 
 func (suite *queryDealTestSuite) TestQueryDeal() {
@@ -95,4 +103,19 @@ func (suite queryDealTestSuite) TestDataSale() {
 	suite.Require().Equal(newDataSale.VotingPeriod.VotingStartTime.UTC(), res.DataSale.VotingPeriod.VotingStartTime)
 	suite.Require().Equal(newDataSale.VotingPeriod.VotingEndTime.UTC(), res.DataSale.VotingPeriod.VotingEndTime)
 	suite.Require().Equal(newDataSale.SellerAddress, res.DataSale.SellerAddress)
+}
+
+func (suite queryDealTestSuite) TestDataVerificationVote() {
+	dataVerificationVote := suite.MakeNewDataVerificationVote(suite.oracleAccAddr, suite.verifiableCID)
+	err := suite.DataDealKeeper.SetDataVerificationVote(suite.Ctx, dataVerificationVote)
+	suite.Require().NoError(err)
+
+	req := types.QueryDataVerificationVoteRequest{
+		DealId:        1,
+		VerifiableCid: suite.verifiableCID,
+		VoterAddress:  suite.oracleAccAddr.String(),
+	}
+
+	res, err := suite.DataDealKeeper.DataVerificationVote(sdk.WrapSDKContext(suite.Ctx), &req)
+	suite.Require().Equal(dataVerificationVote, res.DataVerificationVote)
 }
