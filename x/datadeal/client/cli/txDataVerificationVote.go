@@ -1,35 +1,33 @@
 package cli
 
 import (
-	"strconv"
+	"os"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
+	"github.com/gogo/protobuf/jsonpb"
 	"github.com/medibloc/panacea-core/v2/x/datadeal/types"
 	"github.com/spf13/cobra"
 )
 
-func CmdSellData() *cobra.Command {
+func CmdVoteDataVerification() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "sell-data [deal_id] [verifiable_cid]",
-		Short: "Sell data",
-		Args:  cobra.ExactArgs(2),
+		Use:   "data-verification-vote [path]",
+		Short: "Vote for data verification",
+		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
 
-			sellerAddress := clientCtx.GetFromAddress().String()
-
-			dealID, err := strconv.ParseUint(args[0], 10, 64)
+			msg, err := readMsgFrom(args[0])
 			if err != nil {
 				return err
 			}
 
-			msg := types.NewMsgSellData(dealID, args[1], sellerAddress)
-			if err = msg.ValidateBasic(); err != nil {
+			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
 
@@ -38,6 +36,21 @@ func CmdSellData() *cobra.Command {
 	}
 
 	flags.AddTxFlagsToCmd(cmd)
-
 	return cmd
+}
+
+func readMsgFrom(path string) (*types.MsgVoteDataVerification, error) {
+	var msg types.MsgVoteDataVerification
+
+	file, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	if err := jsonpb.Unmarshal(file, &msg); err != nil {
+		return nil, err
+	}
+
+	return &msg, nil
 }
