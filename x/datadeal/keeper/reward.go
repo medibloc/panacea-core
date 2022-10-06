@@ -21,6 +21,7 @@ func (k Keeper) DistributeRewards(ctx sdk.Context, dealID uint64, oracles map[st
 		panic(err)
 	}
 
+	// calculate oracle commission
 	totalBudget := deal.GetBudget().Amount.ToDec()
 	maxNumData := sdk.NewIntFromUint64(deal.GetMaxNumData()).ToDec()
 	oracleCommission := k.oracleKeeper.GetParams(ctx).OracleCommissionRate
@@ -45,6 +46,7 @@ func (k Keeper) DistributeRewards(ctx sdk.Context, dealID uint64, oracles map[st
 	}
 	totalVotingPowerDec := totalVotingPower.ToDec()
 
+	// distribute rewards
 	for _, oracle := range oracles {
 		if oracle.IsPossibleVote() {
 			bondedDec := oracle.BondedTokens.ToDec()

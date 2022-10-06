@@ -51,7 +51,7 @@ func (suite *DataDealBaseTestSuite) SetValidator(pubKey cryptotypes.PubKey, amou
 	suite.Require().NoError(err)
 	validator = validator.UpdateStatus(stakingtypes.Bonded)
 	validator, _ = validator.AddTokensFromDel(amount)
-	newCommission := stakingtypes.NewCommission(commission, sdk.OneDec(), sdk.NewDecWithPrec(5, 1)) // commission 10%
+	newCommission := stakingtypes.NewCommission(commission, sdk.OneDec(), sdk.NewDecWithPrec(5, 1))
 	validator.Commission = newCommission
 
 	suite.StakingKeeper.SetValidator(suite.Ctx, validator)

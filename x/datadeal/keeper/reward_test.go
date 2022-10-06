@@ -46,7 +46,7 @@ func TestRewardTestSuite(t *testing.T) {
 func (suite *rewardTestSuite) BeforeTest(_, _ string) {
 	ctx := suite.Ctx
 
-	suite.defaultFunds = sdk.NewCoins(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(10000000000))) // 10,000 MED
+	suite.defaultFunds = sdk.NewCoins(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(10_000_000_000))) // 10,000 MED
 
 	suite.sellerAccPrivKey = secp256k1.GenPrivKey()
 	suite.sellerAccPubKey = suite.sellerAccPrivKey.PubKey()
