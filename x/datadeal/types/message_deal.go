@@ -3,6 +3,7 @@ package types
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	oracletypes "github.com/medibloc/panacea-core/v2/x/oracle/types"
 )
 
 var _ sdk.Msg = &MsgCreateDeal{}
@@ -153,8 +154,8 @@ func (msg *MsgVoteDataDelivery) ValidateBasic() error {
 	if _, err := sdk.AccAddressFromBech32(msg.DataDeliveryVote.VoterAddress); err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid voter address (%s)", err)
 	}
-	if len(msg.DataDeliveryVote.DeliveredCid) == 0 {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "Delivered Cid can not be empty")
+	if len(msg.DataDeliveryVote.DeliveredCid) == 0 && msg.DataDeliveryVote.VoteOption == oracletypes.VOTE_OPTION_YES {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "Delivered Cid can not be empty when vote option is yes")
 	}
 	if len(msg.DataDeliveryVote.VerifiableCid) == 0 {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "Verifiable Cid can not be empty")
