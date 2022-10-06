@@ -19,6 +19,7 @@ import (
 	"github.com/tendermint/tendermint/libs/log"
 	dbm "github.com/tendermint/tm-db"
 
+	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/debug"
@@ -37,9 +38,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/crisis"
 	genutilcli "github.com/cosmos/cosmos-sdk/x/genutil/client/cli"
 	"github.com/medibloc/panacea-core/v2/app"
-	"github.com/medibloc/panacea-core/v2/client/decrypt"
 
-	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
 )
 
 var ChainID string
@@ -115,6 +114,8 @@ func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
 		// this line is used by starport scaffolding # stargate/root/commands
 		AddGenesisWasmMsgCmd(app.DefaultNodeHome),
 		AddGenesisOracleCmd(app.DefaultNodeHome),
+		EncryptData(app.DefaultNodeHome),
+		DecryptData(app.DefaultNodeHome),
 	)
 
 	a := appCreator{encodingConfig}
@@ -126,7 +127,6 @@ func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
 		queryCommand(),
 		txCommand(),
 		keys.Commands(app.DefaultNodeHome),
-		decrypt.Command(app.DefaultNodeHome),
 	)
 }
 
