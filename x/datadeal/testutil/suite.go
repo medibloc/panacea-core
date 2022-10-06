@@ -3,7 +3,9 @@ package testutil
 import (
 	"time"
 
+	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	"github.com/medibloc/panacea-core/v2/types/assets"
 	"github.com/medibloc/panacea-core/v2/types/testsuite"
 	"github.com/medibloc/panacea-core/v2/x/datadeal/types"
@@ -41,4 +43,20 @@ func (suite *DataDealBaseTestSuite) MakeNewDataSale(sellerAddr sdk.AccAddress, v
 		VerificationTallyResult: nil,
 		DeliveryTallyResult:     nil,
 	}
+}
+
+func (suite *DataDealBaseTestSuite) SetValidator(pubKey cryptotypes.PubKey, amount sdk.Int, commission sdk.Dec) stakingtypes.Validator {
+	varAddr := sdk.ValAddress(pubKey.Address().Bytes())
+	validator, err := stakingtypes.NewValidator(varAddr, pubKey, stakingtypes.Description{})
+	suite.Require().NoError(err)
+	validator = validator.UpdateStatus(stakingtypes.Bonded)
+	validator, _ = validator.AddTokensFromDel(amount)
+	newCommission := stakingtypes.NewCommission(commission, sdk.OneDec(), sdk.NewDecWithPrec(5, 1)) // commission 10%
+	validator.Commission = newCommission
+
+	suite.StakingKeeper.SetValidator(suite.Ctx, validator)
+	err = suite.StakingKeeper.SetValidatorByConsAddr(suite.Ctx, validator)
+	suite.Require().NoError(err)
+
+	return validator
 }
