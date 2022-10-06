@@ -28,7 +28,7 @@ func (k Keeper) DistributeRewards(ctx sdk.Context, dealID uint64, oracles map[st
 
 	dealBalance := k.bankKeeper.GetBalance(ctx, dealAddress, assets.MicroMedDenom)
 	if dealBalance.IsLT(pricePerData) {
-		panic(fmt.Sprintf("deal's balanace is not enough"))
+		panic(fmt.Errorf("deal's balanace is not enough"))
 	}
 
 	totalReward := sdk.NewDecCoinsFromCoins(pricePerData)
