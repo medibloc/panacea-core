@@ -289,12 +289,7 @@ func (suite dealTestSuite) TestDataVerificationVoteSuccess() {
 	err = suite.DataDealKeeper.SetDataSale(suite.Ctx, dataSale)
 	suite.Require().NoError(err)
 
-	dataVerificationVote := &types.DataVerificationVote{
-		VoterAddress:  suite.oracleAccAddr.String(),
-		DealId:        1,
-		VerifiableCid: suite.verifiableCID1,
-		VoteOption:    oracletypes.VOTE_OPTION_YES,
-	}
+	dataVerificationVote := suite.MakeNewDataVerificationVote(suite.oracleAccAddr, suite.verifiableCID1)
 
 	voteBz, err := suite.Cdc.Marshaler.Marshal(dataVerificationVote)
 	suite.Require().NoError(err)
@@ -323,12 +318,7 @@ func (suite dealTestSuite) TestDataVerificationVoteFailedVerifySignature() {
 	err := suite.DataDealKeeper.SetDataSale(suite.Ctx, dataSale)
 	suite.Require().NoError(err)
 
-	dataVerificationVote := &types.DataVerificationVote{
-		VoterAddress:  suite.oracleAccAddr.String(),
-		DealId:        1,
-		VerifiableCid: suite.verifiableCID1,
-		VoteOption:    oracletypes.VOTE_OPTION_YES,
-	}
+	dataVerificationVote := suite.MakeNewDataVerificationVote(suite.oracleAccAddr, suite.verifiableCID1)
 
 	voteBz, err := suite.Cdc.Marshaler.Marshal(dataVerificationVote)
 	suite.Require().NoError(err)
@@ -369,12 +359,7 @@ func (suite dealTestSuite) TestDataVerificationInvalidDataSaleStatus() {
 	err = suite.DataDealKeeper.SetDataSale(suite.Ctx, getDataSale)
 	suite.Require().NoError(err)
 
-	dataVerificationVote := &types.DataVerificationVote{
-		VoterAddress:  suite.oracleAccAddr.String(),
-		DealId:        1,
-		VerifiableCid: suite.verifiableCID1,
-		VoteOption:    oracletypes.VOTE_OPTION_YES,
-	}
+	dataVerificationVote := suite.MakeNewDataVerificationVote(suite.oracleAccAddr, suite.verifiableCID1)
 
 	voteBz, err := suite.Cdc.Marshaler.Marshal(dataVerificationVote)
 	suite.Require().NoError(err)
@@ -423,12 +408,7 @@ func (suite dealTestSuite) TestDataVerificationInvalidGenesisOracleStatus() {
 	err = suite.DataDealKeeper.SetDataSale(suite.Ctx, dataSale)
 	suite.Require().NoError(err)
 
-	dataVerificationVote := &types.DataVerificationVote{
-		VoterAddress:  suite.oracleAccAddr.String(),
-		DealId:        1,
-		VerifiableCid: suite.verifiableCID1,
-		VoteOption:    oracletypes.VOTE_OPTION_YES,
-	}
+	dataVerificationVote := suite.MakeNewDataVerificationVote(suite.oracleAccAddr, suite.verifiableCID1)
 
 	voteBz, err := suite.Cdc.Marshaler.Marshal(dataVerificationVote)
 	suite.Require().NoError(err)
@@ -441,4 +421,68 @@ func (suite dealTestSuite) TestDataVerificationInvalidGenesisOracleStatus() {
 	err = suite.DataDealKeeper.VoteDataVerification(suite.Ctx, dataVerificationVote, signature)
 	suite.Require().Error(err, types.ErrDataVerificationVote)
 	suite.Require().ErrorContains(err, "this oracle is not in 'ACTIVE' state")
+}
+
+func (suite dealTestSuite) TestGetAllDataVerificationVoteList() {
+	oracleAccAddr := sdk.AccAddress(suite.oracleAccPubKey.Address().Bytes())
+	oracleAccount := suite.AccountKeeper.NewAccountWithAddress(suite.Ctx, oracleAccAddr)
+	suite.Require().NoError(oracleAccount.SetPubKey(suite.oracleAccPubKey))
+	suite.AccountKeeper.SetAccount(suite.Ctx, oracleAccount)
+
+	err := suite.OracleKeeper.SetOracle(suite.Ctx, &oracletypes.Oracle{
+		Address:  suite.oracleAccAddr.String(),
+		Status:   oracletypes.ORACLE_STATUS_ACTIVE,
+		Uptime:   0,
+		JailedAt: nil,
+	})
+	suite.Require().NoError(err)
+
+	type dataVerificationVoteKey struct {
+		dealID        uint64
+		verifiableCID string
+		voterAddress  sdk.AccAddress
+	}
+	dataVerificationVoteKeys := make([]dataVerificationVoteKey, 0)
+
+	verificationVote1 := suite.MakeNewDataVerificationVote(suite.oracleAccAddr, suite.verifiableCID1)
+	err = suite.DataDealKeeper.SetDataVerificationVote(suite.Ctx, verificationVote1)
+	suite.Require().NoError(err)
+	voterAcc, err := sdk.AccAddressFromBech32(verificationVote1.VoterAddress)
+	suite.Require().NoError(err)
+	dataVerificationVoteKeys = append(dataVerificationVoteKeys, dataVerificationVoteKey{verificationVote1.DealId, verificationVote1.VerifiableCid, voterAcc})
+
+	verificationVote2 := suite.MakeNewDataVerificationVote(suite.oracleAccAddr, suite.verifiableCID2)
+	err = suite.DataDealKeeper.SetDataVerificationVote(suite.Ctx, verificationVote2)
+	suite.Require().NoError(err)
+	voterAcc, err = sdk.AccAddressFromBech32(verificationVote2.VoterAddress)
+	suite.Require().NoError(err)
+	dataVerificationVoteKeys = append(dataVerificationVoteKeys, dataVerificationVoteKey{verificationVote2.DealId, verificationVote2.VerifiableCid, voterAcc})
+
+	verificationVote3 := suite.MakeNewDataVerificationVote(suite.oracleAccAddr, suite.verifiableCID3)
+	err = suite.DataDealKeeper.SetDataVerificationVote(suite.Ctx, verificationVote3)
+	suite.Require().NoError(err)
+	voterAcc, err = sdk.AccAddressFromBech32(verificationVote3.VoterAddress)
+	suite.Require().NoError(err)
+	dataVerificationVoteKeys = append(dataVerificationVoteKeys, dataVerificationVoteKey{verificationVote3.DealId, verificationVote3.VerifiableCid, voterAcc})
+
+	allDataVerificationVoteList, err := suite.DataDealKeeper.GetAllDataVerificationVoteList(suite.Ctx)
+	suite.Require().NoError(err)
+
+	sort.Slice(dataVerificationVoteKeys, func(i, j int) bool {
+		return dataVerificationVoteKeys[i].verifiableCID < dataVerificationVoteKeys[j].verifiableCID
+	})
+
+	sort.Slice(allDataVerificationVoteList, func(i, j int) bool {
+		return allDataVerificationVoteList[i].VerifiableCid < allDataVerificationVoteList[j].VerifiableCid
+	})
+
+	for i, dataVerificationVoteKey := range dataVerificationVoteKeys {
+		dataVerificationVote, err := suite.DataDealKeeper.GetDataVerificationVote(suite.Ctx, dataVerificationVoteKey.verifiableCID, dataVerificationVoteKey.voterAddress.String(), dataVerificationVoteKey.dealID)
+		suite.Require().NoError(err)
+
+		suite.Require().Equal(dataVerificationVote.VerifiableCid, allDataVerificationVoteList[i].VerifiableCid)
+		suite.Require().Equal(dataVerificationVote.DealId, allDataVerificationVoteList[i].DealId)
+		suite.Require().Equal(dataVerificationVote.VoterAddress, allDataVerificationVoteList[i].VoterAddress)
+		suite.Require().Equal(dataVerificationVote.VoteOption, allDataVerificationVoteList[i].VoteOption)
+	}
 }
