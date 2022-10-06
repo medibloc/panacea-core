@@ -289,12 +289,7 @@ func (suite dealTestSuite) TestDataVerificationVoteSuccess() {
 	err = suite.DataDealKeeper.SetDataSale(suite.Ctx, dataSale)
 	suite.Require().NoError(err)
 
-	dataVerificationVote := &types.DataVerificationVote{
-		VoterAddress:  suite.oracleAccAddr.String(),
-		DealId:        1,
-		VerifiableCid: suite.verifiableCID1,
-		VoteOption:    oracletypes.VOTE_OPTION_YES,
-	}
+	dataVerificationVote := suite.MakeNewDataVerificationVote(suite.oracleAccAddr, suite.verifiableCID1)
 
 	voteBz, err := suite.Cdc.Marshaler.Marshal(dataVerificationVote)
 	suite.Require().NoError(err)
@@ -323,12 +318,7 @@ func (suite dealTestSuite) TestDataVerificationVoteFailedVerifySignature() {
 	err := suite.DataDealKeeper.SetDataSale(suite.Ctx, dataSale)
 	suite.Require().NoError(err)
 
-	dataVerificationVote := &types.DataVerificationVote{
-		VoterAddress:  suite.oracleAccAddr.String(),
-		DealId:        1,
-		VerifiableCid: suite.verifiableCID1,
-		VoteOption:    oracletypes.VOTE_OPTION_YES,
-	}
+	dataVerificationVote := suite.MakeNewDataVerificationVote(suite.oracleAccAddr, suite.verifiableCID1)
 
 	voteBz, err := suite.Cdc.Marshaler.Marshal(dataVerificationVote)
 	suite.Require().NoError(err)
@@ -369,12 +359,7 @@ func (suite dealTestSuite) TestDataVerificationInvalidDataSaleStatus() {
 	err = suite.DataDealKeeper.SetDataSale(suite.Ctx, getDataSale)
 	suite.Require().NoError(err)
 
-	dataVerificationVote := &types.DataVerificationVote{
-		VoterAddress:  suite.oracleAccAddr.String(),
-		DealId:        1,
-		VerifiableCid: suite.verifiableCID1,
-		VoteOption:    oracletypes.VOTE_OPTION_YES,
-	}
+	dataVerificationVote := suite.MakeNewDataVerificationVote(suite.oracleAccAddr, suite.verifiableCID1)
 
 	voteBz, err := suite.Cdc.Marshaler.Marshal(dataVerificationVote)
 	suite.Require().NoError(err)
@@ -423,12 +408,7 @@ func (suite dealTestSuite) TestDataVerificationInvalidGenesisOracleStatus() {
 	err = suite.DataDealKeeper.SetDataSale(suite.Ctx, dataSale)
 	suite.Require().NoError(err)
 
-	dataVerificationVote := &types.DataVerificationVote{
-		VoterAddress:  suite.oracleAccAddr.String(),
-		DealId:        1,
-		VerifiableCid: suite.verifiableCID1,
-		VoteOption:    oracletypes.VOTE_OPTION_YES,
-	}
+	dataVerificationVote := suite.MakeNewDataVerificationVote(suite.oracleAccAddr, suite.verifiableCID1)
 
 	voteBz, err := suite.Cdc.Marshaler.Marshal(dataVerificationVote)
 	suite.Require().NoError(err)
