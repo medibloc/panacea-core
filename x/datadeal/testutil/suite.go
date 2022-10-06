@@ -58,3 +58,13 @@ func (suite *DataDealBaseTestSuite) MakeNewDataSaleDeliveryVoting(sellerAddr sdk
 		DeliveryTallyResult:     nil,
 	}
 }
+
+func (suite *DataDealBaseTestSuite) MakeNewDataDeliveryVote(voterAddr sdk.AccAddress, verifiableCID, deliveredCID string, dealID uint64) *types.DataDeliveryVote {
+	return &types.DataDeliveryVote{
+		VoterAddress:  voterAddr.String(),
+		DealId:        dealID,
+		VerifiableCid: verifiableCID,
+		DeliveredCid:  deliveredCID,
+		VoteOption:    oracletypes.VOTE_OPTION_YES,
+	}
+}
