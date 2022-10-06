@@ -11,7 +11,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func CmdDataVerificationVote() *cobra.Command {
+func CmdVoteDataVerification() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "data-verification-vote [path]",
 		Short: "Vote for data verification",

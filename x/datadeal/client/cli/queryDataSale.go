@@ -9,7 +9,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func GetCmdDataSale() *cobra.Command {
+func CmdGetDataSale() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "datasale [deal_id] [verifiable_cid]",
 		Short: "Query a datasale info",

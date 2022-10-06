@@ -11,7 +11,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func CmdRegisterOracleVote() *cobra.Command {
+func CmdVoteOracleRegistration() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "register-oracle-vote [path]",
 		Short: "Vote for register new oracle",
