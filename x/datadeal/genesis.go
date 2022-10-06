@@ -59,10 +59,5 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	}
 	genesis.DataDeliveryVotes = dataDeliveryVotes
 
-	return &types.GenesisState{
-		Deals:             deals,
-		NextDealNumber:    nextDealNum,
-		DataSales:         dataSales,
-		DataDeliveryVotes: dataDeliveryVotes,
-	}
+	return genesis
 }
