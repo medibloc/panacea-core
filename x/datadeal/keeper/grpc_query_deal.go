@@ -22,7 +22,7 @@ func (k Keeper) Deal(goCtx context.Context, req *types.QueryDealRequest) (*types
 	}
 
 	return &types.QueryDealResponse{
-		Deal: &deal,
+		Deal: deal,
 	}, nil
 }
 

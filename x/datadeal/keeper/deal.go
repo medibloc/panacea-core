@@ -47,7 +47,7 @@ func (k Keeper) CreateDeal(ctx sdk.Context, buyerAddress sdk.AccAddress, msg *ty
 		return 0, sdkerrors.Wrapf(err, "Failed to send coins to deal account")
 	}
 
-	if err = k.SetDeal(ctx, *newDeal); err != nil {
+	if err = k.SetDeal(ctx, newDeal); err != nil {
 		return 0, err
 	}
 
@@ -98,26 +98,26 @@ func (k Keeper) GetNextDealNumberAndIncrement(ctx sdk.Context) (uint64, error) {
 	return dealNumber, nil
 }
 
-func (k Keeper) GetDeal(ctx sdk.Context, dealID uint64) (types.Deal, error) {
+func (k Keeper) GetDeal(ctx sdk.Context, dealID uint64) (*types.Deal, error) {
 	store := ctx.KVStore(k.storeKey)
 	dealKey := types.GetDealKey(dealID)
 
 	bz := store.Get(dealKey)
 	if bz == nil {
-		return types.Deal{}, sdkerrors.Wrapf(types.ErrDealNotFound, "deal with ID %d does not exist", dealID)
+		return nil, sdkerrors.Wrapf(types.ErrDealNotFound, "deal with ID %d does not exist", dealID)
 	}
 
-	var deal types.Deal
-	if err := k.cdc.UnmarshalLengthPrefixed(bz, &deal); err != nil {
-		return types.Deal{}, err
+	deal := &types.Deal{}
+	if err := k.cdc.UnmarshalLengthPrefixed(bz, deal); err != nil {
+		return nil, err
 	}
 	return deal, nil
 }
 
-func (k Keeper) SetDeal(ctx sdk.Context, deal types.Deal) error {
+func (k Keeper) SetDeal(ctx sdk.Context, deal *types.Deal) error {
 	store := ctx.KVStore(k.storeKey)
 	dealKey := types.GetDealKey(deal.GetId())
-	bz, err := k.cdc.MarshalLengthPrefixed(&deal)
+	bz, err := k.cdc.MarshalLengthPrefixed(deal)
 	if err != nil {
 		return sdkerrors.Wrapf(err, "Failed to set deal")
 	}
@@ -299,16 +299,16 @@ func (k Keeper) SetDataDeliveryVote(ctx sdk.Context, vote *types.DataDeliveryVot
 	return nil
 }
 
-func (k Keeper) GetDataDeliveryVote(ctx sdk.Context, veifiableCID, voterAddress string, dealID uint64) (*types.DataDeliveryVote, error) {
+func (k Keeper) GetDataDeliveryVote(ctx sdk.Context, verifiableCID, voterAddress string, dealID uint64) (*types.DataDeliveryVote, error) {
 	store := ctx.KVStore(k.storeKey)
 	voterAccAddr, err := sdk.AccAddressFromBech32(voterAddress)
 	if err != nil {
 		return nil, err
 	}
-	key := types.GetDataDeliveryVoteKey(veifiableCID, voterAccAddr, dealID)
+	key := types.GetDataDeliveryVoteKey(verifiableCID, voterAccAddr, dealID)
 	bz := store.Get(key)
 	if bz == nil {
-		return nil, fmt.Errorf("DataSale does not exist. dealID: %d, voterAddress: %s, verifiableCID: %s", dealID, voterAddress, veifiableCID)
+		return nil, fmt.Errorf("DataSale does not exist. dealID: %d, voterAddress: %s, verifiableCID: %s", dealID, voterAddress, verifiableCID)
 	}
 	vote := &types.DataDeliveryVote{}
 	err = k.cdc.UnmarshalLengthPrefixed(bz, vote)
@@ -318,4 +318,26 @@ func (k Keeper) GetDataDeliveryVote(ctx sdk.Context, veifiableCID, voterAddress 
 	}
 
 	return vote, nil
+}
+
+func (k Keeper) GetAllDataDeliveryVoteList(ctx sdk.Context) ([]types.DataDeliveryVote, error) {
+	store := ctx.KVStore(k.storeKey)
+	iterator := sdk.KVStorePrefixIterator(store, types.DataDeliveryVoteKey)
+	defer iterator.Close()
+
+	dataDeliveryVotes := make([]types.DataDeliveryVote, 0)
+
+	for ; iterator.Valid(); iterator.Next() {
+		bz := iterator.Value()
+		var dataDeliveryVote types.DataDeliveryVote
+
+		err := k.cdc.UnmarshalLengthPrefixed(bz, &dataDeliveryVote)
+		if err != nil {
+			return nil, sdkerrors.Wrapf(types.ErrGetDataSale, err.Error())
+		}
+
+		dataDeliveryVotes = append(dataDeliveryVotes, dataDeliveryVote)
+	}
+
+	return dataDeliveryVotes, nil
 }
