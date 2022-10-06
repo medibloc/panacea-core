@@ -117,5 +117,6 @@ func (suite queryDealTestSuite) TestDataVerificationVote() {
 	}
 
 	res, err := suite.DataDealKeeper.DataVerificationVote(sdk.WrapSDKContext(suite.Ctx), &req)
+	suite.Require().NoError(err)
 	suite.Require().Equal(dataVerificationVote, res.DataVerificationVote)
 }
