@@ -13,8 +13,8 @@ import (
 
 func CmdVoteDataDelivery() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "data-verification-vote [path]",
-		Short: "Vote for data verification",
+		Use:   "data-delivery-vote [path]",
+		Short: "Vote for data delivery",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
