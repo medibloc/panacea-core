@@ -268,7 +268,7 @@ func (k Keeper) validateDataDeliveryVote(ctx sdk.Context, vote *types.DataDelive
 		return err
 	}
 	if oracle.Status != oracletypes.ORACLE_STATUS_ACTIVE {
-		return sdkerrors.Wrap(types.ErrOracleNotActive, "")
+		return types.ErrOracleNotActive
 	}
 
 	dataSale, err := k.GetDataSale(ctx, vote.VerifiableCid, vote.DealId)
