@@ -67,7 +67,7 @@ func GetDataDeliveryQueueByTimeKey(endTime time.Time) []byte {
 }
 
 func SplitDataDeliveryQueueKey(key []byte) (uint64, string) {
-	return sdk.BigEndianToUint64(key[1+lenTime+1 : 1+lenTime+1+8]), string(key[1+lenTime+1+8:])
+	return sdk.BigEndianToUint64(key[1+lenTime+1 : 1+lenTime+1+8]), string(key[1+lenTime+1+8+1:])
 }
 
 // CombineKeys function defines combines deal_id with data_hash.

@@ -33,6 +33,7 @@ func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) {
 		if tallyResult.IsPassed() {
 			dataSale.Status = types.DATA_SALE_STATUS_COMPLETED
 			dataSale.DeliveredCid = string(tallyResult.ConsensusValue)
+
 		} else {
 			dataSale.Status = types.DATA_SALE_STATUS_FAILED
 		}
