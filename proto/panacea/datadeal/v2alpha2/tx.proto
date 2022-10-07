@@ -78,26 +78,21 @@ message DataVerificationVote {
 
 // MsgVoteDataDelivery defines the Msg/VoteDataDelivery request type.
 message MsgVoteDataDelivery {
-  SignedDataDeliveryVote signed_data_delivery_vote = 1;
+  DataDeliveryVote data_delivery_vote = 1;
+  bytes signature = 2;
 }
 
 // MsgVoteDataDeliveryResponse defines the Msg/VoteDataDelivery response type.
 message MsgVoteDataDeliveryResponse {
 }
 
-// SignedDataDeliveryVote defines the DataDeliveryVote with signature.
-message SignedDataDeliveryVote {
-  DataDeliveryVote data_delivery_vote = 1;
-  bytes signature = 2;
-}
-
 // DataDeliveryVote defines the vote info for delivering data.
 message DataDeliveryVote {
   string voter_address = 1;
   uint64 deal_id = 2;
-  bytes verifiable_cid = 3;
-  bytes delivered_cid = 4;
-  panacea.oracle.v2alpha2.VoteOption valid = 5;
+  string verifiable_cid = 3;
+  string delivered_cid = 4;
+  panacea.oracle.v2alpha2.VoteOption vote_option = 5;
 }
 
 // MsgDeactivateDeal defines the Msg/DeactivateDeal request type.

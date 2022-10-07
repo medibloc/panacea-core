@@ -3,6 +3,7 @@ package types
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	oracletypes "github.com/medibloc/panacea-core/v2/x/oracle/types"
 )
 
 func NewDataSale(msg *MsgSellData) *DataSale {
@@ -73,6 +74,30 @@ func (m DataSale) ValidateBasic() error {
 		if m.DeliveryTallyResult.InvalidYes == nil {
 			return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalidYes in TallyResult must not be negative: %s", m.DeliveryTallyResult.Yes)
 		}
+	}
+
+	return nil
+}
+
+func (m DataDeliveryVote) ValidateBasic() error {
+	if m.DealId == 0 {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "dealID can not be 0")
+	}
+
+	if _, err := sdk.AccAddressFromBech32(m.VoterAddress); err != nil {
+		return sdkerrors.Wrapf(err, "voterAddress is invalid. address: %s", m.VoterAddress)
+	}
+
+	if len(m.VerifiableCid) == 0 {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "VerifiableCid is empty")
+	}
+
+	if len(m.DeliveredCid) == 0 && m.VoteOption == oracletypes.VOTE_OPTION_YES {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "vote option is yes, but DeliveredCid is empty")
+	}
+
+	if err := m.VoteOption.ValidateBasic(); err != nil {
+		return err
 	}
 
 	return nil

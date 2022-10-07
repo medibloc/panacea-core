@@ -6,10 +6,13 @@ option go_package = "github.com/medibloc/panacea-core/v2/x/datadeal/types";
 import "gogoproto/gogo.proto";
 import "panacea/datadeal/v2alpha2/deal.proto";
 import "panacea/datadeal/v2alpha2/datasale.proto";
+import "panacea/datadeal/v2alpha2/tx.proto";
 
 // GenesisState defines the datadeal module's genesis state.
 message GenesisState {
   repeated Deal deals = 1 [(gogoproto.nullable) = false];
   uint64 next_deal_number = 2;
   repeated DataSale data_sales = 3 [(gogoproto.nullable) = false];
+  repeated DataVerificationVote data_verification_votes = 4 [(gogoproto.nullable) = false];
+  repeated DataDeliveryVote data_delivery_votes = 5 [(gogoproto.nullable) = false];
 }

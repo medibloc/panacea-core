@@ -3,6 +3,7 @@ package types
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	oracletypes "github.com/medibloc/panacea-core/v2/x/oracle/types"
 )
 
 var _ sdk.Msg = &MsgCreateDeal{}
@@ -143,13 +144,34 @@ func (msg *MsgVoteDataDelivery) Type() string {
 }
 
 func (msg *MsgVoteDataDelivery) ValidateBasic() error {
-	//TODO implement me
-	panic("implement me")
+	if msg.DataDeliveryVote == nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "DataDeliveryVote cannot be nil")
+	}
+
+	if msg.DataDeliveryVote.DealId == 0 {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "deal ID cannot be 0")
+	}
+	if _, err := sdk.AccAddressFromBech32(msg.DataDeliveryVote.VoterAddress); err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid voter address (%s)", err)
+	}
+	if len(msg.DataDeliveryVote.DeliveredCid) == 0 && msg.DataDeliveryVote.VoteOption == oracletypes.VOTE_OPTION_YES {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "Delivered Cid can not be empty when vote option is yes")
+	}
+	if len(msg.DataDeliveryVote.VerifiableCid) == 0 {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "Verifiable Cid can not be empty")
+	}
+	if msg.Signature == nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "signature cannot be nil")
+	}
+	return nil
 }
 
 func (msg *MsgVoteDataDelivery) GetSigners() []sdk.AccAddress {
-	//TODO implement me
-	panic("implement me")
+	voterAddress, err := sdk.AccAddressFromBech32(msg.DataDeliveryVote.VoterAddress)
+	if err != nil {
+		panic(err)
+	}
+	return []sdk.AccAddress{voterAddress}
 }
 
 func (msg *MsgDeactivateDeal) Route() string {

@@ -33,6 +33,8 @@ var (
 	KeyIndexSeparator = []byte{0xFF}
 
 	DataSaleKey = []byte{0x03}
+
+	DataDeliveryVoteKey = []byte{0x06}
 )
 
 func GetDealKey(dealID uint64) []byte {
@@ -41,6 +43,10 @@ func GetDealKey(dealID uint64) []byte {
 
 func GetDataSaleKey(verifiableCID string, dealID uint64) []byte {
 	return append(DataSaleKey, CombineKeys(sdk.Uint64ToBigEndian(dealID), []byte(verifiableCID))...)
+}
+
+func GetDataDeliveryVoteKey(verifiableCID string, voterAddress sdk.AccAddress, dealID uint64) []byte {
+	return append(DataDeliveryVoteKey, CombineKeys(sdk.Uint64ToBigEndian(dealID), []byte(verifiableCID), voterAddress)...)
 }
 
 // CombineKeys function defines combines deal_id with data_hash.

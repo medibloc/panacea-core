@@ -1,9 +1,11 @@
 package keeper_test
 
 import (
+	"encoding/base64"
 	"sort"
 	"testing"
 
+	"github.com/btcsuite/btcd/btcec"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -22,6 +24,13 @@ type dealTestSuite struct {
 	sellerAccPrivKey cryptotypes.PrivKey
 	sellerAccPubKey  cryptotypes.PubKey
 	sellerAccAddr    sdk.AccAddress
+
+	oraclePrivKey *btcec.PrivateKey
+	oraclePubKey  *btcec.PublicKey
+
+	oracleAccPrivKey cryptotypes.PrivKey
+	oracleAccPubKey  cryptotypes.PubKey
+	oracleAccAddr    sdk.AccAddress
 
 	verifiableCID1 string
 	verifiableCID2 string
@@ -50,12 +59,19 @@ func (suite *dealTestSuite) BeforeTest(_, _ string) {
 	err = suite.DataDealKeeper.SetDeal(suite.Ctx, testDeal)
 	suite.Require().NoError(err)
 
+	suite.oraclePrivKey, _ = btcec.NewPrivateKey(btcec.S256())
+	suite.oraclePubKey = suite.oraclePrivKey.PubKey()
+
+	suite.oracleAccPrivKey = secp256k1.GenPrivKey()
+	suite.oracleAccPubKey = suite.oracleAccPrivKey.PubKey()
+	suite.oracleAccAddr = sdk.AccAddress(suite.oracleAccPubKey.Address())
+
 	suite.sellerAccPrivKey = secp256k1.GenPrivKey()
 	suite.sellerAccPubKey = suite.sellerAccPrivKey.PubKey()
 	suite.sellerAccAddr = sdk.AccAddress(suite.sellerAccPubKey.Address())
 
 	suite.OracleKeeper.SetParams(suite.Ctx, oracletypes.Params{
-		OraclePublicKey:          "",
+		OraclePublicKey:          base64.StdEncoding.EncodeToString(suite.oraclePubKey.SerializeCompressed()),
 		OraclePubKeyRemoteReport: "",
 		UniqueId:                 "",
 		OracleCommissionRate:     sdk.NewDecWithPrec(1, 1),
@@ -256,4 +272,135 @@ func (suite dealTestSuite) TestGetAllDataSalesList() {
 		suite.Require().Equal(dataSale.VotingPeriod, allDataSaleList[i].VotingPeriod)
 		suite.Require().Equal(dataSale.SellerAddress, allDataSaleList[i].SellerAddress)
 	}
+}
+
+func (suite dealTestSuite) TestDataDeliveryVoteSuccess() {
+	ctx := suite.Ctx
+
+	oracleAccount := suite.AccountKeeper.NewAccountWithAddress(suite.Ctx, suite.oracleAccAddr)
+	suite.Require().NoError(oracleAccount.SetPubKey(suite.oracleAccPubKey))
+	suite.AccountKeeper.SetAccount(suite.Ctx, oracleAccount)
+
+	err := suite.OracleKeeper.SetOracle(suite.Ctx, &oracletypes.Oracle{
+		Address:  suite.oracleAccAddr.String(),
+		Status:   oracletypes.ORACLE_STATUS_ACTIVE,
+		Uptime:   0,
+		JailedAt: nil,
+	})
+	suite.Require().NoError(err)
+
+	dataSale := suite.MakeNewDataSaleDeliveryVoting(suite.sellerAccAddr, suite.verifiableCID1)
+	err = suite.DataDealKeeper.SetDataSale(suite.Ctx, dataSale)
+	suite.Require().NoError(err)
+
+	dataDeliveryVote := &types.DataDeliveryVote{
+		VoterAddress:  suite.oracleAccAddr.String(),
+		DealId:        dataSale.DealId,
+		VerifiableCid: dataSale.VerifiableCid,
+		DeliveredCid:  "test",
+		VoteOption:    oracletypes.VOTE_OPTION_YES,
+	}
+
+	voteBz, err := suite.Cdc.Marshaler.Marshal(dataDeliveryVote)
+	suite.Require().NoError(err)
+
+	oraclePrivKeySecp256k1 := secp256k1.PrivKey{
+		Key: suite.oraclePrivKey.Serialize(),
+	}
+
+	signature, err := oraclePrivKeySecp256k1.Sign(voteBz)
+	suite.Require().NoError(err)
+
+	err = suite.DataDealKeeper.VoteDataDelivery(ctx, dataDeliveryVote, signature)
+	suite.Require().NoError(err)
+
+	getDataDeliveryVote, err := suite.DataDealKeeper.GetDataDeliveryVote(
+		ctx,
+		suite.verifiableCID1,
+		suite.oracleAccAddr.String(),
+		dataSale.DealId,
+	)
+	suite.Require().NoError(err)
+	suite.Require().Equal(dataDeliveryVote, getDataDeliveryVote)
+}
+
+func (suite dealTestSuite) TestDataDeliveryVoteFailedVerifySignature() {
+	ctx := suite.Ctx
+
+	oracleAccount := suite.AccountKeeper.NewAccountWithAddress(suite.Ctx, suite.oracleAccAddr)
+	suite.Require().NoError(oracleAccount.SetPubKey(suite.oracleAccPubKey))
+	suite.AccountKeeper.SetAccount(suite.Ctx, oracleAccount)
+
+	err := suite.OracleKeeper.SetOracle(suite.Ctx, &oracletypes.Oracle{
+		Address:  suite.oracleAccAddr.String(),
+		Status:   oracletypes.ORACLE_STATUS_ACTIVE,
+		Uptime:   0,
+		JailedAt: nil,
+	})
+	suite.Require().NoError(err)
+
+	dataSale := suite.MakeNewDataSaleDeliveryVoting(suite.sellerAccAddr, suite.verifiableCID1)
+	err = suite.DataDealKeeper.SetDataSale(suite.Ctx, dataSale)
+	suite.Require().NoError(err)
+
+	dataDeliveryVote := &types.DataDeliveryVote{
+		VoterAddress:  suite.oracleAccAddr.String(),
+		DealId:        dataSale.DealId,
+		VerifiableCid: dataSale.VerifiableCid,
+		DeliveredCid:  "test",
+		VoteOption:    oracletypes.VOTE_OPTION_YES,
+	}
+
+	voteBz, err := suite.Cdc.Marshaler.Marshal(dataDeliveryVote)
+	suite.Require().NoError(err)
+
+	invalidPrivKey := secp256k1.GenPrivKey()
+	// sign with invalid priv key
+	signature, err := invalidPrivKey.Sign(voteBz)
+	suite.Require().NoError(err)
+
+	err = suite.DataDealKeeper.VoteDataDelivery(ctx, dataDeliveryVote, signature)
+	suite.Require().ErrorIs(err, oracletypes.ErrDetectionMaliciousBehavior)
+}
+
+func (suite dealTestSuite) TestDataDeliveryVoteFaildInvalidStatus() {
+	ctx := suite.Ctx
+
+	oracleAccount := suite.AccountKeeper.NewAccountWithAddress(suite.Ctx, suite.oracleAccAddr)
+	suite.Require().NoError(oracleAccount.SetPubKey(suite.oracleAccPubKey))
+	suite.AccountKeeper.SetAccount(suite.Ctx, oracleAccount)
+
+	err := suite.OracleKeeper.SetOracle(suite.Ctx, &oracletypes.Oracle{
+		Address:  suite.oracleAccAddr.String(),
+		Status:   oracletypes.ORACLE_STATUS_ACTIVE,
+		Uptime:   0,
+		JailedAt: nil,
+	})
+	suite.Require().NoError(err)
+
+	// dataSale that status is DATA_SALE_STATUS_VERIFICATION_VOTING_PERIOD
+	dataSale := suite.MakeNewDataSale(suite.sellerAccAddr, suite.verifiableCID1)
+	err = suite.DataDealKeeper.SetDataSale(suite.Ctx, dataSale)
+	suite.Require().NoError(err)
+
+	dataDeliveryVote := &types.DataDeliveryVote{
+		VoterAddress:  suite.oracleAccAddr.String(),
+		DealId:        dataSale.DealId,
+		VerifiableCid: dataSale.VerifiableCid,
+		DeliveredCid:  "test",
+		VoteOption:    oracletypes.VOTE_OPTION_YES,
+	}
+
+	voteBz, err := suite.Cdc.Marshaler.Marshal(dataDeliveryVote)
+	suite.Require().NoError(err)
+
+	oraclePrivKeySecp256k1 := secp256k1.PrivKey{
+		Key: suite.oraclePrivKey.Serialize(),
+	}
+
+	signature, err := oraclePrivKeySecp256k1.Sign(voteBz)
+	suite.Require().NoError(err)
+
+	err = suite.DataDealKeeper.VoteDataDelivery(ctx, dataDeliveryVote, signature)
+	suite.Require().ErrorIs(err, types.ErrDataDeliveryVote)
 }

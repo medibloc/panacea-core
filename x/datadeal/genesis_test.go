@@ -33,7 +33,7 @@ func (suite *genesisTestSuite) TestInitGenesis() {
 	deal2 := suite.MakeTestDeal(2, suite.buyerAccAddr)
 
 	genesis := types.GenesisState{
-		Deals:          []types.Deal{deal1, deal2},
+		Deals:          []types.Deal{*deal1, *deal2},
 		NextDealNumber: 3,
 	}
 
@@ -41,12 +41,11 @@ func (suite *genesisTestSuite) TestInitGenesis() {
 
 	getDeal1, err := suite.DataDealKeeper.GetDeal(suite.Ctx, 1)
 	suite.Require().NoError(err)
-	suite.Require().Equal(genesis.Deals[0], getDeal1)
+	suite.Require().Equal(genesis.Deals[0], *getDeal1)
 
 	getDeal2, err := suite.DataDealKeeper.GetDeal(suite.Ctx, 2)
 	suite.Require().NoError(err)
-	suite.Require().Equal(genesis.Deals[1], getDeal2)
-
+	suite.Require().Equal(genesis.Deals[1], *getDeal2)
 }
 
 func (suite *genesisTestSuite) TestExportGenesis() {
@@ -54,7 +53,7 @@ func (suite *genesisTestSuite) TestExportGenesis() {
 	deal2 := suite.MakeTestDeal(2, suite.buyerAccAddr)
 
 	genesis := types.GenesisState{
-		Deals:          []types.Deal{deal1},
+		Deals:          []types.Deal{*deal1},
 		NextDealNumber: 2,
 	}
 
