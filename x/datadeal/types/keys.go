@@ -33,10 +33,11 @@ var (
 
 	KeyIndexSeparator = []byte{0xFF}
 
-	DataSaleKey = []byte{0x03}
+	DataSaleKey             = []byte{0x03}
+	DataVerificationVoteKey = []byte{0x04}
+	DataSaleQueueKey        = []byte{0x05}
 
 	DataDeliveryVoteKey = []byte{0x06}
-
 	DataDeliveryQueueKey = []byte{0x07}
 )
 
@@ -48,6 +49,14 @@ func GetDealKey(dealID uint64) []byte {
 
 func GetDataSaleKey(verifiableCID string, dealID uint64) []byte {
 	return append(DataSaleKey, CombineKeys(sdk.Uint64ToBigEndian(dealID), []byte(verifiableCID))...)
+}
+
+func GetDataSaleQueueKey(verifiableCID string, dealID uint64, endTime time.Time) []byte {
+	return append(DataSaleQueueKey, CombineKeys(sdk.FormatTimeBytes(endTime), []byte(verifiableCID), sdk.Uint64ToBigEndian(dealID))...)
+}
+
+func GetDataVerificationVoteKey(verifiableCID string, voterAddress sdk.AccAddress, dealID uint64) []byte {
+	return append(DataVerificationVoteKey, CombineKeys(sdk.Uint64ToBigEndian(dealID), []byte(verifiableCID), voterAddress)...)
 }
 
 func GetDataDeliveryVoteKey(dealID uint64, verifiableCID string, voterAddress sdk.AccAddress) []byte {

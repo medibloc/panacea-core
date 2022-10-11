@@ -24,6 +24,10 @@ service Query {
   rpc DataSale(QueryDataSaleRequest) returns (QueryDataSaleResponse) {
     option (google.api.http).get = "/panacea/datadeal/v2alpha2/datasales/{deal_id}/{verifiable_cid}";
   }
+  // DataVerificationVote returns a DataVerificationVote.
+  rpc DataVerificationVote(QueryDataVerificationVoteRequest) returns (QueryDataVerificationVoteResponse) {
+    option (google.api.http).get = "/panacea/datadeal/v2alpha2/data_verification_votes/{deal_id}/{verifiable_cid}/{voter_address}";
+  }
   // DataDeliveryVote returns a DataDeliveryVote.
   rpc DataDeliveryVote(QueryDataDeliveryVoteRequest) returns (QueryDataDeliveryVoteResponse) {
     option (google.api.http).get = "/panacea/datadeal/v2alpha2/data_delivery_votes/{deal_id}/{verifiable_cid}/{voter_address}";
@@ -60,6 +64,18 @@ message QueryDataSaleRequest {
 // QueryDataSaleResponse defines the response type for the Query/DataSale RPC method.
 message QueryDataSaleResponse {
   DataSale data_sale = 1;
+}
+
+// QueryDataVerificationRequest defines the request type for the Query/DataVerificationVote RPC method.
+message QueryDataVerificationVoteRequest {
+  uint64 deal_id = 1;
+  string verifiable_cid = 2;
+  string voter_address = 3;
+}
+
+// QueryDataVerificationVoteResponse defines the response type for the Query/DataVerificationVote RPC method.
+message QueryDataVerificationVoteResponse {
+  DataVerificationVote data_verification_vote = 1;
 }
 
 // QueryDataDeliveryVoteRequest defines the request type for the Query/DataDeliveryVote RPC method.

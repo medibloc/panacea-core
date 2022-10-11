@@ -79,6 +79,26 @@ func (m DataSale) ValidateBasic() error {
 	return nil
 }
 
+func (m DataVerificationVote) ValidateBasic() error {
+	if m.DealId == 0 {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "dealID should be bigger than 0")
+	}
+
+	if _, err := sdk.AccAddressFromBech32(m.VoterAddress); err != nil {
+		return sdkerrors.Wrapf(err, "voterAddress is invalid. address: %s", m.VoterAddress)
+	}
+
+	if len(m.VerifiableCid) == 0 {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "verifiableCID is empty")
+	}
+
+	if err := m.VoteOption.ValidateBasic(); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (m DataDeliveryVote) ValidateBasic() error {
 	if m.DealId == 0 {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "dealID can not be 0")

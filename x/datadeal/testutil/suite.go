@@ -45,6 +45,15 @@ func (suite *DataDealBaseTestSuite) MakeNewDataSale(sellerAddr sdk.AccAddress, v
 	}
 }
 
+func (suite *DataDealBaseTestSuite) MakeNewDataVerificationVote(voterAddr sdk.AccAddress, verifiableCID string) *types.DataVerificationVote {
+	return &types.DataVerificationVote{
+		VoterAddress:  voterAddr.String(),
+		DealId:        1,
+		VerifiableCid: verifiableCID,
+		VoteOption:    oracletypes.VOTE_OPTION_YES,
+	}
+}
+
 func (suite *DataDealBaseTestSuite) MakeNewDataSaleDeliveryVoting(sellerAddr sdk.AccAddress, verifiableCID string) *types.DataSale {
 	return &types.DataSale{
 		SellerAddress: sellerAddr.String(),

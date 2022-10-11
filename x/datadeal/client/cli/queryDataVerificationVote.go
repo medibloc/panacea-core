@@ -9,29 +9,30 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func CmdGetDataSale() *cobra.Command {
+func CmdGetDataVerificationVote() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "datasale [deal_id] [verifiable_cid]",
-		Short: "Query a datasale info",
-		Args:  cobra.ExactArgs(2),
+		Use:   "data-verification-vote [deal_id] [verifiable_cid] [voter_address]",
+		Short: "Query a dataVerification vote info",
+		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientQueryContext(cmd)
 			if err != nil {
 				return err
 			}
 
-			queryClient := types.NewQueryClient(clientCtx)
-
 			dealID, err := strconv.ParseUint(args[0], 10, 64)
 			if err != nil {
 				return err
 			}
 
-			req := &types.QueryDataSaleRequest{
+			queryClient := types.NewQueryClient(clientCtx)
+			req := &types.QueryDataVerificationVoteRequest{
 				DealId:        dealID,
 				VerifiableCid: args[1],
+				VoterAddress:  args[2],
 			}
-			res, err := queryClient.DataSale(cmd.Context(), req)
+
+			res, err := queryClient.DataVerificationVote(cmd.Context(), req)
 			if err != nil {
 				return err
 			}

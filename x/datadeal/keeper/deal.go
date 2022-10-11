@@ -173,8 +173,15 @@ func (k Keeper) SellData(ctx sdk.Context, msg *types.MsgSellData) error {
 		return sdkerrors.Wrapf(types.ErrSellData, err.Error())
 	}
 
-	//TODO: Add DataSale to VoteDataSale Queue
-	//k.AddDataSaleQueue()
+	k.AddDataSaleQueue(ctx, dataSale.VerifiableCid, dataSale.DealId, dataSale.VotingPeriod.VotingEndTime)
+
+	ctx.EventManager().EmitEvent(
+		sdk.NewEvent(
+			types.EventTypeDataVerificationVote,
+			sdk.NewAttribute(types.AttributeKeyVoteStatus, types.AttributeValueVoteStatusStarted),
+			sdk.NewAttribute(types.AttributeKeyVerifiableCID, dataSale.VerifiableCid),
+		),
+	)
 
 	return nil
 }
@@ -234,11 +241,32 @@ func (k Keeper) GetAllDataSaleList(ctx sdk.Context) ([]types.DataSale, error) {
 	return dataSales, nil
 }
 
+func (k Keeper) VoteDataVerification(ctx sdk.Context, vote *types.DataVerificationVote, signature []byte) error {
+	if err := vote.ValidateBasic(); err != nil {
+		return sdkerrors.Wrapf(types.ErrDataVerificationVote, err.Error())
+	}
+
+	if !k.verifyDataVerificationVoteSignature(ctx, vote, signature) {
+		return sdkerrors.Wrap(oracletypes.ErrDetectionMaliciousBehavior, "")
+	}
+
+	if err := k.validateDataVerificationVote(ctx, vote); err != nil {
+		return sdkerrors.Wrap(types.ErrDataVerificationVote, err.Error())
+	}
+
+	if err := k.SetDataVerificationVote(ctx, vote); err != nil {
+		return sdkerrors.Wrap(types.ErrDataVerificationVote, err.Error())
+	}
+
+	return nil
+}
+
 func (k Keeper) VoteDataDelivery(ctx sdk.Context, vote *types.DataDeliveryVote, signature []byte) error {
 	if err := vote.ValidateBasic(); err != nil {
 		return sdkerrors.Wrap(types.ErrDataDeliveryVote, err.Error())
 	}
-	if !k.verifyVoteSignature(ctx, vote, signature) {
+
+	if !k.verifyDataDeliveryVoteSignature(ctx, vote, signature) {
 		return sdkerrors.Wrap(oracletypes.ErrDetectionMaliciousBehavior, "")
 	}
 
@@ -255,18 +283,28 @@ func (k Keeper) VoteDataDelivery(ctx sdk.Context, vote *types.DataDeliveryVote, 
 	return nil
 }
 
-func (k Keeper) verifyVoteSignature(ctx sdk.Context, vote *types.DataDeliveryVote, signature []byte) bool {
+// verifyVoteSignature defines to check for malicious requests.
+func (k Keeper) verifyDataVerificationVoteSignature(ctx sdk.Context, vote *types.DataVerificationVote, signature []byte) bool {
 	voteBz := k.cdc.MustMarshal(vote)
 
 	oraclePubKeyBz := k.oracleKeeper.GetParams(ctx).MustDecodeOraclePublicKey()
 	return secp256k1.PubKey(oraclePubKeyBz).VerifySignature(voteBz, signature)
 }
 
-func (k Keeper) validateDataDeliveryVote(ctx sdk.Context, vote *types.DataDeliveryVote) error {
+func (k Keeper) verifyDataDeliveryVoteSignature(ctx sdk.Context, vote *types.DataDeliveryVote, signature []byte) bool {
+	voteBz := k.cdc.MustMarshal(vote)
+
+	oraclePubKeyBz := k.oracleKeeper.GetParams(ctx).MustDecodeOraclePublicKey()
+	return secp256k1.PubKey(oraclePubKeyBz).VerifySignature(voteBz, signature)
+}
+
+// validateDataVerificationVote checks the data/verification status in the Panacea to ensure that the data can be voted to be verified.
+func (k Keeper) validateDataVerificationVote(ctx sdk.Context, vote *types.DataVerificationVote) error {
 	oracle, err := k.oracleKeeper.GetOracle(ctx, vote.VoterAddress)
 	if err != nil {
 		return err
 	}
+
 	if oracle.Status != oracletypes.ORACLE_STATUS_ACTIVE {
 		return types.ErrOracleNotActive
 	}
@@ -275,10 +313,95 @@ func (k Keeper) validateDataDeliveryVote(ctx sdk.Context, vote *types.DataDelive
 	if err != nil {
 		return err
 	}
+
+	if dataSale.Status != types.DATA_SALE_STATUS_VERIFICATION_VOTING_PERIOD {
+		return fmt.Errorf("the current voted data's status is not 'VERIFICATION_VOTING_PERIOD'")
+	}
+
+	return nil
+}
+
+func (k Keeper) validateDataDeliveryVote(ctx sdk.Context, vote *types.DataDeliveryVote) error {
+	oracle, err := k.oracleKeeper.GetOracle(ctx, vote.VoterAddress)
+	if err != nil {
+		return err
+	}
+
+	if oracle.Status != oracletypes.ORACLE_STATUS_ACTIVE {
+		return types.ErrOracleNotActive
+	}
+
+	dataSale, err := k.GetDataSale(ctx, vote.VerifiableCid, vote.DealId)
+	if err != nil {
+		return err
+	}
+
 	if dataSale.Status != types.DATA_SALE_STATUS_DELIVERY_VOTING_PERIOD {
 		return fmt.Errorf("the current voted data's status is not 'DELIVERY_VOTING_PERIOD'")
 	}
+
 	return nil
+}
+
+func (k Keeper) GetDataVerificationVote(ctx sdk.Context, verifiableCID, voterAddress string, dealID uint64) (*types.DataVerificationVote, error) {
+	store := ctx.KVStore(k.storeKey)
+	voterAccAddr, err := sdk.AccAddressFromBech32(voterAddress)
+	if err != nil {
+		return nil, err
+	}
+	key := types.GetDataVerificationVoteKey(verifiableCID, voterAccAddr, dealID)
+	bz := store.Get(key)
+	if bz == nil {
+		return nil, fmt.Errorf("oracle does not exist. verifiableCID: %s, voterAddress: %s, dealID: %d", verifiableCID, voterAddress, dealID)
+	}
+
+	vote := &types.DataVerificationVote{}
+	err = k.cdc.UnmarshalLengthPrefixed(bz, vote)
+	if err != nil {
+		return nil, err
+	}
+
+	return vote, nil
+}
+
+func (k Keeper) SetDataVerificationVote(ctx sdk.Context, vote *types.DataVerificationVote) error {
+	store := ctx.KVStore(k.storeKey)
+
+	voterAccAddr, err := sdk.AccAddressFromBech32(vote.VoterAddress)
+	if err != nil {
+		return err
+	}
+
+	key := types.GetDataVerificationVoteKey(vote.VerifiableCid, voterAccAddr, vote.DealId)
+	bz, err := k.cdc.MarshalLengthPrefixed(vote)
+	if err != nil {
+		return err
+	}
+
+	store.Set(key, bz)
+
+	return nil
+}
+
+func (k Keeper) GetAllDataVerificationVoteList(ctx sdk.Context) ([]types.DataVerificationVote, error) {
+	store := ctx.KVStore(k.storeKey)
+	iterator := sdk.KVStorePrefixIterator(store, types.DataVerificationVoteKey)
+	defer iterator.Close()
+
+	dataVerificationVotes := make([]types.DataVerificationVote, 0)
+
+	for ; iterator.Valid(); iterator.Next() {
+		bz := iterator.Value()
+		var dataVerificationVote types.DataVerificationVote
+		err := k.cdc.UnmarshalLengthPrefixed(bz, &dataVerificationVote)
+		if err != nil {
+			return nil, sdkerrors.Wrapf(types.ErrDataVerificationVote, err.Error())
+		}
+
+		dataVerificationVotes = append(dataVerificationVotes, dataVerificationVote)
+	}
+
+	return dataVerificationVotes, nil
 }
 
 func (k Keeper) SetDataDeliveryVote(ctx sdk.Context, vote *types.DataDeliveryVote) error {

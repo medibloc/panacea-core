@@ -85,3 +85,8 @@ func (k Keeper) IterateClosedDataDeliveryQueue(ctx sdk.Context, endTime time.Tim
 		}
 	}
 }
+
+func (k Keeper) AddDataSaleQueue(ctx sdk.Context, verifiableCID string, dealID uint64, endTime time.Time) {
+	store := ctx.KVStore(k.storeKey)
+	store.Set(types.GetDataSaleQueueKey(verifiableCID, dealID, endTime), []byte(verifiableCID))
+}
