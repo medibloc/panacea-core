@@ -19,7 +19,7 @@ func GetTxCmd() *cobra.Command {
 	}
 
 	cmd.AddCommand(CmdRegisterOracle())
-	cmd.AddCommand(CmdRegisterOracleVote())
+	cmd.AddCommand(CmdVoteOracleRegistration())
 
 	return cmd
 }

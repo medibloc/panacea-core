@@ -12,7 +12,7 @@ import (
 
 func CmdSellData() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "sell-data [dealID] [verifiableCID]",
+		Use:   "sell-data [deal_id] [verifiable_cid]",
 		Short: "Sell data",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {

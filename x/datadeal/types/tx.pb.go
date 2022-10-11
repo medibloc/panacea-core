@@ -252,7 +252,8 @@ var xxx_messageInfo_MsgSellDataResponse proto.InternalMessageInfo
 
 // MsgVoteDataVerification defines the Msg/VoteDataVerification request type.
 type MsgVoteDataVerification struct {
-	SignedDataVerificationVote *SignedDataVerificationVote `protobuf:"bytes,1,opt,name=signed_data_verification_vote,json=signedDataVerificationVote,proto3" json:"signed_data_verification_vote,omitempty"`
+	DataVerificationVote *DataVerificationVote `protobuf:"bytes,1,opt,name=data_verification_vote,json=dataVerificationVote,proto3" json:"data_verification_vote,omitempty"`
+	Signature            []byte                `protobuf:"bytes,2,opt,name=signature,proto3" json:"signature,omitempty"`
 }
 
 func (m *MsgVoteDataVerification) Reset()         { *m = MsgVoteDataVerification{} }
@@ -288,9 +289,16 @@ func (m *MsgVoteDataVerification) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgVoteDataVerification proto.InternalMessageInfo
 
-func (m *MsgVoteDataVerification) GetSignedDataVerificationVote() *SignedDataVerificationVote {
+func (m *MsgVoteDataVerification) GetDataVerificationVote() *DataVerificationVote {
 	if m != nil {
-		return m.SignedDataVerificationVote
+		return m.DataVerificationVote
+	}
+	return nil
+}
+
+func (m *MsgVoteDataVerification) GetSignature() []byte {
+	if m != nil {
+		return m.Signature
 	}
 	return nil
 }
@@ -332,73 +340,19 @@ func (m *MsgVoteDataVerificationResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgVoteDataVerificationResponse proto.InternalMessageInfo
 
-// SignedDataVerificationVote defines the DataVerificationVote with signature.
-type SignedDataVerificationVote struct {
-	DataVerificationVote *DataVerificationVote `protobuf:"bytes,1,opt,name=data_verification_vote,json=dataVerificationVote,proto3" json:"data_verification_vote,omitempty"`
-	Signature            []byte                `protobuf:"bytes,2,opt,name=signature,proto3" json:"signature,omitempty"`
-}
-
-func (m *SignedDataVerificationVote) Reset()         { *m = SignedDataVerificationVote{} }
-func (m *SignedDataVerificationVote) String() string { return proto.CompactTextString(m) }
-func (*SignedDataVerificationVote) ProtoMessage()    {}
-func (*SignedDataVerificationVote) Descriptor() ([]byte, []int) {
-	return fileDescriptor_49dbc965b6b631a7, []int{6}
-}
-func (m *SignedDataVerificationVote) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *SignedDataVerificationVote) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_SignedDataVerificationVote.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *SignedDataVerificationVote) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_SignedDataVerificationVote.Merge(m, src)
-}
-func (m *SignedDataVerificationVote) XXX_Size() int {
-	return m.Size()
-}
-func (m *SignedDataVerificationVote) XXX_DiscardUnknown() {
-	xxx_messageInfo_SignedDataVerificationVote.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_SignedDataVerificationVote proto.InternalMessageInfo
-
-func (m *SignedDataVerificationVote) GetDataVerificationVote() *DataVerificationVote {
-	if m != nil {
-		return m.DataVerificationVote
-	}
-	return nil
-}
-
-func (m *SignedDataVerificationVote) GetSignature() []byte {
-	if m != nil {
-		return m.Signature
-	}
-	return nil
-}
-
 // DataVerificationVote defines the vote info for verifying data.
 type DataVerificationVote struct {
 	VoterAddress  string            `protobuf:"bytes,1,opt,name=voter_address,json=voterAddress,proto3" json:"voter_address,omitempty"`
-	SellerAddress string            `protobuf:"bytes,2,opt,name=seller_address,json=sellerAddress,proto3" json:"seller_address,omitempty"`
 	DealId        uint64            `protobuf:"varint,3,opt,name=deal_id,json=dealId,proto3" json:"deal_id,omitempty"`
-	VerifiableCid []byte            `protobuf:"bytes,4,opt,name=verifiable_cid,json=verifiableCid,proto3" json:"verifiable_cid,omitempty"`
-	Valid         types1.VoteOption `protobuf:"varint,5,opt,name=valid,proto3,enum=panacea.oracle.v2alpha2.VoteOption" json:"valid,omitempty"`
+	VerifiableCid string            `protobuf:"bytes,4,opt,name=verifiable_cid,json=verifiableCid,proto3" json:"verifiable_cid,omitempty"`
+	VoteOption    types1.VoteOption `protobuf:"varint,5,opt,name=vote_option,json=voteOption,proto3,enum=panacea.oracle.v2alpha2.VoteOption" json:"vote_option,omitempty"`
 }
 
 func (m *DataVerificationVote) Reset()         { *m = DataVerificationVote{} }
 func (m *DataVerificationVote) String() string { return proto.CompactTextString(m) }
 func (*DataVerificationVote) ProtoMessage()    {}
 func (*DataVerificationVote) Descriptor() ([]byte, []int) {
-	return fileDescriptor_49dbc965b6b631a7, []int{7}
+	return fileDescriptor_49dbc965b6b631a7, []int{6}
 }
 func (m *DataVerificationVote) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -434,13 +388,6 @@ func (m *DataVerificationVote) GetVoterAddress() string {
 	return ""
 }
 
-func (m *DataVerificationVote) GetSellerAddress() string {
-	if m != nil {
-		return m.SellerAddress
-	}
-	return ""
-}
-
 func (m *DataVerificationVote) GetDealId() uint64 {
 	if m != nil {
 		return m.DealId
@@ -448,30 +395,31 @@ func (m *DataVerificationVote) GetDealId() uint64 {
 	return 0
 }
 
-func (m *DataVerificationVote) GetVerifiableCid() []byte {
+func (m *DataVerificationVote) GetVerifiableCid() string {
 	if m != nil {
 		return m.VerifiableCid
 	}
-	return nil
+	return ""
 }
 
-func (m *DataVerificationVote) GetValid() types1.VoteOption {
+func (m *DataVerificationVote) GetVoteOption() types1.VoteOption {
 	if m != nil {
-		return m.Valid
+		return m.VoteOption
 	}
 	return types1.VOTE_OPTION_UNSPECIFIED
 }
 
 // MsgVoteDataDelivery defines the Msg/VoteDataDelivery request type.
 type MsgVoteDataDelivery struct {
-	SignedDataDeliveryVote *SignedDataDeliveryVote `protobuf:"bytes,1,opt,name=signed_data_delivery_vote,json=signedDataDeliveryVote,proto3" json:"signed_data_delivery_vote,omitempty"`
+	DataDeliveryVote *DataDeliveryVote `protobuf:"bytes,1,opt,name=data_delivery_vote,json=dataDeliveryVote,proto3" json:"data_delivery_vote,omitempty"`
+	Signature        []byte            `protobuf:"bytes,2,opt,name=signature,proto3" json:"signature,omitempty"`
 }
 
 func (m *MsgVoteDataDelivery) Reset()         { *m = MsgVoteDataDelivery{} }
 func (m *MsgVoteDataDelivery) String() string { return proto.CompactTextString(m) }
 func (*MsgVoteDataDelivery) ProtoMessage()    {}
 func (*MsgVoteDataDelivery) Descriptor() ([]byte, []int) {
-	return fileDescriptor_49dbc965b6b631a7, []int{8}
+	return fileDescriptor_49dbc965b6b631a7, []int{7}
 }
 func (m *MsgVoteDataDelivery) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -500,9 +448,16 @@ func (m *MsgVoteDataDelivery) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgVoteDataDelivery proto.InternalMessageInfo
 
-func (m *MsgVoteDataDelivery) GetSignedDataDeliveryVote() *SignedDataDeliveryVote {
+func (m *MsgVoteDataDelivery) GetDataDeliveryVote() *DataDeliveryVote {
 	if m != nil {
-		return m.SignedDataDeliveryVote
+		return m.DataDeliveryVote
+	}
+	return nil
+}
+
+func (m *MsgVoteDataDelivery) GetSignature() []byte {
+	if m != nil {
+		return m.Signature
 	}
 	return nil
 }
@@ -515,7 +470,7 @@ func (m *MsgVoteDataDeliveryResponse) Reset()         { *m = MsgVoteDataDelivery
 func (m *MsgVoteDataDeliveryResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgVoteDataDeliveryResponse) ProtoMessage()    {}
 func (*MsgVoteDataDeliveryResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_49dbc965b6b631a7, []int{9}
+	return fileDescriptor_49dbc965b6b631a7, []int{8}
 }
 func (m *MsgVoteDataDeliveryResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -544,73 +499,20 @@ func (m *MsgVoteDataDeliveryResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgVoteDataDeliveryResponse proto.InternalMessageInfo
 
-// SignedDataDeliveryVote defines the DataDeliveryVote with signature.
-type SignedDataDeliveryVote struct {
-	DataDeliveryVote *DataDeliveryVote `protobuf:"bytes,1,opt,name=data_delivery_vote,json=dataDeliveryVote,proto3" json:"data_delivery_vote,omitempty"`
-	Signature        []byte            `protobuf:"bytes,2,opt,name=signature,proto3" json:"signature,omitempty"`
-}
-
-func (m *SignedDataDeliveryVote) Reset()         { *m = SignedDataDeliveryVote{} }
-func (m *SignedDataDeliveryVote) String() string { return proto.CompactTextString(m) }
-func (*SignedDataDeliveryVote) ProtoMessage()    {}
-func (*SignedDataDeliveryVote) Descriptor() ([]byte, []int) {
-	return fileDescriptor_49dbc965b6b631a7, []int{10}
-}
-func (m *SignedDataDeliveryVote) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *SignedDataDeliveryVote) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_SignedDataDeliveryVote.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *SignedDataDeliveryVote) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_SignedDataDeliveryVote.Merge(m, src)
-}
-func (m *SignedDataDeliveryVote) XXX_Size() int {
-	return m.Size()
-}
-func (m *SignedDataDeliveryVote) XXX_DiscardUnknown() {
-	xxx_messageInfo_SignedDataDeliveryVote.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_SignedDataDeliveryVote proto.InternalMessageInfo
-
-func (m *SignedDataDeliveryVote) GetDataDeliveryVote() *DataDeliveryVote {
-	if m != nil {
-		return m.DataDeliveryVote
-	}
-	return nil
-}
-
-func (m *SignedDataDeliveryVote) GetSignature() []byte {
-	if m != nil {
-		return m.Signature
-	}
-	return nil
-}
-
 // DataDeliveryVote defines the vote info for delivering data.
 type DataDeliveryVote struct {
 	VoterAddress  string            `protobuf:"bytes,1,opt,name=voter_address,json=voterAddress,proto3" json:"voter_address,omitempty"`
 	DealId        uint64            `protobuf:"varint,2,opt,name=deal_id,json=dealId,proto3" json:"deal_id,omitempty"`
-	VerifiableCid []byte            `protobuf:"bytes,3,opt,name=verifiable_cid,json=verifiableCid,proto3" json:"verifiable_cid,omitempty"`
-	DeliveredCid  []byte            `protobuf:"bytes,4,opt,name=delivered_cid,json=deliveredCid,proto3" json:"delivered_cid,omitempty"`
-	Valid         types1.VoteOption `protobuf:"varint,5,opt,name=valid,proto3,enum=panacea.oracle.v2alpha2.VoteOption" json:"valid,omitempty"`
+	VerifiableCid string            `protobuf:"bytes,3,opt,name=verifiable_cid,json=verifiableCid,proto3" json:"verifiable_cid,omitempty"`
+	DeliveredCid  string            `protobuf:"bytes,4,opt,name=delivered_cid,json=deliveredCid,proto3" json:"delivered_cid,omitempty"`
+	VoteOption    types1.VoteOption `protobuf:"varint,5,opt,name=vote_option,json=voteOption,proto3,enum=panacea.oracle.v2alpha2.VoteOption" json:"vote_option,omitempty"`
 }
 
 func (m *DataDeliveryVote) Reset()         { *m = DataDeliveryVote{} }
 func (m *DataDeliveryVote) String() string { return proto.CompactTextString(m) }
 func (*DataDeliveryVote) ProtoMessage()    {}
 func (*DataDeliveryVote) Descriptor() ([]byte, []int) {
-	return fileDescriptor_49dbc965b6b631a7, []int{11}
+	return fileDescriptor_49dbc965b6b631a7, []int{9}
 }
 func (m *DataDeliveryVote) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -653,23 +555,23 @@ func (m *DataDeliveryVote) GetDealId() uint64 {
 	return 0
 }
 
-func (m *DataDeliveryVote) GetVerifiableCid() []byte {
+func (m *DataDeliveryVote) GetVerifiableCid() string {
 	if m != nil {
 		return m.VerifiableCid
 	}
-	return nil
+	return ""
 }
 
-func (m *DataDeliveryVote) GetDeliveredCid() []byte {
+func (m *DataDeliveryVote) GetDeliveredCid() string {
 	if m != nil {
 		return m.DeliveredCid
 	}
-	return nil
+	return ""
 }
 
-func (m *DataDeliveryVote) GetValid() types1.VoteOption {
+func (m *DataDeliveryVote) GetVoteOption() types1.VoteOption {
 	if m != nil {
-		return m.Valid
+		return m.VoteOption
 	}
 	return types1.VOTE_OPTION_UNSPECIFIED
 }
@@ -684,7 +586,7 @@ func (m *MsgDeactivateDeal) Reset()         { *m = MsgDeactivateDeal{} }
 func (m *MsgDeactivateDeal) String() string { return proto.CompactTextString(m) }
 func (*MsgDeactivateDeal) ProtoMessage()    {}
 func (*MsgDeactivateDeal) Descriptor() ([]byte, []int) {
-	return fileDescriptor_49dbc965b6b631a7, []int{12}
+	return fileDescriptor_49dbc965b6b631a7, []int{10}
 }
 func (m *MsgDeactivateDeal) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -735,7 +637,7 @@ func (m *MsgDeactivateDealResponse) Reset()         { *m = MsgDeactivateDealResp
 func (m *MsgDeactivateDealResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgDeactivateDealResponse) ProtoMessage()    {}
 func (*MsgDeactivateDealResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_49dbc965b6b631a7, []int{13}
+	return fileDescriptor_49dbc965b6b631a7, []int{11}
 }
 func (m *MsgDeactivateDealResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -771,11 +673,9 @@ func init() {
 	proto.RegisterType((*MsgSellDataResponse)(nil), "panacea.datadeal.v2alpha2.MsgSellDataResponse")
 	proto.RegisterType((*MsgVoteDataVerification)(nil), "panacea.datadeal.v2alpha2.MsgVoteDataVerification")
 	proto.RegisterType((*MsgVoteDataVerificationResponse)(nil), "panacea.datadeal.v2alpha2.MsgVoteDataVerificationResponse")
-	proto.RegisterType((*SignedDataVerificationVote)(nil), "panacea.datadeal.v2alpha2.SignedDataVerificationVote")
 	proto.RegisterType((*DataVerificationVote)(nil), "panacea.datadeal.v2alpha2.DataVerificationVote")
 	proto.RegisterType((*MsgVoteDataDelivery)(nil), "panacea.datadeal.v2alpha2.MsgVoteDataDelivery")
 	proto.RegisterType((*MsgVoteDataDeliveryResponse)(nil), "panacea.datadeal.v2alpha2.MsgVoteDataDeliveryResponse")
-	proto.RegisterType((*SignedDataDeliveryVote)(nil), "panacea.datadeal.v2alpha2.SignedDataDeliveryVote")
 	proto.RegisterType((*DataDeliveryVote)(nil), "panacea.datadeal.v2alpha2.DataDeliveryVote")
 	proto.RegisterType((*MsgDeactivateDeal)(nil), "panacea.datadeal.v2alpha2.MsgDeactivateDeal")
 	proto.RegisterType((*MsgDeactivateDealResponse)(nil), "panacea.datadeal.v2alpha2.MsgDeactivateDealResponse")
@@ -786,60 +686,56 @@ func init() {
 }
 
 var fileDescriptor_49dbc965b6b631a7 = []byte{
-	// 833 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xa4, 0x56, 0xcf, 0x6f, 0xe3, 0x44,
-	0x14, 0xee, 0x34, 0x6d, 0xa1, 0xaf, 0x49, 0xd5, 0x35, 0xd9, 0x6e, 0xea, 0x65, 0xb3, 0xc1, 0x05,
-	0x14, 0x69, 0xc1, 0xde, 0x86, 0x05, 0x09, 0x6e, 0xd0, 0x5c, 0x38, 0x64, 0x91, 0x5c, 0x69, 0xa5,
-	0xe5, 0x62, 0x8d, 0xed, 0x87, 0x63, 0xc9, 0xf6, 0x04, 0xcf, 0xc4, 0x4a, 0xb9, 0x22, 0x71, 0x06,
-	0xf1, 0x17, 0xf0, 0x9f, 0x70, 0xe4, 0x84, 0xf6, 0x06, 0x17, 0x24, 0xd4, 0xfe, 0x23, 0xc8, 0xe3,
-	0x1f, 0x71, 0x12, 0x27, 0x4d, 0xc5, 0x2d, 0xfe, 0xe6, 0x9b, 0xf7, 0xbe, 0x99, 0xef, 0xf3, 0x8b,
-	0x41, 0x9b, 0xd0, 0x88, 0x3a, 0x48, 0x0d, 0x97, 0x0a, 0xea, 0x22, 0x0d, 0x8c, 0x64, 0x40, 0x83,
-	0xc9, 0x98, 0x0e, 0x0c, 0x31, 0xd3, 0x27, 0x31, 0x13, 0x4c, 0x39, 0xcb, 0x39, 0x7a, 0xc1, 0xd1,
-	0x0b, 0x8e, 0xda, 0xf6, 0x98, 0xc7, 0x24, 0xcb, 0x48, 0x7f, 0x65, 0x1b, 0xd4, 0xae, 0xc3, 0x78,
-	0xc8, 0xb8, 0x61, 0x53, 0x8e, 0x46, 0x72, 0x61, 0xa3, 0xa0, 0x17, 0x86, 0xc3, 0xfc, 0x28, 0x5f,
-	0x7f, 0xbf, 0x68, 0xca, 0x62, 0xea, 0x04, 0x38, 0x6f, 0x99, 0x3d, 0x67, 0x2c, 0xed, 0x77, 0x02,
-	0xad, 0x11, 0xf7, 0x2e, 0x63, 0xa4, 0x02, 0x87, 0x48, 0x03, 0xe5, 0x29, 0x1c, 0xa5, 0x12, 0x2c,
-	0xee, 0x8c, 0x31, 0xa4, 0x1d, 0xd2, 0x6b, 0xf4, 0x0f, 0x4d, 0x48, 0xa1, 0x2b, 0x89, 0x28, 0x17,
-	0x70, 0x60, 0x4f, 0x5d, 0x0f, 0x45, 0x67, 0xb7, 0x47, 0xfa, 0x47, 0x83, 0x33, 0x3d, 0x53, 0xa2,
-	0xa7, 0x4a, 0xf4, 0x5c, 0x89, 0x7e, 0xc9, 0xfc, 0xc8, 0xcc, 0x89, 0x4a, 0x0f, 0x9a, 0x21, 0x9d,
-	0x59, 0xd1, 0x34, 0xb4, 0xd2, 0x42, 0x9d, 0x46, 0x8f, 0xf4, 0xf7, 0x4c, 0x08, 0xe9, 0xec, 0xe5,
-	0x34, 0x1c, 0x52, 0x41, 0x95, 0x73, 0x68, 0xd9, 0xd3, 0x6b, 0x8c, 0x2d, 0xea, 0xba, 0x31, 0x72,
-	0xde, 0xd9, 0xeb, 0x91, 0xfe, 0xa1, 0xd9, 0x94, 0xe0, 0x97, 0x19, 0xa6, 0xb4, 0x61, 0x3f, 0x62,
-	0x91, 0x83, 0x9d, 0xfd, 0x1e, 0xe9, 0x37, 0xcd, 0xec, 0x41, 0x7b, 0x0e, 0x0f, 0x17, 0x4e, 0x60,
-	0x22, 0x9f, 0xb0, 0x88, 0xa3, 0xf2, 0x08, 0xde, 0x4a, 0x2f, 0xd2, 0xf2, 0xdd, 0x0e, 0x91, 0x0d,
-	0x0f, 0xd2, 0xc7, 0xaf, 0x5d, 0x4d, 0xc0, 0xd1, 0x88, 0x7b, 0x57, 0x18, 0x04, 0xb2, 0xf7, 0x3a,
-	0x9e, 0xf2, 0x01, 0x1c, 0x27, 0x18, 0xfb, 0xdf, 0xf9, 0xd4, 0x0e, 0xd0, 0x72, 0x7c, 0x57, 0x9e,
-	0xf8, 0xd0, 0x6c, 0xcd, 0xd1, 0x4b, 0x5f, 0xd2, 0x38, 0x06, 0x41, 0x45, 0x7c, 0x23, 0xa3, 0x65,
-	0x68, 0xae, 0x5e, 0x7b, 0x08, 0xef, 0x54, 0xba, 0x16, 0x2a, 0xb5, 0x5f, 0x09, 0x3c, 0x1a, 0x71,
-	0xef, 0x15, 0x13, 0x98, 0xe2, 0xaf, 0x64, 0x69, 0x87, 0x0a, 0x9f, 0x45, 0xca, 0x0c, 0x9e, 0x70,
-	0xdf, 0x8b, 0xd0, 0x95, 0xd7, 0x66, 0x25, 0x95, 0x35, 0x2b, 0x61, 0x02, 0xa5, 0xde, 0xa3, 0xc1,
-	0xa7, 0xfa, 0xda, 0xf0, 0xe8, 0x57, 0x72, 0xff, 0x72, 0xe5, 0xb4, 0x9b, 0xa9, 0xf2, 0xb5, 0x6b,
-	0xda, 0x7b, 0xf0, 0x74, 0x8d, 0xa8, 0x52, 0xf8, 0x6f, 0x04, 0xd4, 0xf5, 0xd5, 0x15, 0x84, 0xd3,
-	0x8d, 0xa2, 0x8d, 0x0d, 0xa2, 0x6b, 0xe5, 0xb6, 0xdd, 0xba, 0x36, 0xef, 0xc2, 0x61, 0x7a, 0x0c,
-	0x2a, 0xa6, 0x31, 0x4a, 0x7b, 0x9a, 0xe6, 0x1c, 0xd0, 0xfe, 0x21, 0xd0, 0xae, 0x55, 0x77, 0x0e,
-	0xad, 0x54, 0xcb, 0xdc, 0x32, 0x92, 0xe5, 0x4d, 0x82, 0x45, 0xde, 0x56, 0x8d, 0xdd, 0xad, 0x31,
-	0xb6, 0x9a, 0x9f, 0xc6, 0x1d, 0xf9, 0xd9, 0x93, 0x02, 0x97, 0xf2, 0xf3, 0x39, 0xec, 0x27, 0x34,
-	0xf0, 0x5d, 0x19, 0xeb, 0xe3, 0xc1, 0x79, 0x79, 0x31, 0xf9, 0x9b, 0x5a, 0x5e, 0x4b, 0xaa, 0xfc,
-	0x9b, 0x89, 0x34, 0x21, 0xdb, 0xa1, 0xfd, 0x48, 0x64, 0xa8, 0x0a, 0x9f, 0x86, 0x18, 0xf8, 0x09,
-	0xc6, 0xd7, 0x4a, 0x00, 0x67, 0xd5, 0xe0, 0xb8, 0x39, 0x5e, 0xbd, 0xff, 0x8b, 0xad, 0x42, 0x53,
-	0x54, 0x94, 0x0e, 0x9c, 0xf2, 0x5a, 0x5c, 0x7b, 0x02, 0x8f, 0x6b, 0x44, 0x94, 0x41, 0xf9, 0x85,
-	0xc0, 0x69, 0x7d, 0x45, 0xe5, 0x35, 0x28, 0x6b, 0x05, 0x3e, 0xbb, 0x23, 0x20, 0x0b, 0xd2, 0x4e,
-	0xdc, 0xe5, 0xd2, 0x9b, 0x83, 0xf1, 0x17, 0x81, 0x93, 0x15, 0x35, 0x5b, 0x85, 0xa2, 0xe2, 0xf6,
-	0xee, 0x1d, 0x6e, 0x37, 0xea, 0xdc, 0x3e, 0x87, 0x56, 0x7e, 0x5a, 0x74, 0x2b, 0x99, 0x68, 0x96,
-	0xe0, 0xff, 0x8c, 0xc4, 0x6b, 0x78, 0x30, 0xe2, 0xde, 0x10, 0xa9, 0x23, 0xfc, 0xa4, 0x18, 0xea,
-	0x6b, 0x47, 0xdc, 0x33, 0x78, 0x10, 0xe3, 0xf7, 0x53, 0xe4, 0x62, 0x25, 0xe5, 0x27, 0xe5, 0x42,
-	0x31, 0xc1, 0x1e, 0xc3, 0xd9, 0x4a, 0xe9, 0xc2, 0xe5, 0xc1, 0x9f, 0x7b, 0xd0, 0x18, 0x71, 0x4f,
-	0x19, 0x03, 0x54, 0xfe, 0x4d, 0xfa, 0x1b, 0x4c, 0x5c, 0x98, 0xda, 0xea, 0xf3, 0x6d, 0x99, 0xe5,
-	0x7c, 0xb7, 0xe1, 0xed, 0x72, 0x86, 0x7f, 0xb8, 0x79, 0x77, 0xc1, 0x53, 0xf5, 0xed, 0x78, 0x65,
-	0x8f, 0x9f, 0x08, 0xb4, 0x6b, 0x47, 0xf3, 0x60, 0x73, 0xa1, 0xba, 0x3d, 0xea, 0x17, 0xf7, 0xdf,
-	0x53, 0x0a, 0xf9, 0x01, 0x4e, 0x56, 0xde, 0x72, 0x7d, 0xbb, 0x7a, 0x05, 0x5f, 0xfd, 0xec, 0x7e,
-	0xfc, 0xb2, 0xb7, 0x80, 0xe3, 0xa5, 0x3c, 0x7d, 0xb4, 0xb9, 0xd2, 0x22, 0x5b, 0x7d, 0x71, 0x1f,
-	0x76, 0xd1, 0xf5, 0xab, 0x97, 0x7f, 0xdc, 0x74, 0xc9, 0x9b, 0x9b, 0x2e, 0xf9, 0xf7, 0xa6, 0x4b,
-	0x7e, 0xbe, 0xed, 0xee, 0xbc, 0xb9, 0xed, 0xee, 0xfc, 0x7d, 0xdb, 0xdd, 0xf9, 0xf6, 0x85, 0xe7,
-	0x8b, 0xf1, 0xd4, 0xd6, 0x1d, 0x16, 0x1a, 0x21, 0xba, 0xbe, 0x1d, 0x30, 0xc7, 0xc8, 0x5b, 0x7c,
-	0xec, 0xb0, 0x38, 0xfd, 0xd8, 0x31, 0x66, 0xf3, 0xaf, 0x2d, 0x71, 0x3d, 0x41, 0x6e, 0x1f, 0xc8,
-	0x2f, 0x9e, 0x4f, 0xfe, 0x0b, 0x00, 0x00, 0xff, 0xff, 0x24, 0xfa, 0x0d, 0xa5, 0x8e, 0x09, 0x00,
-	0x00,
+	// 774 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x56, 0xcb, 0x6e, 0xdb, 0x46,
+	0x14, 0xf5, 0x58, 0xb2, 0x5b, 0x5d, 0x49, 0x86, 0xcc, 0xca, 0xb5, 0x2c, 0xb7, 0xb2, 0x4a, 0xb7,
+	0x85, 0x00, 0xb7, 0xa4, 0xad, 0x1a, 0x5d, 0x74, 0xd7, 0x5a, 0x9b, 0x2e, 0xe4, 0x00, 0x34, 0x60,
+	0xc0, 0xd9, 0x10, 0x43, 0x72, 0x42, 0x11, 0x20, 0x39, 0x0a, 0x67, 0x44, 0xc8, 0xf9, 0x80, 0x2c,
+	0x83, 0x7c, 0x41, 0xbe, 0x25, 0xd9, 0x65, 0x15, 0x78, 0x99, 0x65, 0x20, 0xff, 0x48, 0xc0, 0xe1,
+	0x43, 0xb4, 0xac, 0x87, 0x05, 0x64, 0x27, 0x1e, 0x9e, 0xb9, 0xe7, 0xcc, 0xb9, 0x33, 0x97, 0x02,
+	0x79, 0x88, 0x7d, 0x6c, 0x12, 0xac, 0x5a, 0x98, 0x63, 0x8b, 0x60, 0x57, 0x0d, 0xbb, 0xd8, 0x1d,
+	0x0e, 0x70, 0x57, 0xe5, 0x63, 0x65, 0x18, 0x50, 0x4e, 0xa5, 0x83, 0x84, 0xa3, 0xa4, 0x1c, 0x25,
+	0xe5, 0x34, 0xeb, 0x36, 0xb5, 0xa9, 0x60, 0xa9, 0xd1, 0xaf, 0x78, 0x41, 0xb3, 0x65, 0x52, 0xe6,
+	0x51, 0xa6, 0x1a, 0x98, 0x11, 0x35, 0x3c, 0x33, 0x08, 0xc7, 0x67, 0xaa, 0x49, 0x1d, 0x3f, 0x79,
+	0xff, 0x6b, 0x2a, 0x4a, 0x03, 0x6c, 0xba, 0x64, 0x2a, 0x19, 0x3f, 0xc7, 0x2c, 0xf9, 0x3d, 0x82,
+	0x6a, 0x9f, 0xd9, 0x17, 0x01, 0xc1, 0x9c, 0xf4, 0x08, 0x76, 0xa5, 0x23, 0x28, 0x47, 0x16, 0x74,
+	0x66, 0x0e, 0x88, 0x87, 0x1b, 0xa8, 0x5d, 0xe8, 0x94, 0x34, 0x88, 0xa0, 0x2b, 0x81, 0x48, 0x67,
+	0xb0, 0x6d, 0x8c, 0x2c, 0x9b, 0xf0, 0xc6, 0x66, 0x1b, 0x75, 0xca, 0xdd, 0x03, 0x25, 0x76, 0xa2,
+	0x44, 0x4e, 0x94, 0xc4, 0x89, 0x72, 0x41, 0x1d, 0x5f, 0x4b, 0x88, 0x52, 0x1b, 0x2a, 0x1e, 0x1e,
+	0xeb, 0xfe, 0xc8, 0xd3, 0xa3, 0x42, 0x8d, 0x42, 0x1b, 0x75, 0x8a, 0x1a, 0x78, 0x78, 0x7c, 0x39,
+	0xf2, 0x7a, 0x98, 0x63, 0xe9, 0x18, 0xaa, 0xc6, 0xe8, 0x96, 0x04, 0x3a, 0xb6, 0xac, 0x80, 0x30,
+	0xd6, 0x28, 0xb6, 0x51, 0xa7, 0xa4, 0x55, 0x04, 0xf8, 0x6f, 0x8c, 0x49, 0x75, 0xd8, 0xf2, 0xa9,
+	0x6f, 0x92, 0xc6, 0x56, 0x1b, 0x75, 0x2a, 0x5a, 0xfc, 0x20, 0x9f, 0xc2, 0xde, 0x83, 0x1d, 0x68,
+	0x84, 0x0d, 0xa9, 0xcf, 0x88, 0xb4, 0x0f, 0xdf, 0x45, 0x41, 0xea, 0x8e, 0xd5, 0x40, 0x42, 0x70,
+	0x3b, 0x7a, 0xfc, 0xdf, 0x92, 0x39, 0x94, 0xfb, 0xcc, 0xbe, 0x22, 0xae, 0x2b, 0xb4, 0x17, 0xf1,
+	0xa4, 0xdf, 0x60, 0x27, 0x24, 0x81, 0xf3, 0xc2, 0xc1, 0x86, 0x4b, 0x74, 0xd3, 0xb1, 0xc4, 0x8e,
+	0x4b, 0x5a, 0x75, 0x8a, 0x5e, 0x38, 0x82, 0xc6, 0x88, 0xeb, 0xe6, 0xcc, 0x17, 0x62, 0x5a, 0x8c,
+	0x26, 0xee, 0xe5, 0x3d, 0xf8, 0x21, 0xa7, 0x9a, 0xba, 0x94, 0xdf, 0x21, 0xd8, 0xef, 0x33, 0xfb,
+	0x9a, 0x72, 0x12, 0xe1, 0xd7, 0xa2, 0xb4, 0x89, 0xb9, 0x43, 0x7d, 0x89, 0xc0, 0x8f, 0xa2, 0x17,
+	0x61, 0x0e, 0xd4, 0x43, 0xca, 0x89, 0x30, 0x5a, 0xee, 0xaa, 0xca, 0xc2, 0x53, 0xa3, 0xcc, 0x16,
+	0x8b, 0x04, 0xb4, 0xba, 0x35, 0x07, 0x95, 0x7e, 0x82, 0x12, 0x73, 0x6c, 0x1f, 0xf3, 0x51, 0x40,
+	0xc4, 0x16, 0x2b, 0xda, 0x14, 0x90, 0x7f, 0x81, 0xa3, 0x05, 0xfe, 0xb2, 0x3d, 0x7c, 0x40, 0x50,
+	0x9f, 0xa7, 0x17, 0xb5, 0x35, 0xb2, 0x3b, 0x4d, 0x06, 0xc5, 0x6d, 0x15, 0x60, 0xda, 0xd6, 0x5c,
+	0xfe, 0x85, 0x15, 0xf9, 0x17, 0xe7, 0xe5, 0xdf, 0x83, 0x72, 0x54, 0x4f, 0xa7, 0xc3, 0x48, 0x57,
+	0x1c, 0x8e, 0x9d, 0xee, 0x71, 0x16, 0x4d, 0x72, 0xde, 0xb3, 0x60, 0x22, 0x63, 0xcf, 0x04, 0x55,
+	0x83, 0x30, 0xfb, 0x2d, 0xbf, 0x41, 0xa2, 0x3f, 0xe9, 0x3e, 0x7b, 0xc4, 0x75, 0x42, 0x12, 0xdc,
+	0x4a, 0x37, 0x20, 0x89, 0x1e, 0x58, 0x09, 0x90, 0xcf, 0xff, 0x64, 0x45, 0xfe, 0x69, 0x11, 0x91,
+	0x7d, 0xcd, 0x9a, 0x41, 0x56, 0xe4, 0xfe, 0x33, 0x1c, 0xce, 0xf1, 0x93, 0x65, 0x3e, 0x41, 0x50,
+	0x9b, 0xd5, 0x58, 0x3b, 0xef, 0xcd, 0x15, 0x79, 0x17, 0xe6, 0xe5, 0x7d, 0x0c, 0xd5, 0x24, 0x0c,
+	0x62, 0xe5, 0xba, 0x52, 0xc9, 0xc0, 0x6f, 0xd7, 0x94, 0x1b, 0xd8, 0xed, 0x33, 0xbb, 0x47, 0xb0,
+	0xc9, 0x9d, 0x30, 0x9d, 0x50, 0x0b, 0xef, 0xeb, 0x09, 0xec, 0x06, 0xe4, 0xe5, 0x88, 0xb0, 0x7c,
+	0x02, 0xf1, 0x95, 0xad, 0x65, 0x2f, 0xd2, 0xeb, 0x78, 0x08, 0x07, 0x8f, 0x4a, 0xa7, 0xe1, 0x76,
+	0x3f, 0x15, 0xa1, 0xd0, 0x67, 0xb6, 0x34, 0x00, 0xc8, 0x8d, 0xc6, 0xce, 0x92, 0x76, 0x3f, 0x18,
+	0x41, 0xcd, 0xd3, 0xa7, 0x32, 0xb3, 0x61, 0x65, 0xc0, 0xf7, 0xd9, 0x40, 0xfa, 0x7d, 0xf9, 0xea,
+	0x94, 0xd7, 0x54, 0x9e, 0xc6, 0xcb, 0x34, 0x5e, 0x23, 0xa8, 0xcf, 0x9d, 0x33, 0xdd, 0xe5, 0x85,
+	0xe6, 0xad, 0x69, 0xfe, 0xb3, 0xfe, 0x9a, 0xcc, 0xc8, 0x2b, 0xa8, 0x3d, 0xba, 0x67, 0xca, 0xd3,
+	0xea, 0xa5, 0xfc, 0xe6, 0xdf, 0xeb, 0xf1, 0x33, 0x6d, 0x0e, 0x3b, 0x33, 0xe7, 0xe9, 0x8f, 0xe5,
+	0x95, 0x1e, 0xb2, 0x9b, 0xe7, 0xeb, 0xb0, 0x53, 0xd5, 0xff, 0x2e, 0x3f, 0x4e, 0x5a, 0xe8, 0x6e,
+	0xd2, 0x42, 0x5f, 0x26, 0x2d, 0xf4, 0xf6, 0xbe, 0xb5, 0x71, 0x77, 0xdf, 0xda, 0xf8, 0x7c, 0xdf,
+	0xda, 0x78, 0x7e, 0x6e, 0x3b, 0x7c, 0x30, 0x32, 0x14, 0x93, 0x7a, 0xaa, 0x47, 0x2c, 0xc7, 0x70,
+	0xa9, 0xa9, 0x26, 0x12, 0x7f, 0x9a, 0x34, 0x88, 0xbe, 0xdc, 0xea, 0x78, 0xfa, 0xd7, 0x81, 0xdf,
+	0x0e, 0x09, 0x33, 0xb6, 0xc5, 0xe7, 0xfb, 0xaf, 0xaf, 0x01, 0x00, 0x00, 0xff, 0xff, 0x66, 0xac,
+	0x4f, 0xf0, 0x5b, 0x08, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -1252,9 +1148,16 @@ func (m *MsgVoteDataVerification) MarshalToSizedBuffer(dAtA []byte) (int, error)
 	_ = i
 	var l int
 	_ = l
-	if m.SignedDataVerificationVote != nil {
+	if len(m.Signature) > 0 {
+		i -= len(m.Signature)
+		copy(dAtA[i:], m.Signature)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Signature)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if m.DataVerificationVote != nil {
 		{
-			size, err := m.SignedDataVerificationVote.MarshalToSizedBuffer(dAtA[:i])
+			size, err := m.DataVerificationVote.MarshalToSizedBuffer(dAtA[:i])
 			if err != nil {
 				return 0, err
 			}
@@ -1290,48 +1193,6 @@ func (m *MsgVoteDataVerificationResponse) MarshalToSizedBuffer(dAtA []byte) (int
 	return len(dAtA) - i, nil
 }
 
-func (m *SignedDataVerificationVote) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *SignedDataVerificationVote) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *SignedDataVerificationVote) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if len(m.Signature) > 0 {
-		i -= len(m.Signature)
-		copy(dAtA[i:], m.Signature)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.Signature)))
-		i--
-		dAtA[i] = 0x12
-	}
-	if m.DataVerificationVote != nil {
-		{
-			size, err := m.DataVerificationVote.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintTx(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
-}
-
 func (m *DataVerificationVote) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -1352,8 +1213,8 @@ func (m *DataVerificationVote) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if m.Valid != 0 {
-		i = encodeVarintTx(dAtA, i, uint64(m.Valid))
+	if m.VoteOption != 0 {
+		i = encodeVarintTx(dAtA, i, uint64(m.VoteOption))
 		i--
 		dAtA[i] = 0x28
 	}
@@ -1368,13 +1229,6 @@ func (m *DataVerificationVote) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i = encodeVarintTx(dAtA, i, uint64(m.DealId))
 		i--
 		dAtA[i] = 0x18
-	}
-	if len(m.SellerAddress) > 0 {
-		i -= len(m.SellerAddress)
-		copy(dAtA[i:], m.SellerAddress)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.SellerAddress)))
-		i--
-		dAtA[i] = 0x12
 	}
 	if len(m.VoterAddress) > 0 {
 		i -= len(m.VoterAddress)
@@ -1406,9 +1260,16 @@ func (m *MsgVoteDataDelivery) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if m.SignedDataDeliveryVote != nil {
+	if len(m.Signature) > 0 {
+		i -= len(m.Signature)
+		copy(dAtA[i:], m.Signature)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Signature)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if m.DataDeliveryVote != nil {
 		{
-			size, err := m.SignedDataDeliveryVote.MarshalToSizedBuffer(dAtA[:i])
+			size, err := m.DataDeliveryVote.MarshalToSizedBuffer(dAtA[:i])
 			if err != nil {
 				return 0, err
 			}
@@ -1444,48 +1305,6 @@ func (m *MsgVoteDataDeliveryResponse) MarshalToSizedBuffer(dAtA []byte) (int, er
 	return len(dAtA) - i, nil
 }
 
-func (m *SignedDataDeliveryVote) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *SignedDataDeliveryVote) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *SignedDataDeliveryVote) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if len(m.Signature) > 0 {
-		i -= len(m.Signature)
-		copy(dAtA[i:], m.Signature)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.Signature)))
-		i--
-		dAtA[i] = 0x12
-	}
-	if m.DataDeliveryVote != nil {
-		{
-			size, err := m.DataDeliveryVote.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintTx(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
-}
-
 func (m *DataDeliveryVote) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -1506,8 +1325,8 @@ func (m *DataDeliveryVote) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if m.Valid != 0 {
-		i = encodeVarintTx(dAtA, i, uint64(m.Valid))
+	if m.VoteOption != 0 {
+		i = encodeVarintTx(dAtA, i, uint64(m.VoteOption))
 		i--
 		dAtA[i] = 0x28
 	}
@@ -1686,8 +1505,12 @@ func (m *MsgVoteDataVerification) Size() (n int) {
 	}
 	var l int
 	_ = l
-	if m.SignedDataVerificationVote != nil {
-		l = m.SignedDataVerificationVote.Size()
+	if m.DataVerificationVote != nil {
+		l = m.DataVerificationVote.Size()
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.Signature)
+	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
 	return n
@@ -1702,23 +1525,6 @@ func (m *MsgVoteDataVerificationResponse) Size() (n int) {
 	return n
 }
 
-func (m *SignedDataVerificationVote) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if m.DataVerificationVote != nil {
-		l = m.DataVerificationVote.Size()
-		n += 1 + l + sovTx(uint64(l))
-	}
-	l = len(m.Signature)
-	if l > 0 {
-		n += 1 + l + sovTx(uint64(l))
-	}
-	return n
-}
-
 func (m *DataVerificationVote) Size() (n int) {
 	if m == nil {
 		return 0
@@ -1729,10 +1535,6 @@ func (m *DataVerificationVote) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
-	l = len(m.SellerAddress)
-	if l > 0 {
-		n += 1 + l + sovTx(uint64(l))
-	}
 	if m.DealId != 0 {
 		n += 1 + sovTx(uint64(m.DealId))
 	}
@@ -1740,35 +1542,13 @@ func (m *DataVerificationVote) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
-	if m.Valid != 0 {
-		n += 1 + sovTx(uint64(m.Valid))
+	if m.VoteOption != 0 {
+		n += 1 + sovTx(uint64(m.VoteOption))
 	}
 	return n
 }
 
 func (m *MsgVoteDataDelivery) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if m.SignedDataDeliveryVote != nil {
-		l = m.SignedDataDeliveryVote.Size()
-		n += 1 + l + sovTx(uint64(l))
-	}
-	return n
-}
-
-func (m *MsgVoteDataDeliveryResponse) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	return n
-}
-
-func (m *SignedDataDeliveryVote) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -1782,6 +1562,15 @@ func (m *SignedDataDeliveryVote) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
+	return n
+}
+
+func (m *MsgVoteDataDeliveryResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
 	return n
 }
 
@@ -1806,8 +1595,8 @@ func (m *DataDeliveryVote) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
-	if m.Valid != 0 {
-		n += 1 + sovTx(uint64(m.Valid))
+	if m.VoteOption != 0 {
+		n += 1 + sovTx(uint64(m.VoteOption))
 	}
 	return n
 }
@@ -2329,142 +2118,6 @@ func (m *MsgVoteDataVerification) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field SignedDataVerificationVote", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthTx
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthTx
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.SignedDataVerificationVote == nil {
-				m.SignedDataVerificationVote = &SignedDataVerificationVote{}
-			}
-			if err := m.SignedDataVerificationVote.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipTx(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthTx
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *MsgVoteDataVerificationResponse) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowTx
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: MsgVoteDataVerificationResponse: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgVoteDataVerificationResponse: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		default:
-			iNdEx = preIndex
-			skippy, err := skipTx(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthTx
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *SignedDataVerificationVote) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowTx
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: SignedDataVerificationVote: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: SignedDataVerificationVote: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field DataVerificationVote", wireType)
 			}
 			var msglen int
@@ -2554,6 +2207,56 @@ func (m *SignedDataVerificationVote) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
+func (m *MsgVoteDataVerificationResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgVoteDataVerificationResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgVoteDataVerificationResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
 func (m *DataVerificationVote) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -2615,9 +2318,28 @@ func (m *DataVerificationVote) Unmarshal(dAtA []byte) error {
 			}
 			m.VoterAddress = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 2:
+		case 3:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field DealId", wireType)
+			}
+			m.DealId = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.DealId |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 4:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field SellerAddress", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field VerifiableCid", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -2645,66 +2367,13 @@ func (m *DataVerificationVote) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.SellerAddress = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 3:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field DealId", wireType)
-			}
-			m.DealId = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.DealId |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 4:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field VerifiableCid", wireType)
-			}
-			var byteLen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				byteLen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if byteLen < 0 {
-				return ErrInvalidLengthTx
-			}
-			postIndex := iNdEx + byteLen
-			if postIndex < 0 {
-				return ErrInvalidLengthTx
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.VerifiableCid = append(m.VerifiableCid[:0], dAtA[iNdEx:postIndex]...)
-			if m.VerifiableCid == nil {
-				m.VerifiableCid = []byte{}
-			}
+			m.VerifiableCid = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 5:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Valid", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field VoteOption", wireType)
 			}
-			m.Valid = 0
+			m.VoteOption = 0
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowTx
@@ -2714,7 +2383,7 @@ func (m *DataVerificationVote) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.Valid |= types1.VoteOption(b&0x7F) << shift
+				m.VoteOption |= types1.VoteOption(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -2767,142 +2436,6 @@ func (m *MsgVoteDataDelivery) Unmarshal(dAtA []byte) error {
 		}
 		if fieldNum <= 0 {
 			return fmt.Errorf("proto: MsgVoteDataDelivery: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field SignedDataDeliveryVote", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthTx
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthTx
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.SignedDataDeliveryVote == nil {
-				m.SignedDataDeliveryVote = &SignedDataDeliveryVote{}
-			}
-			if err := m.SignedDataDeliveryVote.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipTx(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthTx
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *MsgVoteDataDeliveryResponse) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowTx
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: MsgVoteDataDeliveryResponse: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgVoteDataDeliveryResponse: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		default:
-			iNdEx = preIndex
-			skippy, err := skipTx(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthTx
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *SignedDataDeliveryVote) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowTx
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: SignedDataDeliveryVote: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: SignedDataDeliveryVote: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -2975,6 +2508,56 @@ func (m *SignedDataDeliveryVote) Unmarshal(dAtA []byte) error {
 				m.Signature = []byte{}
 			}
 			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgVoteDataDeliveryResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgVoteDataDeliveryResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgVoteDataDeliveryResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
 		default:
 			iNdEx = preIndex
 			skippy, err := skipTx(dAtA[iNdEx:])
@@ -3080,7 +2663,7 @@ func (m *DataDeliveryVote) Unmarshal(dAtA []byte) error {
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field VerifiableCid", wireType)
 			}
-			var byteLen int
+			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowTx
@@ -3090,31 +2673,29 @@ func (m *DataDeliveryVote) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				byteLen |= int(b&0x7F) << shift
+				stringLen |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			if byteLen < 0 {
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
 				return ErrInvalidLengthTx
 			}
-			postIndex := iNdEx + byteLen
+			postIndex := iNdEx + intStringLen
 			if postIndex < 0 {
 				return ErrInvalidLengthTx
 			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.VerifiableCid = append(m.VerifiableCid[:0], dAtA[iNdEx:postIndex]...)
-			if m.VerifiableCid == nil {
-				m.VerifiableCid = []byte{}
-			}
+			m.VerifiableCid = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 4:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field DeliveredCid", wireType)
 			}
-			var byteLen int
+			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowTx
@@ -3124,31 +2705,29 @@ func (m *DataDeliveryVote) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				byteLen |= int(b&0x7F) << shift
+				stringLen |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			if byteLen < 0 {
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
 				return ErrInvalidLengthTx
 			}
-			postIndex := iNdEx + byteLen
+			postIndex := iNdEx + intStringLen
 			if postIndex < 0 {
 				return ErrInvalidLengthTx
 			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.DeliveredCid = append(m.DeliveredCid[:0], dAtA[iNdEx:postIndex]...)
-			if m.DeliveredCid == nil {
-				m.DeliveredCid = []byte{}
-			}
+			m.DeliveredCid = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 5:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Valid", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field VoteOption", wireType)
 			}
-			m.Valid = 0
+			m.VoteOption = 0
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowTx
@@ -3158,7 +2737,7 @@ func (m *DataDeliveryVote) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.Valid |= types1.VoteOption(b&0x7F) << shift
+				m.VoteOption |= types1.VoteOption(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
