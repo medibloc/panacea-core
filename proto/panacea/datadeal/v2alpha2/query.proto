@@ -26,7 +26,11 @@ service Query {
   }
   // DataVerificationVote returns a DataVerificationVote.
   rpc DataVerificationVote(QueryDataVerificationVoteRequest) returns (QueryDataVerificationVoteResponse) {
-      option (google.api.http).get = "/panacea/datadeal/v2alpha2/data_verification_votes/{deal_id}/{verifiable_cid}/{voter_address}";
+    option (google.api.http).get = "/panacea/datadeal/v2alpha2/data_verification_votes/{deal_id}/{verifiable_cid}/{voter_address}";
+  }
+  // DataDeliveryVote returns a DataDeliveryVote.
+  rpc DataDeliveryVote(QueryDataDeliveryVoteRequest) returns (QueryDataDeliveryVoteResponse) {
+    option (google.api.http).get = "/panacea/datadeal/v2alpha2/data_delivery_votes/{deal_id}/{verifiable_cid}/{voter_address}";
   }
 }
 
@@ -72,4 +76,16 @@ message QueryDataVerificationVoteRequest {
 // QueryDataVerificationVoteResponse defines the response type for the Query/DataVerificationVote RPC method.
 message QueryDataVerificationVoteResponse {
   DataVerificationVote data_verification_vote = 1;
+}
+
+// QueryDataDeliveryVoteRequest defines the request type for the Query/DataDeliveryVote RPC method.
+message QueryDataDeliveryVoteRequest{
+  uint64 deal_id =1;
+  string verifiable_cid =2;
+  string voter_address =3;
+}
+
+// QueryDataDeliveryVoteResponse defines the response type for the Query/DataDeliveryVote RPC method.
+message QueryDataDeliveryVoteResponse{
+  DataDeliveryVote data_delivery_vote=1;
 }

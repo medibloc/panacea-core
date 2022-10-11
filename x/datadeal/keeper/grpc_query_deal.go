@@ -22,7 +22,7 @@ func (k Keeper) Deal(goCtx context.Context, req *types.QueryDealRequest) (*types
 	}
 
 	return &types.QueryDealResponse{
-		Deal: &deal,
+		Deal: deal,
 	}, nil
 }
 
@@ -76,5 +76,16 @@ func (k Keeper) DataVerificationVote(goCtx context.Context, req *types.QueryData
 
 	return &types.QueryDataVerificationVoteResponse{
 		DataVerificationVote: dataVerificationVote,
+	}, nil
+}
+
+func (k Keeper) DataDeliveryVote(goCtx context.Context, req *types.QueryDataDeliveryVoteRequest) (*types.QueryDataDeliveryVoteResponse, error) {
+	dataDeliveryVote, err := k.GetDataDeliveryVote(sdk.UnwrapSDKContext(goCtx), req.VerifiableCid, req.VoterAddress, req.DealId)
+	if err != nil {
+		return nil, err
+	}
+
+	return &types.QueryDataDeliveryVoteResponse{
+		DataDeliveryVote: dataDeliveryVote,
 	}, nil
 }

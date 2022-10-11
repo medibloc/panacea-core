@@ -63,7 +63,21 @@ func (m msgServer) VoteDataVerification(goCtx context.Context, msg *types.MsgVot
 
 // VoteDataDelivery defines a method for voting data delivery.
 func (m msgServer) VoteDataDelivery(goCtx context.Context, msg *types.MsgVoteDataDelivery) (*types.MsgVoteDataDeliveryResponse, error) {
-	panic("implements me")
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	err := m.Keeper.VoteDataDelivery(ctx, msg.DataDeliveryVote, msg.Signature)
+	if err != nil {
+		return nil, err
+	}
+
+	ctx.EventManager().EmitEvent(
+		sdk.NewEvent(
+			sdk.EventTypeMessage,
+			sdk.NewAttribute(sdk.AttributeKeyModule, types.ModuleName),
+		),
+	)
+
+	return &types.MsgVoteDataDeliveryResponse{}, nil
 }
 
 // DeactivateDeal defines a method for deactivating the deal.

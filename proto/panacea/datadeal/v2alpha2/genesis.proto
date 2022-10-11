@@ -14,4 +14,5 @@ message GenesisState {
   uint64 next_deal_number = 2;
   repeated DataSale data_sales = 3 [(gogoproto.nullable) = false];
   repeated DataVerificationVote data_verification_votes = 4 [(gogoproto.nullable) = false];
+  repeated DataDeliveryVote data_delivery_votes = 5 [(gogoproto.nullable) = false];
 }

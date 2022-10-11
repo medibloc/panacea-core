@@ -14,8 +14,8 @@ type DataDealBaseTestSuite struct {
 	testsuite.TestSuite
 }
 
-func (suite *DataDealBaseTestSuite) MakeTestDeal(dealID uint64, buyerAddr sdk.AccAddress) types.Deal {
-	return types.Deal{
+func (suite *DataDealBaseTestSuite) MakeTestDeal(dealID uint64, buyerAddr sdk.AccAddress) *types.Deal {
+	return &types.Deal{
 		Id:           dealID,
 		Address:      types.NewDealAddress(dealID).String(),
 		DataSchema:   []string{"http://jsonld.com"},
@@ -48,6 +48,32 @@ func (suite *DataDealBaseTestSuite) MakeNewDataVerificationVote(voterAddr sdk.Ac
 		VoterAddress:  voterAddr.String(),
 		DealId:        1,
 		VerifiableCid: verifiableCID,
+		VoteOption:    oracletypes.VOTE_OPTION_YES,
+	}
+}
+
+func (suite *DataDealBaseTestSuite) MakeNewDataSaleDeliveryVoting(sellerAddr sdk.AccAddress, verifiableCID string) *types.DataSale {
+	return &types.DataSale{
+		SellerAddress: sellerAddr.String(),
+		DealId:        1,
+		VerifiableCid: verifiableCID,
+		DeliveredCid:  "",
+		Status:        types.DATA_SALE_STATUS_DELIVERY_VOTING_PERIOD,
+		VotingPeriod: &oracletypes.VotingPeriod{
+			VotingStartTime: time.Now(),
+			VotingEndTime:   time.Now().Add(5 * time.Second),
+		},
+		VerificationTallyResult: nil,
+		DeliveryTallyResult:     nil,
+	}
+}
+
+func (suite *DataDealBaseTestSuite) MakeNewDataDeliveryVote(voterAddr sdk.AccAddress, verifiableCID, deliveredCID string, dealID uint64) *types.DataDeliveryVote {
+	return &types.DataDeliveryVote{
+		VoterAddress:  voterAddr.String(),
+		DealId:        dealID,
+		VerifiableCid: verifiableCID,
+		DeliveredCid:  deliveredCID,
 		VoteOption:    oracletypes.VOTE_OPTION_YES,
 	}
 }

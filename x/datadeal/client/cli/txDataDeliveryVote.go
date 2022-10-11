@@ -11,10 +11,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func CmdVoteDataVerification() *cobra.Command {
+func CmdVoteDataDelivery() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "data-verification-vote [path]",
-		Short: "Vote for data verification",
+		Use:   "data-delivery-vote [path]",
+		Short: "Vote for data delivery",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
@@ -22,7 +22,7 @@ func CmdVoteDataVerification() *cobra.Command {
 				return err
 			}
 
-			msg, err := readMsgDataVerificationVoteFrom(args[0])
+			msg, err := readMsgDataDeliveryVoteFrom(args[0])
 			if err != nil {
 				return err
 			}
@@ -39,8 +39,8 @@ func CmdVoteDataVerification() *cobra.Command {
 	return cmd
 }
 
-func readMsgDataVerificationVoteFrom(path string) (*types.MsgVoteDataVerification, error) {
-	var msg types.MsgVoteDataVerification
+func readMsgDataDeliveryVoteFrom(path string) (*types.MsgVoteDataDelivery, error) {
+	var msg types.MsgVoteDataDelivery
 
 	file, err := os.Open(path)
 	if err != nil {

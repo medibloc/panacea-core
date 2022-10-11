@@ -82,7 +82,7 @@ func (suite *genesisTestSuite) TestInitGenesis() {
 	dataVerificationVote2 := suite.MakeNewDataVerificationVote(suite.oracleAccAddr, suite.verifiableCID2)
 
 	genesis := types.GenesisState{
-		Deals:                 []types.Deal{deal1, deal2},
+		Deals:                 []types.Deal{*deal1, *deal2},
 		NextDealNumber:        3,
 		DataSales:             []types.DataSale{*dataSale1, *dataSale2},
 		DataVerificationVotes: []types.DataVerificationVote{*dataVerificationVote1, *dataVerificationVote2},
@@ -92,11 +92,11 @@ func (suite *genesisTestSuite) TestInitGenesis() {
 
 	getDeal1, err := suite.DataDealKeeper.GetDeal(suite.Ctx, 1)
 	suite.Require().NoError(err)
-	suite.Require().Equal(genesis.Deals[0], getDeal1)
+	suite.Require().Equal(genesis.Deals[0], *getDeal1)
 
 	getDeal2, err := suite.DataDealKeeper.GetDeal(suite.Ctx, 2)
 	suite.Require().NoError(err)
-	suite.Require().Equal(genesis.Deals[1], getDeal2)
+	suite.Require().Equal(genesis.Deals[1], *getDeal2)
 
 	getDataSale1, err := suite.DataDealKeeper.GetDataSale(suite.Ctx, suite.verifiableCID1, 1)
 	suite.Require().NoError(err)
@@ -129,6 +129,7 @@ func (suite *genesisTestSuite) TestInitGenesis() {
 	getDataVerificationVote2, err := suite.DataDealKeeper.GetDataVerificationVote(suite.Ctx, suite.verifiableCID2, suite.oracleAccAddr.String(), 1)
 	suite.Require().NoError(err)
 	suite.Require().Equal(genesis.DataVerificationVotes[1], *getDataVerificationVote2)
+	suite.Require().Equal(genesis.Deals[1], *getDeal2)
 }
 
 func (suite *genesisTestSuite) TestExportGenesis() {
@@ -149,7 +150,7 @@ func (suite *genesisTestSuite) TestExportGenesis() {
 	suite.Require().NoError(err)
 
 	genesis := types.GenesisState{
-		Deals:                 []types.Deal{deal1},
+		Deals:                 []types.Deal{*deal1},
 		NextDealNumber:        2,
 		DataSales:             []types.DataSale{*dataSale1},
 		DataVerificationVotes: []types.DataVerificationVote{*dataVerificationVote1},

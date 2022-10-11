@@ -7,6 +7,7 @@ func DefaultGenesis() *GenesisState {
 		NextDealNumber:        uint64(1),
 		DataSales:             []DataSale{},
 		DataVerificationVotes: []DataVerificationVote{},
+		DataDeliveryVotes:     []DataDeliveryVote{},
 	}
 }
 
@@ -29,6 +30,13 @@ func (gs GenesisState) Validate() error {
 		if err := dataVerificationVote.ValidateBasic(); err != nil {
 			return err
 		}
+	}
+
+	for _, dataDeliveryVote := range gs.DataDeliveryVotes {
+		if err := dataDeliveryVote.ValidateBasic(); err != nil {
+			return err
+		}
+
 	}
 
 	return nil
