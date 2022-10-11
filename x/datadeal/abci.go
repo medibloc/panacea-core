@@ -1,6 +1,8 @@
 package datadeal
 
 import (
+	"strconv"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/medibloc/panacea-core/v2/x/datadeal/keeper"
 	"github.com/medibloc/panacea-core/v2/x/datadeal/types"
@@ -51,6 +53,7 @@ func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) {
 				types.EventTypeDataVerificationVote,
 				sdk.NewAttribute(types.AttributeKeyVoteStatus, types.AttributeValueVoteStatusEnded),
 				sdk.NewAttribute(types.AttributeKeyVerifiableCID, dataSale.VerifiableCid),
+				sdk.NewAttribute(types.AttributeKeyDealID, strconv.FormatUint(dataSale.DealId, 10)),
 			),
 		)
 
