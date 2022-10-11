@@ -230,6 +230,7 @@ func (suite *TestSuite) SetupTest() {
 		memKeys[oracletypes.MemStoreKey],
 		paramsKeeper.Subspace(oracletypes.ModuleName),
 		suite.StakingKeeper,
+		suite.DistrKeeper,
 	)
 
 	suite.OracleMsgServer = oraclekeeper.NewMsgServerImpl(suite.OracleKeeper)
