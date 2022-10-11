@@ -1,6 +1,9 @@
 package oracle_test
 
 import (
+	"testing"
+	"time"
+
 	"github.com/btcsuite/btcd/btcec"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -8,8 +11,6 @@ import (
 	"github.com/medibloc/panacea-core/v2/x/oracle"
 	"github.com/medibloc/panacea-core/v2/x/oracle/types"
 	"github.com/stretchr/testify/suite"
-	"testing"
-	"time"
 )
 
 var (
@@ -64,6 +65,12 @@ func makeSampleDate() (types.Oracle, types.OracleRegistration, types.OracleRegis
 					},
 				},
 				ConsensusValue: []byte("encryptedOraclePrivKey"),
+				ValidVoters: []*types.VoterInfo{
+					{
+						VoterAddress: oracleAcc.String(),
+						VotingPower:  sdk.NewInt(5),
+					},
+				},
 			},
 		},
 		types.OracleRegistrationVote{
