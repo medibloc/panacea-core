@@ -1,0 +1,59 @@
+package datadeal
+
+import (
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/medibloc/panacea-core/v2/x/datadeal/keeper"
+	"github.com/medibloc/panacea-core/v2/x/datadeal/types"
+	oracletypes "github.com/medibloc/panacea-core/v2/x/oracle/types"
+)
+
+func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) {
+	keeper.IterateClosedDataVerificationQueue(ctx, ctx.BlockHeader().Time, func(dataSale *types.DataSale) bool {
+
+		keeper.RemoveDataVerificationQueue(ctx, dataSale.DealId, dataSale.VerifiableCid, dataSale.VotingPeriod.VotingEndTime)
+		iterator := keeper.GetDataVerificationVoteIterator(ctx, dataSale.DealId, dataSale.VerifiableCid)
+
+		defer iterator.Close()
+
+		oracleKeeper := keeper.GetOracleKeeper()
+
+		tallyResult, err := oracleKeeper.Tally(
+			ctx,
+			iterator,
+			func() oracletypes.Vote {
+				return &types.DataVerificationVote{}
+			},
+			func(vote oracletypes.Vote) error {
+				return keeper.RemoveDataVerificationVote(ctx, vote.(*types.DataVerificationVote))
+			},
+		)
+		if err != nil {
+			panic(err)
+		}
+
+		if tallyResult.IsPassed() {
+			dataSale.Status = types.DATA_SALE_STATUS_DELIVERY_VOTING_PERIOD
+			dataSale.VerifiableCid = string(tallyResult.ConsensusValue)
+
+			keeper.AddDataDeliveryQueue(ctx, dataSale.VerifiableCid, dataSale.DealId, oracleKeeper.GetVotingPeriod(ctx).VotingEndTime)
+
+		} else {
+			dataSale.Status = types.DATA_SALE_STATUS_FAILED
+		}
+
+		dataSale.VerificationTallyResult = tallyResult
+		if err := keeper.SetDataSale(ctx, dataSale); err != nil {
+			panic(err)
+		}
+
+		ctx.EventManager().EmitEvent(
+			sdk.NewEvent(
+				types.EventTypeDataVerificationVote,
+				sdk.NewAttribute(types.AttributeKeyVoteStatus, types.AttributeValueVoteStatusEnded),
+				sdk.NewAttribute(types.AttributeKeyVerifiableCID, dataSale.VerifiableCid),
+			),
+		)
+
+		return false
+	})
+}

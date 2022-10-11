@@ -173,7 +173,7 @@ func (k Keeper) SellData(ctx sdk.Context, msg *types.MsgSellData) error {
 		return sdkerrors.Wrapf(types.ErrSellData, err.Error())
 	}
 
-	k.AddDataSaleQueue(ctx, dataSale.VerifiableCid, dataSale.DealId, dataSale.VotingPeriod.VotingEndTime)
+	k.AddDataVerificationQueue(ctx, dataSale.VerifiableCid, dataSale.DealId, dataSale.VotingPeriod.VotingEndTime)
 
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(
@@ -383,6 +383,11 @@ func (k Keeper) SetDataVerificationVote(ctx sdk.Context, vote *types.DataVerific
 	return nil
 }
 
+func (k Keeper) GetDataVerificationVoteIterator(ctx sdk.Context, dealID uint64, verifiableCid string) sdk.Iterator {
+	store := ctx.KVStore(k.storeKey)
+	return sdk.KVStorePrefixIterator(store, types.GetDataVerificationVotesKey(verifiableCid, dealID))
+}
+
 func (k Keeper) GetAllDataVerificationVoteList(ctx sdk.Context) ([]types.DataVerificationVote, error) {
 	store := ctx.KVStore(k.storeKey)
 	iterator := sdk.KVStorePrefixIterator(store, types.DataVerificationVoteKey)
@@ -402,6 +407,19 @@ func (k Keeper) GetAllDataVerificationVoteList(ctx sdk.Context) ([]types.DataVer
 	}
 
 	return dataVerificationVotes, nil
+}
+
+func (k Keeper) RemoveDataVerificationVote(ctx sdk.Context, vote *types.DataVerificationVote) error {
+	store := ctx.KVStore(k.storeKey)
+	voterAccAddr, err := sdk.AccAddressFromBech32(vote.VoterAddress)
+	if err != nil {
+		return err
+	}
+	key := types.GetDataVerificationVoteKey(vote.VerifiableCid, voterAccAddr, vote.DealId)
+
+	store.Delete(key)
+
+	return nil
 }
 
 func (k Keeper) SetDataDeliveryVote(ctx sdk.Context, vote *types.DataDeliveryVote) error {

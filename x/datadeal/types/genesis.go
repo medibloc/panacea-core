@@ -8,6 +8,7 @@ func DefaultGenesis() *GenesisState {
 		DataSales:             []DataSale{},
 		DataVerificationVotes: []DataVerificationVote{},
 		DataDeliveryVotes:     []DataDeliveryVote{},
+		// TODO: Add an GenesisState of DataVerification/Delivery Queue
 	}
 }
 
@@ -38,6 +39,8 @@ func (gs GenesisState) Validate() error {
 		}
 
 	}
+
+	// TODO: Add an Validate of DataVerification/Delivery Queue Genesis State
 
 	return nil
 }
