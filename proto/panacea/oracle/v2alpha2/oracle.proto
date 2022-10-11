@@ -83,6 +83,7 @@ message TallyResult {
   repeated VoterInfo valid_voters = 6;
 }
 
+// VoterInfo defines the voter info
 message VoterInfo {
   string voter_address = 1;
   string voting_power = 2[(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int", (gogoproto.nullable) = false];

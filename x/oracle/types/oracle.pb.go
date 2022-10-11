@@ -400,6 +400,7 @@ func (m *TallyResult) GetValidVoters() []*VoterInfo {
 	return nil
 }
 
+// VoterInfo defines the voter info
 type VoterInfo struct {
 	VoterAddress string                                 `protobuf:"bytes,1,opt,name=voter_address,json=voterAddress,proto3" json:"voter_address,omitempty"`
 	VotingPower  github_com_cosmos_cosmos_sdk_types.Int `protobuf:"bytes,2,opt,name=voting_power,json=votingPower,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Int" json:"voting_power"`
