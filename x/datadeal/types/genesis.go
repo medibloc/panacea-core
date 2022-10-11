@@ -3,10 +3,11 @@ package types
 // DefaultGenesis returns the default Capability genesis state
 func DefaultGenesis() *GenesisState {
 	return &GenesisState{
-		Deals:             []Deal{},
-		NextDealNumber:    uint64(1),
-		DataSales:         []DataSale{},
-		DataDeliveryVotes: []DataDeliveryVote{},
+		Deals:                 []Deal{},
+		NextDealNumber:        uint64(1),
+		DataSales:             []DataSale{},
+		DataVerificationVotes: []DataVerificationVote{},
+		DataDeliveryVotes:     []DataDeliveryVote{},
 	}
 }
 
@@ -21,6 +22,12 @@ func (gs GenesisState) Validate() error {
 
 	for _, deal := range gs.Deals {
 		if err := deal.ValidateBasic(); err != nil {
+			return err
+		}
+	}
+
+	for _, dataVerificationVote := range gs.DataVerificationVotes {
+		if err := dataVerificationVote.ValidateBasic(); err != nil {
 			return err
 		}
 	}

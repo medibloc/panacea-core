@@ -106,13 +106,6 @@ func (msg *MsgSellData) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{seller}
 }
 
-func NewMsgDeactivateDeal(dealID uint64, requesterAddress string) *MsgDeactivateDeal {
-	return &MsgDeactivateDeal{
-		DealId:           dealID,
-		RequesterAddress: requesterAddress,
-	}
-}
-
 var _ sdk.Msg = &MsgVoteDataVerification{}
 
 func (msg *MsgVoteDataVerification) Route() string {
@@ -124,13 +117,38 @@ func (msg *MsgVoteDataVerification) Type() string {
 }
 
 func (msg *MsgVoteDataVerification) ValidateBasic() error {
-	//TODO implement me
-	panic("implement me")
+	if msg.DataVerificationVote == nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "dataVerificationVote cannot be nil")
+	}
+
+	if _, err := sdk.AccAddressFromBech32(msg.DataVerificationVote.VoterAddress); err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid voter address (%s)", err)
+	}
+	if len(msg.DataVerificationVote.VerifiableCid) == 0 {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "verifiable CID cannot be empty")
+	}
+	if msg.DataVerificationVote.DealId == 0 {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "deal ID must be bigger than zero(0)")
+	}
+
+	if msg.Signature == nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "signature cannot be nil")
+	}
+
+	return nil
+}
+
+func (msg *MsgVoteDataVerification) GetSignBytes() []byte {
+	bz := ModuleCdc.MustMarshalJSON(msg)
+	return sdk.MustSortJSON(bz)
 }
 
 func (msg *MsgVoteDataVerification) GetSigners() []sdk.AccAddress {
-	//TODO implement me
-	panic("implement me")
+	voterAddress, err := sdk.AccAddressFromBech32(msg.DataVerificationVote.VoterAddress)
+	if err != nil {
+		panic(err)
+	}
+	return []sdk.AccAddress{voterAddress}
 }
 
 var _ sdk.Msg = &MsgVoteDataDelivery{}
@@ -172,6 +190,13 @@ func (msg *MsgVoteDataDelivery) GetSigners() []sdk.AccAddress {
 		panic(err)
 	}
 	return []sdk.AccAddress{voterAddress}
+}
+
+func NewMsgDeactivateDeal(dealID uint64, requesterAddress string) *MsgDeactivateDeal {
+	return &MsgDeactivateDeal{
+		DealId:           dealID,
+		RequesterAddress: requesterAddress,
+	}
 }
 
 func (msg *MsgDeactivateDeal) Route() string {

@@ -1,16 +1,17 @@
 package cli
 
 import (
+	"os"
+
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	"github.com/gogo/protobuf/jsonpb"
 	"github.com/medibloc/panacea-core/v2/x/oracle/types"
 	"github.com/spf13/cobra"
-	"os"
 )
 
-func CmdRegisterOracleVote() *cobra.Command {
+func CmdVoteOracleRegistration() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "register-oracle-vote [path]",
 		Short: "Vote for register new oracle",

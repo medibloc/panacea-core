@@ -107,6 +107,22 @@ func (suite queryDealTestSuite) TestDataSale() {
 	suite.Require().Equal(newDataSale.SellerAddress, res.DataSale.SellerAddress)
 }
 
+func (suite queryDealTestSuite) TestDataVerificationVote() {
+	dataVerificationVote := suite.MakeNewDataVerificationVote(suite.oracleAccAddr, suite.verifiableCID)
+	err := suite.DataDealKeeper.SetDataVerificationVote(suite.Ctx, dataVerificationVote)
+	suite.Require().NoError(err)
+
+	req := types.QueryDataVerificationVoteRequest{
+		DealId:        1,
+		VerifiableCid: suite.verifiableCID,
+		VoterAddress:  suite.oracleAccAddr.String(),
+	}
+
+	res, err := suite.DataDealKeeper.DataVerificationVote(sdk.WrapSDKContext(suite.Ctx), &req)
+	suite.Require().NoError(err)
+	suite.Require().Equal(dataVerificationVote, res.DataVerificationVote)
+}
+
 func (suite queryDealTestSuite) TestDataDeliveryVote() {
 	dataVerificationVote := suite.MakeNewDataDeliveryVote(suite.oracleAccAddr, suite.verifiableCID, suite.deliveredCID, 1)
 	err := suite.DataDealKeeper.SetDataDeliveryVote(suite.Ctx, dataVerificationVote)
