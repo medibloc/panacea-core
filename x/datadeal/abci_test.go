@@ -424,10 +424,11 @@ func (suite abciTestSuite) TestDataDeliveryEndBlockerVotePass() {
 	suite.Require().Equal(1, len(events))
 	suite.Require().Equal(types.EventTypeDataDeliveryVote, events[0].Type)
 	eventAttributes := events[0].Attributes
-	suite.Require().Equal(2, len(eventAttributes))
+	suite.Require().Equal(3, len(eventAttributes))
 	suite.Require().Equal(types.AttributeKeyVoteStatus, string(eventAttributes[0].Key))
 	suite.Require().Equal(types.AttributeValueVoteStatusEnded, string(eventAttributes[0].Value))
 	suite.Require().Equal(types.AttributeKeyDeliveredCID, string(eventAttributes[1].Key))
+	suite.Require().Equal(types.AttributeKeyDealID, string(eventAttributes[2].Key))
 
 }
 
@@ -511,10 +512,11 @@ func (suite abciTestSuite) TestDataDeliveryEndBlockerVoteReject() {
 	suite.Require().Equal(1, len(events))
 	suite.Require().Equal(types.EventTypeDataDeliveryVote, events[0].Type)
 	eventAttributes := events[0].Attributes
-	suite.Require().Equal(2, len(eventAttributes))
+	suite.Require().Equal(3, len(eventAttributes))
 	suite.Require().Equal(types.AttributeKeyVoteStatus, string(eventAttributes[0].Key))
 	suite.Require().Equal(types.AttributeValueVoteStatusEnded, string(eventAttributes[0].Value))
 	suite.Require().Equal(types.AttributeKeyDeliveredCID, string(eventAttributes[1].Key))
+	suite.Require().Equal(types.AttributeKeyDealID, string(eventAttributes[2].Key))
 }
 
 func (suite abciTestSuite) TestDataDeliveryEndBlockerVoteRejectSamePower() {
@@ -601,8 +603,9 @@ func (suite abciTestSuite) TestDataDeliveryEndBlockerVoteRejectSamePower() {
 	suite.Require().Equal(1, len(events))
 	suite.Require().Equal(types.EventTypeDataDeliveryVote, events[0].Type)
 	eventAttributes := events[0].Attributes
-	suite.Require().Equal(2, len(eventAttributes))
+	suite.Require().Equal(3, len(eventAttributes))
 	suite.Require().Equal(types.AttributeKeyVoteStatus, string(eventAttributes[0].Key))
 	suite.Require().Equal(types.AttributeValueVoteStatusEnded, string(eventAttributes[0].Value))
 	suite.Require().Equal(types.AttributeKeyDeliveredCID, string(eventAttributes[1].Key))
+	suite.Require().Equal(types.AttributeKeyDealID, string(eventAttributes[2].Key))
 }
