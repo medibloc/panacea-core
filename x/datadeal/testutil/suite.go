@@ -45,6 +45,22 @@ func (suite *DataDealBaseTestSuite) MakeNewDataSale(sellerAddr sdk.AccAddress, v
 	}
 }
 
+func (suite *DataDealBaseTestSuite) SetValidator(pubKey cryptotypes.PubKey, amount sdk.Int, commission sdk.Dec) stakingtypes.Validator {
+	varAddr := sdk.ValAddress(pubKey.Address().Bytes())
+	validator, err := stakingtypes.NewValidator(varAddr, pubKey, stakingtypes.Description{})
+	suite.Require().NoError(err)
+	validator = validator.UpdateStatus(stakingtypes.Bonded)
+	validator, _ = validator.AddTokensFromDel(amount)
+	newCommission := stakingtypes.NewCommission(commission, sdk.OneDec(), sdk.NewDecWithPrec(5, 1))
+	validator.Commission = newCommission
+
+	suite.StakingKeeper.SetValidator(suite.Ctx, validator)
+	err = suite.StakingKeeper.SetValidatorByConsAddr(suite.Ctx, validator)
+	suite.Require().NoError(err)
+
+	return validator
+}
+
 func (suite *DataDealBaseTestSuite) MakeNewDataVerificationVote(voterAddr sdk.AccAddress, verifiableCID string) *types.DataVerificationVote {
 	return &types.DataVerificationVote{
 		VoterAddress:  voterAddr.String(),
