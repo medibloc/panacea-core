@@ -233,7 +233,7 @@ func (suite abciTestSuite) TestDataVerificationEndBlockerVoteReject() {
 
 	updatedDataSale, err := suite.DataDealKeeper.GetDataSale(ctx, dataSale.VerifiableCid, dataSale.DealId)
 	suite.Require().NoError(err)
-	suite.Require().Equal(types.DATA_SALE_STATUS_FAILED, updatedDataSale.Status)
+	suite.Require().Equal(types.DATA_SALE_STATUS_VERIFICATION_FAILED, updatedDataSale.Status)
 
 	votes, err = suite.DataDealKeeper.GetAllDataVerificationVoteList(ctx)
 	suite.Require().NoError(err)
@@ -308,7 +308,7 @@ func (suite abciTestSuite) TestDataVerificationEndBlockerVoteRejectSamePower() {
 
 	updatedDataSale, err := suite.DataDealKeeper.GetDataSale(ctx, dataSale.VerifiableCid, dataSale.DealId)
 	suite.Require().NoError(err)
-	suite.Require().Equal(types.DATA_SALE_STATUS_FAILED, updatedDataSale.Status)
+	suite.Require().Equal(types.DATA_SALE_STATUS_VERIFICATION_FAILED, updatedDataSale.Status)
 
 	tallyResult := updatedDataSale.VerificationTallyResult
 	suite.Require().Equal(sdk.ZeroInt(), tallyResult.Yes)
@@ -501,7 +501,7 @@ func (suite abciTestSuite) TestDataDeliveryEndBlockerVoteReject() {
 
 	updatedDataSale, err := suite.DataDealKeeper.GetDataSale(ctx, dataSale.VerifiableCid, dataSale.DealId)
 	suite.Require().NoError(err)
-	suite.Require().Equal(types.DATA_SALE_STATUS_FAILED, updatedDataSale.Status)
+	suite.Require().Equal(types.DATA_SALE_STATUS_DELIVERY_FAILED, updatedDataSale.Status)
 
 	votes, err = suite.DataDealKeeper.GetAllDataDeliveryVoteList(ctx)
 	suite.Require().NoError(err)
@@ -576,7 +576,7 @@ func (suite abciTestSuite) TestDataDeliveryEndBlockerVoteRejectSamePower() {
 
 	updatedDataSale, err := suite.DataDealKeeper.GetDataSale(ctx, dataSale.VerifiableCid, dataSale.DealId)
 	suite.Require().NoError(err)
-	suite.Require().Equal(types.DATA_SALE_STATUS_FAILED, updatedDataSale.Status)
+	suite.Require().Equal(types.DATA_SALE_STATUS_DELIVERY_FAILED, updatedDataSale.Status)
 	tallyResult := updatedDataSale.DeliveryTallyResult
 	suite.Require().Equal(sdk.ZeroInt(), tallyResult.Yes)
 	suite.Require().Equal(sdk.ZeroInt(), tallyResult.No)

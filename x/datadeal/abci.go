@@ -40,7 +40,7 @@ func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) {
 
 			keeper.AddDataDeliveryQueue(ctx, dataSale.VerifiableCid, dataSale.DealId, oracleKeeper.GetVotingPeriod(ctx).VotingEndTime)
 		} else {
-			dataSale.Status = types.DATA_SALE_STATUS_FAILED
+			dataSale.Status = types.DATA_SALE_STATUS_VERIFICATION_FAILED
 		}
 
 		dataSale.VerificationTallyResult = tallyResult
@@ -87,7 +87,7 @@ func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) {
 			dataSale.Status = types.DATA_SALE_STATUS_COMPLETED
 			dataSale.DeliveredCid = string(tallyResult.ConsensusValue)
 		} else {
-			dataSale.Status = types.DATA_SALE_STATUS_FAILED
+			dataSale.Status = types.DATA_SALE_STATUS_DELIVERY_FAILED
 		}
 
 		dataSale.DeliveryTallyResult = tallyResult

@@ -162,7 +162,7 @@ func (k Keeper) SellData(ctx sdk.Context, msg *types.MsgSellData) error {
 	}
 
 	getDataSale, _ := k.GetDataSale(ctx, msg.VerifiableCid, msg.DealId)
-	if getDataSale != nil && getDataSale.Status != types.DATA_SALE_STATUS_FAILED {
+	if getDataSale != nil && getDataSale.Status != types.DATA_SALE_STATUS_VERIFICATION_FAILED {
 		return sdkerrors.Wrapf(types.ErrSellData, "data already exists")
 	}
 

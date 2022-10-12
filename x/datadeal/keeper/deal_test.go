@@ -141,7 +141,7 @@ func (suite dealTestSuite) TestSellDataSuccess() {
 func (suite dealTestSuite) TestSellDataStatusFailed() {
 	newDataSale := suite.MakeNewDataSale(suite.sellerAccAddr, suite.verifiableCID1)
 
-	newDataSale.Status = types.DATA_SALE_STATUS_FAILED
+	newDataSale.Status = types.DATA_SALE_STATUS_VERIFICATION_FAILED
 
 	err := suite.DataDealKeeper.SetDataSale(suite.Ctx, newDataSale)
 	suite.Require().NoError(err)
@@ -381,7 +381,7 @@ func (suite dealTestSuite) TestDataVerificationInvalidDataSaleStatus() {
 	suite.Require().Error(err, types.ErrDataVerificationVote)
 	suite.Require().ErrorContains(err, "the current voted data's status is not 'VERIFICATION_VOTING_PERIOD'")
 
-	getDataSale.Status = types.DATA_SALE_STATUS_FAILED
+	getDataSale.Status = types.DATA_SALE_STATUS_DELIVERY_FAILED
 	err = suite.DataDealKeeper.SetDataSale(suite.Ctx, getDataSale)
 	suite.Require().NoError(err)
 
