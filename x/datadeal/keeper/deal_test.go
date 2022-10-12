@@ -636,7 +636,7 @@ func (suite dealTestSuite) TestDeactivateDeal() {
 
 	suite.Require().Equal(getDeal.Status, types.DEAL_STATUS_INACTIVE)
 
-	//TODO: Check the DataVerification/DeliveryVote Queue empty
+	//TODO: Check the DataVerification/DeliveryVote Queue are removed well
 }
 
 func (suite dealTestSuite) TestDeactivateDealInvalidRequester() {
