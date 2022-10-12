@@ -99,7 +99,7 @@ func (suite *DataDealBaseTestSuite) MakeNewDataDeliveryVote(voterAddr sdk.AccAdd
 func (suite *DataDealBaseTestSuite) CreateOracleValidator(pubKey cryptotypes.PubKey, amount sdk.Int) {
 	suite.SetAccount(pubKey)
 
-	suite.SetValidator(pubKey, amount)
+	suite.SetValidator(pubKey, amount, sdk.Dec(sdk.NewInt(0)))
 
 	oracleAccAddr := sdk.AccAddress(pubKey.Address().Bytes())
 	oracle := &oracletypes.Oracle{
@@ -117,16 +117,4 @@ func (suite *DataDealBaseTestSuite) SetAccount(pubKey cryptotypes.PubKey) {
 	oracleAccount := suite.AccountKeeper.NewAccountWithAddress(suite.Ctx, oracleAccAddr)
 	suite.Require().NoError(oracleAccount.SetPubKey(pubKey))
 	suite.AccountKeeper.SetAccount(suite.Ctx, oracleAccount)
-}
-
-func (suite *DataDealBaseTestSuite) SetValidator(pubKey cryptotypes.PubKey, amount sdk.Int) {
-	varAddr := sdk.ValAddress(pubKey.Address().Bytes())
-	validator, err := stakingtypes.NewValidator(varAddr, pubKey, stakingtypes.Description{})
-	suite.Require().NoError(err)
-	validator = validator.UpdateStatus(stakingtypes.Bonded)
-	validator, _ = validator.AddTokensFromDel(amount)
-
-	suite.StakingKeeper.SetValidator(suite.Ctx, validator)
-	err = suite.StakingKeeper.SetValidatorByConsAddr(suite.Ctx, validator)
-	suite.Require().NoError(err)
 }
