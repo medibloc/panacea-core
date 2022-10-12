@@ -621,8 +621,6 @@ func (suite dealTestSuite) TestDataDeliveryVoteFaildInvalidStatus() {
 func (suite dealTestSuite) TestDeactivateDeal() {
 	ctx := suite.Ctx
 
-	_ = suite.MakeTestDeal(1, suite.buyerAccAddr)
-
 	msgDeactivateDeal := &types.MsgDeactivateDeal{
 		DealId:           1,
 		RequesterAddress: suite.buyerAccAddr.String(),
@@ -642,8 +640,6 @@ func (suite dealTestSuite) TestDeactivateDeal() {
 func (suite dealTestSuite) TestDeactivateDealInvalidRequester() {
 	ctx := suite.Ctx
 
-	_ = suite.MakeTestDeal(1, suite.buyerAccAddr)
-
 	msgDeactivateDeal := &types.MsgDeactivateDeal{
 		DealId:           1,
 		RequesterAddress: suite.sellerAccAddr.String(),
@@ -657,11 +653,12 @@ func (suite dealTestSuite) TestDeactivateDealInvalidRequester() {
 func (suite dealTestSuite) TestDeactivateDealStatusNotActive() {
 	ctx := suite.Ctx
 
-	testDeal := suite.MakeTestDeal(1, suite.buyerAccAddr)
+	getDeal, err := suite.DataDealKeeper.GetDeal(ctx, 1)
+	suite.Require().NoError(err)
 
-	testDeal.Status = types.DEAL_STATUS_INACTIVE
+	getDeal.Status = types.DEAL_STATUS_INACTIVE
 
-	err := suite.DataDealKeeper.SetDeal(ctx, testDeal)
+	err = suite.DataDealKeeper.SetDeal(ctx, getDeal)
 	suite.Require().NoError(err)
 
 	msgDeactivateDeal := &types.MsgDeactivateDeal{
@@ -670,5 +667,6 @@ func (suite dealTestSuite) TestDeactivateDealStatusNotActive() {
 	}
 
 	err = suite.DataDealKeeper.DeactivateDeal(ctx, msgDeactivateDeal)
-	suite.Require().ErrorIs(err, types.ErrDealNotActive)
+	suite.Require().ErrorIs(err, types.ErrDealDeactivate)
+	suite.Require().ErrorContains(err, "deal's status is not 'ACTIVE'")
 }
