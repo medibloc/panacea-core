@@ -647,7 +647,7 @@ func (suite dealTestSuite) TestDeactivateDealInvalidRequester() {
 
 	err := suite.DataDealKeeper.DeactivateDeal(ctx, msgDeactivateDeal)
 	suite.Require().ErrorIs(err, types.ErrDealDeactivate)
-	suite.Require().ErrorContains(err, "invalid deactivate requester")
+	suite.Require().ErrorContains(err, "only buyer can deactivate deal")
 }
 
 func (suite dealTestSuite) TestDeactivateDealStatusNotActive() {

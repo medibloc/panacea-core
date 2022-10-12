@@ -18,5 +18,4 @@ var (
 	ErrDataDeliveryVote     = sdkerrors.Register(ModuleName, 10, "error while voting for DataDelivery")
 	ErrOracleNotActive      = sdkerrors.Register(ModuleName, 11, "oracle is not in 'ACTIVE' state")
 	ErrDealDeactivate       = sdkerrors.Register(ModuleName, 12, "error while deactivating a deal")
-	ErrDealNotActive        = sdkerrors.Register(ModuleName, 13, "deal's status is not 'ACTIVE'")
 )
