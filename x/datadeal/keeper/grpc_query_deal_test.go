@@ -110,7 +110,7 @@ func (suite queryDealTestSuite) TestDataSale() {
 }
 
 func (suite queryDealTestSuite) TestDataVerificationVote() {
-	dataVerificationVote := suite.MakeNewDataVerificationVote(suite.oracleAccAddr, suite.verifiableCID)
+	dataVerificationVote := suite.MakeNewDataVerificationVote(suite.oracleAccAddr, suite.dataHash)
 	err := suite.DataDealKeeper.SetDataVerificationVote(suite.Ctx, dataVerificationVote)
 	suite.Require().NoError(err)
 
@@ -126,7 +126,7 @@ func (suite queryDealTestSuite) TestDataVerificationVote() {
 }
 
 func (suite queryDealTestSuite) TestDataDeliveryVote() {
-	dataVerificationVote := suite.MakeNewDataDeliveryVote(suite.oracleAccAddr, suite.verifiableCID, suite.deliveredCID, 1)
+	dataVerificationVote := suite.MakeNewDataDeliveryVote(suite.oracleAccAddr, suite.dataHash, suite.deliveredCID, 1)
 	err := suite.DataDealKeeper.SetDataDeliveryVote(suite.Ctx, dataVerificationVote)
 	suite.Require().NoError(err)
 

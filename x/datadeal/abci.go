@@ -10,8 +10,8 @@ import (
 func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) {
 	keeper.IterateClosedDataDeliveryQueue(ctx, ctx.BlockHeader().Time, func(dataSale *types.DataSale) bool {
 
-		keeper.RemoveDataDeliveryQueue(ctx, dataSale.DealId, dataSale.VerifiableCid, dataSale.VotingPeriod.VotingEndTime)
-		iterator := keeper.GetDataDeliveryVoteIterator(ctx, dataSale.DealId, dataSale.VerifiableCid)
+		keeper.RemoveDataDeliveryQueue(ctx, dataSale.DealId, dataSale.DataHash, dataSale.VotingPeriod.VotingEndTime)
+		iterator := keeper.GetDataDeliveryVoteIterator(ctx, dataSale.DealId, dataSale.DataHash)
 		defer iterator.Close()
 
 		oracleKeeper := keeper.GetOracleKeeper()

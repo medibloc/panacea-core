@@ -352,7 +352,7 @@ func (k Keeper) GetDataVerificationVote(ctx sdk.Context, dataHash, voterAddress 
 	key := types.GetDataVerificationVoteKey(dataHash, voterAccAddr, dealID)
 	bz := store.Get(key)
 	if bz == nil {
-		return nil, fmt.Errorf("oracle does not exist. dataHash: %s, voterAddress: %s, dealID: %d", dataHash, voterAddress, dealID)
+		return nil, fmt.Errorf("DataVerificationyVote does not exist. dataHash: %s, voterAddress: %s, dealID: %d", dataHash, voterAddress, dealID)
 	}
 
 	vote := &types.DataVerificationVote{}
@@ -431,7 +431,7 @@ func (k Keeper) GetDataDeliveryVote(ctx sdk.Context, dataHash, voterAddress stri
 	key := types.GetDataDeliveryVoteKey(dealID, dataHash, voterAccAddr)
 	bz := store.Get(key)
 	if bz == nil {
-		return nil, fmt.Errorf("DataSale does not exist. dealID: %d, voterAddress: %s, dataHash: %s", dealID, voterAddress, dataHash)
+		return nil, fmt.Errorf("DataDeliveryVote does not exist. dealID: %d, voterAddress: %s, dataHash: %s", dealID, voterAddress, dataHash)
 	}
 	vote := &types.DataDeliveryVote{}
 	err = k.cdc.UnmarshalLengthPrefixed(bz, vote)
