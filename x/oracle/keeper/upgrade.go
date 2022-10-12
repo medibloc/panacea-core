@@ -2,6 +2,7 @@ package keeper
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/medibloc/panacea-core/v2/x/oracle/types"
 )
 
@@ -30,7 +31,7 @@ func (k Keeper) GetOracleUpgradeInfo(ctx sdk.Context) (*types.OracleUpgradeInfo,
 
 	var upgradeInfo types.OracleUpgradeInfo
 	if err := k.cdc.UnmarshalLengthPrefixed(bz, &upgradeInfo); err != nil {
-		return nil, err
+		return nil, sdkerrors.Wrap(types.ErrGetOracleUpgradeInfo, err.Error())
 	}
 
 	return &upgradeInfo, nil
