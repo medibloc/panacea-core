@@ -35,6 +35,10 @@ service Query {
   rpc Params(QueryOracleParamsRequest) returns (QueryParamsResponse) {
     option (google.api.http).get = "/panacea/oracle/v2alpha2/params";
   }
+
+  rpc OracleUpgradeInfo(QueryOracleUpgradeInfoRequest) returns (QueryOracleUpgradeInfoResponse) {
+    option (google.api.http).get = "/panacea/oracle/v2alpha2/oracle_upgrade_infos";
+  }
 }
 
 // QueryOraclesRequest is the request type for the Query/Oracles RPC method.
@@ -87,4 +91,10 @@ message QueryOracleParamsRequest {}
 // QueryParamsResponse is the response type for the Query/OracleParams RPC method.
 message QueryParamsResponse {
   Params params = 1;
+}
+
+message QueryOracleUpgradeInfoRequest {}
+
+message QueryOracleUpgradeInfoResponse {
+  OracleUpgradeInfo oracle_upgrade_info = 1;
 }

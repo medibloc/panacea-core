@@ -2,6 +2,8 @@ package keeper
 
 import (
 	"context"
+	"errors"
+
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	"github.com/cosmos/cosmos-sdk/types/query"
 	"google.golang.org/grpc/codes"
@@ -85,4 +87,17 @@ func (k Keeper) OracleRegistrationVote(goCtx context.Context, request *types.Que
 func (k Keeper) Params(goCtx context.Context, req *types.QueryOracleParamsRequest) (*types.QueryParamsResponse, error) {
 	params := k.GetParams(sdk.UnwrapSDKContext(goCtx))
 	return &types.QueryParamsResponse{Params: &params}, nil
+}
+
+func (k Keeper) OracleUpgradeInfo(ctx context.Context, _ *types.QueryOracleUpgradeInfoRequest) (*types.QueryOracleUpgradeInfoResponse, error) {
+	upgradeInfo, err := k.GetOracleUpgradeInfo(sdk.UnwrapSDKContext(ctx))
+	if err != nil {
+		if errors.Is(err, types.ErrOracleUpgradeInfoNotFound) {
+			return &types.QueryOracleUpgradeInfoResponse{}, nil
+		}
+		return nil, err
+	}
+	return &types.QueryOracleUpgradeInfoResponse{
+		OracleUpgradeInfo: upgradeInfo,
+	}, nil
 }
