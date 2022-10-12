@@ -617,3 +617,58 @@ func (suite dealTestSuite) TestDataDeliveryVoteFaildInvalidStatus() {
 	err = suite.DataDealKeeper.VoteDataDelivery(ctx, dataDeliveryVote, signature)
 	suite.Require().ErrorIs(err, types.ErrDataDeliveryVote)
 }
+
+func (suite dealTestSuite) TestDeactivateDeal() {
+	ctx := suite.Ctx
+
+	_ = suite.MakeTestDeal(1, suite.buyerAccAddr)
+
+	msgDeactivateDeal := &types.MsgDeactivateDeal{
+		DealId:           1,
+		RequesterAddress: suite.buyerAccAddr.String(),
+	}
+
+	err := suite.DataDealKeeper.DeactivateDeal(ctx, msgDeactivateDeal)
+	suite.Require().NoError(err)
+
+	getDeal, err := suite.DataDealKeeper.GetDeal(ctx, 1)
+	suite.Require().NoError(err)
+
+	suite.Require().Equal(getDeal.Status, types.DEAL_STATUS_INACTIVE)
+
+	//TODO: Check the DataVerification/DeliveryVote Queue empty
+}
+
+func (suite dealTestSuite) TestDeactivateDealInvalidRequester() {
+	ctx := suite.Ctx
+
+	_ = suite.MakeTestDeal(1, suite.buyerAccAddr)
+
+	msgDeactivateDeal := &types.MsgDeactivateDeal{
+		DealId:           1,
+		RequesterAddress: suite.sellerAccAddr.String(),
+	}
+
+	err := suite.DataDealKeeper.DeactivateDeal(ctx, msgDeactivateDeal)
+	suite.Require().ErrorIs(err, types.ErrDealDeactivate)
+	suite.Require().ErrorContains(err, "invalid deactivate requester")
+}
+
+func (suite dealTestSuite) TestDeactivateDealStatusNotActive() {
+	ctx := suite.Ctx
+
+	testDeal := suite.MakeTestDeal(1, suite.buyerAccAddr)
+
+	testDeal.Status = types.DEAL_STATUS_INACTIVE
+
+	err := suite.DataDealKeeper.SetDeal(ctx, testDeal)
+	suite.Require().NoError(err)
+
+	msgDeactivateDeal := &types.MsgDeactivateDeal{
+		DealId:           1,
+		RequesterAddress: suite.buyerAccAddr.String(),
+	}
+
+	err = suite.DataDealKeeper.DeactivateDeal(ctx, msgDeactivateDeal)
+	suite.Require().ErrorIs(err, types.ErrDealNotActive)
+}

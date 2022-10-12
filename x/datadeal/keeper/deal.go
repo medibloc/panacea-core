@@ -482,3 +482,30 @@ func (k Keeper) RemoveDataDeliveryVote(ctx sdk.Context, vote *types.DataDelivery
 
 	return nil
 }
+
+func (k Keeper) DeactivateDeal(ctx sdk.Context, msg *types.MsgDeactivateDeal) error {
+	deal, err := k.GetDeal(ctx, msg.DealId)
+	if err != nil {
+		return sdkerrors.Wrapf(types.ErrDealDeactivate, err.Error())
+	}
+
+	if deal.BuyerAddress != msg.RequesterAddress {
+		return sdkerrors.Wrapf(types.ErrDealDeactivate, "invalid deactivate requester")
+	}
+
+	if deal.Status != types.DEAL_STATUS_ACTIVE {
+		return types.ErrDealNotActive
+	}
+
+	deal.Status = types.DEAL_STATUS_INACTIVE
+
+	err = k.SetDeal(ctx, deal)
+	if err != nil {
+		return sdkerrors.Wrapf(types.ErrDealDeactivate, err.Error())
+	}
+
+	//TODO: Implement Remove the DataVerification/DeliveryVote Queue after PR #449 merged
+	//https://github.com/medibloc/panacea-core/pull/449
+
+	return nil
+}
