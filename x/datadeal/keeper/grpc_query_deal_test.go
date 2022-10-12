@@ -26,6 +26,7 @@ type queryDealTestSuite struct {
 
 	verifiableCID string
 	deliveredCID  string
+	dataHash      string
 }
 
 func TestQueryDealTest(t *testing.T) {
@@ -38,6 +39,7 @@ func (suite *queryDealTestSuite) BeforeTest(_, _ string) {
 
 	suite.verifiableCID = "verifiableCID"
 	suite.deliveredCID = "deliveredCID"
+	suite.dataHash = "dataHash"
 
 	suite.sellerAccPrivKey = secp256k1.GenPrivKey()
 	suite.sellerAccPubKey = suite.sellerAccPrivKey.PubKey()
@@ -89,13 +91,13 @@ func (suite queryDealTestSuite) TestQueryDeals() {
 }
 
 func (suite queryDealTestSuite) TestDataSale() {
-	newDataSale := suite.MakeNewDataSale(suite.sellerAccAddr, suite.verifiableCID)
+	newDataSale := suite.MakeNewDataSale(suite.sellerAccAddr, suite.dataHash, suite.verifiableCID)
 	err := suite.DataDealKeeper.SetDataSale(suite.Ctx, newDataSale)
 	suite.Require().NoError(err)
 
 	req := types.QueryDataSaleRequest{
-		DealId:        1,
-		VerifiableCid: suite.verifiableCID,
+		DealId:   1,
+		DataHash: suite.dataHash,
 	}
 
 	res, err := suite.DataDealKeeper.DataSale(sdk.WrapSDKContext(suite.Ctx), &req)
@@ -113,9 +115,9 @@ func (suite queryDealTestSuite) TestDataVerificationVote() {
 	suite.Require().NoError(err)
 
 	req := types.QueryDataVerificationVoteRequest{
-		DealId:        1,
-		VerifiableCid: suite.verifiableCID,
-		VoterAddress:  suite.oracleAccAddr.String(),
+		DealId:       1,
+		DataHash:     suite.dataHash,
+		VoterAddress: suite.oracleAccAddr.String(),
 	}
 
 	res, err := suite.DataDealKeeper.DataVerificationVote(sdk.WrapSDKContext(suite.Ctx), &req)
@@ -129,9 +131,9 @@ func (suite queryDealTestSuite) TestDataDeliveryVote() {
 	suite.Require().NoError(err)
 
 	req := types.QueryDataDeliveryVoteRequest{
-		DealId:        1,
-		VerifiableCid: suite.verifiableCID,
-		VoterAddress:  suite.oracleAccAddr.String(),
+		DealId:       1,
+		DataHash:     suite.dataHash,
+		VoterAddress: suite.oracleAccAddr.String(),
 	}
 
 	res, err := suite.DataDealKeeper.DataDeliveryVote(sdk.WrapSDKContext(suite.Ctx), &req)

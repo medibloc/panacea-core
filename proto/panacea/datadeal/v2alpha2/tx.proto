@@ -45,7 +45,8 @@ message MsgCreateDealResponse {
 message MsgSellData {
   uint64 deal_id = 1;
   string verifiable_cid = 2;
-  string seller_address = 3;
+  string data_hash=3;
+  string seller_address = 4;
 }
 
 // MsgSellDataResponse defines the Msg/SellData response type.
@@ -66,7 +67,7 @@ message MsgVoteDataVerificationResponse {
 message DataVerificationVote {
   string voter_address = 1;
   uint64 deal_id = 3;
-  string verifiable_cid = 4;
+  string data_hash = 4;
   panacea.oracle.v2alpha2.VoteOption vote_option = 5;
 }
 
@@ -84,7 +85,7 @@ message MsgVoteDataDeliveryResponse {
 message DataDeliveryVote {
   string voter_address = 1;
   uint64 deal_id = 2;
-  string verifiable_cid = 3;
+  string data_hash = 3;
   string delivered_cid = 4;
   panacea.oracle.v2alpha2.VoteOption vote_option = 5;
 }

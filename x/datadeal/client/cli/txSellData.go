@@ -12,9 +12,9 @@ import (
 
 func CmdSellData() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "sell-data [deal_id] [verifiable_cid]",
+		Use:   "sell-data [deal_id] [verifiable_cid] [data_hash]",
 		Short: "Sell data",
-		Args:  cobra.ExactArgs(2),
+		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
@@ -28,7 +28,7 @@ func CmdSellData() *cobra.Command {
 				return err
 			}
 
-			msg := types.NewMsgSellData(dealID, args[1], sellerAddress)
+			msg := types.NewMsgSellData(dealID, args[1], args[2], sellerAddress)
 			if err = msg.ValidateBasic(); err != nil {
 				return err
 			}

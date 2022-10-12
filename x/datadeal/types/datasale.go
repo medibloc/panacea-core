@@ -11,6 +11,7 @@ func NewDataSale(msg *MsgSellData) *DataSale {
 		SellerAddress: msg.SellerAddress,
 		DealId:        msg.DealId,
 		VerifiableCid: msg.VerifiableCid,
+		DataHash:      msg.DataHash,
 		Status:        DATA_SALE_STATUS_VERIFICATION_VOTING_PERIOD,
 	}
 }
@@ -26,6 +27,10 @@ func (m DataSale) ValidateBasic() error {
 
 	if m.VerifiableCid == "" {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "verifiable CID is empty")
+	}
+
+	if m.DataHash == "" {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "dataHash is empty")
 	}
 
 	if m.VerificationTallyResult != nil {
@@ -88,8 +93,8 @@ func (m DataVerificationVote) ValidateBasic() error {
 		return sdkerrors.Wrapf(err, "voterAddress is invalid. address: %s", m.VoterAddress)
 	}
 
-	if len(m.VerifiableCid) == 0 {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "verifiableCID is empty")
+	if len(m.DataHash) == 0 {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "dataHash is empty")
 	}
 
 	if err := m.VoteOption.ValidateBasic(); err != nil {
@@ -108,8 +113,8 @@ func (m DataDeliveryVote) ValidateBasic() error {
 		return sdkerrors.Wrapf(err, "voterAddress is invalid. address: %s", m.VoterAddress)
 	}
 
-	if len(m.VerifiableCid) == 0 {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "VerifiableCid is empty")
+	if len(m.DataHash) == 0 {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "dataHash is empty")
 	}
 
 	if len(m.DeliveredCid) == 0 && m.VoteOption == oracletypes.VOTE_OPTION_YES {

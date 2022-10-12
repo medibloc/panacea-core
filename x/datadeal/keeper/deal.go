@@ -161,7 +161,7 @@ func (k Keeper) SellData(ctx sdk.Context, msg *types.MsgSellData) error {
 		return sdkerrors.Wrapf(types.ErrSellData, "deal status is not ACTIVE")
 	}
 
-	getDataSale, _ := k.GetDataSale(ctx, msg.VerifiableCid, msg.DealId)
+	getDataSale, _ := k.GetDataSale(ctx, msg.DataHash, msg.DealId)
 	if getDataSale != nil && getDataSale.Status != types.DATA_SALE_STATUS_FAILED {
 		return sdkerrors.Wrapf(types.ErrSellData, "data already exists")
 	}
@@ -173,22 +173,22 @@ func (k Keeper) SellData(ctx sdk.Context, msg *types.MsgSellData) error {
 		return sdkerrors.Wrapf(types.ErrSellData, err.Error())
 	}
 
-	k.AddDataSaleQueue(ctx, dataSale.VerifiableCid, dataSale.DealId, dataSale.VotingPeriod.VotingEndTime)
+	k.AddDataSaleQueue(ctx, dataSale.DataHash, dataSale.DealId, dataSale.VotingPeriod.VotingEndTime)
 
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(
 			types.EventTypeDataVerificationVote,
 			sdk.NewAttribute(types.AttributeKeyVoteStatus, types.AttributeValueVoteStatusStarted),
-			sdk.NewAttribute(types.AttributeKeyVerifiableCID, dataSale.VerifiableCid),
+			sdk.NewAttribute(types.AttributeKeyDataHash, dataSale.DataHash),
 		),
 	)
 
 	return nil
 }
 
-func (k Keeper) GetDataSale(ctx sdk.Context, verifiableCID string, dealID uint64) (*types.DataSale, error) {
+func (k Keeper) GetDataSale(ctx sdk.Context, dataHash string, dealID uint64) (*types.DataSale, error) {
 	store := ctx.KVStore(k.storeKey)
-	key := types.GetDataSaleKey(verifiableCID, dealID)
+	key := types.GetDataSaleKey(dataHash, dealID)
 
 	bz := store.Get(key)
 	if bz == nil {
@@ -207,7 +207,7 @@ func (k Keeper) GetDataSale(ctx sdk.Context, verifiableCID string, dealID uint64
 
 func (k Keeper) SetDataSale(ctx sdk.Context, dataSale *types.DataSale) error {
 	store := ctx.KVStore(k.storeKey)
-	key := types.GetDataSaleKey(dataSale.VerifiableCid, dataSale.DealId)
+	key := types.GetDataSaleKey(dataSale.DataHash, dataSale.DealId)
 
 	bz, err := k.cdc.MarshalLengthPrefixed(dataSale)
 	if err != nil {
@@ -309,7 +309,7 @@ func (k Keeper) validateDataVerificationVote(ctx sdk.Context, vote *types.DataVe
 		return types.ErrOracleNotActive
 	}
 
-	dataSale, err := k.GetDataSale(ctx, vote.VerifiableCid, vote.DealId)
+	dataSale, err := k.GetDataSale(ctx, vote.DataHash, vote.DealId)
 	if err != nil {
 		return err
 	}
@@ -331,7 +331,7 @@ func (k Keeper) validateDataDeliveryVote(ctx sdk.Context, vote *types.DataDelive
 		return types.ErrOracleNotActive
 	}
 
-	dataSale, err := k.GetDataSale(ctx, vote.VerifiableCid, vote.DealId)
+	dataSale, err := k.GetDataSale(ctx, vote.DataHash, vote.DealId)
 	if err != nil {
 		return err
 	}
@@ -343,16 +343,16 @@ func (k Keeper) validateDataDeliveryVote(ctx sdk.Context, vote *types.DataDelive
 	return nil
 }
 
-func (k Keeper) GetDataVerificationVote(ctx sdk.Context, verifiableCID, voterAddress string, dealID uint64) (*types.DataVerificationVote, error) {
+func (k Keeper) GetDataVerificationVote(ctx sdk.Context, dataHash, voterAddress string, dealID uint64) (*types.DataVerificationVote, error) {
 	store := ctx.KVStore(k.storeKey)
 	voterAccAddr, err := sdk.AccAddressFromBech32(voterAddress)
 	if err != nil {
 		return nil, err
 	}
-	key := types.GetDataVerificationVoteKey(verifiableCID, voterAccAddr, dealID)
+	key := types.GetDataVerificationVoteKey(dataHash, voterAccAddr, dealID)
 	bz := store.Get(key)
 	if bz == nil {
-		return nil, fmt.Errorf("oracle does not exist. verifiableCID: %s, voterAddress: %s, dealID: %d", verifiableCID, voterAddress, dealID)
+		return nil, fmt.Errorf("oracle does not exist. dataHash: %s, voterAddress: %s, dealID: %d", dataHash, voterAddress, dealID)
 	}
 
 	vote := &types.DataVerificationVote{}
@@ -372,7 +372,7 @@ func (k Keeper) SetDataVerificationVote(ctx sdk.Context, vote *types.DataVerific
 		return err
 	}
 
-	key := types.GetDataVerificationVoteKey(vote.VerifiableCid, voterAccAddr, vote.DealId)
+	key := types.GetDataVerificationVoteKey(vote.DataHash, voterAccAddr, vote.DealId)
 	bz, err := k.cdc.MarshalLengthPrefixed(vote)
 	if err != nil {
 		return err
@@ -411,7 +411,7 @@ func (k Keeper) SetDataDeliveryVote(ctx sdk.Context, vote *types.DataDeliveryVot
 	if err != nil {
 		return err
 	}
-	key := types.GetDataDeliveryVoteKey(vote.DealId, vote.VerifiableCid, voterAccAddr)
+	key := types.GetDataDeliveryVoteKey(vote.DealId, vote.DataHash, voterAccAddr)
 
 	bz, err := k.cdc.MarshalLengthPrefixed(vote)
 	if err != nil {
@@ -422,16 +422,16 @@ func (k Keeper) SetDataDeliveryVote(ctx sdk.Context, vote *types.DataDeliveryVot
 	return nil
 }
 
-func (k Keeper) GetDataDeliveryVote(ctx sdk.Context, verifiableCID, voterAddress string, dealID uint64) (*types.DataDeliveryVote, error) {
+func (k Keeper) GetDataDeliveryVote(ctx sdk.Context, dataHash, voterAddress string, dealID uint64) (*types.DataDeliveryVote, error) {
 	store := ctx.KVStore(k.storeKey)
 	voterAccAddr, err := sdk.AccAddressFromBech32(voterAddress)
 	if err != nil {
 		return nil, err
 	}
-	key := types.GetDataDeliveryVoteKey(dealID, verifiableCID, voterAccAddr)
+	key := types.GetDataDeliveryVoteKey(dealID, dataHash, voterAccAddr)
 	bz := store.Get(key)
 	if bz == nil {
-		return nil, fmt.Errorf("DataSale does not exist. dealID: %d, voterAddress: %s, verifiableCID: %s", dealID, voterAddress, verifiableCID)
+		return nil, fmt.Errorf("DataSale does not exist. dealID: %d, voterAddress: %s, dataHash: %s", dealID, voterAddress, dataHash)
 	}
 	vote := &types.DataDeliveryVote{}
 	err = k.cdc.UnmarshalLengthPrefixed(bz, vote)
@@ -443,9 +443,9 @@ func (k Keeper) GetDataDeliveryVote(ctx sdk.Context, verifiableCID, voterAddress
 	return vote, nil
 }
 
-func (k Keeper) GetDataDeliveryVoteIterator(ctx sdk.Context, dealID uint64, verifiableCid string) sdk.Iterator {
+func (k Keeper) GetDataDeliveryVoteIterator(ctx sdk.Context, dealID uint64, dataHash string) sdk.Iterator {
 	store := ctx.KVStore(k.storeKey)
-	return sdk.KVStorePrefixIterator(store, types.GetDataDeliveryVotesKey(dealID, verifiableCid))
+	return sdk.KVStorePrefixIterator(store, types.GetDataDeliveryVotesKey(dealID, dataHash))
 }
 
 func (k Keeper) GetAllDataDeliveryVoteList(ctx sdk.Context) ([]types.DataDeliveryVote, error) {
@@ -476,7 +476,7 @@ func (k Keeper) RemoveDataDeliveryVote(ctx sdk.Context, vote *types.DataDelivery
 	if err != nil {
 		return err
 	}
-	key := types.GetDataDeliveryVoteKey(vote.DealId, vote.VerifiableCid, voterAccAddr)
+	key := types.GetDataDeliveryVoteKey(vote.DealId, vote.DataHash, voterAccAddr)
 
 	store.Delete(key)
 

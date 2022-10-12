@@ -59,10 +59,11 @@ func (msg *MsgCreateDeal) GetSigners() []sdk.AccAddress {
 
 var _ sdk.Msg = &MsgSellData{}
 
-func NewMsgSellData(dealID uint64, verifiableCID, sellerAddress string) *MsgSellData {
+func NewMsgSellData(dealID uint64, verifiableCID, dataHash, sellerAddress string) *MsgSellData {
 	return &MsgSellData{
 		DealId:        dealID,
 		VerifiableCid: verifiableCID,
+		DataHash:      dataHash,
 		SellerAddress: sellerAddress,
 	}
 }
@@ -88,6 +89,9 @@ func (msg *MsgSellData) ValidateBasic() error {
 
 	if len(msg.VerifiableCid) == 0 {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "empty verifiableCID")
+	}
+	if len(msg.DataHash) == 0 {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "empty dataHash")
 	}
 
 	return nil
@@ -124,8 +128,8 @@ func (msg *MsgVoteDataVerification) ValidateBasic() error {
 	if _, err := sdk.AccAddressFromBech32(msg.DataVerificationVote.VoterAddress); err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid voter address (%s)", err)
 	}
-	if len(msg.DataVerificationVote.VerifiableCid) == 0 {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "verifiable CID cannot be empty")
+	if len(msg.DataVerificationVote.DataHash) == 0 {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "DataHash cannot be empty")
 	}
 	if msg.DataVerificationVote.DealId == 0 {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "deal ID must be bigger than zero(0)")
@@ -175,8 +179,8 @@ func (msg *MsgVoteDataDelivery) ValidateBasic() error {
 	if len(msg.DataDeliveryVote.DeliveredCid) == 0 && msg.DataDeliveryVote.VoteOption == oracletypes.VOTE_OPTION_YES {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "Delivered Cid can not be empty when vote option is yes")
 	}
-	if len(msg.DataDeliveryVote.VerifiableCid) == 0 {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "Verifiable Cid can not be empty")
+	if len(msg.DataDeliveryVote.DataHash) == 0 {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "DataHash can not be empty")
 	}
 	if msg.Signature == nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "signature cannot be nil")

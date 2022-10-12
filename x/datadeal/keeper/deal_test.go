@@ -36,6 +36,10 @@ type dealTestSuite struct {
 	verifiableCID2 string
 	verifiableCID3 string
 
+	dataHash1 string
+	dataHash2 string
+	dataHash3 string
+
 	buyerAccAddr sdk.AccAddress
 }
 
@@ -47,6 +51,10 @@ func (suite *dealTestSuite) BeforeTest(_, _ string) {
 	suite.verifiableCID1 = "verifiableCID"
 	suite.verifiableCID2 = "verifiableCID2"
 	suite.verifiableCID3 = "verifiableCID3"
+
+	suite.dataHash1 = "dataHash1"
+	suite.dataHash2 = "dataHash2"
+	suite.dataHash3 = "dataHash3"
 
 	suite.buyerAccAddr = sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address())
 	suite.defaultFunds = sdk.NewCoins(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(10000000000)))
@@ -122,13 +130,14 @@ func (suite dealTestSuite) TestSellDataSuccess() {
 	msgSellData := &types.MsgSellData{
 		DealId:        1,
 		VerifiableCid: suite.verifiableCID1,
+		DataHash:      suite.dataHash1,
 		SellerAddress: suite.sellerAccAddr.String(),
 	}
 
 	err := suite.DataDealKeeper.SellData(suite.Ctx, msgSellData)
 	suite.Require().NoError(err)
 
-	dataSale, err := suite.DataDealKeeper.GetDataSale(suite.Ctx, suite.verifiableCID1, uint64(1))
+	dataSale, err := suite.DataDealKeeper.GetDataSale(suite.Ctx, suite.dataHash1, uint64(1))
 	suite.Require().NoError(err)
 	suite.Require().Equal(dataSale.VerifiableCid, suite.verifiableCID1)
 
@@ -136,10 +145,11 @@ func (suite dealTestSuite) TestSellDataSuccess() {
 	suite.Require().Equal(dataSale.VotingPeriod, suite.OracleKeeper.GetVotingPeriod(suite.Ctx))
 	suite.Require().Equal(dataSale.Status, types.DATA_SALE_STATUS_VERIFICATION_VOTING_PERIOD)
 	suite.Require().Equal(dataSale.SellerAddress, suite.sellerAccAddr.String())
+	suite.Require().Equal(dataSale.DataHash, suite.dataHash1)
 }
 
 func (suite dealTestSuite) TestSellDataStatusFailed() {
-	newDataSale := suite.MakeNewDataSale(suite.sellerAccAddr, suite.verifiableCID1)
+	newDataSale := suite.MakeNewDataSale(suite.sellerAccAddr, suite.dataHash1, suite.verifiableCID1)
 
 	newDataSale.Status = types.DATA_SALE_STATUS_FAILED
 
@@ -149,6 +159,7 @@ func (suite dealTestSuite) TestSellDataStatusFailed() {
 	msgSellData := &types.MsgSellData{
 		DealId:        1,
 		VerifiableCid: newDataSale.VerifiableCid,
+		DataHash:      newDataSale.DataHash,
 		SellerAddress: newDataSale.SellerAddress,
 	}
 
@@ -157,7 +168,7 @@ func (suite dealTestSuite) TestSellDataStatusFailed() {
 }
 
 func (suite dealTestSuite) TestSellDataStatusVotingPeriod() {
-	newDataSale := suite.MakeNewDataSale(suite.sellerAccAddr, suite.verifiableCID1)
+	newDataSale := suite.MakeNewDataSale(suite.sellerAccAddr, suite.dataHash1, suite.verifiableCID1)
 	newDataSale.Status = types.DATA_SALE_STATUS_VERIFICATION_VOTING_PERIOD
 
 	err := suite.DataDealKeeper.SetDataSale(suite.Ctx, newDataSale)
@@ -166,6 +177,7 @@ func (suite dealTestSuite) TestSellDataStatusVotingPeriod() {
 	msgSellData := &types.MsgSellData{
 		DealId:        1,
 		VerifiableCid: newDataSale.VerifiableCid,
+		DataHash:      newDataSale.DataHash,
 		SellerAddress: newDataSale.SellerAddress,
 	}
 
@@ -174,7 +186,7 @@ func (suite dealTestSuite) TestSellDataStatusVotingPeriod() {
 }
 
 func (suite dealTestSuite) TestSellDataStatusCompleted() {
-	newDataSale := suite.MakeNewDataSale(suite.sellerAccAddr, suite.verifiableCID1)
+	newDataSale := suite.MakeNewDataSale(suite.sellerAccAddr, suite.dataHash1, suite.verifiableCID1)
 	newDataSale.Status = types.DATA_SALE_STATUS_COMPLETED
 
 	err := suite.DataDealKeeper.SetDataSale(suite.Ctx, newDataSale)
@@ -183,6 +195,7 @@ func (suite dealTestSuite) TestSellDataStatusCompleted() {
 	msgSellData := &types.MsgSellData{
 		DealId:        1,
 		VerifiableCid: newDataSale.VerifiableCid,
+		DataHash:      newDataSale.DataHash,
 		SellerAddress: newDataSale.SellerAddress,
 	}
 
@@ -194,6 +207,7 @@ func (suite dealTestSuite) TestSellDataDealNotExists() {
 	msgSellData := &types.MsgSellData{
 		DealId:        2,
 		VerifiableCid: suite.verifiableCID1,
+		DataHash:      suite.dataHash1,
 		SellerAddress: suite.sellerAccAddr.String(),
 	}
 
@@ -205,6 +219,7 @@ func (suite dealTestSuite) TestSellDataDealStatusNotActive() {
 	msgSellData := &types.MsgSellData{
 		DealId:        1,
 		VerifiableCid: suite.verifiableCID1,
+		DataHash:      suite.dataHash1,
 		SellerAddress: suite.sellerAccAddr.String(),
 	}
 
@@ -228,39 +243,39 @@ func (suite dealTestSuite) TestSellDataDealStatusNotActive() {
 
 func (suite dealTestSuite) TestGetAllDataSalesList() {
 	type dataSaleKey struct {
-		verifiableCID string
-		dealID        uint64
+		dataHash string
+		dealID   uint64
 	}
 	dataSaleKeys := make([]dataSaleKey, 0)
 
-	dataSale1 := suite.MakeNewDataSale(suite.sellerAccAddr, suite.verifiableCID1)
+	dataSale1 := suite.MakeNewDataSale(suite.sellerAccAddr, suite.dataHash1, suite.verifiableCID1)
 	err := suite.DataDealKeeper.SetDataSale(suite.Ctx, dataSale1)
 	suite.Require().NoError(err)
-	dataSaleKeys = append(dataSaleKeys, dataSaleKey{dataSale1.VerifiableCid, dataSale1.DealId})
+	dataSaleKeys = append(dataSaleKeys, dataSaleKey{dataSale1.DataHash, dataSale1.DealId})
 
-	dataSale2 := suite.MakeNewDataSale(suite.sellerAccAddr, suite.verifiableCID2)
+	dataSale2 := suite.MakeNewDataSale(suite.sellerAccAddr, suite.dataHash2, suite.verifiableCID2)
 	err = suite.DataDealKeeper.SetDataSale(suite.Ctx, dataSale2)
 	suite.Require().NoError(err)
-	dataSaleKeys = append(dataSaleKeys, dataSaleKey{dataSale2.VerifiableCid, dataSale2.DealId})
+	dataSaleKeys = append(dataSaleKeys, dataSaleKey{dataSale2.DataHash, dataSale2.DealId})
 
-	dataSale3 := suite.MakeNewDataSale(suite.sellerAccAddr, suite.verifiableCID3)
+	dataSale3 := suite.MakeNewDataSale(suite.sellerAccAddr, suite.dataHash3, suite.verifiableCID3)
 	err = suite.DataDealKeeper.SetDataSale(suite.Ctx, dataSale3)
 	suite.Require().NoError(err)
-	dataSaleKeys = append(dataSaleKeys, dataSaleKey{dataSale3.VerifiableCid, dataSale3.DealId})
+	dataSaleKeys = append(dataSaleKeys, dataSaleKey{dataSale3.DataHash, dataSale3.DealId})
 
 	allDataSaleList, err := suite.DataDealKeeper.GetAllDataSaleList(suite.Ctx)
 	suite.Require().NoError(err)
 
 	sort.Slice(dataSaleKeys, func(i, j int) bool {
-		return dataSaleKeys[i].verifiableCID < dataSaleKeys[j].verifiableCID
+		return dataSaleKeys[i].dataHash < dataSaleKeys[j].dataHash
 	})
 
 	sort.Slice(allDataSaleList, func(i, j int) bool {
-		return allDataSaleList[i].VerifiableCid < allDataSaleList[j].VerifiableCid
+		return allDataSaleList[i].DataHash < allDataSaleList[j].DataHash
 	})
 
 	for i, dataSaleKey := range dataSaleKeys {
-		dataSale, err := suite.DataDealKeeper.GetDataSale(suite.Ctx, dataSaleKey.verifiableCID, dataSaleKey.dealID)
+		dataSale, err := suite.DataDealKeeper.GetDataSale(suite.Ctx, dataSaleKey.dataHash, dataSaleKey.dealID)
 		suite.Require().NoError(err)
 
 		suite.Require().Equal(dataSale.VerifiableCid, allDataSaleList[i].VerifiableCid)
@@ -268,6 +283,7 @@ func (suite dealTestSuite) TestGetAllDataSalesList() {
 		suite.Require().Equal(dataSale.Status, allDataSaleList[i].Status)
 		suite.Require().Equal(dataSale.VotingPeriod, allDataSaleList[i].VotingPeriod)
 		suite.Require().Equal(dataSale.SellerAddress, allDataSaleList[i].SellerAddress)
+		suite.Require().Equal(dataSale.DataHash, allDataSaleList[i].DataHash)
 	}
 }
 
@@ -285,11 +301,11 @@ func (suite dealTestSuite) TestDataVerificationVoteSuccess() {
 	})
 	suite.Require().NoError(err)
 
-	dataSale := suite.MakeNewDataSale(suite.sellerAccAddr, suite.verifiableCID1)
+	dataSale := suite.MakeNewDataSale(suite.sellerAccAddr, suite.dataHash1, suite.verifiableCID1)
 	err = suite.DataDealKeeper.SetDataSale(suite.Ctx, dataSale)
 	suite.Require().NoError(err)
 
-	dataVerificationVote := suite.MakeNewDataVerificationVote(suite.oracleAccAddr, suite.verifiableCID1)
+	dataVerificationVote := suite.MakeNewDataVerificationVote(suite.oracleAccAddr, suite.dataHash1)
 
 	voteBz, err := suite.Cdc.Marshaler.Marshal(dataVerificationVote)
 	suite.Require().NoError(err)
@@ -303,7 +319,7 @@ func (suite dealTestSuite) TestDataVerificationVoteSuccess() {
 	err = suite.DataDealKeeper.VoteDataVerification(suite.Ctx, dataVerificationVote, signature)
 	suite.Require().NoError(err)
 
-	getDataVerificationVote, err := suite.DataDealKeeper.GetDataVerificationVote(suite.Ctx, suite.verifiableCID1, suite.oracleAccAddr.String(), 1)
+	getDataVerificationVote, err := suite.DataDealKeeper.GetDataVerificationVote(suite.Ctx, suite.dataHash1, suite.oracleAccAddr.String(), 1)
 	suite.Require().NoError(err)
 	suite.Require().Equal(dataVerificationVote, getDataVerificationVote)
 }
@@ -314,11 +330,11 @@ func (suite dealTestSuite) TestDataVerificationVoteFailedVerifySignature() {
 	suite.Require().NoError(oracleAccount.SetPubKey(suite.oracleAccPubKey))
 	suite.AccountKeeper.SetAccount(suite.Ctx, oracleAccount)
 
-	dataSale := suite.MakeNewDataSale(suite.sellerAccAddr, suite.verifiableCID1)
+	dataSale := suite.MakeNewDataSale(suite.sellerAccAddr, suite.dataHash1, suite.verifiableCID1)
 	err := suite.DataDealKeeper.SetDataSale(suite.Ctx, dataSale)
 	suite.Require().NoError(err)
 
-	dataVerificationVote := suite.MakeNewDataVerificationVote(suite.oracleAccAddr, suite.verifiableCID1)
+	dataVerificationVote := suite.MakeNewDataVerificationVote(suite.oracleAccAddr, suite.dataHash1)
 
 	voteBz, err := suite.Cdc.Marshaler.Marshal(dataVerificationVote)
 	suite.Require().NoError(err)
@@ -349,17 +365,17 @@ func (suite dealTestSuite) TestDataVerificationInvalidDataSaleStatus() {
 	})
 	suite.Require().NoError(err)
 
-	dataSale := suite.MakeNewDataSale(suite.sellerAccAddr, suite.verifiableCID1)
+	dataSale := suite.MakeNewDataSale(suite.sellerAccAddr, suite.dataHash1, suite.verifiableCID1)
 	err = suite.DataDealKeeper.SetDataSale(suite.Ctx, dataSale)
 	suite.Require().NoError(err)
 
-	getDataSale, err := suite.DataDealKeeper.GetDataSale(suite.Ctx, suite.verifiableCID1, 1)
+	getDataSale, err := suite.DataDealKeeper.GetDataSale(suite.Ctx, suite.dataHash1, 1)
 	suite.Require().NoError(err)
 	getDataSale.Status = types.DATA_SALE_STATUS_COMPLETED
 	err = suite.DataDealKeeper.SetDataSale(suite.Ctx, getDataSale)
 	suite.Require().NoError(err)
 
-	dataVerificationVote := suite.MakeNewDataVerificationVote(suite.oracleAccAddr, suite.verifiableCID1)
+	dataVerificationVote := suite.MakeNewDataVerificationVote(suite.oracleAccAddr, suite.dataHash1)
 
 	voteBz, err := suite.Cdc.Marshaler.Marshal(dataVerificationVote)
 	suite.Require().NoError(err)
@@ -404,11 +420,11 @@ func (suite dealTestSuite) TestDataVerificationInvalidGenesisOracleStatus() {
 	})
 	suite.Require().NoError(err)
 
-	dataSale := suite.MakeNewDataSale(suite.sellerAccAddr, suite.verifiableCID1)
+	dataSale := suite.MakeNewDataSale(suite.sellerAccAddr, suite.dataHash1, suite.verifiableCID1)
 	err = suite.DataDealKeeper.SetDataSale(suite.Ctx, dataSale)
 	suite.Require().NoError(err)
 
-	dataVerificationVote := suite.MakeNewDataVerificationVote(suite.oracleAccAddr, suite.verifiableCID1)
+	dataVerificationVote := suite.MakeNewDataVerificationVote(suite.oracleAccAddr, suite.dataHash1)
 
 	voteBz, err := suite.Cdc.Marshaler.Marshal(dataVerificationVote)
 	suite.Require().NoError(err)
@@ -438,49 +454,49 @@ func (suite dealTestSuite) TestGetAllDataVerificationVoteList() {
 	suite.Require().NoError(err)
 
 	type dataVerificationVoteKey struct {
-		dealID        uint64
-		verifiableCID string
-		voterAddress  sdk.AccAddress
+		dealID       uint64
+		dataHash     string
+		voterAddress sdk.AccAddress
 	}
 	dataVerificationVoteKeys := make([]dataVerificationVoteKey, 0)
 
-	verificationVote1 := suite.MakeNewDataVerificationVote(suite.oracleAccAddr, suite.verifiableCID1)
+	verificationVote1 := suite.MakeNewDataVerificationVote(suite.oracleAccAddr, suite.dataHash1)
 	err = suite.DataDealKeeper.SetDataVerificationVote(suite.Ctx, verificationVote1)
 	suite.Require().NoError(err)
 	voterAcc, err := sdk.AccAddressFromBech32(verificationVote1.VoterAddress)
 	suite.Require().NoError(err)
-	dataVerificationVoteKeys = append(dataVerificationVoteKeys, dataVerificationVoteKey{verificationVote1.DealId, verificationVote1.VerifiableCid, voterAcc})
+	dataVerificationVoteKeys = append(dataVerificationVoteKeys, dataVerificationVoteKey{verificationVote1.DealId, verificationVote1.DataHash, voterAcc})
 
-	verificationVote2 := suite.MakeNewDataVerificationVote(suite.oracleAccAddr, suite.verifiableCID2)
+	verificationVote2 := suite.MakeNewDataVerificationVote(suite.oracleAccAddr, suite.dataHash2)
 	err = suite.DataDealKeeper.SetDataVerificationVote(suite.Ctx, verificationVote2)
 	suite.Require().NoError(err)
 	voterAcc, err = sdk.AccAddressFromBech32(verificationVote2.VoterAddress)
 	suite.Require().NoError(err)
-	dataVerificationVoteKeys = append(dataVerificationVoteKeys, dataVerificationVoteKey{verificationVote2.DealId, verificationVote2.VerifiableCid, voterAcc})
+	dataVerificationVoteKeys = append(dataVerificationVoteKeys, dataVerificationVoteKey{verificationVote2.DealId, verificationVote2.DataHash, voterAcc})
 
-	verificationVote3 := suite.MakeNewDataVerificationVote(suite.oracleAccAddr, suite.verifiableCID3)
+	verificationVote3 := suite.MakeNewDataVerificationVote(suite.oracleAccAddr, suite.dataHash3)
 	err = suite.DataDealKeeper.SetDataVerificationVote(suite.Ctx, verificationVote3)
 	suite.Require().NoError(err)
 	voterAcc, err = sdk.AccAddressFromBech32(verificationVote3.VoterAddress)
 	suite.Require().NoError(err)
-	dataVerificationVoteKeys = append(dataVerificationVoteKeys, dataVerificationVoteKey{verificationVote3.DealId, verificationVote3.VerifiableCid, voterAcc})
+	dataVerificationVoteKeys = append(dataVerificationVoteKeys, dataVerificationVoteKey{verificationVote3.DealId, verificationVote3.DataHash, voterAcc})
 
 	allDataVerificationVoteList, err := suite.DataDealKeeper.GetAllDataVerificationVoteList(suite.Ctx)
 	suite.Require().NoError(err)
 
 	sort.Slice(dataVerificationVoteKeys, func(i, j int) bool {
-		return dataVerificationVoteKeys[i].verifiableCID < dataVerificationVoteKeys[j].verifiableCID
+		return dataVerificationVoteKeys[i].dataHash < dataVerificationVoteKeys[j].dataHash
 	})
 
 	sort.Slice(allDataVerificationVoteList, func(i, j int) bool {
-		return allDataVerificationVoteList[i].VerifiableCid < allDataVerificationVoteList[j].VerifiableCid
+		return allDataVerificationVoteList[i].DataHash < allDataVerificationVoteList[j].DataHash
 	})
 
 	for i, dataVerificationVoteKey := range dataVerificationVoteKeys {
-		dataVerificationVote, err := suite.DataDealKeeper.GetDataVerificationVote(suite.Ctx, dataVerificationVoteKey.verifiableCID, dataVerificationVoteKey.voterAddress.String(), dataVerificationVoteKey.dealID)
+		dataVerificationVote, err := suite.DataDealKeeper.GetDataVerificationVote(suite.Ctx, dataVerificationVoteKey.dataHash, dataVerificationVoteKey.voterAddress.String(), dataVerificationVoteKey.dealID)
 		suite.Require().NoError(err)
 
-		suite.Require().Equal(dataVerificationVote.VerifiableCid, allDataVerificationVoteList[i].VerifiableCid)
+		suite.Require().Equal(dataVerificationVote.DataHash, allDataVerificationVoteList[i].DataHash)
 		suite.Require().Equal(dataVerificationVote.DealId, allDataVerificationVoteList[i].DealId)
 		suite.Require().Equal(dataVerificationVote.VoterAddress, allDataVerificationVoteList[i].VoterAddress)
 		suite.Require().Equal(dataVerificationVote.VoteOption, allDataVerificationVoteList[i].VoteOption)
@@ -502,16 +518,16 @@ func (suite dealTestSuite) TestDataDeliveryVoteSuccess() {
 	})
 	suite.Require().NoError(err)
 
-	dataSale := suite.MakeNewDataSaleDeliveryVoting(suite.sellerAccAddr, suite.verifiableCID1)
+	dataSale := suite.MakeNewDataSaleDeliveryVoting(suite.sellerAccAddr, suite.dataHash1, suite.verifiableCID1)
 	err = suite.DataDealKeeper.SetDataSale(suite.Ctx, dataSale)
 	suite.Require().NoError(err)
 
 	dataDeliveryVote := &types.DataDeliveryVote{
-		VoterAddress:  suite.oracleAccAddr.String(),
-		DealId:        dataSale.DealId,
-		VerifiableCid: dataSale.VerifiableCid,
-		DeliveredCid:  "test",
-		VoteOption:    oracletypes.VOTE_OPTION_YES,
+		VoterAddress: suite.oracleAccAddr.String(),
+		DealId:       dataSale.DealId,
+		DataHash:     dataSale.DataHash,
+		DeliveredCid: "test",
+		VoteOption:   oracletypes.VOTE_OPTION_YES,
 	}
 
 	voteBz, err := suite.Cdc.Marshaler.Marshal(dataDeliveryVote)
@@ -529,7 +545,7 @@ func (suite dealTestSuite) TestDataDeliveryVoteSuccess() {
 
 	getDataDeliveryVote, err := suite.DataDealKeeper.GetDataDeliveryVote(
 		ctx,
-		suite.verifiableCID1,
+		suite.dataHash1,
 		suite.oracleAccAddr.String(),
 		dataSale.DealId,
 	)
@@ -552,16 +568,16 @@ func (suite dealTestSuite) TestDataDeliveryVoteFailedVerifySignature() {
 	})
 	suite.Require().NoError(err)
 
-	dataSale := suite.MakeNewDataSaleDeliveryVoting(suite.sellerAccAddr, suite.verifiableCID1)
+	dataSale := suite.MakeNewDataSaleDeliveryVoting(suite.sellerAccAddr, suite.dataHash1, suite.verifiableCID1)
 	err = suite.DataDealKeeper.SetDataSale(suite.Ctx, dataSale)
 	suite.Require().NoError(err)
 
 	dataDeliveryVote := &types.DataDeliveryVote{
-		VoterAddress:  suite.oracleAccAddr.String(),
-		DealId:        dataSale.DealId,
-		VerifiableCid: dataSale.VerifiableCid,
-		DeliveredCid:  "test",
-		VoteOption:    oracletypes.VOTE_OPTION_YES,
+		VoterAddress: suite.oracleAccAddr.String(),
+		DealId:       dataSale.DealId,
+		DataHash:     dataSale.DataHash,
+		DeliveredCid: "test",
+		VoteOption:   oracletypes.VOTE_OPTION_YES,
 	}
 
 	voteBz, err := suite.Cdc.Marshaler.Marshal(dataDeliveryVote)
@@ -592,16 +608,16 @@ func (suite dealTestSuite) TestDataDeliveryVoteFaildInvalidStatus() {
 	suite.Require().NoError(err)
 
 	// dataSale that status is DATA_SALE_STATUS_VERIFICATION_VOTING_PERIOD
-	dataSale := suite.MakeNewDataSale(suite.sellerAccAddr, suite.verifiableCID1)
+	dataSale := suite.MakeNewDataSale(suite.sellerAccAddr, suite.dataHash1, suite.verifiableCID1)
 	err = suite.DataDealKeeper.SetDataSale(suite.Ctx, dataSale)
 	suite.Require().NoError(err)
 
 	dataDeliveryVote := &types.DataDeliveryVote{
-		VoterAddress:  suite.oracleAccAddr.String(),
-		DealId:        dataSale.DealId,
-		VerifiableCid: dataSale.VerifiableCid,
-		DeliveredCid:  "test",
-		VoteOption:    oracletypes.VOTE_OPTION_YES,
+		VoterAddress: suite.oracleAccAddr.String(),
+		DealId:       dataSale.DealId,
+		DataHash:     dataSale.DataHash,
+		DeliveredCid: "test",
+		VoteOption:   oracletypes.VOTE_OPTION_YES,
 	}
 
 	voteBz, err := suite.Cdc.Marshaler.Marshal(dataDeliveryVote)
