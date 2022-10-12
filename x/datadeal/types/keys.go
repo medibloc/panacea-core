@@ -38,7 +38,10 @@ var (
 	DataSaleQueueKey        = []byte{0x05}
 
 	DataDeliveryVoteKey = []byte{0x06}
+	DataDeliveryQueueKey = []byte{0x07}
 )
+
+var lenTime = len(sdk.FormatTimeBytes(time.Now()))
 
 func GetDealKey(dealID uint64) []byte {
 	return append(KeyPrefixDeals, sdk.Uint64ToBigEndian(dealID)...)
@@ -56,8 +59,24 @@ func GetDataVerificationVoteKey(verifiableCID string, voterAddress sdk.AccAddres
 	return append(DataVerificationVoteKey, CombineKeys(sdk.Uint64ToBigEndian(dealID), []byte(verifiableCID), voterAddress)...)
 }
 
-func GetDataDeliveryVoteKey(verifiableCID string, voterAddress sdk.AccAddress, dealID uint64) []byte {
+func GetDataDeliveryVoteKey(dealID uint64, verifiableCID string, voterAddress sdk.AccAddress) []byte {
 	return append(DataDeliveryVoteKey, CombineKeys(sdk.Uint64ToBigEndian(dealID), []byte(verifiableCID), voterAddress)...)
+}
+
+func GetDataDeliveryVotesKey(dealID uint64, verifiableCID string) []byte {
+	return append(DataDeliveryVoteKey, CombineKeys(sdk.Uint64ToBigEndian(dealID), []byte(verifiableCID))...)
+}
+
+func GetDataDeliveryQueueKey(dealID uint64, verifiableCID string, endTime time.Time) []byte {
+	return append(DataDeliveryQueueKey, CombineKeys(sdk.FormatTimeBytes(endTime), sdk.Uint64ToBigEndian(dealID), []byte(verifiableCID))...)
+}
+
+func GetDataDeliveryQueueByTimeKey(endTime time.Time) []byte {
+	return append(DataDeliveryQueueKey, sdk.FormatTimeBytes(endTime)...)
+}
+
+func SplitDataDeliveryQueueKey(key []byte) (uint64, string) {
+	return sdk.BigEndianToUint64(key[1+lenTime+1 : 1+lenTime+1+8]), string(key[1+lenTime+1+8+1:])
 }
 
 // CombineKeys function defines combines deal_id with data_hash.

@@ -86,3 +86,7 @@ func (m DataDeliveryVote) ValidateBasic() error {
 
 	return nil
 }
+
+func (m DataDeliveryVote) GetConsensusValue() []byte {
+	return []byte(m.DeliveredCid)
+}
