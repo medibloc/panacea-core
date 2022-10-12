@@ -411,7 +411,7 @@ func (k Keeper) SetDataDeliveryVote(ctx sdk.Context, vote *types.DataDeliveryVot
 	if err != nil {
 		return err
 	}
-	key := types.GetDataDeliveryVoteKey(vote.VerifiableCid, voterAccAddr, vote.DealId)
+	key := types.GetDataDeliveryVoteKey(vote.DealId, vote.VerifiableCid, voterAccAddr)
 
 	bz, err := k.cdc.MarshalLengthPrefixed(vote)
 	if err != nil {
@@ -428,7 +428,7 @@ func (k Keeper) GetDataDeliveryVote(ctx sdk.Context, verifiableCID, voterAddress
 	if err != nil {
 		return nil, err
 	}
-	key := types.GetDataDeliveryVoteKey(verifiableCID, voterAccAddr, dealID)
+	key := types.GetDataDeliveryVoteKey(dealID, verifiableCID, voterAccAddr)
 	bz := store.Get(key)
 	if bz == nil {
 		return nil, fmt.Errorf("DataSale does not exist. dealID: %d, voterAddress: %s, verifiableCID: %s", dealID, voterAddress, verifiableCID)
@@ -441,6 +441,11 @@ func (k Keeper) GetDataDeliveryVote(ctx sdk.Context, verifiableCID, voterAddress
 	}
 
 	return vote, nil
+}
+
+func (k Keeper) GetDataDeliveryVoteIterator(ctx sdk.Context, dealID uint64, verifiableCid string) sdk.Iterator {
+	store := ctx.KVStore(k.storeKey)
+	return sdk.KVStorePrefixIterator(store, types.GetDataDeliveryVotesKey(dealID, verifiableCid))
 }
 
 func (k Keeper) GetAllDataDeliveryVoteList(ctx sdk.Context) ([]types.DataDeliveryVote, error) {
@@ -463,4 +468,17 @@ func (k Keeper) GetAllDataDeliveryVoteList(ctx sdk.Context) ([]types.DataDeliver
 	}
 
 	return dataDeliveryVotes, nil
+}
+
+func (k Keeper) RemoveDataDeliveryVote(ctx sdk.Context, vote *types.DataDeliveryVote) error {
+	store := ctx.KVStore(k.storeKey)
+	voterAccAddr, err := sdk.AccAddressFromBech32(vote.VoterAddress)
+	if err != nil {
+		return err
+	}
+	key := types.GetDataDeliveryVoteKey(vote.DealId, vote.VerifiableCid, voterAccAddr)
+
+	store.Delete(key)
+
+	return nil
 }
