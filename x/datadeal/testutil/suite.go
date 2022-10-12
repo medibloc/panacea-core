@@ -99,7 +99,9 @@ func (suite *DataDealBaseTestSuite) MakeNewDataDeliveryVote(voterAddr sdk.AccAdd
 func (suite *DataDealBaseTestSuite) CreateOracleValidator(pubKey cryptotypes.PubKey, amount sdk.Int) {
 	suite.SetAccount(pubKey)
 
-	suite.SetValidator(pubKey, amount, sdk.Dec(sdk.NewInt(0)))
+	val1Commission := sdk.NewDecWithPrec(1, 1)
+
+	suite.SetValidator(pubKey, amount, val1Commission)
 
 	oracleAccAddr := sdk.AccAddress(pubKey.Address().Bytes())
 	oracle := &oracletypes.Oracle{

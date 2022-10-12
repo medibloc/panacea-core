@@ -29,6 +29,7 @@ func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) {
 				return keeper.RemoveDataVerificationVote(ctx, vote.(*types.DataVerificationVote))
 			},
 		)
+
 		if err != nil {
 			panic(err)
 		}
@@ -38,12 +39,12 @@ func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) {
 			dataSale.VerifiableCid = string(tallyResult.ConsensusValue)
 
 			keeper.AddDataDeliveryQueue(ctx, dataSale.VerifiableCid, dataSale.DealId, oracleKeeper.GetVotingPeriod(ctx).VotingEndTime)
-
 		} else {
 			dataSale.Status = types.DATA_SALE_STATUS_FAILED
 		}
 
 		dataSale.VerificationTallyResult = tallyResult
+
 		if err := keeper.SetDataSale(ctx, dataSale); err != nil {
 			panic(err)
 		}
@@ -54,6 +55,52 @@ func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) {
 				sdk.NewAttribute(types.AttributeKeyVoteStatus, types.AttributeValueVoteStatusEnded),
 				sdk.NewAttribute(types.AttributeKeyVerifiableCID, dataSale.VerifiableCid),
 				sdk.NewAttribute(types.AttributeKeyDealID, strconv.FormatUint(dataSale.DealId, 10)),
+			),
+		)
+
+		return false
+	})
+
+	keeper.IterateClosedDataDeliveryQueue(ctx, ctx.BlockHeader().Time, func(dataSale *types.DataSale) bool {
+
+		keeper.RemoveDataDeliveryQueue(ctx, dataSale.DealId, dataSale.VerifiableCid, dataSale.VotingPeriod.VotingEndTime)
+		iterator := keeper.GetDataDeliveryVoteIterator(ctx, dataSale.DealId, dataSale.VerifiableCid)
+		defer iterator.Close()
+
+		oracleKeeper := keeper.GetOracleKeeper()
+
+		tallyResult, err := oracleKeeper.Tally(
+			ctx,
+			iterator,
+			func() oracletypes.Vote {
+				return &types.DataDeliveryVote{}
+			},
+			func(vote oracletypes.Vote) error {
+				return keeper.RemoveDataDeliveryVote(ctx, vote.(*types.DataDeliveryVote))
+			},
+		)
+		if err != nil {
+			panic(err)
+		}
+
+		if tallyResult.IsPassed() {
+			dataSale.Status = types.DATA_SALE_STATUS_COMPLETED
+			dataSale.DeliveredCid = string(tallyResult.ConsensusValue)
+		} else {
+			dataSale.Status = types.DATA_SALE_STATUS_FAILED
+		}
+
+		dataSale.DeliveryTallyResult = tallyResult
+
+		if err := keeper.SetDataSale(ctx, dataSale); err != nil {
+			panic(err)
+		}
+
+		ctx.EventManager().EmitEvent(
+			sdk.NewEvent(
+				types.EventTypeDataDeliveryVote,
+				sdk.NewAttribute(types.AttributeKeyVoteStatus, types.AttributeValueVoteStatusEnded),
+				sdk.NewAttribute(types.AttributeKeyDeliveredCID, dataSale.DeliveredCid),
 			),
 		)
 
