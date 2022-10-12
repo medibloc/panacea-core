@@ -101,6 +101,7 @@ func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) {
 				types.EventTypeDataDeliveryVote,
 				sdk.NewAttribute(types.AttributeKeyVoteStatus, types.AttributeValueVoteStatusEnded),
 				sdk.NewAttribute(types.AttributeKeyDeliveredCID, dataSale.DeliveredCid),
+				sdk.NewAttribute(types.AttributeKeyDealID, strconv.FormatUint(dataSale.DealId, 10)),
 			),
 		)
 
