@@ -468,6 +468,7 @@ func New(
 		keys[oracletypes.MemStoreKey],
 		app.GetSubspace(oracletypes.ModuleName),
 		app.StakingKeeper,
+		app.DistrKeeper,
 	)
 
 	app.dataDealKeeper = *datadealkeeper.NewKeeper(
