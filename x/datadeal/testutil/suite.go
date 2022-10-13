@@ -51,17 +51,13 @@ func (suite *DataDealBaseTestSuite) SetValidator(pubKey cryptotypes.PubKey, amou
 	validator, err := stakingtypes.NewValidator(varAddr, pubKey, stakingtypes.Description{})
 	suite.Require().NoError(err)
 	validator = validator.UpdateStatus(stakingtypes.Bonded)
-	//validator, _ = validator.AddTokensFromDel(amount)
+	validator, _ = validator.AddTokensFromDel(amount)
 	newCommission := stakingtypes.NewCommission(commission, sdk.OneDec(), sdk.NewDecWithPrec(5, 1))
 	validator.Commission = newCommission
 	validator.MinSelfDelegation = amount
 
 	suite.StakingKeeper.SetValidator(suite.Ctx, validator)
 	err = suite.StakingKeeper.SetValidatorByConsAddr(suite.Ctx, validator)
-	suite.Require().NoError(err)
-
-	accAddr := sdk.AccAddress(pubKey.Address().Bytes())
-	_, err = suite.StakingKeeper.Delegate(suite.Ctx, accAddr, amount, stakingtypes.Unbonded, validator, true)
 	suite.Require().NoError(err)
 
 	return validator

@@ -2,7 +2,6 @@ package keeper_test
 
 import (
 	"encoding/base64"
-	"fmt"
 	"testing"
 
 	"github.com/btcsuite/btcd/btcec"
@@ -237,19 +236,20 @@ func (suite *rewardTestSuite) TestRewardDistributionWithDelegators() {
 	val2 := suite.SetValidator(suite.oracleAcc2PubKey, val2VotingPower, val2Commission)
 	val3 := suite.SetValidator(suite.oracleAcc3PubKey, val3VotingPower, val3Commission)
 
+	// self delegation
+	_, err = suite.StakingKeeper.Delegate(ctx, suite.oracleAcc3Addr, sdk.NewInt(10), stakingtypes.Unbonded, val3, true)
+	suite.Require().NoError(err)
+
 	// delegation
-	//_, err = suite.StakingKeeper.Delegate(ctx, suite.oracleAcc3Addr, sdk.NewInt(10), stakingtypes.Unbonded, val3, true)
-	//suite.Require().NoError(err)
 	_, err = suite.StakingKeeper.Delegate(ctx, suite.delegatorAccAddr, sdk.NewInt(10), stakingtypes.Unbonded, val3, true)
 	suite.Require().NoError(err)
 
+	// initial setting for validator rewards
 	suite.SetupValidatorRewards(val1.GetOperator())
 	suite.SetupValidatorRewards(val2.GetOperator())
 	suite.SetupValidatorRewards(val3.GetOperator())
 	suite.DistrKeeper.SetDelegatorStartingInfo(ctx, val3.GetOperator(), suite.delegatorAccAddr, distrtypes.NewDelegatorStartingInfo(1, sdk.NewInt(10).ToDec(), 1))
-	//staking.EndBlocker(ctx, suite.StakingKeeper)
-	//
-	//ctx = ctx.WithBlockHeight(ctx.BlockHeight() + 1)
+	suite.DistrKeeper.SetDelegatorStartingInfo(ctx, val3.GetOperator(), suite.oracleAcc3Addr, distrtypes.NewDelegatorStartingInfo(1, sdk.NewInt(10).ToDec(), 1))
 
 	// set deal
 	dealAddr := types.NewDealAddress(1)
@@ -333,15 +333,11 @@ func (suite *rewardTestSuite) TestRewardDistributionWithDelegators() {
 	del := suite.StakingKeeper.Delegation(ctx, suite.delegatorAccAddr, val3.GetOperator())
 	selfDel := suite.StakingKeeper.Delegation(ctx, suite.oracleAcc3Addr, val3.GetOperator())
 
-	val3 = suite.StakingKeeper.Validator(ctx, val3.GetOperator()).(stakingtypes.Validator)
-	endingPeriod := suite.DistrKeeper.IncrementValidatorPeriod(ctx, val3)
-	delegatorReward := suite.DistrKeeper.CalculateDelegationRewards(ctx, val3, del, endingPeriod)
-	//validatorReward := suite.DistrKeeper.CalculateDelegationRewards(ctx, val3, selfDel, endingPeriod)
-
-	fmt.Println(selfDel.GetShares())
-
-	//dels, err := suite.DistrKeeper.DelegatorValidators(sdk.WrapSDKContext(ctx), &distrtypes.QueryDelegatorValidatorsRequest{DelegatorAddress: suite.oracleAcc3Addr.String()})
+	val33 := suite.StakingKeeper.Validator(ctx, val3.GetOperator())
+	endingPeriod := suite.DistrKeeper.IncrementValidatorPeriod(ctx, val33)
+	delegatorReward := suite.DistrKeeper.CalculateDelegationRewards(ctx, val33, del, endingPeriod)
+	validatorReward := suite.DistrKeeper.CalculateDelegationRewards(ctx, val3, selfDel, endingPeriod)
 
 	suite.Require().Equal(sdk.NewDecCoins(sdk.NewDecCoin(assets.MicroMedDenom, sdk.NewInt(8_000_000))), delegatorReward)
-	//suite.Require().Equal(sdk.NewDecCoins(sdk.NewDecCoin(assets.MicroMedDenom, sdk.NewInt(8_000_000))), validatorReward)
+	suite.Require().Equal(sdk.NewDecCoins(sdk.NewDecCoin(assets.MicroMedDenom, sdk.NewInt(8_000_000))), validatorReward)
 }
