@@ -144,6 +144,7 @@ func (suite *tallyTestSuite) TestTally() {
 	suite.Require().Equal(0, len(tallyResult.InvalidYes))
 	suite.Require().Equal(sdk.NewInt(90), tallyResult.Total)
 	suite.Require().Equal(consensusValue, tallyResult.ConsensusValue)
+	suite.Require().Len(tallyResult.ValidVoters, 2)
 }
 
 func (suite *tallyTestSuite) TestTallyOracleJailed() {
@@ -227,6 +228,8 @@ func (suite *tallyTestSuite) TestTallyOracleJailed() {
 	// not include oracle2. because oracle2 is jailed.
 	suite.Require().Equal(sdk.NewInt(70), tallyResult.Total)
 	suite.Require().Equal(consensusValue, tallyResult.ConsensusValue)
+	suite.Require().Len(tallyResult.ValidVoters, 1)
+	suite.Require().Equal(tallyResult.ValidVoters[0], &types.VoterInfo{VoterAddress: oracleAccAddr.String(), VotingPower: sdk.NewInt(70)})
 
 	oracleVotes, err = suite.OracleKeeper.GetAllOracleRegistrationVoteList(suite.Ctx)
 	suite.Require().NoError(err)
