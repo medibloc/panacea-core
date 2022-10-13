@@ -22,6 +22,7 @@ func GetTxCmd() *cobra.Command {
 	cmd.AddCommand(CmdSellData())
 	cmd.AddCommand(CmdVoteDataVerification())
 	cmd.AddCommand(CmdVoteDataDelivery())
+	cmd.AddCommand(CmdDeactivateDeal())
 
 	return cmd
 }
