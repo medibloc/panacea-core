@@ -168,13 +168,13 @@ func (k Keeper) SellData(ctx sdk.Context, msg *types.MsgSellData) error {
 	}
 
 	dataSale := types.NewDataSale(msg)
-	dataSale.VotingPeriod = k.oracleKeeper.GetVotingPeriod(ctx)
+	dataSale.VerificationVotingPeriod = k.oracleKeeper.GetVotingPeriod(ctx)
 
 	if err := k.SetDataSale(ctx, dataSale); err != nil {
 		return sdkerrors.Wrapf(types.ErrSellData, err.Error())
 	}
 
-	k.AddDataVerificationQueue(ctx, dataSale.VerifiableCid, dataSale.DealId, dataSale.VotingPeriod.VotingEndTime)
+	k.AddDataVerificationQueue(ctx, dataSale.VerifiableCid, dataSale.DealId, dataSale.VerificationVotingPeriod.VotingEndTime)
 
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(
