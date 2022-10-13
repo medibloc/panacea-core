@@ -328,11 +328,11 @@ func (suite abciTestSuite) TestDataVerificationEndBlockerVoteRejectSamePower() {
 	suite.Require().Equal(2, len(tallyResult.InvalidYes))
 
 	for _, tallyResult := range tallyResult.InvalidYes {
-		if bytes.Equal([]byte(vote.VerifiableCid), tallyResult.ConsensusValue) {
-			suite.Require().Equal([]byte(vote.VerifiableCid), tallyResult.ConsensusValue)
+		if bytes.Equal([]byte(vote.DataHash), tallyResult.ConsensusValue) {
+			suite.Require().Equal([]byte(vote.DataHash), tallyResult.ConsensusValue)
 			suite.Require().Equal(sdk.NewInt(10), tallyResult.VotingAmount)
-		} else if bytes.Equal([]byte(vote2.VerifiableCid), tallyResult.ConsensusValue) {
-			suite.Require().Equal([]byte(vote2.VerifiableCid), tallyResult.ConsensusValue)
+		} else if bytes.Equal([]byte(vote2.DataHash), tallyResult.ConsensusValue) {
+			suite.Require().Equal([]byte(vote2.DataHash), tallyResult.ConsensusValue)
 			suite.Require().Equal(sdk.NewInt(10), tallyResult.VotingAmount)
 		} else {
 			panic(fmt.Sprintf("No matching VerifiableCID(%s) found.", tallyResult.ConsensusValue))
@@ -363,12 +363,12 @@ func (suite abciTestSuite) TestDataDeliveryEndBlockerVotePass() {
 	suite.CreateOracleValidator(suite.oraclePubKey3, sdk.NewInt(10))
 
 	dataSale := &types.DataSale{
-		SellerAddress: suite.sellerAccAddr.String(),
-		DealId:        1,
-		VerifiableCid: suite.verifiableCID,
-		DeliveredCid:  "",
-		DataHash:      suite.dataHash,
-		Status:        types.DATA_SALE_STATUS_DELIVERY_VOTING_PERIOD,
+		SellerAddress:            suite.sellerAccAddr.String(),
+		DealId:                   1,
+		VerifiableCid:            suite.verifiableCID,
+		DeliveredCid:             "",
+		DataHash:                 suite.dataHash,
+		Status:                   types.DATA_SALE_STATUS_DELIVERY_VOTING_PERIOD,
 		VerificationVotingPeriod: nil,
 		DeliveryVotingPeriod: &oracletypes.VotingPeriod{
 			VotingStartTime: time.Now().Add(-2 * time.Second),
@@ -458,7 +458,7 @@ func (suite abciTestSuite) TestDataDeliveryEndBlockerVoteReject() {
 		DealId:                   1,
 		VerifiableCid:            suite.verifiableCID,
 		DeliveredCid:             "",
-		DataHash: suite.dataHash,
+		DataHash:                 suite.dataHash,
 		Status:                   types.DATA_SALE_STATUS_DELIVERY_VOTING_PERIOD,
 		VerificationVotingPeriod: nil,
 		DeliveryVotingPeriod: &oracletypes.VotingPeriod{
@@ -542,12 +542,12 @@ func (suite abciTestSuite) TestDataDeliveryEndBlockerVoteRejectSamePower() {
 	suite.CreateOracleValidator(suite.oraclePubKey2, sdk.NewInt(10))
 
 	dataSale := &types.DataSale{
-		SellerAddress: suite.sellerAccAddr.String(),
-		DealId:        1,
-		VerifiableCid: suite.verifiableCID,
-		DeliveredCid:  "",
-		DataHash:      suite.dataHash,
-		Status:        types.DATA_SALE_STATUS_DELIVERY_VOTING_PERIOD,
+		SellerAddress:            suite.sellerAccAddr.String(),
+		DealId:                   1,
+		VerifiableCid:            suite.verifiableCID,
+		DeliveredCid:             "",
+		DataHash:                 suite.dataHash,
+		Status:                   types.DATA_SALE_STATUS_DELIVERY_VOTING_PERIOD,
 		VerificationVotingPeriod: nil,
 		DeliveryVotingPeriod: &oracletypes.VotingPeriod{
 			VotingStartTime: time.Now().Add(-2 * time.Second),
