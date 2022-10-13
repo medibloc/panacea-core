@@ -5,6 +5,7 @@ import (
 
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	"github.com/medibloc/panacea-core/v2/types/assets"
 	"github.com/medibloc/panacea-core/v2/types/testsuite"
@@ -50,12 +51,17 @@ func (suite *DataDealBaseTestSuite) SetValidator(pubKey cryptotypes.PubKey, amou
 	validator, err := stakingtypes.NewValidator(varAddr, pubKey, stakingtypes.Description{})
 	suite.Require().NoError(err)
 	validator = validator.UpdateStatus(stakingtypes.Bonded)
-	validator, _ = validator.AddTokensFromDel(amount)
+	//validator, _ = validator.AddTokensFromDel(amount)
 	newCommission := stakingtypes.NewCommission(commission, sdk.OneDec(), sdk.NewDecWithPrec(5, 1))
 	validator.Commission = newCommission
+	validator.MinSelfDelegation = amount
 
 	suite.StakingKeeper.SetValidator(suite.Ctx, validator)
 	err = suite.StakingKeeper.SetValidatorByConsAddr(suite.Ctx, validator)
+	suite.Require().NoError(err)
+
+	accAddr := sdk.AccAddress(pubKey.Address().Bytes())
+	_, err = suite.StakingKeeper.Delegate(suite.Ctx, accAddr, amount, stakingtypes.Unbonded, validator, true)
 	suite.Require().NoError(err)
 
 	return validator
@@ -118,4 +124,13 @@ func (suite *DataDealBaseTestSuite) SetAccount(pubKey cryptotypes.PubKey) {
 	oracleAccount := suite.AccountKeeper.NewAccountWithAddress(suite.Ctx, oracleAccAddr)
 	suite.Require().NoError(oracleAccount.SetPubKey(pubKey))
 	suite.AccountKeeper.SetAccount(suite.Ctx, oracleAccount)
+}
+
+func (suite *DataDealBaseTestSuite) SetupValidatorRewards(valAddress sdk.ValAddress) {
+	decCoins := sdk.DecCoins{sdk.NewDecCoinFromDec(assets.MicroMedDenom, sdk.ZeroDec())}
+	historicalRewards := distrtypes.NewValidatorHistoricalRewards(decCoins, 1)
+	suite.DistrKeeper.SetValidatorHistoricalRewards(suite.Ctx, valAddress, 1, historicalRewards)
+	// setup current rewards
+	currentRewards := distrtypes.NewValidatorCurrentRewards(decCoins, 2)
+	suite.DistrKeeper.SetValidatorCurrentRewards(suite.Ctx, valAddress, currentRewards)
 }
