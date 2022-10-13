@@ -98,10 +98,7 @@ func (suite abciTestSuite) TestDataVerificationEndBlockerVotePass() {
 			VotingStartTime: time.Now().Add(-2 * time.Second),
 			VotingEndTime:   time.Now().Add(-1 * time.Second),
 		},
-		DeliveryVotingPeriod: &oracletypes.VotingPeriod{
-			VotingStartTime: time.Now().Add(1 * time.Second),
-			VotingEndTime:   time.Now().Add(2 * time.Second),
-		},
+		DeliveryVotingPeriod:    nil,
 		VerificationTallyResult: nil,
 		DeliveryTallyResult:     nil,
 	}
@@ -192,10 +189,7 @@ func (suite abciTestSuite) TestDataVerificationEndBlockerVoteReject() {
 			VotingStartTime: time.Now().Add(-2 * time.Second),
 			VotingEndTime:   time.Now().Add(-1 * time.Second),
 		},
-		DeliveryVotingPeriod: &oracletypes.VotingPeriod{
-			VotingStartTime: time.Now().Add(1 * time.Second),
-			VotingEndTime:   time.Now().Add(2 * time.Second),
-		},
+		DeliveryVotingPeriod:    nil,
 		VerificationTallyResult: nil,
 		DeliveryTallyResult:     nil,
 	}
@@ -280,10 +274,7 @@ func (suite abciTestSuite) TestDataVerificationEndBlockerVoteRejectSamePower() {
 			VotingStartTime: time.Now().Add(-2 * time.Second),
 			VotingEndTime:   time.Now().Add(-1 * time.Second),
 		},
-		DeliveryVotingPeriod: &oracletypes.VotingPeriod{
-			VotingStartTime: time.Now().Add(1 * time.Second),
-			VotingEndTime:   time.Now().Add(2 * time.Second),
-		},
+		DeliveryVotingPeriod:    nil,
 		VerificationTallyResult: nil,
 		DeliveryTallyResult:     nil,
 	}
