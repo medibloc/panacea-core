@@ -54,7 +54,7 @@ func (t *Tally) Add(vote Vote) error {
 	bondedTokens := oracleValidatorInfo.BondedTokens
 	switch vote.GetVoteOption() {
 	case VOTE_OPTION_YES:
-		t.addYes(vote.GetConsensusValue(), bondedTokens)
+		t.addYes(vote.GetConsensusValue(), vote.GetVoterAddress(), bondedTokens)
 	case VOTE_OPTION_NO:
 		t.addNo(bondedTokens)
 	default:
@@ -64,13 +64,20 @@ func (t *Tally) Add(vote Vote) error {
 }
 
 // addYes defines to be divided and set by ConsensusValue
-func (t *Tally) addYes(consensusValue []byte, amount sdk.Int) {
+func (t *Tally) addYes(consensusValue []byte, voterAddress string, amount sdk.Int) {
 	if val, ok := t.Yes[string(consensusValue)]; ok {
 		val.VotingAmount = val.VotingAmount.Add(amount)
+		val.VoterInfo = append(val.VoterInfo, &VoterInfo{VoterAddress: voterAddress, VotingPower: amount})
 	} else {
 		t.Yes[string(consensusValue)] = &ConsensusTally{
 			ConsensusValue: consensusValue,
 			VotingAmount:   amount,
+			VoterInfo: []*VoterInfo{
+				{
+					VoterAddress: voterAddress,
+					VotingPower:  amount,
+				},
+			},
 		}
 	}
 }
@@ -110,6 +117,7 @@ func (t Tally) CalculateTallyResult(threshold sdk.Dec) *TallyResult {
 		if voteRate.GTE(threshold) {
 			tallyResult.Yes = maxTally.VotingAmount
 			tallyResult.ConsensusValue = maxTally.ConsensusValue
+			tallyResult.ValidVoters = maxTally.VoterInfo
 		} else {
 			tallyResult.AddInvalidYes(maxTally)
 		}
