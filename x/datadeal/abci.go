@@ -36,7 +36,9 @@ func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) {
 
 		if tallyResult.IsPassed() {
 			dataSale.Status = types.DATA_SALE_STATUS_DELIVERY_VOTING_PERIOD
-			dataSale.VerifiableCid = string(tallyResult.ConsensusValue)
+			if dataSale.VerifiableCid != string(tallyResult.ConsensusValue) {
+				panic("invalid verifiable CID consensus value")
+			}
 
 			keeper.AddDataDeliveryQueue(ctx, dataSale.VerifiableCid, dataSale.DealId, oracleKeeper.GetVotingPeriod(ctx).VotingEndTime)
 		} else {
@@ -49,13 +51,17 @@ func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) {
 			panic(err)
 		}
 
-		ctx.EventManager().EmitEvent(
+		ctx.EventManager().EmitEvents(sdk.Events{
 			sdk.NewEvent(
 				types.EventTypeDataVerificationVote,
 				sdk.NewAttribute(types.AttributeKeyVoteStatus, types.AttributeValueVoteStatusEnded),
 				sdk.NewAttribute(types.AttributeKeyVerifiableCID, dataSale.VerifiableCid),
 				sdk.NewAttribute(types.AttributeKeyDealID, strconv.FormatUint(dataSale.DealId, 10)),
 			),
+			sdk.NewEvent(
+				types.EventTypeDataDeliveryVote,
+				sdk.NewAttribute(types.AttributeKeyVoteStatus, types.AttributeValueVoteStatusStarted),
+			)},
 		)
 
 		return false
