@@ -133,7 +133,7 @@ func (suite dealTestSuite) TestSellDataSuccess() {
 	suite.Require().Equal(dataSale.VerifiableCid, suite.verifiableCID1)
 
 	suite.Require().Equal(dataSale.DealId, uint64(1))
-	suite.Require().Equal(dataSale.VotingPeriod, suite.OracleKeeper.GetVotingPeriod(suite.Ctx))
+	suite.Require().Equal(dataSale.VerificationVotingPeriod, suite.OracleKeeper.GetVotingPeriod(suite.Ctx))
 	suite.Require().Equal(dataSale.Status, types.DATA_SALE_STATUS_VERIFICATION_VOTING_PERIOD)
 	suite.Require().Equal(dataSale.SellerAddress, suite.sellerAccAddr.String())
 }
@@ -141,7 +141,7 @@ func (suite dealTestSuite) TestSellDataSuccess() {
 func (suite dealTestSuite) TestSellDataStatusFailed() {
 	newDataSale := suite.MakeNewDataSale(suite.sellerAccAddr, suite.verifiableCID1)
 
-	newDataSale.Status = types.DATA_SALE_STATUS_FAILED
+	newDataSale.Status = types.DATA_SALE_STATUS_VERIFICATION_FAILED
 
 	err := suite.DataDealKeeper.SetDataSale(suite.Ctx, newDataSale)
 	suite.Require().NoError(err)
@@ -266,7 +266,7 @@ func (suite dealTestSuite) TestGetAllDataSalesList() {
 		suite.Require().Equal(dataSale.VerifiableCid, allDataSaleList[i].VerifiableCid)
 		suite.Require().Equal(dataSale.DealId, allDataSaleList[i].DealId)
 		suite.Require().Equal(dataSale.Status, allDataSaleList[i].Status)
-		suite.Require().Equal(dataSale.VotingPeriod, allDataSaleList[i].VotingPeriod)
+		suite.Require().Equal(dataSale.VerificationVotingPeriod, allDataSaleList[i].VerificationVotingPeriod)
 		suite.Require().Equal(dataSale.SellerAddress, allDataSaleList[i].SellerAddress)
 	}
 }
@@ -381,7 +381,7 @@ func (suite dealTestSuite) TestDataVerificationInvalidDataSaleStatus() {
 	suite.Require().Error(err, types.ErrDataVerificationVote)
 	suite.Require().ErrorContains(err, "the current voted data's status is not 'VERIFICATION_VOTING_PERIOD'")
 
-	getDataSale.Status = types.DATA_SALE_STATUS_FAILED
+	getDataSale.Status = types.DATA_SALE_STATUS_DELIVERY_FAILED
 	err = suite.DataDealKeeper.SetDataSale(suite.Ctx, getDataSale)
 	suite.Require().NoError(err)
 
