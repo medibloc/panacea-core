@@ -630,6 +630,7 @@ func (suite dealTestSuite) TestDeactivateDeal() {
 	dealAccAddr, err := sdk.AccAddressFromBech32(getDeal.Address)
 	suite.Require().NoError(err)
 
+	// Sending Budget from buyer to deal
 	err = suite.BankKeeper.SendCoins(suite.Ctx, suite.buyerAccAddr, dealAccAddr, sdk.NewCoins(*getDeal.Budget))
 	suite.Require().NoError(err)
 
@@ -637,6 +638,9 @@ func (suite dealTestSuite) TestDeactivateDeal() {
 		DealId:           1,
 		RequesterAddress: suite.buyerAccAddr.String(),
 	}
+
+	beforeDealBalance := suite.BankKeeper.GetBalance(ctx, dealAccAddr, assets.MicroMedDenom)
+	suite.Require().Equal(beforeDealBalance, *getDeal.Budget)
 
 	err = suite.DataDealKeeper.DeactivateDeal(ctx, msgDeactivateDeal)
 	suite.Require().NoError(err)
@@ -648,6 +652,9 @@ func (suite dealTestSuite) TestDeactivateDeal() {
 
 	buyerBalance := suite.BankKeeper.GetBalance(ctx, suite.buyerAccAddr, assets.MicroMedDenom)
 	suite.Require().Equal(buyerBalance, suite.defaultFunds[0])
+
+	afterDealBalance := suite.BankKeeper.GetBalance(ctx, dealAccAddr, assets.MicroMedDenom)
+	suite.Require().Equal(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(0)), afterDealBalance)
 
 	//TODO: Check the DataVerification/DeliveryVote Queue are removed well
 }
