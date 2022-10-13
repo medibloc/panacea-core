@@ -7,6 +7,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	"github.com/medibloc/panacea-core/v2/types/assets"
 	oracletypes "github.com/medibloc/panacea-core/v2/x/oracle/types"
 	"github.com/tendermint/tendermint/crypto/secp256k1"
 
@@ -479,6 +480,50 @@ func (k Keeper) RemoveDataDeliveryVote(ctx sdk.Context, vote *types.DataDelivery
 	key := types.GetDataDeliveryVoteKey(vote.DealId, vote.VerifiableCid, voterAccAddr)
 
 	store.Delete(key)
+
+	return nil
+}
+
+func (k Keeper) DeactivateDeal(ctx sdk.Context, msg *types.MsgDeactivateDeal) error {
+	deal, err := k.GetDeal(ctx, msg.DealId)
+	if err != nil {
+		return sdkerrors.Wrapf(types.ErrDealDeactivate, err.Error())
+	}
+
+	if deal.BuyerAddress != msg.RequesterAddress {
+		return sdkerrors.Wrapf(types.ErrDealDeactivate, "only buyer can deactivate deal")
+	}
+
+	if deal.Status != types.DEAL_STATUS_ACTIVE {
+		return sdkerrors.Wrapf(types.ErrDealDeactivate, "deal's status is not 'ACTIVE'")
+	}
+
+	deal.Status = types.DEAL_STATUS_INACTIVE
+
+	err = k.SetDeal(ctx, deal)
+	if err != nil {
+		return sdkerrors.Wrapf(types.ErrDealDeactivate, err.Error())
+	}
+
+	dealAcc, err := sdk.AccAddressFromBech32(deal.Address)
+	if err != nil {
+		return sdkerrors.Wrapf(types.ErrDealDeactivate, err.Error())
+	}
+
+	requesterAcc, err := sdk.AccAddressFromBech32(msg.RequesterAddress)
+	if err != nil {
+		return sdkerrors.Wrapf(types.ErrDealDeactivate, err.Error())
+	}
+
+	dealBalance := k.bankKeeper.GetBalance(ctx, dealAcc, assets.MicroMedDenom)
+
+	err = k.bankKeeper.SendCoins(ctx, dealAcc, requesterAcc, sdk.Coins{dealBalance})
+	if err != nil {
+		return sdkerrors.Wrapf(types.ErrDealDeactivate, err.Error())
+	}
+
+	//TODO: Implement Remove the DataVerification/DeliveryVote Queue after PR #449 merged
+	//https://github.com/medibloc/panacea-core/pull/449
 
 	return nil
 }
