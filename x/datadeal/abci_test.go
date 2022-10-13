@@ -157,17 +157,18 @@ func (suite abciTestSuite) TestDataVerificationEndBlockerVotePass() {
 
 	events := ctx.EventManager().Events()
 	suite.Require().Equal(2, len(events))
-	suite.Require().Equal(types.EventTypeDataVerificationVote, events[0].Type)
-	suite.Require().Equal(types.EventTypeDataDeliveryVote, events[1].Type)
+	suite.Require().Equal(types.EventTypeDataDeliveryVote, events[0].Type)
+	suite.Require().Equal(types.EventTypeDataVerificationVote, events[1].Type)
+
 	eventAttributes := events[0].Attributes
 	suite.Require().Equal(3, len(eventAttributes))
 	suite.Require().Equal(types.AttributeKeyVoteStatus, string(eventAttributes[0].Key))
-	suite.Require().Equal(types.AttributeValueVoteStatusEnded, string(eventAttributes[0].Value))
+	suite.Require().Equal(types.AttributeValueVoteStatusStarted, string(eventAttributes[0].Value))
 	suite.Require().Equal(types.AttributeKeyVerifiableCID, string(eventAttributes[1].Key))
 	suite.Require().Equal(types.AttributeKeyDealID, string(eventAttributes[2].Key))
 
 	suite.Require().Equal(types.AttributeKeyVoteStatus, string(events[1].Attributes[0].Key))
-	suite.Require().Equal(types.AttributeValueVoteStatusStarted, string(events[1].Attributes[0].Value))
+	suite.Require().Equal(types.AttributeValueVoteStatusEnded, string(events[1].Attributes[0].Value))
 }
 
 func (suite abciTestSuite) TestDataVerificationEndBlockerVoteReject() {
@@ -244,9 +245,8 @@ func (suite abciTestSuite) TestDataVerificationEndBlockerVoteReject() {
 	suite.Require().Equal(0, len(votes))
 
 	events := ctx.EventManager().Events()
-	suite.Require().Equal(2, len(events))
+	suite.Require().Equal(1, len(events))
 	suite.Require().Equal(types.EventTypeDataVerificationVote, events[0].Type)
-	suite.Require().Equal(types.EventTypeDataDeliveryVote, events[1].Type)
 
 	eventAttributes := events[0].Attributes
 	suite.Require().Equal(3, len(eventAttributes))
@@ -254,9 +254,6 @@ func (suite abciTestSuite) TestDataVerificationEndBlockerVoteReject() {
 	suite.Require().Equal(types.AttributeValueVoteStatusEnded, string(eventAttributes[0].Value))
 	suite.Require().Equal(types.AttributeKeyVerifiableCID, string(eventAttributes[1].Key))
 	suite.Require().Equal(types.AttributeKeyDealID, string(eventAttributes[2].Key))
-
-	suite.Require().Equal(types.AttributeKeyVoteStatus, string(events[1].Attributes[0].Key))
-	suite.Require().Equal(types.AttributeValueVoteStatusStarted, string(events[1].Attributes[0].Value))
 }
 
 func (suite abciTestSuite) TestDataVerificationEndBlockerVoteRejectSamePower() {
@@ -340,9 +337,8 @@ func (suite abciTestSuite) TestDataVerificationEndBlockerVoteRejectSamePower() {
 	suite.Require().Equal(0, len(votes))
 
 	events := ctx.EventManager().Events()
-	suite.Require().Equal(2, len(events))
+	suite.Require().Equal(1, len(events))
 	suite.Require().Equal(types.EventTypeDataVerificationVote, events[0].Type)
-	suite.Require().Equal(types.EventTypeDataDeliveryVote, events[1].Type)
 
 	eventAttributes := events[0].Attributes
 	suite.Require().Equal(3, len(eventAttributes))
@@ -350,9 +346,6 @@ func (suite abciTestSuite) TestDataVerificationEndBlockerVoteRejectSamePower() {
 	suite.Require().Equal(types.AttributeValueVoteStatusEnded, string(eventAttributes[0].Value))
 	suite.Require().Equal(types.AttributeKeyVerifiableCID, string(eventAttributes[1].Key))
 	suite.Require().Equal(types.AttributeKeyDealID, string(eventAttributes[2].Key))
-
-	suite.Require().Equal(types.AttributeKeyVoteStatus, string(events[1].Attributes[0].Key))
-	suite.Require().Equal(types.AttributeValueVoteStatusStarted, string(events[1].Attributes[0].Value))
 }
 
 func (suite abciTestSuite) TestDataDeliveryEndBlockerVotePass() {

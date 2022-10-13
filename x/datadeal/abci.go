@@ -41,6 +41,15 @@ func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) {
 			}
 
 			keeper.AddDataDeliveryQueue(ctx, dataSale.VerifiableCid, dataSale.DealId, oracleKeeper.GetVotingPeriod(ctx).VotingEndTime)
+
+			ctx.EventManager().EmitEvent(
+				sdk.NewEvent(
+					types.EventTypeDataDeliveryVote,
+					sdk.NewAttribute(types.AttributeKeyVoteStatus, types.AttributeValueVoteStatusStarted),
+					sdk.NewAttribute(types.AttributeKeyVerifiableCID, dataSale.VerifiableCid),
+					sdk.NewAttribute(types.AttributeKeyDealID, strconv.FormatUint(dataSale.DealId, 10))),
+			)
+
 		} else {
 			dataSale.Status = types.DATA_SALE_STATUS_VERIFICATION_FAILED
 		}
@@ -58,11 +67,7 @@ func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) {
 				sdk.NewAttribute(types.AttributeKeyVerifiableCID, dataSale.VerifiableCid),
 				sdk.NewAttribute(types.AttributeKeyDealID, strconv.FormatUint(dataSale.DealId, 10)),
 			),
-			sdk.NewEvent(
-				types.EventTypeDataDeliveryVote,
-				sdk.NewAttribute(types.AttributeKeyVoteStatus, types.AttributeValueVoteStatusStarted),
-			)},
-		)
+		})
 
 		return false
 	})
