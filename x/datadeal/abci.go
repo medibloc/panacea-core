@@ -12,8 +12,8 @@ import (
 func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) {
 	keeper.IterateClosedDataVerificationQueue(ctx, ctx.BlockHeader().Time, func(dataSale *types.DataSale) bool {
 
-		keeper.RemoveDataVerificationQueue(ctx, dataSale.DealId, dataSale.VerifiableCid, dataSale.VotingPeriod.VotingEndTime)
-		iterator := keeper.GetDataVerificationVoteIterator(ctx, dataSale.DealId, dataSale.VerifiableCid)
+		keeper.RemoveDataVerificationQueue(ctx, dataSale.DealId, dataSale.DataHash, dataSale.VotingPeriod.VotingEndTime)
+		iterator := keeper.GetDataVerificationVoteIterator(ctx, dataSale.DealId, dataSale.DataHash)
 
 		defer iterator.Close()
 
@@ -36,17 +36,14 @@ func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) {
 
 		if tallyResult.IsPassed() {
 			dataSale.Status = types.DATA_SALE_STATUS_DELIVERY_VOTING_PERIOD
-			if dataSale.VerifiableCid != string(tallyResult.ConsensusValue) {
-				panic("invalid verifiable CID consensus value")
-			}
 
-			keeper.AddDataDeliveryQueue(ctx, dataSale.VerifiableCid, dataSale.DealId, oracleKeeper.GetVotingPeriod(ctx).VotingEndTime)
+			keeper.AddDataDeliveryQueue(ctx, dataSale.DataHash, dataSale.DealId, oracleKeeper.GetVotingPeriod(ctx).VotingEndTime)
 
 			ctx.EventManager().EmitEvent(
 				sdk.NewEvent(
 					types.EventTypeDataDeliveryVote,
 					sdk.NewAttribute(types.AttributeKeyVoteStatus, types.AttributeValueVoteStatusStarted),
-					sdk.NewAttribute(types.AttributeKeyVerifiableCID, dataSale.VerifiableCid),
+					sdk.NewAttribute(types.AttributeKeyDataHash, dataSale.DataHash),
 					sdk.NewAttribute(types.AttributeKeyDealID, strconv.FormatUint(dataSale.DealId, 10))),
 			)
 
@@ -64,7 +61,7 @@ func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) {
 			sdk.NewEvent(
 				types.EventTypeDataVerificationVote,
 				sdk.NewAttribute(types.AttributeKeyVoteStatus, types.AttributeValueVoteStatusEnded),
-				sdk.NewAttribute(types.AttributeKeyVerifiableCID, dataSale.VerifiableCid),
+				sdk.NewAttribute(types.AttributeKeyDataHash, dataSale.DataHash),
 				sdk.NewAttribute(types.AttributeKeyDealID, strconv.FormatUint(dataSale.DealId, 10)),
 			),
 		})

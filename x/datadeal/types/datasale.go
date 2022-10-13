@@ -105,7 +105,7 @@ func (m DataVerificationVote) ValidateBasic() error {
 }
 
 func (m DataVerificationVote) GetConsensusValue() []byte {
-	return []byte(m.VerifiableCid)
+	return []byte(m.DataHash)
 }
 
 func (m DataDeliveryVote) ValidateBasic() error {

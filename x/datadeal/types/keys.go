@@ -51,23 +51,28 @@ func GetDataSaleKey(dataHash string, dealID uint64) []byte {
 	return append(DataSaleKey, CombineKeys(sdk.Uint64ToBigEndian(dealID), []byte(dataHash))...)
 }
 
-func GetDataVerificationQueueKey(verifiableCID string, dealID uint64, endTime time.Time) []byte {
-	return append(DataVerificationQueueKey, CombineKeys(sdk.FormatTimeBytes(endTime), sdk.Uint64ToBigEndian(dealID), []byte(verifiableCID))...)
+func GetDataVerificationVoteKey(dataHash string, voterAddress sdk.AccAddress, dealID uint64) []byte {
+	return append(DataVerificationVoteKey, CombineKeys(sdk.Uint64ToBigEndian(dealID), []byte(dataHash), voterAddress)...)
+}
+
+func GetDataVerificationVotesKey(dataHash string, dealID uint64) []byte {
+	return append(DataVerificationVoteKey, CombineKeys(sdk.Uint64ToBigEndian(dealID), []byte(dataHash))...)
+}
+
+func GetDataVerificationQueueKey(dataHash string, dealID uint64, endTime time.Time) []byte {
+	return append(DataVerificationQueueKey, CombineKeys(sdk.FormatTimeBytes(endTime), sdk.Uint64ToBigEndian(dealID), []byte(dataHash))...)
 }
 
 func GetDataVerificationQueueKeyByTimeKey(endTime time.Time) []byte {
 	return append(DataVerificationQueueKey, sdk.FormatTimeBytes(endTime)...)
 }
 
-func GetDataVerificationVoteKey(dataHash string, voterAddress sdk.AccAddress, dealID uint64) []byte {
-	return append(DataVerificationVoteKey, CombineKeys(sdk.Uint64ToBigEndian(dealID), []byte(dataHash), voterAddress)...)
+func SplitDataVerificationQueueKey(key []byte) (uint64, string) {
+	return sdk.BigEndianToUint64(key[1+lenTime+1 : 1+lenTime+1+8]), string(key[1+lenTime+1+8+1:])
 }
 
 func GetDataDeliveryVoteKey(dealID uint64, dataHash string, voterAddress sdk.AccAddress) []byte {
 	return append(DataDeliveryVoteKey, CombineKeys(sdk.Uint64ToBigEndian(dealID), []byte(dataHash), voterAddress)...)
-}
-func SplitDataVerificationQueueKey(key []byte) (uint64, string) {
-	return sdk.BigEndianToUint64(key[1+lenTime+1 : 1+lenTime+1+8]), string(key[1+lenTime+1+8+1:])
 }
 
 func GetDataDeliveryVotesKey(dealID uint64, dataHash string) []byte {
