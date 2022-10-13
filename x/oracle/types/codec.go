@@ -12,12 +12,14 @@ import (
 
 func RegisterCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&MsgRegisterOracle{}, "oracle/RegisterOracle", nil)
+	cdc.RegisterConcrete(&MsgUpgradeOracle{}, "oracle/UpgradeOracle", nil)
 	cdc.RegisterConcrete(&MsgVoteOracleRegistration{}, "oracle/VoteOracleRegistration", nil)
 }
 
 func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 	registry.RegisterImplementations((*sdk.Msg)(nil),
 		&MsgRegisterOracle{},
+		&MsgUpgradeOracle{},
 		&MsgVoteOracleRegistration{},
 	)
 	registry.RegisterImplementations((*govtypes.Content)(nil),

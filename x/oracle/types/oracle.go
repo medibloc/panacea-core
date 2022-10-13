@@ -27,6 +27,7 @@ func NewOracleRegistration(msg *MsgRegisterOracle) *OracleRegistration {
 		TrustedBlockHash:       msg.TrustedBlockHash,
 		Status:                 ORACLE_REGISTRATION_STATUS_VOTING_PERIOD,
 		Nonce:                  msg.Nonce,
+		RegistrationType:       ORACLE_REGISTRATION_TYPE_NEW,
 	}
 }
 
@@ -199,4 +200,18 @@ func (t *TallyResult) AddInvalidYes(tally *ConsensusTally) {
 
 func (m TallyResult) IsPassed() bool {
 	return m.ConsensusValue != nil
+}
+
+func (m *MsgUpgradeOracle) ToOracleRegistration() *OracleRegistration {
+	return &OracleRegistration{
+		UniqueId:               m.UniqueId,
+		Address:                m.OracleAddress,
+		NodePubKey:             m.NodePubKey,
+		NodePubKeyRemoteReport: m.NodePubKeyRemoteReport,
+		TrustedBlockHeight:     m.TrustedBlockHeight,
+		TrustedBlockHash:       m.TrustedBlockHash,
+		Status:                 ORACLE_REGISTRATION_STATUS_VOTING_PERIOD,
+		Nonce:                  m.Nonce,
+		RegistrationType:       ORACLE_REGISTRATION_TYPE_UPGRADE,
+	}
 }

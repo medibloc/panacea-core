@@ -69,6 +69,8 @@ message OracleRegistration {
   TallyResult tally_result = 10;
   // Nonce required for AES256-GCM encryption
   bytes nonce = 11;
+  // Type of registration through which path
+  OracleRegistrationType registration_type = 12;
 }
 
 // TallyResult defines the tally result of the votes.
@@ -132,4 +134,18 @@ message OracleUpgradeInfo {
   string unique_id = 1;
 
   int64 height = 2;
+}
+
+// OracleRegistrationType defines of oracle registration type.
+enum OracleRegistrationType {
+  option (gogoproto.goproto_enum_prefix) = false;
+
+  // UNSPECIFIED type
+  ORACLE_REGISTRATION_TYPE_UNSPECIFIED = 0;
+
+  // New oracle type
+  ORACLE_REGISTRATION_TYPE_NEW = 1;
+
+  // Upgrade oracle type
+  ORACLE_REGISTRATION_TYPE_UPGRADE = 2;
 }
