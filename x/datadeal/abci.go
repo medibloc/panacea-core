@@ -12,7 +12,7 @@ import (
 func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) {
 	keeper.IterateClosedDataVerificationQueue(ctx, ctx.BlockHeader().Time, func(dataSale *types.DataSale) bool {
 
-		keeper.RemoveDataVerificationQueue(ctx, dataSale.DealId, dataSale.VerifiableCid, dataSale.VotingPeriod.VotingEndTime)
+		keeper.RemoveDataVerificationQueue(ctx, dataSale.DealId, dataSale.VerifiableCid, dataSale.VerificationVotingPeriod.VotingEndTime)
 		iterator := keeper.GetDataVerificationVoteIterator(ctx, dataSale.DealId, dataSale.VerifiableCid)
 
 		defer iterator.Close()
@@ -40,7 +40,7 @@ func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) {
 				panic("invalid verifiable CID consensus value")
 			}
 
-			keeper.AddDataDeliveryQueue(ctx, dataSale.VerifiableCid, dataSale.DealId, oracleKeeper.GetVotingPeriod(ctx).VotingEndTime)
+			keeper.AddDataDeliveryQueue(ctx, dataSale.VerifiableCid, dataSale.DealId, dataSale.DeliveryVotingPeriod.VotingEndTime)
 
 			ctx.EventManager().EmitEvent(
 				sdk.NewEvent(
@@ -74,7 +74,7 @@ func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) {
 
 	keeper.IterateClosedDataDeliveryQueue(ctx, ctx.BlockHeader().Time, func(dataSale *types.DataSale) bool {
 
-		keeper.RemoveDataDeliveryQueue(ctx, dataSale.DealId, dataSale.VerifiableCid, dataSale.VotingPeriod.VotingEndTime)
+		keeper.RemoveDataDeliveryQueue(ctx, dataSale.DealId, dataSale.VerifiableCid, dataSale.DeliveryVotingPeriod.VotingEndTime)
 		iterator := keeper.GetDataDeliveryVoteIterator(ctx, dataSale.DealId, dataSale.VerifiableCid)
 		defer iterator.Close()
 
