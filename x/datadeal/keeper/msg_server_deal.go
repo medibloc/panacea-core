@@ -82,5 +82,12 @@ func (m msgServer) VoteDataDelivery(goCtx context.Context, msg *types.MsgVoteDat
 
 // DeactivateDeal defines a method for deactivating the deal.
 func (m msgServer) DeactivateDeal(goCtx context.Context, msg *types.MsgDeactivateDeal) (*types.MsgDeactivateDealResponse, error) {
-	panic("implements me")
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	err := m.Keeper.DeactivateDeal(ctx, msg)
+	if err != nil {
+		return nil, err
+	}
+
+	return &types.MsgDeactivateDealResponse{}, nil
 }
