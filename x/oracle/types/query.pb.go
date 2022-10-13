@@ -504,6 +504,7 @@ func (m *QueryParamsResponse) GetParams() *Params {
 	return nil
 }
 
+// QueryOracleUpgradeInfoRequest is the request type for the Query/OracleUpgradeInfo RPC method.
 type QueryOracleUpgradeInfoRequest struct {
 }
 
@@ -540,6 +541,7 @@ func (m *QueryOracleUpgradeInfoRequest) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_QueryOracleUpgradeInfoRequest proto.InternalMessageInfo
 
+// QueryOracleUpgradeInfoRequest is the response type for the Query/OracleUpgradeInfo RPC method.
 type QueryOracleUpgradeInfoResponse struct {
 	OracleUpgradeInfo *OracleUpgradeInfo `protobuf:"bytes,1,opt,name=oracle_upgrade_info,json=oracleUpgradeInfo,proto3" json:"oracle_upgrade_info,omitempty"`
 }
@@ -679,6 +681,7 @@ type QueryClient interface {
 	OracleRegistrationVote(ctx context.Context, in *QueryOracleRegistrationVoteRequest, opts ...grpc.CallOption) (*QueryOracleRegistrationVoteResponse, error)
 	// Params returns params of oracle module.
 	Params(ctx context.Context, in *QueryOracleParamsRequest, opts ...grpc.CallOption) (*QueryParamsResponse, error)
+	// OracleUpgradeInfo returns OracleUpgradeInfo of oracle module.
 	OracleUpgradeInfo(ctx context.Context, in *QueryOracleUpgradeInfoRequest, opts ...grpc.CallOption) (*QueryOracleUpgradeInfoResponse, error)
 }
 
@@ -756,6 +759,7 @@ type QueryServer interface {
 	OracleRegistrationVote(context.Context, *QueryOracleRegistrationVoteRequest) (*QueryOracleRegistrationVoteResponse, error)
 	// Params returns params of oracle module.
 	Params(context.Context, *QueryOracleParamsRequest) (*QueryParamsResponse, error)
+	// OracleUpgradeInfo returns OracleUpgradeInfo of oracle module.
 	OracleUpgradeInfo(context.Context, *QueryOracleUpgradeInfoRequest) (*QueryOracleUpgradeInfoResponse, error)
 }
 

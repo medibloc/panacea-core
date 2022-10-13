@@ -23,6 +23,7 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
+// Plan defines upgrade plan information.
 type Plan struct {
 	UniqueId string `protobuf:"bytes,1,opt,name=unique_id,json=uniqueId,proto3" json:"unique_id,omitempty"`
 	Height   int64  `protobuf:"varint,2,opt,name=height,proto3" json:"height,omitempty"`
@@ -61,6 +62,7 @@ func (m *Plan) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_Plan proto.InternalMessageInfo
 
+// OracleUpgradeProposal defines the information required for a proposal.
 type OracleUpgradeProposal struct {
 	Title       string `protobuf:"bytes,1,opt,name=title,proto3" json:"title,omitempty"`
 	Description string `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`

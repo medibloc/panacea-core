@@ -6,6 +6,7 @@ option (gogoproto.goproto_getters_all)  = false;
 
 import "gogoproto/gogo.proto";
 
+// Plan defines upgrade plan information.
 message Plan {
   option (gogoproto.equal) = true;
 
@@ -14,6 +15,7 @@ message Plan {
   int64 height = 2;
 }
 
+// OracleUpgradeProposal defines the information required for a proposal.
 message OracleUpgradeProposal {
   option (gogoproto.equal) = true;
 
