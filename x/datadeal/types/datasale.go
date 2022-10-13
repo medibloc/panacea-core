@@ -104,6 +104,10 @@ func (m DataVerificationVote) ValidateBasic() error {
 	return nil
 }
 
+func (m DataVerificationVote) GetConsensusValue() []byte {
+	return []byte(m.VerifiableCid)
+}
+
 func (m DataDeliveryVote) ValidateBasic() error {
 	if m.DealId == 0 {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "dealID can not be 0")

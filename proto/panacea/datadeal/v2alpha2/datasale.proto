@@ -32,9 +32,12 @@ enum DataSaleStatus {
   // DATA_SALE_STATUS_DELIVERY_VOTING_PERIOD defines that the status of DataSale is delivering in voting period.
   DATA_SALE_STATUS_DELIVERY_VOTING_PERIOD = 2;
 
-  // // DATA_SALE_STATUS_COMPLETED defines that the status of DataSale is completed.
+  // DATA_SALE_STATUS_COMPLETED defines that the status of DataSale is completed.
   DATA_SALE_STATUS_COMPLETED = 3;
 
-  // DATA_SALE_STATUS_FAILED defines that the status of DataSale is failed.
-  DATA_SALE_STATUS_FAILED = 4;
+  // DATA_SALE_STATUS_VERIFICATION_FAILED defines that the status of DataSale is verification failed.
+  DATA_SALE_STATUS_VERIFICATION_FAILED = 4;
+
+  // DATA_SALE_STATUS_DELIVERY_FAILED defines that the status of DataSale is delivery failed.
+  DATA_SALE_STATUS_DELIVERY_FAILED = 5;
 }
