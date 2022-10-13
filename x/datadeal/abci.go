@@ -36,6 +36,11 @@ func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) {
 
 		if tallyResult.IsPassed() {
 			dataSale.Status = types.DATA_SALE_STATUS_DELIVERY_VOTING_PERIOD
+			if dataSale.DataHash != string(tallyResult.ConsensusValue) {
+				panic("invalid dataHash consensus value")
+			}
+
+			dataSale.DeliveryVotingPeriod = oracleKeeper.GetVotingPeriod(ctx)
 
 			keeper.AddDataDeliveryQueue(ctx, dataSale.DataHash, dataSale.DealId, oracleKeeper.GetVotingPeriod(ctx).VotingEndTime)
 
@@ -71,7 +76,7 @@ func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) {
 
 	keeper.IterateClosedDataDeliveryQueue(ctx, ctx.BlockHeader().Time, func(dataSale *types.DataSale) bool {
 
-		keeper.RemoveDataDeliveryQueue(ctx, dataSale.DealId, dataSale.DataHash, dataSale.VotingPeriod.VotingEndTime)
+		keeper.RemoveDataDeliveryQueue(ctx, dataSale.DealId, dataSale.DataHash, dataSale.DeliveryVotingPeriod.VotingEndTime)
 		iterator := keeper.GetDataDeliveryVoteIterator(ctx, dataSale.DealId, dataSale.DataHash)
 		defer iterator.Close()
 

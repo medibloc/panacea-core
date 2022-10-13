@@ -97,10 +97,11 @@ func (suite abciTestSuite) TestDataVerificationEndBlockerVotePass() {
 		DeliveredCid:  "",
 		DataHash:      suite.dataHash,
 		Status:        types.DATA_SALE_STATUS_VERIFICATION_VOTING_PERIOD,
-		VotingPeriod: &oracletypes.VotingPeriod{
+		VerificationVotingPeriod: &oracletypes.VotingPeriod{
 			VotingStartTime: time.Now().Add(-2 * time.Second),
 			VotingEndTime:   time.Now().Add(-1 * time.Second),
 		},
+		DeliveryVotingPeriod:    nil,
 		VerificationTallyResult: nil,
 		DeliveryTallyResult:     nil,
 	}
@@ -112,7 +113,7 @@ func (suite abciTestSuite) TestDataVerificationEndBlockerVotePass() {
 		ctx,
 		dataSale.DataHash,
 		dataSale.DealId,
-		dataSale.VotingPeriod.VotingEndTime,
+		dataSale.VerificationVotingPeriod.VotingEndTime,
 	)
 
 	vote := types.DataVerificationVote{
@@ -187,10 +188,11 @@ func (suite abciTestSuite) TestDataVerificationEndBlockerVoteReject() {
 		VerifiableCid: suite.verifiableCID,
 		DeliveredCid:  "",
 		Status:        types.DATA_SALE_STATUS_VERIFICATION_VOTING_PERIOD,
-		VotingPeriod: &oracletypes.VotingPeriod{
+		VerificationVotingPeriod: &oracletypes.VotingPeriod{
 			VotingStartTime: time.Now().Add(-2 * time.Second),
 			VotingEndTime:   time.Now().Add(-1 * time.Second),
 		},
+		DeliveryVotingPeriod:    nil,
 		VerificationTallyResult: nil,
 		DeliveryTallyResult:     nil,
 	}
@@ -202,7 +204,7 @@ func (suite abciTestSuite) TestDataVerificationEndBlockerVoteReject() {
 		ctx,
 		dataSale.DataHash,
 		dataSale.DealId,
-		dataSale.VotingPeriod.VotingEndTime,
+		dataSale.VerificationVotingPeriod.VotingEndTime,
 	)
 
 	vote := types.DataVerificationVote{
@@ -272,10 +274,11 @@ func (suite abciTestSuite) TestDataVerificationEndBlockerVoteRejectSamePower() {
 		DeliveredCid:  "",
 		DataHash:      suite.dataHash,
 		Status:        types.DATA_SALE_STATUS_VERIFICATION_VOTING_PERIOD,
-		VotingPeriod: &oracletypes.VotingPeriod{
+		VerificationVotingPeriod: &oracletypes.VotingPeriod{
 			VotingStartTime: time.Now().Add(-2 * time.Second),
 			VotingEndTime:   time.Now().Add(-1 * time.Second),
 		},
+		DeliveryVotingPeriod:    nil,
 		VerificationTallyResult: nil,
 		DeliveryTallyResult:     nil,
 	}
@@ -287,7 +290,7 @@ func (suite abciTestSuite) TestDataVerificationEndBlockerVoteRejectSamePower() {
 		ctx,
 		dataSale.DataHash,
 		dataSale.DealId,
-		dataSale.VotingPeriod.VotingEndTime,
+		dataSale.VerificationVotingPeriod.VotingEndTime,
 	)
 
 	vote := types.DataVerificationVote{
@@ -324,6 +327,18 @@ func (suite abciTestSuite) TestDataVerificationEndBlockerVoteRejectSamePower() {
 	suite.Require().Equal(sdk.ZeroInt(), tallyResult.No)
 	suite.Require().Equal(2, len(tallyResult.InvalidYes))
 
+	for _, tallyResult := range tallyResult.InvalidYes {
+		if bytes.Equal([]byte(vote.VerifiableCid), tallyResult.ConsensusValue) {
+			suite.Require().Equal([]byte(vote.VerifiableCid), tallyResult.ConsensusValue)
+			suite.Require().Equal(sdk.NewInt(10), tallyResult.VotingAmount)
+		} else if bytes.Equal([]byte(vote2.VerifiableCid), tallyResult.ConsensusValue) {
+			suite.Require().Equal([]byte(vote2.VerifiableCid), tallyResult.ConsensusValue)
+			suite.Require().Equal(sdk.NewInt(10), tallyResult.VotingAmount)
+		} else {
+			panic(fmt.Sprintf("No matching VerifiableCID(%s) found.", tallyResult.ConsensusValue))
+		}
+	}
+
 	votes, err = suite.DataDealKeeper.GetAllDataVerificationVoteList(ctx)
 	suite.Require().NoError(err)
 	suite.Require().Equal(0, len(votes))
@@ -354,7 +369,8 @@ func (suite abciTestSuite) TestDataDeliveryEndBlockerVotePass() {
 		DeliveredCid:  "",
 		DataHash:      suite.dataHash,
 		Status:        types.DATA_SALE_STATUS_DELIVERY_VOTING_PERIOD,
-		VotingPeriod: &oracletypes.VotingPeriod{
+		VerificationVotingPeriod: nil,
+		DeliveryVotingPeriod: &oracletypes.VotingPeriod{
 			VotingStartTime: time.Now().Add(-2 * time.Second),
 			VotingEndTime:   time.Now().Add(-1 * time.Second),
 		},
@@ -369,7 +385,7 @@ func (suite abciTestSuite) TestDataDeliveryEndBlockerVotePass() {
 		ctx,
 		dataSale.DataHash,
 		dataSale.DealId,
-		dataSale.VotingPeriod.VotingEndTime,
+		dataSale.DeliveryVotingPeriod.VotingEndTime,
 	)
 
 	vote := types.DataDeliveryVote{
@@ -438,12 +454,14 @@ func (suite abciTestSuite) TestDataDeliveryEndBlockerVoteReject() {
 	suite.CreateOracleValidator(suite.oraclePubKey3, sdk.NewInt(10))
 
 	dataSale := &types.DataSale{
-		SellerAddress: suite.sellerAccAddr.String(),
-		DealId:        1,
-		VerifiableCid: suite.verifiableCID,
-		DeliveredCid:  "",
-		Status:        types.DATA_SALE_STATUS_DELIVERY_VOTING_PERIOD,
-		VotingPeriod: &oracletypes.VotingPeriod{
+		SellerAddress:            suite.sellerAccAddr.String(),
+		DealId:                   1,
+		VerifiableCid:            suite.verifiableCID,
+		DeliveredCid:             "",
+		DataHash: suite.dataHash,
+		Status:                   types.DATA_SALE_STATUS_DELIVERY_VOTING_PERIOD,
+		VerificationVotingPeriod: nil,
+		DeliveryVotingPeriod: &oracletypes.VotingPeriod{
 			VotingStartTime: time.Now().Add(-2 * time.Second),
 			VotingEndTime:   time.Now().Add(-1 * time.Second),
 		},
@@ -458,7 +476,7 @@ func (suite abciTestSuite) TestDataDeliveryEndBlockerVoteReject() {
 		ctx,
 		dataSale.DataHash,
 		dataSale.DealId,
-		dataSale.VotingPeriod.VotingEndTime,
+		dataSale.DeliveryVotingPeriod.VotingEndTime,
 	)
 
 	vote := types.DataDeliveryVote{
@@ -527,10 +545,11 @@ func (suite abciTestSuite) TestDataDeliveryEndBlockerVoteRejectSamePower() {
 		SellerAddress: suite.sellerAccAddr.String(),
 		DealId:        1,
 		VerifiableCid: suite.verifiableCID,
-		DataHash:      suite.dataHash,
 		DeliveredCid:  "",
+		DataHash:      suite.dataHash,
 		Status:        types.DATA_SALE_STATUS_DELIVERY_VOTING_PERIOD,
-		VotingPeriod: &oracletypes.VotingPeriod{
+		VerificationVotingPeriod: nil,
+		DeliveryVotingPeriod: &oracletypes.VotingPeriod{
 			VotingStartTime: time.Now().Add(-2 * time.Second),
 			VotingEndTime:   time.Now().Add(-1 * time.Second),
 		},
@@ -545,7 +564,7 @@ func (suite abciTestSuite) TestDataDeliveryEndBlockerVoteRejectSamePower() {
 		ctx,
 		dataSale.DataHash,
 		dataSale.DealId,
-		dataSale.VotingPeriod.VotingEndTime,
+		dataSale.DeliveryVotingPeriod.VotingEndTime,
 	)
 
 	vote := types.DataDeliveryVote{

@@ -142,7 +142,7 @@ func (suite dealTestSuite) TestSellDataSuccess() {
 	suite.Require().Equal(dataSale.VerifiableCid, suite.verifiableCID1)
 
 	suite.Require().Equal(dataSale.DealId, uint64(1))
-	suite.Require().Equal(dataSale.VotingPeriod, suite.OracleKeeper.GetVotingPeriod(suite.Ctx))
+	suite.Require().Equal(dataSale.VerificationVotingPeriod, suite.OracleKeeper.GetVotingPeriod(suite.Ctx))
 	suite.Require().Equal(dataSale.Status, types.DATA_SALE_STATUS_VERIFICATION_VOTING_PERIOD)
 	suite.Require().Equal(dataSale.SellerAddress, suite.sellerAccAddr.String())
 	suite.Require().Equal(dataSale.DataHash, suite.dataHash1)
@@ -281,7 +281,7 @@ func (suite dealTestSuite) TestGetAllDataSalesList() {
 		suite.Require().Equal(dataSale.VerifiableCid, allDataSaleList[i].VerifiableCid)
 		suite.Require().Equal(dataSale.DealId, allDataSaleList[i].DealId)
 		suite.Require().Equal(dataSale.Status, allDataSaleList[i].Status)
-		suite.Require().Equal(dataSale.VotingPeriod, allDataSaleList[i].VotingPeriod)
+		suite.Require().Equal(dataSale.VerificationVotingPeriod, allDataSaleList[i].VerificationVotingPeriod)
 		suite.Require().Equal(dataSale.SellerAddress, allDataSaleList[i].SellerAddress)
 		suite.Require().Equal(dataSale.DataHash, allDataSaleList[i].DataHash)
 	}

@@ -37,10 +37,11 @@ func (suite *DataDealBaseTestSuite) MakeNewDataSale(sellerAddr sdk.AccAddress, d
 		DeliveredCid:  "",
 		DataHash:      dataHash,
 		Status:        types.DATA_SALE_STATUS_VERIFICATION_VOTING_PERIOD,
-		VotingPeriod: &oracletypes.VotingPeriod{
+		VerificationVotingPeriod: &oracletypes.VotingPeriod{
 			VotingStartTime: time.Now(),
 			VotingEndTime:   time.Now().Add(5 * time.Second),
 		},
+		DeliveryVotingPeriod:    nil,
 		VerificationTallyResult: nil,
 		DeliveryTallyResult:     nil,
 	}
@@ -79,7 +80,8 @@ func (suite *DataDealBaseTestSuite) MakeNewDataSaleDeliveryVoting(sellerAddr sdk
 		DeliveredCid:  "",
 		DataHash:      dataHash,
 		Status:        types.DATA_SALE_STATUS_DELIVERY_VOTING_PERIOD,
-		VotingPeriod: &oracletypes.VotingPeriod{
+		VerificationVotingPeriod: nil,
+		DeliveryVotingPeriod: &oracletypes.VotingPeriod{
 			VotingStartTime: time.Now(),
 			VotingEndTime:   time.Now().Add(5 * time.Second),
 		},
