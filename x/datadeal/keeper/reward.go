@@ -2,10 +2,12 @@ package keeper
 
 import (
 	"fmt"
+	"strconv"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
 	"github.com/medibloc/panacea-core/v2/types/assets"
+	"github.com/medibloc/panacea-core/v2/x/datadeal/types"
 	oracletypes "github.com/medibloc/panacea-core/v2/x/oracle/types"
 )
 
@@ -55,4 +57,11 @@ func (k Keeper) DistributeRewards(ctx sdk.Context, dealID uint64, oracles map[st
 			k.oracleKeeper.DistributeRewardToOracle(ctx, oracle.Address, reward)
 		}
 	}
+
+	ctx.EventManager().EmitEvent(
+		sdk.NewEvent(
+			oracletypes.EventTypeOracleReward,
+			sdk.NewAttribute(types.AttributeKeyDealID, strconv.FormatUint(dealID, 10)),
+		),
+	)
 }
