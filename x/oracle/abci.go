@@ -37,9 +37,12 @@ func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) {
 			oracleRegistration.Status = types.ORACLE_REGISTRATION_STATUS_PASSED
 			oracleRegistration.EncryptedOraclePrivKey = tallyResult.ConsensusValue
 
-			oracle := types.NewOracle(oracleRegistration.Address, types.ORACLE_STATUS_ACTIVE)
-			if err := keeper.SetOracle(ctx, oracle); err != nil {
-				panic(err)
+			// Store only new oracle.
+			if oracleRegistration.RegistrationType == types.ORACLE_REGISTRATION_TYPE_NEW {
+				oracle := types.NewOracle(oracleRegistration.Address, types.ORACLE_STATUS_ACTIVE)
+				if err := keeper.SetOracle(ctx, oracle); err != nil {
+					panic(err)
+				}
 			}
 		} else {
 			oracleRegistration.Status = types.ORACLE_REGISTRATION_STATUS_REJECTED
