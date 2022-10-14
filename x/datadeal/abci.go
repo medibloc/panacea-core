@@ -39,7 +39,7 @@ func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) {
 
 			dataSale.DeliveryVotingPeriod = oracleKeeper.GetVotingPeriod(ctx)
 
-			keeper.AddDataDeliveryQueue(ctx, dataSale.DataHash, dataSale.DealId, oracleKeeper.GetVotingPeriod(ctx).VotingEndTime)
+			keeper.AddDataDeliveryQueue(ctx, dataSale.DataHash, dataSale.DealId, dataSale.DeliveryVotingPeriod.VotingEndTime)
 
 			ctx.EventManager().EmitEvent(
 				sdk.NewEvent(
