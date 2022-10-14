@@ -16,13 +16,13 @@ type DataDealBaseTestSuite struct {
 	testsuite.TestSuite
 }
 
-func (suite *DataDealBaseTestSuite) MakeTestDeal(dealID uint64, buyerAddr sdk.AccAddress) *types.Deal {
+func (suite *DataDealBaseTestSuite) MakeTestDeal(dealID uint64, buyerAddr sdk.AccAddress, maxNumData uint64) *types.Deal {
 	return &types.Deal{
 		Id:           dealID,
 		Address:      types.NewDealAddress(dealID).String(),
 		DataSchema:   []string{"http://jsonld.com"},
 		Budget:       &sdk.Coin{Denom: assets.MicroMedDenom, Amount: sdk.NewInt(1000000000)},
-		MaxNumData:   10000,
+		MaxNumData:   maxNumData,
 		CurNumData:   0,
 		BuyerAddress: buyerAddr.String(),
 		Status:       types.DEAL_STATUS_ACTIVE,
@@ -74,12 +74,12 @@ func (suite *DataDealBaseTestSuite) MakeNewDataVerificationVote(voterAddr sdk.Ac
 
 func (suite *DataDealBaseTestSuite) MakeNewDataSaleDeliveryVoting(sellerAddr sdk.AccAddress, dataHash, verifiableCID string) *types.DataSale {
 	return &types.DataSale{
-		SellerAddress: sellerAddr.String(),
-		DealId:        1,
-		VerifiableCid: verifiableCID,
-		DeliveredCid:  "",
-		DataHash:      dataHash,
-		Status:        types.DATA_SALE_STATUS_DELIVERY_VOTING_PERIOD,
+		SellerAddress:            sellerAddr.String(),
+		DealId:                   1,
+		VerifiableCid:            verifiableCID,
+		DeliveredCid:             "",
+		DataHash:                 dataHash,
+		Status:                   types.DATA_SALE_STATUS_DELIVERY_VOTING_PERIOD,
 		VerificationVotingPeriod: nil,
 		DeliveryVotingPeriod: &oracletypes.VotingPeriod{
 			VotingStartTime: time.Now(),

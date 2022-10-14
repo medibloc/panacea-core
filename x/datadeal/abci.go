@@ -11,7 +11,6 @@ import (
 
 func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) {
 	keeper.IterateClosedDataVerificationQueue(ctx, ctx.BlockHeader().Time, func(dataSale *types.DataSale) bool {
-
 		keeper.RemoveDataVerificationQueue(ctx, dataSale.DealId, dataSale.DataHash, dataSale.VerificationVotingPeriod.VotingEndTime)
 		iterator := keeper.GetDataVerificationVoteIterator(ctx, dataSale.DealId, dataSale.DataHash)
 
@@ -35,23 +34,31 @@ func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) {
 		}
 
 		if tallyResult.IsPassed() {
-			dataSale.Status = types.DATA_SALE_STATUS_DELIVERY_VOTING_PERIOD
-			if dataSale.DataHash != string(tallyResult.ConsensusValue) {
-				panic("invalid dataHash consensus value")
+			isDealCompleted, err := keeper.IsDealCompleted(ctx, dataSale.DealId)
+			if err != nil {
+				panic(err)
 			}
 
-			dataSale.DeliveryVotingPeriod = oracleKeeper.GetVotingPeriod(ctx)
+			if isDealCompleted {
+				dataSale.Status = types.DATA_SALE_STATUS_DEAL_FULL
+			} else if dataSale.DataHash != string(tallyResult.ConsensusValue) {
+				dataSale.Status = types.DATA_SALE_STATUS_VERIFICATION_FAILED
+			} else {
+				if err = keeper.GetDealCurNumDataAndIncrement(ctx, dataSale.DealId); err != nil {
+					panic(err)
+				}
+				dataSale.DeliveryVotingPeriod = oracleKeeper.GetVotingPeriod(ctx)
+				dataSale.Status = types.DATA_SALE_STATUS_DELIVERY_VOTING_PERIOD
+				keeper.AddDataDeliveryQueue(ctx, dataSale.DataHash, dataSale.DealId, oracleKeeper.GetVotingPeriod(ctx).VotingEndTime)
 
-			keeper.AddDataDeliveryQueue(ctx, dataSale.DataHash, dataSale.DealId, oracleKeeper.GetVotingPeriod(ctx).VotingEndTime)
-
-			ctx.EventManager().EmitEvent(
-				sdk.NewEvent(
-					types.EventTypeDataDeliveryVote,
-					sdk.NewAttribute(types.AttributeKeyVoteStatus, types.AttributeValueVoteStatusStarted),
-					sdk.NewAttribute(types.AttributeKeyDataHash, dataSale.DataHash),
-					sdk.NewAttribute(types.AttributeKeyDealID, strconv.FormatUint(dataSale.DealId, 10))),
-			)
-
+				ctx.EventManager().EmitEvent(
+					sdk.NewEvent(
+						types.EventTypeDataDeliveryVote,
+						sdk.NewAttribute(types.AttributeKeyVoteStatus, types.AttributeValueVoteStatusStarted),
+						sdk.NewAttribute(types.AttributeKeyDataHash, dataSale.DataHash),
+						sdk.NewAttribute(types.AttributeKeyDealID, strconv.FormatUint(dataSale.DealId, 10))),
+				)
+			}
 		} else {
 			dataSale.Status = types.DATA_SALE_STATUS_VERIFICATION_FAILED
 		}

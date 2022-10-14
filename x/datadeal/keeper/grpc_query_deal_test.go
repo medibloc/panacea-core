@@ -51,7 +51,7 @@ func (suite *queryDealTestSuite) BeforeTest(_, _ string) {
 }
 
 func (suite *queryDealTestSuite) TestQueryDeal() {
-	deal := suite.MakeTestDeal(1, suite.buyerAccAddr)
+	deal := suite.MakeTestDeal(1, suite.buyerAccAddr, 100)
 	err := suite.DataDealKeeper.SetDeal(suite.Ctx, deal)
 	suite.Require().NoError(err)
 	err = suite.DataDealKeeper.SetNextDealNumber(suite.Ctx, 2)
@@ -68,15 +68,15 @@ func (suite *queryDealTestSuite) TestQueryDeal() {
 
 func (suite queryDealTestSuite) TestQueryDeals() {
 	// set deals
-	deal1 := suite.MakeTestDeal(1, suite.buyerAccAddr)
+	deal1 := suite.MakeTestDeal(1, suite.buyerAccAddr, 100)
 	err := suite.DataDealKeeper.SetDeal(suite.Ctx, deal1)
 	suite.Require().NoError(err)
 
-	deal2 := suite.MakeTestDeal(2, suite.buyerAccAddr)
+	deal2 := suite.MakeTestDeal(2, suite.buyerAccAddr, 100)
 	err = suite.DataDealKeeper.SetDeal(suite.Ctx, deal2)
 	suite.Require().NoError(err)
 
-	deal3 := suite.MakeTestDeal(3, suite.buyerAccAddr)
+	deal3 := suite.MakeTestDeal(3, suite.buyerAccAddr, 100)
 	err = suite.DataDealKeeper.SetDeal(suite.Ctx, deal3)
 	suite.Require().NoError(err)
 
