@@ -10,7 +10,7 @@ import (
 func CmdGetOracleUpgradeInfo() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "oracle-upgrade-info",
-		Short: "Query a oracle upgrade information",
+		Short: "Query an oracle upgrade information",
 		Args:  cobra.ExactArgs(0),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientQueryContext(cmd)
