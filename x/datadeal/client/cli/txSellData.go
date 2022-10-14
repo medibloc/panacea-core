@@ -14,6 +14,7 @@ func CmdSellData() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "sell-data [deal_id] [verifiable_cid] [data_hash]",
 		Short: "Sell data",
+		Long:  "[data-hash] is a hex-encoded string obtained by hashing the original data through the SHA256 hash function",
 		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
