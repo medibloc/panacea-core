@@ -37,10 +37,11 @@ func (suite *DataDealBaseTestSuite) MakeNewDataSale(sellerAddr sdk.AccAddress, v
 		VerifiableCid: verifiableCID,
 		DeliveredCid:  "",
 		Status:        types.DATA_SALE_STATUS_VERIFICATION_VOTING_PERIOD,
-		VotingPeriod: &oracletypes.VotingPeriod{
+		VerificationVotingPeriod: &oracletypes.VotingPeriod{
 			VotingStartTime: time.Now(),
 			VotingEndTime:   time.Now().Add(5 * time.Second),
 		},
+		DeliveryVotingPeriod:    nil,
 		VerificationTallyResult: nil,
 		DeliveryTallyResult:     nil,
 	}
@@ -74,12 +75,13 @@ func (suite *DataDealBaseTestSuite) MakeNewDataVerificationVote(voterAddr sdk.Ac
 
 func (suite *DataDealBaseTestSuite) MakeNewDataSaleDeliveryVoting(sellerAddr sdk.AccAddress, verifiableCID string) *types.DataSale {
 	return &types.DataSale{
-		SellerAddress: sellerAddr.String(),
-		DealId:        1,
-		VerifiableCid: verifiableCID,
-		DeliveredCid:  "",
-		Status:        types.DATA_SALE_STATUS_DELIVERY_VOTING_PERIOD,
-		VotingPeriod: &oracletypes.VotingPeriod{
+		SellerAddress:            sellerAddr.String(),
+		DealId:                   1,
+		VerifiableCid:            verifiableCID,
+		DeliveredCid:             "",
+		Status:                   types.DATA_SALE_STATUS_DELIVERY_VOTING_PERIOD,
+		VerificationVotingPeriod: nil,
+		DeliveryVotingPeriod: &oracletypes.VotingPeriod{
 			VotingStartTime: time.Now(),
 			VotingEndTime:   time.Now().Add(5 * time.Second),
 		},
@@ -100,6 +102,7 @@ func (suite *DataDealBaseTestSuite) MakeNewDataDeliveryVote(voterAddr sdk.AccAdd
 
 func (suite *DataDealBaseTestSuite) CreateOracleValidator(pubKey cryptotypes.PubKey, amount sdk.Int) {
 	suite.SetAccount(pubKey)
+
 	val1Commission := sdk.NewDecWithPrec(1, 1)
 
 	suite.SetValidator(pubKey, amount, val1Commission)

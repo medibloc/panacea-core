@@ -102,8 +102,8 @@ func (suite queryDealTestSuite) TestDataSale() {
 	suite.Require().NoError(err)
 	suite.Require().Equal(newDataSale.DealId, res.DataSale.DealId)
 	suite.Require().Equal(newDataSale.VerifiableCid, res.DataSale.VerifiableCid)
-	suite.Require().Equal(newDataSale.VotingPeriod.VotingStartTime.UTC(), res.DataSale.VotingPeriod.VotingStartTime)
-	suite.Require().Equal(newDataSale.VotingPeriod.VotingEndTime.UTC(), res.DataSale.VotingPeriod.VotingEndTime)
+	suite.Require().Equal(newDataSale.VerificationVotingPeriod.VotingStartTime.UTC(), res.DataSale.VerificationVotingPeriod.VotingStartTime)
+	suite.Require().Equal(newDataSale.VerificationVotingPeriod.VotingEndTime.UTC(), res.DataSale.VerificationVotingPeriod.VotingEndTime)
 	suite.Require().Equal(newDataSale.SellerAddress, res.DataSale.SellerAddress)
 }
 
