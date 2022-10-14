@@ -11,6 +11,7 @@ import (
 
 func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) {
 	keeper.IterateClosedDataVerificationQueue(ctx, ctx.BlockHeader().Time, func(dataSale *types.DataSale) bool {
+
 		keeper.RemoveDataVerificationQueue(ctx, dataSale.DealId, dataSale.DataHash, dataSale.VerificationVotingPeriod.VotingEndTime)
 		iterator := keeper.GetDataVerificationVoteIterator(ctx, dataSale.DealId, dataSale.DataHash)
 
@@ -41,8 +42,6 @@ func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) {
 
 			if isDealCompleted {
 				dataSale.Status = types.DATA_SALE_STATUS_DEAL_FULL
-			} else if dataSale.DataHash != string(tallyResult.ConsensusValue) {
-				dataSale.Status = types.DATA_SALE_STATUS_VERIFICATION_FAILED
 			} else {
 				if err = keeper.GetDealCurNumDataAndIncrement(ctx, dataSale.DealId); err != nil {
 					panic(err)
