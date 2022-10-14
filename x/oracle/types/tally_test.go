@@ -3,10 +3,11 @@ package types_test
 import (
 	"container/heap"
 	"fmt"
+	"testing"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/medibloc/panacea-core/v2/x/oracle/types"
 	"github.com/stretchr/testify/require"
-	"testing"
 )
 
 var threshold = sdk.NewDec(2).Quo(sdk.NewDec(3))
@@ -71,6 +72,10 @@ func TestTallyResultAllValid(t *testing.T) {
 	require.Equal(t, 0, len(tallyResult.InvalidYes))
 	require.Equal(t, consensusValue, tallyResult.ConsensusValue)
 	require.Equal(t, sdk.NewInt(100), tallyResult.Total)
+	require.Len(t, tallyResult.ValidVoters, 3)
+	require.Equal(t, tallyResult.ValidVoters[0], &types.VoterInfo{VoterAddress: "voter0", VotingPower: sdk.NewInt(70)})
+	require.Equal(t, tallyResult.ValidVoters[1], &types.VoterInfo{VoterAddress: "voter1", VotingPower: sdk.NewInt(20)})
+	require.Equal(t, tallyResult.ValidVoters[2], &types.VoterInfo{VoterAddress: "voter2", VotingPower: sdk.NewInt(10)})
 }
 
 func TestTallyResultAllInValid(t *testing.T) {
@@ -101,6 +106,7 @@ func TestTallyResultAllInValid(t *testing.T) {
 	require.Equal(t, 0, len(tallyResult.InvalidYes))
 	require.Nil(t, tallyResult.ConsensusValue)
 	require.Equal(t, sdk.NewInt(100), tallyResult.Total)
+	require.Len(t, tallyResult.ValidVoters, 0)
 }
 
 func TestTallyResultDifferentConsensusValueSuccessConsensus(t *testing.T) {
@@ -142,6 +148,7 @@ func TestTallyResultDifferentConsensusValueSuccessConsensus(t *testing.T) {
 	require.Equal(t, sdk.NewInt(10), tallyResult.InvalidYes[1].VotingAmount)
 	require.Equal(t, consensusValue, tallyResult.ConsensusValue)
 	require.Equal(t, sdk.NewInt(100), tallyResult.Total)
+	require.Equal(t, tallyResult.ValidVoters[0], &types.VoterInfo{VoterAddress: "voter0", VotingPower: sdk.NewInt(70)})
 }
 
 func TestTallyResultDifferentConsensusValueFailedConsensus(t *testing.T) {
@@ -185,6 +192,7 @@ func TestTallyResultDifferentConsensusValueFailedConsensus(t *testing.T) {
 	require.Equal(t, sdk.NewInt(20), tallyResult.InvalidYes[2].VotingAmount)
 	require.Nil(t, tallyResult.ConsensusValue)
 	require.Equal(t, sdk.NewInt(100), tallyResult.Total)
+	require.Len(t, tallyResult.ValidVoters, 0)
 }
 
 func TestTallyResultLessThenThreshold(t *testing.T) {
@@ -213,6 +221,7 @@ func TestTallyResultLessThenThreshold(t *testing.T) {
 	require.Equal(t, sdk.NewInt(10), tallyResult.InvalidYes[0].VotingAmount)
 	require.Nil(t, tallyResult.ConsensusValue)
 	require.Equal(t, sdk.NewInt(60), tallyResult.Total)
+	require.Len(t, tallyResult.ValidVoters, 0)
 }
 
 func TestTallyResultNumberOfAllVotes(t *testing.T) {
@@ -252,6 +261,8 @@ func TestTallyResultNumberOfAllVotes(t *testing.T) {
 	require.Equal(t, sdk.NewInt(10), tallyResult.InvalidYes[0].VotingAmount)
 	require.Equal(t, consensusValue, tallyResult.ConsensusValue)
 	require.Equal(t, sdk.NewInt(100), tallyResult.Total)
+	require.Equal(t, tallyResult.ValidVoters[0], &types.VoterInfo{VoterAddress: "voter0", VotingPower: sdk.NewInt(70)})
+	require.Len(t, tallyResult.ValidVoters, 1)
 }
 
 func TestConsensusTallyMaxHeap(t *testing.T) {
