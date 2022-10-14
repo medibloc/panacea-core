@@ -36,9 +36,6 @@ func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) {
 
 		if tallyResult.IsPassed() {
 			dataSale.Status = types.DATA_SALE_STATUS_DELIVERY_VOTING_PERIOD
-			if dataSale.DataHash != string(tallyResult.ConsensusValue) {
-				panic("invalid dataHash consensus value")
-			}
 
 			dataSale.DeliveryVotingPeriod = oracleKeeper.GetVotingPeriod(ctx)
 
