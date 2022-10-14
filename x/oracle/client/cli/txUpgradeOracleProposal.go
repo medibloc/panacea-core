@@ -20,8 +20,8 @@ func CmdUpgradeOracleProposal() *cobra.Command {
 		Use:   "oracle-upgrade (--upgrade-unique-id [uniqueID]) (--upgrade-height [height]) [flags]",
 		Args:  cobra.ExactArgs(0),
 		Short: "Submit a oracle upgrade proposal",
-		Long: "Submit a oracle upgrade along with an initial deposit.\n + " +
-			"You must enter the uniqueID and block height of the Oracle to perform the upgrade.",
+		Long: "Submit an oracle upgrade proposal along with an initial deposit.\n + " +
+			"You must enter the uniqueID of a new version of oracle and target block height for upgrade.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
