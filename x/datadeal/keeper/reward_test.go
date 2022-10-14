@@ -333,10 +333,10 @@ func (suite *rewardTestSuite) TestRewardDistributionWithDelegators() {
 	del := suite.StakingKeeper.Delegation(ctx, suite.delegatorAccAddr, val3.GetOperator())
 	selfDel := suite.StakingKeeper.Delegation(ctx, suite.oracleAcc3Addr, val3.GetOperator())
 
-	val33 := suite.StakingKeeper.Validator(ctx, val3.GetOperator())
-	endingPeriod := suite.DistrKeeper.IncrementValidatorPeriod(ctx, val33)
-	delegatorReward := suite.DistrKeeper.CalculateDelegationRewards(ctx, val33, del, endingPeriod)
-	validatorReward := suite.DistrKeeper.CalculateDelegationRewards(ctx, val3, selfDel, endingPeriod)
+	val3Updated := suite.StakingKeeper.Validator(ctx, val3.GetOperator())
+	endingPeriod := suite.DistrKeeper.IncrementValidatorPeriod(ctx, val3Updated)
+	delegatorReward := suite.DistrKeeper.CalculateDelegationRewards(ctx, val3Updated, del, endingPeriod)
+	validatorReward := suite.DistrKeeper.CalculateDelegationRewards(ctx, val3Updated, selfDel, endingPeriod)
 
 	suite.Require().Equal(sdk.NewDecCoins(sdk.NewDecCoin(assets.MicroMedDenom, sdk.NewInt(8_000_000))), delegatorReward)
 	suite.Require().Equal(sdk.NewDecCoins(sdk.NewDecCoin(assets.MicroMedDenom, sdk.NewInt(8_000_000))), validatorReward)
