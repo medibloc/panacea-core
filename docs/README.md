@@ -53,4 +53,4 @@ To build documentation as a static website run `npm run build`.
 
 ## Search
 
-We are using [Algolia](https://www.algolia.com) to power full-text search. This uses a public API search-only key in the `config.js` as well as a [cosmos_network.json](https://github.com/algolia/docsearch-configs/blob/master/configs/cosmos_network.json) configuration file that we can update with PRs.
+TODO: We are using [Algolia](https://www.algolia.com) to power full-text search. 
