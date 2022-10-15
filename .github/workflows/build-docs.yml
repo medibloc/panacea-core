@@ -4,7 +4,8 @@ name: Build Docs
 on:
   pull_request:
     branches:
-      - "docs/**"
+      - master
+      - "release/**"
     paths:
       - "docs/**"
       - "x/**/*.md"
