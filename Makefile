@@ -100,6 +100,27 @@ update-swagger-docs: proto-swagger-gen
         echo "\033[92mSwagger docs are in sync\033[0m";\
     fi
 
+# This builds the docs.cosmos.network docs using docusaurus.
+# Old documentation, which have not been migrated to docusaurus are generated with vuepress.
+build-docs:
+	@echo "building docusaurus docs"
+	@cd docs && npm ci && npm run build
+	mv docs/build ~/output
+
+#	@echo "building old docs"
+#	@cd docs && \
+#			while read -r branch path_prefix; do \
+#			echo "building vuepress $${branch} docs" ; \
+#			(git clean -fdx && git reset --hard && git checkout $${branch} && npm install && VUEPRESS_BASE="/$${path_prefix}/" npm run build) ; \
+#			mkdir -p ~/output/$${path_prefix} ; \
+#			cp -r .vuepress/dist/* ~/output/$${path_prefix}/ ; \
+#	done < vuepress_versions ;	
+
+	@echo "setup domain"
+	@echo $(DOCS_DOMAIN) > ~/output/CNAME
+
+.PHONY: build-docs
+
 ########################################
 ### Clean
 
