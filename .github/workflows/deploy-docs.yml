@@ -1,10 +1,10 @@
 name: Deploy docs
 # This job builds and deploys documentation to github pages.
-# It runs on every push to main and release/** branches with a change in the docs folder.
+# It runs on every push to master and release/** branches with a change in the docs folder.
 on:
   push:
     branches:
-      - main
+      - master
       - "release/**"
     paths:
       - "docs/**"
