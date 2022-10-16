@@ -1,6 +1,10 @@
 package testsuite
 
 import (
+	"github.com/CosmWasm/wasmd/x/wasm"
+	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
+	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
+	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/cosmos-sdk/store"
@@ -10,6 +14,7 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
+	capabilitykeeper "github.com/cosmos/cosmos-sdk/x/capability/keeper"
 	capabilitytypes "github.com/cosmos/cosmos-sdk/x/capability/types"
 	distrkeeper "github.com/cosmos/cosmos-sdk/x/distribution/keeper"
 	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
@@ -116,6 +121,10 @@ func (suite *TestSuite) SetupTest() {
 		cdc.Amino,
 		keyParams[paramstypes.StoreKey],
 		tKeyParams)
+
+	suite.CapabilityKeeper = capabilitykeeper.NewKeeper(cdc.Marshaler, keyParams[capabilitytypes.StoreKey], memKeys[capabilitytypes.MemStoreKey])
+
+	scopedIBCKeeper := suite.CapabilityKeeper.ScopeToModule(ibchost.ModuleName)
 
 	suite.Ctx = ctx
 	suite.AccountKeeper = authkeeper.NewAccountKeeper(
