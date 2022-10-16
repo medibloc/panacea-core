@@ -31,7 +31,7 @@ func TestOwnerKeeperTestSuite(t *testing.T) {
 	suite.Run(t, new(ownerTestSuite))
 }
 
-func (suite ownerTestSuite) TestOneOwner() {
+func (suite *ownerTestSuite) TestOneOwner() {
 	ctx := suite.Ctx
 	aolKeeper := suite.AolKeeper
 
@@ -58,7 +58,7 @@ func (suite ownerTestSuite) TestOneOwner() {
 	suite.Require().Equal([]aoltypes.Owner{owner}, resultOwners)
 }
 
-func (suite ownerTestSuite) TestMultiOwner() {
+func (suite *ownerTestSuite) TestMultiOwner() {
 	ctx := suite.Ctx
 	aolKeeper := suite.AolKeeper
 

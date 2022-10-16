@@ -14,13 +14,13 @@ jobs:
     steps:
 
     - name: Set up Go 1.x
-      uses: actions/setup-go@v2
+      uses: actions/setup-go@v3
       with:
         go-version: 1.19
       id: go
 
     - name: Check out code into the Go module directory
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     - name: Build (+ generating proto and docs)
       run: make build-all
@@ -31,7 +31,7 @@ jobs:
     - name: Lint
       uses: golangci/golangci-lint-action@v3
       with:
-        version: v1.30
+        version: latest
 
     - name: Publish coverage.html as an artifact
       uses: actions/upload-artifact@master
