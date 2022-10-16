@@ -1,4 +1,4 @@
-FROM golang:1.16.5-buster AS build-env
+FROM golang:1.19.2-bullseye AS build-env
 
 # Install minimum necessary dependencies,
 ENV PACKAGES make git gcc
@@ -21,7 +21,7 @@ RUN make clean && make build
 RUN git clone -b v0.14.0 https://github.com/CosmWasm/wasmvm.git /src/wasmvm
 
 # Final image
-FROM debian:buster-slim
+FROM debian:bullseye-slim
 
 # Copy over binaries from the build-env
 COPY --from=build-env /src/panacea-core/build/panacead /usr/bin/panacead

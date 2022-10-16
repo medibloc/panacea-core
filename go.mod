@@ -1,6 +1,6 @@
 module github.com/medibloc/panacea-core/v2
 
-go 1.17
+go 1.19
 
 require (
 	github.com/CosmWasm/wasmd v0.24.0
