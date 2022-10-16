@@ -644,7 +644,9 @@ func New(
 	app.ScopedTransferKeeper = scopedTransferKeeper
 	app.ScopedWasmKeeper = scopedWasmKeeper
 
-	app.registerUpgradeHandlers()
+	if err := app.registerUpgradeHandlers(); err != nil {
+		panic("Failed to register upgradeHandler: " + err.Error())
+	}
 
 	return app
 }
