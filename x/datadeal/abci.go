@@ -98,6 +98,7 @@ func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) {
 				return keeper.RemoveDataDeliveryVote(ctx, vote.(*types.DataDeliveryVote))
 			},
 		)
+
 		if err != nil {
 			panic(err)
 		}
