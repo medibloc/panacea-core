@@ -40,6 +40,10 @@ func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) {
 				panic("invalid verifiable CID consensus value")
 			}
 
+			if err := keeper.DistributeVerificationRewards(ctx, dataSale); err != nil {
+				panic(err)
+			}
+
 			dataSale.DeliveryVotingPeriod = oracleKeeper.GetVotingPeriod(ctx)
 			keeper.AddDataDeliveryQueue(ctx, dataSale.VerifiableCid, dataSale.DealId, dataSale.DeliveryVotingPeriod.VotingEndTime)
 

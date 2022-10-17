@@ -85,6 +85,55 @@ func (suite *rewardTestSuite) BeforeTest(_, _ string) {
 	})
 }
 
+func (suite rewardTestSuite) TestSellerRewardDistribution() {
+	ctx := suite.Ctx
+
+	err := suite.FundAccount(ctx, suite.buyerAccAddr, suite.defaultFunds)
+	suite.Require().NoError(err)
+
+	dealAddr := types.NewDealAddress(1)
+	msgCreateDeal := &types.MsgCreateDeal{
+		DataSchema:   []string{"http://jsonld.com"},
+		Budget:       &sdk.Coin{Denom: assets.MicroMedDenom, Amount: sdk.NewInt(100_000_000)}, // 100 MED,
+		MaxNumData:   1,
+		BuyerAddress: suite.buyerAccAddr.String(),
+	}
+
+	buyer, err := sdk.AccAddressFromBech32(suite.buyerAccAddr.String())
+	suite.Require().NoError(err)
+
+	dealID, err := suite.DataDealKeeper.CreateDeal(ctx, buyer, msgCreateDeal)
+	suite.Require().NoError(err)
+	suite.Require().Equal(uint64(1), dealID)
+
+	// balance check before reward distribution
+	dealBalance := suite.BankKeeper.GetBalance(ctx, dealAddr, assets.MicroMedDenom)
+	suite.Require().Equal(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(100_000_000)), dealBalance)
+
+	sellerBalance := suite.BankKeeper.GetBalance(ctx, suite.sellerAccAddr, assets.MicroMedDenom)
+	suite.Require().Equal(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(0)), sellerBalance)
+
+	dataSale := types.NewDataSale(&types.MsgSellData{
+		DealId:        1,
+		VerifiableCid: "verifiableCID",
+		SellerAddress: suite.sellerAccAddr.String(),
+	})
+
+	// distribute data verification rewards
+	err = suite.DataDealKeeper.DistributeVerificationRewards(ctx, dataSale)
+	suite.Require().NoError(err)
+
+	// TODO check balance of oracles
+
+	// balance check after reward distribution
+	dealBalance = suite.BankKeeper.GetBalance(ctx, dealAddr, assets.MicroMedDenom)
+	suite.Require().Equal(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(10_000_000)), dealBalance)
+
+	sellerBalance = suite.BankKeeper.GetBalance(ctx, suite.sellerAccAddr, assets.MicroMedDenom)
+	suite.Require().Equal(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(90_000_000)), sellerBalance)
+
+}
+
 // Assumes that 2 oracles(validators)
 //
 // oracle commission : 10%
@@ -96,7 +145,7 @@ func (suite *rewardTestSuite) BeforeTest(_, _ string) {
 // ****** oracle2 ******
 // voting power : 30
 // validator commission rate : 50%
-func (suite *rewardTestSuite) TestRewardDistribution() {
+func (suite *rewardTestSuite) TestOracleRewardDistribution() {
 	ctx := suite.Ctx
 
 	err := suite.FundAccount(ctx, suite.buyerAccAddr, suite.defaultFunds)
@@ -152,7 +201,7 @@ func (suite *rewardTestSuite) TestRewardDistribution() {
 	suite.Require().Equal(sdk.NewCoin(assets.MicroMedDenom, sdk.ZeroInt()), distrBalance)
 
 	// distribute rewards to oracles
-	suite.DataDealKeeper.DistributeRewards(ctx, dealID, oracles)
+	suite.DataDealKeeper.DistributeOracleRewards(ctx, dealID, oracles)
 
 	// after distribution, the balance of deal is 360 MED. 10%(40 MED) was sent to distrModuleAcc for reward
 	dealBalance = suite.BankKeeper.GetBalance(ctx, dealAddr, assets.MicroMedDenom)
