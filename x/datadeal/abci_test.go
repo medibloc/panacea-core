@@ -11,6 +11,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/medibloc/panacea-core/v2/types/assets"
 	"github.com/medibloc/panacea-core/v2/x/datadeal"
 	"github.com/medibloc/panacea-core/v2/x/datadeal/testutil"
 	"github.com/medibloc/panacea-core/v2/x/datadeal/types"
@@ -21,9 +22,13 @@ import (
 type abciTestSuite struct {
 	testutil.DataDealBaseTestSuite
 
+	defaultFunds sdk.Coins
+
 	sellerAccPrivKey cryptotypes.PrivKey
 	sellerAccPubKey  cryptotypes.PubKey
 	sellerAccAddr    sdk.AccAddress
+
+	buyerAccAddr sdk.AccAddress
 
 	verifiableCID  string
 	verifiableCID2 string
@@ -47,9 +52,15 @@ func (suite *abciTestSuite) BeforeTest(_, _ string) {
 	ctx := suite.Ctx
 	suite.uniqueID = "uniqueID"
 
+	suite.defaultFunds = sdk.NewCoins(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(10_000_000_000))) // 10,000 MED
+
 	suite.sellerAccPrivKey = secp256k1.GenPrivKey()
 	suite.sellerAccPubKey = suite.sellerAccPrivKey.PubKey()
 	suite.sellerAccAddr = sdk.AccAddress(suite.sellerAccPubKey.Address())
+
+	suite.buyerAccAddr = sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address())
+	err := suite.FundAccount(ctx, suite.buyerAccAddr, suite.defaultFunds)
+	suite.Require().NoError(err)
 
 	suite.verifiableCID = "verifiableCID"
 	suite.verifiableCID2 = "verifiableCID2"
@@ -79,6 +90,22 @@ func (suite *abciTestSuite) BeforeTest(_, _ string) {
 		},
 	})
 
+	err = suite.DataDealKeeper.SetNextDealNumber(ctx, 1)
+	suite.Require().NoError(err)
+
+	msgCreateDeal := &types.MsgCreateDeal{
+		DataSchema:   []string{"http://jsonld.com"},
+		Budget:       &sdk.Coin{Denom: assets.MicroMedDenom, Amount: sdk.NewInt(400_000_000)}, // 400 MED,
+		MaxNumData:   1,
+		BuyerAddress: suite.buyerAccAddr.String(),
+	}
+
+	buyer, err := sdk.AccAddressFromBech32(suite.buyerAccAddr.String())
+	suite.Require().NoError(err)
+
+	dealID, err := suite.DataDealKeeper.CreateDeal(ctx, buyer, msgCreateDeal)
+	suite.Require().NoError(err)
+	suite.Require().Equal(uint64(1), dealID)
 }
 
 func (suite abciTestSuite) TestDataVerificationEndBlockerVotePass() {
@@ -157,19 +184,32 @@ func (suite abciTestSuite) TestDataVerificationEndBlockerVotePass() {
 	suite.Require().Equal(0, len(votes))
 
 	events := ctx.EventManager().Events()
-	suite.Require().Equal(2, len(events))
-	suite.Require().Equal(types.EventTypeDataDeliveryVote, events[0].Type)
-	suite.Require().Equal(types.EventTypeDataVerificationVote, events[1].Type)
 
-	eventAttributes := events[0].Attributes
-	suite.Require().Equal(3, len(eventAttributes))
-	suite.Require().Equal(types.AttributeKeyVoteStatus, string(eventAttributes[0].Key))
-	suite.Require().Equal(types.AttributeValueVoteStatusStarted, string(eventAttributes[0].Value))
-	suite.Require().Equal(types.AttributeKeyVerifiableCID, string(eventAttributes[1].Key))
-	suite.Require().Equal(types.AttributeKeyDealID, string(eventAttributes[2].Key))
+	requiredEvents := map[string]bool{
+		types.EventTypeDataDeliveryVote:     false,
+		types.EventTypeDataVerificationVote: false,
+	}
 
-	suite.Require().Equal(types.AttributeKeyVoteStatus, string(events[1].Attributes[0].Key))
-	suite.Require().Equal(types.AttributeValueVoteStatusEnded, string(events[1].Attributes[0].Value))
+	for _, e := range events {
+		if e.Type == types.EventTypeDataDeliveryVote {
+			requiredEvents[e.Type] = true
+			suite.Require().Equal(3, len(e.Attributes))
+			suite.Require().Equal(types.AttributeKeyVoteStatus, string(e.Attributes[0].Key))
+			suite.Require().Equal(types.AttributeValueVoteStatusStarted, string(e.Attributes[0].Value))
+			suite.Require().Equal(types.AttributeKeyVerifiableCID, string(e.Attributes[1].Key))
+			suite.Require().Equal(types.AttributeKeyDealID, string(e.Attributes[2].Key))
+		}
+
+		if e.Type == types.EventTypeDataVerificationVote {
+			requiredEvents[e.Type] = true
+			suite.Require().Equal(types.AttributeKeyVoteStatus, string(e.Attributes[0].Key))
+			suite.Require().Equal(types.AttributeValueVoteStatusEnded, string(e.Attributes[0].Value))
+		}
+	}
+
+	for _, v := range requiredEvents {
+		suite.Require().True(v)
+	}
 }
 
 func (suite abciTestSuite) TestDataVerificationEndBlockerVoteReject() {
@@ -247,15 +287,24 @@ func (suite abciTestSuite) TestDataVerificationEndBlockerVoteReject() {
 	suite.Require().Equal(0, len(votes))
 
 	events := ctx.EventManager().Events()
-	suite.Require().Equal(1, len(events))
-	suite.Require().Equal(types.EventTypeDataVerificationVote, events[0].Type)
 
-	eventAttributes := events[0].Attributes
-	suite.Require().Equal(3, len(eventAttributes))
-	suite.Require().Equal(types.AttributeKeyVoteStatus, string(eventAttributes[0].Key))
-	suite.Require().Equal(types.AttributeValueVoteStatusEnded, string(eventAttributes[0].Value))
-	suite.Require().Equal(types.AttributeKeyVerifiableCID, string(eventAttributes[1].Key))
-	suite.Require().Equal(types.AttributeKeyDealID, string(eventAttributes[2].Key))
+	requiredEvents := map[string]bool{
+		types.EventTypeDataVerificationVote: false,
+	}
+
+	for _, e := range events {
+		if e.Type == types.EventTypeDataVerificationVote {
+			requiredEvents[e.Type] = true
+			suite.Require().Equal(types.AttributeKeyVoteStatus, string(e.Attributes[0].Key))
+			suite.Require().Equal(types.AttributeValueVoteStatusEnded, string(e.Attributes[0].Value))
+			suite.Require().Equal(types.AttributeKeyVerifiableCID, string(e.Attributes[1].Key))
+			suite.Require().Equal(types.AttributeKeyDealID, string(e.Attributes[2].Key))
+		}
+	}
+
+	for _, v := range requiredEvents {
+		suite.Require().True(v)
+	}
 }
 
 func (suite abciTestSuite) TestDataVerificationEndBlockerVoteRejectSamePower() {
@@ -340,15 +389,24 @@ func (suite abciTestSuite) TestDataVerificationEndBlockerVoteRejectSamePower() {
 	suite.Require().Equal(0, len(votes))
 
 	events := ctx.EventManager().Events()
-	suite.Require().Equal(1, len(events))
-	suite.Require().Equal(types.EventTypeDataVerificationVote, events[0].Type)
 
-	eventAttributes := events[0].Attributes
-	suite.Require().Equal(3, len(eventAttributes))
-	suite.Require().Equal(types.AttributeKeyVoteStatus, string(eventAttributes[0].Key))
-	suite.Require().Equal(types.AttributeValueVoteStatusEnded, string(eventAttributes[0].Value))
-	suite.Require().Equal(types.AttributeKeyVerifiableCID, string(eventAttributes[1].Key))
-	suite.Require().Equal(types.AttributeKeyDealID, string(eventAttributes[2].Key))
+	requiredEvents := map[string]bool{
+		types.EventTypeDataVerificationVote: false,
+	}
+
+	for _, e := range events {
+		if e.Type == types.EventTypeDataVerificationVote {
+			requiredEvents[e.Type] = true
+			suite.Require().Equal(types.AttributeKeyVoteStatus, string(e.Attributes[0].Key))
+			suite.Require().Equal(types.AttributeValueVoteStatusEnded, string(e.Attributes[0].Value))
+			suite.Require().Equal(types.AttributeKeyVerifiableCID, string(e.Attributes[1].Key))
+			suite.Require().Equal(types.AttributeKeyDealID, string(e.Attributes[2].Key))
+		}
+	}
+
+	for _, v := range requiredEvents {
+		suite.Require().True(v)
+	}
 }
 
 func (suite abciTestSuite) TestDataDeliveryEndBlockerVotePass() {
@@ -430,15 +488,25 @@ func (suite abciTestSuite) TestDataDeliveryEndBlockerVotePass() {
 	suite.Require().Equal(0, len(votes))
 
 	events := ctx.EventManager().Events()
-	suite.Require().Equal(1, len(events))
-	suite.Require().Equal(types.EventTypeDataDeliveryVote, events[0].Type)
-	eventAttributes := events[0].Attributes
-	suite.Require().Equal(3, len(eventAttributes))
-	suite.Require().Equal(types.AttributeKeyVoteStatus, string(eventAttributes[0].Key))
-	suite.Require().Equal(types.AttributeValueVoteStatusEnded, string(eventAttributes[0].Value))
-	suite.Require().Equal(types.AttributeKeyDeliveredCID, string(eventAttributes[1].Key))
-	suite.Require().Equal(types.AttributeKeyDealID, string(eventAttributes[2].Key))
 
+	requiredEvents := map[string]bool{
+		types.EventTypeDataDeliveryVote: false,
+	}
+
+	for _, e := range events {
+		if e.Type == types.EventTypeDataDeliveryVote {
+			requiredEvents[e.Type] = true
+			suite.Require().Len(e.Attributes, 3)
+			suite.Require().Equal(types.AttributeKeyVoteStatus, string(e.Attributes[0].Key))
+			suite.Require().Equal(types.AttributeValueVoteStatusEnded, string(e.Attributes[0].Value))
+			suite.Require().Equal(types.AttributeKeyDeliveredCID, string(e.Attributes[1].Key))
+			suite.Require().Equal(types.AttributeKeyDealID, string(e.Attributes[2].Key))
+		}
+	}
+
+	for _, v := range requiredEvents {
+		suite.Require().True(v)
+	}
 }
 
 func (suite abciTestSuite) TestDataDeliveryEndBlockerVoteReject() {
@@ -519,14 +587,24 @@ func (suite abciTestSuite) TestDataDeliveryEndBlockerVoteReject() {
 	suite.Require().Equal(0, len(votes))
 
 	events := ctx.EventManager().Events()
-	suite.Require().Equal(1, len(events))
-	suite.Require().Equal(types.EventTypeDataDeliveryVote, events[0].Type)
-	eventAttributes := events[0].Attributes
-	suite.Require().Equal(3, len(eventAttributes))
-	suite.Require().Equal(types.AttributeKeyVoteStatus, string(eventAttributes[0].Key))
-	suite.Require().Equal(types.AttributeValueVoteStatusEnded, string(eventAttributes[0].Value))
-	suite.Require().Equal(types.AttributeKeyDeliveredCID, string(eventAttributes[1].Key))
-	suite.Require().Equal(types.AttributeKeyDealID, string(eventAttributes[2].Key))
+
+	requiredEvents := map[string]bool{
+		types.EventTypeDataDeliveryVote: false,
+	}
+
+	for _, e := range events {
+		if e.Type == types.EventTypeDataDeliveryVote {
+			requiredEvents[e.Type] = true
+			suite.Require().Equal(types.AttributeKeyVoteStatus, string(e.Attributes[0].Key))
+			suite.Require().Equal(types.AttributeValueVoteStatusEnded, string(e.Attributes[0].Value))
+			suite.Require().Equal(types.AttributeKeyDeliveredCID, string(e.Attributes[1].Key))
+			suite.Require().Equal(types.AttributeKeyDealID, string(e.Attributes[2].Key))
+		}
+	}
+
+	for _, v := range requiredEvents {
+		suite.Require().True(v)
+	}
 }
 
 func (suite abciTestSuite) TestDataDeliveryEndBlockerVoteRejectSamePower() {
@@ -611,12 +689,22 @@ func (suite abciTestSuite) TestDataDeliveryEndBlockerVoteRejectSamePower() {
 	suite.Require().Equal(0, len(votes))
 
 	events := ctx.EventManager().Events()
-	suite.Require().Equal(1, len(events))
-	suite.Require().Equal(types.EventTypeDataDeliveryVote, events[0].Type)
-	eventAttributes := events[0].Attributes
-	suite.Require().Equal(3, len(eventAttributes))
-	suite.Require().Equal(types.AttributeKeyVoteStatus, string(eventAttributes[0].Key))
-	suite.Require().Equal(types.AttributeValueVoteStatusEnded, string(eventAttributes[0].Value))
-	suite.Require().Equal(types.AttributeKeyDeliveredCID, string(eventAttributes[1].Key))
-	suite.Require().Equal(types.AttributeKeyDealID, string(eventAttributes[2].Key))
+
+	requiredEvents := map[string]bool{
+		types.EventTypeDataDeliveryVote: false,
+	}
+
+	for _, e := range events {
+		if e.Type == types.EventTypeDataDeliveryVote {
+			requiredEvents[types.EventTypeDataDeliveryVote] = true
+			suite.Require().Equal(types.AttributeKeyVoteStatus, string(e.Attributes[0].Key))
+			suite.Require().Equal(types.AttributeValueVoteStatusEnded, string(e.Attributes[0].Value))
+			suite.Require().Equal(types.AttributeKeyDeliveredCID, string(e.Attributes[1].Key))
+			suite.Require().Equal(types.AttributeKeyDealID, string(e.Attributes[2].Key))
+		}
+	}
+
+	for _, v := range requiredEvents {
+		suite.Require().True(v)
+	}
 }
