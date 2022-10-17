@@ -133,7 +133,7 @@ func (suite dealTestSuite) TestSellDataSuccess() {
 	suite.Require().Equal(dataSale.VerifiableCid, suite.verifiableCID1)
 
 	suite.Require().Equal(dataSale.DealId, uint64(1))
-	suite.Require().Equal(dataSale.VotingPeriod, suite.OracleKeeper.GetVotingPeriod(suite.Ctx))
+	suite.Require().Equal(dataSale.VerificationVotingPeriod, suite.OracleKeeper.GetVotingPeriod(suite.Ctx))
 	suite.Require().Equal(dataSale.Status, types.DATA_SALE_STATUS_VERIFICATION_VOTING_PERIOD)
 	suite.Require().Equal(dataSale.SellerAddress, suite.sellerAccAddr.String())
 }
@@ -141,7 +141,7 @@ func (suite dealTestSuite) TestSellDataSuccess() {
 func (suite dealTestSuite) TestSellDataStatusFailed() {
 	newDataSale := suite.MakeNewDataSale(suite.sellerAccAddr, suite.verifiableCID1)
 
-	newDataSale.Status = types.DATA_SALE_STATUS_FAILED
+	newDataSale.Status = types.DATA_SALE_STATUS_VERIFICATION_FAILED
 
 	err := suite.DataDealKeeper.SetDataSale(suite.Ctx, newDataSale)
 	suite.Require().NoError(err)
@@ -266,7 +266,7 @@ func (suite dealTestSuite) TestGetAllDataSalesList() {
 		suite.Require().Equal(dataSale.VerifiableCid, allDataSaleList[i].VerifiableCid)
 		suite.Require().Equal(dataSale.DealId, allDataSaleList[i].DealId)
 		suite.Require().Equal(dataSale.Status, allDataSaleList[i].Status)
-		suite.Require().Equal(dataSale.VotingPeriod, allDataSaleList[i].VotingPeriod)
+		suite.Require().Equal(dataSale.VerificationVotingPeriod, allDataSaleList[i].VerificationVotingPeriod)
 		suite.Require().Equal(dataSale.SellerAddress, allDataSaleList[i].SellerAddress)
 	}
 }
@@ -381,7 +381,7 @@ func (suite dealTestSuite) TestDataVerificationInvalidDataSaleStatus() {
 	suite.Require().Error(err, types.ErrDataVerificationVote)
 	suite.Require().ErrorContains(err, "the current voted data's status is not 'VERIFICATION_VOTING_PERIOD'")
 
-	getDataSale.Status = types.DATA_SALE_STATUS_FAILED
+	getDataSale.Status = types.DATA_SALE_STATUS_DELIVERY_FAILED
 	err = suite.DataDealKeeper.SetDataSale(suite.Ctx, getDataSale)
 	suite.Require().NoError(err)
 
@@ -616,4 +616,79 @@ func (suite dealTestSuite) TestDataDeliveryVoteFaildInvalidStatus() {
 
 	err = suite.DataDealKeeper.VoteDataDelivery(ctx, dataDeliveryVote, signature)
 	suite.Require().ErrorIs(err, types.ErrDataDeliveryVote)
+}
+
+func (suite dealTestSuite) TestDeactivateDeal() {
+	ctx := suite.Ctx
+
+	err := suite.FundAccount(ctx, suite.buyerAccAddr, suite.defaultFunds)
+	suite.Require().NoError(err)
+
+	getDeal, err := suite.DataDealKeeper.GetDeal(ctx, 1)
+	suite.Require().NoError(err)
+
+	dealAccAddr, err := sdk.AccAddressFromBech32(getDeal.Address)
+	suite.Require().NoError(err)
+
+	// Sending Budget from buyer to deal
+	err = suite.BankKeeper.SendCoins(suite.Ctx, suite.buyerAccAddr, dealAccAddr, sdk.NewCoins(*getDeal.Budget))
+	suite.Require().NoError(err)
+
+	msgDeactivateDeal := &types.MsgDeactivateDeal{
+		DealId:           1,
+		RequesterAddress: suite.buyerAccAddr.String(),
+	}
+
+	beforeDealBalance := suite.BankKeeper.GetBalance(ctx, dealAccAddr, assets.MicroMedDenom)
+	suite.Require().Equal(beforeDealBalance, *getDeal.Budget)
+
+	err = suite.DataDealKeeper.DeactivateDeal(ctx, msgDeactivateDeal)
+	suite.Require().NoError(err)
+
+	getDeal, err = suite.DataDealKeeper.GetDeal(ctx, 1)
+	suite.Require().NoError(err)
+
+	suite.Require().Equal(getDeal.Status, types.DEAL_STATUS_INACTIVE)
+
+	buyerBalance := suite.BankKeeper.GetBalance(ctx, suite.buyerAccAddr, assets.MicroMedDenom)
+	suite.Require().Equal(buyerBalance, suite.defaultFunds[0])
+
+	afterDealBalance := suite.BankKeeper.GetBalance(ctx, dealAccAddr, assets.MicroMedDenom)
+	suite.Require().Equal(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(0)), afterDealBalance)
+
+	//TODO: Check the DataVerification/DeliveryVote Queue are removed well
+}
+
+func (suite dealTestSuite) TestDeactivateDealInvalidRequester() {
+	ctx := suite.Ctx
+
+	msgDeactivateDeal := &types.MsgDeactivateDeal{
+		DealId:           1,
+		RequesterAddress: suite.sellerAccAddr.String(),
+	}
+
+	err := suite.DataDealKeeper.DeactivateDeal(ctx, msgDeactivateDeal)
+	suite.Require().ErrorIs(err, types.ErrDealDeactivate)
+	suite.Require().ErrorContains(err, "only buyer can deactivate deal")
+}
+
+func (suite dealTestSuite) TestDeactivateDealStatusNotActive() {
+	ctx := suite.Ctx
+
+	getDeal, err := suite.DataDealKeeper.GetDeal(ctx, 1)
+	suite.Require().NoError(err)
+
+	getDeal.Status = types.DEAL_STATUS_INACTIVE
+
+	err = suite.DataDealKeeper.SetDeal(ctx, getDeal)
+	suite.Require().NoError(err)
+
+	msgDeactivateDeal := &types.MsgDeactivateDeal{
+		DealId:           1,
+		RequesterAddress: suite.buyerAccAddr.String(),
+	}
+
+	err = suite.DataDealKeeper.DeactivateDeal(ctx, msgDeactivateDeal)
+	suite.Require().ErrorIs(err, types.ErrDealDeactivate)
+	suite.Require().ErrorContains(err, "deal's status is not 'ACTIVE'")
 }

@@ -36,6 +36,8 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 			panic(err)
 		}
 	}
+
+	// TODO: Add an InitGenesis of DataVerification/Delivery Queue
 }
 
 // ExportGenesis returns the capability module's exported genesis.
@@ -72,5 +74,6 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	}
 	genesis.DataDeliveryVotes = dataDeliveryVotes
 
+	// TODO: Add an ExportGenesis of DataVerification/Delivery Queue
 	return genesis
 }

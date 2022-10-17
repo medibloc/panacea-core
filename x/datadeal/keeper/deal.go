@@ -7,6 +7,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	"github.com/medibloc/panacea-core/v2/types/assets"
 	oracletypes "github.com/medibloc/panacea-core/v2/x/oracle/types"
 	"github.com/tendermint/tendermint/crypto/secp256k1"
 
@@ -162,18 +163,18 @@ func (k Keeper) SellData(ctx sdk.Context, msg *types.MsgSellData) error {
 	}
 
 	getDataSale, _ := k.GetDataSale(ctx, msg.VerifiableCid, msg.DealId)
-	if getDataSale != nil && getDataSale.Status != types.DATA_SALE_STATUS_FAILED {
+	if getDataSale != nil && getDataSale.Status != types.DATA_SALE_STATUS_VERIFICATION_FAILED {
 		return sdkerrors.Wrapf(types.ErrSellData, "data already exists")
 	}
 
 	dataSale := types.NewDataSale(msg)
-	dataSale.VotingPeriod = k.oracleKeeper.GetVotingPeriod(ctx)
+	dataSale.VerificationVotingPeriod = k.oracleKeeper.GetVotingPeriod(ctx)
 
 	if err := k.SetDataSale(ctx, dataSale); err != nil {
 		return sdkerrors.Wrapf(types.ErrSellData, err.Error())
 	}
 
-	k.AddDataSaleQueue(ctx, dataSale.VerifiableCid, dataSale.DealId, dataSale.VotingPeriod.VotingEndTime)
+	k.AddDataVerificationQueue(ctx, dataSale.VerifiableCid, dataSale.DealId, dataSale.VerificationVotingPeriod.VotingEndTime)
 
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(
@@ -383,6 +384,11 @@ func (k Keeper) SetDataVerificationVote(ctx sdk.Context, vote *types.DataVerific
 	return nil
 }
 
+func (k Keeper) GetDataVerificationVoteIterator(ctx sdk.Context, dealID uint64, verifiableCid string) sdk.Iterator {
+	store := ctx.KVStore(k.storeKey)
+	return sdk.KVStorePrefixIterator(store, types.GetDataVerificationVotesKey(verifiableCid, dealID))
+}
+
 func (k Keeper) GetAllDataVerificationVoteList(ctx sdk.Context) ([]types.DataVerificationVote, error) {
 	store := ctx.KVStore(k.storeKey)
 	iterator := sdk.KVStorePrefixIterator(store, types.DataVerificationVoteKey)
@@ -404,6 +410,19 @@ func (k Keeper) GetAllDataVerificationVoteList(ctx sdk.Context) ([]types.DataVer
 	return dataVerificationVotes, nil
 }
 
+func (k Keeper) RemoveDataVerificationVote(ctx sdk.Context, vote *types.DataVerificationVote) error {
+	store := ctx.KVStore(k.storeKey)
+	voterAccAddr, err := sdk.AccAddressFromBech32(vote.VoterAddress)
+	if err != nil {
+		return err
+	}
+	key := types.GetDataVerificationVoteKey(vote.VerifiableCid, voterAccAddr, vote.DealId)
+
+	store.Delete(key)
+
+	return nil
+}
+
 func (k Keeper) SetDataDeliveryVote(ctx sdk.Context, vote *types.DataDeliveryVote) error {
 	store := ctx.KVStore(k.storeKey)
 
@@ -411,7 +430,7 @@ func (k Keeper) SetDataDeliveryVote(ctx sdk.Context, vote *types.DataDeliveryVot
 	if err != nil {
 		return err
 	}
-	key := types.GetDataDeliveryVoteKey(vote.VerifiableCid, voterAccAddr, vote.DealId)
+	key := types.GetDataDeliveryVoteKey(vote.DealId, vote.VerifiableCid, voterAccAddr)
 
 	bz, err := k.cdc.MarshalLengthPrefixed(vote)
 	if err != nil {
@@ -428,7 +447,7 @@ func (k Keeper) GetDataDeliveryVote(ctx sdk.Context, verifiableCID, voterAddress
 	if err != nil {
 		return nil, err
 	}
-	key := types.GetDataDeliveryVoteKey(verifiableCID, voterAccAddr, dealID)
+	key := types.GetDataDeliveryVoteKey(dealID, verifiableCID, voterAccAddr)
 	bz := store.Get(key)
 	if bz == nil {
 		return nil, fmt.Errorf("DataSale does not exist. dealID: %d, voterAddress: %s, verifiableCID: %s", dealID, voterAddress, verifiableCID)
@@ -441,6 +460,11 @@ func (k Keeper) GetDataDeliveryVote(ctx sdk.Context, verifiableCID, voterAddress
 	}
 
 	return vote, nil
+}
+
+func (k Keeper) GetDataDeliveryVoteIterator(ctx sdk.Context, dealID uint64, verifiableCid string) sdk.Iterator {
+	store := ctx.KVStore(k.storeKey)
+	return sdk.KVStorePrefixIterator(store, types.GetDataDeliveryVotesKey(dealID, verifiableCid))
 }
 
 func (k Keeper) GetAllDataDeliveryVoteList(ctx sdk.Context) ([]types.DataDeliveryVote, error) {
@@ -463,4 +487,61 @@ func (k Keeper) GetAllDataDeliveryVoteList(ctx sdk.Context) ([]types.DataDeliver
 	}
 
 	return dataDeliveryVotes, nil
+}
+
+func (k Keeper) RemoveDataDeliveryVote(ctx sdk.Context, vote *types.DataDeliveryVote) error {
+	store := ctx.KVStore(k.storeKey)
+	voterAccAddr, err := sdk.AccAddressFromBech32(vote.VoterAddress)
+	if err != nil {
+		return err
+	}
+	key := types.GetDataDeliveryVoteKey(vote.DealId, vote.VerifiableCid, voterAccAddr)
+
+	store.Delete(key)
+
+	return nil
+}
+
+func (k Keeper) DeactivateDeal(ctx sdk.Context, msg *types.MsgDeactivateDeal) error {
+	deal, err := k.GetDeal(ctx, msg.DealId)
+	if err != nil {
+		return sdkerrors.Wrapf(types.ErrDealDeactivate, err.Error())
+	}
+
+	if deal.BuyerAddress != msg.RequesterAddress {
+		return sdkerrors.Wrapf(types.ErrDealDeactivate, "only buyer can deactivate deal")
+	}
+
+	if deal.Status != types.DEAL_STATUS_ACTIVE {
+		return sdkerrors.Wrapf(types.ErrDealDeactivate, "deal's status is not 'ACTIVE'")
+	}
+
+	deal.Status = types.DEAL_STATUS_INACTIVE
+
+	err = k.SetDeal(ctx, deal)
+	if err != nil {
+		return sdkerrors.Wrapf(types.ErrDealDeactivate, err.Error())
+	}
+
+	dealAcc, err := sdk.AccAddressFromBech32(deal.Address)
+	if err != nil {
+		return sdkerrors.Wrapf(types.ErrDealDeactivate, err.Error())
+	}
+
+	requesterAcc, err := sdk.AccAddressFromBech32(msg.RequesterAddress)
+	if err != nil {
+		return sdkerrors.Wrapf(types.ErrDealDeactivate, err.Error())
+	}
+
+	dealBalance := k.bankKeeper.GetBalance(ctx, dealAcc, assets.MicroMedDenom)
+
+	err = k.bankKeeper.SendCoins(ctx, dealAcc, requesterAcc, sdk.Coins{dealBalance})
+	if err != nil {
+		return sdkerrors.Wrapf(types.ErrDealDeactivate, err.Error())
+	}
+
+	//TODO: Implement Remove the DataVerification/DeliveryVote Queue after PR #449 merged
+	//https://github.com/medibloc/panacea-core/pull/449
+
+	return nil
 }

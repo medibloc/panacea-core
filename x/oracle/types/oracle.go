@@ -70,26 +70,8 @@ func (m OracleRegistration) ValidateBasic() error {
 	}
 
 	if m.TallyResult != nil {
-		if m.TallyResult.Yes.IsNegative() {
-			return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "yes in TallyResult must not be negative: %s", m.TallyResult.Yes)
-		}
-
-		if m.TallyResult.No.IsNegative() {
-			return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "no in TallyResult must not be negative: %s", m.TallyResult.Yes)
-		}
-
-		if len(m.TallyResult.InvalidYes) > 0 {
-			for _, invalidYes := range m.TallyResult.InvalidYes {
-				if invalidYes.ConsensusValue == nil {
-					return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalidConsensusValue in ConsensusValue must not be nil")
-				}
-				if invalidYes.VotingAmount.IsNegative() {
-					return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "votingAmount in ConsensusValue must not be negative: %s", m.TallyResult.Yes)
-				}
-			}
-		}
-		if m.TallyResult.InvalidYes == nil {
-			return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalidYes in TallyResult must not be negative: %s", m.TallyResult.Yes)
+		if err := m.TallyResult.ValidateBasic(); err != nil {
+			return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, err.Error())
 		}
 	}
 
@@ -190,6 +172,7 @@ func NewTallyResult() *TallyResult {
 		InvalidYes:     make([]*ConsensusTally, 0),
 		ConsensusValue: nil,
 		Total:          sdk.ZeroInt(),
+		ValidVoters:    make([]*VoterInfo, 0),
 	}
 }
 
@@ -197,6 +180,52 @@ func (t *TallyResult) AddInvalidYes(tally *ConsensusTally) {
 	t.InvalidYes = append(t.InvalidYes, tally)
 }
 
-func (m TallyResult) IsPassed() bool {
-	return m.ConsensusValue != nil
+func (t TallyResult) IsPassed() bool {
+	return t.ConsensusValue != nil
+}
+
+func (t TallyResult) ValidateBasic() error {
+	if t.Yes.IsNegative() {
+		return fmt.Errorf("yes in TallyResult must not be negative: %s", t.Yes)
+	}
+
+	if t.No.IsNegative() {
+		return fmt.Errorf("no in TallyResult must not be negative: %s", t.Yes)
+	}
+
+	if t.Total.IsNegative() {
+		return fmt.Errorf("total in TallyResult must not be negative: %s", t.Total)
+	}
+
+	if len(t.InvalidYes) > 0 {
+		for _, invalidYes := range t.InvalidYes {
+			if invalidYes.ConsensusValue == nil {
+				return fmt.Errorf("invalidConsensusValue in ConsensusValue must not be nil")
+			}
+			if invalidYes.VotingAmount.IsNegative() {
+				return fmt.Errorf("votingAmount in ConsensusValue must not be negative: %s", t.Yes)
+			}
+		}
+	}
+
+	if t.InvalidYes == nil {
+		return fmt.Errorf("invalidYes in TallyResult cannot be nil")
+	}
+
+	if len(t.ValidVoters) > 0 {
+		for _, voter := range t.ValidVoters {
+			if _, err := sdk.AccAddressFromBech32(voter.VoterAddress); err != nil {
+				return fmt.Errorf("invalid voter address: %s", voter.VoterAddress)
+			}
+			if voter.VotingPower.IsNegative() {
+				return fmt.Errorf("voting power cannot be negetive: %s", voter.VotingPower)
+			}
+		}
+	}
+
+	if t.ValidVoters == nil {
+		return fmt.Errorf("validVoters cannot be nil")
+	}
+
+	return nil
 }
