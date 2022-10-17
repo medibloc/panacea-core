@@ -82,12 +82,20 @@ message TallyResult {
   string total = 4 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int", (gogoproto.nullable) = false];
   // The consensus value between oracles
   bytes consensus_value = 5;
+  repeated VoterInfo valid_voters = 6;
+}
+
+// VoterInfo defines the voter info
+message VoterInfo {
+  string voter_address = 1;
+  string voting_power = 2[(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int", (gogoproto.nullable) = false];
 }
 
 // ConsensusTally defines the consensus value and the vote amount.
 message ConsensusTally {
   bytes consensus_value = 1;
   string voting_amount = 2[(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int", (gogoproto.nullable) = false];
+  repeated VoterInfo voter_info = 3;
 }
 
 // VotingPeriod defines the voting period of transactions governed by oracles.

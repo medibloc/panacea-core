@@ -19,9 +19,9 @@ func CmdUpgradeOracleProposal() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "oracle-upgrade (--upgrade-unique-id [uniqueID]) (--upgrade-height [height]) [flags]",
 		Args:  cobra.ExactArgs(0),
-		Short: "Submit a oracle upgrade proposal",
-		Long: "Submit a oracle upgrade along with an initial deposit.\n + " +
-			"You must enter the uniqueID and block height of the Oracle to perform the upgrade.",
+		Short: "Submit an oracle upgrade proposal",
+		Long: "Submit an oracle upgrade proposal along with an initial deposit.\n + " +
+			"You must enter the uniqueID of a new version of oracle and target block height for upgrade.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
@@ -48,17 +48,25 @@ func CmdUpgradeOracleProposal() *cobra.Command {
 			if err != nil {
 				return err
 			}
+			if err := msg.ValidateBasic(); err != nil {
+				return err
+			}
 
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
 	}
-
 	cmd.Flags().String(govcli.FlagTitle, "", "title of proposal")
 	cmd.Flags().String(govcli.FlagDescription, "", "description of proposal")
 	cmd.Flags().String(govcli.FlagDeposit, "", "deposit of proposal")
 	cmd.Flags().Int64(FlagUpgradeHeight, 0, "The height at which the upgrade must happen")
 	cmd.Flags().String(FlagUpgradeUniqueID, "", "Oracle's uniqueID to be upgraded")
 
+	if err := cmd.MarkFlagRequired(FlagUpgradeHeight); err != nil {
+		panic(err)
+	}
+	if err := cmd.MarkFlagRequired(FlagUpgradeUniqueID); err != nil {
+		panic(err)
+	}
 	return cmd
 }
 
@@ -84,6 +92,9 @@ func parseArgsToContent(cmd *cobra.Command) (govtypes.Content, error) {
 	}
 
 	plan := types.Plan{UniqueId: uniqueID, Height: height}
+	if err := plan.ValidateBasic(); err != nil {
+		return nil, err
+	}
 	content := types.NewOracleUpgradeProposal(title, description, plan)
 	return content, nil
 }

@@ -632,7 +632,7 @@ var (
 
 	pattern_Query_Params_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"panacea", "oracle", "v2alpha2", "params"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_OracleUpgradeInfo_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"panacea", "oracle", "v2alpha2", "oracle_upgrade_infos"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_OracleUpgradeInfo_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"panacea", "oracle", "v2alpha2", "oracle_upgrade_info"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (

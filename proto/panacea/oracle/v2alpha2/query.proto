@@ -38,7 +38,7 @@ service Query {
 
   // OracleUpgradeInfo returns OracleUpgradeInfo of oracle module.
   rpc OracleUpgradeInfo(QueryOracleUpgradeInfoRequest) returns (QueryOracleUpgradeInfoResponse) {
-    option (google.api.http).get = "/panacea/oracle/v2alpha2/oracle_upgrade_infos";
+    option (google.api.http).get = "/panacea/oracle/v2alpha2/oracle_upgrade_info";
   }
 }
 

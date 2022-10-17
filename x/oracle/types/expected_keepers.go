@@ -8,11 +8,15 @@ import (
 )
 
 type AccountKeeper interface {
-	GetAccount(ctx sdk.Context, addr sdk.AccAddress) authtypes.AccountI
+	GetAccount(sdk.Context, sdk.AccAddress) authtypes.AccountI
 	GetPubKey(sdk.Context, sdk.AccAddress) (cryptotypes.PubKey, error)
 }
 
 // StakingKeeper expected staking keeper (Validator and Delegator sets) (noalias)
 type StakingKeeper interface {
 	GetValidator(sdk.Context, sdk.ValAddress) (stakingtypes.Validator, bool)
+}
+
+type DistrKeeper interface {
+	AllocateTokensToValidator(sdk.Context, stakingtypes.ValidatorI, sdk.DecCoins)
 }
