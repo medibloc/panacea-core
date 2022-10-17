@@ -5,7 +5,7 @@ const (
 	EventTypeDataDeliveryVote     = "data_delivery"
 
 	AttributeKeyVoteStatus          = "vote_status"
-	AttributeKeyVerifiableCID       = "verifiable_cid"
+	AttributeKeyDataHash            = "data_hash"
 	AttributeKeyDeliveredCID        = "delivered_cid"
 	AttributeKeyDealID              = "deal_id"
 	AttributeValueVoteStatusStarted = "started"

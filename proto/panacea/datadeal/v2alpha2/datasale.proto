@@ -12,11 +12,12 @@ message DataSale {
   uint64 deal_id = 2;
   string verifiable_cid = 3;
   string delivered_cid = 4;
-  DataSaleStatus status = 5;
-  panacea.oracle.v2alpha2.VotingPeriod verification_voting_period = 6;
-  panacea.oracle.v2alpha2.VotingPeriod delivery_voting_period = 7;
-  panacea.oracle.v2alpha2.TallyResult verification_tally_result = 8;
-  panacea.oracle.v2alpha2.TallyResult delivery_tally_result = 9;
+  string data_hash = 5;
+  DataSaleStatus status = 6;
+  panacea.oracle.v2alpha2.VotingPeriod verification_voting_period = 7;
+  panacea.oracle.v2alpha2.VotingPeriod delivery_voting_period = 8;
+  panacea.oracle.v2alpha2.TallyResult verification_tally_result = 9;
+  panacea.oracle.v2alpha2.TallyResult delivery_tally_result = 10;
 }
 
 // DataSaleStatus enumerates the status of data sale.
