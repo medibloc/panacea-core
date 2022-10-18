@@ -619,10 +619,6 @@ func New(
 	app.SetAnteHandler(anteHandler)
 	app.SetEndBlocker(app.EndBlocker)
 
-	if err := app.registerUpgradeHandlers(); err != nil {
-		panic("Failed to register upgradeHandler: " + err.Error())
-	}
-
 	if loadLatest {
 		if err := app.LoadLatestVersion(); err != nil {
 			tmos.Exit(err.Error())
@@ -647,6 +643,10 @@ func New(
 	app.ScopedIBCKeeper = scopedIBCKeeper
 	app.ScopedTransferKeeper = scopedTransferKeeper
 	app.ScopedWasmKeeper = scopedWasmKeeper
+
+	if err := app.registerUpgradeHandlers(); err != nil {
+		panic("Failed to register upgradeHandler: " + err.Error())
+	}
 
 	return app
 }
