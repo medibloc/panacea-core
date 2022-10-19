@@ -22,15 +22,15 @@ service Query {
   }
   // DataSale returns a DataSale.
   rpc DataSale(QueryDataSaleRequest) returns (QueryDataSaleResponse) {
-    option (google.api.http).get = "/panacea/datadeal/v2alpha2/datasales/{deal_id}/{verifiable_cid}";
+    option (google.api.http).get = "/panacea/datadeal/v2alpha2/datasales/{deal_id}/{data_hash}";
   }
   // DataVerificationVote returns a DataVerificationVote.
   rpc DataVerificationVote(QueryDataVerificationVoteRequest) returns (QueryDataVerificationVoteResponse) {
-    option (google.api.http).get = "/panacea/datadeal/v2alpha2/data_verification_votes/{deal_id}/{verifiable_cid}/{voter_address}";
+    option (google.api.http).get = "/panacea/datadeal/v2alpha2/data_verification_votes/{deal_id}/{data_hash}/{voter_address}";
   }
   // DataDeliveryVote returns a DataDeliveryVote.
   rpc DataDeliveryVote(QueryDataDeliveryVoteRequest) returns (QueryDataDeliveryVoteResponse) {
-    option (google.api.http).get = "/panacea/datadeal/v2alpha2/data_delivery_votes/{deal_id}/{verifiable_cid}/{voter_address}";
+    option (google.api.http).get = "/panacea/datadeal/v2alpha2/data_delivery_votes/{deal_id}/{data_hash}/{voter_address}";
   }
 }
 
@@ -58,7 +58,7 @@ message QueryDealsResponse {
 // QueryDataSaleRequest defines the request type for the Query/DataSale RPC method.
 message QueryDataSaleRequest {
   uint64 deal_id = 1;
-  string verifiable_cid = 2;
+  string data_hash = 2;
 }
 
 // QueryDataSaleResponse defines the response type for the Query/DataSale RPC method.
@@ -69,7 +69,7 @@ message QueryDataSaleResponse {
 // QueryDataVerificationRequest defines the request type for the Query/DataVerificationVote RPC method.
 message QueryDataVerificationVoteRequest {
   uint64 deal_id = 1;
-  string verifiable_cid = 2;
+  string data_hash = 2;
   string voter_address = 3;
 }
 
@@ -81,7 +81,7 @@ message QueryDataVerificationVoteResponse {
 // QueryDataDeliveryVoteRequest defines the request type for the Query/DataDeliveryVote RPC method.
 message QueryDataDeliveryVoteRequest{
   uint64 deal_id =1;
-  string verifiable_cid =2;
+  string data_hash =2;
   string voter_address =3;
 }
 
