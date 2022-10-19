@@ -30,12 +30,13 @@ func (suite *DataDealBaseTestSuite) MakeTestDeal(dealID uint64, buyerAddr sdk.Ac
 	}
 }
 
-func (suite *DataDealBaseTestSuite) MakeNewDataSale(sellerAddr sdk.AccAddress, verifiableCID string) *types.DataSale {
+func (suite *DataDealBaseTestSuite) MakeNewDataSale(sellerAddr sdk.AccAddress, dataHash, verifiableCID string) *types.DataSale {
 	return &types.DataSale{
 		SellerAddress: sellerAddr.String(),
 		DealId:        1,
 		VerifiableCid: verifiableCID,
 		DeliveredCid:  "",
+		DataHash:      dataHash,
 		Status:        types.DATA_SALE_STATUS_VERIFICATION_VOTING_PERIOD,
 		VerificationVotingPeriod: &oracletypes.VotingPeriod{
 			VotingStartTime: time.Now(),
@@ -64,22 +65,23 @@ func (suite *DataDealBaseTestSuite) SetValidator(pubKey cryptotypes.PubKey, amou
 	return validator
 }
 
-func (suite *DataDealBaseTestSuite) MakeNewDataVerificationVote(voterAddr sdk.AccAddress, verifiableCID string) *types.DataVerificationVote {
+func (suite *DataDealBaseTestSuite) MakeNewDataVerificationVote(voterAddr sdk.AccAddress, dataHash string) *types.DataVerificationVote {
 	return &types.DataVerificationVote{
-		VoterAddress:  voterAddr.String(),
-		DealId:        1,
-		VerifiableCid: verifiableCID,
-		VoteOption:    oracletypes.VOTE_OPTION_YES,
+		VoterAddress: voterAddr.String(),
+		DealId:       1,
+		DataHash:     dataHash,
+		VoteOption:   oracletypes.VOTE_OPTION_YES,
 	}
 }
 
-func (suite *DataDealBaseTestSuite) MakeNewDataSaleDeliveryVoting(sellerAddr sdk.AccAddress, verifiableCID string) *types.DataSale {
+func (suite *DataDealBaseTestSuite) MakeNewDataSaleDeliveryVoting(sellerAddr sdk.AccAddress, dataHash, verifiableCID string) *types.DataSale {
 	return &types.DataSale{
-		SellerAddress:            sellerAddr.String(),
-		DealId:                   1,
-		VerifiableCid:            verifiableCID,
-		DeliveredCid:             "",
-		Status:                   types.DATA_SALE_STATUS_DELIVERY_VOTING_PERIOD,
+		SellerAddress: sellerAddr.String(),
+		DealId:        1,
+		VerifiableCid: verifiableCID,
+		DeliveredCid:  "",
+		DataHash:      dataHash,
+		Status:        types.DATA_SALE_STATUS_DELIVERY_VOTING_PERIOD,
 		VerificationVotingPeriod: nil,
 		DeliveryVotingPeriod: &oracletypes.VotingPeriod{
 			VotingStartTime: time.Now(),
@@ -90,13 +92,13 @@ func (suite *DataDealBaseTestSuite) MakeNewDataSaleDeliveryVoting(sellerAddr sdk
 	}
 }
 
-func (suite *DataDealBaseTestSuite) MakeNewDataDeliveryVote(voterAddr sdk.AccAddress, verifiableCID, deliveredCID string, dealID uint64) *types.DataDeliveryVote {
+func (suite *DataDealBaseTestSuite) MakeNewDataDeliveryVote(voterAddr sdk.AccAddress, dataHash, deliveredCID string, dealID uint64) *types.DataDeliveryVote {
 	return &types.DataDeliveryVote{
-		VoterAddress:  voterAddr.String(),
-		DealId:        dealID,
-		VerifiableCid: verifiableCID,
-		DeliveredCid:  deliveredCID,
-		VoteOption:    oracletypes.VOTE_OPTION_YES,
+		VoterAddress: voterAddr.String(),
+		DealId:       dealID,
+		DataHash:     dataHash,
+		DeliveredCid: deliveredCID,
+		VoteOption:   oracletypes.VOTE_OPTION_YES,
 	}
 }
 

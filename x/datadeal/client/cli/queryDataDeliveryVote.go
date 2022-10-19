@@ -11,7 +11,7 @@ import (
 
 func CmdGetDataDeliveryVote() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "data-delivery-vote [deal_id] [verifiable_cid] [voter_address]",
+		Use:   "data-delivery-vote [deal_id] [data_hash] [voter_address]",
 		Short: "Query a dataDelivery vote info",
 		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -27,9 +27,9 @@ func CmdGetDataDeliveryVote() *cobra.Command {
 
 			queryClient := types.NewQueryClient(clientCtx)
 			req := &types.QueryDataDeliveryVoteRequest{
-				DealId:        dealID,
-				VerifiableCid: args[1],
-				VoterAddress:  args[2],
+				DealId:       dealID,
+				DataHash:     args[1],
+				VoterAddress: args[2],
 			}
 
 			res, err := queryClient.DataDeliveryVote(cmd.Context(), req)

@@ -58,7 +58,7 @@ func (k Keeper) Deals(goCtx context.Context, req *types.QueryDealsRequest) (*typ
 }
 
 func (k Keeper) DataSale(goCtx context.Context, req *types.QueryDataSaleRequest) (*types.QueryDataSaleResponse, error) {
-	dataSale, err := k.GetDataSale(sdk.UnwrapSDKContext(goCtx), req.VerifiableCid, req.DealId)
+	dataSale, err := k.GetDataSale(sdk.UnwrapSDKContext(goCtx), req.DataHash, req.DealId)
 	if err != nil {
 		return nil, err
 	}
@@ -69,7 +69,7 @@ func (k Keeper) DataSale(goCtx context.Context, req *types.QueryDataSaleRequest)
 }
 
 func (k Keeper) DataVerificationVote(goCtx context.Context, req *types.QueryDataVerificationVoteRequest) (*types.QueryDataVerificationVoteResponse, error) {
-	dataVerificationVote, err := k.GetDataVerificationVote(sdk.UnwrapSDKContext(goCtx), req.VerifiableCid, req.VoterAddress, req.DealId)
+	dataVerificationVote, err := k.GetDataVerificationVote(sdk.UnwrapSDKContext(goCtx), req.DataHash, req.VoterAddress, req.DealId)
 	if err != nil {
 		return nil, err
 	}
@@ -80,7 +80,7 @@ func (k Keeper) DataVerificationVote(goCtx context.Context, req *types.QueryData
 }
 
 func (k Keeper) DataDeliveryVote(goCtx context.Context, req *types.QueryDataDeliveryVoteRequest) (*types.QueryDataDeliveryVoteResponse, error) {
-	dataDeliveryVote, err := k.GetDataDeliveryVote(sdk.UnwrapSDKContext(goCtx), req.VerifiableCid, req.VoterAddress, req.DealId)
+	dataDeliveryVote, err := k.GetDataDeliveryVote(sdk.UnwrapSDKContext(goCtx), req.DataHash, req.VoterAddress, req.DealId)
 	if err != nil {
 		return nil, err
 	}
