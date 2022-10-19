@@ -43,7 +43,7 @@ func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) {
 			if isDealCompleted {
 				dataSale.Status = types.DATA_SALE_STATUS_DEAL_FULL
 			} else {
-				if err = keeper.GetDealCurNumDataAndIncrement(ctx, dataSale.DealId); err != nil {
+				if err = keeper.IncrementCurNumDataAtDeal(ctx, dataSale.DealId); err != nil {
 					panic(err)
 				}
 				dataSale.DeliveryVotingPeriod = oracleKeeper.GetVotingPeriod(ctx)

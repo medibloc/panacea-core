@@ -149,7 +149,7 @@ func (suite dealTestSuite) TestCheckDealCurNumDataAndIncrement() {
 	suite.Require().NoError(err)
 	suite.Equal(false, check)
 
-	err = suite.DataDealKeeper.GetDealCurNumDataAndIncrement(suite.Ctx, dealID)
+	err = suite.DataDealKeeper.IncrementCurNumDataAtDeal(suite.Ctx, dealID)
 	suite.Require().NoError(err)
 	updatedDeal, err := suite.DataDealKeeper.GetDeal(suite.Ctx, dealID)
 	suite.Require().NoError(err)

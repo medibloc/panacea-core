@@ -159,7 +159,7 @@ func (k Keeper) IsDealCompleted(ctx sdk.Context, dealID uint64) (bool, error) {
 	}
 }
 
-func (k Keeper) GetDealCurNumDataAndIncrement(ctx sdk.Context, dealID uint64) error {
+func (k Keeper) IncrementCurNumDataAtDeal(ctx sdk.Context, dealID uint64) error {
 	deal, err := k.GetDeal(ctx, dealID)
 	if err != nil {
 		return err
