@@ -24,7 +24,7 @@ func TestRecordKeeper(t *testing.T) {
 	suite.Run(t, new(recordTestSuite))
 }
 
-func (suite recordTestSuite) TestOneRecord() {
+func (suite *recordTestSuite) TestOneRecord() {
 	ctx := suite.Ctx
 	aolKeeper := suite.AolKeeper
 
@@ -54,7 +54,7 @@ func (suite recordTestSuite) TestOneRecord() {
 	suite.Require().Equal([]aoltypes.Record{record}, resultRecords)
 }
 
-func (suite recordTestSuite) TestMultiRecord() {
+func (suite *recordTestSuite) TestMultiRecord() {
 	ctx := suite.Ctx
 	aolKeeper := suite.AolKeeper
 

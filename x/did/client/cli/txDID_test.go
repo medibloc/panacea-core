@@ -25,12 +25,12 @@ func TestTxTestSuite(t *testing.T) {
 	suite.Run(t, new(txTestSuite))
 }
 
-func (suite txTestSuite) AfterTest(_, _ string) {
+func (suite *txTestSuite) AfterTest(_, _ string) {
 	err := os.RemoveAll(baseDir)
 	suite.Require().NoError(err)
 }
 
-func (suite txTestSuite) TestNewMsgCreateDID() {
+func (suite *txTestSuite) TestNewMsgCreateDID() {
 	privKey, _ := crypto.GenSecp256k1PrivKey("", "")
 	fromAddr, err := sdk.AccAddressFromBech32("panacea154p6kyu9kqgvcmq63w3vpn893ssy6anpu8ykfq")
 	suite.Require().NoError(err)
@@ -49,14 +49,14 @@ func (suite txTestSuite) TestNewMsgCreateDID() {
 	suite.Require().True(ok)
 }
 
-func (suite txTestSuite) TestReadBIP39ParamsFrom_NotInteractive() {
+func (suite *txTestSuite) TestReadBIP39ParamsFrom_NotInteractive() {
 	mnemonic, passphrase, err := readBIP39ParamsFrom(false, nil)
 	suite.Require().NoError(err)
 	suite.Require().Empty(mnemonic)
 	suite.Require().Empty(passphrase)
 }
 
-func (suite txTestSuite) TestReadBIP39ParamsFrom() {
+func (suite *txTestSuite) TestReadBIP39ParamsFrom() {
 	inputMnemonic := "travel broken word scare punch suggest air behind process gather sick void potato double furnace"
 	inputPassphrase := "mypasswd"
 	reader := bufio.NewReader(strings.NewReader(fmt.Sprintf(
@@ -69,7 +69,7 @@ func (suite txTestSuite) TestReadBIP39ParamsFrom() {
 	suite.Require().Equal(inputPassphrase, passphrase)
 }
 
-func (suite txTestSuite) TestReadBIP39ParamsFrom_EmptyPassphrase() {
+func (suite *txTestSuite) TestReadBIP39ParamsFrom_EmptyPassphrase() {
 	inputMnemonic := "travel broken word scare punch suggest air behind process gather sick void potato double furnace"
 	reader := bufio.NewReader(strings.NewReader(fmt.Sprintf(
 		"%s\n\n", inputMnemonic,
@@ -81,7 +81,7 @@ func (suite txTestSuite) TestReadBIP39ParamsFrom_EmptyPassphrase() {
 	suite.Require().Equal("", passphrase)
 }
 
-func (suite txTestSuite) TestReadBIP39ParamsFrom_PassphraseNotMatched() {
+func (suite *txTestSuite) TestReadBIP39ParamsFrom_PassphraseNotMatched() {
 	inputMnemonic := "travel broken word scare punch suggest air behind process gather sick void potato double furnace"
 	reader := bufio.NewReader(strings.NewReader(fmt.Sprintf(
 		"%s\npasswd1\npasswd2\n", inputMnemonic,
@@ -91,7 +91,7 @@ func (suite txTestSuite) TestReadBIP39ParamsFrom_PassphraseNotMatched() {
 	suite.Require().Error(err, "passphrases don't match")
 }
 
-func (suite txTestSuite) TestReadBIP39ParamsFrom_InvalidMnemonic() {
+func (suite *txTestSuite) TestReadBIP39ParamsFrom_InvalidMnemonic() {
 	inputMnemonic := "travel broken"
 	reader := bufio.NewReader(strings.NewReader(fmt.Sprintf(
 		"%s\npasswd1\npasswd1\n", inputMnemonic,
@@ -101,7 +101,7 @@ func (suite txTestSuite) TestReadBIP39ParamsFrom_InvalidMnemonic() {
 	suite.Require().Error(err, "invalid mnemonic")
 }
 
-func (suite txTestSuite) TestSaveAndGetPrivKeyFromKeyStore() {
+func (suite *txTestSuite) TestSaveAndGetPrivKeyFromKeyStore() {
 	verificationMethodID := "key1"
 	privKey, _ := crypto.GenSecp256k1PrivKey("", "")
 
@@ -114,15 +114,15 @@ func (suite txTestSuite) TestSaveAndGetPrivKeyFromKeyStore() {
 	suite.Require().Equal(privKey, privKeyLoaded)
 }
 
-func (suite txTestSuite) TestReadDIDDocOneContext() {
+func (suite *txTestSuite) TestReadDIDDocOneContext() {
 	suite.testReadDIDDocOneContext("./testdata/did_one_context.json")
 }
 
-func (suite txTestSuite) TestReadDIDDocOneContext_W3C() {
+func (suite *txTestSuite) TestReadDIDDocOneContext_W3C() {
 	suite.testReadDIDDocOneContext("./testdata/did_one_context_w3c.json")
 }
 
-func (suite txTestSuite) testReadDIDDocOneContext(path string) {
+func (suite *txTestSuite) testReadDIDDocOneContext(path string) {
 	doc, err := readDIDDocFrom(path)
 	suite.Require().NoError(err)
 	contexts := *doc.Contexts
@@ -138,15 +138,15 @@ func (suite txTestSuite) testReadDIDDocOneContext(path string) {
 	suite.Require().Equal("did:panacea:27FnaDeQZApXhsRZZDARhWYs2nKFaw3p7evGd9zUSrBZ#key1", doc.Authentications[0].GetVerificationMethodId())
 }
 
-func (suite txTestSuite) TestReadDIDDocTwoContexts() {
+func (suite *txTestSuite) TestReadDIDDocTwoContexts() {
 	suite.testReadDIDDocTwoContexts("./testdata/did_multi_context.json")
 }
 
-func (suite txTestSuite) TestReadDIDDocTwoContexts_W3C() {
+func (suite *txTestSuite) TestReadDIDDocTwoContexts_W3C() {
 	suite.testReadDIDDocTwoContexts("./testdata/did_multi_context_w3c.json")
 }
 
-func (suite txTestSuite) testReadDIDDocTwoContexts(path string) {
+func (suite *txTestSuite) testReadDIDDocTwoContexts(path string) {
 	doc, err := readDIDDocFrom(path)
 
 	suite.Require().NoError(err)
@@ -164,15 +164,15 @@ func (suite txTestSuite) testReadDIDDocTwoContexts(path string) {
 	suite.Require().Equal("did:panacea:27FnaDeQZApXhsRZZDARhWYs2nKFaw3p7evGd9zUSrBZ#key1", doc.Authentications[0].GetVerificationMethodId())
 }
 
-func (suite txTestSuite) TestReadDIDDocMultiRelationship() {
+func (suite *txTestSuite) TestReadDIDDocMultiRelationship() {
 	suite.testReadDIDDocMultiRelationship("./testdata/did_multi_authentication.json")
 }
 
-func (suite txTestSuite) TestReadDIDDocMultiRelationship_W3C() {
+func (suite *txTestSuite) TestReadDIDDocMultiRelationship_W3C() {
 	suite.testReadDIDDocMultiRelationship("./testdata/did_multi_authentication_w3c.json")
 }
 
-func (suite txTestSuite) testReadDIDDocMultiRelationship(path string) {
+func (suite *txTestSuite) testReadDIDDocMultiRelationship(path string) {
 	doc, err := readDIDDocFrom(path)
 
 	suite.Require().NoError(err)
