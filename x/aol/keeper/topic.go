@@ -10,7 +10,7 @@ import (
 // SetTopic set a specific topic in the store
 func (k Keeper) SetTopic(ctx sdk.Context, key types.TopicCompositeKey, topic types.Topic) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.TopicKeyPrefix)
-	b := k.cdc.MustMarshalBinaryBare(&topic)
+	b := k.cdc.MustMarshal(&topic)
 	store.Set(compkey.MustEncode(&key), b)
 }
 
@@ -18,7 +18,7 @@ func (k Keeper) SetTopic(ctx sdk.Context, key types.TopicCompositeKey, topic typ
 func (k Keeper) GetTopic(ctx sdk.Context, key types.TopicCompositeKey) types.Topic {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.TopicKeyPrefix)
 	var topic types.Topic
-	k.cdc.MustUnmarshalBinaryBare(store.Get(compkey.MustEncode(&key)), &topic)
+	k.cdc.MustUnmarshal(store.Get(compkey.MustEncode(&key)), &topic)
 	return topic
 }
 
@@ -43,7 +43,7 @@ func (k Keeper) GetAllTopics(ctx sdk.Context) ([]types.TopicCompositeKey, []type
 		keys = append(keys, key)
 
 		var value types.Topic
-		k.cdc.MustUnmarshalBinaryBare(iterator.Value(), &value)
+		k.cdc.MustUnmarshal(iterator.Value(), &value)
 		values = append(values, value)
 	}
 

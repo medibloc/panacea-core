@@ -10,7 +10,7 @@ import (
 // SetWriter set a specific writer in the store
 func (k Keeper) SetWriter(ctx sdk.Context, key types.WriterCompositeKey, writer types.Writer) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.WriterKeyPrefix)
-	b := k.cdc.MustMarshalBinaryBare(&writer)
+	b := k.cdc.MustMarshal(&writer)
 	store.Set(compkey.MustEncode(&key), b)
 }
 
@@ -18,7 +18,7 @@ func (k Keeper) SetWriter(ctx sdk.Context, key types.WriterCompositeKey, writer 
 func (k Keeper) GetWriter(ctx sdk.Context, key types.WriterCompositeKey) types.Writer {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.WriterKeyPrefix)
 	var writer types.Writer
-	k.cdc.MustUnmarshalBinaryBare(store.Get(compkey.MustEncode(&key)), &writer)
+	k.cdc.MustUnmarshal(store.Get(compkey.MustEncode(&key)), &writer)
 	return writer
 }
 
@@ -49,7 +49,7 @@ func (k Keeper) GetAllWriters(ctx sdk.Context) ([]types.WriterCompositeKey, []ty
 		keys = append(keys, key)
 
 		var value types.Writer
-		k.cdc.MustUnmarshalBinaryBare(iterator.Value(), &value)
+		k.cdc.MustUnmarshal(iterator.Value(), &value)
 		values = append(values, value)
 	}
 
