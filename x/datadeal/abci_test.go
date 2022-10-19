@@ -11,7 +11,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/medibloc/panacea-core/v2/types/assets"
 	"github.com/medibloc/panacea-core/v2/x/datadeal"
 	"github.com/medibloc/panacea-core/v2/x/datadeal/testutil"
 	"github.com/medibloc/panacea-core/v2/x/datadeal/types"
@@ -32,6 +31,8 @@ type abciTestSuite struct {
 
 	verifiableCID  string
 	verifiableCID2 string
+	dataHash      string
+	dataHash2     string
 
 	oraclePubKey  cryptotypes.PubKey
 	oracleAddr    sdk.AccAddress
@@ -61,6 +62,9 @@ func (suite *abciTestSuite) BeforeTest(_, _ string) {
 	suite.buyerAccAddr = sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address())
 	err := suite.FundAccount(ctx, suite.buyerAccAddr, suite.defaultFunds)
 	suite.Require().NoError(err)
+
+	suite.dataHash = "dataHash"
+	suite.dataHash2 = "dataHash2"
 
 	suite.verifiableCID = "verifiableCID"
 	suite.verifiableCID2 = "verifiableCID2"
@@ -120,6 +124,7 @@ func (suite abciTestSuite) TestDataVerificationEndBlockerVotePass() {
 		DealId:        1,
 		VerifiableCid: suite.verifiableCID,
 		DeliveredCid:  "",
+		DataHash:      suite.dataHash,
 		Status:        types.DATA_SALE_STATUS_VERIFICATION_VOTING_PERIOD,
 		VerificationVotingPeriod: &oracletypes.VotingPeriod{
 			VotingStartTime: time.Now().Add(-2 * time.Second),
@@ -135,30 +140,30 @@ func (suite abciTestSuite) TestDataVerificationEndBlockerVotePass() {
 
 	suite.DataDealKeeper.AddDataVerificationQueue(
 		ctx,
-		dataSale.VerifiableCid,
+		dataSale.DataHash,
 		dataSale.DealId,
 		dataSale.VerificationVotingPeriod.VotingEndTime,
 	)
 
 	vote := types.DataVerificationVote{
-		VoterAddress:  suite.oracleAddr.String(),
-		DealId:        1,
-		VerifiableCid: suite.verifiableCID,
-		VoteOption:    oracletypes.VOTE_OPTION_YES,
+		VoterAddress: suite.oracleAddr.String(),
+		DealId:       1,
+		DataHash:     suite.dataHash,
+		VoteOption:   oracletypes.VOTE_OPTION_YES,
 	}
 
 	vote2 := types.DataVerificationVote{
-		VoterAddress:  suite.oracleAddr2.String(),
-		DealId:        1,
-		VerifiableCid: suite.verifiableCID,
-		VoteOption:    oracletypes.VOTE_OPTION_YES,
+		VoterAddress: suite.oracleAddr2.String(),
+		DealId:       1,
+		DataHash:     suite.dataHash,
+		VoteOption:   oracletypes.VOTE_OPTION_YES,
 	}
 
 	vote3 := types.DataVerificationVote{
-		VoterAddress:  suite.oracleAddr3.String(),
-		DealId:        1,
-		VerifiableCid: suite.verifiableCID,
-		VoteOption:    oracletypes.VOTE_OPTION_YES,
+		VoterAddress: suite.oracleAddr3.String(),
+		DealId:       1,
+		DataHash:     suite.dataHash,
+		VoteOption:   oracletypes.VOTE_OPTION_YES,
 	}
 
 	err = suite.DataDealKeeper.SetDataVerificationVote(ctx, &vote)
@@ -174,10 +179,10 @@ func (suite abciTestSuite) TestDataVerificationEndBlockerVotePass() {
 
 	datadeal.EndBlocker(ctx, suite.DataDealKeeper)
 
-	updatedDataSale, err := suite.DataDealKeeper.GetDataSale(ctx, dataSale.VerifiableCid, dataSale.DealId)
+	updatedDataSale, err := suite.DataDealKeeper.GetDataSale(ctx, dataSale.DataHash, dataSale.DealId)
 	suite.Require().NoError(err)
 	suite.Require().Equal(types.DATA_SALE_STATUS_DELIVERY_VOTING_PERIOD, updatedDataSale.Status)
-	suite.Require().Equal(suite.verifiableCID, updatedDataSale.VerifiableCid)
+	suite.Require().Equal(suite.dataHash, updatedDataSale.DataHash)
 
 	votes, err = suite.DataDealKeeper.GetAllDataVerificationVoteList(ctx)
 	suite.Require().NoError(err)
@@ -196,7 +201,7 @@ func (suite abciTestSuite) TestDataVerificationEndBlockerVotePass() {
 			suite.Require().Equal(3, len(e.Attributes))
 			suite.Require().Equal(types.AttributeKeyVoteStatus, string(e.Attributes[0].Key))
 			suite.Require().Equal(types.AttributeValueVoteStatusStarted, string(e.Attributes[0].Value))
-			suite.Require().Equal(types.AttributeKeyVerifiableCID, string(e.Attributes[1].Key))
+			suite.Require().Equal(types.AttributeKeyDataHash, string(e.Attributes[1].Key))
 			suite.Require().Equal(types.AttributeKeyDealID, string(e.Attributes[2].Key))
 		}
 
@@ -239,30 +244,30 @@ func (suite abciTestSuite) TestDataVerificationEndBlockerVoteReject() {
 
 	suite.DataDealKeeper.AddDataVerificationQueue(
 		ctx,
-		dataSale.VerifiableCid,
+		dataSale.DataHash,
 		dataSale.DealId,
 		dataSale.VerificationVotingPeriod.VotingEndTime,
 	)
 
 	vote := types.DataVerificationVote{
-		VoterAddress:  suite.oracleAddr.String(),
-		DealId:        1,
-		VerifiableCid: suite.verifiableCID,
-		VoteOption:    oracletypes.VOTE_OPTION_NO,
+		VoterAddress: suite.oracleAddr.String(),
+		DealId:       1,
+		DataHash:     suite.dataHash,
+		VoteOption:   oracletypes.VOTE_OPTION_NO,
 	}
 
 	vote2 := types.DataVerificationVote{
-		VoterAddress:  suite.oracleAddr2.String(),
-		DealId:        1,
-		VerifiableCid: suite.verifiableCID,
-		VoteOption:    oracletypes.VOTE_OPTION_YES,
+		VoterAddress: suite.oracleAddr2.String(),
+		DealId:       1,
+		DataHash:     suite.dataHash,
+		VoteOption:   oracletypes.VOTE_OPTION_YES,
 	}
 
 	vote3 := types.DataVerificationVote{
-		VoterAddress:  suite.oracleAddr3.String(),
-		DealId:        1,
-		VerifiableCid: suite.verifiableCID,
-		VoteOption:    oracletypes.VOTE_OPTION_YES,
+		VoterAddress: suite.oracleAddr3.String(),
+		DealId:       1,
+		DataHash:     suite.dataHash,
+		VoteOption:   oracletypes.VOTE_OPTION_YES,
 	}
 
 	err = suite.DataDealKeeper.SetDataVerificationVote(ctx, &vote)
@@ -278,7 +283,7 @@ func (suite abciTestSuite) TestDataVerificationEndBlockerVoteReject() {
 
 	datadeal.EndBlocker(ctx, suite.DataDealKeeper)
 
-	updatedDataSale, err := suite.DataDealKeeper.GetDataSale(ctx, dataSale.VerifiableCid, dataSale.DealId)
+	updatedDataSale, err := suite.DataDealKeeper.GetDataSale(ctx, dataSale.DataHash, dataSale.DealId)
 	suite.Require().NoError(err)
 	suite.Require().Equal(types.DATA_SALE_STATUS_VERIFICATION_FAILED, updatedDataSale.Status)
 
@@ -297,7 +302,7 @@ func (suite abciTestSuite) TestDataVerificationEndBlockerVoteReject() {
 			requiredEvents[e.Type] = true
 			suite.Require().Equal(types.AttributeKeyVoteStatus, string(e.Attributes[0].Key))
 			suite.Require().Equal(types.AttributeValueVoteStatusEnded, string(e.Attributes[0].Value))
-			suite.Require().Equal(types.AttributeKeyVerifiableCID, string(e.Attributes[1].Key))
+			suite.Require().Equal(types.AttributeKeyDataHash, string(e.Attributes[1].Key))
 			suite.Require().Equal(types.AttributeKeyDealID, string(e.Attributes[2].Key))
 		}
 	}
@@ -318,6 +323,7 @@ func (suite abciTestSuite) TestDataVerificationEndBlockerVoteRejectSamePower() {
 		DealId:        1,
 		VerifiableCid: suite.verifiableCID,
 		DeliveredCid:  "",
+		DataHash:      suite.dataHash,
 		Status:        types.DATA_SALE_STATUS_VERIFICATION_VOTING_PERIOD,
 		VerificationVotingPeriod: &oracletypes.VotingPeriod{
 			VotingStartTime: time.Now().Add(-2 * time.Second),
@@ -333,23 +339,23 @@ func (suite abciTestSuite) TestDataVerificationEndBlockerVoteRejectSamePower() {
 
 	suite.DataDealKeeper.AddDataVerificationQueue(
 		ctx,
-		dataSale.VerifiableCid,
+		dataSale.DataHash,
 		dataSale.DealId,
 		dataSale.VerificationVotingPeriod.VotingEndTime,
 	)
 
 	vote := types.DataVerificationVote{
-		VoterAddress:  suite.oracleAddr.String(),
-		DealId:        1,
-		VerifiableCid: suite.verifiableCID,
-		VoteOption:    oracletypes.VOTE_OPTION_YES,
+		VoterAddress: suite.oracleAddr.String(),
+		DealId:       1,
+		DataHash:     suite.dataHash,
+		VoteOption:   oracletypes.VOTE_OPTION_YES,
 	}
 
 	vote2 := types.DataVerificationVote{
-		VoterAddress:  suite.oracleAddr2.String(),
-		DealId:        1,
-		VerifiableCid: suite.verifiableCID2,
-		VoteOption:    oracletypes.VOTE_OPTION_YES,
+		VoterAddress: suite.oracleAddr2.String(),
+		DealId:       1,
+		DataHash:     suite.dataHash2,
+		VoteOption:   oracletypes.VOTE_OPTION_YES,
 	}
 
 	err = suite.DataDealKeeper.SetDataVerificationVote(ctx, &vote)
@@ -363,7 +369,7 @@ func (suite abciTestSuite) TestDataVerificationEndBlockerVoteRejectSamePower() {
 
 	datadeal.EndBlocker(ctx, suite.DataDealKeeper)
 
-	updatedDataSale, err := suite.DataDealKeeper.GetDataSale(ctx, dataSale.VerifiableCid, dataSale.DealId)
+	updatedDataSale, err := suite.DataDealKeeper.GetDataSale(ctx, dataSale.DataHash, dataSale.DealId)
 	suite.Require().NoError(err)
 	suite.Require().Equal(types.DATA_SALE_STATUS_VERIFICATION_FAILED, updatedDataSale.Status)
 
@@ -373,11 +379,11 @@ func (suite abciTestSuite) TestDataVerificationEndBlockerVoteRejectSamePower() {
 	suite.Require().Equal(2, len(tallyResult.InvalidYes))
 
 	for _, tallyResult := range tallyResult.InvalidYes {
-		if bytes.Equal([]byte(vote.VerifiableCid), tallyResult.ConsensusValue) {
-			suite.Require().Equal([]byte(vote.VerifiableCid), tallyResult.ConsensusValue)
+		if bytes.Equal([]byte(vote.DataHash), tallyResult.ConsensusValue) {
+			suite.Require().Equal([]byte(vote.DataHash), tallyResult.ConsensusValue)
 			suite.Require().Equal(sdk.NewInt(10), tallyResult.VotingAmount)
-		} else if bytes.Equal([]byte(vote2.VerifiableCid), tallyResult.ConsensusValue) {
-			suite.Require().Equal([]byte(vote2.VerifiableCid), tallyResult.ConsensusValue)
+		} else if bytes.Equal([]byte(vote2.DataHash), tallyResult.ConsensusValue) {
+			suite.Require().Equal([]byte(vote2.DataHash), tallyResult.ConsensusValue)
 			suite.Require().Equal(sdk.NewInt(10), tallyResult.VotingAmount)
 		} else {
 			panic(fmt.Sprintf("No matching VerifiableCID(%s) found.", tallyResult.ConsensusValue))
@@ -399,7 +405,7 @@ func (suite abciTestSuite) TestDataVerificationEndBlockerVoteRejectSamePower() {
 			requiredEvents[e.Type] = true
 			suite.Require().Equal(types.AttributeKeyVoteStatus, string(e.Attributes[0].Key))
 			suite.Require().Equal(types.AttributeValueVoteStatusEnded, string(e.Attributes[0].Value))
-			suite.Require().Equal(types.AttributeKeyVerifiableCID, string(e.Attributes[1].Key))
+			suite.Require().Equal(types.AttributeKeyDataHash, string(e.Attributes[1].Key))
 			suite.Require().Equal(types.AttributeKeyDealID, string(e.Attributes[2].Key))
 		}
 	}
@@ -421,6 +427,7 @@ func (suite abciTestSuite) TestDataDeliveryEndBlockerVotePass() {
 		DealId:                   1,
 		VerifiableCid:            suite.verifiableCID,
 		DeliveredCid:             "",
+		DataHash:                 suite.dataHash,
 		Status:                   types.DATA_SALE_STATUS_DELIVERY_VOTING_PERIOD,
 		VerificationVotingPeriod: nil,
 		DeliveryVotingPeriod: &oracletypes.VotingPeriod{
@@ -436,33 +443,33 @@ func (suite abciTestSuite) TestDataDeliveryEndBlockerVotePass() {
 
 	suite.DataDealKeeper.AddDataDeliveryQueue(
 		ctx,
-		dataSale.VerifiableCid,
+		dataSale.DataHash,
 		dataSale.DealId,
 		dataSale.DeliveryVotingPeriod.VotingEndTime,
 	)
 
 	vote := types.DataDeliveryVote{
-		VoterAddress:  suite.oracleAddr.String(),
-		DealId:        1,
-		VerifiableCid: suite.verifiableCID,
-		DeliveredCid:  "deliveredCID",
-		VoteOption:    oracletypes.VOTE_OPTION_YES,
+		VoterAddress: suite.oracleAddr.String(),
+		DealId:       1,
+		DataHash:     suite.dataHash,
+		DeliveredCid: "deliveredCID",
+		VoteOption:   oracletypes.VOTE_OPTION_YES,
 	}
 
 	vote2 := types.DataDeliveryVote{
-		VoterAddress:  suite.oracleAddr2.String(),
-		DealId:        1,
-		VerifiableCid: suite.verifiableCID,
-		DeliveredCid:  "deliveredCID",
-		VoteOption:    oracletypes.VOTE_OPTION_YES,
+		VoterAddress: suite.oracleAddr2.String(),
+		DealId:       1,
+		DataHash:     suite.dataHash,
+		DeliveredCid: "deliveredCID",
+		VoteOption:   oracletypes.VOTE_OPTION_YES,
 	}
 
 	vote3 := types.DataDeliveryVote{
-		VoterAddress:  suite.oracleAddr3.String(),
-		DealId:        1,
-		VerifiableCid: suite.verifiableCID,
-		DeliveredCid:  "deliveredCID",
-		VoteOption:    oracletypes.VOTE_OPTION_YES,
+		VoterAddress: suite.oracleAddr3.String(),
+		DealId:       1,
+		DataHash:     suite.dataHash,
+		DeliveredCid: "deliveredCID",
+		VoteOption:   oracletypes.VOTE_OPTION_YES,
 	}
 
 	err = suite.DataDealKeeper.SetDataDeliveryVote(ctx, &vote)
@@ -478,7 +485,7 @@ func (suite abciTestSuite) TestDataDeliveryEndBlockerVotePass() {
 
 	datadeal.EndBlocker(ctx, suite.DataDealKeeper)
 
-	updatedDataSale, err := suite.DataDealKeeper.GetDataSale(ctx, dataSale.VerifiableCid, dataSale.DealId)
+	updatedDataSale, err := suite.DataDealKeeper.GetDataSale(ctx, dataSale.DataHash, dataSale.DealId)
 	suite.Require().NoError(err)
 	suite.Require().Equal(types.DATA_SALE_STATUS_COMPLETED, updatedDataSale.Status)
 	suite.Require().Equal("deliveredCID", updatedDataSale.DeliveredCid)
@@ -521,6 +528,7 @@ func (suite abciTestSuite) TestDataDeliveryEndBlockerVoteReject() {
 		DealId:                   1,
 		VerifiableCid:            suite.verifiableCID,
 		DeliveredCid:             "",
+		DataHash:                 suite.dataHash,
 		Status:                   types.DATA_SALE_STATUS_DELIVERY_VOTING_PERIOD,
 		VerificationVotingPeriod: nil,
 		DeliveryVotingPeriod: &oracletypes.VotingPeriod{
@@ -536,33 +544,33 @@ func (suite abciTestSuite) TestDataDeliveryEndBlockerVoteReject() {
 
 	suite.DataDealKeeper.AddDataDeliveryQueue(
 		ctx,
-		dataSale.VerifiableCid,
+		dataSale.DataHash,
 		dataSale.DealId,
 		dataSale.DeliveryVotingPeriod.VotingEndTime,
 	)
 
 	vote := types.DataDeliveryVote{
-		VoterAddress:  suite.oracleAddr.String(),
-		DealId:        1,
-		VerifiableCid: suite.verifiableCID,
-		DeliveredCid:  "deliveredCID",
-		VoteOption:    oracletypes.VOTE_OPTION_NO,
+		VoterAddress: suite.oracleAddr.String(),
+		DealId:       1,
+		DataHash:     suite.dataHash,
+		DeliveredCid: "deliveredCID",
+		VoteOption:   oracletypes.VOTE_OPTION_NO,
 	}
 
 	vote2 := types.DataDeliveryVote{
-		VoterAddress:  suite.oracleAddr2.String(),
-		DealId:        1,
-		VerifiableCid: suite.verifiableCID,
-		DeliveredCid:  "deliveredCID",
-		VoteOption:    oracletypes.VOTE_OPTION_YES,
+		VoterAddress: suite.oracleAddr2.String(),
+		DealId:       1,
+		DataHash:     suite.dataHash,
+		DeliveredCid: "deliveredCID",
+		VoteOption:   oracletypes.VOTE_OPTION_YES,
 	}
 
 	vote3 := types.DataDeliveryVote{
-		VoterAddress:  suite.oracleAddr3.String(),
-		DealId:        1,
-		VerifiableCid: suite.verifiableCID,
-		DeliveredCid:  "deliveredCID",
-		VoteOption:    oracletypes.VOTE_OPTION_YES,
+		VoterAddress: suite.oracleAddr3.String(),
+		DealId:       1,
+		DataHash:     suite.dataHash,
+		DeliveredCid: "deliveredCID",
+		VoteOption:   oracletypes.VOTE_OPTION_YES,
 	}
 
 	err = suite.DataDealKeeper.SetDataDeliveryVote(ctx, &vote)
@@ -578,7 +586,7 @@ func (suite abciTestSuite) TestDataDeliveryEndBlockerVoteReject() {
 
 	datadeal.EndBlocker(ctx, suite.DataDealKeeper)
 
-	updatedDataSale, err := suite.DataDealKeeper.GetDataSale(ctx, dataSale.VerifiableCid, dataSale.DealId)
+	updatedDataSale, err := suite.DataDealKeeper.GetDataSale(ctx, dataSale.DataHash, dataSale.DealId)
 	suite.Require().NoError(err)
 	suite.Require().Equal(types.DATA_SALE_STATUS_DELIVERY_FAILED, updatedDataSale.Status)
 
@@ -618,6 +626,7 @@ func (suite abciTestSuite) TestDataDeliveryEndBlockerVoteRejectSamePower() {
 		DealId:                   1,
 		VerifiableCid:            suite.verifiableCID,
 		DeliveredCid:             "",
+		DataHash:                 suite.dataHash,
 		Status:                   types.DATA_SALE_STATUS_DELIVERY_VOTING_PERIOD,
 		VerificationVotingPeriod: nil,
 		DeliveryVotingPeriod: &oracletypes.VotingPeriod{
@@ -633,25 +642,25 @@ func (suite abciTestSuite) TestDataDeliveryEndBlockerVoteRejectSamePower() {
 
 	suite.DataDealKeeper.AddDataDeliveryQueue(
 		ctx,
-		dataSale.VerifiableCid,
+		dataSale.DataHash,
 		dataSale.DealId,
 		dataSale.DeliveryVotingPeriod.VotingEndTime,
 	)
 
 	vote := types.DataDeliveryVote{
-		VoterAddress:  suite.oracleAddr.String(),
-		DealId:        1,
-		VerifiableCid: suite.verifiableCID,
-		DeliveredCid:  "deliveredCID1",
-		VoteOption:    oracletypes.VOTE_OPTION_YES,
+		VoterAddress: suite.oracleAddr.String(),
+		DealId:       1,
+		DataHash:     suite.dataHash,
+		DeliveredCid: "deliveredCID1",
+		VoteOption:   oracletypes.VOTE_OPTION_YES,
 	}
 
 	vote2 := types.DataDeliveryVote{
-		VoterAddress:  suite.oracleAddr2.String(),
-		DealId:        1,
-		VerifiableCid: suite.verifiableCID,
-		DeliveredCid:  "deliveredCID2",
-		VoteOption:    oracletypes.VOTE_OPTION_YES,
+		VoterAddress: suite.oracleAddr2.String(),
+		DealId:       1,
+		DataHash:     suite.dataHash,
+		DeliveredCid: "deliveredCID2",
+		VoteOption:   oracletypes.VOTE_OPTION_YES,
 	}
 
 	err = suite.DataDealKeeper.SetDataDeliveryVote(ctx, &vote)
@@ -665,7 +674,7 @@ func (suite abciTestSuite) TestDataDeliveryEndBlockerVoteRejectSamePower() {
 
 	datadeal.EndBlocker(ctx, suite.DataDealKeeper)
 
-	updatedDataSale, err := suite.DataDealKeeper.GetDataSale(ctx, dataSale.VerifiableCid, dataSale.DealId)
+	updatedDataSale, err := suite.DataDealKeeper.GetDataSale(ctx, dataSale.DataHash, dataSale.DealId)
 	suite.Require().NoError(err)
 	suite.Require().Equal(types.DATA_SALE_STATUS_DELIVERY_FAILED, updatedDataSale.Status)
 	tallyResult := updatedDataSale.DeliveryTallyResult

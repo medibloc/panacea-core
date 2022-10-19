@@ -12,8 +12,8 @@ import (
 func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) {
 	keeper.IterateClosedDataVerificationQueue(ctx, ctx.BlockHeader().Time, func(dataSale *types.DataSale) bool {
 
-		keeper.RemoveDataVerificationQueue(ctx, dataSale.DealId, dataSale.VerifiableCid, dataSale.VerificationVotingPeriod.VotingEndTime)
-		iterator := keeper.GetDataVerificationVoteIterator(ctx, dataSale.DealId, dataSale.VerifiableCid)
+		keeper.RemoveDataVerificationQueue(ctx, dataSale.DealId, dataSale.DataHash, dataSale.VerificationVotingPeriod.VotingEndTime)
+		iterator := keeper.GetDataVerificationVoteIterator(ctx, dataSale.DealId, dataSale.DataHash)
 
 		defer iterator.Close()
 
@@ -36,22 +36,20 @@ func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) {
 
 		if tallyResult.IsPassed() {
 			dataSale.Status = types.DATA_SALE_STATUS_DELIVERY_VOTING_PERIOD
-			if dataSale.VerifiableCid != string(tallyResult.ConsensusValue) {
-				panic("invalid verifiable CID consensus value")
-			}
 
 			if err := keeper.DistributeVerificationRewards(ctx, dataSale); err != nil {
 				panic(err)
 			}
 
 			dataSale.DeliveryVotingPeriod = oracleKeeper.GetVotingPeriod(ctx)
-			keeper.AddDataDeliveryQueue(ctx, dataSale.VerifiableCid, dataSale.DealId, dataSale.DeliveryVotingPeriod.VotingEndTime)
+
+			keeper.AddDataDeliveryQueue(ctx, dataSale.DataHash, dataSale.DealId, dataSale.DeliveryVotingPeriod.VotingEndTime)
 
 			ctx.EventManager().EmitEvent(
 				sdk.NewEvent(
 					types.EventTypeDataDeliveryVote,
 					sdk.NewAttribute(types.AttributeKeyVoteStatus, types.AttributeValueVoteStatusStarted),
-					sdk.NewAttribute(types.AttributeKeyVerifiableCID, dataSale.VerifiableCid),
+					sdk.NewAttribute(types.AttributeKeyDataHash, dataSale.DataHash),
 					sdk.NewAttribute(types.AttributeKeyDealID, strconv.FormatUint(dataSale.DealId, 10))),
 			)
 
@@ -69,7 +67,7 @@ func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) {
 			sdk.NewEvent(
 				types.EventTypeDataVerificationVote,
 				sdk.NewAttribute(types.AttributeKeyVoteStatus, types.AttributeValueVoteStatusEnded),
-				sdk.NewAttribute(types.AttributeKeyVerifiableCID, dataSale.VerifiableCid),
+				sdk.NewAttribute(types.AttributeKeyDataHash, dataSale.DataHash),
 				sdk.NewAttribute(types.AttributeKeyDealID, strconv.FormatUint(dataSale.DealId, 10)),
 			),
 		})
@@ -79,8 +77,8 @@ func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) {
 
 	keeper.IterateClosedDataDeliveryQueue(ctx, ctx.BlockHeader().Time, func(dataSale *types.DataSale) bool {
 
-		keeper.RemoveDataDeliveryQueue(ctx, dataSale.DealId, dataSale.VerifiableCid, dataSale.DeliveryVotingPeriod.VotingEndTime)
-		iterator := keeper.GetDataDeliveryVoteIterator(ctx, dataSale.DealId, dataSale.VerifiableCid)
+		keeper.RemoveDataDeliveryQueue(ctx, dataSale.DealId, dataSale.DataHash, dataSale.DeliveryVotingPeriod.VotingEndTime)
+		iterator := keeper.GetDataDeliveryVoteIterator(ctx, dataSale.DealId, dataSale.DataHash)
 		defer iterator.Close()
 
 		oracleKeeper := keeper.GetOracleKeeper()
