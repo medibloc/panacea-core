@@ -471,7 +471,7 @@ func (suite abciTestSuite) TestDataVerificationEndBlockerVoteRejectDealCompleted
 
 	updatedDataSale2, err := suite.DataDealKeeper.GetDataSale(suite.Ctx, suite.dataHash2, 1)
 	suite.Require().NoError(err)
-	suite.Require().Equal(types.DATA_SALE_STATUS_DEAL_FULL, updatedDataSale2.Status)
+	suite.Require().Equal(types.DATA_SALE_STATUS_DEAL_COMPLETED, updatedDataSale2.Status)
 
 	updatedDeal, err := suite.DataDealKeeper.GetDeal(suite.Ctx, 1)
 	suite.Require().NoError(err)

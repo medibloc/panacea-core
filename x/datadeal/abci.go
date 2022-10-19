@@ -41,7 +41,7 @@ func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) {
 			}
 
 			if isDealCompleted {
-				dataSale.Status = types.DATA_SALE_STATUS_DEAL_FULL
+				dataSale.Status = types.DATA_SALE_STATUS_DEAL_COMPLETED
 			} else {
 				if err = keeper.IncrementCurNumDataAtDeal(ctx, dataSale.DealId); err != nil {
 					panic(err)
