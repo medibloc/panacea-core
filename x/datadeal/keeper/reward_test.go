@@ -85,11 +85,15 @@ func (suite *rewardTestSuite) BeforeTest(_, _ string) {
 	})
 }
 
-func (suite rewardTestSuite) TestSellerRewardDistribution() {
+func (suite rewardTestSuite) TestBasicVerificationRewardDistribution() {
 	ctx := suite.Ctx
 
 	err := suite.FundAccount(ctx, suite.buyerAccAddr, suite.defaultFunds)
 	suite.Require().NoError(err)
+
+	val1VotingPower := sdk.NewInt(100)
+	val1Commission := sdk.NewDecWithPrec(1, 1)
+	val1 := suite.SetValidator(suite.oracleAcc1PubKey, val1VotingPower, val1Commission)
 
 	dealAddr := types.NewDealAddress(1)
 	msgCreateDeal := &types.MsgCreateDeal{
@@ -113,25 +117,41 @@ func (suite rewardTestSuite) TestSellerRewardDistribution() {
 	sellerBalance := suite.BankKeeper.GetBalance(ctx, suite.sellerAccAddr, assets.MicroMedDenom)
 	suite.Require().Equal(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(0)), sellerBalance)
 
+	oracleBalance := suite.BankKeeper.GetBalance(ctx, suite.oracleAcc1Addr, assets.MicroMedDenom)
+	suite.Require().Equal(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(0)), oracleBalance)
+
 	dataSale := types.NewDataSale(&types.MsgSellData{
 		DealId:        1,
 		VerifiableCid: "verifiableCID",
 		SellerAddress: suite.sellerAccAddr.String(),
 	})
 
+	voters := []*oracletypes.VoterInfo{
+		{
+			VoterAddress: suite.oracleAcc1Addr.String(),
+			VotingPower:  sdk.NewInt(100),
+		},
+	}
+
 	// distribute data verification rewards
-	err = suite.DataDealKeeper.DistributeVerificationRewards(ctx, dataSale)
+	err = suite.DataDealKeeper.DistributeVerificationRewards(ctx, dataSale, voters)
 	suite.Require().NoError(err)
 
-	// TODO check balance of oracles
-
 	// balance check after reward distribution
-	dealBalance = suite.BankKeeper.GetBalance(ctx, dealAddr, assets.MicroMedDenom)
-	suite.Require().Equal(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(10_000_000)), dealBalance)
 
+	// 5 MED is remained, which is a reward for data delivery
+	dealBalance = suite.BankKeeper.GetBalance(ctx, dealAddr, assets.MicroMedDenom)
+	suite.Require().Equal(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(5_000_000)), dealBalance)
+
+	// 90 MED is for seller
 	sellerBalance = suite.BankKeeper.GetBalance(ctx, suite.sellerAccAddr, assets.MicroMedDenom)
 	suite.Require().Equal(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(90_000_000)), sellerBalance)
 
+	// 5 MED for data verification reward
+	// - 0.5 MED (10% of 5 MED) for commission
+	// - 4.5 MED (90% of 5 MED) for reward
+	suite.Require().Equal(sdk.NewDecCoins(sdk.NewDecCoin(assets.MicroMedDenom, sdk.NewInt(500_000))), suite.DistrKeeper.GetValidatorAccumulatedCommission(ctx, val1.GetOperator()).Commission)
+	suite.Require().Equal(sdk.NewDecCoins(sdk.NewDecCoin(assets.MicroMedDenom, sdk.NewInt(4_500_000))), suite.DistrKeeper.GetValidatorCurrentRewards(ctx, val1.GetOperator()).Rewards)
 }
 
 // Assumes that 2 oracles(validators)
@@ -155,8 +175,8 @@ func (suite *rewardTestSuite) TestOracleRewardDistribution() {
 	val1VotingPower := sdk.NewInt(10)
 	val2VotingPower := sdk.NewInt(30)
 
-	val1Commission := sdk.NewDecWithPrec(1, 1)
-	val2Commission := sdk.NewDecWithPrec(5, 1)
+	val1Commission := sdk.NewDecWithPrec(1, 1) // 10% commission
+	val2Commission := sdk.NewDecWithPrec(5, 1) // 50% commission
 	val1 := suite.SetValidator(suite.oracleAcc1PubKey, val1VotingPower, val1Commission)
 	val2 := suite.SetValidator(suite.oracleAcc2PubKey, val2VotingPower, val2Commission)
 
@@ -180,47 +200,64 @@ func (suite *rewardTestSuite) TestOracleRewardDistribution() {
 	dealBalance := suite.BankKeeper.GetBalance(ctx, dealAddr, assets.MicroMedDenom)
 	suite.Require().Equal(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(400_000_000)), dealBalance)
 
+	dataSale := types.NewDataSale(&types.MsgSellData{
+		DealId:        1,
+		VerifiableCid: "verifiableCID",
+		SellerAddress: suite.sellerAccAddr.String(),
+	})
+
 	// oracle lists to be rewarded (2 oracles)
-	oracles := make(map[string]*oracletypes.OracleValidatorInfo)
-	oracles[suite.oracleAcc1Addr.String()] = &oracletypes.OracleValidatorInfo{
-		Address:         suite.oracleAcc1Addr.String(),
-		OracleActivated: true,
-		BondedTokens:    sdk.NewInt(10),
-		ValidatorJailed: false,
-	}
-	oracles[suite.oracleAcc2Addr.String()] = &oracletypes.OracleValidatorInfo{
-		Address:         suite.oracleAcc2Addr.String(),
-		OracleActivated: true,
-		BondedTokens:    sdk.NewInt(30),
-		ValidatorJailed: false,
+	voters := []*oracletypes.VoterInfo{
+		{
+			VoterAddress: suite.oracleAcc1Addr.String(),
+			VotingPower:  sdk.NewInt(10),
+		},
+		{
+			VoterAddress: suite.oracleAcc2Addr.String(),
+			VotingPower:  sdk.NewInt(30),
+		},
 	}
 
-	// before distribution, the balance of distrModuleAcc is 0 MED
+	// balance check before distribution
+	// the balance of distrModuleAcc is 0 MED
 	distrModuleAcc := suite.AccountKeeper.GetModuleAccount(ctx, distrtypes.ModuleName).GetAddress()
 	distrBalance := suite.BankKeeper.GetBalance(ctx, distrModuleAcc, assets.MicroMedDenom)
 	suite.Require().Equal(sdk.NewCoin(assets.MicroMedDenom, sdk.ZeroInt()), distrBalance)
 
-	// distribute rewards to oracles
-	suite.DataDealKeeper.DistributeOracleRewards(ctx, dealID, oracles)
+	// the balance of seller is 0 MED
+	sellerBalance := suite.BankKeeper.GetBalance(ctx, suite.sellerAccAddr, assets.MicroMedDenom)
+	suite.Require().Equal(sdk.NewCoin(assets.MicroMedDenom, sdk.ZeroInt()), sellerBalance)
 
-	// after distribution, the balance of deal is 360 MED. 10%(40 MED) was sent to distrModuleAcc for reward
+	// distribute rewards to oracles
+	err = suite.DataDealKeeper.DistributeVerificationRewards(ctx, dataSale, voters)
+	suite.Require().NoError(err)
+
+	// after distribution, the balance of deal is 20 MED.
+	// 90% (360 MED) - seller
+	// 5% (20 MED) - distrModuleAcc for data verification reward
+	// 5% (20 MED) - remained for data delivery reward
 	dealBalance = suite.BankKeeper.GetBalance(ctx, dealAddr, assets.MicroMedDenom)
-	suite.Require().Equal(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(360_000_000)), dealBalance)
+	suite.Require().Equal(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(20_000_000)), dealBalance)
 
 	// the balance of distrModuleAcc is 40 MED, which is 10% of 400 MED
 	distrBalance = suite.BankKeeper.GetBalance(ctx, distrModuleAcc, assets.MicroMedDenom)
-	suite.Require().Equal(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(40_000_000)), distrBalance)
+	suite.Require().Equal(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(20_000_000)), distrBalance)
 
-	// Among total oracle commission(40 MED), 25% is for oracle 1 and 75% is for oracle 2 according to the respective voting power
-	// 10 MED (25% of 40 MED) for oracle 1
-	// - 1 MED (validator commission) + 9 MED (reward)
+	sellerBalance = suite.BankKeeper.GetBalance(ctx, suite.sellerAccAddr, assets.MicroMedDenom)
+	suite.Require().Equal(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(360_000_000)), sellerBalance)
+
+	// Among total oracle commission(20 MED), 25% is for oracle 1 and 75% is for oracle 2 according to the respective voting power
+	// 5 MED (25% of 20 MED) for oracle 1
+	// - 0.5 MED (validator commission) + 4.5 MED (reward)
 	//
-	// 30 MED (75% of 40 MED) for oracle 2
-	// - 15 MED (validator commission) + 15 MED (reward)
+	// 15 MED (75% of 20 MED) for oracle 2
+	// - 7.5 MED (validator commission) + 7.5 MED (reward)
 
-	suite.Require().Equal(sdk.NewDecCoins(sdk.NewDecCoin(assets.MicroMedDenom, sdk.NewInt(1_000_000))), suite.DistrKeeper.GetValidatorAccumulatedCommission(ctx, val1.GetOperator()).Commission)
-	suite.Require().Equal(sdk.NewDecCoins(sdk.NewDecCoin(assets.MicroMedDenom, sdk.NewInt(9_000_000))), suite.DistrKeeper.GetValidatorCurrentRewards(ctx, val1.GetOperator()).Rewards)
+	val1Updated := suite.StakingKeeper.Validator(ctx, val1.GetOperator())
 
-	suite.Require().Equal(sdk.NewDecCoins(sdk.NewDecCoin(assets.MicroMedDenom, sdk.NewInt(15_000_000))), suite.DistrKeeper.GetValidatorAccumulatedCommission(ctx, val2.GetOperator()).Commission)
-	suite.Require().Equal(sdk.NewDecCoins(sdk.NewDecCoin(assets.MicroMedDenom, sdk.NewInt(15_000_000))), suite.DistrKeeper.GetValidatorCurrentRewards(ctx, val2.GetOperator()).Rewards)
+	suite.Require().Equal(sdk.NewDecCoins(sdk.NewDecCoin(assets.MicroMedDenom, sdk.NewInt(500_000))), suite.DistrKeeper.GetValidatorAccumulatedCommission(ctx, val1Updated.GetOperator()).Commission)
+	suite.Require().Equal(sdk.NewDecCoins(sdk.NewDecCoin(assets.MicroMedDenom, sdk.NewInt(4_500_000))), suite.DistrKeeper.GetValidatorCurrentRewards(ctx, val1Updated.GetOperator()).Rewards)
+
+	suite.Require().Equal(sdk.NewDecCoins(sdk.NewDecCoin(assets.MicroMedDenom, sdk.NewInt(7_500_000))), suite.DistrKeeper.GetValidatorAccumulatedCommission(ctx, val2.GetOperator()).Commission)
+	suite.Require().Equal(sdk.NewDecCoins(sdk.NewDecCoin(assets.MicroMedDenom, sdk.NewInt(7_500_000))), suite.DistrKeeper.GetValidatorCurrentRewards(ctx, val2.GetOperator()).Rewards)
 }
