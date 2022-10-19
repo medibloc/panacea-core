@@ -11,6 +11,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/medibloc/panacea-core/v2/types/assets"
 	"github.com/medibloc/panacea-core/v2/x/datadeal"
 	"github.com/medibloc/panacea-core/v2/x/datadeal/testutil"
 	"github.com/medibloc/panacea-core/v2/x/datadeal/types"
@@ -29,8 +30,7 @@ type abciTestSuite struct {
 
 	buyerAccAddr sdk.AccAddress
 
-	verifiableCID  string
-	verifiableCID2 string
+	verifiableCID string
 	dataHash      string
 	dataHash2     string
 
@@ -67,7 +67,6 @@ func (suite *abciTestSuite) BeforeTest(_, _ string) {
 	suite.dataHash2 = "dataHash2"
 
 	suite.verifiableCID = "verifiableCID"
-	suite.verifiableCID2 = "verifiableCID2"
 
 	suite.oraclePubKey = secp256k1.GenPrivKey().PubKey()
 	suite.oracleAddr = sdk.AccAddress(suite.oraclePubKey.Address())
