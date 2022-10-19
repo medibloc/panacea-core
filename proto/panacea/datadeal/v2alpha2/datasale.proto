@@ -42,6 +42,6 @@ enum DataSaleStatus {
   // DATA_SALE_STATUS_DELIVERY_FAILED defines that the status of DataSale is delivery failed.
   DATA_SALE_STATUS_DELIVERY_FAILED = 5;
 
-  //DATA_SALE_STATUS_DEAL_FULL defines that the status of Deal associated with DataSale is full.
-  DATA_SALE_STATUS_DEAL_FULL = 6;
+  //DATA_SALE_STATUS_DEAL_COMPLETED defines that the status of Deal associated with DataSale is DEAL_STATUS_COMPLETED.
+  DATA_SALE_STATUS_DEAL_COMPLETED = 6;
 }
