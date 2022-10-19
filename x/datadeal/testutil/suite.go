@@ -3,7 +3,9 @@ package testutil
 import (
 	"time"
 
+	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	"github.com/medibloc/panacea-core/v2/types/assets"
 	"github.com/medibloc/panacea-core/v2/types/testsuite"
 	"github.com/medibloc/panacea-core/v2/x/datadeal/types"
@@ -27,39 +29,59 @@ func (suite *DataDealBaseTestSuite) MakeTestDeal(dealID uint64, buyerAddr sdk.Ac
 	}
 }
 
-func (suite *DataDealBaseTestSuite) MakeNewDataSale(sellerAddr sdk.AccAddress, verifiableCID string) *types.DataSale {
+func (suite *DataDealBaseTestSuite) MakeNewDataSale(sellerAddr sdk.AccAddress, dataHash, verifiableCID string) *types.DataSale {
 	return &types.DataSale{
 		SellerAddress: sellerAddr.String(),
 		DealId:        1,
 		VerifiableCid: verifiableCID,
 		DeliveredCid:  "",
+		DataHash:      dataHash,
 		Status:        types.DATA_SALE_STATUS_VERIFICATION_VOTING_PERIOD,
-		VotingPeriod: &oracletypes.VotingPeriod{
+		VerificationVotingPeriod: &oracletypes.VotingPeriod{
 			VotingStartTime: time.Now(),
 			VotingEndTime:   time.Now().Add(5 * time.Second),
 		},
+		DeliveryVotingPeriod:    nil,
 		VerificationTallyResult: nil,
 		DeliveryTallyResult:     nil,
 	}
 }
 
-func (suite *DataDealBaseTestSuite) MakeNewDataVerificationVote(voterAddr sdk.AccAddress, verifiableCID string) *types.DataVerificationVote {
+func (suite *DataDealBaseTestSuite) SetValidator(pubKey cryptotypes.PubKey, amount sdk.Int, commission sdk.Dec) stakingtypes.Validator {
+	varAddr := sdk.ValAddress(pubKey.Address().Bytes())
+	validator, err := stakingtypes.NewValidator(varAddr, pubKey, stakingtypes.Description{})
+	suite.Require().NoError(err)
+	validator = validator.UpdateStatus(stakingtypes.Bonded)
+	validator, _ = validator.AddTokensFromDel(amount)
+	newCommission := stakingtypes.NewCommission(commission, sdk.OneDec(), sdk.NewDecWithPrec(5, 1))
+	validator.Commission = newCommission
+
+	suite.StakingKeeper.SetValidator(suite.Ctx, validator)
+	err = suite.StakingKeeper.SetValidatorByConsAddr(suite.Ctx, validator)
+	suite.Require().NoError(err)
+
+	return validator
+}
+
+func (suite *DataDealBaseTestSuite) MakeNewDataVerificationVote(voterAddr sdk.AccAddress, dataHash string) *types.DataVerificationVote {
 	return &types.DataVerificationVote{
-		VoterAddress:  voterAddr.String(),
-		DealId:        1,
-		VerifiableCid: verifiableCID,
-		VoteOption:    oracletypes.VOTE_OPTION_YES,
+		VoterAddress: voterAddr.String(),
+		DealId:       1,
+		DataHash:     dataHash,
+		VoteOption:   oracletypes.VOTE_OPTION_YES,
 	}
 }
 
-func (suite *DataDealBaseTestSuite) MakeNewDataSaleDeliveryVoting(sellerAddr sdk.AccAddress, verifiableCID string) *types.DataSale {
+func (suite *DataDealBaseTestSuite) MakeNewDataSaleDeliveryVoting(sellerAddr sdk.AccAddress, dataHash, verifiableCID string) *types.DataSale {
 	return &types.DataSale{
 		SellerAddress: sellerAddr.String(),
 		DealId:        1,
 		VerifiableCid: verifiableCID,
 		DeliveredCid:  "",
+		DataHash:      dataHash,
 		Status:        types.DATA_SALE_STATUS_DELIVERY_VOTING_PERIOD,
-		VotingPeriod: &oracletypes.VotingPeriod{
+		VerificationVotingPeriod: nil,
+		DeliveryVotingPeriod: &oracletypes.VotingPeriod{
 			VotingStartTime: time.Now(),
 			VotingEndTime:   time.Now().Add(5 * time.Second),
 		},
@@ -68,12 +90,37 @@ func (suite *DataDealBaseTestSuite) MakeNewDataSaleDeliveryVoting(sellerAddr sdk
 	}
 }
 
-func (suite *DataDealBaseTestSuite) MakeNewDataDeliveryVote(voterAddr sdk.AccAddress, verifiableCID, deliveredCID string, dealID uint64) *types.DataDeliveryVote {
+func (suite *DataDealBaseTestSuite) MakeNewDataDeliveryVote(voterAddr sdk.AccAddress, dataHash, deliveredCID string, dealID uint64) *types.DataDeliveryVote {
 	return &types.DataDeliveryVote{
-		VoterAddress:  voterAddr.String(),
-		DealId:        dealID,
-		VerifiableCid: verifiableCID,
-		DeliveredCid:  deliveredCID,
-		VoteOption:    oracletypes.VOTE_OPTION_YES,
+		VoterAddress: voterAddr.String(),
+		DealId:       dealID,
+		DataHash:     dataHash,
+		DeliveredCid: deliveredCID,
+		VoteOption:   oracletypes.VOTE_OPTION_YES,
 	}
+}
+
+func (suite *DataDealBaseTestSuite) CreateOracleValidator(pubKey cryptotypes.PubKey, amount sdk.Int) {
+	suite.SetAccount(pubKey)
+
+	val1Commission := sdk.NewDecWithPrec(1, 1)
+
+	suite.SetValidator(pubKey, amount, val1Commission)
+
+	oracleAccAddr := sdk.AccAddress(pubKey.Address().Bytes())
+	oracle := &oracletypes.Oracle{
+		Address:  oracleAccAddr.String(),
+		Status:   oracletypes.ORACLE_STATUS_ACTIVE,
+		Uptime:   0,
+		JailedAt: nil,
+	}
+
+	suite.Require().NoError(suite.OracleKeeper.SetOracle(suite.Ctx, oracle))
+}
+
+func (suite *DataDealBaseTestSuite) SetAccount(pubKey cryptotypes.PubKey) {
+	oracleAccAddr := sdk.AccAddress(pubKey.Address().Bytes())
+	oracleAccount := suite.AccountKeeper.NewAccountWithAddress(suite.Ctx, oracleAccAddr)
+	suite.Require().NoError(oracleAccount.SetPubKey(pubKey))
+	suite.AccountKeeper.SetAccount(suite.Ctx, oracleAccount)
 }

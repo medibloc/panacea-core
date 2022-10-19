@@ -11,7 +11,7 @@ import (
 
 func CmdGetDataSale() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "datasale [deal_id] [verifiable_cid]",
+		Use:   "datasale [deal_id] [data_hash]",
 		Short: "Query a datasale info",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -28,8 +28,8 @@ func CmdGetDataSale() *cobra.Command {
 			}
 
 			req := &types.QueryDataSaleRequest{
-				DealId:        dealID,
-				VerifiableCid: args[1],
+				DealId:   dealID,
+				DataHash: args[1],
 			}
 			res, err := queryClient.DataSale(cmd.Context(), req)
 			if err != nil {

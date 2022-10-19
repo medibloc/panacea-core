@@ -65,6 +65,12 @@ func makeSampleDate() (types.Oracle, types.OracleRegistration, types.OracleRegis
 					},
 				},
 				ConsensusValue: []byte("encryptedOraclePrivKey"),
+				ValidVoters: []*types.VoterInfo{
+					{
+						VoterAddress: oracleAcc.String(),
+						VotingPower:  sdk.NewInt(5),
+					},
+				},
 			},
 		},
 		types.OracleRegistrationVote{

@@ -21,6 +21,7 @@ type (
 
 		paramSpace    paramtypes.Subspace
 		stakingKeeper types.StakingKeeper
+		distrKeeper   types.DistrKeeper
 	}
 )
 
@@ -30,6 +31,7 @@ func NewKeeper(
 	memKey sdk.StoreKey,
 	paramSpace paramtypes.Subspace,
 	stakingKeeper types.StakingKeeper,
+	distrKeeper types.DistrKeeper,
 ) *Keeper {
 	if !paramSpace.HasKeyTable() {
 		paramSpace = paramSpace.WithKeyTable(types.ParamKeyTable())
@@ -41,6 +43,7 @@ func NewKeeper(
 		memKey:        memKey,
 		paramSpace:    paramSpace,
 		stakingKeeper: stakingKeeper,
+		distrKeeper:   distrKeeper,
 	}
 }
 

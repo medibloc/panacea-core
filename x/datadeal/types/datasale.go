@@ -11,6 +11,7 @@ func NewDataSale(msg *MsgSellData) *DataSale {
 		SellerAddress: msg.SellerAddress,
 		DealId:        msg.DealId,
 		VerifiableCid: msg.VerifiableCid,
+		DataHash:      msg.DataHash,
 		Status:        DATA_SALE_STATUS_VERIFICATION_VOTING_PERIOD,
 	}
 }
@@ -28,51 +29,19 @@ func (m DataSale) ValidateBasic() error {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "verifiable CID is empty")
 	}
 
+	if m.DataHash == "" {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "dataHash is empty")
+	}
+
 	if m.VerificationTallyResult != nil {
-		if m.VerificationTallyResult.Yes.IsNegative() {
-			return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "yes in TallyResult must not be negative: %s", m.VerificationTallyResult.Yes)
-		}
-
-		if m.VerificationTallyResult.No.IsNegative() {
-			return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "no in TallyResult must not be negative: %s", m.VerificationTallyResult.Yes)
-		}
-
-		if len(m.VerificationTallyResult.InvalidYes) > 0 {
-			for _, invalidYes := range m.VerificationTallyResult.InvalidYes {
-				if invalidYes.ConsensusValue == nil {
-					return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalidConsensusValue in ConsensusValue must not be nil")
-				}
-				if invalidYes.VotingAmount.IsNegative() {
-					return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "votingAmount in ConsensusValue must not be negative: %s", m.VerificationTallyResult.Yes)
-				}
-			}
-		}
-		if m.VerificationTallyResult.InvalidYes == nil {
-			return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalidYes in TallyResult must not be negative: %s", m.VerificationTallyResult.Yes)
+		if err := m.VerificationTallyResult.ValidateBasic(); err != nil {
+			return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, err.Error())
 		}
 	}
 
 	if m.DeliveryTallyResult != nil {
-		if m.DeliveryTallyResult.Yes.IsNegative() {
-			return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "yes in TallyResult must not be negative: %s", m.DeliveryTallyResult.Yes)
-		}
-
-		if m.DeliveryTallyResult.No.IsNegative() {
-			return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "no in TallyResult must not be negative: %s", m.DeliveryTallyResult.Yes)
-		}
-
-		if len(m.DeliveryTallyResult.InvalidYes) > 0 {
-			for _, invalidYes := range m.DeliveryTallyResult.InvalidYes {
-				if invalidYes.ConsensusValue == nil {
-					return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalidConsensusValue in ConsensusValue must not be nil")
-				}
-				if invalidYes.VotingAmount.IsNegative() {
-					return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "votingAmount in ConsensusValue must not be negative: %s", m.DeliveryTallyResult.Yes)
-				}
-			}
-		}
-		if m.DeliveryTallyResult.InvalidYes == nil {
-			return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalidYes in TallyResult must not be negative: %s", m.DeliveryTallyResult.Yes)
+		if err := m.DeliveryTallyResult.ValidateBasic(); err != nil {
+			return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, err.Error())
 		}
 	}
 
@@ -88,8 +57,8 @@ func (m DataVerificationVote) ValidateBasic() error {
 		return sdkerrors.Wrapf(err, "voterAddress is invalid. address: %s", m.VoterAddress)
 	}
 
-	if len(m.VerifiableCid) == 0 {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "verifiableCID is empty")
+	if len(m.DataHash) == 0 {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "dataHash is empty")
 	}
 
 	if err := m.VoteOption.ValidateBasic(); err != nil {
@@ -97,6 +66,10 @@ func (m DataVerificationVote) ValidateBasic() error {
 	}
 
 	return nil
+}
+
+func (m DataVerificationVote) GetConsensusValue() []byte {
+	return []byte(m.DataHash)
 }
 
 func (m DataDeliveryVote) ValidateBasic() error {
@@ -108,8 +81,8 @@ func (m DataDeliveryVote) ValidateBasic() error {
 		return sdkerrors.Wrapf(err, "voterAddress is invalid. address: %s", m.VoterAddress)
 	}
 
-	if len(m.VerifiableCid) == 0 {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "VerifiableCid is empty")
+	if len(m.DataHash) == 0 {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "dataHash is empty")
 	}
 
 	if len(m.DeliveredCid) == 0 && m.VoteOption == oracletypes.VOTE_OPTION_YES {
@@ -121,4 +94,8 @@ func (m DataDeliveryVote) ValidateBasic() error {
 	}
 
 	return nil
+}
+
+func (m DataDeliveryVote) GetConsensusValue() []byte {
+	return []byte(m.DeliveredCid)
 }

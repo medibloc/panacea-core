@@ -2,7 +2,7 @@ syntax = "proto3";
 package panacea.oracle.v2alpha2;
 
 option go_package = "github.com/medibloc/panacea-core/v2/x/oracle/types";
-option (gogoproto.goproto_getters_all)  = false;
+option (gogoproto.goproto_getters_all) = false;
 
 import "gogoproto/gogo.proto";
 

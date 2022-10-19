@@ -21,6 +21,10 @@ func NewOracleProposalHandler(k keeper.Keeper) govtypes.Handler {
 }
 
 func handlerOracleUpgradeProposal(ctx sdk.Context, k keeper.Keeper, p *types.OracleUpgradeProposal) error {
+	if p.Plan.Height < ctx.BlockHeight() {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "oracle upgrade cannot be scheduled in the past")
+	}
+
 	upgradeInfo := &types.OracleUpgradeInfo{
 		UniqueId: p.Plan.UniqueId,
 		Height:   p.Plan.Height,

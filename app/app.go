@@ -469,6 +469,7 @@ func New(
 		keys[oracletypes.MemStoreKey],
 		app.GetSubspace(oracletypes.ModuleName),
 		app.StakingKeeper,
+		app.DistrKeeper,
 	)
 	govRouter.AddRoute(oracletypes.RouterKey, oracle.NewOracleProposalHandler(app.oracleKeeper))
 
