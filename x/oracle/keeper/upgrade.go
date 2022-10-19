@@ -39,6 +39,12 @@ func (k Keeper) GetOracleUpgradeInfo(ctx sdk.Context) (*types.OracleUpgradeInfo,
 	return &upgradeInfo, nil
 }
 
+func (k Keeper) RemoveOracleUpgradeInfo(ctx sdk.Context) {
+	store := ctx.KVStore(k.storeKey)
+
+	store.Delete(types.OracleUpgradeInfoKey)
+}
+
 func (k Keeper) UpgradeOracle(ctx sdk.Context, msg *types.MsgUpgradeOracle) error {
 	oracleRegistration := msg.ToOracleRegistration()
 	compareFn := func(uniqueID string) error {
@@ -63,6 +69,23 @@ func (k Keeper) UpgradeOracle(ctx sdk.Context, msg *types.MsgUpgradeOracle) erro
 			sdk.NewAttribute(types.AttributeKeyUniqueID, oracleRegistration.UniqueId),
 			sdk.NewAttribute(types.AttributeKeyVoteStatus, types.AttributeValueVoteStatusStarted),
 			sdk.NewAttribute(types.AttributeKeyOracleAddress, oracleRegistration.Address),
+		),
+	)
+	return nil
+}
+
+func (k Keeper) ApplyUpgrade(ctx sdk.Context, info *types.OracleUpgradeInfo) error {
+	params := k.GetParams(ctx)
+	params.UniqueId = info.UniqueId
+	if err := params.Validate(); err != nil {
+		return err
+	}
+	k.SetParams(ctx, params)
+
+	ctx.EventManager().EmitEvent(
+		sdk.NewEvent(
+			types.EventTypeUpgradeVote,
+			sdk.NewAttribute(types.AttributeKeyUniqueID, info.UniqueId),
 		),
 	)
 	return nil

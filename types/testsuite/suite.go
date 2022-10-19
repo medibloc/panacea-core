@@ -102,7 +102,7 @@ func (suite *TestSuite) SetupTest() {
 	cdc := newTestCodec()
 	db := dbm.NewMemDB()
 	ms := store.NewCommitMultiStore(db)
-	ctx := sdk.NewContext(ms, tmproto.Header{Time: time.Now()}, false, log.NewNopLogger())
+	ctx := sdk.NewContext(ms, tmproto.Header{Time: time.Now(), Height: 1}, false, log.NewNopLogger())
 
 	ms.MountStoreWithDB(tKeyParams, sdk.StoreTypeTransient, db)
 	for _, v := range keyParams {

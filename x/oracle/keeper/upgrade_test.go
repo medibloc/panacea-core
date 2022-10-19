@@ -143,3 +143,26 @@ func (suite oracleTestSuite) TestUpgradeOracleFailedValidatorJailed() {
 	err := suite.OracleKeeper.UpgradeOracle(ctx, msg)
 	suite.Require().Error(err, types.ErrJailedValidator)
 }
+
+func (suite oracleTestSuite) TestApplyUpgradeSuccess() {
+	ctx := suite.Ctx
+
+	params := types.DefaultParams()
+	params.UniqueId = "orgUniqueID"
+	suite.OracleKeeper.SetParams(ctx, params)
+	suite.Require().Equal(params.UniqueId, suite.OracleKeeper.GetParams(ctx).UniqueId)
+
+	upgradeInfo := &types.OracleUpgradeInfo{
+		UniqueId: "upgradeUniqueID",
+		Height:   0,
+	}
+
+	suite.Require().NoError(suite.OracleKeeper.ApplyUpgrade(ctx, upgradeInfo))
+	suite.Require().Equal(upgradeInfo.UniqueId, suite.OracleKeeper.GetParams(ctx).UniqueId)
+
+	events := suite.Ctx.EventManager().Events()
+	suite.Require().Equal(1, len(events))
+	suite.Require().Equal(types.EventTypeUpgradeVote, events[0].Type)
+	suite.Require().Equal(types.AttributeKeyUniqueID, string(events[0].Attributes[0].Key))
+	suite.Require().Equal(upgradeInfo.UniqueId, string(events[0].Attributes[0].Value))
+}
