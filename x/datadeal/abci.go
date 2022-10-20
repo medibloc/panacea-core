@@ -35,20 +35,29 @@ func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) {
 		}
 
 		if tallyResult.IsPassed() {
-			dataSale.Status = types.DATA_SALE_STATUS_DELIVERY_VOTING_PERIOD
+			isDealCompleted, err := keeper.IsDealCompleted(ctx, dataSale.DealId)
+			if err != nil {
+				panic(err)
+			}
 
-			dataSale.DeliveryVotingPeriod = oracleKeeper.GetVotingPeriod(ctx)
+			if isDealCompleted {
+				dataSale.Status = types.DATA_SALE_STATUS_DEAL_COMPLETED
+			} else {
+				if err = keeper.IncrementCurNumDataAtDeal(ctx, dataSale.DealId); err != nil {
+					panic(err)
+				}
+				dataSale.DeliveryVotingPeriod = oracleKeeper.GetVotingPeriod(ctx)
+				dataSale.Status = types.DATA_SALE_STATUS_DELIVERY_VOTING_PERIOD
+				keeper.AddDataDeliveryQueue(ctx, dataSale.DataHash, dataSale.DealId, oracleKeeper.GetVotingPeriod(ctx).VotingEndTime)
 
-			keeper.AddDataDeliveryQueue(ctx, dataSale.DataHash, dataSale.DealId, dataSale.DeliveryVotingPeriod.VotingEndTime)
-
-			ctx.EventManager().EmitEvent(
-				sdk.NewEvent(
-					types.EventTypeDataDeliveryVote,
-					sdk.NewAttribute(types.AttributeKeyVoteStatus, types.AttributeValueVoteStatusStarted),
-					sdk.NewAttribute(types.AttributeKeyDataHash, dataSale.DataHash),
-					sdk.NewAttribute(types.AttributeKeyDealID, strconv.FormatUint(dataSale.DealId, 10))),
-			)
-
+				ctx.EventManager().EmitEvent(
+					sdk.NewEvent(
+						types.EventTypeDataDeliveryVote,
+						sdk.NewAttribute(types.AttributeKeyVoteStatus, types.AttributeValueVoteStatusStarted),
+						sdk.NewAttribute(types.AttributeKeyDataHash, dataSale.DataHash),
+						sdk.NewAttribute(types.AttributeKeyDealID, strconv.FormatUint(dataSale.DealId, 10))),
+				)
+			}
 		} else {
 			dataSale.Status = types.DATA_SALE_STATUS_VERIFICATION_FAILED
 		}
@@ -89,6 +98,7 @@ func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) {
 				return keeper.RemoveDataDeliveryVote(ctx, vote.(*types.DataDeliveryVote))
 			},
 		)
+
 		if err != nil {
 			panic(err)
 		}
