@@ -1,6 +1,8 @@
 package testsuite
 
 import (
+	"os"
+
 	"github.com/CosmWasm/wasmd/x/wasm"
 	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
 	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
@@ -102,7 +104,7 @@ func (suite *TestSuite) SetupTest() {
 	cdc := newTestCodec()
 	db := dbm.NewMemDB()
 	ms := store.NewCommitMultiStore(db)
-	ctx := sdk.NewContext(ms, tmproto.Header{Time: time.Now(), Height: 1}, false, log.NewNopLogger())
+	ctx := sdk.NewContext(ms, tmproto.Header{Time: time.Now(), Height: 1}, false, log.NewTMLogger(os.Stdout))
 
 	ms.MountStoreWithDB(tKeyParams, sdk.StoreTypeTransient, db)
 	for _, v := range keyParams {

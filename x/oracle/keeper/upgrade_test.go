@@ -154,7 +154,7 @@ func (suite oracleTestSuite) TestApplyUpgradeSuccess() {
 
 	upgradeInfo := &types.OracleUpgradeInfo{
 		UniqueId: "upgradeUniqueID",
-		Height:   0,
+		Height:   1,
 	}
 
 	suite.Require().NoError(suite.OracleKeeper.ApplyUpgrade(ctx, upgradeInfo))

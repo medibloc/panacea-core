@@ -88,5 +88,6 @@ func (k Keeper) ApplyUpgrade(ctx sdk.Context, info *types.OracleUpgradeInfo) err
 			sdk.NewAttribute(types.AttributeKeyUniqueID, info.UniqueId),
 		),
 	)
+	ctx.Logger().Info("Oracle upgrade was successful.", fmt.Sprintf("uniqueID: %s, height: %v", info.UniqueId, info.Height))
 	return nil
 }
