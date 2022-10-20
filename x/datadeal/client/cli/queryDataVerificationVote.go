@@ -11,7 +11,7 @@ import (
 
 func CmdGetDataVerificationVote() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "data-verification-vote [deal_id] [verifiable_cid] [voter_address]",
+		Use:   "data-verification-vote [deal_id] [data_hash] [voter_address]",
 		Short: "Query a dataVerification vote info",
 		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -27,9 +27,9 @@ func CmdGetDataVerificationVote() *cobra.Command {
 
 			queryClient := types.NewQueryClient(clientCtx)
 			req := &types.QueryDataVerificationVoteRequest{
-				DealId:        dealID,
-				VerifiableCid: args[1],
-				VoterAddress:  args[2],
+				DealId:       dealID,
+				DataHash:     args[1],
+				VoterAddress: args[2],
 			}
 
 			res, err := queryClient.DataVerificationVote(cmd.Context(), req)

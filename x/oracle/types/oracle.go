@@ -244,3 +244,11 @@ func (m *MsgUpgradeOracle) ToOracleRegistration() *OracleRegistration {
 		RegistrationType:       ORACLE_REGISTRATION_TYPE_UPGRADE,
 	}
 }
+
+func (m OracleUpgradeInfo) ValidateBasic() error {
+	if m.Height < 0 {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "height must be greater than or equals to 0")
+	}
+
+	return nil
+}

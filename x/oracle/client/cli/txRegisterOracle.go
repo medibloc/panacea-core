@@ -3,6 +3,7 @@ package cli
 import (
 	"crypto/rand"
 	"encoding/base64"
+	"encoding/hex"
 	"fmt"
 	"io"
 	"strconv"
@@ -41,7 +42,7 @@ func CmdRegisterOracle() *cobra.Command {
 				return err
 			}
 
-			trustedBlockHash, err := base64.StdEncoding.DecodeString(args[4])
+			trustedBlockHash, err := hex.DecodeString(args[4])
 			if err != nil {
 				return err
 			}
