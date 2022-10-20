@@ -2,8 +2,9 @@ package types
 
 import (
 	"bytes"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"time"
+
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 const (
@@ -29,6 +30,7 @@ var (
 	OracleRegistrationKey       = []byte{0x02}
 	OracleRegistrationVotesKey  = []byte{0x03}
 	OracleRegistrationsQueueKey = []byte{0x04}
+	OracleUpgradeInfoKey        = []byte{0x05}
 
 	IndexSeparator = []byte{0xFF}
 )

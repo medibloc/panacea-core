@@ -6,12 +6,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/medibloc/panacea-core/v2/x/oracle/testutil"
-
 	"github.com/btcsuite/btcd/btcec"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/medibloc/panacea-core/v2/x/oracle/testutil"
 	"github.com/medibloc/panacea-core/v2/x/oracle/types"
 	"github.com/stretchr/testify/suite"
 )
