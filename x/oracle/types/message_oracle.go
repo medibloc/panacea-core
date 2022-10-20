@@ -157,6 +157,11 @@ func (msg *MsgUpgradeOracle) ValidateBasic() error {
 	return nil
 }
 
+func (msg *MsgUpgradeOracle) GetSignBytes() []byte {
+	bz := ModuleCdc.MustMarshalJSON(msg)
+	return sdk.MustSortJSON(bz)
+}
+
 func (msg *MsgUpgradeOracle) GetSigners() []sdk.AccAddress {
 	oracleAddress, err := sdk.AccAddressFromBech32(msg.OracleAddress)
 	if err != nil {
