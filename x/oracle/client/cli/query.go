@@ -23,6 +23,7 @@ func GetQueryCmd(queryRoute string) *cobra.Command {
 	cmd.AddCommand(CmdGetOracle())
 	cmd.AddCommand(CmdGetOracleRegistration())
 	cmd.AddCommand(CmdGetOracleRegistrationVote())
+	cmd.AddCommand(CmdGetOracleUpgradeInfo())
 
 	return cmd
 }

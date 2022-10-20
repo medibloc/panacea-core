@@ -1,13 +1,14 @@
 package keeper_test
 
 import (
+	"testing"
+	"time"
+
 	"github.com/btcsuite/btcd/btcec"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	"github.com/cosmos/cosmos-sdk/types/query"
 	"github.com/medibloc/panacea-core/v2/x/oracle/testutil"
-	"testing"
-	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/medibloc/panacea-core/v2/x/oracle/types"
@@ -178,4 +179,20 @@ func (suite queryOracleTestSuite) TestOracleParams() {
 	suite.Require().NoError(err)
 
 	suite.Require().Equal(types.DefaultParams(), *res.Params)
+}
+
+func (suite queryOracleTestSuite) TestOracleUpgradeInfo() {
+	ctx := suite.Ctx
+	oracleKeeper := suite.OracleKeeper
+
+	upgradeInfo := &types.OracleUpgradeInfo{
+		UniqueId: "UpgradeUniqueID",
+		Height:   1000000,
+	}
+	suite.Require().NoError(oracleKeeper.SetOracleUpgradeInfo(ctx, upgradeInfo))
+
+	getUpgradeInfo, err := oracleKeeper.OracleUpgradeInfo(sdk.WrapSDKContext(ctx), nil)
+	suite.Require().NoError(err)
+	suite.Require().Equal(upgradeInfo.UniqueId, getUpgradeInfo.OracleUpgradeInfo.UniqueId)
+	suite.Require().Equal(upgradeInfo.Height, getUpgradeInfo.OracleUpgradeInfo.Height)
 }

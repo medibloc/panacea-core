@@ -1,0 +1,25 @@
+syntax = "proto3";
+package panacea.oracle.v2alpha2;
+
+option go_package = "github.com/medibloc/panacea-core/v2/x/oracle/types";
+option (gogoproto.goproto_getters_all) = false;
+
+import "gogoproto/gogo.proto";
+
+// Plan defines upgrade plan information.
+message Plan {
+  option (gogoproto.equal) = true;
+
+  string unique_id = 1;
+
+  int64 height = 2;
+}
+
+// OracleUpgradeProposal defines the information required for a proposal.
+message OracleUpgradeProposal {
+  option (gogoproto.equal) = true;
+
+  string title       = 1;
+  string description = 2;
+  Plan   plan        = 3 [(gogoproto.nullable) = false];
+}
