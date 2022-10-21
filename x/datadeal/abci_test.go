@@ -30,10 +30,10 @@ type abciTestSuite struct {
 
 	buyerAccAddr sdk.AccAddress
 
-	verifiableCID string
+	verifiableCID  string
 	verifiableCID2 string
-	dataHash      string
-	dataHash2     string
+	dataHash       string
+	dataHash2      string
 
 	oraclePubKey  cryptotypes.PubKey
 	oracleAddr    sdk.AccAddress
@@ -43,7 +43,7 @@ type abciTestSuite struct {
 	oracleAddr3   sdk.AccAddress
 
 	uniqueID string
-	dealID uint64
+	dealID   uint64
 }
 
 func TestAbciTestSuite(t *testing.T) {
@@ -379,8 +379,8 @@ func (suite abciTestSuite) TestDataVerificationEndBlockerVoteRejectSamePower() {
 
 	tallyResult := updatedDataSale.VerificationTallyResult
 	suite.Require().Equal(sdk.ZeroInt(), tallyResult.Yes)
-	suite.Require().Equal(sdk.ZeroInt(), tallyResult.No)
-	suite.Require().Equal(2, len(tallyResult.InvalidYes))
+	suite.Require().Equal(sdk.NewInt(10), tallyResult.No)
+	suite.Require().Equal(1, len(tallyResult.InvalidYes))
 
 	for _, tallyResult := range tallyResult.InvalidYes {
 		if bytes.Equal([]byte(vote.DataHash), tallyResult.ConsensusValue) {
@@ -432,9 +432,6 @@ func (suite abciTestSuite) TestDataVerificationEndBlockerVoteRejectDealCompleted
 	}
 
 	buyer, err := sdk.AccAddressFromBech32(msgCreateDeal.BuyerAddress)
-	suite.Require().NoError(err)
-
-	err = suite.DataDealKeeper.SetNextDealNumber(suite.Ctx, 1)
 	suite.Require().NoError(err)
 
 	dealID, err := suite.DataDealKeeper.CreateDeal(suite.Ctx, buyer, msgCreateDeal)
@@ -557,15 +554,15 @@ func (suite abciTestSuite) TestDataVerificationEndBlockerVoteRejectDealCompleted
 
 	datadeal.EndBlocker(ctx, suite.DataDealKeeper)
 
-	updatedDataSale, err := suite.DataDealKeeper.GetDataSale(suite.Ctx, suite.dataHash, 1)
+	updatedDataSale, err := suite.DataDealKeeper.GetDataSale(suite.Ctx, suite.dataHash, dealID)
 	suite.Require().NoError(err)
 	suite.Require().Equal(types.DATA_SALE_STATUS_DELIVERY_VOTING_PERIOD, updatedDataSale.Status)
 
-	updatedDataSale2, err := suite.DataDealKeeper.GetDataSale(suite.Ctx, suite.dataHash2, 1)
+	updatedDataSale2, err := suite.DataDealKeeper.GetDataSale(suite.Ctx, suite.dataHash2, dealID)
 	suite.Require().NoError(err)
 	suite.Require().Equal(types.DATA_SALE_STATUS_DEAL_COMPLETED, updatedDataSale2.Status)
 
-	updatedDeal, err := suite.DataDealKeeper.GetDeal(suite.Ctx, 1)
+	updatedDeal, err := suite.DataDealKeeper.GetDeal(suite.Ctx, dealID)
 	suite.Require().NoError(err)
 	suite.Require().Equal(types.DEAL_STATUS_COMPLETED, updatedDeal.Status)
 	suite.Require().Equal(uint64(1), updatedDeal.CurNumData)
