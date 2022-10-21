@@ -147,6 +147,33 @@ func (k Keeper) GetAllDeals(ctx sdk.Context) ([]types.Deal, error) {
 	return deals, nil
 }
 
+func (k Keeper) IsDealCompleted(ctx sdk.Context, dealID uint64) (bool, error) {
+	deal, err := k.GetDeal(ctx, dealID)
+	if err != nil {
+		return false, err
+	}
+	if deal.Status == types.DEAL_STATUS_COMPLETED {
+		return true, nil
+	} else {
+		return false, nil
+	}
+}
+
+func (k Keeper) IncrementCurNumDataAtDeal(ctx sdk.Context, dealID uint64) error {
+	deal, err := k.GetDeal(ctx, dealID)
+	if err != nil {
+		return err
+	}
+	deal.CurNumData = deal.CurNumData + 1
+	if deal.CurNumData == deal.MaxNumData {
+		deal.Status = types.DEAL_STATUS_COMPLETED
+	}
+	if err = k.SetDeal(ctx, deal); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (k Keeper) SellData(ctx sdk.Context, msg *types.MsgSellData) error {
 	_, err := sdk.AccAddressFromBech32(msg.SellerAddress)
 	if err != nil {
@@ -180,6 +207,7 @@ func (k Keeper) SellData(ctx sdk.Context, msg *types.MsgSellData) error {
 		sdk.NewEvent(
 			types.EventTypeDataVerificationVote,
 			sdk.NewAttribute(types.AttributeKeyVoteStatus, types.AttributeValueVoteStatusStarted),
+			sdk.NewAttribute(types.AttributeKeyDealID, strconv.FormatUint(dataSale.DealId, 10)),
 			sdk.NewAttribute(types.AttributeKeyDataHash, dataSale.DataHash),
 		),
 	)

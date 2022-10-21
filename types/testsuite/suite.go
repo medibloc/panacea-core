@@ -1,6 +1,8 @@
 package testsuite
 
 import (
+	"os"
+
 	"github.com/CosmWasm/wasmd/x/wasm"
 	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
 	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
@@ -32,6 +34,7 @@ import (
 	ibctransfertypes "github.com/cosmos/ibc-go/v2/modules/apps/transfer/types"
 	ibchost "github.com/cosmos/ibc-go/v2/modules/core/24-host"
 	ibckeeper "github.com/cosmos/ibc-go/v2/modules/core/keeper"
+	"github.com/medibloc/panacea-core/v2/types/assets"
 	aolkeeper "github.com/medibloc/panacea-core/v2/x/aol/keeper"
 	aoltypes "github.com/medibloc/panacea-core/v2/x/aol/types"
 	burnkeeper "github.com/medibloc/panacea-core/v2/x/burn/keeper"
@@ -102,7 +105,7 @@ func (suite *TestSuite) SetupTest() {
 	cdc := newTestCodec()
 	db := dbm.NewMemDB()
 	ms := store.NewCommitMultiStore(db)
-	ctx := sdk.NewContext(ms, tmproto.Header{Time: time.Now()}, false, log.NewNopLogger())
+	ctx := sdk.NewContext(ms, tmproto.Header{Time: time.Now(), Height: 1}, false, log.NewTMLogger(os.Stdout))
 
 	ms.MountStoreWithDB(tKeyParams, sdk.StoreTypeTransient, db)
 	for _, v := range keyParams {
@@ -170,6 +173,15 @@ func (suite *TestSuite) SetupTest() {
 	suite.StakingKeeper = stakingkeeper.NewKeeper(
 		cdc.Marshaler, keyParams[stakingtypes.StoreKey], suite.AccountKeeper, suite.BankKeeper, paramsKeeper.Subspace(stakingtypes.ModuleName),
 	)
+	defaultParams := stakingtypes.NewParams(
+		stakingtypes.DefaultUnbondingTime,
+		stakingtypes.DefaultMaxValidators,
+		stakingtypes.DefaultMaxEntries,
+		stakingtypes.DefaultHistoricalEntries,
+		assets.MicroMedDenom,
+		stakingtypes.DefaultMinCommissionRate,
+	)
+	suite.StakingKeeper.SetParams(suite.Ctx, defaultParams)
 	suite.BurnKeeper = *burnkeeper.NewKeeper(suite.BankKeeper)
 	suite.DistrKeeper = distrkeeper.NewKeeper(
 		cdc.Marshaler, keyParams[distrtypes.StoreKey], paramsKeeper.Subspace(distrtypes.ModuleName), suite.AccountKeeper, suite.BankKeeper, &suite.StakingKeeper, "test_fee_collector", modAccAddrs,

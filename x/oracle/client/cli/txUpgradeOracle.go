@@ -3,7 +3,6 @@ package cli
 import (
 	"crypto/rand"
 	"encoding/base64"
-	"encoding/hex"
 	"fmt"
 	"io"
 	"strconv"
@@ -15,10 +14,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func CmdRegisterOracle() *cobra.Command {
+func CmdUpgradeOracle() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "register-oracle [unique ID] [node public key] [node public key remote report] [trusted block height] [trusted block hash]",
-		Short: "Register a new oracle",
+		Use:   "upgrade-oracle [unique ID] [node public key] [node public key remote report]  [trusted block height] [trusted block hash]",
+		Short: "Upgrade an oracle",
 		Args:  cobra.ExactArgs(5),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
@@ -42,7 +41,7 @@ func CmdRegisterOracle() *cobra.Command {
 				return err
 			}
 
-			trustedBlockHash, err := hex.DecodeString(args[4])
+			trustedBlockHash, err := base64.StdEncoding.DecodeString(args[4])
 			if err != nil {
 				return err
 			}
@@ -53,7 +52,7 @@ func CmdRegisterOracle() *cobra.Command {
 				return fmt.Errorf("failed to make nonce: %w", err)
 			}
 
-			msg := types.NewMsgRegisterOracle(args[0], oracleAddress, nodePubKey, nodePubKeyRemoteReport, trustedBlockHeight, trustedBlockHash, nonce)
+			msg := types.NewMsgUpgradeOracle(args[0], oracleAddress, nodePubKey, nodePubKeyRemoteReport, trustedBlockHeight, trustedBlockHash, nonce)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}

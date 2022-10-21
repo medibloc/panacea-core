@@ -32,3 +32,11 @@ func (m msgServer) VoteOracleRegistration(goCtx context.Context, msg *types.MsgV
 
 	return &types.MsgVoteOracleRegistrationResponse{}, nil
 }
+
+func (m msgServer) UpgradeOracle(goCtx context.Context, msg *types.MsgUpgradeOracle) (*types.MsgUpgradeOracleResponse, error) {
+	if err := m.Keeper.UpgradeOracle(sdk.UnwrapSDKContext(goCtx), msg); err != nil {
+		return nil, err
+	}
+
+	return &types.MsgUpgradeOracleResponse{}, nil
+}

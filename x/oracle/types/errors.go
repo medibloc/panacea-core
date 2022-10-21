@@ -18,4 +18,7 @@ var (
 	ErrValidatorNotFound           = sdkerrors.Register(ModuleName, 11, "validator not found")
 	ErrJailedValidator             = sdkerrors.Register(ModuleName, 12, "jailed validator cannot be a oracle")
 	ErrOracleRegistrationNotFound  = sdkerrors.Register(ModuleName, 13, "oracle registration not found")
+	ErrOracleUpgradeInfoNotFound   = sdkerrors.Register(ModuleName, 14, "oracle upgrade information not found")
+	ErrGetOracleUpgradeInfo        = sdkerrors.Register(ModuleName, 15, "error while get oracleUpgradeInfo")
+	ErrUpgradeOracle               = sdkerrors.Register(ModuleName, 16, "error while upgrading a oracle")
 )

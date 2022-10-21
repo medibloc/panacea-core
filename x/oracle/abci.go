@@ -1,13 +1,20 @@
 package oracle
 
 import (
+	"errors"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/medibloc/panacea-core/v2/x/oracle/keeper"
 	"github.com/medibloc/panacea-core/v2/x/oracle/types"
 )
 
 func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) {
+	handlerOracleRegistrationVote(ctx, keeper)
 
+	handlerOracleUpgrade(ctx, keeper)
+}
+
+func handlerOracleRegistrationVote(ctx sdk.Context, keeper keeper.Keeper) {
 	// Iterate through the closed OracleRegistration.
 	keeper.IterateClosedOracleRegistrationQueue(ctx, ctx.BlockHeader().Time, func(oracleRegistration *types.OracleRegistration) bool {
 		// TODO When a particular OracleRegistration fails, we need to consider whether to skip this OracleRegistration or fail all of them.
@@ -37,9 +44,12 @@ func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) {
 			oracleRegistration.Status = types.ORACLE_REGISTRATION_STATUS_PASSED
 			oracleRegistration.EncryptedOraclePrivKey = tallyResult.ConsensusValue
 
-			oracle := types.NewOracle(oracleRegistration.Address, types.ORACLE_STATUS_ACTIVE)
-			if err := keeper.SetOracle(ctx, oracle); err != nil {
-				panic(err)
+			// Store only new oracle.
+			if oracleRegistration.RegistrationType == types.ORACLE_REGISTRATION_TYPE_NEW {
+				oracle := types.NewOracle(oracleRegistration.Address, types.ORACLE_STATUS_ACTIVE)
+				if err := keeper.SetOracle(ctx, oracle); err != nil {
+					panic(err)
+				}
 			}
 		} else {
 			oracleRegistration.Status = types.ORACLE_REGISTRATION_STATUS_REJECTED
@@ -61,4 +71,22 @@ func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) {
 
 		return false
 	})
+}
+
+func handlerOracleUpgrade(ctx sdk.Context, keeper keeper.Keeper) {
+	upgradeInfo, err := keeper.GetOracleUpgradeInfo(ctx)
+	if err != nil {
+		if errors.Is(err, types.ErrOracleUpgradeInfoNotFound) {
+			return
+		} else {
+			panic(err)
+		}
+	}
+
+	if upgradeInfo.ShouldExecute(ctx) {
+		if err := keeper.ApplyUpgrade(ctx, upgradeInfo); err != nil {
+			panic(err)
+		}
+		keeper.RemoveOracleUpgradeInfo(ctx)
+	}
 }

@@ -108,3 +108,64 @@ func (msg *MsgVoteOracleRegistration) GetSigners() []sdk.AccAddress {
 	}
 	return []sdk.AccAddress{oracleAddress}
 }
+
+var _ sdk.Msg = &MsgUpgradeOracle{}
+
+func NewMsgUpgradeOracle(uniqueID, oracleAddress string, nodePubKey, nodePubKeyRemoteReport []byte, trustedBlockHeight int64, trustedBlockHash, nonce []byte) *MsgUpgradeOracle {
+	return &MsgUpgradeOracle{
+		UniqueId:               uniqueID,
+		OracleAddress:          oracleAddress,
+		NodePubKey:             nodePubKey,
+		NodePubKeyRemoteReport: nodePubKeyRemoteReport,
+		TrustedBlockHeight:     trustedBlockHeight,
+		TrustedBlockHash:       trustedBlockHash,
+		Nonce:                  nonce,
+	}
+}
+
+func (msg *MsgUpgradeOracle) Route() string {
+	return RouterKey
+}
+
+func (msg *MsgUpgradeOracle) Type() string {
+	return "OracleUpgrade"
+}
+
+func (msg *MsgUpgradeOracle) ValidateBasic() error {
+	if err := validateUniqueID(msg.UniqueId); err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid unique ID")
+	}
+	if len(msg.UniqueId) == 0 {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "unique ID cannot be empty")
+	}
+	if _, err := sdk.AccAddressFromBech32(msg.OracleAddress); err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid oracle address (%s)", err)
+	}
+	if err := validateNodeKey(msg.NodePubKey); err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, err.Error())
+	}
+	if err := validateNodePubKeyRemoteReport(msg.NodePubKeyRemoteReport); err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, err.Error())
+	}
+	if err := validateTrustedBlockHeight(msg.TrustedBlockHeight); err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, err.Error())
+	}
+	if err := validateTrustedBlockHash(msg.TrustedBlockHash); err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, err.Error())
+	}
+
+	return nil
+}
+
+func (msg *MsgUpgradeOracle) GetSignBytes() []byte {
+	bz := ModuleCdc.MustMarshalJSON(msg)
+	return sdk.MustSortJSON(bz)
+}
+
+func (msg *MsgUpgradeOracle) GetSigners() []sdk.AccAddress {
+	oracleAddress, err := sdk.AccAddressFromBech32(msg.OracleAddress)
+	if err != nil {
+		panic(err)
+	}
+	return []sdk.AccAddress{oracleAddress}
+}

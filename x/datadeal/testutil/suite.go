@@ -5,6 +5,7 @@ import (
 
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	"github.com/medibloc/panacea-core/v2/types/assets"
 	"github.com/medibloc/panacea-core/v2/types/testsuite"
@@ -16,13 +17,13 @@ type DataDealBaseTestSuite struct {
 	testsuite.TestSuite
 }
 
-func (suite *DataDealBaseTestSuite) MakeTestDeal(dealID uint64, buyerAddr sdk.AccAddress) *types.Deal {
+func (suite *DataDealBaseTestSuite) MakeTestDeal(dealID uint64, buyerAddr sdk.AccAddress, maxNumData uint64) *types.Deal {
 	return &types.Deal{
 		Id:           dealID,
 		Address:      types.NewDealAddress(dealID).String(),
 		DataSchema:   []string{"http://jsonld.com"},
 		Budget:       &sdk.Coin{Denom: assets.MicroMedDenom, Amount: sdk.NewInt(1000000000)},
-		MaxNumData:   10000,
+		MaxNumData:   maxNumData,
 		CurNumData:   0,
 		BuyerAddress: buyerAddr.String(),
 		Status:       types.DEAL_STATUS_ACTIVE,
@@ -55,6 +56,7 @@ func (suite *DataDealBaseTestSuite) SetValidator(pubKey cryptotypes.PubKey, amou
 	validator, _ = validator.AddTokensFromDel(amount)
 	newCommission := stakingtypes.NewCommission(commission, sdk.OneDec(), sdk.NewDecWithPrec(5, 1))
 	validator.Commission = newCommission
+	validator.MinSelfDelegation = amount
 
 	suite.StakingKeeper.SetValidator(suite.Ctx, validator)
 	err = suite.StakingKeeper.SetValidatorByConsAddr(suite.Ctx, validator)
@@ -74,12 +76,12 @@ func (suite *DataDealBaseTestSuite) MakeNewDataVerificationVote(voterAddr sdk.Ac
 
 func (suite *DataDealBaseTestSuite) MakeNewDataSaleDeliveryVoting(sellerAddr sdk.AccAddress, dataHash, verifiableCID string) *types.DataSale {
 	return &types.DataSale{
-		SellerAddress: sellerAddr.String(),
-		DealId:        1,
-		VerifiableCid: verifiableCID,
-		DeliveredCid:  "",
-		DataHash:      dataHash,
-		Status:        types.DATA_SALE_STATUS_DELIVERY_VOTING_PERIOD,
+		SellerAddress:            sellerAddr.String(),
+		DealId:                   1,
+		VerifiableCid:            verifiableCID,
+		DeliveredCid:             "",
+		DataHash:                 dataHash,
+		Status:                   types.DATA_SALE_STATUS_DELIVERY_VOTING_PERIOD,
 		VerificationVotingPeriod: nil,
 		DeliveryVotingPeriod: &oracletypes.VotingPeriod{
 			VotingStartTime: time.Now(),
@@ -123,4 +125,13 @@ func (suite *DataDealBaseTestSuite) SetAccount(pubKey cryptotypes.PubKey) {
 	oracleAccount := suite.AccountKeeper.NewAccountWithAddress(suite.Ctx, oracleAccAddr)
 	suite.Require().NoError(oracleAccount.SetPubKey(pubKey))
 	suite.AccountKeeper.SetAccount(suite.Ctx, oracleAccount)
+}
+
+func (suite *DataDealBaseTestSuite) SetupValidatorRewards(valAddress sdk.ValAddress) {
+	decCoins := sdk.DecCoins{sdk.NewDecCoinFromDec(assets.MicroMedDenom, sdk.ZeroDec())}
+	historicalRewards := distrtypes.NewValidatorHistoricalRewards(decCoins, 1)
+	suite.DistrKeeper.SetValidatorHistoricalRewards(suite.Ctx, valAddress, 1, historicalRewards)
+	// setup current rewards
+	currentRewards := distrtypes.NewValidatorCurrentRewards(decCoins, 2)
+	suite.DistrKeeper.SetValidatorCurrentRewards(suite.Ctx, valAddress, currentRewards)
 }

@@ -248,48 +248,183 @@ func (m *MsgVoteOracleRegistrationResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgVoteOracleRegistrationResponse proto.InternalMessageInfo
 
+// MsgUpgradeOracle defines the Msg/UpgradeOracle request type.
+type MsgUpgradeOracle struct {
+	UniqueId               string `protobuf:"bytes,1,opt,name=unique_id,json=uniqueId,proto3" json:"unique_id,omitempty"`
+	OracleAddress          string `protobuf:"bytes,2,opt,name=oracle_address,json=oracleAddress,proto3" json:"oracle_address,omitempty"`
+	NodePubKey             []byte `protobuf:"bytes,3,opt,name=node_pub_key,json=nodePubKey,proto3" json:"node_pub_key,omitempty"`
+	NodePubKeyRemoteReport []byte `protobuf:"bytes,4,opt,name=node_pub_key_remote_report,json=nodePubKeyRemoteReport,proto3" json:"node_pub_key_remote_report,omitempty"`
+	TrustedBlockHeight     int64  `protobuf:"varint,5,opt,name=trusted_block_height,json=trustedBlockHeight,proto3" json:"trusted_block_height,omitempty"`
+	TrustedBlockHash       []byte `protobuf:"bytes,6,opt,name=trusted_block_hash,json=trustedBlockHash,proto3" json:"trusted_block_hash,omitempty"`
+	Nonce                  []byte `protobuf:"bytes,7,opt,name=nonce,proto3" json:"nonce,omitempty"`
+}
+
+func (m *MsgUpgradeOracle) Reset()         { *m = MsgUpgradeOracle{} }
+func (m *MsgUpgradeOracle) String() string { return proto.CompactTextString(m) }
+func (*MsgUpgradeOracle) ProtoMessage()    {}
+func (*MsgUpgradeOracle) Descriptor() ([]byte, []int) {
+	return fileDescriptor_c4592444ae79a4d4, []int{4}
+}
+func (m *MsgUpgradeOracle) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgUpgradeOracle) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgUpgradeOracle.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgUpgradeOracle) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgUpgradeOracle.Merge(m, src)
+}
+func (m *MsgUpgradeOracle) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgUpgradeOracle) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgUpgradeOracle.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgUpgradeOracle proto.InternalMessageInfo
+
+func (m *MsgUpgradeOracle) GetUniqueId() string {
+	if m != nil {
+		return m.UniqueId
+	}
+	return ""
+}
+
+func (m *MsgUpgradeOracle) GetOracleAddress() string {
+	if m != nil {
+		return m.OracleAddress
+	}
+	return ""
+}
+
+func (m *MsgUpgradeOracle) GetNodePubKey() []byte {
+	if m != nil {
+		return m.NodePubKey
+	}
+	return nil
+}
+
+func (m *MsgUpgradeOracle) GetNodePubKeyRemoteReport() []byte {
+	if m != nil {
+		return m.NodePubKeyRemoteReport
+	}
+	return nil
+}
+
+func (m *MsgUpgradeOracle) GetTrustedBlockHeight() int64 {
+	if m != nil {
+		return m.TrustedBlockHeight
+	}
+	return 0
+}
+
+func (m *MsgUpgradeOracle) GetTrustedBlockHash() []byte {
+	if m != nil {
+		return m.TrustedBlockHash
+	}
+	return nil
+}
+
+func (m *MsgUpgradeOracle) GetNonce() []byte {
+	if m != nil {
+		return m.Nonce
+	}
+	return nil
+}
+
+// MsgUpgradeOracleResponse defines the Msg/UpgradeOracle response type.
+type MsgUpgradeOracleResponse struct {
+}
+
+func (m *MsgUpgradeOracleResponse) Reset()         { *m = MsgUpgradeOracleResponse{} }
+func (m *MsgUpgradeOracleResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgUpgradeOracleResponse) ProtoMessage()    {}
+func (*MsgUpgradeOracleResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_c4592444ae79a4d4, []int{5}
+}
+func (m *MsgUpgradeOracleResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgUpgradeOracleResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgUpgradeOracleResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgUpgradeOracleResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgUpgradeOracleResponse.Merge(m, src)
+}
+func (m *MsgUpgradeOracleResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgUpgradeOracleResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgUpgradeOracleResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgUpgradeOracleResponse proto.InternalMessageInfo
+
 func init() {
 	proto.RegisterType((*MsgRegisterOracle)(nil), "panacea.oracle.v2alpha2.MsgRegisterOracle")
 	proto.RegisterType((*MsgRegisterOracleResponse)(nil), "panacea.oracle.v2alpha2.MsgRegisterOracleResponse")
 	proto.RegisterType((*MsgVoteOracleRegistration)(nil), "panacea.oracle.v2alpha2.MsgVoteOracleRegistration")
 	proto.RegisterType((*MsgVoteOracleRegistrationResponse)(nil), "panacea.oracle.v2alpha2.MsgVoteOracleRegistrationResponse")
+	proto.RegisterType((*MsgUpgradeOracle)(nil), "panacea.oracle.v2alpha2.MsgUpgradeOracle")
+	proto.RegisterType((*MsgUpgradeOracleResponse)(nil), "panacea.oracle.v2alpha2.MsgUpgradeOracleResponse")
 }
 
 func init() { proto.RegisterFile("panacea/oracle/v2alpha2/tx.proto", fileDescriptor_c4592444ae79a4d4) }
 
 var fileDescriptor_c4592444ae79a4d4 = []byte{
-	// 489 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x93, 0xbf, 0x6f, 0xd3, 0x40,
-	0x14, 0xc7, 0xe3, 0x84, 0x16, 0x72, 0x84, 0x0a, 0x4e, 0x51, 0x30, 0x2e, 0xb2, 0x4c, 0xa0, 0x52,
-	0x84, 0xc0, 0x46, 0x66, 0xeb, 0x46, 0x27, 0x10, 0x54, 0x20, 0x0f, 0x0c, 0x2c, 0xd6, 0xd9, 0x7e,
-	0x3a, 0x9f, 0x9a, 0xdc, 0x99, 0xbb, 0x73, 0xd5, 0xac, 0x4c, 0x8c, 0xfc, 0x11, 0x6c, 0xfc, 0x23,
-	0x8c, 0x1d, 0x19, 0x51, 0xf2, 0x8f, 0x20, 0x9f, 0x6d, 0xb5, 0x34, 0x31, 0xa2, 0xdb, 0xe5, 0xfb,
-	0xfd, 0xbc, 0x1f, 0x79, 0x7e, 0x0f, 0x79, 0x05, 0xe1, 0x24, 0x05, 0x12, 0x08, 0x49, 0xd2, 0x39,
-	0x04, 0xa7, 0x21, 0x99, 0x17, 0x39, 0x09, 0x03, 0x7d, 0xe6, 0x17, 0x52, 0x68, 0x81, 0xef, 0x37,
-	0x84, 0x5f, 0x13, 0x7e, 0x4b, 0x38, 0x4f, 0xba, 0x42, 0x1b, 0xd0, 0x84, 0x3b, 0x07, 0x5d, 0x14,
-	0x05, 0x0e, 0x8a, 0xa9, 0x06, 0x1b, 0x53, 0x41, 0x85, 0x79, 0x06, 0xd5, 0xab, 0x56, 0xa7, 0x3f,
-	0xfa, 0xe8, 0xde, 0xb1, 0xa2, 0x11, 0x50, 0xa6, 0x34, 0xc8, 0xf7, 0x26, 0x05, 0xde, 0x47, 0xc3,
-	0x92, 0xb3, 0xcf, 0x25, 0xc4, 0x2c, 0xb3, 0x2d, 0xcf, 0x9a, 0x0d, 0xa3, 0x5b, 0xb5, 0xf0, 0x26,
-	0xc3, 0x07, 0x68, 0xaf, 0xae, 0x14, 0x93, 0x2c, 0x93, 0xa0, 0x94, 0xdd, 0x37, 0xc4, 0x9d, 0x5a,
-	0x7d, 0x55, 0x8b, 0xd8, 0x43, 0x23, 0x2e, 0x32, 0x88, 0x8b, 0x32, 0x89, 0x4f, 0x60, 0x69, 0x0f,
-	0x3c, 0x6b, 0x36, 0x8a, 0x50, 0xa5, 0x7d, 0x28, 0x93, 0xb7, 0xb0, 0xc4, 0x87, 0xc8, 0xb9, 0x4c,
-	0xc4, 0x12, 0x16, 0x42, 0x43, 0x2c, 0xa1, 0x10, 0x52, 0xdb, 0x37, 0x0c, 0x3f, 0xb9, 0xe0, 0x23,
-	0x63, 0x47, 0xc6, 0xc5, 0x2f, 0xd0, 0x58, 0xcb, 0x52, 0x69, 0xc8, 0xe2, 0x64, 0x2e, 0xd2, 0x93,
-	0x38, 0x07, 0x46, 0x73, 0x6d, 0xef, 0x78, 0xd6, 0x6c, 0x10, 0xe1, 0xc6, 0x3b, 0xaa, 0xac, 0xd7,
-	0xc6, 0xc1, 0xcf, 0x10, 0xbe, 0x12, 0x41, 0x54, 0x6e, 0xef, 0x9a, 0x2a, 0x77, 0xff, 0xe2, 0x89,
-	0xca, 0xf1, 0x18, 0xed, 0x70, 0xc1, 0x53, 0xb0, 0x6f, 0x1a, 0xa0, 0xfe, 0x31, 0xdd, 0x47, 0x0f,
-	0x36, 0x86, 0x15, 0x81, 0x2a, 0x04, 0x57, 0x30, 0xfd, 0x6e, 0x19, 0xf7, 0xa3, 0xd0, 0xd0, 0x3a,
-	0x15, 0x27, 0x89, 0x66, 0x82, 0x63, 0x86, 0xec, 0x66, 0x6a, 0xf2, 0x92, 0x1c, 0x9f, 0x0a, 0x0d,
-	0x66, 0xc2, 0xb7, 0xc3, 0xc0, 0xef, 0xd8, 0x03, 0x7f, 0x33, 0x5d, 0x55, 0x24, 0x9a, 0x88, 0xad,
-	0x3a, 0x7e, 0x88, 0x86, 0x8a, 0x51, 0x4e, 0x74, 0x29, 0xc1, 0x7c, 0x9b, 0x51, 0x74, 0x21, 0x4c,
-	0x1f, 0xa3, 0x47, 0x9d, 0x5d, 0xb6, 0xff, 0x25, 0xfc, 0xd2, 0x47, 0x83, 0x63, 0x45, 0x71, 0x81,
-	0xf6, 0xae, 0xac, 0xc6, 0xd3, 0xce, 0x2e, 0x37, 0x26, 0xe3, 0x84, 0xff, 0xcf, 0xb6, 0x95, 0xf1,
-	0x57, 0x0b, 0x4d, 0x3a, 0x46, 0xf8, 0xcf, 0x74, 0xdb, 0x63, 0x9c, 0xc3, 0xeb, 0xc7, 0xb4, 0xad,
-	0x1c, 0xbd, 0xfb, 0xb9, 0x72, 0xad, 0xf3, 0x95, 0x6b, 0xfd, 0x5e, 0xb9, 0xd6, 0xb7, 0xb5, 0xdb,
-	0x3b, 0x5f, 0xbb, 0xbd, 0x5f, 0x6b, 0xb7, 0xf7, 0x29, 0xa4, 0x4c, 0xe7, 0x65, 0xe2, 0xa7, 0x62,
-	0x11, 0x2c, 0x20, 0x63, 0xd5, 0x42, 0x05, 0x4d, 0xa1, 0xe7, 0xa9, 0x90, 0xd5, 0x11, 0x06, 0x67,
-	0xed, 0x41, 0xea, 0x65, 0x01, 0x2a, 0xd9, 0x35, 0x07, 0xf7, 0xf2, 0x4f, 0x00, 0x00, 0x00, 0xff,
-	0xff, 0x6c, 0x24, 0x5f, 0x62, 0x10, 0x04, 0x00, 0x00,
+	// 536 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xec, 0x94, 0xc1, 0x6e, 0xd3, 0x4c,
+	0x10, 0xc7, 0xe3, 0xe4, 0x6b, 0x3f, 0xb2, 0xa4, 0x55, 0x59, 0x45, 0xc1, 0xb8, 0xc8, 0x0a, 0x81,
+	0x4a, 0x01, 0x81, 0x0d, 0xe6, 0xd6, 0x1b, 0x3d, 0x81, 0x20, 0x02, 0x59, 0x82, 0x03, 0x17, 0x6b,
+	0x63, 0x8f, 0xd6, 0xab, 0x26, 0x5e, 0xb3, 0xbb, 0xae, 0x9a, 0x37, 0xe0, 0xc8, 0x43, 0x70, 0x82,
+	0x17, 0xe1, 0xd8, 0x23, 0x47, 0x94, 0x3c, 0x01, 0x6f, 0x80, 0xbc, 0xb6, 0xdb, 0x26, 0xa9, 0xa3,
+	0x72, 0xe7, 0xb6, 0xf9, 0xff, 0x7f, 0x33, 0xb3, 0x99, 0x1d, 0x0f, 0xea, 0xa7, 0x24, 0x21, 0x21,
+	0x10, 0x97, 0x0b, 0x12, 0x4e, 0xc0, 0x3d, 0xf1, 0xc8, 0x24, 0x8d, 0x89, 0xe7, 0xaa, 0x53, 0x27,
+	0x15, 0x5c, 0x71, 0x7c, 0xbb, 0x24, 0x9c, 0x82, 0x70, 0x2a, 0xc2, 0x7a, 0x50, 0x17, 0x5a, 0x82,
+	0x3a, 0xdc, 0x3a, 0xa8, 0xa3, 0x28, 0x24, 0x20, 0x99, 0x2c, 0xb1, 0x2e, 0xe5, 0x94, 0xeb, 0xa3,
+	0x9b, 0x9f, 0x0a, 0x75, 0xf0, 0xbd, 0x89, 0x6e, 0x8d, 0x24, 0xf5, 0x81, 0x32, 0xa9, 0x40, 0xbc,
+	0xd5, 0x29, 0xf0, 0x3e, 0x6a, 0x67, 0x09, 0xfb, 0x94, 0x41, 0xc0, 0x22, 0xd3, 0xe8, 0x1b, 0xc3,
+	0xb6, 0x7f, 0xa3, 0x10, 0x5e, 0x45, 0xf8, 0x00, 0xed, 0x16, 0x95, 0x02, 0x12, 0x45, 0x02, 0xa4,
+	0x34, 0x9b, 0x9a, 0xd8, 0x29, 0xd4, 0x17, 0x85, 0x88, 0xfb, 0xa8, 0x93, 0xf0, 0x08, 0x82, 0x34,
+	0x1b, 0x07, 0xc7, 0x30, 0x33, 0x5b, 0x7d, 0x63, 0xd8, 0xf1, 0x51, 0xae, 0xbd, 0xcb, 0xc6, 0xaf,
+	0x61, 0x86, 0x0f, 0x91, 0x75, 0x99, 0x08, 0x04, 0x4c, 0xb9, 0x82, 0x40, 0x40, 0xca, 0x85, 0x32,
+	0xff, 0xd3, 0x7c, 0xef, 0x82, 0xf7, 0xb5, 0xed, 0x6b, 0x17, 0x3f, 0x45, 0x5d, 0x25, 0x32, 0xa9,
+	0x20, 0x0a, 0xc6, 0x13, 0x1e, 0x1e, 0x07, 0x31, 0x30, 0x1a, 0x2b, 0x73, 0xab, 0x6f, 0x0c, 0x5b,
+	0x3e, 0x2e, 0xbd, 0xa3, 0xdc, 0x7a, 0xa9, 0x1d, 0xfc, 0x18, 0xe1, 0x95, 0x08, 0x22, 0x63, 0x73,
+	0x5b, 0x57, 0xd9, 0x5b, 0xe2, 0x89, 0x8c, 0x71, 0x17, 0x6d, 0x25, 0x3c, 0x09, 0xc1, 0xfc, 0x5f,
+	0x03, 0xc5, 0x8f, 0xc1, 0x3e, 0xba, 0xb3, 0xd6, 0x2c, 0x1f, 0x64, 0xca, 0x13, 0x09, 0x83, 0xaf,
+	0x86, 0x76, 0x3f, 0x70, 0x05, 0x95, 0x93, 0x73, 0x82, 0x28, 0xc6, 0x13, 0xcc, 0x90, 0x59, 0x76,
+	0x4d, 0x5c, 0x92, 0x83, 0x13, 0xae, 0x40, 0x77, 0xf8, 0xa6, 0xe7, 0x3a, 0x35, 0x73, 0xe0, 0xac,
+	0xa7, 0xcb, 0x8b, 0xf8, 0x3d, 0x7e, 0xa5, 0x8e, 0xef, 0xa2, 0xb6, 0x64, 0x34, 0x21, 0x2a, 0x13,
+	0xa0, 0xdf, 0xa6, 0xe3, 0x5f, 0x08, 0x83, 0xfb, 0xe8, 0x5e, 0xed, 0x2d, 0xcf, 0xff, 0xcb, 0xb7,
+	0x26, 0xda, 0x1b, 0x49, 0xfa, 0x3e, 0xa5, 0x82, 0x44, 0xf0, 0x6f, 0x2a, 0x36, 0x4e, 0x85, 0x85,
+	0xcc, 0xd5, 0x5e, 0x55, 0x8d, 0xf4, 0x7e, 0x37, 0x51, 0x6b, 0x24, 0x29, 0x4e, 0xd1, 0xee, 0xca,
+	0x37, 0xf6, 0xa8, 0xf6, 0xb9, 0xd7, 0x46, 0xcc, 0xf2, 0xae, 0xcf, 0x56, 0x95, 0xf1, 0x67, 0x03,
+	0xf5, 0x6a, 0x66, 0x71, 0x63, 0xba, 0xab, 0x63, 0xac, 0xc3, 0xbf, 0x8f, 0x39, 0xbf, 0xca, 0x14,
+	0xed, 0x2c, 0x4f, 0xd2, 0xc3, 0x4d, 0xc9, 0x96, 0x50, 0xeb, 0xd9, 0xb5, 0xd1, 0xaa, 0xdc, 0xd1,
+	0x9b, 0x1f, 0x73, 0xdb, 0x38, 0x9b, 0xdb, 0xc6, 0xaf, 0xb9, 0x6d, 0x7c, 0x59, 0xd8, 0x8d, 0xb3,
+	0x85, 0xdd, 0xf8, 0xb9, 0xb0, 0x1b, 0x1f, 0x3d, 0xca, 0x54, 0x9c, 0x8d, 0x9d, 0x90, 0x4f, 0xdd,
+	0x29, 0x44, 0x2c, 0x7f, 0x72, 0xb7, 0xcc, 0xff, 0x24, 0xe4, 0x22, 0x5f, 0x9e, 0xee, 0x69, 0xb5,
+	0x48, 0xd5, 0x2c, 0x05, 0x39, 0xde, 0xd6, 0x8b, 0xf2, 0xf9, 0x9f, 0x00, 0x00, 0x00, 0xff, 0xff,
+	0x9c, 0xcd, 0xc7, 0x49, 0xc8, 0x05, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -308,6 +443,8 @@ type MsgClient interface {
 	RegisterOracle(ctx context.Context, in *MsgRegisterOracle, opts ...grpc.CallOption) (*MsgRegisterOracleResponse, error)
 	// VoteOracleRegistration  defines a method for voting registration of oracle.
 	VoteOracleRegistration(ctx context.Context, in *MsgVoteOracleRegistration, opts ...grpc.CallOption) (*MsgVoteOracleRegistrationResponse, error)
+	// UpgradeOracle defines a method for upgrade of oracle.
+	UpgradeOracle(ctx context.Context, in *MsgUpgradeOracle, opts ...grpc.CallOption) (*MsgUpgradeOracleResponse, error)
 }
 
 type msgClient struct {
@@ -336,12 +473,23 @@ func (c *msgClient) VoteOracleRegistration(ctx context.Context, in *MsgVoteOracl
 	return out, nil
 }
 
+func (c *msgClient) UpgradeOracle(ctx context.Context, in *MsgUpgradeOracle, opts ...grpc.CallOption) (*MsgUpgradeOracleResponse, error) {
+	out := new(MsgUpgradeOracleResponse)
+	err := c.cc.Invoke(ctx, "/panacea.oracle.v2alpha2.Msg/UpgradeOracle", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // MsgServer is the server API for Msg service.
 type MsgServer interface {
 	// RegisterOracle defines a method for registration of oracle.
 	RegisterOracle(context.Context, *MsgRegisterOracle) (*MsgRegisterOracleResponse, error)
 	// VoteOracleRegistration  defines a method for voting registration of oracle.
 	VoteOracleRegistration(context.Context, *MsgVoteOracleRegistration) (*MsgVoteOracleRegistrationResponse, error)
+	// UpgradeOracle defines a method for upgrade of oracle.
+	UpgradeOracle(context.Context, *MsgUpgradeOracle) (*MsgUpgradeOracleResponse, error)
 }
 
 // UnimplementedMsgServer can be embedded to have forward compatible implementations.
@@ -353,6 +501,9 @@ func (*UnimplementedMsgServer) RegisterOracle(ctx context.Context, req *MsgRegis
 }
 func (*UnimplementedMsgServer) VoteOracleRegistration(ctx context.Context, req *MsgVoteOracleRegistration) (*MsgVoteOracleRegistrationResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method VoteOracleRegistration not implemented")
+}
+func (*UnimplementedMsgServer) UpgradeOracle(ctx context.Context, req *MsgUpgradeOracle) (*MsgUpgradeOracleResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpgradeOracle not implemented")
 }
 
 func RegisterMsgServer(s grpc1.Server, srv MsgServer) {
@@ -395,6 +546,24 @@ func _Msg_VoteOracleRegistration_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Msg_UpgradeOracle_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgUpgradeOracle)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).UpgradeOracle(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/panacea.oracle.v2alpha2.Msg/UpgradeOracle",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).UpgradeOracle(ctx, req.(*MsgUpgradeOracle))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _Msg_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "panacea.oracle.v2alpha2.Msg",
 	HandlerType: (*MsgServer)(nil),
@@ -406,6 +575,10 @@ var _Msg_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "VoteOracleRegistration",
 			Handler:    _Msg_VoteOracleRegistration_Handler,
+		},
+		{
+			MethodName: "UpgradeOracle",
+			Handler:    _Msg_UpgradeOracle_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
@@ -570,6 +743,99 @@ func (m *MsgVoteOracleRegistrationResponse) MarshalToSizedBuffer(dAtA []byte) (i
 	return len(dAtA) - i, nil
 }
 
+func (m *MsgUpgradeOracle) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgUpgradeOracle) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgUpgradeOracle) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Nonce) > 0 {
+		i -= len(m.Nonce)
+		copy(dAtA[i:], m.Nonce)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Nonce)))
+		i--
+		dAtA[i] = 0x3a
+	}
+	if len(m.TrustedBlockHash) > 0 {
+		i -= len(m.TrustedBlockHash)
+		copy(dAtA[i:], m.TrustedBlockHash)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.TrustedBlockHash)))
+		i--
+		dAtA[i] = 0x32
+	}
+	if m.TrustedBlockHeight != 0 {
+		i = encodeVarintTx(dAtA, i, uint64(m.TrustedBlockHeight))
+		i--
+		dAtA[i] = 0x28
+	}
+	if len(m.NodePubKeyRemoteReport) > 0 {
+		i -= len(m.NodePubKeyRemoteReport)
+		copy(dAtA[i:], m.NodePubKeyRemoteReport)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.NodePubKeyRemoteReport)))
+		i--
+		dAtA[i] = 0x22
+	}
+	if len(m.NodePubKey) > 0 {
+		i -= len(m.NodePubKey)
+		copy(dAtA[i:], m.NodePubKey)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.NodePubKey)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if len(m.OracleAddress) > 0 {
+		i -= len(m.OracleAddress)
+		copy(dAtA[i:], m.OracleAddress)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.OracleAddress)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.UniqueId) > 0 {
+		i -= len(m.UniqueId)
+		copy(dAtA[i:], m.UniqueId)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.UniqueId)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgUpgradeOracleResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgUpgradeOracleResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgUpgradeOracleResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	return len(dAtA) - i, nil
+}
+
 func encodeVarintTx(dAtA []byte, offset int, v uint64) int {
 	offset -= sovTx(v)
 	base := offset
@@ -644,6 +910,51 @@ func (m *MsgVoteOracleRegistration) Size() (n int) {
 }
 
 func (m *MsgVoteOracleRegistrationResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	return n
+}
+
+func (m *MsgUpgradeOracle) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.UniqueId)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.OracleAddress)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.NodePubKey)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.NodePubKeyRemoteReport)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	if m.TrustedBlockHeight != 0 {
+		n += 1 + sovTx(uint64(m.TrustedBlockHeight))
+	}
+	l = len(m.TrustedBlockHash)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.Nonce)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	return n
+}
+
+func (m *MsgUpgradeOracleResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -1124,6 +1435,325 @@ func (m *MsgVoteOracleRegistrationResponse) Unmarshal(dAtA []byte) error {
 		}
 		if fieldNum <= 0 {
 			return fmt.Errorf("proto: MsgVoteOracleRegistrationResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgUpgradeOracle) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgUpgradeOracle: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgUpgradeOracle: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field UniqueId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.UniqueId = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field OracleAddress", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.OracleAddress = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field NodePubKey", wireType)
+			}
+			var byteLen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				byteLen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if byteLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + byteLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.NodePubKey = append(m.NodePubKey[:0], dAtA[iNdEx:postIndex]...)
+			if m.NodePubKey == nil {
+				m.NodePubKey = []byte{}
+			}
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field NodePubKeyRemoteReport", wireType)
+			}
+			var byteLen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				byteLen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if byteLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + byteLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.NodePubKeyRemoteReport = append(m.NodePubKeyRemoteReport[:0], dAtA[iNdEx:postIndex]...)
+			if m.NodePubKeyRemoteReport == nil {
+				m.NodePubKeyRemoteReport = []byte{}
+			}
+			iNdEx = postIndex
+		case 5:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field TrustedBlockHeight", wireType)
+			}
+			m.TrustedBlockHeight = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.TrustedBlockHeight |= int64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 6:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field TrustedBlockHash", wireType)
+			}
+			var byteLen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				byteLen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if byteLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + byteLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.TrustedBlockHash = append(m.TrustedBlockHash[:0], dAtA[iNdEx:postIndex]...)
+			if m.TrustedBlockHash == nil {
+				m.TrustedBlockHash = []byte{}
+			}
+			iNdEx = postIndex
+		case 7:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Nonce", wireType)
+			}
+			var byteLen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				byteLen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if byteLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + byteLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Nonce = append(m.Nonce[:0], dAtA[iNdEx:postIndex]...)
+			if m.Nonce == nil {
+				m.Nonce = []byte{}
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgUpgradeOracleResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgUpgradeOracleResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgUpgradeOracleResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		default:
