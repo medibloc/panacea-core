@@ -56,7 +56,7 @@ func (suite *abciTestSuite) BeforeTest(_, _ string) {
 	ctx := suite.Ctx
 	suite.uniqueID = "uniqueID"
 
-	suite.defaultFunds = sdk.NewCoins(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(100_000_000_000))) // 10,000 MED
+	suite.defaultFunds = sdk.NewCoins(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(100_000_000_000))) // 100,000 MED
 
 	suite.sellerAccPrivKey = secp256k1.GenPrivKey()
 	suite.sellerAccPubKey = suite.sellerAccPrivKey.PubKey()
