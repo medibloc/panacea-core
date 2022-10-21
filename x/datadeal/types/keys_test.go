@@ -8,7 +8,20 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestSplitOracleRegistrationVoteQueueKey(t *testing.T) {
+func TestSplitDataVerificationVoteQueueKey(t *testing.T) {
+	dealID := uint64(1)
+	dataHash := "dataHash"
+	now := time.Now()
+
+	key := types.GetDataVerificationQueueKey(dataHash, dealID, now)
+
+	splitDealID, splitCID := types.SplitDataVerificationQueueKey(key)
+
+	require.Equal(t, dealID, splitDealID)
+	require.Equal(t, dataHash, splitCID)
+}
+
+func TestSpliDataDeliveryVoteQueueKey(t *testing.T) {
 	dealID := uint64(1)
 	dataHash := "dataHash"
 	now := time.Now()

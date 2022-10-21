@@ -229,3 +229,15 @@ func (t TallyResult) ValidateBasic() error {
 
 	return nil
 }
+
+func (m OracleUpgradeInfo) ValidateBasic() error {
+	if len(m.UniqueId) == 0 {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "uniqueID is empty")
+	}
+
+	if m.Height <= 0 {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "height must be greater than zero")
+	}
+
+	return nil
+}

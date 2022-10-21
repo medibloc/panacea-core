@@ -77,8 +77,8 @@ func (suite *genesisTestSuite) BeforeTest(_, _ string) {
 }
 
 func (suite *genesisTestSuite) TestInitGenesis() {
-	deal1 := suite.MakeTestDeal(1, suite.buyerAccAddr)
-	deal2 := suite.MakeTestDeal(2, suite.buyerAccAddr)
+	deal1 := suite.MakeTestDeal(1, suite.buyerAccAddr, 100)
+	deal2 := suite.MakeTestDeal(2, suite.buyerAccAddr, 100)
 
 	dataSale1 := suite.MakeNewDataSale(suite.sellerAccAddr, suite.dataHash1, suite.verifiableCID1)
 	dataSale2 := suite.MakeNewDataSale(suite.sellerAccAddr, suite.dataHash2, suite.verifiableCID2)
@@ -138,8 +138,8 @@ func (suite *genesisTestSuite) TestInitGenesis() {
 }
 
 func (suite *genesisTestSuite) TestExportGenesis() {
-	deal1 := suite.MakeTestDeal(1, suite.buyerAccAddr)
-	deal2 := suite.MakeTestDeal(2, suite.buyerAccAddr)
+	deal1 := suite.MakeTestDeal(1, suite.buyerAccAddr, 100)
+	deal2 := suite.MakeTestDeal(2, suite.buyerAccAddr, 100)
 
 	dataSale1 := suite.MakeNewDataSale(suite.sellerAccAddr, suite.dataHash1, suite.verifiableCID1)
 	dataSale2 := suite.MakeNewDataSale(suite.sellerAccAddr, suite.dataHash2, suite.verifiableCID2)

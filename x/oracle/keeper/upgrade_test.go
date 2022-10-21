@@ -1,0 +1,37 @@
+package keeper_test
+
+import (
+	"testing"
+
+	"github.com/medibloc/panacea-core/v2/x/oracle/testutil"
+	"github.com/medibloc/panacea-core/v2/x/oracle/types"
+	"github.com/stretchr/testify/require"
+	"github.com/stretchr/testify/suite"
+)
+
+type oracleUpgradeTestSuite struct {
+	testutil.OracleBaseTestSuite
+}
+
+func TestOracleUpgradeTestSuite(t *testing.T) {
+	suite.Run(t, new(oracleUpgradeTestSuite))
+}
+
+func (suite *oracleUpgradeTestSuite) TestOracleUpgradeInfo() {
+	upgradeInfo := &types.OracleUpgradeInfo{
+		UniqueId: "upgradeUniqueID",
+		Height:   10000000,
+	}
+
+	require.NoError(suite.T(), suite.OracleKeeper.SetOracleUpgradeInfo(suite.Ctx, upgradeInfo))
+
+	getUpgradeInfo, err := suite.OracleKeeper.GetOracleUpgradeInfo(suite.Ctx)
+	require.NoError(suite.T(), err)
+	require.Equal(suite.T(), upgradeInfo, getUpgradeInfo)
+}
+
+func (suite *oracleUpgradeTestSuite) TestEmptyOracleUpgradeInfo() {
+	upgradeInfo, err := suite.OracleKeeper.GetOracleUpgradeInfo(suite.Ctx)
+	require.ErrorIs(suite.T(), err, types.ErrOracleUpgradeInfoNotFound)
+	require.Nil(suite.T(), upgradeInfo)
+}
