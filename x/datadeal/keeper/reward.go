@@ -38,7 +38,7 @@ func (k Keeper) DistributeVerificationRewards(ctx sdk.Context, dataSale *types.D
 	sellerReward := sdk.NewCoin(assets.MicroMedDenom, pricePerData.Mul(sdk.OneDec().Sub(oracleCommissionRate)).TruncateInt())
 	// 50% of oracle commission for data verification
 	// remain is for data delivery
-	oracleRewards := sdk.NewCoin(assets.MicroMedDenom, pricePerData.Mul(oracleCommissionRate).Mul(sdk.NewDecWithPrec(5, 1)).TruncateInt())
+	oracleRewards := sdk.NewCoin(assets.MicroMedDenom, pricePerData.Mul(oracleCommissionRate).Mul(types.DataVerificationRewardFraction).TruncateInt())
 
 	// send to seller
 	if err := k.bankKeeper.SendCoins(ctx, dealAccAddr, sellerAccAddr, sdk.NewCoins(sellerReward)); err != nil {
