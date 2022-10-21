@@ -47,7 +47,7 @@ func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) {
 					panic(err)
 				}
 
-				if err := keeper.DistributeVerificationRewards(ctx, dataSale); err != nil {
+				if err := keeper.DistributeVerificationRewards(ctx, dataSale, tallyResult.ValidVoters); err != nil {
 					panic(err)
 				}
 
