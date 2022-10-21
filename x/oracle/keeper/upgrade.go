@@ -1,6 +1,8 @@
 package keeper
 
 import (
+	"fmt"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/medibloc/panacea-core/v2/x/oracle/types"
@@ -35,4 +37,33 @@ func (k Keeper) GetOracleUpgradeInfo(ctx sdk.Context) (*types.OracleUpgradeInfo,
 	}
 
 	return &upgradeInfo, nil
+}
+
+func (k Keeper) UpgradeOracle(ctx sdk.Context, msg *types.MsgUpgradeOracle) error {
+	oracleRegistration := msg.ToOracleRegistration()
+	compareFn := func(uniqueID string) error {
+		// check unique id
+		upgradeInfo, err := k.GetOracleUpgradeInfo(ctx)
+		if err != nil {
+			return err
+		}
+		if upgradeInfo.UniqueId != uniqueID {
+			return fmt.Errorf("The uniqueID to upgrade does not match. expected(%s), received(%s), ", upgradeInfo.UniqueId, msg.UniqueId)
+		}
+		return nil
+	}
+
+	if err := k.registerOracle(ctx, compareFn, oracleRegistration); err != nil {
+		return sdkerrors.Wrapf(types.ErrUpgradeOracle, err.Error())
+	}
+
+	ctx.EventManager().EmitEvent(
+		sdk.NewEvent(
+			types.EventTypeUpgradeVote,
+			sdk.NewAttribute(types.AttributeKeyUniqueID, oracleRegistration.UniqueId),
+			sdk.NewAttribute(types.AttributeKeyVoteStatus, types.AttributeValueVoteStatusStarted),
+			sdk.NewAttribute(types.AttributeKeyOracleAddress, oracleRegistration.Address),
+		),
+	)
+	return nil
 }
