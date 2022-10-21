@@ -231,20 +231,6 @@ func (t TallyResult) ValidateBasic() error {
 	return nil
 }
 
-func (m *MsgUpgradeOracle) ToOracleRegistration() *OracleRegistration {
-	return &OracleRegistration{
-		UniqueId:               m.UniqueId,
-		Address:                m.OracleAddress,
-		NodePubKey:             m.NodePubKey,
-		NodePubKeyRemoteReport: m.NodePubKeyRemoteReport,
-		TrustedBlockHeight:     m.TrustedBlockHeight,
-		TrustedBlockHash:       m.TrustedBlockHash,
-		Status:                 ORACLE_REGISTRATION_STATUS_VOTING_PERIOD,
-		Nonce:                  m.Nonce,
-		RegistrationType:       ORACLE_REGISTRATION_TYPE_UPGRADE,
-	}
-}
-
 func (m OracleUpgradeInfo) ValidateBasic() error {
 	if m.Height < 0 {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "height must be greater than or equals to 0")
