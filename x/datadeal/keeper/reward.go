@@ -11,8 +11,53 @@ import (
 	oracletypes "github.com/medibloc/panacea-core/v2/x/oracle/types"
 )
 
-// DistributeRewards distributes reward to oracles for data verification and delivery
-func (k Keeper) DistributeRewards(ctx sdk.Context, dealID uint64, oracles map[string]*oracletypes.OracleValidatorInfo) {
+func (k Keeper) DistributeVerificationRewards(ctx sdk.Context, dataSale *types.DataSale) error {
+	deal, err := k.GetDeal(ctx, dataSale.DealId)
+	if err != nil {
+		return err
+	}
+
+	totalBudget := deal.GetBudget().Amount.ToDec()
+	maxNumData := sdk.NewIntFromUint64(deal.GetMaxNumData()).ToDec()
+	pricePerData := totalBudget.Quo(maxNumData).TruncateDec()
+
+	oracleCommissionRate := k.oracleKeeper.GetParams(ctx).OracleCommissionRate
+	sellerReward := sdk.NewCoin(assets.MicroMedDenom, pricePerData.Mul(sdk.OneDec().Sub(oracleCommissionRate)).TruncateInt())
+
+	if err := k.sendSellerReward(ctx, deal.GetAddress(), dataSale.SellerAddress, sellerReward); err != nil {
+		return err
+	}
+
+	// TODO distribute rewards to oracles
+
+	return nil
+}
+
+func (k Keeper) sendSellerReward(ctx sdk.Context, dealAddress, sellerAddress string, reward sdk.Coin) error {
+	dealAccAddr, err := sdk.AccAddressFromBech32(dealAddress)
+	if err != nil {
+		return err
+	}
+
+	sellerAccAddr, err := sdk.AccAddressFromBech32(sellerAddress)
+	if err != nil {
+		return err
+	}
+
+	dealBalance := k.bankKeeper.GetBalance(ctx, dealAccAddr, assets.MicroMedDenom)
+	if dealBalance.IsLT(reward) {
+		return fmt.Errorf("not enough balance in deal")
+	}
+
+	if err := k.bankKeeper.SendCoins(ctx, dealAccAddr, sellerAccAddr, sdk.NewCoins(reward)); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// DistributeOracleRewards distributes reward to oracles for data verification and delivery
+func (k Keeper) DistributeOracleRewards(ctx sdk.Context, dealID uint64, oracles map[string]*oracletypes.OracleValidatorInfo) {
 	deal, err := k.GetDeal(ctx, dealID)
 	if err != nil {
 		panic(err)
