@@ -100,7 +100,7 @@ func (m genesisTestSuite) TestInitGenesis() {
 			oracleRegistrationVote,
 		},
 		Params:            types.DefaultParams(),
-		OracleUpgradeInfo: upgradeInfo,
+		OracleUpgradeInfo: &upgradeInfo,
 	}
 
 	oracle.InitGenesis(m.Ctx, m.OracleKeeper, genesis)
