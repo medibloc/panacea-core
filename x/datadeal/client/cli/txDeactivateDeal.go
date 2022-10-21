@@ -10,31 +10,31 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func CmdSellData() *cobra.Command {
+func CmdDeactivateDeal() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "sell-data [deal_id] [verifiable_cid] [data_hash]",
-		Short: "Sell data",
-		Long:  "[data-hash] is a hex-encoded string obtained by hashing the original data through the SHA256 hash function",
-		Args:  cobra.ExactArgs(3),
+		Use:   "deactivate-deal [dealID]",
+		Short: "Deactivate a deal",
+		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
 
-			sellerAddress := clientCtx.GetFromAddress().String()
-
 			dealID, err := strconv.ParseUint(args[0], 10, 64)
 			if err != nil {
 				return err
 			}
 
-			msg := types.NewMsgSellData(dealID, args[1], args[2], sellerAddress)
-			if err = msg.ValidateBasic(); err != nil {
+			requesterAddr := clientCtx.GetFromAddress()
+
+			msgDeactivateDeal := types.NewMsgDeactivateDeal(dealID, requesterAddr.String())
+
+			if err := msgDeactivateDeal.ValidateBasic(); err != nil {
 				return err
 			}
 
-			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msgDeactivateDeal)
 		},
 	}
 

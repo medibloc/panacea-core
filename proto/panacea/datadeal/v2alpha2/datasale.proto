@@ -12,10 +12,12 @@ message DataSale {
   uint64 deal_id = 2;
   string verifiable_cid = 3;
   string delivered_cid = 4;
-  DataSaleStatus status = 5;
-  panacea.oracle.v2alpha2.VotingPeriod voting_period = 6;
-  panacea.oracle.v2alpha2.TallyResult verification_tally_result = 7;
-  panacea.oracle.v2alpha2.TallyResult delivery_tally_result = 8;
+  string data_hash = 5;
+  DataSaleStatus status = 6;
+  panacea.oracle.v2alpha2.VotingPeriod verification_voting_period = 7;
+  panacea.oracle.v2alpha2.VotingPeriod delivery_voting_period = 8;
+  panacea.oracle.v2alpha2.TallyResult verification_tally_result = 9;
+  panacea.oracle.v2alpha2.TallyResult delivery_tally_result = 10;
 }
 
 // DataSaleStatus enumerates the status of data sale.
@@ -31,9 +33,15 @@ enum DataSaleStatus {
   // DATA_SALE_STATUS_DELIVERY_VOTING_PERIOD defines that the status of DataSale is delivering in voting period.
   DATA_SALE_STATUS_DELIVERY_VOTING_PERIOD = 2;
 
-  // // DATA_SALE_STATUS_COMPLETED defines that the status of DataSale is completed.
+  // DATA_SALE_STATUS_COMPLETED defines that the status of DataSale is completed.
   DATA_SALE_STATUS_COMPLETED = 3;
 
-  // DATA_SALE_STATUS_FAILED defines that the status of DataSale is failed.
-  DATA_SALE_STATUS_FAILED = 4;
+  // DATA_SALE_STATUS_VERIFICATION_FAILED defines that the status of DataSale is verification failed.
+  DATA_SALE_STATUS_VERIFICATION_FAILED = 4;
+
+  // DATA_SALE_STATUS_DELIVERY_FAILED defines that the status of DataSale is delivery failed.
+  DATA_SALE_STATUS_DELIVERY_FAILED = 5;
+
+  //DATA_SALE_STATUS_DEAL_COMPLETED defines that the status of Deal associated with DataSale is DEAL_STATUS_COMPLETED.
+  DATA_SALE_STATUS_DEAL_COMPLETED = 6;
 }

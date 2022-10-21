@@ -111,6 +111,18 @@ func (msg *MsgVoteOracleRegistration) GetSigners() []sdk.AccAddress {
 
 var _ sdk.Msg = &MsgUpgradeOracle{}
 
+func NewMsgUpgradeOracle(uniqueID, oracleAddress string, nodePubKey, nodePubKeyRemoteReport []byte, trustedBlockHeight int64, trustedBlockHash, nonce []byte) *MsgUpgradeOracle {
+	return &MsgUpgradeOracle{
+		UniqueId:               uniqueID,
+		OracleAddress:          oracleAddress,
+		NodePubKey:             nodePubKey,
+		NodePubKeyRemoteReport: nodePubKeyRemoteReport,
+		TrustedBlockHeight:     trustedBlockHeight,
+		TrustedBlockHash:       trustedBlockHash,
+		Nonce:                  nonce,
+	}
+}
+
 func (msg *MsgUpgradeOracle) Route() string {
 	return RouterKey
 }
@@ -143,6 +155,11 @@ func (msg *MsgUpgradeOracle) ValidateBasic() error {
 	}
 
 	return nil
+}
+
+func (msg *MsgUpgradeOracle) GetSignBytes() []byte {
+	bz := ModuleCdc.MustMarshalJSON(msg)
+	return sdk.MustSortJSON(bz)
 }
 
 func (msg *MsgUpgradeOracle) GetSigners() []sdk.AccAddress {
