@@ -19,4 +19,5 @@ var (
 	ErrOracleNotActive          = sdkerrors.Register(ModuleName, 11, "oracle is not in 'ACTIVE' state")
 	ErrDealDeactivate           = sdkerrors.Register(ModuleName, 12, "error while deactivating a deal")
 	ErrDistrVerificationRewards = sdkerrors.Register(ModuleName, 13, "error while distributing data verification rewards")
+	ErrDistrDeliveryRewards     = sdkerrors.Register(ModuleName, 14, "error while distributing data delivery rewards")
 )
