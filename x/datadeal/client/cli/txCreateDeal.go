@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
+	"os"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -46,7 +46,7 @@ func CmdCreateDeal() *cobra.Command {
 func newCreateDealMsg(file string) (sdk.Msg, error) {
 	var msg *types.MsgCreateDeal
 
-	contents, err := ioutil.ReadFile(file)
+	contents, err := os.ReadFile(file)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read file: %w", err)
 	}
