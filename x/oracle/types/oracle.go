@@ -252,3 +252,10 @@ func (m *MsgUpgradeOracle) ToOracleRegistration() *OracleRegistration {
 		RegistrationType:       ORACLE_REGISTRATION_TYPE_UPGRADE,
 	}
 }
+
+func (m *OracleUpgradeInfo) ShouldExecute(ctx sdk.Context) bool {
+	if m.Height > 0 {
+		return m.Height <= ctx.BlockHeight()
+	}
+	return false
+}

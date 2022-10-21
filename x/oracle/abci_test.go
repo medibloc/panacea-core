@@ -342,6 +342,36 @@ func (suite abciTestSuite) TestEndBlockerNewOracleVoteRejectSamePower() {
 	suite.Require().Equal(oracleRegistration.Address, string(eventAttributes[1].Value))
 }
 
+func (suite abciTestSuite) TestOracleUpgradeSuccess() {
+	ctx := suite.Ctx
+
+	suite.Require().Equal(suite.uniqueID, suite.OracleKeeper.GetParams(ctx).UniqueId)
+
+	upgradeUniqueID := "upgradeUniqueID"
+
+	upgradeInfo := &types.OracleUpgradeInfo{
+		UniqueId: upgradeUniqueID,
+		Height:   ctx.BlockHeight(),
+	}
+
+	suite.Require().NoError(suite.OracleKeeper.SetOracleUpgradeInfo(ctx, upgradeInfo))
+
+	oracle.EndBlocker(suite.Ctx, suite.OracleKeeper)
+
+	suite.Require().Equal(upgradeUniqueID, suite.OracleKeeper.GetParams(ctx).UniqueId)
+
+	_, err := suite.OracleKeeper.GetOracleUpgradeInfo(ctx)
+	suite.Require().Error(err, types.ErrOracleUpgradeInfoNotFound)
+}
+
+func (suite abciTestSuite) TestOracleUpgradeEmptyUpgradeData() {
+	ctx := suite.Ctx
+
+	suite.Require().Equal(suite.uniqueID, suite.OracleKeeper.GetParams(ctx).UniqueId)
+
+	oracle.EndBlocker(suite.Ctx, suite.OracleKeeper)
+}
+
 func (suite abciTestSuite) TestEndBlockerUpgradeOracleVotePass() {
 	ctx := suite.Ctx
 	upgradeUniqueID := "UpgradeUniqueID"
