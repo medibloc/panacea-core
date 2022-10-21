@@ -347,7 +347,7 @@ func (suite *rewardTestSuite) TestRewardDistributionWithDelegators() {
 	suite.Require().Equal(sdk.NewCoin(assets.MicroMedDenom, sdk.ZeroInt()), distrBalance)
 
 	// distribute rewards to oracles
-	suite.DataDealKeeper.DistributeRewards(ctx, dealID, oracles)
+	suite.DataDealKeeper.DistributeOracleRewards(ctx, dealID, oracles)
 
 	ctx = ctx.WithBlockHeight(ctx.BlockHeight() + 1)
 
