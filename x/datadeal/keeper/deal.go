@@ -207,6 +207,7 @@ func (k Keeper) SellData(ctx sdk.Context, msg *types.MsgSellData) error {
 		sdk.NewEvent(
 			types.EventTypeDataVerificationVote,
 			sdk.NewAttribute(types.AttributeKeyVoteStatus, types.AttributeValueVoteStatusStarted),
+			sdk.NewAttribute(types.AttributeKeyDealID, strconv.FormatUint(dataSale.DealId, 10)),
 			sdk.NewAttribute(types.AttributeKeyDataHash, dataSale.DataHash),
 		),
 	)
