@@ -10,37 +10,50 @@ import (
 	"github.com/tendermint/tendermint/crypto/secp256k1"
 )
 
-func (k Keeper) RegisterOracle(ctx sdk.Context, msg *types.MsgRegisterOracle) error {
-	oracleAccAddr, err := sdk.AccAddressFromBech32(msg.OracleAddress)
+func (k Keeper) registerOracle(ctx sdk.Context, compareUniqueID func(string) error, oracleRegistration *types.OracleRegistration) error {
+	oracleAccAddr, err := sdk.AccAddressFromBech32(oracleRegistration.Address)
 	if err != nil {
 		return err
 	}
 
 	// check if the oracle is active validator
 	if err := k.checkValidatorStatus(ctx, oracleAccAddr); err != nil {
-		return sdkerrors.Wrapf(types.ErrRegisterOracle, err.Error())
+		return err
 	}
 
-	// check unique id
-	params := k.GetParams(ctx)
-	if params.UniqueId != msg.UniqueId {
-		return sdkerrors.Wrapf(types.ErrRegisterOracle, "is not match the currently active uniqueID")
+	if err := compareUniqueID(oracleRegistration.UniqueId); err != nil {
+		return err
 	}
 
 	// check oracle status
-	if err := k.checkOracleRegistrationStatus(ctx, msg.UniqueId, msg.OracleAddress); err != nil {
-		return sdkerrors.Wrapf(types.ErrRegisterOracle, err.Error())
+	if err := k.checkOracleRegistrationStatus(ctx, oracleRegistration.UniqueId, oracleRegistration.Address); err != nil {
+		return err
 	}
 
-	// store
-	oracleRegistration := types.NewOracleRegistration(msg)
 	oracleRegistration.VotingPeriod = k.GetVotingPeriod(ctx)
-
 	if err := k.SetOracleRegistration(ctx, oracleRegistration); err != nil {
-		return sdkerrors.Wrapf(types.ErrRegisterOracle, err.Error())
+		return err
 	}
 
 	k.AddOracleRegistrationQueue(ctx, oracleRegistration.UniqueId, oracleAccAddr, oracleRegistration.VotingPeriod.VotingEndTime)
+
+	return nil
+}
+
+func (k Keeper) RegisterOracle(ctx sdk.Context, msg *types.MsgRegisterOracle) error {
+	oracleRegistration := types.NewOracleRegistration(msg)
+	compareFn := func(uniqueID string) error {
+		// check unique id
+		params := k.GetParams(ctx)
+		if params.UniqueId != uniqueID {
+			return fmt.Errorf("is not match the currently active uniqueID")
+		}
+		return nil
+	}
+
+	if err := k.registerOracle(ctx, compareFn, oracleRegistration); err != nil {
+		return sdkerrors.Wrapf(types.ErrRegisterOracle, err.Error())
+	}
 
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(

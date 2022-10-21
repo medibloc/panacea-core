@@ -14,6 +14,9 @@ service Msg {
 
   // VoteOracleRegistration  defines a method for voting registration of oracle.
   rpc VoteOracleRegistration(MsgVoteOracleRegistration) returns (MsgVoteOracleRegistrationResponse);
+
+  // UpgradeOracle defines a method for upgrade of oracle.
+  rpc UpgradeOracle(MsgUpgradeOracle) returns (MsgUpgradeOracleResponse);
 }
 
 // MsgRegisterOracle defines the Msg/RegisterOracle request type.
@@ -39,3 +42,18 @@ message MsgVoteOracleRegistration {
 
 // MsgVoteOracleRegistrationResponse defines the Msg/VoteOracleRegistration response type.
 message MsgVoteOracleRegistrationResponse {}
+
+// MsgUpgradeOracle defines the Msg/UpgradeOracle request type.
+message MsgUpgradeOracle {
+  string unique_id = 1;
+  string oracle_address = 2;  // panacea1.. account address
+  bytes node_pub_key = 3;
+  bytes node_pub_key_remote_report = 4;
+  int64 trusted_block_height = 5;
+  bytes trusted_block_hash = 6;
+  bytes nonce = 7;
+}
+
+// MsgUpgradeOracleResponse defines the Msg/UpgradeOracle response type.
+message MsgUpgradeOracleResponse {
+}
