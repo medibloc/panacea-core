@@ -3,7 +3,7 @@ package cmd
 import (
 	"encoding/base64"
 	"encoding/hex"
-	"io/ioutil"
+	"os"
 	"strconv"
 
 	"github.com/btcsuite/btcd/btcec"
@@ -44,7 +44,7 @@ func EncryptData(defaultNodeHome string) *cobra.Command {
 				return err
 			}
 
-			originData, err := ioutil.ReadFile(args[0])
+			originData, err := os.ReadFile(args[0])
 			if err != nil {
 				return err
 			}
@@ -66,7 +66,7 @@ func EncryptData(defaultNodeHome string) *cobra.Command {
 				return err
 			}
 
-			err = ioutil.WriteFile(args[1], encryptedData, 0644)
+			err = os.WriteFile(args[1], encryptedData, 0644)
 			if err != nil {
 				return err
 			}
