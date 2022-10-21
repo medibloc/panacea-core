@@ -231,6 +231,14 @@ func (t TallyResult) ValidateBasic() error {
 	return nil
 }
 
+func (m OracleUpgradeInfo) ValidateBasic() error {
+	if m.Height < 0 {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "height must be greater than or equals to 0")
+	}
+
+	return nil
+}
+
 func (m *MsgUpgradeOracle) ToOracleRegistration() *OracleRegistration {
 	return &OracleRegistration{
 		UniqueId:               m.UniqueId,

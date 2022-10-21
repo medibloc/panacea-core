@@ -47,40 +47,40 @@ func GetDealKey(dealID uint64) []byte {
 	return append(KeyPrefixDeals, sdk.Uint64ToBigEndian(dealID)...)
 }
 
-func GetDataSaleKey(verifiableCID string, dealID uint64) []byte {
-	return append(DataSaleKey, CombineKeys(sdk.Uint64ToBigEndian(dealID), []byte(verifiableCID))...)
+func GetDataSaleKey(dataHash string, dealID uint64) []byte {
+	return append(DataSaleKey, CombineKeys(sdk.Uint64ToBigEndian(dealID), []byte(dataHash))...)
 }
 
-func GetDataVerificationQueueKey(verifiableCID string, dealID uint64, endTime time.Time) []byte {
-	return append(DataVerificationQueueKey, CombineKeys(sdk.FormatTimeBytes(endTime), sdk.Uint64ToBigEndian(dealID), []byte(verifiableCID))...)
+func GetDataVerificationVoteKey(dataHash string, voterAddress sdk.AccAddress, dealID uint64) []byte {
+	return append(DataVerificationVoteKey, CombineKeys(sdk.Uint64ToBigEndian(dealID), []byte(dataHash), voterAddress)...)
+}
+
+func GetDataVerificationVotesKey(dataHash string, dealID uint64) []byte {
+	return append(DataVerificationVoteKey, CombineKeys(sdk.Uint64ToBigEndian(dealID), []byte(dataHash))...)
+}
+
+func GetDataVerificationQueueKey(dataHash string, dealID uint64, endTime time.Time) []byte {
+	return append(DataVerificationQueueKey, CombineKeys(sdk.FormatTimeBytes(endTime), sdk.Uint64ToBigEndian(dealID), []byte(dataHash))...)
 }
 
 func GetDataVerificationQueueKeyByTimeKey(endTime time.Time) []byte {
 	return append(DataVerificationQueueKey, sdk.FormatTimeBytes(endTime)...)
 }
 
-func GetDataVerificationVoteKey(verifiableCID string, voterAddress sdk.AccAddress, dealID uint64) []byte {
-	return append(DataVerificationVoteKey, CombineKeys(sdk.Uint64ToBigEndian(dealID), []byte(verifiableCID), voterAddress)...)
-}
-
-func GetDataVerificationVotesKey(verifiableCID string, dealID uint64) []byte {
-	return append(DataVerificationVoteKey, CombineKeys(sdk.Uint64ToBigEndian(dealID), []byte(verifiableCID))...)
-}
-
 func SplitDataVerificationQueueKey(key []byte) (uint64, string) {
 	return sdk.BigEndianToUint64(key[1+lenTime+1 : 1+lenTime+1+8]), string(key[1+lenTime+1+8+1:])
 }
 
-func GetDataDeliveryVoteKey(dealID uint64, verifiableCID string, voterAddress sdk.AccAddress) []byte {
-	return append(DataDeliveryVoteKey, CombineKeys(sdk.Uint64ToBigEndian(dealID), []byte(verifiableCID), voterAddress)...)
+func GetDataDeliveryVoteKey(dealID uint64, dataHash string, voterAddress sdk.AccAddress) []byte {
+	return append(DataDeliveryVoteKey, CombineKeys(sdk.Uint64ToBigEndian(dealID), []byte(dataHash), voterAddress)...)
 }
 
-func GetDataDeliveryVotesKey(dealID uint64, verifiableCID string) []byte {
-	return append(DataDeliveryVoteKey, CombineKeys(sdk.Uint64ToBigEndian(dealID), []byte(verifiableCID))...)
+func GetDataDeliveryVotesKey(dealID uint64, dataHash string) []byte {
+	return append(DataDeliveryVoteKey, CombineKeys(sdk.Uint64ToBigEndian(dealID), []byte(dataHash))...)
 }
 
-func GetDataDeliveryQueueKey(dealID uint64, verifiableCID string, endTime time.Time) []byte {
-	return append(DataDeliveryQueueKey, CombineKeys(sdk.FormatTimeBytes(endTime), sdk.Uint64ToBigEndian(dealID), []byte(verifiableCID))...)
+func GetDataDeliveryQueueKey(dealID uint64, dataHash string, endTime time.Time) []byte {
+	return append(DataDeliveryQueueKey, CombineKeys(sdk.FormatTimeBytes(endTime), sdk.Uint64ToBigEndian(dealID), []byte(dataHash))...)
 }
 
 func GetDataDeliveryQueueByTimeKey(endTime time.Time) []byte {

@@ -151,9 +151,9 @@ enum OracleRegistrationType {
   // UNSPECIFIED type
   ORACLE_REGISTRATION_TYPE_UNSPECIFIED = 0;
 
-  // New oracle type
+  // For oracles newly added
   ORACLE_REGISTRATION_TYPE_NEW = 1;
 
-  // Upgrade oracle type
+  // For oracles to be upgraded
   ORACLE_REGISTRATION_TYPE_UPGRADE = 2;
 }

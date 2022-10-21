@@ -138,9 +138,9 @@ type OracleRegistrationType int32
 const (
 	// UNSPECIFIED type
 	ORACLE_REGISTRATION_TYPE_UNSPECIFIED OracleRegistrationType = 0
-	// New oracle type
+	// For oracles newly added
 	ORACLE_REGISTRATION_TYPE_NEW OracleRegistrationType = 1
-	// Upgrade oracle type
+	// For oracles to be upgraded
 	ORACLE_REGISTRATION_TYPE_UPGRADE OracleRegistrationType = 2
 )
 

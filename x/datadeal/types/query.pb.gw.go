@@ -143,15 +143,15 @@ func request_Query_DataSale_0(ctx context.Context, marshaler runtime.Marshaler, 
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "deal_id", err)
 	}
 
-	val, ok = pathParams["verifiable_cid"]
+	val, ok = pathParams["data_hash"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "verifiable_cid")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "data_hash")
 	}
 
-	protoReq.VerifiableCid, err = runtime.String(val)
+	protoReq.DataHash, err = runtime.String(val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "verifiable_cid", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "data_hash", err)
 	}
 
 	msg, err := client.DataSale(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -181,15 +181,15 @@ func local_request_Query_DataSale_0(ctx context.Context, marshaler runtime.Marsh
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "deal_id", err)
 	}
 
-	val, ok = pathParams["verifiable_cid"]
+	val, ok = pathParams["data_hash"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "verifiable_cid")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "data_hash")
 	}
 
-	protoReq.VerifiableCid, err = runtime.String(val)
+	protoReq.DataHash, err = runtime.String(val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "verifiable_cid", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "data_hash", err)
 	}
 
 	msg, err := server.DataSale(ctx, &protoReq)
@@ -219,15 +219,15 @@ func request_Query_DataVerificationVote_0(ctx context.Context, marshaler runtime
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "deal_id", err)
 	}
 
-	val, ok = pathParams["verifiable_cid"]
+	val, ok = pathParams["data_hash"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "verifiable_cid")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "data_hash")
 	}
 
-	protoReq.VerifiableCid, err = runtime.String(val)
+	protoReq.DataHash, err = runtime.String(val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "verifiable_cid", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "data_hash", err)
 	}
 
 	val, ok = pathParams["voter_address"]
@@ -268,15 +268,15 @@ func local_request_Query_DataVerificationVote_0(ctx context.Context, marshaler r
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "deal_id", err)
 	}
 
-	val, ok = pathParams["verifiable_cid"]
+	val, ok = pathParams["data_hash"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "verifiable_cid")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "data_hash")
 	}
 
-	protoReq.VerifiableCid, err = runtime.String(val)
+	protoReq.DataHash, err = runtime.String(val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "verifiable_cid", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "data_hash", err)
 	}
 
 	val, ok = pathParams["voter_address"]
@@ -317,15 +317,15 @@ func request_Query_DataDeliveryVote_0(ctx context.Context, marshaler runtime.Mar
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "deal_id", err)
 	}
 
-	val, ok = pathParams["verifiable_cid"]
+	val, ok = pathParams["data_hash"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "verifiable_cid")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "data_hash")
 	}
 
-	protoReq.VerifiableCid, err = runtime.String(val)
+	protoReq.DataHash, err = runtime.String(val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "verifiable_cid", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "data_hash", err)
 	}
 
 	val, ok = pathParams["voter_address"]
@@ -366,15 +366,15 @@ func local_request_Query_DataDeliveryVote_0(ctx context.Context, marshaler runti
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "deal_id", err)
 	}
 
-	val, ok = pathParams["verifiable_cid"]
+	val, ok = pathParams["data_hash"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "verifiable_cid")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "data_hash")
 	}
 
-	protoReq.VerifiableCid, err = runtime.String(val)
+	protoReq.DataHash, err = runtime.String(val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "verifiable_cid", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "data_hash", err)
 	}
 
 	val, ok = pathParams["voter_address"]
@@ -648,11 +648,11 @@ var (
 
 	pattern_Query_Deals_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"panacea", "datadeal", "v2alpha2", "deals"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_DataSale_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5}, []string{"panacea", "datadeal", "v2alpha2", "datasales", "deal_id", "verifiable_cid"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_DataSale_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5}, []string{"panacea", "datadeal", "v2alpha2", "datasales", "deal_id", "data_hash"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_DataVerificationVote_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6}, []string{"panacea", "datadeal", "v2alpha2", "data_verification_votes", "deal_id", "verifiable_cid", "voter_address"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_DataVerificationVote_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6}, []string{"panacea", "datadeal", "v2alpha2", "data_verification_votes", "deal_id", "data_hash", "voter_address"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_DataDeliveryVote_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6}, []string{"panacea", "datadeal", "v2alpha2", "data_delivery_votes", "deal_id", "verifiable_cid", "voter_address"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_DataDeliveryVote_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6}, []string{"panacea", "datadeal", "v2alpha2", "data_delivery_votes", "deal_id", "data_hash", "voter_address"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (
