@@ -1,4 +1,4 @@
-FROM golang:1.17-alpine3.14 AS build-env
+FROM golang:1.19.2-bullseye AS build-env
 
 # Install minimum necessary dependencies,
 RUN set -eux; apk add --no-cache ca-certificates build-base;
@@ -22,11 +22,11 @@ RUN sha256sum /lib/libwasmvm_muslc.a | grep d0152067a5609bfdfb3f0d5d6c0f2760f79d
 RUN make clean && BUILD_TAGS=muslc make build
 
 # Final image
-FROM debian:buster-slim
-#
-## Copy over binaries from the build-env
+FROM debian:bullseye-slim
+
+# Copy over binaries from the build-env
 COPY --from=build-env /src/panacea-core/build/panacead /usr/bin/panacead
 #
 RUN chmod +x /usr/bin/panacead
-#
+
 EXPOSE 26656 26657 1317 9090

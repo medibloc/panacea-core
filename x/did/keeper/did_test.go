@@ -21,7 +21,7 @@ func TestDIDTestSuite(t *testing.T) {
 	suite.Run(t, new(didTestSuite))
 }
 
-func (suite didTestSuite) TestSetGetDIDDocument() {
+func (suite *didTestSuite) TestSetGetDIDDocument() {
 	didKeeper := suite.DIDKeeper
 
 	// Input two DIDDocument
