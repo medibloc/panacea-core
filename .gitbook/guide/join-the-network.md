@@ -111,6 +111,36 @@ Insert those public nodes to the `persistent_peers` field in the `~/.panacea/con
 
 For more information on seeds and peers, see the [Using Tendermint: Peers](https://docs.tendermint.com/master/tendermint-core/using-tendermint.html#peers).
 
+### State Sync (Mainnet)
+
+Your node can rapidly sync with the network using state sync (recommended). For more details, please refer to [this](https://docs.tendermint.com/v0.34/tendermint-core/state-sync.html).
+
+To set state sync enabled, RPC servers and trusted block info (height and hash) are required.
+
+You can use the following public RPC endpoint provided by Medibloc team.
+- https://rpc.gopanacea.org
+
+You can obtain the trusted block info via RPC.
+
+```shell
+curl -s https://rpc.gopanacea.org/block | jq -r '.result.block.header.height + "\n" + .result.block_id.hash'
+# 7700000 (height)
+# 0D3E53F02ABCDDA8AAC1520342D37A290DDABE4C28190EE6E2C6B0C819F74D4A (hash)
+```
+
+Then, you need to edit several things in `~/.panacea/config/config.toml` file.
+
+```toml
+[statesync]
+
+enable = true
+
+rpc_servers = "https://rpc.gopanacea.org,<rpc_addr2>" # rpc addresses
+trust_height = 7700000 # trusted block height
+trust_hash = "<trusted-hash>" # trusted block hash
+trust_period = "336h0m0s" # 2/3 of 21 days (unbonding period)
+
+```
 
 ## Run a Full Node
 
