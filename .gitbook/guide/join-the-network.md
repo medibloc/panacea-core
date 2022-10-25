@@ -111,7 +111,7 @@ Insert those public nodes to the `persistent_peers` field in the `~/.panacea/con
 
 For more information on seeds and peers, see the [Using Tendermint: Peers](https://docs.tendermint.com/master/tendermint-core/using-tendermint.html#peers).
 
-### State Sync (Mainnet)
+### State Sync
 
 Your node can rapidly sync with the network using state sync (recommended). For more details, please refer to [this](https://docs.tendermint.com/v0.34/tendermint-core/state-sync.html).
 
