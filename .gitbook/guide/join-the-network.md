@@ -113,7 +113,7 @@ For more information on seeds and peers, see the [Using Tendermint: Peers](https
 
 ### State Sync
 
-Your node can rapidly sync with the network using state sync. For more details, please refer to [this](https://docs.tendermint.com/v0.34/tendermint-core/state-sync.html).
+Your node can rapidly sync with the network using state sync without replaying historical blocks. For more details, please refer to [this](https://docs.tendermint.com/v0.34/tendermint-core/state-sync.html).
 
 To set state sync enabled, RPC servers and trusted block info (height and hash) are required.
 
