@@ -66,7 +66,7 @@ func (suite *queryDealTestSuite) TestQueryDeal() {
 	suite.Require().Equal(deal, res.Deal)
 }
 
-func (suite queryDealTestSuite) TestQueryDeals() {
+func (suite *queryDealTestSuite) TestQueryDeals() {
 	// set deals
 	deal1 := suite.MakeTestDeal(1, suite.buyerAccAddr, 100)
 	err := suite.DataDealKeeper.SetDeal(suite.Ctx, deal1)
@@ -90,7 +90,7 @@ func (suite queryDealTestSuite) TestQueryDeals() {
 	suite.Require().Equal(res.Deal[2].Address, deal3.Address)
 }
 
-func (suite queryDealTestSuite) TestDataSale() {
+func (suite *queryDealTestSuite) TestDataSale() {
 	newDataSale := suite.MakeNewDataSale(suite.sellerAccAddr, suite.dataHash, suite.verifiableCID)
 	err := suite.DataDealKeeper.SetDataSale(suite.Ctx, newDataSale)
 	suite.Require().NoError(err)
@@ -109,7 +109,7 @@ func (suite queryDealTestSuite) TestDataSale() {
 	suite.Require().Equal(newDataSale.SellerAddress, res.DataSale.SellerAddress)
 }
 
-func (suite queryDealTestSuite) TestDataVerificationVote() {
+func (suite *queryDealTestSuite) TestDataVerificationVote() {
 	dataVerificationVote := suite.MakeNewDataVerificationVote(suite.oracleAccAddr, suite.dataHash)
 	err := suite.DataDealKeeper.SetDataVerificationVote(suite.Ctx, dataVerificationVote)
 	suite.Require().NoError(err)
@@ -125,7 +125,7 @@ func (suite queryDealTestSuite) TestDataVerificationVote() {
 	suite.Require().Equal(dataVerificationVote, res.DataVerificationVote)
 }
 
-func (suite queryDealTestSuite) TestDataDeliveryVote() {
+func (suite *queryDealTestSuite) TestDataDeliveryVote() {
 	dataVerificationVote := suite.MakeNewDataDeliveryVote(suite.oracleAccAddr, suite.dataHash, suite.deliveredCID, 1)
 	err := suite.DataDealKeeper.SetDataDeliveryVote(suite.Ctx, dataVerificationVote)
 	suite.Require().NoError(err)
