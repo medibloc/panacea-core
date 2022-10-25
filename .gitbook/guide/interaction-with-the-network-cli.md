@@ -293,7 +293,7 @@ panacead tx staking create-validator \
   For details about various key types, please see this [guide](interaction-with-the-network-cli.md#keys).
 - `moniker`: A validator nickname that will be displayed publicly
 - `details`: A detail description of the validator
-- `identity`: The `identity` can be used as to verify identity with systems like Keybase or UPort. When using with Keybase `identity` should be populated with a 16-digit string that is generated with a [keybase.io](https://keybase.io/) account.
+- `identity`: (Not required) The `identity` can be used as to verify identity with systems like Keybase or UPort. When using with Keybase `identity` should be populated with a 16-digit string that is generated with a [keybase.io](https://keybase.io/) account.
 - `commission-rate`: An initial commission rate on block rewards and fees charged to delegators
   - This shouldn't be smaller than the minimum commission rate (a genesis parameter) that can be queried by `panacead query staking params`.
 - `commission-max-rate`: A maximum commission rate which this validator can charge. This cannot be changed after the
@@ -501,7 +501,30 @@ With the `pool` command you will get the values for:
 
 * Not-bonded and bonded tokens
 
-## Fee Distribution
+## Reward Distribution
+
+### Withdraw rewards (and commissions)
+
+You can withdraw rewards proportional to your stake delegated to a specific validator.
+```bash
+panacead tx distribution withdraw-rewards <valoper-address> --from <delegator-address>
+```
+The `<valoper-address>` is an unique ID of a validator which starts with `panaceavaloper1`, while the `<delegator-address>` starts with `panacea1`.
+
+If you are a validator operator, you can withdraw commissions (collected from delegators) as well as rewards, by adding a `--commission` flag as below.
+```bash
+panacead tx distribution withdraw-rewards <valoper-address> --from <operator-address> --commission
+```
+
+If you are delegating to multiple validators, you can withdraw rewards from all validators that you are delegating to.
+```bash
+panacead tx distribution withdraw-all-rewards --from <delegator-address>
+```
+
+If you want to make your rewards to be withdrawn to another wallet, you can set an withdraw address as below. Then, whenever you execute `withdraw-rewards` or `withdraw-all-rewards` transactions, all rewards and commissions will be withdrawn to the withdraw address.
+```bash
+panacead tx distribution set-withdraw-addr <withdraw-address> --from <delegator-address>
+```
 
 ### Query distribution parameters
 
