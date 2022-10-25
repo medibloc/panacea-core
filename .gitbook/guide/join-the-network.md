@@ -137,8 +137,8 @@ Then, you need to edit several things in `~/.panacea/config/config.toml` file.
 enable = true
 
 rpc_servers = "13.124.96.254:26657,52.79.108.35:26657" # rpc addresses
-trust_height = 7700000 # trusted block height
-trust_hash = "<trusted-block-hash>" # trusted block hash
+trust_height = <trusted-block-height>
+trust_hash = "<trusted-block-hash>"
 trust_period = "336h0m0s" # 2/3 of 21 days (unbonding period)
 
 ```
