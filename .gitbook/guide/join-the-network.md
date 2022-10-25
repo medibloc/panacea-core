@@ -113,7 +113,7 @@ For more information on seeds and peers, see the [Using Tendermint: Peers](https
 
 ### State Sync
 
-Your node can rapidly sync with the network using state sync (recommended). For more details, please refer to [this](https://docs.tendermint.com/v0.34/tendermint-core/state-sync.html).
+Your node can rapidly sync with the network using state sync. For more details, please refer to [this](https://docs.tendermint.com/v0.34/tendermint-core/state-sync.html).
 
 To set state sync enabled, RPC servers and trusted block info (height and hash) are required.
 
@@ -138,7 +138,7 @@ enable = true
 
 rpc_servers = "13.124.96.254:26657,52.79.108.35:26657" # rpc addresses
 trust_height = 7700000 # trusted block height
-trust_hash = "<trusted-hash>" # trusted block hash
+trust_hash = "<trusted-block-hash>" # trusted block hash
 trust_period = "336h0m0s" # 2/3 of 21 days (unbonding period)
 
 ```
