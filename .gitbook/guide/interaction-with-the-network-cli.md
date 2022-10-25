@@ -505,7 +505,7 @@ With the `pool` command you will get the values for:
 
 ### Withdraw rewards (and commissions)
 
-You can withdraw rewards proportional to your delegated to a specific validator.
+You can withdraw rewards proportional to your stake delegated to a specific validator.
 ```bash
 panacead tx distribution withdraw-rewards <valoper-address> --from <delegator-address>
 ```
