@@ -4,6 +4,22 @@
 
 TBD
 
+## [v2.0.5](https://github.com/medibloc/panacea-core/releases/tag/v2.0.5) - 2022-10-19
+
+### Improvements
+
+- [\#466](https://github.com/medibloc/panacea-core/pull/466) feat: upgrade cosmos-sdk to v0.45.4
+- [\#467](https://github.com/medibloc/panacea-core/pull/467) build: use the official v0.9.3 release of cosmos/ledger-go
+- [\#468](https://github.com/medibloc/panacea-core/pull/468) feat: bump cosmos-sdk to v0.45.9 (for the [IBC security fix](https://forum.cosmos.network/t/ibc-security-advisory-dragonberry/7702))
+
+
+## [v2.0.4](https://github.com/medibloc/panacea-core/releases/tag/v2.0.4) - 2022-07-29
+
+### Improvements
+
+- [\#367](https://github.com/medibloc/panacea-core/pull/367) Use a new version of `cosmos/ledger-go` for Ledger Nano S+
+
+
 ## [v2.0.3](https://github.com/medibloc/panacea-core/releases/tag/v2.0.3) - 2022-04-12
 
 ### Improvements

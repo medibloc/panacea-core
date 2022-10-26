@@ -21,7 +21,7 @@ func (suite *aolMsgServerTestSuite) BeforeTest(_, _ string) {
 
 }
 
-func (suite aolMsgServerTestSuite) TestMsgServer() {
+func (suite *aolMsgServerTestSuite) TestMsgServer() {
 	ctx := suite.Ctx
 	goCtx := sdk.WrapSDKContext(ctx)
 	aolKeeper := suite.AolKeeper
