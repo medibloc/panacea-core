@@ -86,7 +86,7 @@ func makeSampleDate() (types.Oracle, types.OracleRegistration, types.OracleRegis
 		}
 }
 
-func (m genesisTestSuite) TestInitGenesis() {
+func (m *genesisTestSuite) TestInitGenesis() {
 	oracle1, oracleRegistration, oracleRegistrationVote, upgradeInfo := makeSampleDate()
 
 	genesis := types.GenesisState{
@@ -114,7 +114,7 @@ func (m genesisTestSuite) TestInitGenesis() {
 	m.Require().Equal(&genesis.OracleUpgradeInfo, oracleUpgradeInfo)
 }
 
-func (m genesisTestSuite) TestExportGenesis() {
+func (m *genesisTestSuite) TestExportGenesis() {
 	oracle1, oracleRegistration, oracleRegistrationVote, upgradeInfo := makeSampleDate()
 
 	err := m.OracleKeeper.SetOracle(m.Ctx, &oracle1)

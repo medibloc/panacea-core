@@ -52,7 +52,7 @@ func (suite *queryOracleTestSuite) BeforeTest(_, _ string) {
 	suite.nodePubKey = suite.nodePrivKey.PubKey()
 }
 
-func (suite queryOracleTestSuite) makeNewOracleRegistration() *types.OracleRegistration {
+func (suite *queryOracleTestSuite) makeNewOracleRegistration() *types.OracleRegistration {
 	return &types.OracleRegistration{
 		UniqueId:               suite.uniqueID,
 		Address:                suite.newOracleAccAddr.String(),
@@ -69,7 +69,7 @@ func (suite queryOracleTestSuite) makeNewOracleRegistration() *types.OracleRegis
 	}
 }
 
-func (suite queryOracleTestSuite) TestOracle() {
+func (suite *queryOracleTestSuite) TestOracle() {
 	ctx := suite.Ctx
 	oracleKeeper := suite.OracleKeeper
 
@@ -86,7 +86,7 @@ func (suite queryOracleTestSuite) TestOracle() {
 	suite.Require().Nil(res.Oracle.JailedAt)
 }
 
-func (suite queryOracleTestSuite) TestOracles() {
+func (suite *queryOracleTestSuite) TestOracles() {
 	ctx := suite.Ctx
 	oracleKeeper := suite.OracleKeeper
 
@@ -118,7 +118,7 @@ func (suite queryOracleTestSuite) TestOracles() {
 	}
 }
 
-func (suite queryOracleTestSuite) TestOracleRegistration() {
+func (suite *queryOracleTestSuite) TestOracleRegistration() {
 	ctx := suite.Ctx
 	oracleKeeper := suite.OracleKeeper
 
@@ -142,7 +142,7 @@ func (suite queryOracleTestSuite) TestOracleRegistration() {
 	suite.Require().Equal(newOracleRegistration.TrustedBlockHeight, res.OracleRegistration.TrustedBlockHeight)
 }
 
-func (suite queryOracleTestSuite) TestOracleRegistrationVote() {
+func (suite *queryOracleTestSuite) TestOracleRegistrationVote() {
 	ctx := suite.Ctx
 	oracleKeeper := suite.OracleKeeper
 
@@ -168,7 +168,7 @@ func (suite queryOracleTestSuite) TestOracleRegistrationVote() {
 	suite.Require().Equal(vote.VotingTargetAddress, res.OracleRegistrationVote.VotingTargetAddress)
 }
 
-func (suite queryOracleTestSuite) TestOracleParams() {
+func (suite *queryOracleTestSuite) TestOracleParams() {
 	ctx := suite.Ctx
 	oracleKeeper := suite.OracleKeeper
 
@@ -181,7 +181,7 @@ func (suite queryOracleTestSuite) TestOracleParams() {
 	suite.Require().Equal(types.DefaultParams(), *res.Params)
 }
 
-func (suite queryOracleTestSuite) TestOracleUpgradeInfo() {
+func (suite *queryOracleTestSuite) TestOracleUpgradeInfo() {
 	ctx := suite.Ctx
 	oracleKeeper := suite.OracleKeeper
 

@@ -1,67 +1,79 @@
 package keeper
 
 import (
-	"fmt"
-	"strconv"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
 	"github.com/medibloc/panacea-core/v2/types/assets"
 	"github.com/medibloc/panacea-core/v2/x/datadeal/types"
 	oracletypes "github.com/medibloc/panacea-core/v2/x/oracle/types"
 )
 
-// DistributeRewards distributes reward to oracles for data verification and delivery
-func (k Keeper) DistributeRewards(ctx sdk.Context, dealID uint64, oracles map[string]*oracletypes.OracleValidatorInfo) {
-	deal, err := k.GetDeal(ctx, dealID)
+func (k Keeper) DistributeVerificationRewards(ctx sdk.Context, dataSale *types.DataSale, voters []*oracletypes.VoterInfo) error {
+	deal, err := k.GetDeal(ctx, dataSale.DealId)
 	if err != nil {
-		panic(err)
+		return sdkerrors.Wrapf(types.ErrDistrVerificationRewards, err.Error())
 	}
 
-	dealAddress, err := sdk.AccAddressFromBech32(deal.GetAddress())
+	dealAccAddr, err := sdk.AccAddressFromBech32(deal.GetAddress())
 	if err != nil {
-		panic(err)
+		return sdkerrors.Wrapf(types.ErrDistrVerificationRewards, err.Error())
 	}
 
-	// calculate oracle commission
+	sellerAccAddr, err := sdk.AccAddressFromBech32(dataSale.GetSellerAddress())
+	if err != nil {
+		return sdkerrors.Wrapf(types.ErrDistrVerificationRewards, err.Error())
+	}
+
 	totalBudget := deal.GetBudget().Amount.ToDec()
 	maxNumData := sdk.NewIntFromUint64(deal.GetMaxNumData()).ToDec()
-	oracleCommission := k.oracleKeeper.GetParams(ctx).OracleCommissionRate
-	pricePerData := sdk.NewCoin(assets.MicroMedDenom, totalBudget.Quo(maxNumData).TruncateDec().Mul(oracleCommission).TruncateInt())
+	pricePerData := totalBudget.Quo(maxNumData).TruncateDec()
 
-	dealBalance := k.bankKeeper.GetBalance(ctx, dealAddress, assets.MicroMedDenom)
-	if dealBalance.IsLT(pricePerData) {
-		panic(fmt.Errorf("deal's balanace is not enough"))
+	dealBalance := k.bankKeeper.GetBalance(ctx, dealAccAddr, assets.MicroMedDenom)
+	if dealBalance.IsLT(sdk.NewCoin(assets.MicroMedDenom, pricePerData.TruncateInt())) {
+		return sdkerrors.Wrapf(types.ErrDistrVerificationRewards, "not enough balance in deal")
 	}
 
-	totalReward := sdk.NewDecCoinsFromCoins(pricePerData)
-	if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, dealAddress, distrtypes.ModuleName, sdk.Coins{pricePerData}); err != nil {
-		panic(err)
+	oracleCommissionRate := k.oracleKeeper.GetParams(ctx).OracleCommissionRate
+	sellerReward := sdk.NewCoin(assets.MicroMedDenom, pricePerData.Mul(sdk.OneDec().Sub(oracleCommissionRate)).TruncateInt())
+	// 50% of oracle commission for data verification
+	// remain is for data delivery
+	oracleRewards := sdk.NewCoin(assets.MicroMedDenom, pricePerData.Mul(oracleCommissionRate).Mul(types.DataVerificationRewardFraction).TruncateInt())
+
+	// send to seller
+	if err := k.bankKeeper.SendCoins(ctx, dealAccAddr, sellerAccAddr, sdk.NewCoins(sellerReward)); err != nil {
+		return sdkerrors.Wrapf(types.ErrDistrVerificationRewards, err.Error())
+	}
+
+	// send to oracles
+	if err := k.distributeOracleRewards(ctx, dealAccAddr, voters, oracleRewards); err != nil {
+		return sdkerrors.Wrapf(types.ErrDistrVerificationRewards, err.Error())
+	}
+
+	return nil
+}
+
+// distributeOracleRewards distributes reward to oracles for data verification and delivery
+func (k Keeper) distributeOracleRewards(ctx sdk.Context, dealAccAddr sdk.AccAddress, oracles []*oracletypes.VoterInfo, rewards sdk.Coin) error {
+	// send reward to distribution module
+	if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, dealAccAddr, distrtypes.ModuleName, sdk.Coins{rewards}); err != nil {
+		return err
 	}
 
 	// calculate total voting power
 	totalVotingPower := sdk.ZeroInt()
 	for _, oracle := range oracles {
-		if oracle.IsPossibleVote() {
-			totalVotingPower = totalVotingPower.Add(oracle.BondedTokens)
-		}
+		totalVotingPower = totalVotingPower.Add(oracle.VotingPower)
 	}
 	totalVotingPowerDec := totalVotingPower.ToDec()
 
-	// distribute rewards
+	// distribute rewards proportional to its voting power
+	totalRewards := sdk.NewDecCoinsFromCoins(rewards)
 	for _, oracle := range oracles {
-		if oracle.IsPossibleVote() {
-			bondedDec := oracle.BondedTokens.ToDec()
-			fraction := bondedDec.Quo(totalVotingPowerDec)
-			reward := totalReward.MulDec(fraction)
-			k.oracleKeeper.DistributeRewardToOracle(ctx, oracle.Address, reward)
-		}
+		bondedDec := oracle.VotingPower.ToDec()
+		reward := totalRewards.MulDec(bondedDec).QuoDecTruncate(totalVotingPowerDec)
+		k.oracleKeeper.DistributeRewardToOracle(ctx, oracle.GetVoterAddress(), reward)
 	}
 
-	ctx.EventManager().EmitEvent(
-		sdk.NewEvent(
-			oracletypes.EventTypeOracleReward,
-			sdk.NewAttribute(types.AttributeKeyDealID, strconv.FormatUint(dealID, 10)),
-		),
-	)
+	return nil
 }

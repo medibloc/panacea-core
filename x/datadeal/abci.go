@@ -46,6 +46,11 @@ func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) {
 				if err = keeper.IncrementCurNumDataAtDeal(ctx, dataSale.DealId); err != nil {
 					panic(err)
 				}
+
+				if err := keeper.DistributeVerificationRewards(ctx, dataSale, tallyResult.ValidVoters); err != nil {
+					panic(err)
+				}
+
 				dataSale.DeliveryVotingPeriod = oracleKeeper.GetVotingPeriod(ctx)
 				dataSale.Status = types.DATA_SALE_STATUS_DELIVERY_VOTING_PERIOD
 				keeper.AddDataDeliveryQueue(ctx, dataSale.DataHash, dataSale.DealId, oracleKeeper.GetVotingPeriod(ctx).VotingEndTime)

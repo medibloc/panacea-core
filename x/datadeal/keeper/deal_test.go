@@ -126,7 +126,7 @@ func (suite *dealTestSuite) TestCreateNewDeal() {
 	suite.Require().Equal(deal.GetStatus(), types.DEAL_STATUS_ACTIVE)
 }
 
-func (suite dealTestSuite) TestCheckDealCurNumDataAndIncrement() {
+func (suite *dealTestSuite) TestCheckDealCurNumDataAndIncrement() {
 	err := suite.FundAccount(suite.Ctx, suite.buyerAccAddr, suite.defaultFunds)
 	suite.Require().NoError(err)
 
@@ -161,7 +161,7 @@ func (suite dealTestSuite) TestCheckDealCurNumDataAndIncrement() {
 
 }
 
-func (suite dealTestSuite) TestSellDataSuccess() {
+func (suite *dealTestSuite) TestSellDataSuccess() {
 	msgSellData := &types.MsgSellData{
 		DealId:        1,
 		VerifiableCid: suite.verifiableCID1,
@@ -183,7 +183,7 @@ func (suite dealTestSuite) TestSellDataSuccess() {
 	suite.Require().Equal(dataSale.DataHash, suite.dataHash1)
 }
 
-func (suite dealTestSuite) TestSellDataStatusFailed() {
+func (suite *dealTestSuite) TestSellDataStatusFailed() {
 	newDataSale := suite.MakeNewDataSale(suite.sellerAccAddr, suite.dataHash1, suite.verifiableCID1)
 
 	newDataSale.Status = types.DATA_SALE_STATUS_VERIFICATION_FAILED
@@ -202,7 +202,7 @@ func (suite dealTestSuite) TestSellDataStatusFailed() {
 	suite.Require().NoError(err)
 }
 
-func (suite dealTestSuite) TestSellDataStatusVotingPeriod() {
+func (suite *dealTestSuite) TestSellDataStatusVotingPeriod() {
 	newDataSale := suite.MakeNewDataSale(suite.sellerAccAddr, suite.dataHash1, suite.verifiableCID1)
 	newDataSale.Status = types.DATA_SALE_STATUS_VERIFICATION_VOTING_PERIOD
 
@@ -220,7 +220,7 @@ func (suite dealTestSuite) TestSellDataStatusVotingPeriod() {
 	suite.Require().Error(err, types.ErrSellData)
 }
 
-func (suite dealTestSuite) TestSellDataStatusCompleted() {
+func (suite *dealTestSuite) TestSellDataStatusCompleted() {
 	newDataSale := suite.MakeNewDataSale(suite.sellerAccAddr, suite.dataHash1, suite.verifiableCID1)
 	newDataSale.Status = types.DATA_SALE_STATUS_COMPLETED
 
@@ -238,7 +238,7 @@ func (suite dealTestSuite) TestSellDataStatusCompleted() {
 	suite.Require().Error(err, types.ErrSellData)
 }
 
-func (suite dealTestSuite) TestSellDataDealNotExists() {
+func (suite *dealTestSuite) TestSellDataDealNotExists() {
 	msgSellData := &types.MsgSellData{
 		DealId:        2,
 		VerifiableCid: suite.verifiableCID1,
@@ -250,7 +250,7 @@ func (suite dealTestSuite) TestSellDataDealNotExists() {
 	suite.Require().Error(err, types.ErrSellData)
 }
 
-func (suite dealTestSuite) TestSellDataDealStatusNotActive() {
+func (suite *dealTestSuite) TestSellDataDealStatusNotActive() {
 	msgSellData := &types.MsgSellData{
 		DealId:        1,
 		VerifiableCid: suite.verifiableCID1,
@@ -276,7 +276,7 @@ func (suite dealTestSuite) TestSellDataDealStatusNotActive() {
 	suite.Require().Error(err, types.ErrSellData)
 }
 
-func (suite dealTestSuite) TestGetAllDataSalesList() {
+func (suite *dealTestSuite) TestGetAllDataSalesList() {
 	type dataSaleKey struct {
 		dataHash string
 		dealID   uint64
@@ -322,7 +322,7 @@ func (suite dealTestSuite) TestGetAllDataSalesList() {
 	}
 }
 
-func (suite dealTestSuite) TestDataVerificationVoteSuccess() {
+func (suite *dealTestSuite) TestDataVerificationVoteSuccess() {
 	oracleAccAddr := sdk.AccAddress(suite.oracleAccPubKey.Address().Bytes())
 	oracleAccount := suite.AccountKeeper.NewAccountWithAddress(suite.Ctx, oracleAccAddr)
 	suite.Require().NoError(oracleAccount.SetPubKey(suite.oracleAccPubKey))
@@ -359,7 +359,7 @@ func (suite dealTestSuite) TestDataVerificationVoteSuccess() {
 	suite.Require().Equal(dataVerificationVote, getDataVerificationVote)
 }
 
-func (suite dealTestSuite) TestDataVerificationVoteFailedVerifySignature() {
+func (suite *dealTestSuite) TestDataVerificationVoteFailedVerifySignature() {
 	oracleAccAddr := sdk.AccAddress(suite.oracleAccPubKey.Address().Bytes())
 	oracleAccount := suite.AccountKeeper.NewAccountWithAddress(suite.Ctx, oracleAccAddr)
 	suite.Require().NoError(oracleAccount.SetPubKey(suite.oracleAccPubKey))
@@ -386,7 +386,7 @@ func (suite dealTestSuite) TestDataVerificationVoteFailedVerifySignature() {
 	suite.Require().Error(err, oracletypes.ErrDetectionMaliciousBehavior)
 }
 
-func (suite dealTestSuite) TestDataVerificationInvalidDataSaleStatus() {
+func (suite *dealTestSuite) TestDataVerificationInvalidDataSaleStatus() {
 	oracleAccAddr := sdk.AccAddress(suite.oracleAccPubKey.Address().Bytes())
 	oracleAccount := suite.AccountKeeper.NewAccountWithAddress(suite.Ctx, oracleAccAddr)
 	suite.Require().NoError(oracleAccount.SetPubKey(suite.oracleAccPubKey))
@@ -441,7 +441,7 @@ func (suite dealTestSuite) TestDataVerificationInvalidDataSaleStatus() {
 	suite.Require().ErrorContains(err, "the current voted data's status is not 'VERIFICATION_VOTING_PERIOD'")
 }
 
-func (suite dealTestSuite) TestDataVerificationInvalidGenesisOracleStatus() {
+func (suite *dealTestSuite) TestDataVerificationInvalidGenesisOracleStatus() {
 	oracleAccAddr := sdk.AccAddress(suite.oracleAccPubKey.Address().Bytes())
 	oracleAccount := suite.AccountKeeper.NewAccountWithAddress(suite.Ctx, oracleAccAddr)
 	suite.Require().NoError(oracleAccount.SetPubKey(suite.oracleAccPubKey))
@@ -474,7 +474,7 @@ func (suite dealTestSuite) TestDataVerificationInvalidGenesisOracleStatus() {
 	suite.Require().Error(err, types.ErrOracleNotActive)
 }
 
-func (suite dealTestSuite) TestGetAllDataVerificationVoteList() {
+func (suite *dealTestSuite) TestGetAllDataVerificationVoteList() {
 	oracleAccAddr := sdk.AccAddress(suite.oracleAccPubKey.Address().Bytes())
 	oracleAccount := suite.AccountKeeper.NewAccountWithAddress(suite.Ctx, oracleAccAddr)
 	suite.Require().NoError(oracleAccount.SetPubKey(suite.oracleAccPubKey))
@@ -538,7 +538,7 @@ func (suite dealTestSuite) TestGetAllDataVerificationVoteList() {
 	}
 }
 
-func (suite dealTestSuite) TestDataDeliveryVoteSuccess() {
+func (suite *dealTestSuite) TestDataDeliveryVoteSuccess() {
 	ctx := suite.Ctx
 
 	oracleAccount := suite.AccountKeeper.NewAccountWithAddress(suite.Ctx, suite.oracleAccAddr)
@@ -588,7 +588,7 @@ func (suite dealTestSuite) TestDataDeliveryVoteSuccess() {
 	suite.Require().Equal(dataDeliveryVote, getDataDeliveryVote)
 }
 
-func (suite dealTestSuite) TestDataDeliveryVoteFailedVerifySignature() {
+func (suite *dealTestSuite) TestDataDeliveryVoteFailedVerifySignature() {
 	ctx := suite.Ctx
 
 	oracleAccount := suite.AccountKeeper.NewAccountWithAddress(suite.Ctx, suite.oracleAccAddr)
@@ -627,7 +627,7 @@ func (suite dealTestSuite) TestDataDeliveryVoteFailedVerifySignature() {
 	suite.Require().ErrorIs(err, oracletypes.ErrDetectionMaliciousBehavior)
 }
 
-func (suite dealTestSuite) TestDataDeliveryVoteFaildInvalidStatus() {
+func (suite *dealTestSuite) TestDataDeliveryVoteFaildInvalidStatus() {
 	ctx := suite.Ctx
 
 	oracleAccount := suite.AccountKeeper.NewAccountWithAddress(suite.Ctx, suite.oracleAccAddr)
@@ -669,7 +669,7 @@ func (suite dealTestSuite) TestDataDeliveryVoteFaildInvalidStatus() {
 	suite.Require().ErrorIs(err, types.ErrDataDeliveryVote)
 }
 
-func (suite dealTestSuite) TestDeactivateDeal() {
+func (suite *dealTestSuite) TestDeactivateDeal() {
 	ctx := suite.Ctx
 
 	err := suite.FundAccount(ctx, suite.buyerAccAddr, suite.defaultFunds)
@@ -710,7 +710,7 @@ func (suite dealTestSuite) TestDeactivateDeal() {
 	//TODO: Check the DataVerification/DeliveryVote Queue are removed well
 }
 
-func (suite dealTestSuite) TestDeactivateDealInvalidRequester() {
+func (suite *dealTestSuite) TestDeactivateDealInvalidRequester() {
 	ctx := suite.Ctx
 
 	msgDeactivateDeal := &types.MsgDeactivateDeal{
@@ -723,7 +723,7 @@ func (suite dealTestSuite) TestDeactivateDealInvalidRequester() {
 	suite.Require().ErrorContains(err, "only buyer can deactivate deal")
 }
 
-func (suite dealTestSuite) TestDeactivateDealStatusNotActive() {
+func (suite *dealTestSuite) TestDeactivateDealStatusNotActive() {
 	ctx := suite.Ctx
 
 	getDeal, err := suite.DataDealKeeper.GetDeal(ctx, 1)
