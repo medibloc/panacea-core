@@ -98,7 +98,7 @@ func (suite *rewardTestSuite) BeforeTest(_, _ string) {
 	})
 }
 
-func (suite rewardTestSuite) TestBasicVerificationRewardDistribution() {
+func (suite *rewardTestSuite) TestBasicVerificationRewardDistribution() {
 	ctx := suite.Ctx
 
 	err := suite.FundAccount(ctx, suite.buyerAccAddr, suite.defaultFunds)

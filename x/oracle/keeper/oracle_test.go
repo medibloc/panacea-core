@@ -84,7 +84,7 @@ func (suite *oracleTestSuite) BeforeTest(_, _ string) {
 	})
 }
 
-func (suite oracleTestSuite) makeNewOracleRegistration() *types.OracleRegistration {
+func (suite *oracleTestSuite) makeNewOracleRegistration() *types.OracleRegistration {
 	return &types.OracleRegistration{
 		UniqueId:               suite.uniqueID,
 		Address:                suite.newOracleAccAddr.String(),
@@ -101,7 +101,7 @@ func (suite oracleTestSuite) makeNewOracleRegistration() *types.OracleRegistrati
 	}
 }
 
-func (suite oracleTestSuite) TestRegisterOracleSuccess() {
+func (suite *oracleTestSuite) TestRegisterOracleSuccess() {
 	ctx := suite.Ctx
 
 	// set validator
@@ -145,7 +145,7 @@ func (suite oracleTestSuite) TestRegisterOracleSuccess() {
 	suite.Require().Equal(suite.oracleAccAddr.String(), string(eventVoteAttributes[1].Value))
 }
 
-func (suite oracleTestSuite) TestRegisterOracleFailedValidatorNotFound() {
+func (suite *oracleTestSuite) TestRegisterOracleFailedValidatorNotFound() {
 	ctx := suite.Ctx
 
 	msgRegisterOracle := &types.MsgRegisterOracle{
@@ -161,7 +161,7 @@ func (suite oracleTestSuite) TestRegisterOracleFailedValidatorNotFound() {
 	suite.Require().Error(err, types.ErrValidatorNotFound)
 }
 
-func (suite oracleTestSuite) TestRegisterOracleFailedValidatorJailed() {
+func (suite *oracleTestSuite) TestRegisterOracleFailedValidatorJailed() {
 	ctx := suite.Ctx
 
 	// set jailed validator
@@ -181,7 +181,7 @@ func (suite oracleTestSuite) TestRegisterOracleFailedValidatorJailed() {
 	suite.Require().Error(err, types.ErrJailedValidator)
 }
 
-func (suite oracleTestSuite) TestRegisterOracleFailedInvalidUniqueID() {
+func (suite *oracleTestSuite) TestRegisterOracleFailedInvalidUniqueID() {
 	ctx := suite.Ctx
 
 	// set validator
@@ -200,7 +200,7 @@ func (suite oracleTestSuite) TestRegisterOracleFailedInvalidUniqueID() {
 	suite.Require().Error(err, types.ErrRegisterOracle)
 }
 
-func (suite oracleTestSuite) TestRegisterOracleFailedStatusVotingPeriod() {
+func (suite *oracleTestSuite) TestRegisterOracleFailedStatusVotingPeriod() {
 	ctx := suite.Ctx
 
 	suite.SetValidator(suite.oracleAccPubKey, sdk.NewInt(70))
@@ -232,7 +232,7 @@ func (suite oracleTestSuite) TestRegisterOracleFailedStatusVotingPeriod() {
 	suite.Require().Error(err, types.ErrRegisterOracle)
 }
 
-func (suite oracleTestSuite) TestRegisterOracleFailedStatusPassedNotJailed() {
+func (suite *oracleTestSuite) TestRegisterOracleFailedStatusPassedNotJailed() {
 	ctx := suite.Ctx
 
 	suite.SetValidator(suite.oracleAccPubKey, sdk.NewInt(70))
