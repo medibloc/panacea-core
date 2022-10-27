@@ -661,8 +661,7 @@ func New(
 	app.SetAnteHandler(anteHandler)
 	app.SetEndBlocker(app.EndBlocker)
 
-	err = app.registerUpgradeHandlers()
-	if err != nil {
+	if err := app.registerUpgradeHandlers(); err != nil {
 		panic("Failed to register upgradeHandler: " + err.Error())
 	}
 
@@ -861,31 +860,7 @@ func initParamsKeeper(appCodec codec.Codec, legacyAmino *codec.LegacyAmino, key,
 // This function must be called before sealing the BaseApp (i.e. by app.LoadLatestVersion())
 // because the storetypes loader cannot be set if BaseApp is already sealed.
 func (app *App) registerUpgradeHandlers() error {
-	app.UpgradeKeeper.SetUpgradeHandler("v2.0.2", func(ctx sdk.Context, plan upgradetypes.Plan, _ module.VersionMap) (module.VersionMap, error) {
-		return nil, nil
-	})
-
-	app.UpgradeKeeper.SetUpgradeHandler("v2.1.0-alpha2", func(ctx sdk.Context, plan upgradetypes.Plan, _ module.VersionMap) (module.VersionMap, error) {
-		datadeal.InitGenesis(ctx, app.dataDealKeeper, *datadealtypes.DefaultGenesis())
-		oracle.InitGenesis(ctx, app.oracleKeeper, *oracletypes.DefaultGenesis())
-		return nil, nil
-	})
-
-	upgradeInfo, err := app.UpgradeKeeper.ReadUpgradeInfoFromDisk()
-	if err != nil {
-		return err
-	}
-
-	if upgradeInfo.Name == "v2.1.0-alpha2" && !app.UpgradeKeeper.IsSkipHeight(upgradeInfo.Height) {
-		storeUpgrades := storetypes.StoreUpgrades{
-			Added: []string{datadealtypes.ModuleName, oracletypes.ModuleName},
-		}
-
-		// configure storetypes loader that checks if version == upgradeHeight and applies storetypes upgrades
-		app.SetStoreLoader(upgradetypes.UpgradeStoreLoader(upgradeInfo.Height, &storeUpgrades))
-	}
-
-	app.UpgradeKeeper.SetUpgradeHandler("v2.2.0-alpha1", func(ctx sdk.Context, plan upgradetypes.Plan, _ module.VersionMap) (module.VersionMap, error) {
+	app.UpgradeKeeper.SetUpgradeHandler("v2.0.5", func(ctx sdk.Context, plan upgradetypes.Plan, _ module.VersionMap) (module.VersionMap, error) {
 		// 1st-time running in-store migrations, using 1 as fromVersion to
 		// avoid running InitGenesis.
 		fromVM := map[string]uint64{
@@ -909,8 +884,6 @@ func (app *App) registerUpgradeHandlers() error {
 			"did":          1,
 			"burn":         1,
 			"wasm":         1,
-			"datadeal":     1,
-			"oracle":       1,
 		}
 
 		app.IBCKeeper.ConnectionKeeper.SetParams(ctx, ibcconnectiontypes.DefaultParams())
@@ -918,7 +891,12 @@ func (app *App) registerUpgradeHandlers() error {
 		return app.mm.RunMigrations(ctx, app.configurator, fromVM)
 	})
 
-	if upgradeInfo.Name == "v2.2.0-alpha1" && !app.UpgradeKeeper.IsSkipHeight(upgradeInfo.Height) {
+	upgradeInfo, err := app.UpgradeKeeper.ReadUpgradeInfoFromDisk()
+	if err != nil {
+		return err
+	}
+
+	if upgradeInfo.Name == "v2.0.5" && !app.UpgradeKeeper.IsSkipHeight(upgradeInfo.Height) {
 		storeUpgrades := storetypes.StoreUpgrades{
 			Added:   []string{"authz", "feegrant"},
 			Deleted: []string{"token"},

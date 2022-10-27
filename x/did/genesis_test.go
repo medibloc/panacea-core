@@ -21,7 +21,7 @@ func TestGenesisTestSuite(t *testing.T) {
 	suite.Run(t, new(genesisTestSuite))
 }
 
-func (suite genesisTestSuite) TestGenesis() {
+func (suite *genesisTestSuite) TestGenesis() {
 	didKeeper := suite.DIDKeeper
 
 	// prepare a keeper with some data
@@ -51,11 +51,11 @@ func (suite genesisTestSuite) TestGenesis() {
 	suite.Require().Equal(doc2Deactivated, didKeeper.GetDIDDocument(suite.Ctx, did2))
 }
 
-func (suite genesisTestSuite) newGenesisKey(did string) string {
+func (suite *genesisTestSuite) newGenesisKey(did string) string {
 	return types.GenesisDIDDocumentKey{DID: did}.Marshal()
 }
 
-func (suite genesisTestSuite) newDIDDocumentWithSeq(did string) (types.DIDDocumentWithSeq, crypto.PrivKey) {
+func (suite *genesisTestSuite) newDIDDocumentWithSeq(did string) (types.DIDDocumentWithSeq, crypto.PrivKey) {
 	privKey := secp256k1.GenPrivKey()
 	pubKey := secp256k1util.PubKeyBytes(secp256k1util.DerivePubKey(privKey))
 	verificationMethodID := types.NewVerificationMethodID(did, "key1")
