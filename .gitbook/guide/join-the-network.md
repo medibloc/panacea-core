@@ -124,7 +124,7 @@ You can use the following public RPC endpoints provided by Medibloc team.
 trusted block info can be obtained via RPC.
 
 ```shell
-curl -s 13.124.96.254:26657 | jq -r '.result.block.header.height + "\n" + .result.block_id.hash'
+curl -s 13.124.96.254:26657/block | jq -r '.result.block.header.height + "\n" + .result.block_id.hash'
 # 7700000 (height)
 # 0D3E53F02ABCDDA8AAC1520342D37A290DDABE4C28190EE6E2C6B0C819F74D4A (hash)
 ```
