@@ -6,6 +6,11 @@ import (
 	oracletypes "github.com/medibloc/panacea-core/v2/x/oracle/types"
 )
 
+var (
+	_ oracletypes.Vote = (*DataVerificationVote)(nil)
+	_ oracletypes.Vote = (*DataDeliveryVote)(nil)
+)
+
 func NewDataSale(msg *MsgSellData) *DataSale {
 	return &DataSale{
 		SellerAddress: msg.SellerAddress,

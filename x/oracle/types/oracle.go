@@ -10,6 +10,10 @@ import (
 
 const NonceSize = 12
 
+var (
+	_ Vote = (*OracleRegistrationVote)(nil)
+)
+
 func NewOracle(address string, status OracleStatus) *Oracle {
 	return &Oracle{
 		Address: address,
