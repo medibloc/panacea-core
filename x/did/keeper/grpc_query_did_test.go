@@ -19,7 +19,7 @@ func TestQueryDIDTestSuite(t *testing.T) {
 	suite.Run(t, new(queryDIDTestSuite))
 }
 
-func (suite queryDIDTestSuite) TestDIDDocumentWithSeq() {
+func (suite *queryDIDTestSuite) TestDIDDocumentWithSeq() {
 	didKeeper := suite.DIDKeeper
 	did := "did1:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm"
 	docWithSeq, _ := makeTestDIDDocumentWithSeq(did)
