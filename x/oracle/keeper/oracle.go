@@ -114,7 +114,7 @@ func (k Keeper) VoteOracleRegistration(ctx sdk.Context, vote *types.OracleRegist
 		return sdkerrors.Wrap(types.ErrOracleRegistrationVote, err.Error())
 	}
 
-	if !k.verifyVoteSignature(ctx, vote, signature) {
+	if !k.VerifyVoteSignature(ctx, vote, signature) {
 		// TODO implements request slashing
 		return sdkerrors.Wrap(types.ErrDetectionMaliciousBehavior, "")
 	}
@@ -133,11 +133,10 @@ func (k Keeper) VoteOracleRegistration(ctx sdk.Context, vote *types.OracleRegist
 	return nil
 }
 
-// verifyVoteSignature defines to check for malicious requests.
-func (k Keeper) verifyVoteSignature(ctx sdk.Context, vote *types.OracleRegistrationVote, signature []byte) bool {
+// VerifyVoteSignature verifies the signature of vote with oracle public key
+func (k Keeper) VerifyVoteSignature(ctx sdk.Context, vote types.Vote, signature []byte) bool {
 	voteBz := k.cdc.MustMarshal(vote)
 
-	// Verifies that voting requests are signed with oraclePrivKey.
 	oraclePubKeyBz := k.GetParams(ctx).MustDecodeOraclePublicKey()
 	return secp256k1.PubKey(oraclePubKeyBz).VerifySignature(voteBz, signature)
 }
