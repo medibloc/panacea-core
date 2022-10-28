@@ -140,7 +140,12 @@ rpc_servers = "13.124.96.254:26657,52.79.108.35:26657" # rpc addresses
 trust_height = <trusted-block-height>
 trust_hash = "<trusted-block-hash>"
 trust_period = "336h0m0s" # 2/3 of 21 days (unbonding period)
+```
 
+If your node have block history data previously synced, you need to clear the data first.
+
+```shell
+panacead tendermint unsafe-reset-all
 ```
 
 ## Run a Full Node
