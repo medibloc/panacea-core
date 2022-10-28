@@ -188,6 +188,11 @@ func (msg *MsgVoteDataDelivery) ValidateBasic() error {
 	return nil
 }
 
+func (msg *MsgVoteDataDelivery) GetSignBytes() []byte {
+	bz := ModuleCdc.MustMarshalJSON(msg)
+	return sdk.MustSortJSON(bz)
+}
+
 func (msg *MsgVoteDataDelivery) GetSigners() []sdk.AccAddress {
 	voterAddress, err := sdk.AccAddressFromBech32(msg.DataDeliveryVote.VoterAddress)
 	if err != nil {
