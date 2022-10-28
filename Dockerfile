@@ -1,4 +1,4 @@
-FROM golang:1.19.2-bullseye AS build-env
+FROM golang:1.19.2-alpine3.15 AS build-env
 
 # Install minimum necessary dependencies,
 RUN set -eux; apk add --no-cache ca-certificates build-base;
