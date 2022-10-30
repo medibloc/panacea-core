@@ -24,7 +24,7 @@ func TestTopicKeeperTestSuite(t *testing.T) {
 	suite.Run(t, new(topicTestSuite))
 }
 
-func (suite topicTestSuite) TestOneTopic() {
+func (suite *topicTestSuite) TestOneTopic() {
 	ctx := suite.Ctx
 	aolKeeper := suite.AolKeeper
 
@@ -58,7 +58,7 @@ func (suite topicTestSuite) TestOneTopic() {
 	suite.Require().Equal(uint64(0), resultAllTopics[0].TotalWriters)
 }
 
-func (suite topicTestSuite) TestMultiTopic() {
+func (suite *topicTestSuite) TestMultiTopic() {
 	ctx := suite.Ctx
 	aolKeeper := suite.AolKeeper
 

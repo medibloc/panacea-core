@@ -35,7 +35,7 @@ func TestGenesisTestSuite(t *testing.T) {
 	suite.Run(t, new(genesisTestSuite))
 }
 
-func makeSampleDate() (types.Oracle, types.OracleRegistration, types.OracleRegistrationVote, types.OracleUpgradeInfo) {
+func makeSampleDate() (types.Oracle, types.OracleRegistration, types.OracleRegistrationVote, *types.OracleUpgradeInfo) {
 	return types.Oracle{
 			Address:  oracleAcc.String(),
 			Status:   types.ORACLE_STATUS_ACTIVE,
@@ -80,13 +80,13 @@ func makeSampleDate() (types.Oracle, types.OracleRegistration, types.OracleRegis
 			VoteOption:             types.VOTE_OPTION_YES,
 			EncryptedOraclePrivKey: []byte("encryptedOraclePrivKey"),
 		},
-		types.OracleUpgradeInfo{
+		&types.OracleUpgradeInfo{
 			UniqueId: "UpgradeUniqueID",
 			Height:   10000,
 		}
 }
 
-func (m genesisTestSuite) TestInitGenesis() {
+func (m *genesisTestSuite) TestInitGenesis() {
 	oracle1, oracleRegistration, oracleRegistrationVote, upgradeInfo := makeSampleDate()
 
 	genesis := types.GenesisState{
@@ -111,10 +111,10 @@ func (m genesisTestSuite) TestInitGenesis() {
 
 	oracleUpgradeInfo, err := m.OracleKeeper.GetOracleUpgradeInfo(m.Ctx)
 	m.Require().NoError(err)
-	m.Require().Equal(&genesis.OracleUpgradeInfo, oracleUpgradeInfo)
+	m.Require().Equal(genesis.OracleUpgradeInfo, oracleUpgradeInfo)
 }
 
-func (m genesisTestSuite) TestExportGenesis() {
+func (m *genesisTestSuite) TestExportGenesis() {
 	oracle1, oracleRegistration, oracleRegistrationVote, upgradeInfo := makeSampleDate()
 
 	err := m.OracleKeeper.SetOracle(m.Ctx, &oracle1)
@@ -129,7 +129,7 @@ func (m genesisTestSuite) TestExportGenesis() {
 	params := types.DefaultParams()
 	m.OracleKeeper.SetParams(m.Ctx, params)
 
-	err = m.OracleKeeper.SetOracleUpgradeInfo(m.Ctx, &upgradeInfo)
+	err = m.OracleKeeper.SetOracleUpgradeInfo(m.Ctx, upgradeInfo)
 	m.Require().NoError(err)
 
 	genesisStatus := oracle.ExportGenesis(m.Ctx, m.OracleKeeper)

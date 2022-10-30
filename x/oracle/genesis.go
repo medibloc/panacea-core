@@ -29,8 +29,10 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 
 	k.SetParams(ctx, genState.Params)
 
-	if err := k.SetOracleUpgradeInfo(ctx, &genState.OracleUpgradeInfo); err != nil {
-		panic(err)
+	if genState.OracleUpgradeInfo != nil {
+		if err := k.SetOracleUpgradeInfo(ctx, genState.OracleUpgradeInfo); err != nil {
+			panic(err)
+		}
 	}
 
 }
@@ -63,7 +65,7 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	if err != nil {
 		panic(err)
 	}
-	genesis.OracleUpgradeInfo = *upgradeInfo
+	genesis.OracleUpgradeInfo = upgradeInfo
 
 	return genesis
 }

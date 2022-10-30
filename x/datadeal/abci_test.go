@@ -117,7 +117,7 @@ func (suite *abciTestSuite) BeforeTest(_, _ string) {
 	suite.dealID = dealID
 }
 
-func (suite abciTestSuite) TestDataVerificationEndBlockerVotePass() {
+func (suite *abciTestSuite) TestDataVerificationEndBlockerVotePass() {
 	ctx := suite.Ctx
 
 	oracle1 := suite.CreateOracleValidator(suite.oraclePubKey, sdk.NewInt(70))
@@ -263,7 +263,7 @@ func (suite abciTestSuite) TestDataVerificationEndBlockerVotePass() {
 	}
 }
 
-func (suite abciTestSuite) TestDataVerificationEndBlockerVoteReject() {
+func (suite *abciTestSuite) TestDataVerificationEndBlockerVoteReject() {
 	ctx := suite.Ctx
 
 	suite.CreateOracleValidator(suite.oraclePubKey, sdk.NewInt(70))
@@ -358,7 +358,7 @@ func (suite abciTestSuite) TestDataVerificationEndBlockerVoteReject() {
 	}
 }
 
-func (suite abciTestSuite) TestDataVerificationEndBlockerVoteRejectSamePower() {
+func (suite *abciTestSuite) TestDataVerificationEndBlockerVoteRejectSamePower() {
 	ctx := suite.Ctx
 
 	suite.CreateOracleValidator(suite.oraclePubKey, sdk.NewInt(10))
@@ -461,7 +461,7 @@ func (suite abciTestSuite) TestDataVerificationEndBlockerVoteRejectSamePower() {
 	}
 }
 
-func (suite abciTestSuite) TestDataVerificationEndBlockerVoteRejectDealCompleted() {
+func (suite *abciTestSuite) TestDataVerificationEndBlockerVoteRejectDealCompleted() {
 	ctx := suite.Ctx
 
 	budget := &sdk.Coin{Denom: assets.MicroMedDenom, Amount: sdk.NewInt(10000000)}
@@ -610,7 +610,7 @@ func (suite abciTestSuite) TestDataVerificationEndBlockerVoteRejectDealCompleted
 	suite.Require().Equal(uint64(1), updatedDeal.CurNumData)
 }
 
-func (suite abciTestSuite) TestDataDeliveryEndBlockerVotePass() {
+func (suite *abciTestSuite) TestDataDeliveryEndBlockerVotePass() {
 	ctx := suite.Ctx
 
 	oracle1 := suite.CreateOracleValidator(suite.oraclePubKey, sdk.NewInt(70))
@@ -746,7 +746,7 @@ func (suite abciTestSuite) TestDataDeliveryEndBlockerVotePass() {
 	}
 }
 
-func (suite abciTestSuite) TestDataDeliveryEndBlockerVoteReject() {
+func (suite *abciTestSuite) TestDataDeliveryEndBlockerVoteReject() {
 	ctx := suite.Ctx
 
 	suite.CreateOracleValidator(suite.oraclePubKey, sdk.NewInt(70))
@@ -845,7 +845,7 @@ func (suite abciTestSuite) TestDataDeliveryEndBlockerVoteReject() {
 	}
 }
 
-func (suite abciTestSuite) TestDataDeliveryEndBlockerVoteRejectSamePower() {
+func (suite *abciTestSuite) TestDataDeliveryEndBlockerVoteRejectSamePower() {
 	ctx := suite.Ctx
 
 	suite.CreateOracleValidator(suite.oraclePubKey, sdk.NewInt(10))

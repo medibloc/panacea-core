@@ -1,14 +1,15 @@
 package keeper_test
 
 import (
+	"testing"
+	"time"
+
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/medibloc/panacea-core/v2/x/oracle/testutil"
 	"github.com/medibloc/panacea-core/v2/x/oracle/types"
 	"github.com/stretchr/testify/suite"
-	"testing"
-	"time"
 )
 
 type keeperTestSuite struct {
@@ -48,7 +49,7 @@ func (suite *keeperTestSuite) BeforeTest(_, _ string) {
 	suite.oracleAccAddr3 = sdk.AccAddress(suite.oracleAccPubKey3.Address())
 }
 
-func (suite keeperTestSuite) TestClosedVoteQueue() {
+func (suite *keeperTestSuite) TestClosedVoteQueue() {
 	now := time.Now()
 	suite.OracleKeeper.AddOracleRegistrationQueue(suite.Ctx, suite.uniqueID, suite.oracleAccAddr, now.Add(1*time.Second))
 	suite.OracleKeeper.AddOracleRegistrationQueue(suite.Ctx, suite.uniqueID, suite.oracleAccAddr2, now.Add(3*time.Second))

@@ -7,12 +7,10 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
-	"github.com/medibloc/panacea-core/v2/types/assets"
-	oracletypes "github.com/medibloc/panacea-core/v2/x/oracle/types"
-	"github.com/tendermint/tendermint/crypto/secp256k1"
-
 	gogotypes "github.com/gogo/protobuf/types"
+	"github.com/medibloc/panacea-core/v2/types/assets"
 	"github.com/medibloc/panacea-core/v2/x/datadeal/types"
+	oracletypes "github.com/medibloc/panacea-core/v2/x/oracle/types"
 )
 
 func (k Keeper) CreateDeal(ctx sdk.Context, buyerAddress sdk.AccAddress, msg *types.MsgCreateDeal) (uint64, error) {
@@ -275,7 +273,7 @@ func (k Keeper) VoteDataVerification(ctx sdk.Context, vote *types.DataVerificati
 		return sdkerrors.Wrapf(types.ErrDataVerificationVote, err.Error())
 	}
 
-	if !k.verifyDataVerificationVoteSignature(ctx, vote, signature) {
+	if !k.oracleKeeper.VerifyVoteSignature(ctx, vote, signature) {
 		return sdkerrors.Wrap(oracletypes.ErrDetectionMaliciousBehavior, "")
 	}
 
@@ -295,7 +293,7 @@ func (k Keeper) VoteDataDelivery(ctx sdk.Context, vote *types.DataDeliveryVote, 
 		return sdkerrors.Wrap(types.ErrDataDeliveryVote, err.Error())
 	}
 
-	if !k.verifyDataDeliveryVoteSignature(ctx, vote, signature) {
+	if !k.oracleKeeper.VerifyVoteSignature(ctx, vote, signature) {
 		return sdkerrors.Wrap(oracletypes.ErrDetectionMaliciousBehavior, "")
 	}
 
@@ -310,21 +308,6 @@ func (k Keeper) VoteDataDelivery(ctx sdk.Context, vote *types.DataDeliveryVote, 
 	}
 
 	return nil
-}
-
-// verifyVoteSignature defines to check for malicious requests.
-func (k Keeper) verifyDataVerificationVoteSignature(ctx sdk.Context, vote *types.DataVerificationVote, signature []byte) bool {
-	voteBz := k.cdc.MustMarshal(vote)
-
-	oraclePubKeyBz := k.oracleKeeper.GetParams(ctx).MustDecodeOraclePublicKey()
-	return secp256k1.PubKey(oraclePubKeyBz).VerifySignature(voteBz, signature)
-}
-
-func (k Keeper) verifyDataDeliveryVoteSignature(ctx sdk.Context, vote *types.DataDeliveryVote, signature []byte) bool {
-	voteBz := k.cdc.MustMarshal(vote)
-
-	oraclePubKeyBz := k.oracleKeeper.GetParams(ctx).MustDecodeOraclePublicKey()
-	return secp256k1.PubKey(oraclePubKeyBz).VerifySignature(voteBz, signature)
 }
 
 // validateDataVerificationVote checks the data/verification status in the Panacea to ensure that the data can be voted to be verified.
