@@ -104,7 +104,7 @@ func (suite *oracleTestSuite) TestUpgradeOracleNotSameUniqueID() {
 	suite.Require().Equal(0, len(events))
 }
 
-func (suite oracleTestSuite) TestUpgradeOracleFailedValidatorNotFound() {
+func (suite *oracleTestSuite) TestUpgradeOracleFailedValidatorNotFound() {
 	ctx := suite.Ctx
 	nonce := []byte("nonce")
 
@@ -122,7 +122,7 @@ func (suite oracleTestSuite) TestUpgradeOracleFailedValidatorNotFound() {
 	suite.Require().Error(err, types.ErrValidatorNotFound)
 }
 
-func (suite oracleTestSuite) TestUpgradeOracleFailedValidatorJailed() {
+func (suite *oracleTestSuite) TestUpgradeOracleFailedValidatorJailed() {
 	ctx := suite.Ctx
 	nonce := []byte("nonce")
 
@@ -144,7 +144,7 @@ func (suite oracleTestSuite) TestUpgradeOracleFailedValidatorJailed() {
 	suite.Require().Error(err, types.ErrJailedValidator)
 }
 
-func (suite oracleTestSuite) TestApplyUpgradeSuccess() {
+func (suite *oracleTestSuite) TestApplyUpgradeSuccess() {
 	ctx := suite.Ctx
 
 	params := types.DefaultParams()

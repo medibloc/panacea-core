@@ -14,7 +14,7 @@ func DefaultGenesis() *GenesisState {
 		OracleRegistrations:     []OracleRegistration{},
 		OracleRegistrationVotes: []OracleRegistrationVote{},
 		Params:                  DefaultParams(),
-		OracleUpgradeInfo:       OracleUpgradeInfo{},
+		OracleUpgradeInfo:       nil,
 	}
 }
 
@@ -52,8 +52,10 @@ func (m GenesisState) Validate() error {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, err.Error())
 	}
 
-	if err := m.OracleUpgradeInfo.ValidateBasic(); err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, err.Error())
+	if m.OracleUpgradeInfo != nil {
+		if err := m.OracleUpgradeInfo.ValidateBasic(); err != nil {
+			return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, err.Error())
+		}
 	}
 
 	return nil

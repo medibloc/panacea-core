@@ -10,6 +10,10 @@ import (
 
 const NonceSize = 12
 
+var (
+	_ Vote = (*OracleRegistrationVote)(nil)
+)
+
 func NewOracle(address string, status OracleStatus) *Oracle {
 	return &Oracle{
 		Address: address,
@@ -104,9 +108,6 @@ func (m OracleRegistrationVote) ValidateBasic() error {
 
 	if _, err := sdk.AccAddressFromBech32(m.VotingTargetAddress); err != nil {
 		return sdkerrors.Wrapf(err, "votingTargetAddress is invalid. address: %s", m.VotingTargetAddress)
-	}
-	if len(m.EncryptedOraclePrivKey) == 0 {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "encryptedOraclePrivKey is empty")
 	}
 	if err := m.VoteOption.ValidateBasic(); err != nil {
 		return err

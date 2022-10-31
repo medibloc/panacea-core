@@ -21,7 +21,7 @@ func TestMsgServerTestSuite(t *testing.T) {
 	suite.Run(t, new(msgServerTestSuite))
 }
 
-func (suite msgServerTestSuite) TestHandleMsgCreateDID() {
+func (suite *msgServerTestSuite) TestHandleMsgCreateDID() {
 	didKeeper := suite.DIDKeeper
 	didMsgServer := suite.DIDMsgServer
 
@@ -35,7 +35,7 @@ func (suite msgServerTestSuite) TestHandleMsgCreateDID() {
 	suite.Require().Equal(docWithSeq, didKeeper.GetDIDDocument(suite.Ctx, did))
 }
 
-func (suite msgServerTestSuite) TestHandleMsgCreateDID_Exists() {
+func (suite *msgServerTestSuite) TestHandleMsgCreateDID_Exists() {
 	didKeeper := suite.DIDKeeper
 	didMsgServer := suite.DIDMsgServer
 
@@ -55,7 +55,7 @@ func (suite msgServerTestSuite) TestHandleMsgCreateDID_Exists() {
 	suite.Require().Nil(res)
 }
 
-func (suite msgServerTestSuite) TestHandleMsgCreateDID_Deactivated() {
+func (suite *msgServerTestSuite) TestHandleMsgCreateDID_Deactivated() {
 	didKeeper := suite.DIDKeeper
 	didMsgServer := suite.DIDMsgServer
 	goContext := sdk.WrapSDKContext(suite.Ctx)
@@ -81,7 +81,7 @@ func (suite msgServerTestSuite) TestHandleMsgCreateDID_Deactivated() {
 	suite.Require().Nil(res)
 }
 
-func (suite msgServerTestSuite) TestHandleMsgCreateDID_SigVerificationFailed() {
+func (suite *msgServerTestSuite) TestHandleMsgCreateDID_SigVerificationFailed() {
 	didMsgServer := suite.DIDMsgServer
 	goContext := sdk.WrapSDKContext(suite.Ctx)
 
@@ -97,7 +97,7 @@ func (suite msgServerTestSuite) TestHandleMsgCreateDID_SigVerificationFailed() {
 	suite.Require().Nil(res)
 }
 
-func (suite msgServerTestSuite) TestHandleMsgUpdateDID() {
+func (suite *msgServerTestSuite) TestHandleMsgUpdateDID() {
 	didKeeper := suite.DIDKeeper
 	didMsgServer := suite.DIDMsgServer
 	goContext := sdk.WrapSDKContext(suite.Ctx)
@@ -139,7 +139,7 @@ func (suite msgServerTestSuite) TestHandleMsgUpdateDID() {
 	suite.Require().Nil(updateRes)
 }
 
-func (suite msgServerTestSuite) TestHandleMsgUpdateDID_DIDNotFound() {
+func (suite *msgServerTestSuite) TestHandleMsgUpdateDID_DIDNotFound() {
 	didMsgServer := suite.DIDMsgServer
 	goContext := sdk.WrapSDKContext(suite.Ctx)
 
@@ -152,7 +152,7 @@ func (suite msgServerTestSuite) TestHandleMsgUpdateDID_DIDNotFound() {
 	suite.Nil(res)
 }
 
-func (suite msgServerTestSuite) TestHandleMsgUpdateDID_DIDDeactivated() {
+func (suite *msgServerTestSuite) TestHandleMsgUpdateDID_DIDDeactivated() {
 	didKeeper := suite.DIDKeeper
 	didMsgServer := suite.DIDMsgServer
 	goContext := sdk.WrapSDKContext(suite.Ctx)
@@ -179,7 +179,7 @@ func (suite msgServerTestSuite) TestHandleMsgUpdateDID_DIDDeactivated() {
 	suite.Require().Nil(updateRes)
 }
 
-func (suite msgServerTestSuite) TestHandleMsgDeactivateDID() {
+func (suite *msgServerTestSuite) TestHandleMsgDeactivateDID() {
 	didKeeper := suite.DIDKeeper
 	didMsgServer := suite.DIDMsgServer
 	goContext := sdk.WrapSDKContext(suite.Ctx)
@@ -206,7 +206,7 @@ func (suite msgServerTestSuite) TestHandleMsgDeactivateDID() {
 	suite.Require().Equal(types.InitialSequence+1, tombstone.Sequence)
 }
 
-func (suite msgServerTestSuite) TestHandleMsgDeactivateDID_DIDNotFound() {
+func (suite *msgServerTestSuite) TestHandleMsgDeactivateDID_DIDNotFound() {
 	didMsgServer := suite.DIDMsgServer
 	goContext := sdk.WrapSDKContext(suite.Ctx)
 
@@ -219,7 +219,7 @@ func (suite msgServerTestSuite) TestHandleMsgDeactivateDID_DIDNotFound() {
 	suite.Require().Nil(res)
 }
 
-func (suite msgServerTestSuite) TestHandleMsgDeactivateDID_DIDDeactivated() {
+func (suite *msgServerTestSuite) TestHandleMsgDeactivateDID_DIDDeactivated() {
 	didKeeper := suite.DIDKeeper
 	didMsgServer := suite.DIDMsgServer
 	goContext := sdk.WrapSDKContext(suite.Ctx)
@@ -245,7 +245,7 @@ func (suite msgServerTestSuite) TestHandleMsgDeactivateDID_DIDDeactivated() {
 	suite.Require().ErrorIs(types.ErrDIDDeactivated, err)
 }
 
-func (suite msgServerTestSuite) TestHandleMsgDeactivateDID_SigVerificationFailed() {
+func (suite *msgServerTestSuite) TestHandleMsgDeactivateDID_SigVerificationFailed() {
 	didKeeper := suite.DIDKeeper
 	didMsgServer := suite.DIDMsgServer
 	goContext := sdk.WrapSDKContext(suite.Ctx)
@@ -269,7 +269,7 @@ func (suite msgServerTestSuite) TestHandleMsgDeactivateDID_SigVerificationFailed
 	suite.Require().ErrorIs(types.ErrSigVerificationFailed, err)
 }
 
-func (suite msgServerTestSuite) TestVerifyDIDOwnership() {
+func (suite *msgServerTestSuite) TestVerifyDIDOwnership() {
 	did := "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm"
 	docWithSeq, privKey := suite.newDIDDocumentWithSeq(did)
 	doc := docWithSeq.Document
@@ -281,7 +281,7 @@ func (suite msgServerTestSuite) TestVerifyDIDOwnership() {
 	suite.Require().Equal(docWithSeq.Sequence+1, newSeq)
 }
 
-func (suite msgServerTestSuite) TestVerifyDIDOwnership_SigVerificationFailed() {
+func (suite *msgServerTestSuite) TestVerifyDIDOwnership_SigVerificationFailed() {
 	did := "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm"
 	docWithSeq, privKey := suite.newDIDDocumentWithSeq(did)
 	doc := docWithSeq.Document
@@ -292,13 +292,13 @@ func (suite msgServerTestSuite) TestVerifyDIDOwnership_SigVerificationFailed() {
 	suite.Require().ErrorIs(types.ErrSigVerificationFailed, err)
 }
 
-func (suite msgServerTestSuite) makeTestData() (string, types.DIDDocumentWithSeq, crypto.PrivKey, string) {
+func (suite *msgServerTestSuite) makeTestData() (string, types.DIDDocumentWithSeq, crypto.PrivKey, string) {
 	did := "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm"
 	doc, privKey := suite.newDIDDocumentWithSeq(did)
 	return did, doc, privKey, doc.Document.VerificationMethods[0].Id
 }
 
-func (suite msgServerTestSuite) newDIDDocumentWithSeq(did string) (types.DIDDocumentWithSeq, crypto.PrivKey) {
+func (suite *msgServerTestSuite) newDIDDocumentWithSeq(did string) (types.DIDDocumentWithSeq, crypto.PrivKey) {
 	privKey := secp256k1.GenPrivKey()
 	pubKey := secp256k1util.PubKeyBytes(secp256k1util.DerivePubKey(privKey))
 	verificationMethodID := types.NewVerificationMethodID(did, "key1")
@@ -320,19 +320,19 @@ func (suite msgServerTestSuite) newDIDDocumentWithSeq(did string) (types.DIDDocu
 	return docWithSeq, privKey
 }
 
-func newMsgCreateDID(suite msgServerTestSuite, doc types.DIDDocument, verificationMethodID string, privKey crypto.PrivKey) types.MsgCreateDID {
+func newMsgCreateDID(suite *msgServerTestSuite, doc types.DIDDocument, verificationMethodID string, privKey crypto.PrivKey) types.MsgCreateDID {
 	sig, err := types.Sign(&doc, types.InitialSequence, privKey)
 	suite.Require().NoError(err)
 	return types.NewMsgCreateDID(doc.Id, doc, verificationMethodID, sig, sdk.AccAddress{}.String())
 }
 
-func newMsgUpdateDID(suite msgServerTestSuite, newDoc types.DIDDocument, verificationMethodID string, privKey crypto.PrivKey, seq uint64) types.MsgUpdateDID {
+func newMsgUpdateDID(suite *msgServerTestSuite, newDoc types.DIDDocument, verificationMethodID string, privKey crypto.PrivKey, seq uint64) types.MsgUpdateDID {
 	sig, err := types.Sign(&newDoc, seq, privKey)
 	suite.Require().NoError(err)
 	return types.NewMsgUpdateDID(newDoc.Id, newDoc, verificationMethodID, sig, sdk.AccAddress{}.String())
 }
 
-func newMsgDeactivateDID(suite msgServerTestSuite, did string, verificationMethodID string, privKey crypto.PrivKey, seq uint64) types.MsgDeactivateDID {
+func newMsgDeactivateDID(suite *msgServerTestSuite, did string, verificationMethodID string, privKey crypto.PrivKey, seq uint64) types.MsgDeactivateDID {
 	doc := types.DIDDocument{
 		Id: did,
 	}

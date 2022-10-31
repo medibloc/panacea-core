@@ -69,7 +69,7 @@ func (suite *abciTestSuite) BeforeTest(_, _ string) {
 	})
 }
 
-func (suite abciTestSuite) TestEndBlockerNewOracleVotePass() {
+func (suite *abciTestSuite) TestEndBlockerNewOracleVotePass() {
 	ctx := suite.Ctx
 
 	suite.CreateOracleValidator(suite.oraclePubKey, sdk.NewInt(70))
@@ -160,7 +160,7 @@ func (suite abciTestSuite) TestEndBlockerNewOracleVotePass() {
 	suite.Require().Equal(oracleRegistration.Address, string(eventAttributes[1].Value))
 }
 
-func (suite abciTestSuite) TestEndBlockerNewOracleVoteReject() {
+func (suite *abciTestSuite) TestEndBlockerNewOracleVoteReject() {
 	ctx := suite.Ctx
 
 	suite.CreateOracleValidator(suite.oraclePubKey, sdk.NewInt(70))
@@ -248,7 +248,7 @@ func (suite abciTestSuite) TestEndBlockerNewOracleVoteReject() {
 	suite.Require().Equal(oracleRegistration.Address, string(eventAttributes[1].Value))
 }
 
-func (suite abciTestSuite) TestEndBlockerNewOracleVoteRejectSamePower() {
+func (suite *abciTestSuite) TestEndBlockerNewOracleVoteRejectSamePower() {
 	ctx := suite.Ctx
 
 	suite.CreateOracleValidator(suite.oraclePubKey, sdk.NewInt(10))
@@ -342,7 +342,7 @@ func (suite abciTestSuite) TestEndBlockerNewOracleVoteRejectSamePower() {
 	suite.Require().Equal(oracleRegistration.Address, string(eventAttributes[1].Value))
 }
 
-func (suite abciTestSuite) TestOracleUpgradeSuccess() {
+func (suite *abciTestSuite) TestOracleUpgradeSuccess() {
 	ctx := suite.Ctx
 
 	suite.Require().Equal(suite.uniqueID, suite.OracleKeeper.GetParams(ctx).UniqueId)
@@ -364,7 +364,7 @@ func (suite abciTestSuite) TestOracleUpgradeSuccess() {
 	suite.Require().Error(err, types.ErrOracleUpgradeInfoNotFound)
 }
 
-func (suite abciTestSuite) TestOracleUpgradeEmptyUpgradeData() {
+func (suite *abciTestSuite) TestOracleUpgradeEmptyUpgradeData() {
 	ctx := suite.Ctx
 
 	suite.Require().Equal(suite.uniqueID, suite.OracleKeeper.GetParams(ctx).UniqueId)
@@ -372,7 +372,7 @@ func (suite abciTestSuite) TestOracleUpgradeEmptyUpgradeData() {
 	oracle.EndBlocker(suite.Ctx, suite.OracleKeeper)
 }
 
-func (suite abciTestSuite) TestEndBlockerUpgradeOracleVotePass() {
+func (suite *abciTestSuite) TestEndBlockerUpgradeOracleVotePass() {
 	ctx := suite.Ctx
 	upgradeUniqueID := "UpgradeUniqueID"
 
