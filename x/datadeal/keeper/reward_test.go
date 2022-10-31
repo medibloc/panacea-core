@@ -431,7 +431,7 @@ func (suite *rewardTestSuite) TestVerificationRewardDistributionWithDelegators()
 	suite.Require().Equal(sdk.NewDecCoins(sdk.NewDecCoin(assets.MicroMedDenom, sdk.NewInt(4_000_000))), validatorReward)
 }
 
-func (suite rewardTestSuite) TestBasicDeliveryRewardDistribution() {
+func (suite *rewardTestSuite) TestBasicDeliveryRewardDistribution() {
 	ctx := suite.Ctx
 
 	err := suite.FundAccount(ctx, suite.buyerAccAddr, suite.defaultFunds)
