@@ -10,6 +10,12 @@ import (
 )
 
 func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) {
+	handleDataVerificationVote(ctx, keeper)
+
+	handleDataDeliveryVote(ctx, keeper)
+}
+
+func handleDataVerificationVote(ctx sdk.Context, keeper keeper.Keeper) {
 	keeper.IterateClosedDataVerificationQueue(ctx, ctx.BlockHeader().Time, func(dataSale *types.DataSale) bool {
 
 		keeper.RemoveDataVerificationQueue(ctx, dataSale.DealId, dataSale.DataHash, dataSale.VerificationVotingPeriod.VotingEndTime)
@@ -84,7 +90,9 @@ func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) {
 
 		return false
 	})
+}
 
+func handleDataDeliveryVote(ctx sdk.Context, keeper keeper.Keeper) {
 	keeper.IterateClosedDataDeliveryQueue(ctx, ctx.BlockHeader().Time, func(dataSale *types.DataSale) bool {
 
 		keeper.RemoveDataDeliveryQueue(ctx, dataSale.DealId, dataSale.DataHash, dataSale.DeliveryVotingPeriod.VotingEndTime)
@@ -109,6 +117,10 @@ func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) {
 		}
 
 		if tallyResult.IsPassed() {
+			if err := keeper.DistributeDeliveryRewards(ctx, dataSale, tallyResult.ValidVoters); err != nil {
+				panic(err)
+			}
+
 			dataSale.Status = types.DATA_SALE_STATUS_COMPLETED
 			dataSale.DeliveredCid = string(tallyResult.ConsensusValue)
 		} else {
