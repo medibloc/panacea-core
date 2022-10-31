@@ -143,11 +143,6 @@ func (k Keeper) VerifyVoteSignature(ctx sdk.Context, vote types.Vote, signature 
 
 // validateOracleRegistrationVote checks the oracle/registration status in the Panacea to ensure that the oracle can be voted to be registered.
 func (k Keeper) validateOracleRegistrationVote(ctx sdk.Context, vote *types.OracleRegistrationVote) error {
-	params := k.GetParams(ctx)
-
-	if params.UniqueId != vote.UniqueId {
-		return fmt.Errorf("not matched with the currently active uniqueID. expected %s, got %s", params.UniqueId, vote.UniqueId)
-	}
 
 	oracle, err := k.GetOracle(ctx, vote.VoterAddress)
 	if err != nil {
@@ -164,6 +159,25 @@ func (k Keeper) validateOracleRegistrationVote(ctx sdk.Context, vote *types.Orac
 
 	if oracleRegistration.Status != types.ORACLE_REGISTRATION_STATUS_VOTING_PERIOD {
 		return fmt.Errorf("the currently voted oracle's status is not 'VOTING_PERIOD'")
+	}
+
+	switch oracleRegistration.RegistrationType {
+	case types.ORACLE_REGISTRATION_TYPE_NEW:
+		params := k.GetParams(ctx)
+		if params.UniqueId != vote.UniqueId {
+			return fmt.Errorf("not matched with the currently active uniqueID. expected %s, got %s", params.UniqueId, vote.UniqueId)
+		}
+	case types.ORACLE_REGISTRATION_TYPE_UPGRADE:
+		upgradeInfo, err := k.GetOracleUpgradeInfo(ctx)
+		if err != nil {
+			return fmt.Errorf("upgrade is not in progress")
+		}
+
+		if upgradeInfo.UniqueId != vote.UniqueId {
+			return fmt.Errorf("not matched with the upgrade uniqueID. expected %s, got %s", upgradeInfo.UniqueId, vote.UniqueId)
+		}
+	default:
+
 	}
 
 	return nil
