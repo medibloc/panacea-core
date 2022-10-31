@@ -177,7 +177,7 @@ func (k Keeper) validateOracleRegistrationVote(ctx sdk.Context, vote *types.Orac
 			return fmt.Errorf("not matched with the upgrade uniqueID. expected %s, got %s", upgradeInfo.UniqueId, vote.UniqueId)
 		}
 	default:
-
+		return fmt.Errorf("registrationType is invalid. registrationTYpe(%s)", oracleRegistration.RegistrationType)
 	}
 
 	return nil
