@@ -53,7 +53,37 @@ func (k Keeper) DistributeVerificationRewards(ctx sdk.Context, dataSale *types.D
 	return nil
 }
 
-// distributeOracleRewards distributes reward to oracles for data verification and delivery
+func (k Keeper) DistributeDeliveryRewards(ctx sdk.Context, dataSale *types.DataSale, voters []*oracletypes.VoterInfo) error {
+	deal, err := k.GetDeal(ctx, dataSale.DealId)
+	if err != nil {
+		return sdkerrors.Wrapf(types.ErrDistrDeliveryRewards, err.Error())
+	}
+
+	dealAccAddr, err := sdk.AccAddressFromBech32(deal.GetAddress())
+	if err != nil {
+		return sdkerrors.Wrapf(types.ErrDistrDeliveryRewards, err.Error())
+	}
+
+	totalBudget := deal.GetBudget().Amount.ToDec()
+	maxNumData := sdk.NewIntFromUint64(deal.GetMaxNumData()).ToDec()
+	pricePerData := totalBudget.Quo(maxNumData).TruncateDec()
+	oracleCommissionRate := k.oracleKeeper.GetParams(ctx).OracleCommissionRate
+	oracleRewards := sdk.NewCoin(assets.MicroMedDenom, pricePerData.Mul(oracleCommissionRate).Mul(types.DataDeliveryRewardFraction).TruncateInt())
+
+	dealBalance := k.bankKeeper.GetBalance(ctx, dealAccAddr, assets.MicroMedDenom)
+	if dealBalance.IsLT(oracleRewards) {
+		return sdkerrors.Wrapf(types.ErrDistrDeliveryRewards, "not enough balance in deal")
+	}
+
+	// send to oracles
+	if err := k.distributeOracleRewards(ctx, dealAccAddr, voters, oracleRewards); err != nil {
+		return sdkerrors.Wrapf(types.ErrDistrDeliveryRewards, err.Error())
+	}
+
+	return nil
+}
+
+// distributeOracleRewards distributes reward to oracles and their delegators proportional to their voting power
 func (k Keeper) distributeOracleRewards(ctx sdk.Context, dealAccAddr sdk.AccAddress, oracles []*oracletypes.VoterInfo, rewards sdk.Coin) error {
 	// send reward to distribution module
 	if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, dealAccAddr, distrtypes.ModuleName, sdk.Coins{rewards}); err != nil {
