@@ -92,6 +92,24 @@ func (suite *DataDealBaseTestSuite) MakeNewDataSaleDeliveryVoting(sellerAddr sdk
 	}
 }
 
+func (suite *DataDealBaseTestSuite) MakeNewDataSaleDeliveryFailed(sellerAddr sdk.AccAddress, dataHash, verifiableCID string) *types.DataSale {
+	return &types.DataSale{
+		SellerAddress:            sellerAddr.String(),
+		DealId:                   1,
+		VerifiableCid:            verifiableCID,
+		DeliveredCid:             "",
+		DataHash:                 dataHash,
+		Status:                   types.DATA_SALE_STATUS_DELIVERY_FAILED,
+		VerificationVotingPeriod: nil,
+		DeliveryVotingPeriod: &oracletypes.VotingPeriod{
+			VotingStartTime: time.Now(),
+			VotingEndTime:   time.Now().Add(5 * time.Second),
+		},
+		VerificationTallyResult: nil,
+		DeliveryTallyResult:     nil,
+	}
+}
+
 func (suite *DataDealBaseTestSuite) MakeNewDataDeliveryVote(voterAddr sdk.AccAddress, dataHash, deliveredCID string, dealID uint64) *types.DataDeliveryVote {
 	return &types.DataDeliveryVote{
 		VoterAddress: voterAddr.String(),

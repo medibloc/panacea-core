@@ -556,3 +556,43 @@ func (k Keeper) DeactivateDeal(ctx sdk.Context, msg *types.MsgDeactivateDeal) er
 
 	return nil
 }
+
+func (k Keeper) RequestDataDeliveryVote(ctx sdk.Context, msg *types.MsgRequestDataDeliveryVote) error {
+	deal, err := k.GetDeal(ctx, msg.DealId)
+	if err != nil {
+		return sdkerrors.Wrapf(types.ErrGetDeal, err.Error())
+	}
+
+	if deal.BuyerAddress != msg.RequesterAddress {
+		return sdkerrors.Wrapf(types.ErrRequestDataDeliveryVote, "only buyer can request data delivery vote")
+	}
+
+	dataSale, err := k.GetDataSale(ctx, msg.DataHash, msg.DealId)
+	if err != nil {
+		return sdkerrors.Wrapf(types.ErrGetDataSale, err.Error())
+	}
+
+	if dataSale.Status != types.DATA_SALE_STATUS_DELIVERY_FAILED {
+		return sdkerrors.Wrapf(types.ErrRequestDataDeliveryVote, "can request data delivery vote when status is `DELIVERY_FAILED`")
+	}
+
+	dataSale.Status = types.DATA_SALE_STATUS_DELIVERY_VOTING_PERIOD
+	dataSale.DeliveryVotingPeriod = k.oracleKeeper.GetVotingPeriod(ctx)
+
+	if err := k.SetDataSale(ctx, dataSale); err != nil {
+		return sdkerrors.Wrapf(types.ErrRequestDataDeliveryVote, err.Error())
+	}
+
+	k.AddDataDeliveryQueue(ctx, dataSale.DataHash, dataSale.DealId, dataSale.DeliveryVotingPeriod.VotingEndTime)
+
+	ctx.EventManager().EmitEvent(
+		sdk.NewEvent(
+			types.EventTypeDataDeliveryVote,
+			sdk.NewAttribute(types.AttributeKeyVoteStatus, types.AttributeValueVoteStatusStarted),
+			sdk.NewAttribute(types.AttributeKeyDataHash, dataSale.DataHash),
+			sdk.NewAttribute(types.AttributeKeyDealID, strconv.FormatUint(dataSale.DealId, 10))),
+	)
+
+	return nil
+
+}

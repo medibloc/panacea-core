@@ -20,4 +20,5 @@ var (
 	ErrDealDeactivate           = sdkerrors.Register(ModuleName, 12, "error while deactivating a deal")
 	ErrDistrVerificationRewards = sdkerrors.Register(ModuleName, 13, "error while distributing data verification rewards")
 	ErrDistrDeliveryRewards     = sdkerrors.Register(ModuleName, 14, "error while distributing data delivery rewards")
+	ErrRequestDataDeliveryVote  = sdkerrors.Register(ModuleName, 15, "error while requesting data delivery vote")
 )
