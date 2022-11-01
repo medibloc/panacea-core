@@ -573,7 +573,7 @@ func (k Keeper) RequestDataDeliveryVote(ctx sdk.Context, msg *types.MsgRequestDa
 	}
 
 	if dataSale.Status != types.DATA_SALE_STATUS_DELIVERY_FAILED {
-		return sdkerrors.Wrapf(types.ErrRequestDataDeliveryVote, "can request data delivery vote when status is `DELIVERY_FAILED`")
+		return sdkerrors.Wrapf(types.ErrRequestDataDeliveryVote, "can't request data delivery vote when status is not `DELIVERY_FAILED`")
 	}
 
 	dataSale.Status = types.DATA_SALE_STATUS_DELIVERY_VOTING_PERIOD
