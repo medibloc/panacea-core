@@ -4,7 +4,7 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"os"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -150,7 +150,7 @@ func setOracleParams(cmd *cobra.Command, genState *oracletypes.GenesisState) err
 		return err
 	}
 	if len(path) > 0 {
-		contentBz, err := ioutil.ReadFile(path)
+		contentBz, err := os.ReadFile(path)
 		if err != nil {
 			return err
 		}

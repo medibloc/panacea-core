@@ -187,9 +187,9 @@ func (k Keeper) SellData(ctx sdk.Context, msg *types.MsgSellData) error {
 		return sdkerrors.Wrapf(types.ErrSellData, "deal status is not ACTIVE")
 	}
 
-	getDataSale, _ := k.GetDataSale(ctx, msg.DataHash, msg.DealId)
-	if getDataSale != nil && getDataSale.Status != types.DATA_SALE_STATUS_VERIFICATION_FAILED {
-		return sdkerrors.Wrapf(types.ErrSellData, "data already exists")
+	err = k.checkDataSaleStatus(ctx, msg.SellerAddress, msg.DataHash, msg.DealId)
+	if err != nil {
+		return sdkerrors.Wrapf(types.ErrSellData, err.Error())
 	}
 
 	dataSale := types.NewDataSale(msg)
@@ -209,6 +209,22 @@ func (k Keeper) SellData(ctx sdk.Context, msg *types.MsgSellData) error {
 			sdk.NewAttribute(types.AttributeKeyDataHash, dataSale.DataHash),
 		),
 	)
+
+	return nil
+}
+
+func (k Keeper) checkDataSaleStatus(ctx sdk.Context, sellerAddress, dataHash string, dealID uint64) error {
+	getDataSale, _ := k.GetDataSale(ctx, dataHash, dealID)
+
+	if getDataSale != nil {
+		if getDataSale.Status != types.DATA_SALE_STATUS_VERIFICATION_FAILED {
+			return fmt.Errorf("data already exists")
+		} else {
+			if getDataSale.SellerAddress != sellerAddress {
+				return fmt.Errorf("invalid data seller address")
+			}
+		}
+	}
 
 	return nil
 }

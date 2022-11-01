@@ -183,7 +183,7 @@ func (suite *dealTestSuite) TestSellDataSuccess() {
 	suite.Require().Equal(dataSale.DataHash, suite.dataHash1)
 }
 
-func (suite *dealTestSuite) TestSellDataStatusFailed() {
+func (suite *dealTestSuite) TestReSellData() {
 	newDataSale := suite.MakeNewDataSale(suite.sellerAccAddr, suite.dataHash1, suite.verifiableCID1)
 
 	newDataSale.Status = types.DATA_SALE_STATUS_VERIFICATION_FAILED
@@ -200,6 +200,16 @@ func (suite *dealTestSuite) TestSellDataStatusFailed() {
 
 	err = suite.DataDealKeeper.SellData(suite.Ctx, msgSellData)
 	suite.Require().NoError(err)
+
+	dataSale, err := suite.DataDealKeeper.GetDataSale(suite.Ctx, suite.dataHash1, uint64(1))
+	suite.Require().NoError(err)
+	suite.Require().Equal(dataSale.VerifiableCid, suite.verifiableCID1)
+
+	suite.Require().Equal(dataSale.DealId, uint64(1))
+	suite.Require().Equal(dataSale.VerificationVotingPeriod, suite.OracleKeeper.GetVotingPeriod(suite.Ctx))
+	suite.Require().Equal(dataSale.Status, types.DATA_SALE_STATUS_VERIFICATION_VOTING_PERIOD)
+	suite.Require().Equal(dataSale.SellerAddress, suite.sellerAccAddr.String())
+	suite.Require().Equal(dataSale.DataHash, suite.dataHash1)
 }
 
 func (suite *dealTestSuite) TestSellDataStatusVotingPeriod() {
