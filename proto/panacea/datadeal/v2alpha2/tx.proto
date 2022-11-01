@@ -27,7 +27,7 @@ service Msg {
   rpc DeactivateDeal(MsgDeactivateDeal) returns (MsgDeactivateDealResponse);
 
   // RequestDataDeliveryVote defines a method for requesting DataDeliveryVote.
-  rpc RequestDataDeliveryVote(MsgRequestDataDeliveryVote) returns (MsgRequestRequestDataDeliveryVoteResponse);
+  rpc RequestDataDeliveryVote(MsgRequestDataDeliveryVote) returns (MsgRequestDataDeliveryVoteResponse);
 }
 
 // MsgCreateDeal defines the Msg/CreateDeal request type.
@@ -112,7 +112,7 @@ message MsgRequestDataDeliveryVote {
 }
 
 // MsgRequestRequestDataDeliveryVoteResponse defines the Msg/RequestDataDeliveryVote response type.
-message MsgRequestRequestDataDeliveryVoteResponse {
+message MsgRequestDataDeliveryVoteResponse {
 
 }
 

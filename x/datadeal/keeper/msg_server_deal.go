@@ -92,7 +92,7 @@ func (m msgServer) DeactivateDeal(goCtx context.Context, msg *types.MsgDeactivat
 	return &types.MsgDeactivateDealResponse{}, nil
 }
 
-func (m msgServer) RequestDataDeliveryVote(goCtx context.Context, msg *types.MsgRequestDataDeliveryVote) (*types.MsgRequestRequestDataDeliveryVoteResponse, error) {
+func (m msgServer) RequestDataDeliveryVote(goCtx context.Context, msg *types.MsgRequestDataDeliveryVote) (*types.MsgRequestDataDeliveryVoteResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	err := m.Keeper.RequestDataDeliveryVote(ctx, msg)
@@ -100,5 +100,5 @@ func (m msgServer) RequestDataDeliveryVote(goCtx context.Context, msg *types.Msg
 		return nil, err
 	}
 
-	return &types.MsgRequestRequestDataDeliveryVoteResponse{}, nil
+	return &types.MsgRequestDataDeliveryVoteResponse{}, nil
 }
