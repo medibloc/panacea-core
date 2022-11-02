@@ -2,7 +2,6 @@ package keeper_test
 
 import (
 	"encoding/base64"
-	"fmt"
 	"testing"
 	"time"
 
@@ -280,6 +279,7 @@ func (suite *oracleTestSuite) TestOracleRegistrationVoteSuccess() {
 	suite.SetValidator(suite.newOracleAccPubKey, sdk.NewInt(20))
 
 	oracleRegistration := suite.makeNewOracleRegistration()
+	oracleRegistration.RegistrationType = types.ORACLE_REGISTRATION_TYPE_NEW
 	err := suite.OracleKeeper.SetOracleRegistration(ctx, oracleRegistration)
 	suite.Require().NoError(err)
 
@@ -325,6 +325,7 @@ func (suite *oracleTestSuite) TestOracleRegistrationVoteFailedVerifySignature() 
 	suite.SetValidator(suite.newOracleAccPubKey, sdk.NewInt(20))
 
 	oracleRegistration := suite.makeNewOracleRegistration()
+	oracleRegistration.RegistrationType = types.ORACLE_REGISTRATION_TYPE_NEW
 	err := suite.OracleKeeper.SetOracleRegistration(ctx, oracleRegistration)
 	suite.Require().NoError(err)
 
@@ -363,6 +364,7 @@ func (suite *oracleTestSuite) TestOracleRegistrationVoteInvalidUniqueID() {
 	suite.SetValidator(suite.newOracleAccPubKey, sdk.NewInt(20))
 
 	oracleRegistration := suite.makeNewOracleRegistration()
+	oracleRegistration.RegistrationType = types.ORACLE_REGISTRATION_TYPE_NEW
 	err := suite.OracleKeeper.SetOracleRegistration(ctx, oracleRegistration)
 	suite.Require().NoError(err)
 
@@ -389,8 +391,7 @@ func (suite *oracleTestSuite) TestOracleRegistrationVoteInvalidUniqueID() {
 	suite.Require().NoError(err)
 
 	err = suite.OracleKeeper.VoteOracleRegistration(ctx, oracleRegistrationVote, signature)
-	suite.Require().ErrorIs(err, types.ErrOracleRegistrationVote)
-	suite.Require().ErrorContains(err, fmt.Sprintf("not matched with the currently active uniqueID. expected %s, got %s", suite.uniqueID, invalidUniqueID))
+	suite.Require().ErrorIs(err, types.ErrOracleRegistrationVote, "oracle registration not found")
 }
 
 func (suite *oracleTestSuite) TestOracleRegistrationVoteInvalidGenesisOracleStatus() {
