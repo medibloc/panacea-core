@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	"errors"
 	"fmt"
 	"strconv"
 
@@ -173,11 +174,6 @@ func (k Keeper) IncrementCurNumDataAtDeal(ctx sdk.Context, dealID uint64) error 
 }
 
 func (k Keeper) SellData(ctx sdk.Context, msg *types.MsgSellData) error {
-	_, err := sdk.AccAddressFromBech32(msg.SellerAddress)
-	if err != nil {
-		return err
-	}
-
 	deal, err := k.GetDeal(ctx, msg.DealId)
 	if err != nil {
 		return sdkerrors.Wrapf(types.ErrSellData, err.Error())
@@ -187,9 +183,8 @@ func (k Keeper) SellData(ctx sdk.Context, msg *types.MsgSellData) error {
 		return sdkerrors.Wrapf(types.ErrSellData, "deal status is not ACTIVE")
 	}
 
-	getDataSale, _ := k.GetDataSale(ctx, msg.DataHash, msg.DealId)
-	if getDataSale != nil && getDataSale.Status != types.DATA_SALE_STATUS_VERIFICATION_FAILED {
-		return sdkerrors.Wrapf(types.ErrSellData, "data already exists")
+	if err := k.checkDataSaleStatus(ctx, msg.SellerAddress, msg.DataHash, msg.DealId); err != nil {
+		return sdkerrors.Wrapf(types.ErrSellData, err.Error())
 	}
 
 	dataSale := types.NewDataSale(msg)
@@ -209,6 +204,28 @@ func (k Keeper) SellData(ctx sdk.Context, msg *types.MsgSellData) error {
 			sdk.NewAttribute(types.AttributeKeyDataHash, dataSale.DataHash),
 		),
 	)
+
+	return nil
+}
+
+func (k Keeper) checkDataSaleStatus(ctx sdk.Context, sellerAddress, dataHash string, dealID uint64) error {
+	getDataSale, err := k.GetDataSale(ctx, dataHash, dealID)
+
+	if err != nil {
+		if errors.Is(types.ErrDataSaleNotFound, err) {
+			return nil
+		} else {
+			return err
+		}
+	}
+
+	if getDataSale != nil {
+		if getDataSale.Status != types.DATA_SALE_STATUS_VERIFICATION_FAILED {
+			return fmt.Errorf("data already exists")
+		} else if getDataSale.SellerAddress != sellerAddress {
+			return fmt.Errorf("invalid data seller address")
+		}
+	}
 
 	return nil
 }
