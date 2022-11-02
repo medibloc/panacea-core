@@ -174,13 +174,22 @@ func (suite *dealTestSuite) TestSellDataSuccess() {
 
 	dataSale, err := suite.DataDealKeeper.GetDataSale(suite.Ctx, suite.dataHash1, uint64(1))
 	suite.Require().NoError(err)
-	suite.Require().Equal(dataSale.VerifiableCid, suite.verifiableCID1)
 
+	suite.Require().Equal(dataSale.VerifiableCid, suite.verifiableCID1)
 	suite.Require().Equal(dataSale.DealId, uint64(1))
 	suite.Require().Equal(dataSale.VerificationVotingPeriod, suite.OracleKeeper.GetVotingPeriod(suite.Ctx))
 	suite.Require().Equal(dataSale.Status, types.DATA_SALE_STATUS_VERIFICATION_VOTING_PERIOD)
 	suite.Require().Equal(dataSale.SellerAddress, suite.sellerAccAddr.String())
 	suite.Require().Equal(dataSale.DataHash, suite.dataHash1)
+
+	events := suite.Ctx.EventManager().Events()
+
+	suite.Require().Equal(3, len(events[0].Attributes))
+	suite.Require().Equal(types.EventTypeDataVerificationVote, events[0].Type)
+	suite.Require().Equal(types.AttributeKeyVoteStatus, string(events[0].Attributes[0].Key))
+	suite.Require().Equal(types.AttributeValueVoteStatusStarted, string(events[0].Attributes[0].Value))
+	suite.Require().Equal(types.AttributeKeyDealID, string(events[0].Attributes[1].Key))
+	suite.Require().Equal(types.AttributeKeyDataHash, string(events[0].Attributes[2].Key))
 }
 
 func (suite *dealTestSuite) TestReSellData() {
@@ -210,6 +219,56 @@ func (suite *dealTestSuite) TestReSellData() {
 	suite.Require().Equal(dataSale.Status, types.DATA_SALE_STATUS_VERIFICATION_VOTING_PERIOD)
 	suite.Require().Equal(dataSale.SellerAddress, suite.sellerAccAddr.String())
 	suite.Require().Equal(dataSale.DataHash, suite.dataHash1)
+
+	events := suite.Ctx.EventManager().Events()
+
+	suite.Require().Equal(3, len(events[0].Attributes))
+	suite.Require().Equal(types.EventTypeDataVerificationVote, events[0].Type)
+	suite.Require().Equal(types.AttributeKeyVoteStatus, string(events[0].Attributes[0].Key))
+	suite.Require().Equal(types.AttributeValueVoteStatusStarted, string(events[0].Attributes[0].Value))
+	suite.Require().Equal(types.AttributeKeyDealID, string(events[0].Attributes[1].Key))
+	suite.Require().Equal(types.AttributeKeyDataHash, string(events[0].Attributes[2].Key))
+
+}
+
+func (suite *dealTestSuite) TestReSellDataFailed() {
+	newDataSale := suite.MakeNewDataSale(suite.sellerAccAddr, suite.dataHash1, suite.verifiableCID1)
+
+	newDataSale.Status = types.DATA_SALE_STATUS_VERIFICATION_FAILED
+
+	err := suite.DataDealKeeper.SetDataSale(suite.Ctx, newDataSale)
+	suite.Require().NoError(err)
+
+	sellerAddr2 := secp256k1.GenPrivKey().PubKey().Address()
+
+	msgSellData := &types.MsgSellData{
+		DealId:        1,
+		VerifiableCid: newDataSale.VerifiableCid,
+		DataHash:      newDataSale.DataHash,
+		SellerAddress: sellerAddr2.String(),
+	}
+
+	err = suite.DataDealKeeper.SellData(suite.Ctx, msgSellData)
+	suite.Require().Error(err, types.ErrSellData)
+}
+
+func (suite *dealTestSuite) TestReSellDataNotFound() {
+	newDataSale := suite.MakeNewDataSale(suite.sellerAccAddr, suite.dataHash1, suite.verifiableCID1)
+
+	newDataSale.Status = types.DATA_SALE_STATUS_VERIFICATION_FAILED
+
+	err := suite.DataDealKeeper.SetDataSale(suite.Ctx, newDataSale)
+	suite.Require().NoError(err)
+
+	msgSellData := &types.MsgSellData{
+		DealId:        2,
+		VerifiableCid: newDataSale.VerifiableCid,
+		DataHash:      newDataSale.DataHash,
+		SellerAddress: newDataSale.SellerAddress,
+	}
+
+	err = suite.DataDealKeeper.SellData(suite.Ctx, msgSellData)
+	suite.Require().Error(err, types.ErrSellData)
 }
 
 func (suite *dealTestSuite) TestSellDataStatusVotingPeriod() {
@@ -637,7 +696,7 @@ func (suite *dealTestSuite) TestDataDeliveryVoteFailedVerifySignature() {
 	suite.Require().ErrorIs(err, oracletypes.ErrDetectionMaliciousBehavior)
 }
 
-func (suite *dealTestSuite) TestDataDeliveryVoteFaildInvalidStatus() {
+func (suite *dealTestSuite) TestDataDeliveryVoteFailedInvalidStatus() {
 	ctx := suite.Ctx
 
 	oracleAccount := suite.AccountKeeper.NewAccountWithAddress(suite.Ctx, suite.oracleAccAddr)
