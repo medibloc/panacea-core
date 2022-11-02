@@ -1,6 +1,8 @@
 package keeper_test
 
 import (
+	"github.com/btcsuite/btcd/btcec"
+	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/medibloc/panacea-core/v2/x/oracle/types"
 	"github.com/stretchr/testify/require"
@@ -165,4 +167,157 @@ func (suite *oracleTestSuite) TestApplyUpgradeSuccess() {
 	suite.Require().Equal(types.EventTypeUpgradeVote, events[0].Type)
 	suite.Require().Equal(types.AttributeKeyUniqueID, string(events[0].Attributes[0].Key))
 	suite.Require().Equal(upgradeInfo.UniqueId, string(events[0].Attributes[0].Value))
+}
+
+func (suite *oracleTestSuite) TestOracleUpgradeVoteSuccess() {
+	ctx := suite.Ctx
+
+	suite.CreateOracleValidator(suite.oracleAccPubKey, sdk.NewInt(70))
+	suite.SetAccount(suite.newOracleAccPubKey)
+	suite.SetValidator(suite.newOracleAccPubKey, sdk.NewInt(20))
+
+	upgradeUniqueID := "upgradeUniqueID"
+
+	oracleRegistration := suite.makeNewOracleRegistration()
+	oracleRegistration.UniqueId = upgradeUniqueID
+	oracleRegistration.RegistrationType = types.ORACLE_REGISTRATION_TYPE_UPGRADE
+	err := suite.OracleKeeper.SetOracleRegistration(ctx, oracleRegistration)
+	suite.Require().NoError(err)
+
+	upgradeInfo := &types.OracleUpgradeInfo{
+		UniqueId: upgradeUniqueID,
+		Height:   1000,
+	}
+	err = suite.OracleKeeper.SetOracleUpgradeInfo(ctx, upgradeInfo)
+	suite.Require().NoError(err)
+
+	// make the correct encryptedOraclePrivKey
+	encryptedOraclePrivKey, err := btcec.Encrypt(suite.nodePubKey, suite.oraclePrivKey.Serialize())
+	suite.Require().NoError(err)
+	// make the correct vote info
+	oracleRegistrationVote := &types.OracleRegistrationVote{
+		UniqueId:               upgradeUniqueID,
+		VoterAddress:           suite.oracleAccAddr.String(),
+		VotingTargetAddress:    suite.newOracleAccAddr.String(),
+		VoteOption:             types.VOTE_OPTION_YES,
+		EncryptedOraclePrivKey: encryptedOraclePrivKey,
+	}
+
+	// make the correct signature
+	voteBz, err := suite.Cdc.Marshaler.Marshal(oracleRegistrationVote)
+	suite.Require().NoError(err)
+	oraclePrivKeySecp256k1 := secp256k1.PrivKey{
+		Key: suite.oraclePrivKey.Serialize(),
+	}
+	signature, err := oraclePrivKeySecp256k1.Sign(voteBz)
+	suite.Require().NoError(err)
+
+	err = suite.OracleKeeper.VoteOracleRegistration(ctx, oracleRegistrationVote, signature)
+	suite.Require().NoError(err)
+
+	getOracleRegistrationVote, err := suite.OracleKeeper.GetOracleRegistrationVote(
+		ctx,
+		upgradeUniqueID,
+		suite.newOracleAccAddr.String(),
+		suite.oracleAccAddr.String(),
+	)
+	suite.Require().NoError(err)
+	suite.Require().Equal(oracleRegistrationVote, getOracleRegistrationVote)
+}
+
+func (suite *oracleTestSuite) TestOracleUpgradeVoteFailedVerifySignature() {
+	ctx := suite.Ctx
+
+	suite.CreateOracleValidator(suite.oracleAccPubKey, sdk.NewInt(70))
+	suite.SetAccount(suite.newOracleAccPubKey)
+	suite.SetValidator(suite.newOracleAccPubKey, sdk.NewInt(20))
+
+	upgradeUniqueID := "upgradeUniqueID"
+
+	oracleRegistration := suite.makeNewOracleRegistration()
+	oracleRegistration.UniqueId = upgradeUniqueID
+	oracleRegistration.RegistrationType = types.ORACLE_REGISTRATION_TYPE_UPGRADE
+	err := suite.OracleKeeper.SetOracleRegistration(ctx, oracleRegistration)
+	suite.Require().NoError(err)
+
+	upgradeInfo := &types.OracleUpgradeInfo{
+		UniqueId: upgradeUniqueID,
+		Height:   1000,
+	}
+	err = suite.OracleKeeper.SetOracleUpgradeInfo(ctx, upgradeInfo)
+	suite.Require().NoError(err)
+
+	// make the correct encryptedOraclePrivKey
+	encryptedOraclePrivKey, err := btcec.Encrypt(suite.nodePubKey, suite.oraclePrivKey.Serialize())
+	suite.Require().NoError(err)
+	// make the correct vote info
+	oracleRegistrationVote := &types.OracleRegistrationVote{
+		UniqueId:               upgradeUniqueID,
+		VoterAddress:           suite.oracleAccAddr.String(),
+		VotingTargetAddress:    suite.newOracleAccAddr.String(),
+		VoteOption:             types.VOTE_OPTION_YES,
+		EncryptedOraclePrivKey: encryptedOraclePrivKey,
+	}
+
+	// make the correct signature
+	voteBz, err := suite.Cdc.Marshaler.Marshal(oracleRegistrationVote)
+	suite.Require().NoError(err)
+	invalidOraclePrivKey, err := btcec.NewPrivateKey(btcec.S256())
+	suite.Require().NoError(err)
+	oraclePrivKeySecp256k1 := secp256k1.PrivKey{
+		Key: invalidOraclePrivKey.Serialize(),
+	}
+	signature, err := oraclePrivKeySecp256k1.Sign(voteBz)
+	suite.Require().NoError(err)
+
+	err = suite.OracleKeeper.VoteOracleRegistration(ctx, oracleRegistrationVote, signature)
+	suite.Require().ErrorIs(err, types.ErrDetectionMaliciousBehavior)
+}
+
+func (suite *oracleTestSuite) TestOracleUpgradeVoteInvalidUniqueID() {
+	ctx := suite.Ctx
+
+	suite.CreateOracleValidator(suite.oracleAccPubKey, sdk.NewInt(70))
+	suite.SetAccount(suite.newOracleAccPubKey)
+	suite.SetValidator(suite.newOracleAccPubKey, sdk.NewInt(20))
+
+	upgradeUniqueID := "upgradeUniqueID"
+
+	oracleRegistration := suite.makeNewOracleRegistration()
+	oracleRegistration.UniqueId = upgradeUniqueID
+	oracleRegistration.RegistrationType = types.ORACLE_REGISTRATION_TYPE_UPGRADE
+	err := suite.OracleKeeper.SetOracleRegistration(ctx, oracleRegistration)
+	suite.Require().NoError(err)
+
+	upgradeInfo := &types.OracleUpgradeInfo{
+		UniqueId: upgradeUniqueID,
+		Height:   1000,
+	}
+	err = suite.OracleKeeper.SetOracleUpgradeInfo(ctx, upgradeInfo)
+	suite.Require().NoError(err)
+
+	// make the correct encryptedOraclePrivKey
+	encryptedOraclePrivKey, err := btcec.Encrypt(suite.nodePubKey, suite.oraclePrivKey.Serialize())
+	suite.Require().NoError(err)
+	// make vote with invalid uniqueID
+	invalidUniqueID := "invalidUniqueID"
+	oracleRegistrationVote := &types.OracleRegistrationVote{
+		UniqueId:               invalidUniqueID,
+		VoterAddress:           suite.oracleAccAddr.String(),
+		VotingTargetAddress:    suite.newOracleAccAddr.String(),
+		VoteOption:             types.VOTE_OPTION_YES,
+		EncryptedOraclePrivKey: encryptedOraclePrivKey,
+	}
+
+	// make the correct signature
+	voteBz, err := suite.Cdc.Marshaler.Marshal(oracleRegistrationVote)
+	suite.Require().NoError(err)
+	oraclePrivKeySecp256k1 := secp256k1.PrivKey{
+		Key: suite.oraclePrivKey.Serialize(),
+	}
+	signature, err := oraclePrivKeySecp256k1.Sign(voteBz)
+	suite.Require().NoError(err)
+
+	err = suite.OracleKeeper.VoteOracleRegistration(ctx, oracleRegistrationVote, signature)
+	suite.Require().ErrorIs(err, types.ErrOracleRegistrationVote, "oracle registration not found")
 }

@@ -9,12 +9,12 @@ import (
 )
 
 func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) {
-	handlerOracleRegistrationVote(ctx, keeper)
+	handleOracleRegistrationVote(ctx, keeper)
 
-	handlerOracleUpgrade(ctx, keeper)
+	handleOracleUpgradeVote(ctx, keeper)
 }
 
-func handlerOracleRegistrationVote(ctx sdk.Context, keeper keeper.Keeper) {
+func handleOracleRegistrationVote(ctx sdk.Context, keeper keeper.Keeper) {
 	// Iterate through the closed OracleRegistration.
 	keeper.IterateClosedOracleRegistrationQueue(ctx, ctx.BlockHeader().Time, func(oracleRegistration *types.OracleRegistration) bool {
 		// TODO When a particular OracleRegistration fails, we need to consider whether to skip this OracleRegistration or fail all of them.
@@ -73,7 +73,7 @@ func handlerOracleRegistrationVote(ctx sdk.Context, keeper keeper.Keeper) {
 	})
 }
 
-func handlerOracleUpgrade(ctx sdk.Context, keeper keeper.Keeper) {
+func handleOracleUpgradeVote(ctx sdk.Context, keeper keeper.Keeper) {
 	upgradeInfo, err := keeper.GetOracleUpgradeInfo(ctx)
 	if err != nil {
 		if errors.Is(err, types.ErrOracleUpgradeInfoNotFound) {
