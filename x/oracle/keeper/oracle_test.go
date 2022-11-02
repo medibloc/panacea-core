@@ -138,10 +138,13 @@ func (suite *oracleTestSuite) TestRegisterOracleSuccess() {
 	suite.Require().Equal(types.EventTypeRegistrationVote, events[0].Type)
 
 	eventVoteAttributes := events[0].Attributes
-	suite.Require().Equal(types.AttributeKeyVoteStatus, string(eventVoteAttributes[0].Key))
-	suite.Require().Equal(types.AttributeValueVoteStatusStarted, string(eventVoteAttributes[0].Value))
-	suite.Require().Equal(types.AttributeKeyOracleAddress, string(eventVoteAttributes[1].Key))
-	suite.Require().Equal(suite.oracleAccAddr.String(), string(eventVoteAttributes[1].Value))
+	suite.Require().Equal(3, len(eventVoteAttributes))
+	suite.Require().Equal(types.AttributeKeyUniqueID, string(eventVoteAttributes[0].Key))
+	suite.Require().Equal(suite.uniqueID, string(eventVoteAttributes[0].Value))
+	suite.Require().Equal(types.AttributeKeyVoteStatus, string(eventVoteAttributes[1].Key))
+	suite.Require().Equal(types.AttributeValueVoteStatusStarted, string(eventVoteAttributes[1].Value))
+	suite.Require().Equal(types.AttributeKeyOracleAddress, string(eventVoteAttributes[2].Key))
+	suite.Require().Equal(suite.oracleAccAddr.String(), string(eventVoteAttributes[2].Value))
 }
 
 func (suite *oracleTestSuite) TestRegisterOracleFailedValidatorNotFound() {
@@ -510,9 +513,11 @@ func (suite *oracleTestSuite) TestOracleRegistrationEmittedEvent() {
 	suite.Require().Equal(1, len(events))
 	suite.Require().Equal(types.EventTypeRegistrationVote, events[0].Type)
 	eventAttributes := events[0].Attributes
-	suite.Require().Equal(2, len(eventAttributes))
-	suite.Require().Equal(types.AttributeKeyVoteStatus, string(eventAttributes[0].Key))
-	suite.Require().Equal(types.AttributeValueVoteStatusStarted, string(eventAttributes[0].Value))
-	suite.Require().Equal(types.AttributeKeyOracleAddress, string(eventAttributes[1].Key))
-	suite.Require().Equal(msg.OracleAddress, string(eventAttributes[1].Value))
+	suite.Require().Equal(3, len(eventAttributes))
+	suite.Require().Equal(types.AttributeKeyUniqueID, string(eventAttributes[0].Key))
+	suite.Require().Equal(suite.uniqueID, string(eventAttributes[0].Value))
+	suite.Require().Equal(types.AttributeKeyVoteStatus, string(eventAttributes[1].Key))
+	suite.Require().Equal(types.AttributeValueVoteStatusStarted, string(eventAttributes[1].Value))
+	suite.Require().Equal(types.AttributeKeyOracleAddress, string(eventAttributes[2].Key))
+	suite.Require().Equal(msg.OracleAddress, string(eventAttributes[2].Value))
 }
