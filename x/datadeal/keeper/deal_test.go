@@ -786,23 +786,6 @@ func (suite *dealTestSuite) TestRequestDataDeliveryVoteSuccess() {
 	}
 }
 
-func (suite *dealTestSuite) TestRequestDataDeliveryVoteFailedInvalidAddress() {
-	ctx := suite.Ctx
-
-	dataSale := suite.MakeNewDataSaleDeliveryFailed(suite.sellerAccAddr, suite.dataHash1, suite.verifiableCID1)
-	err := suite.DataDealKeeper.SetDataSale(suite.Ctx, dataSale)
-	suite.Require().NoError(err)
-
-	msgRequestDataDeliveryVote := &types.MsgReRequestDataDeliveryVote{
-		DealId:           1,
-		DataHash:         dataSale.DataHash,
-		RequesterAddress: suite.sellerAccAddr.String(),
-	}
-
-	err = suite.DataDealKeeper.ReRequestDataDeliveryVote(ctx, msgRequestDataDeliveryVote)
-	suite.Require().ErrorIs(err, types.ErrReRequestDataDeliveryVote)
-}
-
 func (suite *dealTestSuite) TestRequestDataDeliveryVoteFailedInvalidStatus() {
 	ctx := suite.Ctx
 
@@ -810,12 +793,12 @@ func (suite *dealTestSuite) TestRequestDataDeliveryVoteFailedInvalidStatus() {
 	err := suite.DataDealKeeper.SetDataSale(suite.Ctx, dataSale)
 	suite.Require().NoError(err)
 
-	msgRequestDataDeliveryVote := &types.MsgReRequestDataDeliveryVote{
+	msgReRequestDataDeliveryVote := &types.MsgReRequestDataDeliveryVote{
 		DealId:           1,
 		DataHash:         dataSale.DataHash,
 		RequesterAddress: suite.buyerAccAddr.String(),
 	}
 
-	err = suite.DataDealKeeper.ReRequestDataDeliveryVote(ctx, msgRequestDataDeliveryVote)
+	err = suite.DataDealKeeper.ReRequestDataDeliveryVote(ctx, msgReRequestDataDeliveryVote)
 	suite.Require().ErrorIs(err, types.ErrReRequestDataDeliveryVote)
 }
