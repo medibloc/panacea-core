@@ -751,13 +751,13 @@ func (suite *dealTestSuite) TestRequestDataDeliveryVoteSuccess() {
 	err := suite.DataDealKeeper.SetDataSale(suite.Ctx, dataSale)
 	suite.Require().NoError(err)
 
-	msgRequestDataDeliveryVote := &types.MsgRequestDataDeliveryVote{
+	msgRequestDataDeliveryVote := &types.MsgReRequestDataDeliveryVote{
 		DealId:           1,
 		DataHash:         dataSale.DataHash,
 		RequesterAddress: suite.buyerAccAddr.String(),
 	}
 
-	err = suite.DataDealKeeper.RequestDataDeliveryVote(ctx, msgRequestDataDeliveryVote)
+	err = suite.DataDealKeeper.ReRequestDataDeliveryVote(ctx, msgRequestDataDeliveryVote)
 	suite.Require().NoError(err)
 
 	dataSale, err = suite.DataDealKeeper.GetDataSale(ctx, dataSale.DataHash, 1)
@@ -793,14 +793,14 @@ func (suite *dealTestSuite) TestRequestDataDeliveryVoteFailedInvalidAddress() {
 	err := suite.DataDealKeeper.SetDataSale(suite.Ctx, dataSale)
 	suite.Require().NoError(err)
 
-	msgRequestDataDeliveryVote := &types.MsgRequestDataDeliveryVote{
+	msgRequestDataDeliveryVote := &types.MsgReRequestDataDeliveryVote{
 		DealId:           1,
 		DataHash:         dataSale.DataHash,
 		RequesterAddress: suite.sellerAccAddr.String(),
 	}
 
-	err = suite.DataDealKeeper.RequestDataDeliveryVote(ctx, msgRequestDataDeliveryVote)
-	suite.Require().ErrorIs(err, types.ErrRequestDataDeliveryVote)
+	err = suite.DataDealKeeper.ReRequestDataDeliveryVote(ctx, msgRequestDataDeliveryVote)
+	suite.Require().ErrorIs(err, types.ErrReRequestDataDeliveryVote)
 }
 
 func (suite *dealTestSuite) TestRequestDataDeliveryVoteFailedInvalidStatus() {
@@ -810,12 +810,12 @@ func (suite *dealTestSuite) TestRequestDataDeliveryVoteFailedInvalidStatus() {
 	err := suite.DataDealKeeper.SetDataSale(suite.Ctx, dataSale)
 	suite.Require().NoError(err)
 
-	msgRequestDataDeliveryVote := &types.MsgRequestDataDeliveryVote{
+	msgRequestDataDeliveryVote := &types.MsgReRequestDataDeliveryVote{
 		DealId:           1,
 		DataHash:         dataSale.DataHash,
 		RequesterAddress: suite.buyerAccAddr.String(),
 	}
 
-	err = suite.DataDealKeeper.RequestDataDeliveryVote(ctx, msgRequestDataDeliveryVote)
-	suite.Require().ErrorIs(err, types.ErrRequestDataDeliveryVote)
+	err = suite.DataDealKeeper.ReRequestDataDeliveryVote(ctx, msgRequestDataDeliveryVote)
+	suite.Require().ErrorIs(err, types.ErrReRequestDataDeliveryVote)
 }

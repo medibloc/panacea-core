@@ -557,15 +557,7 @@ func (k Keeper) DeactivateDeal(ctx sdk.Context, msg *types.MsgDeactivateDeal) er
 	return nil
 }
 
-func (k Keeper) RequestDataDeliveryVote(ctx sdk.Context, msg *types.MsgRequestDataDeliveryVote) error {
-	deal, err := k.GetDeal(ctx, msg.DealId)
-	if err != nil {
-		return sdkerrors.Wrapf(types.ErrGetDeal, err.Error())
-	}
-
-	if deal.BuyerAddress != msg.RequesterAddress {
-		return sdkerrors.Wrapf(types.ErrRequestDataDeliveryVote, "only buyer can request data delivery vote")
-	}
+func (k Keeper) ReRequestDataDeliveryVote(ctx sdk.Context, msg *types.MsgReRequestDataDeliveryVote) error {
 
 	dataSale, err := k.GetDataSale(ctx, msg.DataHash, msg.DealId)
 	if err != nil {
@@ -573,14 +565,14 @@ func (k Keeper) RequestDataDeliveryVote(ctx sdk.Context, msg *types.MsgRequestDa
 	}
 
 	if dataSale.Status != types.DATA_SALE_STATUS_DELIVERY_FAILED {
-		return sdkerrors.Wrapf(types.ErrRequestDataDeliveryVote, "can't request data delivery vote when status is not `DELIVERY_FAILED`")
+		return sdkerrors.Wrapf(types.ErrReRequestDataDeliveryVote, "can't request data delivery vote when status is not `DELIVERY_FAILED`")
 	}
 
 	dataSale.Status = types.DATA_SALE_STATUS_DELIVERY_VOTING_PERIOD
 	dataSale.DeliveryVotingPeriod = k.oracleKeeper.GetVotingPeriod(ctx)
 
 	if err := k.SetDataSale(ctx, dataSale); err != nil {
-		return sdkerrors.Wrapf(types.ErrRequestDataDeliveryVote, err.Error())
+		return sdkerrors.Wrapf(types.ErrReRequestDataDeliveryVote, err.Error())
 	}
 
 	k.AddDataDeliveryQueue(ctx, dataSale.DataHash, dataSale.DealId, dataSale.DeliveryVotingPeriod.VotingEndTime)

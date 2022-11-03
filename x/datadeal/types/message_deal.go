@@ -216,7 +216,6 @@ func (m *MsgDeactivateDeal) Type() string {
 	return "DeactivateDeal"
 }
 
-// ValidateBasic is validation for MsgCreateDeal.
 func (m *MsgDeactivateDeal) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(m.RequesterAddress)
 	if err != nil {
@@ -242,26 +241,26 @@ func (m *MsgDeactivateDeal) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{creator}
 }
 
-var _ sdk.Msg = &MsgRequestDataDeliveryVote{}
+var _ sdk.Msg = &MsgReRequestDataDeliveryVote{}
 
-func NewMsgRequestDataDeliveryVote(dealID uint64, dataHash string, requesterAddress string) *MsgRequestDataDeliveryVote {
-	return &MsgRequestDataDeliveryVote{
+func NewMsgReRequestDataDeliveryVote(dealID uint64, dataHash string, requesterAddress string) *MsgReRequestDataDeliveryVote {
+	return &MsgReRequestDataDeliveryVote{
 		DealId:           dealID,
 		DataHash:         dataHash,
 		RequesterAddress: requesterAddress,
 	}
 }
 
-func (m *MsgRequestDataDeliveryVote) Route() string {
+func (m *MsgReRequestDataDeliveryVote) Route() string {
 	return RouterKey
 }
 
-func (m *MsgRequestDataDeliveryVote) Type() string {
+func (m *MsgReRequestDataDeliveryVote) Type() string {
 	return "RequestDeliveredCid"
 }
 
-// ValidateBasic is validation for MsgCreateDeal.
-func (m *MsgRequestDataDeliveryVote) ValidateBasic() error {
+func (m *MsgReRequestDataDeliveryVote) ValidateBasic() error {
+
 	_, err := sdk.AccAddressFromBech32(m.RequesterAddress)
 	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid requester address (%s)", err)
@@ -277,12 +276,12 @@ func (m *MsgRequestDataDeliveryVote) ValidateBasic() error {
 	return nil
 }
 
-func (m *MsgRequestDataDeliveryVote) GetSignBytes() []byte {
+func (m *MsgReRequestDataDeliveryVote) GetSignBytes() []byte {
 	bz := ModuleCdc.MustMarshalJSON(m)
 	return sdk.MustSortJSON(bz)
 }
 
-func (m *MsgRequestDataDeliveryVote) GetSigners() []sdk.AccAddress {
+func (m *MsgReRequestDataDeliveryVote) GetSigners() []sdk.AccAddress {
 	creator, err := sdk.AccAddressFromBech32(m.RequesterAddress)
 	if err != nil {
 		panic(err)

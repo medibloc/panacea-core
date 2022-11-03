@@ -10,10 +10,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func CmdRequestDataDeliveryVote() *cobra.Command {
+func CmdReRequestDataDeliveryVote() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "request-delivery-vote [dealID] [dataHash]",
-		Short: "request again data delivery vote if the data delivery vote failed",
+		Use:   "re-request-delivery-vote [dealID] [dataHash]",
+		Short: "re-request data delivery vote if the data delivery vote failed",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
@@ -28,7 +28,7 @@ func CmdRequestDataDeliveryVote() *cobra.Command {
 
 			requesterAddr := clientCtx.GetFromAddress()
 
-			msgRequestDataDeliveryVote := types.NewMsgRequestDataDeliveryVote(dealID, args[1], requesterAddr.String())
+			msgRequestDataDeliveryVote := types.NewMsgReRequestDataDeliveryVote(dealID, args[1], requesterAddr.String())
 
 			if err := msgRequestDataDeliveryVote.ValidateBasic(); err != nil {
 				return err

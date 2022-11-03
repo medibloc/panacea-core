@@ -92,13 +92,14 @@ func (m msgServer) DeactivateDeal(goCtx context.Context, msg *types.MsgDeactivat
 	return &types.MsgDeactivateDealResponse{}, nil
 }
 
-func (m msgServer) RequestDataDeliveryVote(goCtx context.Context, msg *types.MsgRequestDataDeliveryVote) (*types.MsgRequestDataDeliveryVoteResponse, error) {
+// ReRequestDataDeliveryVote defines a method for re-requesting data delivery vote.
+func (m msgServer) ReRequestDataDeliveryVote(goCtx context.Context, msg *types.MsgReRequestDataDeliveryVote) (*types.MsgReRequestDataDeliveryVoteResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	err := m.Keeper.RequestDataDeliveryVote(ctx, msg)
+	err := m.Keeper.ReRequestDataDeliveryVote(ctx, msg)
 	if err != nil {
 		return nil, err
 	}
 
-	return &types.MsgRequestDataDeliveryVoteResponse{}, nil
+	return &types.MsgReRequestDataDeliveryVoteResponse{}, nil
 }
