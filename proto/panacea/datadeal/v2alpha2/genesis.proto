@@ -7,6 +7,7 @@ import "gogoproto/gogo.proto";
 import "panacea/datadeal/v2alpha2/deal.proto";
 import "panacea/datadeal/v2alpha2/datasale.proto";
 import "panacea/datadeal/v2alpha2/tx.proto";
+import "google/protobuf/timestamp.proto";
 
 // GenesisState defines the datadeal module's genesis state.
 message GenesisState {
@@ -15,4 +16,28 @@ message GenesisState {
   repeated DataSale data_sales = 3 [(gogoproto.nullable) = false];
   repeated DataVerificationVote data_verification_votes = 4 [(gogoproto.nullable) = false];
   repeated DataDeliveryVote data_delivery_votes = 5 [(gogoproto.nullable) = false];
+  repeated DataVerificationQueue data_verification_queue = 6 [(gogoproto.nullable) = false];
+  repeated DataDeliveryQueue data_delivery_queue = 7 [(gogoproto.nullable) = false];
+}
+
+// DataVerificationQueue defines a data verification queue.
+message DataVerificationQueue {
+  string data_hash = 1;
+  uint64 deal_id = 2;
+  google.protobuf.Timestamp voting_end_time = 3 [
+    (gogoproto.stdtime) = true,
+    (gogoproto.nullable) = false,
+    (gogoproto.moretags) = "yaml:\"voting_end_time\""
+  ];
+}
+
+// DataDeliveryQueue defines a data delivery queue.
+message DataDeliveryQueue {
+  string data_hash = 1;
+  uint64 deal_id = 2;
+  google.protobuf.Timestamp voting_end_time = 3 [
+    (gogoproto.stdtime) = true,
+    (gogoproto.nullable) = false,
+    (gogoproto.moretags) = "yaml:\"voting_end_time\""
+  ];
 }

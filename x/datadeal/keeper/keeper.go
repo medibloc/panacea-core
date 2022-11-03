@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	oraclekeeper "github.com/medibloc/panacea-core/v2/x/oracle/keeper"
 
 	"github.com/tendermint/tendermint/libs/log"
@@ -56,6 +57,26 @@ func (k Keeper) AddDataVerificationQueue(ctx sdk.Context, dataHash string, dealI
 	store.Set(types.GetDataVerificationQueueKey(dataHash, dealID, endTime), []byte(dataHash))
 }
 
+func (k Keeper) GetAllDataVerificationQueue(ctx sdk.Context) ([]types.DataVerificationQueue, error) {
+	store := ctx.KVStore(k.storeKey)
+	iterator := sdk.KVStorePrefixIterator(store, types.DataVerificationQueueKey)
+	defer iterator.Close()
+
+	dataVerificationQueues := make([]types.DataVerificationQueue, 0)
+
+	for ; iterator.Valid(); iterator.Next() {
+		bz := iterator.Value()
+		var dataVerificationQueue types.DataVerificationQueue
+
+		err := k.cdc.UnmarshalLengthPrefixed(bz, &dataVerificationQueue)
+		if err != nil {
+			return nil, sdkerrors.Wrapf(types.ErrGetDataVerificationQueue, err.Error())
+		}
+	}
+
+	return dataVerificationQueues, nil
+}
+
 func (k Keeper) GetClosedDataVerificationQueueIterator(ctx sdk.Context, endTime time.Time) sdk.Iterator {
 	store := ctx.KVStore(k.storeKey)
 	return store.Iterator(types.DataVerificationQueueKey, sdk.PrefixEndBytes(types.GetDataVerificationQueueKeyByTimeKey(endTime)))
@@ -72,7 +93,7 @@ func (k Keeper) IterateClosedDataVerificationQueue(ctx sdk.Context, endTime time
 	defer iter.Close()
 
 	for ; iter.Valid(); iter.Next() {
-		dealID, dataHash := types.SplitDataVerificationQueueKey(iter.Key())
+		_, dealID, dataHash, _ := types.SplitDataVerificationQueueKey(iter.Key())
 
 		dataSale, err := k.GetDataSale(ctx, dataHash, dealID)
 
@@ -91,6 +112,26 @@ func (k Keeper) AddDataDeliveryQueue(ctx sdk.Context, dataHash string, dealID ui
 	store.Set(types.GetDataDeliveryQueueKey(dealID, dataHash, endTime), []byte(dataHash))
 }
 
+func (k Keeper) GetAllDataDeliveryQueue(ctx sdk.Context) ([]types.DataDeliveryQueue, error) {
+	store := ctx.KVStore(k.storeKey)
+	iterator := sdk.KVStorePrefixIterator(store, types.DataDeliveryQueueKey)
+	defer iterator.Close()
+
+	dataDeliveryQueues := make([]types.DataDeliveryQueue, 0)
+
+	for ; iterator.Valid(); iterator.Next() {
+		bz := iterator.Value()
+		var dataDeliveryQueue types.DataDeliveryQueue
+
+		err := k.cdc.UnmarshalLengthPrefixed(bz, &dataDeliveryQueue)
+		if err != nil {
+			return nil, sdkerrors.Wrapf(types.ErrGetDataVerificationQueue, err.Error())
+		}
+	}
+
+	return dataDeliveryQueues, nil
+}
+
 func (k Keeper) GetClosedDataDeliveryQueueIterator(ctx sdk.Context, endTime time.Time) sdk.Iterator {
 	store := ctx.KVStore(k.storeKey)
 	return store.Iterator(types.DataDeliveryQueueKey, sdk.PrefixEndBytes(types.GetDataDeliveryQueueByTimeKey(endTime)))
@@ -107,7 +148,7 @@ func (k Keeper) IterateClosedDataDeliveryQueue(ctx sdk.Context, endTime time.Tim
 	defer iter.Close()
 
 	for ; iter.Valid(); iter.Next() {
-		dealId, dataHash := types.SplitDataDeliveryQueueKey(iter.Key())
+		_, dealId, dataHash, _ := types.SplitDataDeliveryQueueKey(iter.Key())
 
 		dataSale, err := k.GetDataSale(ctx, dataHash, dealId)
 

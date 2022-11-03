@@ -104,3 +104,35 @@ func (m DataDeliveryVote) ValidateBasic() error {
 func (m DataDeliveryVote) GetConsensusValue() []byte {
 	return []byte(m.DeliveredCid)
 }
+
+func (m DataVerificationQueue) ValidateBasic() error {
+	if len(m.DataHash) == 0 {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "dataHash is empty")
+	}
+
+	if m.DealId == 0 {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "dealID can not be 0")
+	}
+
+	if m.VotingEndTime.IsZero() {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "voting end time can not be 0")
+	}
+
+	return nil
+}
+
+func (m DataDeliveryQueue) ValidateBasic() error {
+	if len(m.DataHash) == 0 {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "dataHash is empty")
+	}
+
+	if m.DealId == 0 {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "dealID can not be 0")
+	}
+
+	if m.VotingEndTime.IsZero() {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "voting end time can not be 0")
+	}
+
+	return nil
+}

@@ -67,8 +67,12 @@ func GetDataVerificationQueueKeyByTimeKey(endTime time.Time) []byte {
 	return append(DataVerificationQueueKey, sdk.FormatTimeBytes(endTime)...)
 }
 
-func SplitDataVerificationQueueKey(key []byte) (uint64, string) {
-	return sdk.BigEndianToUint64(key[1+lenTime+1 : 1+lenTime+1+8]), string(key[1+lenTime+1+8+1:])
+func SplitDataVerificationQueueKey(key []byte) (*time.Time, uint64, string, error) {
+	votingEndTime, err := sdk.ParseTimeBytes(key[1 : 1+lenTime])
+	if err != nil {
+		return nil, 0, "", err
+	}
+	return &votingEndTime, sdk.BigEndianToUint64(key[1+lenTime+1 : 1+lenTime+1+8]), string(key[1+lenTime+1+8+1:]), nil
 }
 
 func GetDataDeliveryVoteKey(dealID uint64, dataHash string, voterAddress sdk.AccAddress) []byte {
@@ -87,8 +91,12 @@ func GetDataDeliveryQueueByTimeKey(endTime time.Time) []byte {
 	return append(DataDeliveryQueueKey, sdk.FormatTimeBytes(endTime)...)
 }
 
-func SplitDataDeliveryQueueKey(key []byte) (uint64, string) {
-	return sdk.BigEndianToUint64(key[1+lenTime+1 : 1+lenTime+1+8]), string(key[1+lenTime+1+8+1:])
+func SplitDataDeliveryQueueKey(key []byte) (*time.Time, uint64, string, error) {
+	votingEndTime, err := sdk.ParseTimeBytes(key[1 : 1+lenTime])
+	if err != nil {
+		return nil, 0, "", err
+	}
+	return &votingEndTime, sdk.BigEndianToUint64(key[1+lenTime+1 : 1+lenTime+1+8]), string(key[1+lenTime+1+8+1:]), nil
 }
 
 // CombineKeys function defines combines deal_id with data_hash.
