@@ -162,6 +162,11 @@ func (k Keeper) validateOracleRegistrationVote(ctx sdk.Context, vote *types.Orac
 		return fmt.Errorf("the currently voted oracle's status is not 'VOTING_PERIOD'")
 	}
 
+	uniqueID := k.GetParams(ctx).UniqueId
+	if uniqueID != vote.VoterUniqueId {
+		return fmt.Errorf("voter's unique_id does not matched activated unique_id. voterUniqueID(%s), activeUniqueID(%s)", uniqueID, vote.VoterUniqueId)
+	}
+
 	switch oracleRegistration.RegistrationType {
 	case types.ORACLE_REGISTRATION_TYPE_NEW:
 		params := k.GetParams(ctx)

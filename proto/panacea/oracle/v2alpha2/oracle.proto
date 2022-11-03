@@ -116,9 +116,10 @@ message VotingPeriod {
 message OracleRegistrationVote {
   string unique_id = 1;
   string voter_address = 2;
-  string voting_target_address = 3;
-  VoteOption vote_option = 4;
-  bytes encrypted_oracle_priv_key = 5;
+  string voter_unique_id = 3;
+  string voting_target_address = 4;
+  VoteOption vote_option = 5;
+  bytes encrypted_oracle_priv_key = 6;
 }
 
 // VoteOption enumerates the vote option.
