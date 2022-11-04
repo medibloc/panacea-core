@@ -2,6 +2,7 @@ package datadeal_test
 
 import (
 	"encoding/base64"
+	"fmt"
 	"testing"
 
 	"github.com/btcsuite/btcd/btcec"
@@ -31,6 +32,9 @@ type genesisTestSuite struct {
 
 	dataHash1 string
 	dataHash2 string
+
+	deliveryCID1 string
+	deliveryCID2 string
 }
 
 func TestGenesisTestSuite(t *testing.T) {
@@ -47,6 +51,8 @@ func (suite *genesisTestSuite) BeforeTest(_, _ string) {
 	suite.verifiableCID2 = "verifiableCID2"
 	suite.dataHash1 = "dataHash1"
 	suite.dataHash2 = "dataHash2"
+	suite.deliveryCID1 = "deliveryCID"
+	suite.deliveryCID2 = "deliveryCID2"
 
 	suite.oraclePrivKey, _ = btcec.NewPrivateKey(btcec.S256())
 	suite.oraclePubKey = suite.oraclePrivKey.PubKey()
@@ -86,11 +92,24 @@ func (suite *genesisTestSuite) TestInitGenesis() {
 	dataVerificationVote1 := suite.MakeNewDataVerificationVote(suite.oracleAccAddr, suite.dataHash1)
 	dataVerificationVote2 := suite.MakeNewDataVerificationVote(suite.oracleAccAddr, suite.dataHash2)
 
+	verificationQueue1 := &types.DataVerificationQueue{
+		DataHash:      dataSale1.DataHash,
+		DealId:        dataSale1.DealId,
+		VotingEndTime: dataSale1.VerificationVotingPeriod.VotingEndTime,
+	}
+
+	verificationQueue2 := &types.DataVerificationQueue{
+		DataHash:      dataSale2.DataHash,
+		DealId:        dataSale2.DealId,
+		VotingEndTime: dataSale2.VerificationVotingPeriod.VotingEndTime,
+	}
+
 	genesis := types.GenesisState{
 		Deals:                 []types.Deal{*deal1, *deal2},
 		NextDealNumber:        3,
 		DataSales:             []types.DataSale{*dataSale1, *dataSale2},
 		DataVerificationVotes: []types.DataVerificationVote{*dataVerificationVote1, *dataVerificationVote2},
+		DataVerificationQueue: []types.DataVerificationQueue{*verificationQueue1, *verificationQueue2},
 	}
 
 	datadeal.InitGenesis(suite.Ctx, suite.DataDealKeeper, genesis)
@@ -135,6 +154,12 @@ func (suite *genesisTestSuite) TestInitGenesis() {
 	suite.Require().NoError(err)
 	suite.Require().Equal(genesis.DataVerificationVotes[1], *getDataVerificationVote2)
 	suite.Require().Equal(genesis.Deals[1], *getDeal2)
+
+	dataVerificationQueue, err := suite.DataDealKeeper.GetAllDataVerificationQueue(suite.Ctx)
+	fmt.Println(dataVerificationQueue[1])
+	//suite.Require().Error(err)
+	suite.Require().Equal(genesis.DataVerificationQueue[0], dataVerificationQueue[0])
+	suite.Require().Equal(genesis.DataVerificationQueue[1], dataVerificationQueue[1])
 }
 
 func (suite *genesisTestSuite) TestExportGenesis() {
