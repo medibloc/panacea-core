@@ -693,7 +693,8 @@ func (suite *dealTestSuite) TestDataDeliveryVoteFailedVerifySignature() {
 	suite.Require().NoError(err)
 
 	err = suite.DataDealKeeper.VoteDataDelivery(ctx, dataDeliveryVote, signature)
-	suite.Require().ErrorIs(err, oracletypes.ErrDetectionMaliciousBehavior)
+	suite.Require().ErrorIs(err, types.ErrDataDeliveryVote)
+	suite.Require().ErrorContains(err, "failed to signature validation")
 }
 
 func (suite *dealTestSuite) TestDataDeliveryVoteFailedInvalidStatus() {
