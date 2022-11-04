@@ -102,6 +102,9 @@ func (m OracleRegistrationVote) ValidateBasic() error {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "uniqueID is empty")
 	}
 
+	if len(m.VoterUniqueId) == 0 {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "voter's uniqueID is empty")
+	}
 	if _, err := sdk.AccAddressFromBech32(m.VoterAddress); err != nil {
 		return sdkerrors.Wrapf(err, "voterAddress is invalid. address: %s", m.VoterAddress)
 	}

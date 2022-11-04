@@ -198,6 +198,7 @@ func (suite *oracleTestSuite) TestOracleUpgradeVoteSuccess() {
 	oracleRegistrationVote := &types.OracleRegistrationVote{
 		UniqueId:               upgradeUniqueID,
 		VoterAddress:           suite.oracleAccAddr.String(),
+		VoterUniqueId:          suite.uniqueID,
 		VotingTargetAddress:    suite.newOracleAccAddr.String(),
 		VoteOption:             types.VOTE_OPTION_YES,
 		EncryptedOraclePrivKey: encryptedOraclePrivKey,
@@ -254,6 +255,7 @@ func (suite *oracleTestSuite) TestOracleUpgradeVoteFailedVerifySignature() {
 	oracleRegistrationVote := &types.OracleRegistrationVote{
 		UniqueId:               upgradeUniqueID,
 		VoterAddress:           suite.oracleAccAddr.String(),
+		VoterUniqueId:          suite.uniqueID,
 		VotingTargetAddress:    suite.newOracleAccAddr.String(),
 		VoteOption:             types.VOTE_OPTION_YES,
 		EncryptedOraclePrivKey: encryptedOraclePrivKey,
@@ -304,6 +306,7 @@ func (suite *oracleTestSuite) TestOracleUpgradeVoteInvalidUniqueID() {
 	oracleRegistrationVote := &types.OracleRegistrationVote{
 		UniqueId:               invalidUniqueID,
 		VoterAddress:           suite.oracleAccAddr.String(),
+		VoterUniqueId:          suite.uniqueID,
 		VotingTargetAddress:    suite.newOracleAccAddr.String(),
 		VoteOption:             types.VOTE_OPTION_YES,
 		EncryptedOraclePrivKey: encryptedOraclePrivKey,
