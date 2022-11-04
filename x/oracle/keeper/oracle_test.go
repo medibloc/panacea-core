@@ -293,6 +293,7 @@ func (suite *oracleTestSuite) TestOracleRegistrationVoteSuccess() {
 	oracleRegistrationVote := &types.OracleRegistrationVote{
 		UniqueId:               suite.uniqueID,
 		VoterAddress:           suite.oracleAccAddr.String(),
+		VoterUniqueId:          suite.uniqueID,
 		VotingTargetAddress:    suite.newOracleAccAddr.String(),
 		VoteOption:             types.VOTE_OPTION_YES,
 		EncryptedOraclePrivKey: encryptedOraclePrivKey,
@@ -339,6 +340,7 @@ func (suite *oracleTestSuite) TestOracleRegistrationVoteFailedVerifySignature() 
 	oracleRegistrationVote := &types.OracleRegistrationVote{
 		UniqueId:               suite.uniqueID,
 		VoterAddress:           suite.oracleAccAddr.String(),
+		VoterUniqueId:          suite.uniqueID,
 		VotingTargetAddress:    suite.newOracleAccAddr.String(),
 		VoteOption:             types.VOTE_OPTION_YES,
 		EncryptedOraclePrivKey: encryptedOraclePrivKey,
@@ -379,6 +381,7 @@ func (suite *oracleTestSuite) TestOracleRegistrationVoteInvalidUniqueID() {
 	oracleRegistrationVote := &types.OracleRegistrationVote{
 		UniqueId:               invalidUniqueID,
 		VoterAddress:           suite.oracleAccAddr.String(),
+		VoterUniqueId:          suite.uniqueID,
 		VotingTargetAddress:    suite.newOracleAccAddr.String(),
 		VoteOption:             types.VOTE_OPTION_YES,
 		EncryptedOraclePrivKey: encryptedOraclePrivKey,
@@ -424,6 +427,7 @@ func (suite *oracleTestSuite) TestOracleRegistrationVoteInvalidGenesisOracleStat
 	oracleRegistrationVote := &types.OracleRegistrationVote{
 		UniqueId:               suite.uniqueID,
 		VoterAddress:           suite.oracleAccAddr.String(),
+		VoterUniqueId:          suite.uniqueID,
 		VotingTargetAddress:    suite.newOracleAccAddr.String(),
 		VoteOption:             types.VOTE_OPTION_YES,
 		EncryptedOraclePrivKey: encryptedOraclePrivKey,
@@ -462,6 +466,7 @@ func (suite *oracleTestSuite) TestOracleRegistrationVoteInvalidOracleRegistratio
 	oracleRegistrationVote := &types.OracleRegistrationVote{
 		UniqueId:               suite.uniqueID,
 		VoterAddress:           suite.oracleAccAddr.String(),
+		VoterUniqueId:          suite.uniqueID,
 		VotingTargetAddress:    suite.newOracleAccAddr.String(),
 		VoteOption:             types.VOTE_OPTION_YES,
 		EncryptedOraclePrivKey: encryptedOraclePrivKey,
@@ -479,6 +484,45 @@ func (suite *oracleTestSuite) TestOracleRegistrationVoteInvalidOracleRegistratio
 	err = suite.OracleKeeper.VoteOracleRegistration(ctx, oracleRegistrationVote, signature)
 	suite.Require().ErrorIs(err, types.ErrOracleRegistrationVote)
 	suite.Require().ErrorContains(err, "the currently voted oracle's status is not 'VOTING_PERIOD'")
+}
+
+func (suite *oracleTestSuite) TestOracleRegistrationVoteInvalidVoterUniqueID() {
+	ctx := suite.Ctx
+
+	suite.CreateOracleValidator(suite.oracleAccPubKey, sdk.NewInt(70))
+	suite.SetAccount(suite.newOracleAccPubKey)
+	suite.SetValidator(suite.newOracleAccPubKey, sdk.NewInt(20))
+
+	oracleRegistration := suite.makeNewOracleRegistration()
+	oracleRegistration.RegistrationType = types.ORACLE_REGISTRATION_TYPE_NEW
+	err := suite.OracleKeeper.SetOracleRegistration(ctx, oracleRegistration)
+	suite.Require().NoError(err)
+
+	// make the correct encryptedOraclePrivKey
+	encryptedOraclePrivKey, err := btcec.Encrypt(suite.nodePubKey, suite.oraclePrivKey.Serialize())
+	suite.Require().NoError(err)
+	// make the correct vote info
+	oracleRegistrationVote := &types.OracleRegistrationVote{
+		UniqueId:               suite.uniqueID,
+		VoterAddress:           suite.oracleAccAddr.String(),
+		VoterUniqueId:          "Wrong uniqueID",
+		VotingTargetAddress:    suite.newOracleAccAddr.String(),
+		VoteOption:             types.VOTE_OPTION_YES,
+		EncryptedOraclePrivKey: encryptedOraclePrivKey,
+	}
+
+	// make the correct signature
+	voteBz, err := suite.Cdc.Marshaler.Marshal(oracleRegistrationVote)
+	suite.Require().NoError(err)
+	oraclePrivKeySecp256k1 := secp256k1.PrivKey{
+		Key: suite.oraclePrivKey.Serialize(),
+	}
+	signature, err := oraclePrivKeySecp256k1.Sign(voteBz)
+	suite.Require().NoError(err)
+
+	err = suite.OracleKeeper.VoteOracleRegistration(ctx, oracleRegistrationVote, signature)
+	suite.Require().ErrorIs(err, types.ErrOracleRegistrationVote)
+	suite.Require().ErrorContains(err, "voter's unique_id does not matched activated unique_id.")
 }
 
 func (suite *oracleTestSuite) TestOracleRegistrationEmittedEvent() {
