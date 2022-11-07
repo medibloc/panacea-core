@@ -1,8 +1,9 @@
 package types
 
 const (
-	EventTypeRegistrationVote = "oracle_registration"
-	EventTypeUpgradeVote      = "oracle_upgrade"
+	EventTypeRegistrationVote = "oracle_registration_vote"
+	EventTypeUpgradeVote      = "oracle_upgrade_vote"
+	EventTypeOracleUpgraded   = "oracle_upgraded"
 	EventTypeOracleReward     = "oracle_reward"
 
 	AttributeKeyUniqueID            = "unique_id"

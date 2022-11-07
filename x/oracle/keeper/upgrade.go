@@ -84,7 +84,7 @@ func (k Keeper) ApplyUpgrade(ctx sdk.Context, info *types.OracleUpgradeInfo) err
 
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(
-			types.EventTypeUpgradeVote,
+			types.EventTypeOracleUpgraded,
 			sdk.NewAttribute(types.AttributeKeyUniqueID, info.UniqueId),
 		),
 	)

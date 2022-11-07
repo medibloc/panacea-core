@@ -362,6 +362,14 @@ func (suite *abciTestSuite) TestOracleUpgradeSuccess() {
 
 	_, err := suite.OracleKeeper.GetOracleUpgradeInfo(ctx)
 	suite.Require().Error(err, types.ErrOracleUpgradeInfoNotFound)
+
+	events := ctx.EventManager().Events()
+	suite.Require().Equal(1, len(events))
+	suite.Require().Equal(types.EventTypeOracleUpgraded, events[0].Type)
+	eventAttributes := events[0].Attributes
+	suite.Require().Equal(1, len(eventAttributes))
+	suite.Require().Equal(types.AttributeKeyUniqueID, string(eventAttributes[0].Key))
+	suite.Require().Equal(upgradeUniqueID, string(eventAttributes[0].Value))
 }
 
 func (suite *abciTestSuite) TestOracleUpgradeEmptyUpgradeData() {
