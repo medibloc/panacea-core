@@ -31,6 +31,8 @@ type genesisTestSuite struct {
 
 	dataHash1 string
 	dataHash2 string
+	dataHash3 string
+	dataHash4 string
 
 	deliveryCID1 string
 	deliveryCID2 string
@@ -50,6 +52,8 @@ func (suite *genesisTestSuite) BeforeTest(_, _ string) {
 	suite.verifiableCID2 = "verifiableCID2"
 	suite.dataHash1 = "dataHash1"
 	suite.dataHash2 = "dataHash2"
+	suite.dataHash3 = "dataHash3"
+	suite.dataHash4 = "dataHash4"
 	suite.deliveryCID1 = "deliveryCID"
 	suite.deliveryCID2 = "deliveryCID2"
 
@@ -207,11 +211,11 @@ func (suite *genesisTestSuite) TestExportGenesis() {
 	dataVerificationVote1 := suite.MakeNewDataVerificationVote(suite.oracleAccAddr, suite.dataHash1)
 	dataVerificationVote2 := suite.MakeNewDataVerificationVote(suite.oracleAccAddr, suite.dataHash2)
 
-	dataSaleDeliveryVoting1 := suite.MakeNewDataSaleDeliveryVoting(suite.sellerAccAddr, suite.dataHash1, suite.verifiableCID1)
-	dataSaleDeliveryVoting2 := suite.MakeNewDataSaleDeliveryVoting(suite.sellerAccAddr, suite.dataHash2, suite.verifiableCID2)
+	dataSaleDeliveryVoting1 := suite.MakeNewDataSaleDeliveryVoting(suite.sellerAccAddr, suite.dataHash3, suite.verifiableCID1)
+	dataSaleDeliveryVoting2 := suite.MakeNewDataSaleDeliveryVoting(suite.sellerAccAddr, suite.dataHash4, suite.verifiableCID2)
 
-	dataDeliveryVote1 := suite.MakeNewDataDeliveryVote(suite.oracleAccAddr, suite.dataHash1, suite.deliveryCID1, 1)
-	dataDeliveryVote2 := suite.MakeNewDataDeliveryVote(suite.oracleAccAddr, suite.dataHash2, suite.deliveryCID2, 1)
+	dataDeliveryVote1 := suite.MakeNewDataDeliveryVote(suite.oracleAccAddr, suite.dataHash3, suite.deliveryCID1, 1)
+	dataDeliveryVote2 := suite.MakeNewDataDeliveryVote(suite.oracleAccAddr, suite.dataHash4, suite.deliveryCID2, 1)
 
 	voteBz, err := suite.Cdc.Marshaler.Marshal(dataVerificationVote2)
 	suite.Require().NoError(err)
@@ -287,6 +291,11 @@ func (suite *genesisTestSuite) TestExportGenesis() {
 	err = suite.DataDealKeeper.VoteDataVerification(suite.Ctx, dataVerificationVote2, signature)
 	suite.Require().NoError(err)
 
+	err = suite.DataDealKeeper.SetDataSale(suite.Ctx, dataSaleDeliveryVoting2)
+	suite.Require().NoError(err)
+
+	suite.DataDealKeeper.AddDataDeliveryQueue(suite.Ctx, dataSaleDeliveryVoting2.DataHash, dataSaleDeliveryVoting2.DealId, dataSaleDeliveryVoting2.DeliveryVotingPeriod.VotingEndTime)
+
 	err = suite.DataDealKeeper.VoteDataDelivery(suite.Ctx, dataDeliveryVote2, signature2)
 	suite.Require().NoError(err)
 
@@ -337,10 +346,10 @@ func (suite *genesisTestSuite) TestExportGenesis() {
 	suite.Require().Equal(dataDeliveryVote1.VoteOption, genesisStatus.DataDeliveryVotes[0].VoteOption)
 	suite.Require().Equal(dataDeliveryVote2.VoteOption, genesisStatus.DataDeliveryVotes[1].VoteOption)
 
-	suite.Require().Equal(verificationQueue1.DataHash, genesisStatus.DataVerificationQueue[0].DataHash)
-	suite.Require().Equal(verificationQueue1.DealId, genesisStatus.DataVerificationQueue[0].DealId)
-	suite.Require().Equal(verificationQueue2.DataHash, genesisStatus.DataVerificationQueue[1].DataHash)
-	suite.Require().Equal(verificationQueue2.DealId, genesisStatus.DataVerificationQueue[1].DealId)
+	suite.Require().Equal(verificationQueue2.DataHash, genesisStatus.DataVerificationQueue[0].DataHash)
+	suite.Require().Equal(verificationQueue2.DealId, genesisStatus.DataVerificationQueue[0].DealId)
+	suite.Require().Equal(verificationQueue1.DataHash, genesisStatus.DataVerificationQueue[1].DataHash)
+	suite.Require().Equal(verificationQueue1.DealId, genesisStatus.DataVerificationQueue[1].DealId)
 
 	suite.Require().Equal(deliveryQueue1.DataHash, genesisStatus.DataDeliveryQueue[0].DataHash)
 	suite.Require().Equal(deliveryQueue1.DealId, genesisStatus.DataDeliveryQueue[0].DealId)

@@ -120,7 +120,7 @@ func (k Keeper) AddDataDeliveryQueue(ctx sdk.Context, dataHash string, dealID ui
 
 func (k Keeper) GetAllDataDeliveryQueue(ctx sdk.Context) ([]types.DataDeliveryQueue, error) {
 	store := ctx.KVStore(k.storeKey)
-	iterator := sdk.KVStorePrefixIterator(store, types.DataVerificationQueueKey)
+	iterator := sdk.KVStorePrefixIterator(store, types.DataDeliveryQueueKey)
 	defer iterator.Close()
 
 	dataDeliveryQueues := make([]types.DataDeliveryQueue, 0)
