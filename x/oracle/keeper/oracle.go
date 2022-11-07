@@ -58,6 +58,7 @@ func (k Keeper) RegisterOracle(ctx sdk.Context, msg *types.MsgRegisterOracle) er
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(
 			types.EventTypeRegistrationVote,
+			sdk.NewAttribute(types.AttributeKeyUniqueID, oracleRegistration.UniqueId),
 			sdk.NewAttribute(types.AttributeKeyVoteStatus, types.AttributeValueVoteStatusStarted),
 			sdk.NewAttribute(types.AttributeKeyOracleAddress, oracleRegistration.Address),
 		),
@@ -159,6 +160,11 @@ func (k Keeper) validateOracleRegistrationVote(ctx sdk.Context, vote *types.Orac
 
 	if oracleRegistration.Status != types.ORACLE_REGISTRATION_STATUS_VOTING_PERIOD {
 		return fmt.Errorf("the currently voted oracle's status is not 'VOTING_PERIOD'")
+	}
+
+	uniqueID := k.GetParams(ctx).UniqueId
+	if uniqueID != vote.VoterUniqueId {
+		return fmt.Errorf("voter's unique_id does not matched activated unique_id. voterUniqueID(%s), activeUniqueID(%s)", uniqueID, vote.VoterUniqueId)
 	}
 
 	switch oracleRegistration.RegistrationType {
