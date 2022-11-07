@@ -2,7 +2,6 @@ package datadeal_test
 
 import (
 	"encoding/base64"
-	"fmt"
 	"testing"
 
 	"github.com/btcsuite/btcd/btcec"
@@ -89,8 +88,14 @@ func (suite *genesisTestSuite) TestInitGenesis() {
 	dataSale1 := suite.MakeNewDataSale(suite.sellerAccAddr, suite.dataHash1, suite.verifiableCID1)
 	dataSale2 := suite.MakeNewDataSale(suite.sellerAccAddr, suite.dataHash2, suite.verifiableCID2)
 
+	dataSaleDeliveryVoting1 := suite.MakeNewDataSaleDeliveryVoting(suite.sellerAccAddr, suite.dataHash1, suite.verifiableCID1)
+	dataSaleDeliveryVoting2 := suite.MakeNewDataSaleDeliveryVoting(suite.sellerAccAddr, suite.dataHash2, suite.verifiableCID2)
+
 	dataVerificationVote1 := suite.MakeNewDataVerificationVote(suite.oracleAccAddr, suite.dataHash1)
 	dataVerificationVote2 := suite.MakeNewDataVerificationVote(suite.oracleAccAddr, suite.dataHash2)
+
+	dataDeliveryVote1 := suite.MakeNewDataDeliveryVote(suite.oracleAccAddr, dataSale1.DataHash, suite.deliveryCID1, deal1.Id)
+	dataDeliveryVote2 := suite.MakeNewDataDeliveryVote(suite.oracleAccAddr, dataSale2.DataHash, suite.deliveryCID2, deal2.Id)
 
 	verificationQueue1 := &types.DataVerificationQueue{
 		DataHash:      dataSale1.DataHash,
@@ -104,12 +109,26 @@ func (suite *genesisTestSuite) TestInitGenesis() {
 		VotingEndTime: dataSale2.VerificationVotingPeriod.VotingEndTime,
 	}
 
+	deliveryQueue1 := &types.DataDeliveryQueue{
+		DataHash:      dataSaleDeliveryVoting1.DataHash,
+		DealId:        dataSaleDeliveryVoting1.DealId,
+		VotingEndTime: dataSaleDeliveryVoting1.DeliveryVotingPeriod.VotingEndTime,
+	}
+
+	deliveryQueue2 := &types.DataDeliveryQueue{
+		DataHash:      dataSaleDeliveryVoting2.DataHash,
+		DealId:        dataSaleDeliveryVoting2.DealId,
+		VotingEndTime: dataSaleDeliveryVoting2.DeliveryVotingPeriod.VotingEndTime,
+	}
+
 	genesis := types.GenesisState{
 		Deals:                 []types.Deal{*deal1, *deal2},
 		NextDealNumber:        3,
 		DataSales:             []types.DataSale{*dataSale1, *dataSale2},
 		DataVerificationVotes: []types.DataVerificationVote{*dataVerificationVote1, *dataVerificationVote2},
+		DataDeliveryVotes:     []types.DataDeliveryVote{*dataDeliveryVote1, *dataDeliveryVote2},
 		DataVerificationQueue: []types.DataVerificationQueue{*verificationQueue1, *verificationQueue2},
+		DataDeliveryQueue:     []types.DataDeliveryQueue{*deliveryQueue1, *deliveryQueue2},
 	}
 
 	datadeal.InitGenesis(suite.Ctx, suite.DataDealKeeper, genesis)
@@ -155,11 +174,27 @@ func (suite *genesisTestSuite) TestInitGenesis() {
 	suite.Require().Equal(genesis.DataVerificationVotes[1], *getDataVerificationVote2)
 	suite.Require().Equal(genesis.Deals[1], *getDeal2)
 
+	getDataDeliveryVote1, err := suite.DataDealKeeper.GetDataDeliveryVote(suite.Ctx, suite.dataHash1, suite.oracleAccAddr.String(), 1)
+	suite.Require().NoError(err)
+	suite.Require().Equal(genesis.DataDeliveryVotes[0], *getDataDeliveryVote1)
+
+	getDataDeliveryVote2, err := suite.DataDealKeeper.GetDataDeliveryVote(suite.Ctx, suite.dataHash2, suite.oracleAccAddr.String(), 2)
+	suite.Require().NoError(err)
+	suite.Require().Equal(genesis.DataDeliveryVotes[1], *getDataDeliveryVote2)
+
 	dataVerificationQueue, err := suite.DataDealKeeper.GetAllDataVerificationQueue(suite.Ctx)
-	fmt.Println(dataVerificationQueue[1])
-	//suite.Require().Error(err)
-	suite.Require().Equal(genesis.DataVerificationQueue[0], dataVerificationQueue[0])
-	suite.Require().Equal(genesis.DataVerificationQueue[1], dataVerificationQueue[1])
+	suite.Require().NoError(err)
+	suite.Require().Equal(genesis.DataVerificationQueue[0].DataHash, dataVerificationQueue[0].DataHash)
+	suite.Require().Equal(genesis.DataVerificationQueue[0].DealId, dataVerificationQueue[0].DealId)
+	suite.Require().Equal(genesis.DataVerificationQueue[1].DataHash, dataVerificationQueue[1].DataHash)
+	suite.Require().Equal(genesis.DataVerificationQueue[1].DealId, dataVerificationQueue[1].DealId)
+
+	dataDeliveryQueue, err := suite.DataDealKeeper.GetAllDataDeliveryQueue(suite.Ctx)
+	suite.Require().NoError(err)
+	suite.Require().Equal(genesis.DataDeliveryQueue[0].DataHash, dataDeliveryQueue[0].DataHash)
+	suite.Require().Equal(genesis.DataDeliveryQueue[0].DealId, dataDeliveryQueue[0].DealId)
+	suite.Require().Equal(genesis.DataDeliveryQueue[1].DataHash, dataDeliveryQueue[1].DataHash)
+	suite.Require().Equal(genesis.DataDeliveryQueue[1].DealId, dataDeliveryQueue[1].DealId)
 }
 
 func (suite *genesisTestSuite) TestExportGenesis() {
@@ -172,6 +207,12 @@ func (suite *genesisTestSuite) TestExportGenesis() {
 	dataVerificationVote1 := suite.MakeNewDataVerificationVote(suite.oracleAccAddr, suite.dataHash1)
 	dataVerificationVote2 := suite.MakeNewDataVerificationVote(suite.oracleAccAddr, suite.dataHash2)
 
+	dataSaleDeliveryVoting1 := suite.MakeNewDataSaleDeliveryVoting(suite.sellerAccAddr, suite.dataHash1, suite.verifiableCID1)
+	dataSaleDeliveryVoting2 := suite.MakeNewDataSaleDeliveryVoting(suite.sellerAccAddr, suite.dataHash2, suite.verifiableCID2)
+
+	dataDeliveryVote1 := suite.MakeNewDataDeliveryVote(suite.oracleAccAddr, suite.dataHash1, suite.deliveryCID1, 1)
+	dataDeliveryVote2 := suite.MakeNewDataDeliveryVote(suite.oracleAccAddr, suite.dataHash2, suite.deliveryCID2, 1)
+
 	voteBz, err := suite.Cdc.Marshaler.Marshal(dataVerificationVote2)
 	suite.Require().NoError(err)
 
@@ -179,11 +220,43 @@ func (suite *genesisTestSuite) TestExportGenesis() {
 	signature, err := oraclePrivKeySecp256k1.Sign(voteBz)
 	suite.Require().NoError(err)
 
+	voteBz2, err := suite.Cdc.Marshaler.Marshal(dataDeliveryVote2)
+	suite.Require().NoError(err)
+	signature2, err := oraclePrivKeySecp256k1.Sign(voteBz2)
+	suite.Require().NoError(err)
+
+	verificationQueue1 := &types.DataVerificationQueue{
+		DataHash:      dataSale1.DataHash,
+		DealId:        dataSale1.DealId,
+		VotingEndTime: dataSale1.VerificationVotingPeriod.VotingEndTime,
+	}
+
+	verificationQueue2 := &types.DataVerificationQueue{
+		DataHash:      dataSale2.DataHash,
+		DealId:        dataSale2.DealId,
+		VotingEndTime: dataSale2.VerificationVotingPeriod.VotingEndTime,
+	}
+
+	deliveryQueue1 := &types.DataDeliveryQueue{
+		DataHash:      dataSaleDeliveryVoting1.DataHash,
+		DealId:        dataSaleDeliveryVoting1.DealId,
+		VotingEndTime: dataSaleDeliveryVoting1.DeliveryVotingPeriod.VotingEndTime,
+	}
+
+	deliveryQueue2 := &types.DataDeliveryQueue{
+		DataHash:      dataSaleDeliveryVoting2.DataHash,
+		DealId:        dataSaleDeliveryVoting2.DealId,
+		VotingEndTime: dataSaleDeliveryVoting2.DeliveryVotingPeriod.VotingEndTime,
+	}
+
 	genesis := types.GenesisState{
 		Deals:                 []types.Deal{*deal1},
 		NextDealNumber:        2,
 		DataSales:             []types.DataSale{*dataSale1},
 		DataVerificationVotes: []types.DataVerificationVote{*dataVerificationVote1},
+		DataDeliveryVotes:     []types.DataDeliveryVote{*dataDeliveryVote1},
+		DataVerificationQueue: []types.DataVerificationQueue{*verificationQueue1},
+		DataDeliveryQueue:     []types.DataDeliveryQueue{*deliveryQueue1},
 	}
 
 	msgCreateDeal := &types.MsgCreateDeal{
@@ -212,6 +285,9 @@ func (suite *genesisTestSuite) TestExportGenesis() {
 	suite.Require().NoError(err)
 
 	err = suite.DataDealKeeper.VoteDataVerification(suite.Ctx, dataVerificationVote2, signature)
+	suite.Require().NoError(err)
+
+	err = suite.DataDealKeeper.VoteDataDelivery(suite.Ctx, dataDeliveryVote2, signature2)
 	suite.Require().NoError(err)
 
 	genesisStatus := datadeal.ExportGenesis(suite.Ctx, suite.DataDealKeeper)
@@ -252,4 +328,22 @@ func (suite *genesisTestSuite) TestExportGenesis() {
 	suite.Require().Equal(dataVerificationVote1.VoteOption, genesisStatus.DataVerificationVotes[0].VoteOption)
 	suite.Require().Equal(dataVerificationVote2.VoteOption, genesisStatus.DataVerificationVotes[1].VoteOption)
 
+	suite.Require().Equal(dataDeliveryVote1.VoterAddress, genesisStatus.DataDeliveryVotes[0].VoterAddress)
+	suite.Require().Equal(dataDeliveryVote2.VoterAddress, genesisStatus.DataDeliveryVotes[1].VoterAddress)
+	suite.Require().Equal(dataDeliveryVote1.DataHash, genesisStatus.DataDeliveryVotes[0].DataHash)
+	suite.Require().Equal(dataDeliveryVote2.DataHash, genesisStatus.DataDeliveryVotes[1].DataHash)
+	suite.Require().Equal(dataDeliveryVote1.DealId, genesisStatus.DataDeliveryVotes[0].DealId)
+	suite.Require().Equal(dataDeliveryVote2.DealId, genesisStatus.DataDeliveryVotes[1].DealId)
+	suite.Require().Equal(dataDeliveryVote1.VoteOption, genesisStatus.DataDeliveryVotes[0].VoteOption)
+	suite.Require().Equal(dataDeliveryVote2.VoteOption, genesisStatus.DataDeliveryVotes[1].VoteOption)
+
+	suite.Require().Equal(verificationQueue1.DataHash, genesisStatus.DataVerificationQueue[0].DataHash)
+	suite.Require().Equal(verificationQueue1.DealId, genesisStatus.DataVerificationQueue[0].DealId)
+	suite.Require().Equal(verificationQueue2.DataHash, genesisStatus.DataVerificationQueue[1].DataHash)
+	suite.Require().Equal(verificationQueue2.DealId, genesisStatus.DataVerificationQueue[1].DealId)
+
+	suite.Require().Equal(deliveryQueue1.DataHash, genesisStatus.DataDeliveryQueue[0].DataHash)
+	suite.Require().Equal(deliveryQueue1.DealId, genesisStatus.DataDeliveryQueue[0].DealId)
+	suite.Require().Equal(deliveryQueue2.DataHash, genesisStatus.DataDeliveryQueue[1].DataHash)
+	suite.Require().Equal(deliveryQueue2.DealId, genesisStatus.DataDeliveryQueue[1].DealId)
 }

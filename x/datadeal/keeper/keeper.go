@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"time"
 
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	oraclekeeper "github.com/medibloc/panacea-core/v2/x/oracle/keeper"
 
 	"github.com/tendermint/tendermint/libs/log"
@@ -65,13 +64,20 @@ func (k Keeper) GetAllDataVerificationQueue(ctx sdk.Context) ([]types.DataVerifi
 	dataVerificationQueues := make([]types.DataVerificationQueue, 0)
 
 	for ; iterator.Valid(); iterator.Next() {
-		bz := iterator.Value()
-		var dataVerificationQueue types.DataVerificationQueue
+		//bz := iterator.Value()
 
-		err := k.cdc.UnmarshalLengthPrefixed(bz, &dataVerificationQueue)
+		votingEndTime, dealID, dataHash, err := types.SplitDataVerificationQueueKey(iterator.Key())
 		if err != nil {
-			return nil, sdkerrors.Wrapf(types.ErrGetDataVerificationQueue, err.Error())
+			panic(err)
 		}
+
+		dataVerificationQueue := types.DataVerificationQueue{
+			DataHash:      dataHash,
+			DealId:        dealID,
+			VotingEndTime: *votingEndTime,
+		}
+
+		dataVerificationQueues = append(dataVerificationQueues, dataVerificationQueue)
 	}
 
 	return dataVerificationQueues, nil
@@ -114,19 +120,26 @@ func (k Keeper) AddDataDeliveryQueue(ctx sdk.Context, dataHash string, dealID ui
 
 func (k Keeper) GetAllDataDeliveryQueue(ctx sdk.Context) ([]types.DataDeliveryQueue, error) {
 	store := ctx.KVStore(k.storeKey)
-	iterator := sdk.KVStorePrefixIterator(store, types.DataDeliveryQueueKey)
+	iterator := sdk.KVStorePrefixIterator(store, types.DataVerificationQueueKey)
 	defer iterator.Close()
 
 	dataDeliveryQueues := make([]types.DataDeliveryQueue, 0)
 
 	for ; iterator.Valid(); iterator.Next() {
-		bz := iterator.Value()
-		var dataDeliveryQueue types.DataDeliveryQueue
+		//bz := iterator.Value()
 
-		err := k.cdc.UnmarshalLengthPrefixed(bz, &dataDeliveryQueue)
+		votingEndTime, dealID, dataHash, err := types.SplitDataDeliveryQueueKey(iterator.Key())
 		if err != nil {
-			return nil, sdkerrors.Wrapf(types.ErrGetDataVerificationQueue, err.Error())
+			panic(err)
 		}
+
+		dataDeliveryQueue := types.DataDeliveryQueue{
+			DataHash:      dataHash,
+			DealId:        dealID,
+			VotingEndTime: *votingEndTime,
+		}
+
+		dataDeliveryQueues = append(dataDeliveryQueues, dataDeliveryQueue)
 	}
 
 	return dataDeliveryQueues, nil

@@ -84,46 +84,14 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	if err != nil {
 		panic(err)
 	}
-	genesisDataVerificationQueues := make([]types.DataVerificationQueue, 0)
-
-	for _, dataVerificationQueue := range dataVerificationQueues {
-		votingEndTime, dealID, dataHash, err := types.SplitDataDeliveryQueueKey(types.GetDataVerificationQueueKey(dataVerificationQueue.DataHash, dataVerificationQueue.DealId, dataVerificationQueue.VotingEndTime))
-		if err != nil {
-			panic(err)
-		}
-
-		dataVerificationQueue := types.DataVerificationQueue{
-			DataHash:      dataHash,
-			DealId:        dealID,
-			VotingEndTime: *votingEndTime,
-		}
-
-		genesisDataVerificationQueues = append(genesisDataVerificationQueues, dataVerificationQueue)
-	}
-	genesis.DataVerificationQueue = genesisDataVerificationQueues
+	genesis.DataVerificationQueue = dataVerificationQueues
 
 	dataDeliveryQueues, err := k.GetAllDataDeliveryQueue(ctx)
 	if err != nil {
 		panic(err)
 	}
 
-	genesisDataDeliveryQueues := make([]types.DataDeliveryQueue, 0)
-
-	for _, dataDeliveryQueue := range dataDeliveryQueues {
-		votingEndTime, dealID, dataHash, err := types.SplitDataVerificationQueueKey(types.GetDataDeliveryQueueKey(dataDeliveryQueue.DealId, dataDeliveryQueue.DataHash, dataDeliveryQueue.VotingEndTime))
-		if err != nil {
-			panic(err)
-		}
-
-		dataDeliveryQueue := types.DataDeliveryQueue{
-			DataHash:      dataHash,
-			DealId:        dealID,
-			VotingEndTime: *votingEndTime,
-		}
-
-		genesisDataDeliveryQueues = append(genesisDataDeliveryQueues, dataDeliveryQueue)
-	}
-	genesis.DataDeliveryQueue = genesisDataDeliveryQueues
+	genesis.DataDeliveryQueue = dataDeliveryQueues
 
 	return genesis
 }
