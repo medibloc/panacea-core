@@ -290,8 +290,8 @@ func (k Keeper) VoteDataVerification(ctx sdk.Context, vote *types.DataVerificati
 		return sdkerrors.Wrapf(types.ErrDataVerificationVote, err.Error())
 	}
 
-	if !k.oracleKeeper.VerifyVoteSignature(ctx, vote, signature) {
-		return sdkerrors.Wrap(oracletypes.ErrDetectionMaliciousBehavior, "")
+	if err := k.oracleKeeper.VerifyVoteBasic(ctx, vote, signature); err != nil {
+		return sdkerrors.Wrap(types.ErrDataVerificationVote, err.Error())
 	}
 
 	if err := k.validateDataVerificationVote(ctx, vote); err != nil {
@@ -310,8 +310,8 @@ func (k Keeper) VoteDataDelivery(ctx sdk.Context, vote *types.DataDeliveryVote, 
 		return sdkerrors.Wrap(types.ErrDataDeliveryVote, err.Error())
 	}
 
-	if !k.oracleKeeper.VerifyVoteSignature(ctx, vote, signature) {
-		return sdkerrors.Wrap(oracletypes.ErrDetectionMaliciousBehavior, "")
+	if err := k.oracleKeeper.VerifyVoteBasic(ctx, vote, signature); err != nil {
+		return sdkerrors.Wrap(types.ErrDataDeliveryVote, err.Error())
 	}
 
 	// Check if the dataSale vote status
