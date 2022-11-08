@@ -273,7 +273,8 @@ func (suite *oracleTestSuite) TestOracleUpgradeVoteFailedVerifySignature() {
 	suite.Require().NoError(err)
 
 	err = suite.OracleKeeper.VoteOracleRegistration(ctx, oracleRegistrationVote, signature)
-	suite.Require().ErrorIs(err, types.ErrDetectionMaliciousBehavior)
+	suite.Require().ErrorIs(err, types.ErrOracleRegistrationVote)
+	suite.Require().ErrorContains(err, "failed to signature validation")
 }
 
 func (suite *oracleTestSuite) TestOracleUpgradeVoteInvalidUniqueID() {

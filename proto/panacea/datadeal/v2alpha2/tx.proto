@@ -68,10 +68,11 @@ message MsgVoteDataVerificationResponse {
 
 // DataVerificationVote defines the vote info for verifying data.
 message DataVerificationVote {
-  string voter_address = 1;
-  uint64 deal_id = 2;
-  string data_hash = 3;
-  panacea.oracle.v2alpha2.VoteOption vote_option = 4;
+  string voter_unique_id = 1;
+  string voter_address = 2;
+  uint64 deal_id = 3;
+  string data_hash = 4;
+  panacea.oracle.v2alpha2.VoteOption vote_option = 5;
 }
 
 // MsgVoteDataDelivery defines the Msg/VoteDataDelivery request type.
@@ -86,11 +87,12 @@ message MsgVoteDataDeliveryResponse {
 
 // DataDeliveryVote defines the vote info for delivering data.
 message DataDeliveryVote {
-  string voter_address = 1;
-  uint64 deal_id = 2;
-  string data_hash = 3;
-  string delivered_cid = 4;
-  panacea.oracle.v2alpha2.VoteOption vote_option = 5;
+  string voter_unique_id = 1;
+  string voter_address = 2;
+  uint64 deal_id = 3;
+  string data_hash = 4;
+  string delivered_cid = 5;
+  panacea.oracle.v2alpha2.VoteOption vote_option = 6;
 }
 
 // MsgDeactivateDeal defines the Msg/DeactivateDeal request type.
