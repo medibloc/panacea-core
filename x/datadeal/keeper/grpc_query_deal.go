@@ -68,6 +68,37 @@ func (k Keeper) DataSale(goCtx context.Context, req *types.QueryDataSaleRequest)
 	}, nil
 }
 
+func (k Keeper) DataSales(goCtx context.Context, req *types.QueryDataSalesRequest) (*types.QueryDataSalesResponse, error) {
+	if req == nil {
+		return nil, status.Error(codes.InvalidArgument, "invalid request")
+	}
+
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	store := ctx.KVStore(k.storeKey)
+	dataSalesStore := prefix.NewStore(store, types.GetDataSalesKey(req.DealId))
+
+	var dataSales []*types.DataSale
+	pageRes, err := query.Paginate(dataSalesStore, req.Pagination, func(_, value []byte) error {
+		var dataSale types.DataSale
+		err := k.cdc.UnmarshalLengthPrefixed(value, &dataSale)
+		if err != nil {
+			return err
+		}
+		dataSales = append(dataSales, &dataSale)
+		return nil
+	})
+
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	return &types.QueryDataSalesResponse{
+		DataSale:   dataSales,
+		Pagination: pageRes,
+	}, nil
+}
+
 func (k Keeper) DataVerificationVote(goCtx context.Context, req *types.QueryDataVerificationVoteRequest) (*types.QueryDataVerificationVoteResponse, error) {
 	dataVerificationVote, err := k.GetDataVerificationVote(sdk.UnwrapSDKContext(goCtx), req.DataHash, req.VoterAddress, req.DealId)
 	if err != nil {
