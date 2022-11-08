@@ -64,9 +64,7 @@ func (k Keeper) GetAllDataVerificationQueue(ctx sdk.Context) ([]types.DataVerifi
 	dataVerificationQueues := make([]types.DataVerificationQueue, 0)
 
 	for ; iterator.Valid(); iterator.Next() {
-		//bz := iterator.Value()
-
-		votingEndTime, dealID, dataHash, err := types.SplitDataVerificationQueueKey(iterator.Key())
+		votingEndTime, dealID, dataHash, err := types.SplitDataQueueKey(iterator.Key())
 		if err != nil {
 			panic(err)
 		}
@@ -99,7 +97,7 @@ func (k Keeper) IterateClosedDataVerificationQueue(ctx sdk.Context, endTime time
 	defer iter.Close()
 
 	for ; iter.Valid(); iter.Next() {
-		_, dealID, dataHash, _ := types.SplitDataVerificationQueueKey(iter.Key())
+		_, dealID, dataHash, _ := types.SplitDataQueueKey(iter.Key())
 
 		dataSale, err := k.GetDataSale(ctx, dataHash, dealID)
 
@@ -126,9 +124,7 @@ func (k Keeper) GetAllDataDeliveryQueue(ctx sdk.Context) ([]types.DataDeliveryQu
 	dataDeliveryQueues := make([]types.DataDeliveryQueue, 0)
 
 	for ; iterator.Valid(); iterator.Next() {
-		//bz := iterator.Value()
-
-		votingEndTime, dealID, dataHash, err := types.SplitDataDeliveryQueueKey(iterator.Key())
+		votingEndTime, dealID, dataHash, err := types.SplitDataQueueKey(iterator.Key())
 		if err != nil {
 			panic(err)
 		}
@@ -161,7 +157,7 @@ func (k Keeper) IterateClosedDataDeliveryQueue(ctx sdk.Context, endTime time.Tim
 	defer iter.Close()
 
 	for ; iter.Valid(); iter.Next() {
-		_, dealId, dataHash, _ := types.SplitDataDeliveryQueueKey(iter.Key())
+		_, dealId, dataHash, _ := types.SplitDataQueueKey(iter.Key())
 
 		dataSale, err := k.GetDataSale(ctx, dataHash, dealId)
 
