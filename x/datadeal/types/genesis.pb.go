@@ -29,13 +29,13 @@ const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 // GenesisState defines the datadeal module's genesis state.
 type GenesisState struct {
-	Deals                 []Deal                  `protobuf:"bytes,1,rep,name=deals,proto3" json:"deals"`
-	NextDealNumber        uint64                  `protobuf:"varint,2,opt,name=next_deal_number,json=nextDealNumber,proto3" json:"next_deal_number,omitempty"`
-	DataSales             []DataSale              `protobuf:"bytes,3,rep,name=data_sales,json=dataSales,proto3" json:"data_sales"`
-	DataVerificationVotes []DataVerificationVote  `protobuf:"bytes,4,rep,name=data_verification_votes,json=dataVerificationVotes,proto3" json:"data_verification_votes"`
-	DataDeliveryVotes     []DataDeliveryVote      `protobuf:"bytes,5,rep,name=data_delivery_votes,json=dataDeliveryVotes,proto3" json:"data_delivery_votes"`
-	DataVerificationQueue []DataVerificationQueue `protobuf:"bytes,6,rep,name=data_verification_queue,json=dataVerificationQueue,proto3" json:"data_verification_queue"`
-	DataDeliveryQueue     []DataDeliveryQueue     `protobuf:"bytes,7,rep,name=data_delivery_queue,json=dataDeliveryQueue,proto3" json:"data_delivery_queue"`
+	Deals                         []Deal                         `protobuf:"bytes,1,rep,name=deals,proto3" json:"deals"`
+	NextDealNumber                uint64                         `protobuf:"varint,2,opt,name=next_deal_number,json=nextDealNumber,proto3" json:"next_deal_number,omitempty"`
+	DataSales                     []DataSale                     `protobuf:"bytes,3,rep,name=data_sales,json=dataSales,proto3" json:"data_sales"`
+	DataVerificationVotes         []DataVerificationVote         `protobuf:"bytes,4,rep,name=data_verification_votes,json=dataVerificationVotes,proto3" json:"data_verification_votes"`
+	DataDeliveryVotes             []DataDeliveryVote             `protobuf:"bytes,5,rep,name=data_delivery_votes,json=dataDeliveryVotes,proto3" json:"data_delivery_votes"`
+	DataVerificationQueueElements []DataVerificationQueueElement `protobuf:"bytes,6,rep,name=data_verification_queue_elements,json=dataVerificationQueueElements,proto3" json:"data_verification_queue_elements"`
+	DataDeliveryQueueElements     []DataDeliveryQueueElement     `protobuf:"bytes,7,rep,name=data_delivery_queue_elements,json=dataDeliveryQueueElements,proto3" json:"data_delivery_queue_elements"`
 }
 
 func (m *GenesisState) Reset()         { *m = GenesisState{} }
@@ -106,39 +106,39 @@ func (m *GenesisState) GetDataDeliveryVotes() []DataDeliveryVote {
 	return nil
 }
 
-func (m *GenesisState) GetDataVerificationQueue() []DataVerificationQueue {
+func (m *GenesisState) GetDataVerificationQueueElements() []DataVerificationQueueElement {
 	if m != nil {
-		return m.DataVerificationQueue
+		return m.DataVerificationQueueElements
 	}
 	return nil
 }
 
-func (m *GenesisState) GetDataDeliveryQueue() []DataDeliveryQueue {
+func (m *GenesisState) GetDataDeliveryQueueElements() []DataDeliveryQueueElement {
 	if m != nil {
-		return m.DataDeliveryQueue
+		return m.DataDeliveryQueueElements
 	}
 	return nil
 }
 
 // DataVerificationQueue defines a data verification queue.
-type DataVerificationQueue struct {
+type DataVerificationQueueElement struct {
 	DataHash      string    `protobuf:"bytes,1,opt,name=data_hash,json=dataHash,proto3" json:"data_hash,omitempty"`
 	DealId        uint64    `protobuf:"varint,2,opt,name=deal_id,json=dealId,proto3" json:"deal_id,omitempty"`
 	VotingEndTime time.Time `protobuf:"bytes,3,opt,name=voting_end_time,json=votingEndTime,proto3,stdtime" json:"voting_end_time" yaml:"voting_end_time"`
 }
 
-func (m *DataVerificationQueue) Reset()         { *m = DataVerificationQueue{} }
-func (m *DataVerificationQueue) String() string { return proto.CompactTextString(m) }
-func (*DataVerificationQueue) ProtoMessage()    {}
-func (*DataVerificationQueue) Descriptor() ([]byte, []int) {
+func (m *DataVerificationQueueElement) Reset()         { *m = DataVerificationQueueElement{} }
+func (m *DataVerificationQueueElement) String() string { return proto.CompactTextString(m) }
+func (*DataVerificationQueueElement) ProtoMessage()    {}
+func (*DataVerificationQueueElement) Descriptor() ([]byte, []int) {
 	return fileDescriptor_148a7361fee02e04, []int{1}
 }
-func (m *DataVerificationQueue) XXX_Unmarshal(b []byte) error {
+func (m *DataVerificationQueueElement) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *DataVerificationQueue) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *DataVerificationQueueElement) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_DataVerificationQueue.Marshal(b, m, deterministic)
+		return xxx_messageInfo_DataVerificationQueueElement.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -148,33 +148,33 @@ func (m *DataVerificationQueue) XXX_Marshal(b []byte, deterministic bool) ([]byt
 		return b[:n], nil
 	}
 }
-func (m *DataVerificationQueue) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_DataVerificationQueue.Merge(m, src)
+func (m *DataVerificationQueueElement) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_DataVerificationQueueElement.Merge(m, src)
 }
-func (m *DataVerificationQueue) XXX_Size() int {
+func (m *DataVerificationQueueElement) XXX_Size() int {
 	return m.Size()
 }
-func (m *DataVerificationQueue) XXX_DiscardUnknown() {
-	xxx_messageInfo_DataVerificationQueue.DiscardUnknown(m)
+func (m *DataVerificationQueueElement) XXX_DiscardUnknown() {
+	xxx_messageInfo_DataVerificationQueueElement.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_DataVerificationQueue proto.InternalMessageInfo
+var xxx_messageInfo_DataVerificationQueueElement proto.InternalMessageInfo
 
-func (m *DataVerificationQueue) GetDataHash() string {
+func (m *DataVerificationQueueElement) GetDataHash() string {
 	if m != nil {
 		return m.DataHash
 	}
 	return ""
 }
 
-func (m *DataVerificationQueue) GetDealId() uint64 {
+func (m *DataVerificationQueueElement) GetDealId() uint64 {
 	if m != nil {
 		return m.DealId
 	}
 	return 0
 }
 
-func (m *DataVerificationQueue) GetVotingEndTime() time.Time {
+func (m *DataVerificationQueueElement) GetVotingEndTime() time.Time {
 	if m != nil {
 		return m.VotingEndTime
 	}
@@ -182,24 +182,24 @@ func (m *DataVerificationQueue) GetVotingEndTime() time.Time {
 }
 
 // DataDeliveryQueue defines a data delivery queue.
-type DataDeliveryQueue struct {
+type DataDeliveryQueueElement struct {
 	DataHash      string    `protobuf:"bytes,1,opt,name=data_hash,json=dataHash,proto3" json:"data_hash,omitempty"`
 	DealId        uint64    `protobuf:"varint,2,opt,name=deal_id,json=dealId,proto3" json:"deal_id,omitempty"`
 	VotingEndTime time.Time `protobuf:"bytes,3,opt,name=voting_end_time,json=votingEndTime,proto3,stdtime" json:"voting_end_time" yaml:"voting_end_time"`
 }
 
-func (m *DataDeliveryQueue) Reset()         { *m = DataDeliveryQueue{} }
-func (m *DataDeliveryQueue) String() string { return proto.CompactTextString(m) }
-func (*DataDeliveryQueue) ProtoMessage()    {}
-func (*DataDeliveryQueue) Descriptor() ([]byte, []int) {
+func (m *DataDeliveryQueueElement) Reset()         { *m = DataDeliveryQueueElement{} }
+func (m *DataDeliveryQueueElement) String() string { return proto.CompactTextString(m) }
+func (*DataDeliveryQueueElement) ProtoMessage()    {}
+func (*DataDeliveryQueueElement) Descriptor() ([]byte, []int) {
 	return fileDescriptor_148a7361fee02e04, []int{2}
 }
-func (m *DataDeliveryQueue) XXX_Unmarshal(b []byte) error {
+func (m *DataDeliveryQueueElement) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *DataDeliveryQueue) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *DataDeliveryQueueElement) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_DataDeliveryQueue.Marshal(b, m, deterministic)
+		return xxx_messageInfo_DataDeliveryQueueElement.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -209,33 +209,33 @@ func (m *DataDeliveryQueue) XXX_Marshal(b []byte, deterministic bool) ([]byte, e
 		return b[:n], nil
 	}
 }
-func (m *DataDeliveryQueue) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_DataDeliveryQueue.Merge(m, src)
+func (m *DataDeliveryQueueElement) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_DataDeliveryQueueElement.Merge(m, src)
 }
-func (m *DataDeliveryQueue) XXX_Size() int {
+func (m *DataDeliveryQueueElement) XXX_Size() int {
 	return m.Size()
 }
-func (m *DataDeliveryQueue) XXX_DiscardUnknown() {
-	xxx_messageInfo_DataDeliveryQueue.DiscardUnknown(m)
+func (m *DataDeliveryQueueElement) XXX_DiscardUnknown() {
+	xxx_messageInfo_DataDeliveryQueueElement.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_DataDeliveryQueue proto.InternalMessageInfo
+var xxx_messageInfo_DataDeliveryQueueElement proto.InternalMessageInfo
 
-func (m *DataDeliveryQueue) GetDataHash() string {
+func (m *DataDeliveryQueueElement) GetDataHash() string {
 	if m != nil {
 		return m.DataHash
 	}
 	return ""
 }
 
-func (m *DataDeliveryQueue) GetDealId() uint64 {
+func (m *DataDeliveryQueueElement) GetDealId() uint64 {
 	if m != nil {
 		return m.DealId
 	}
 	return 0
 }
 
-func (m *DataDeliveryQueue) GetVotingEndTime() time.Time {
+func (m *DataDeliveryQueueElement) GetVotingEndTime() time.Time {
 	if m != nil {
 		return m.VotingEndTime
 	}
@@ -244,8 +244,8 @@ func (m *DataDeliveryQueue) GetVotingEndTime() time.Time {
 
 func init() {
 	proto.RegisterType((*GenesisState)(nil), "panacea.datadeal.v2alpha2.GenesisState")
-	proto.RegisterType((*DataVerificationQueue)(nil), "panacea.datadeal.v2alpha2.DataVerificationQueue")
-	proto.RegisterType((*DataDeliveryQueue)(nil), "panacea.datadeal.v2alpha2.DataDeliveryQueue")
+	proto.RegisterType((*DataVerificationQueueElement)(nil), "panacea.datadeal.v2alpha2.DataVerificationQueueElement")
+	proto.RegisterType((*DataDeliveryQueueElement)(nil), "panacea.datadeal.v2alpha2.DataDeliveryQueueElement")
 }
 
 func init() {
@@ -253,41 +253,43 @@ func init() {
 }
 
 var fileDescriptor_148a7361fee02e04 = []byte{
-	// 541 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xcc, 0x54, 0xcd, 0x6e, 0xd3, 0x40,
-	0x10, 0x8e, 0x69, 0xda, 0xd2, 0x2d, 0x7f, 0x5d, 0x28, 0x35, 0x41, 0x72, 0x22, 0x83, 0x84, 0x25,
-	0xc0, 0x8b, 0x02, 0x27, 0xb8, 0x45, 0x45, 0x94, 0x4b, 0x25, 0x52, 0xd4, 0x03, 0x17, 0x6b, 0x9c,
-	0x9d, 0x38, 0x96, 0x6c, 0x6f, 0xc8, 0x6e, 0xac, 0xe4, 0x2d, 0xfa, 0x2a, 0x1c, 0x78, 0x87, 0x1e,
-	0x7b, 0xe4, 0x54, 0x50, 0x22, 0x5e, 0x80, 0x27, 0x40, 0xbb, 0x76, 0x44, 0x08, 0x49, 0x0b, 0x37,
-	0x6e, 0x9e, 0x99, 0xef, 0x67, 0x3e, 0xed, 0xc8, 0xe4, 0x51, 0x1f, 0x32, 0xe8, 0x20, 0x30, 0x0e,
-	0x0a, 0x38, 0x42, 0xc2, 0xf2, 0x26, 0x24, 0xfd, 0x1e, 0x34, 0x59, 0x84, 0x19, 0xca, 0x58, 0xfa,
-	0xfd, 0x81, 0x50, 0x82, 0xde, 0x2b, 0x81, 0xfe, 0x0c, 0xe8, 0xcf, 0x80, 0xb5, 0x3b, 0x91, 0x88,
-	0x84, 0x41, 0x31, 0xfd, 0x55, 0x10, 0x6a, 0x0f, 0x57, 0x2b, 0x1b, 0x7a, 0x81, 0xf2, 0x2e, 0x40,
-	0x81, 0x02, 0x09, 0x09, 0x96, 0x48, 0x77, 0x35, 0x52, 0x8d, 0x4a, 0x4c, 0x3d, 0x12, 0x22, 0x4a,
-	0x90, 0x99, 0x2a, 0x1c, 0x76, 0x99, 0x8a, 0x53, 0x94, 0x0a, 0xd2, 0x7e, 0x01, 0x70, 0xbf, 0x57,
-	0xc9, 0xb5, 0x37, 0x45, 0xae, 0x23, 0x05, 0x0a, 0xe9, 0x2b, 0xb2, 0xae, 0xb5, 0xa4, 0x6d, 0x35,
-	0xd6, 0xbc, 0xed, 0x66, 0xdd, 0x5f, 0x19, 0xd3, 0xdf, 0x47, 0x48, 0x5a, 0xd5, 0xd3, 0xf3, 0x7a,
-	0xa5, 0x5d, 0x70, 0xa8, 0x47, 0x6e, 0x65, 0x38, 0x52, 0x81, 0xae, 0x82, 0x6c, 0x98, 0x86, 0x38,
-	0xb0, 0xaf, 0x34, 0x2c, 0xaf, 0xda, 0xbe, 0xa1, 0xfb, 0x9a, 0x70, 0x68, 0xba, 0xf4, 0x80, 0x10,
-	0x2d, 0x18, 0xe8, 0x3c, 0xd2, 0x5e, 0x33, 0x5e, 0x0f, 0x2e, 0xf2, 0x02, 0x05, 0x47, 0x90, 0x60,
-	0xe9, 0xb7, 0xc5, 0xcb, 0x5a, 0xd2, 0x94, 0xec, 0x19, 0xa5, 0x1c, 0x07, 0x71, 0x37, 0xee, 0x80,
-	0x8a, 0x45, 0x16, 0xe4, 0x42, 0xa1, 0xb4, 0xab, 0x46, 0x96, 0x5d, 0x22, 0x7b, 0x3c, 0x47, 0x3c,
-	0x16, 0x6a, 0x66, 0xb1, 0xcb, 0x97, 0xcc, 0x24, 0x05, 0x72, 0xdb, 0xd8, 0x71, 0x4c, 0xe2, 0x1c,
-	0x07, 0xe3, 0xd2, 0x6a, 0xdd, 0x58, 0x3d, 0xbe, 0xc4, 0x6a, 0xbf, 0x24, 0xcd, 0xd9, 0xec, 0xf0,
-	0x85, 0xbe, 0xa4, 0xd9, 0xb2, 0x44, 0x1f, 0x87, 0x38, 0x44, 0x7b, 0xc3, 0xd8, 0x3c, 0xfb, 0x87,
-	0x44, 0xef, 0x34, 0x6f, 0x55, 0x24, 0x33, 0xa4, 0xe1, 0x62, 0xa4, 0xc2, 0x6b, 0xd3, 0x78, 0x3d,
-	0xf9, 0xcb, 0x48, 0xf3, 0x3e, 0xbf, 0x65, 0x32, 0x03, 0xf7, 0xb3, 0x45, 0x76, 0x97, 0xae, 0x46,
-	0xef, 0x13, 0xf3, 0x98, 0x41, 0x0f, 0x64, 0xcf, 0xb6, 0x1a, 0x96, 0xb7, 0xd5, 0xbe, 0xaa, 0x1b,
-	0x07, 0x20, 0x7b, 0x74, 0x8f, 0x6c, 0x9a, 0x5b, 0x8a, 0x79, 0x79, 0x47, 0x1b, 0xba, 0x7c, 0xcb,
-	0x69, 0x97, 0xdc, 0xcc, 0x85, 0x8a, 0xb3, 0x28, 0xc0, 0x8c, 0x07, 0xfa, 0xaa, 0xed, 0xb5, 0x86,
-	0xe5, 0x6d, 0x37, 0x6b, 0x7e, 0x71, 0xf2, 0xfe, 0xec, 0xe4, 0xfd, 0xf7, 0xb3, 0x93, 0x6f, 0xb9,
-	0x7a, 0xbb, 0x1f, 0xe7, 0xf5, 0xbb, 0x63, 0x48, 0x93, 0x97, 0xee, 0x82, 0x80, 0x7b, 0xf2, 0xb5,
-	0x6e, 0xb5, 0xaf, 0x17, 0xdd, 0xd7, 0x19, 0xd7, 0x3c, 0xf7, 0x93, 0x45, 0x76, 0xfe, 0x88, 0xf9,
-	0x7f, 0xef, 0xdc, 0x3a, 0x3c, 0x9d, 0x38, 0xd6, 0xd9, 0xc4, 0xb1, 0xbe, 0x4d, 0x1c, 0xeb, 0x64,
-	0xea, 0x54, 0xce, 0xa6, 0x4e, 0xe5, 0xcb, 0xd4, 0xa9, 0x7c, 0x78, 0x11, 0xc5, 0xaa, 0x37, 0x0c,
-	0xfd, 0x8e, 0x48, 0x59, 0x8a, 0x3c, 0x0e, 0x13, 0xd1, 0x61, 0xe5, 0xfb, 0x3e, 0xed, 0x88, 0x01,
-	0xb2, 0xbc, 0xc9, 0x46, 0xbf, 0x7e, 0x28, 0x6a, 0xdc, 0x47, 0x19, 0x6e, 0x98, 0xb5, 0x9e, 0xff,
-	0x0c, 0x00, 0x00, 0xff, 0xff, 0x1e, 0x1c, 0x1d, 0x46, 0x1b, 0x05, 0x00, 0x00,
+	// 563 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xcc, 0x54, 0xcd, 0x6e, 0xd3, 0x4e,
+	0x10, 0xcf, 0xfe, 0xdb, 0xa4, 0xff, 0x6e, 0xf9, 0x34, 0x1f, 0x75, 0x43, 0x71, 0x22, 0x83, 0x84,
+	0x25, 0x84, 0x57, 0x4a, 0x91, 0x90, 0xe0, 0x16, 0xb5, 0xa2, 0x5c, 0x2a, 0x91, 0xa2, 0x1e, 0xb8,
+	0x58, 0x93, 0xec, 0xc4, 0xb1, 0x64, 0x7b, 0x43, 0x76, 0x63, 0x25, 0x3c, 0x00, 0xe7, 0x9e, 0x78,
+	0x16, 0x0e, 0x3c, 0x40, 0x8f, 0x3d, 0x72, 0x2a, 0x28, 0x79, 0x03, 0x9e, 0x00, 0xed, 0xda, 0x11,
+	0x25, 0x34, 0x29, 0xdc, 0xb8, 0x65, 0x66, 0x7f, 0x1f, 0xf3, 0x53, 0x66, 0x4c, 0x1f, 0xf5, 0x21,
+	0x85, 0x0e, 0x02, 0xe3, 0xa0, 0x80, 0x23, 0xc4, 0x2c, 0x6b, 0x40, 0xdc, 0xef, 0x41, 0x83, 0x85,
+	0x98, 0xa2, 0x8c, 0xa4, 0xdf, 0x1f, 0x08, 0x25, 0xac, 0xad, 0x02, 0xe8, 0xcf, 0x80, 0xfe, 0x0c,
+	0x58, 0xbd, 0x1d, 0x8a, 0x50, 0x18, 0x14, 0xd3, 0xbf, 0x72, 0x42, 0xf5, 0xe1, 0x62, 0x65, 0x43,
+	0xcf, 0x51, 0xde, 0x12, 0x14, 0x28, 0x90, 0x10, 0x63, 0x81, 0x74, 0x17, 0x23, 0xd5, 0xa8, 0xc0,
+	0xd4, 0x42, 0x21, 0xc2, 0x18, 0x99, 0xa9, 0xda, 0xc3, 0x2e, 0x53, 0x51, 0x82, 0x52, 0x41, 0xd2,
+	0xcf, 0x01, 0xee, 0xc7, 0x32, 0xbd, 0xf2, 0x32, 0xcf, 0x75, 0xa8, 0x40, 0xa1, 0xf5, 0x82, 0x96,
+	0xb5, 0x96, 0xb4, 0x49, 0x7d, 0xc5, 0xdb, 0x68, 0xd4, 0xfc, 0x85, 0x31, 0xfd, 0x5d, 0x84, 0xb8,
+	0xb9, 0x7a, 0x72, 0x56, 0x2b, 0xb5, 0x72, 0x8e, 0xe5, 0xd1, 0x1b, 0x29, 0x8e, 0x54, 0xa0, 0xab,
+	0x20, 0x1d, 0x26, 0x6d, 0x1c, 0xd8, 0xff, 0xd5, 0x89, 0xb7, 0xda, 0xba, 0xa6, 0xfb, 0x9a, 0x70,
+	0x60, 0xba, 0xd6, 0x3e, 0xa5, 0x5a, 0x30, 0xd0, 0x79, 0xa4, 0xbd, 0x62, 0xbc, 0x1e, 0x2c, 0xf3,
+	0x02, 0x05, 0x87, 0x10, 0x63, 0xe1, 0xb7, 0xce, 0x8b, 0x5a, 0x5a, 0x09, 0xdd, 0x34, 0x4a, 0x19,
+	0x0e, 0xa2, 0x6e, 0xd4, 0x01, 0x15, 0x89, 0x34, 0xc8, 0x84, 0x42, 0x69, 0xaf, 0x1a, 0x59, 0x76,
+	0x89, 0xec, 0xd1, 0x39, 0xe2, 0x91, 0x50, 0x33, 0x8b, 0x3b, 0xfc, 0x82, 0x37, 0x69, 0x01, 0xbd,
+	0x65, 0xec, 0x38, 0xc6, 0x51, 0x86, 0x83, 0x71, 0x61, 0x55, 0x36, 0x56, 0x8f, 0x2f, 0xb1, 0xda,
+	0x2d, 0x48, 0xe7, 0x6c, 0x6e, 0xf2, 0xb9, 0xbe, 0xb4, 0x3e, 0x10, 0x5a, 0xff, 0x3d, 0xd2, 0xbb,
+	0x21, 0x0e, 0x31, 0xc0, 0x18, 0x13, 0x4c, 0x95, 0xb4, 0x2b, 0xc6, 0xf0, 0xd9, 0x5f, 0x64, 0x7b,
+	0xad, 0x05, 0xf6, 0x72, 0x7e, 0x61, 0x7e, 0x9f, 0x2f, 0xc1, 0x48, 0xeb, 0x3d, 0xdd, 0xfe, 0x35,
+	0xeb, 0xdc, 0x0c, 0x6b, 0x66, 0x86, 0x9d, 0x3f, 0x0c, 0x7d, 0x81, 0xff, 0x16, 0x5f, 0xf0, 0x2e,
+	0xdd, 0xcf, 0x84, 0x6e, 0x2f, 0x4b, 0x60, 0xdd, 0xa3, 0x66, 0x09, 0x82, 0x1e, 0xc8, 0x9e, 0x4d,
+	0xea, 0xc4, 0x5b, 0x6f, 0xfd, 0xaf, 0x1b, 0xfb, 0x20, 0x7b, 0xd6, 0x26, 0x5d, 0x33, 0x3b, 0x18,
+	0xf1, 0x62, 0xff, 0x2a, 0xba, 0x7c, 0xc5, 0xad, 0x2e, 0xbd, 0x9e, 0x09, 0x15, 0xa5, 0x61, 0x80,
+	0x29, 0x0f, 0xf4, 0x35, 0xd8, 0x2b, 0x75, 0xe2, 0x6d, 0x34, 0xaa, 0x7e, 0x7e, 0x2a, 0xfe, 0xec,
+	0x54, 0xfc, 0x37, 0xb3, 0x53, 0x69, 0xba, 0x7a, 0xd8, 0xef, 0x67, 0xb5, 0xbb, 0x63, 0x48, 0xe2,
+	0xe7, 0xee, 0x9c, 0x80, 0x7b, 0xfc, 0xb5, 0x46, 0x5a, 0x57, 0xf3, 0xee, 0x5e, 0xca, 0x35, 0xcf,
+	0xfd, 0x44, 0xa8, 0xbd, 0x28, 0xfc, 0xbf, 0x3d, 0x7a, 0xf3, 0xe0, 0x64, 0xe2, 0x90, 0xd3, 0x89,
+	0x43, 0xbe, 0x4d, 0x1c, 0x72, 0x3c, 0x75, 0x4a, 0xa7, 0x53, 0xa7, 0xf4, 0x65, 0xea, 0x94, 0xde,
+	0x3e, 0x0d, 0x23, 0xd5, 0x1b, 0xb6, 0xfd, 0x8e, 0x48, 0x58, 0x82, 0x3c, 0x6a, 0xc7, 0xa2, 0xc3,
+	0x8a, 0x3f, 0xff, 0x49, 0x47, 0x0c, 0x90, 0x65, 0x0d, 0x36, 0xfa, 0xf9, 0x3d, 0x52, 0xe3, 0x3e,
+	0xca, 0x76, 0xc5, 0x8c, 0xb5, 0xf3, 0x23, 0x00, 0x00, 0xff, 0xff, 0xde, 0xc0, 0x22, 0xcb, 0x5a,
+	0x05, 0x00, 0x00,
 }
 
 func (m *GenesisState) Marshal() (dAtA []byte, err error) {
@@ -310,10 +312,10 @@ func (m *GenesisState) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if len(m.DataDeliveryQueue) > 0 {
-		for iNdEx := len(m.DataDeliveryQueue) - 1; iNdEx >= 0; iNdEx-- {
+	if len(m.DataDeliveryQueueElements) > 0 {
+		for iNdEx := len(m.DataDeliveryQueueElements) - 1; iNdEx >= 0; iNdEx-- {
 			{
-				size, err := m.DataDeliveryQueue[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				size, err := m.DataDeliveryQueueElements[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -324,10 +326,10 @@ func (m *GenesisState) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 			dAtA[i] = 0x3a
 		}
 	}
-	if len(m.DataVerificationQueue) > 0 {
-		for iNdEx := len(m.DataVerificationQueue) - 1; iNdEx >= 0; iNdEx-- {
+	if len(m.DataVerificationQueueElements) > 0 {
+		for iNdEx := len(m.DataVerificationQueueElements) - 1; iNdEx >= 0; iNdEx-- {
 			{
-				size, err := m.DataVerificationQueue[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				size, err := m.DataVerificationQueueElements[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -402,7 +404,7 @@ func (m *GenesisState) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *DataVerificationQueue) Marshal() (dAtA []byte, err error) {
+func (m *DataVerificationQueueElement) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -412,12 +414,12 @@ func (m *DataVerificationQueue) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *DataVerificationQueue) MarshalTo(dAtA []byte) (int, error) {
+func (m *DataVerificationQueueElement) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *DataVerificationQueue) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *DataVerificationQueueElement) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -445,7 +447,7 @@ func (m *DataVerificationQueue) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *DataDeliveryQueue) Marshal() (dAtA []byte, err error) {
+func (m *DataDeliveryQueueElement) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -455,12 +457,12 @@ func (m *DataDeliveryQueue) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *DataDeliveryQueue) MarshalTo(dAtA []byte) (int, error) {
+func (m *DataDeliveryQueueElement) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *DataDeliveryQueue) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *DataDeliveryQueueElement) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -532,14 +534,14 @@ func (m *GenesisState) Size() (n int) {
 			n += 1 + l + sovGenesis(uint64(l))
 		}
 	}
-	if len(m.DataVerificationQueue) > 0 {
-		for _, e := range m.DataVerificationQueue {
+	if len(m.DataVerificationQueueElements) > 0 {
+		for _, e := range m.DataVerificationQueueElements {
 			l = e.Size()
 			n += 1 + l + sovGenesis(uint64(l))
 		}
 	}
-	if len(m.DataDeliveryQueue) > 0 {
-		for _, e := range m.DataDeliveryQueue {
+	if len(m.DataDeliveryQueueElements) > 0 {
+		for _, e := range m.DataDeliveryQueueElements {
 			l = e.Size()
 			n += 1 + l + sovGenesis(uint64(l))
 		}
@@ -547,7 +549,7 @@ func (m *GenesisState) Size() (n int) {
 	return n
 }
 
-func (m *DataVerificationQueue) Size() (n int) {
+func (m *DataVerificationQueueElement) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -565,7 +567,7 @@ func (m *DataVerificationQueue) Size() (n int) {
 	return n
 }
 
-func (m *DataDeliveryQueue) Size() (n int) {
+func (m *DataDeliveryQueueElement) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -775,7 +777,7 @@ func (m *GenesisState) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 6:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field DataVerificationQueue", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field DataVerificationQueueElements", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -802,14 +804,14 @@ func (m *GenesisState) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.DataVerificationQueue = append(m.DataVerificationQueue, DataVerificationQueue{})
-			if err := m.DataVerificationQueue[len(m.DataVerificationQueue)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			m.DataVerificationQueueElements = append(m.DataVerificationQueueElements, DataVerificationQueueElement{})
+			if err := m.DataVerificationQueueElements[len(m.DataVerificationQueueElements)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
 		case 7:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field DataDeliveryQueue", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field DataDeliveryQueueElements", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -836,8 +838,8 @@ func (m *GenesisState) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.DataDeliveryQueue = append(m.DataDeliveryQueue, DataDeliveryQueue{})
-			if err := m.DataDeliveryQueue[len(m.DataDeliveryQueue)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			m.DataDeliveryQueueElements = append(m.DataDeliveryQueueElements, DataDeliveryQueueElement{})
+			if err := m.DataDeliveryQueueElements[len(m.DataDeliveryQueueElements)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -862,7 +864,7 @@ func (m *GenesisState) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *DataVerificationQueue) Unmarshal(dAtA []byte) error {
+func (m *DataVerificationQueueElement) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -885,10 +887,10 @@ func (m *DataVerificationQueue) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: DataVerificationQueue: wiretype end group for non-group")
+			return fmt.Errorf("proto: DataVerificationQueueElement: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: DataVerificationQueue: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: DataVerificationQueueElement: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -996,7 +998,7 @@ func (m *DataVerificationQueue) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *DataDeliveryQueue) Unmarshal(dAtA []byte) error {
+func (m *DataDeliveryQueueElement) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -1019,10 +1021,10 @@ func (m *DataDeliveryQueue) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: DataDeliveryQueue: wiretype end group for non-group")
+			return fmt.Errorf("proto: DataDeliveryQueueElement: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: DataDeliveryQueue: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: DataDeliveryQueueElement: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:

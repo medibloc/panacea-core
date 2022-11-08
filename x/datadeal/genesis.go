@@ -37,12 +37,12 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 		}
 	}
 
-	for _, dataVerificationQueue := range genState.DataVerificationQueue {
-		k.AddDataVerificationQueue(ctx, dataVerificationQueue.DataHash, dataVerificationQueue.DealId, dataVerificationQueue.VotingEndTime)
+	for _, dataVerificationQueueElement := range genState.DataVerificationQueueElements {
+		k.AddDataVerificationQueue(ctx, dataVerificationQueueElement.DataHash, dataVerificationQueueElement.DealId, dataVerificationQueueElement.VotingEndTime)
 	}
 
-	for _, dataDeliveryQueue := range genState.DataDeliveryQueue {
-		k.AddDataDeliveryQueue(ctx, dataDeliveryQueue.DataHash, dataDeliveryQueue.DealId, dataDeliveryQueue.VotingEndTime)
+	for _, dataDeliveryQueueElement := range genState.DataDeliveryQueueElements {
+		k.AddDataDeliveryQueue(ctx, dataDeliveryQueueElement.DataHash, dataDeliveryQueueElement.DealId, dataDeliveryQueueElement.VotingEndTime)
 	}
 }
 
@@ -80,18 +80,18 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	}
 	genesis.DataDeliveryVotes = dataDeliveryVotes
 
-	dataVerificationQueues, err := k.GetAllDataVerificationQueue(ctx)
+	dataVerificationQueueElements, err := k.GetAllDataVerificationQueueElements(ctx)
 	if err != nil {
 		panic(err)
 	}
-	genesis.DataVerificationQueue = dataVerificationQueues
+	genesis.DataVerificationQueueElements = dataVerificationQueueElements
 
-	dataDeliveryQueues, err := k.GetAllDataDeliveryQueue(ctx)
+	dataDeliveryQueuesElements, err := k.GetAllDataDeliveryQueueElements(ctx)
 	if err != nil {
 		panic(err)
 	}
 
-	genesis.DataDeliveryQueue = dataDeliveryQueues
+	genesis.DataDeliveryQueueElements = dataDeliveryQueuesElements
 
 	return genesis
 }

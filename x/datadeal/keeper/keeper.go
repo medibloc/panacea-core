@@ -56,12 +56,12 @@ func (k Keeper) AddDataVerificationQueue(ctx sdk.Context, dataHash string, dealI
 	store.Set(types.GetDataVerificationQueueKey(dataHash, dealID, endTime), []byte(dataHash))
 }
 
-func (k Keeper) GetAllDataVerificationQueue(ctx sdk.Context) ([]types.DataVerificationQueue, error) {
+func (k Keeper) GetAllDataVerificationQueueElements(ctx sdk.Context) ([]types.DataVerificationQueueElement, error) {
 	store := ctx.KVStore(k.storeKey)
 	iterator := sdk.KVStorePrefixIterator(store, types.DataVerificationQueueKey)
 	defer iterator.Close()
 
-	dataVerificationQueues := make([]types.DataVerificationQueue, 0)
+	dataVerificationQueues := make([]types.DataVerificationQueueElement, 0)
 
 	for ; iterator.Valid(); iterator.Next() {
 		votingEndTime, dealID, dataHash, err := types.SplitDataQueueKey(iterator.Key())
@@ -69,7 +69,7 @@ func (k Keeper) GetAllDataVerificationQueue(ctx sdk.Context) ([]types.DataVerifi
 			panic(err)
 		}
 
-		dataVerificationQueue := types.DataVerificationQueue{
+		dataVerificationQueue := types.DataVerificationQueueElement{
 			DataHash:      dataHash,
 			DealId:        dealID,
 			VotingEndTime: *votingEndTime,
@@ -116,12 +116,12 @@ func (k Keeper) AddDataDeliveryQueue(ctx sdk.Context, dataHash string, dealID ui
 	store.Set(types.GetDataDeliveryQueueKey(dealID, dataHash, endTime), []byte(dataHash))
 }
 
-func (k Keeper) GetAllDataDeliveryQueue(ctx sdk.Context) ([]types.DataDeliveryQueue, error) {
+func (k Keeper) GetAllDataDeliveryQueueElements(ctx sdk.Context) ([]types.DataDeliveryQueueElement, error) {
 	store := ctx.KVStore(k.storeKey)
 	iterator := sdk.KVStorePrefixIterator(store, types.DataDeliveryQueueKey)
 	defer iterator.Close()
 
-	dataDeliveryQueues := make([]types.DataDeliveryQueue, 0)
+	dataDeliveryQueues := make([]types.DataDeliveryQueueElement, 0)
 
 	for ; iterator.Valid(); iterator.Next() {
 		votingEndTime, dealID, dataHash, err := types.SplitDataQueueKey(iterator.Key())
@@ -129,7 +129,7 @@ func (k Keeper) GetAllDataDeliveryQueue(ctx sdk.Context) ([]types.DataDeliveryQu
 			panic(err)
 		}
 
-		dataDeliveryQueue := types.DataDeliveryQueue{
+		dataDeliveryQueue := types.DataDeliveryQueueElement{
 			DataHash:      dataHash,
 			DealId:        dealID,
 			VotingEndTime: *votingEndTime,

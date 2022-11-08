@@ -16,12 +16,12 @@ message GenesisState {
   repeated DataSale data_sales = 3 [(gogoproto.nullable) = false];
   repeated DataVerificationVote data_verification_votes = 4 [(gogoproto.nullable) = false];
   repeated DataDeliveryVote data_delivery_votes = 5 [(gogoproto.nullable) = false];
-  repeated DataVerificationQueue data_verification_queue = 6 [(gogoproto.nullable) = false];
-  repeated DataDeliveryQueue data_delivery_queue = 7 [(gogoproto.nullable) = false];
+  repeated DataVerificationQueueElement data_verification_queue_elements = 6 [(gogoproto.nullable) = false];
+  repeated DataDeliveryQueueElement data_delivery_queue_elements = 7 [(gogoproto.nullable) = false];
 }
 
 // DataVerificationQueue defines a data verification queue.
-message DataVerificationQueue {
+message DataVerificationQueueElement {
   string data_hash = 1;
   uint64 deal_id = 2;
   google.protobuf.Timestamp voting_end_time = 3 [
@@ -32,7 +32,7 @@ message DataVerificationQueue {
 }
 
 // DataDeliveryQueue defines a data delivery queue.
-message DataDeliveryQueue {
+message DataDeliveryQueueElement {
   string data_hash = 1;
   uint64 deal_id = 2;
   google.protobuf.Timestamp voting_end_time = 3 [

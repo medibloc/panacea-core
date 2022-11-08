@@ -105,7 +105,7 @@ func (m DataDeliveryVote) GetConsensusValue() []byte {
 	return []byte(m.DeliveredCid)
 }
 
-func (m DataVerificationQueue) ValidateBasic() error {
+func (m DataVerificationQueueElement) ValidateBasic() error {
 	if len(m.DataHash) == 0 {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "dataHash is empty")
 	}
@@ -121,7 +121,7 @@ func (m DataVerificationQueue) ValidateBasic() error {
 	return nil
 }
 
-func (m DataDeliveryQueue) ValidateBasic() error {
+func (m DataDeliveryQueueElement) ValidateBasic() error {
 	if len(m.DataHash) == 0 {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "dataHash is empty")
 	}

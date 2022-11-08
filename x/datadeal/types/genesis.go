@@ -3,13 +3,13 @@ package types
 // DefaultGenesis returns the default Capability genesis state
 func DefaultGenesis() *GenesisState {
 	return &GenesisState{
-		Deals:                 []Deal{},
-		NextDealNumber:        uint64(1),
-		DataSales:             []DataSale{},
-		DataVerificationVotes: []DataVerificationVote{},
-		DataDeliveryVotes:     []DataDeliveryVote{},
-		DataVerificationQueue: []DataVerificationQueue{},
-		DataDeliveryQueue:     []DataDeliveryQueue{},
+		Deals:                         []Deal{},
+		NextDealNumber:                uint64(1),
+		DataSales:                     []DataSale{},
+		DataVerificationVotes:         []DataVerificationVote{},
+		DataDeliveryVotes:             []DataDeliveryVote{},
+		DataVerificationQueueElements: []DataVerificationQueueElement{},
+		DataDeliveryQueueElements:     []DataDeliveryQueueElement{},
 	}
 }
 
@@ -38,17 +38,16 @@ func (gs GenesisState) Validate() error {
 		if err := dataDeliveryVote.ValidateBasic(); err != nil {
 			return err
 		}
-
 	}
 
-	for _, dataVerificationQueue := range gs.DataVerificationQueue {
-		if err := dataVerificationQueue.ValidateBasic(); err != nil {
+	for _, dataVerificationQueueElement := range gs.DataVerificationQueueElements {
+		if err := dataVerificationQueueElement.ValidateBasic(); err != nil {
 			return err
 		}
 	}
 
-	for _, dataDeliveryQueue := range gs.DataDeliveryQueue {
-		if err := dataDeliveryQueue.ValidateBasic(); err != nil {
+	for _, dataDeliveryQueueElement := range gs.DataDeliveryQueueElements {
+		if err := dataDeliveryQueueElement.ValidateBasic(); err != nil {
 			return err
 		}
 	}
