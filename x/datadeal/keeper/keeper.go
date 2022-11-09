@@ -157,7 +157,10 @@ func (k Keeper) IterateClosedDataDeliveryQueue(ctx sdk.Context, endTime time.Tim
 	defer iter.Close()
 
 	for ; iter.Valid(); iter.Next() {
-		_, dealId, dataHash, _ := types.SplitDataQueueKey(iter.Key())
+		_, dealId, dataHash, err := types.SplitDataQueueKey(iter.Key())
+		if err != nil {
+			panic(err)
+		}
 
 		dataSale, err := k.GetDataSale(ctx, dataHash, dealId)
 
