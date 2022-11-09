@@ -81,7 +81,7 @@ func CmdGetDataSales() *cobra.Command {
 		},
 	}
 
-	flags.AddPaginationFlagsToCmd(cmd, "all data certificates by deal ID")
+	flags.AddPaginationFlagsToCmd(cmd, "all data sales by deal ID")
 	flags.AddQueryFlagsToCmd(cmd)
 
 	return cmd
