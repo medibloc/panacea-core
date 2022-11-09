@@ -38,6 +38,8 @@ var (
 	DataDeliveryVoteKey  = []byte{0x06}
 	DataDeliveryQueueKey = []byte{0x07}
 
+	DealQueueKey = []byte{0x08}
+
 	KeyIndexSeparator = []byte{0xFF}
 )
 
@@ -89,6 +91,18 @@ func GetDataDeliveryQueueByTimeKey(endTime time.Time) []byte {
 
 func SplitDataDeliveryQueueKey(key []byte) (uint64, string) {
 	return sdk.BigEndianToUint64(key[1+lenTime+1 : 1+lenTime+1+8]), string(key[1+lenTime+1+8+1:])
+}
+
+func GetDealQueueKey(dealID uint64, deactivationHeight int64) []byte {
+	return append(DealQueueKey, CombineKeys(sdk.Uint64ToBigEndian(uint64(deactivationHeight)), sdk.Uint64ToBigEndian(dealID))...)
+}
+
+func GetDealQueueByHeight(deactivationHeight int64) []byte {
+	return append(DealQueueKey, sdk.Uint64ToBigEndian(uint64(deactivationHeight))...)
+}
+
+func SplitDealQueueKey(key []byte) uint64 {
+	return sdk.BigEndianToUint64(key[10:])
 }
 
 // CombineKeys function defines combines deal_id with data_hash.

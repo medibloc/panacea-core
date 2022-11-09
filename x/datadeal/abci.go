@@ -10,9 +10,19 @@ import (
 )
 
 func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) {
+	handleDealDeactivate(ctx, keeper)
+
 	handleDataVerificationVote(ctx, keeper)
 
 	handleDataDeliveryVote(ctx, keeper)
+}
+
+func handleDealDeactivate(ctx sdk.Context, keeper keeper.Keeper) {
+	keeper.IteratedClosedDealQueue(ctx, ctx.BlockHeader().Height, func(deal *types.Deal) bool {
+		keeper.RemoveDealQueue(ctx, deal.Id, ctx.BlockHeader().Height)
+		keeper.DeactivateDeal(ctx, deal.Id)
+		return false
+	})
 }
 
 func handleDataVerificationVote(ctx sdk.Context, keeper keeper.Keeper) {

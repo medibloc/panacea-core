@@ -3,12 +3,14 @@ package keeper_test
 import (
 	"encoding/base64"
 	"sort"
+	"strconv"
 	"testing"
 
 	"github.com/btcsuite/btcd/btcec"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	"github.com/medibloc/panacea-core/v2/types/assets"
 	"github.com/medibloc/panacea-core/v2/x/datadeal/testutil"
 	"github.com/medibloc/panacea-core/v2/x/datadeal/types"
@@ -330,7 +332,7 @@ func (suite *dealTestSuite) TestSellDataDealStatusNotActive() {
 	deal, err := suite.DataDealKeeper.GetDeal(suite.Ctx, msgSellData.DealId)
 	suite.Require().NoError(err)
 
-	deal.Status = types.DEAL_STATUS_INACTIVE
+	deal.Status = types.DEAL_STATUS_COMPLETED
 	err = suite.DataDealKeeper.SetDeal(suite.Ctx, deal)
 	suite.Require().NoError(err)
 
@@ -738,7 +740,7 @@ func (suite *dealTestSuite) TestDataDeliveryVoteFailedInvalidStatus() {
 	suite.Require().ErrorIs(err, types.ErrDataDeliveryVote)
 }
 
-func (suite *dealTestSuite) TestDeactivateDeal() {
+func (suite *dealTestSuite) TestRequestDeactivateDeal() {
 	ctx := suite.Ctx
 
 	err := suite.FundAccount(ctx, suite.buyerAccAddr, suite.defaultFunds)
@@ -759,27 +761,18 @@ func (suite *dealTestSuite) TestDeactivateDeal() {
 		RequesterAddress: suite.buyerAccAddr.String(),
 	}
 
-	beforeDealBalance := suite.BankKeeper.GetBalance(ctx, dealAccAddr, assets.MicroMedDenom)
-	suite.Require().Equal(beforeDealBalance, *getDeal.Budget)
-
-	err = suite.DataDealKeeper.DeactivateDeal(ctx, msgDeactivateDeal)
+	err = suite.DataDealKeeper.RequestDeactivateDeal(ctx, msgDeactivateDeal)
 	suite.Require().NoError(err)
 
 	getDeal, err = suite.DataDealKeeper.GetDeal(ctx, 1)
 	suite.Require().NoError(err)
 
-	suite.Require().Equal(getDeal.Status, types.DEAL_STATUS_INACTIVE)
+	suite.Require().Equal(getDeal.Status, types.DEAL_STATUS_DEACTIVATING)
 
-	buyerBalance := suite.BankKeeper.GetBalance(ctx, suite.buyerAccAddr, assets.MicroMedDenom)
-	suite.Require().Equal(buyerBalance, suite.defaultFunds[0])
-
-	afterDealBalance := suite.BankKeeper.GetBalance(ctx, dealAccAddr, assets.MicroMedDenom)
-	suite.Require().Equal(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(0)), afterDealBalance)
-
-	//TODO: Check the DataVerification/DeliveryVote Queue are removed well
+	//TODO: Check the DealQueue
 }
 
-func (suite *dealTestSuite) TestDeactivateDealInvalidRequester() {
+func (suite *dealTestSuite) TestRequestDeactivateDealInvalidRequester() {
 	ctx := suite.Ctx
 
 	msgDeactivateDeal := &types.MsgDeactivateDeal{
@@ -787,18 +780,18 @@ func (suite *dealTestSuite) TestDeactivateDealInvalidRequester() {
 		RequesterAddress: suite.sellerAccAddr.String(),
 	}
 
-	err := suite.DataDealKeeper.DeactivateDeal(ctx, msgDeactivateDeal)
+	err := suite.DataDealKeeper.RequestDeactivateDeal(ctx, msgDeactivateDeal)
 	suite.Require().ErrorIs(err, types.ErrDealDeactivate)
 	suite.Require().ErrorContains(err, "only buyer can deactivate deal")
 }
 
-func (suite *dealTestSuite) TestDeactivateDealStatusNotActive() {
+func (suite *dealTestSuite) TestRequestDeactivateDealStatusNotActive() {
 	ctx := suite.Ctx
 
 	getDeal, err := suite.DataDealKeeper.GetDeal(ctx, 1)
 	suite.Require().NoError(err)
 
-	getDeal.Status = types.DEAL_STATUS_INACTIVE
+	getDeal.Status = types.DEAL_STATUS_COMPLETED
 
 	err = suite.DataDealKeeper.SetDeal(ctx, getDeal)
 	suite.Require().NoError(err)
@@ -808,7 +801,63 @@ func (suite *dealTestSuite) TestDeactivateDealStatusNotActive() {
 		RequesterAddress: suite.buyerAccAddr.String(),
 	}
 
-	err = suite.DataDealKeeper.DeactivateDeal(ctx, msgDeactivateDeal)
+	err = suite.DataDealKeeper.RequestDeactivateDeal(ctx, msgDeactivateDeal)
 	suite.Require().ErrorIs(err, types.ErrDealDeactivate)
 	suite.Require().ErrorContains(err, "deal's status is not 'ACTIVE'")
+}
+
+func (suite *dealTestSuite) TestDeactivateDeal() {
+	ctx := suite.Ctx
+
+	err := suite.FundAccount(suite.Ctx, suite.buyerAccAddr, suite.defaultFunds)
+	suite.Require().NoError(err)
+
+	deactivatingDeal := &types.Deal{
+		Id:           2,
+		Address:      types.NewDealAddress(2).String(),
+		DataSchema:   []string{"http://jsonld.com"},
+		Budget:       &sdk.Coin{Denom: assets.MicroMedDenom, Amount: sdk.NewInt(1000000000)},
+		MaxNumData:   100,
+		CurNumData:   0,
+		BuyerAddress: suite.buyerAccAddr.String(),
+		Status:       types.DEAL_STATUS_DEACTIVATING,
+	}
+
+	coins := sdk.NewCoins(*deactivatingDeal.Budget)
+
+	dealAddress, err := sdk.AccAddressFromBech32(deactivatingDeal.Address)
+	suite.Require().NoError(err)
+
+	acc := suite.AccountKeeper.GetAccount(ctx, dealAddress)
+
+	acc = suite.AccountKeeper.NewAccount(ctx, authtypes.NewModuleAccount(
+		authtypes.NewBaseAccountWithAddress(
+			dealAddress,
+		),
+		"deal"+strconv.FormatUint(deactivatingDeal.Id, 10)),
+	)
+	suite.AccountKeeper.SetAccount(ctx, acc)
+
+	err = suite.BankKeeper.SendCoins(ctx, suite.buyerAccAddr, dealAddress, coins)
+	suite.Require().NoError(err)
+
+	err = suite.DataDealKeeper.SetDeal(ctx, deactivatingDeal)
+	suite.Require().NoError(err)
+
+	beforeBuyerBalance := suite.BankKeeper.GetBalance(ctx, suite.buyerAccAddr, assets.MicroMedDenom)
+	suite.Require().Equal(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(9000000000)), beforeBuyerBalance)
+
+	err = suite.DataDealKeeper.DeactivateDeal(ctx, 2)
+	suite.Require().NoError(err)
+
+	afterBuyerBalance := suite.BankKeeper.GetBalance(ctx, suite.buyerAccAddr, assets.MicroMedDenom)
+	suite.Require().Equal(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(10000000000)), afterBuyerBalance)
+
+	getDeal, err := suite.DataDealKeeper.GetDeal(ctx, 2)
+	suite.Require().NoError(err)
+
+	suite.Require().Equal(getDeal.Status, types.DEAL_STATUS_DEACTIVATED)
+
+	//TODO: Check the DataVerification/DeliveryVote Queue are removed well
+
 }

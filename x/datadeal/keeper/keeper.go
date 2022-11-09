@@ -120,3 +120,38 @@ func (k Keeper) IterateClosedDataDeliveryQueue(ctx sdk.Context, endTime time.Tim
 		}
 	}
 }
+
+func (k Keeper) AddDealQueue(ctx sdk.Context, dealID uint64, deactivationHeight int64) {
+	store := ctx.KVStore(k.storeKey)
+	store.Set(types.GetDealQueueKey(dealID, deactivationHeight), sdk.Uint64ToBigEndian(dealID))
+}
+
+func (k Keeper) GetClosedDealQueueIterator(ctx sdk.Context, deactivationHeight int64) sdk.Iterator {
+	store := ctx.KVStore(k.storeKey)
+	return store.Iterator(types.DealQueueKey, sdk.PrefixEndBytes(types.GetDealQueueByHeight(deactivationHeight)))
+}
+
+func (k Keeper) RemoveDealQueue(ctx sdk.Context, dealId uint64, deactivationHeight int64) {
+	store := ctx.KVStore(k.storeKey)
+	store.Delete(types.GetDealQueueKey(dealId, deactivationHeight))
+}
+
+func (k Keeper) IteratedClosedDealQueue(ctx sdk.Context, deactivationHeight int64, cb func(deal *types.Deal) (stop bool)) {
+	iter := k.GetClosedDealQueueIterator(ctx, deactivationHeight)
+
+	defer iter.Close()
+
+	for ; iter.Valid(); iter.Next() {
+		dealId := types.SplitDealQueueKey(iter.Key())
+
+		deal, err := k.GetDeal(ctx, dealId)
+
+		if err != nil {
+			panic(fmt.Errorf("failed get deal. err: %w", err))
+		}
+
+		if cb(deal) {
+			break
+		}
+	}
+}

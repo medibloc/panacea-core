@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"strconv"
+	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -530,7 +531,7 @@ func (k Keeper) RemoveDataDeliveryVote(ctx sdk.Context, vote *types.DataDelivery
 	return nil
 }
 
-func (k Keeper) DeactivateDeal(ctx sdk.Context, msg *types.MsgDeactivateDeal) error {
+func (k Keeper) RequestDeactivateDeal(ctx sdk.Context, msg *types.MsgDeactivateDeal) error {
 	deal, err := k.GetDeal(ctx, msg.DealId)
 	if err != nil {
 		return sdkerrors.Wrapf(types.ErrDealDeactivate, err.Error())
@@ -544,32 +545,61 @@ func (k Keeper) DeactivateDeal(ctx sdk.Context, msg *types.MsgDeactivateDeal) er
 		return sdkerrors.Wrapf(types.ErrDealDeactivate, "deal's status is not 'ACTIVE'")
 	}
 
-	deal.Status = types.DEAL_STATUS_INACTIVE
+	deal.Status = types.DEAL_STATUS_DEACTIVATING
 
 	err = k.SetDeal(ctx, deal)
 	if err != nil {
 		return sdkerrors.Wrapf(types.ErrDealDeactivate, err.Error())
 	}
 
+	BlockPeriod := 6 * time.Second // need to fix
+	params := k.oracleKeeper.GetParams(ctx)
+	VotingPeriod := params.VoteParams.VotingPeriod
+
+	deactivationHeight := ctx.BlockHeader().Height + 3*int64(VotingPeriod/BlockPeriod) // need to fix
+
+	k.AddDealQueue(ctx, deal.Id, deactivationHeight)
+
+	return nil
+}
+
+func (k Keeper) DeactivateDeal(ctx sdk.Context, dealID uint64) error {
+	deal, err := k.GetDeal(ctx, dealID)
+	if err != nil {
+		return sdkerrors.Wrapf(types.ErrDealDeactivate, err.Error())
+	}
+
+	if deal.Status != types.DEAL_STATUS_DEACTIVATING {
+		return sdkerrors.Wrapf(types.ErrDealDeactivate, "deal's status is not 'DEACTIVATING'")
+	}
+
+	// change deal status to DEAL_STATUS_DEACTIVATED
+	deal.Status = types.DEAL_STATUS_DEACTIVATED
+
+	err = k.SetDeal(ctx, deal)
+	if err != nil {
+		return sdkerrors.Wrapf(types.ErrDealDeactivate, err.Error())
+	}
+
+	// refund remaining budget to buyer
 	dealAcc, err := sdk.AccAddressFromBech32(deal.Address)
 	if err != nil {
 		return sdkerrors.Wrapf(types.ErrDealDeactivate, err.Error())
 	}
 
-	requesterAcc, err := sdk.AccAddressFromBech32(msg.RequesterAddress)
+	buyerAcc, err := sdk.AccAddressFromBech32(deal.BuyerAddress)
 	if err != nil {
 		return sdkerrors.Wrapf(types.ErrDealDeactivate, err.Error())
 	}
 
 	dealBalance := k.bankKeeper.GetBalance(ctx, dealAcc, assets.MicroMedDenom)
 
-	err = k.bankKeeper.SendCoins(ctx, dealAcc, requesterAcc, sdk.Coins{dealBalance})
+	err = k.bankKeeper.SendCoins(ctx, dealAcc, buyerAcc, sdk.Coins{dealBalance})
 	if err != nil {
 		return sdkerrors.Wrapf(types.ErrDealDeactivate, err.Error())
 	}
 
-	//TODO: Implement Remove the DataVerification/DeliveryVote Queue after PR #449 merged
-	//https://github.com/medibloc/panacea-core/pull/449
+	//Remove DataVerification/DeliveryVote Queue
 
 	return nil
 }

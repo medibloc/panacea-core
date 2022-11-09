@@ -29,9 +29,12 @@ enum DealStatus {
   // DEAL_STATUS_ACTIVE defines the deal status that is active.
   DEAL_STATUS_ACTIVE = 1;
 
-  // DEAL_STATUS_INACTIVE defines the deal status that is inactive.
-  DEAL_STATUS_INACTIVE = 2;
+  // DEAL_STATUS_INACTIVE defines the deal status in the process of deactivate.
+  DEAL_STATUS_DEACTIVATING = 2;
+
+  // DEAL_STATUS_DEACTIVATED defines the deal status that is deactivate has been processed.
+  DEAL_STATUS_DEACTIVATED = 3;
 
   // DEAL_STATUS_COMPLETED defines the deal status that is completed.
-  DEAL_STATUS_COMPLETED = 3;
+  DEAL_STATUS_COMPLETED = 4;
 }

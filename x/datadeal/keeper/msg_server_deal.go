@@ -84,7 +84,7 @@ func (m msgServer) VoteDataDelivery(goCtx context.Context, msg *types.MsgVoteDat
 func (m msgServer) DeactivateDeal(goCtx context.Context, msg *types.MsgDeactivateDeal) (*types.MsgDeactivateDealResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	err := m.Keeper.DeactivateDeal(ctx, msg)
+	err := m.Keeper.RequestDeactivateDeal(ctx, msg)
 	if err != nil {
 		return nil, err
 	}
