@@ -51,6 +51,10 @@ func GetDataSaleKey(dataHash string, dealID uint64) []byte {
 	return append(DataSaleKey, CombineKeys(sdk.Uint64ToBigEndian(dealID), []byte(dataHash))...)
 }
 
+func GetDataSalesKey(dealID uint64) []byte {
+	return append(DataSaleKey, sdk.Uint64ToBigEndian(dealID)...)
+}
+
 func GetDataVerificationVoteKey(dataHash string, voterAddress sdk.AccAddress, dealID uint64) []byte {
 	return append(DataVerificationVoteKey, CombineKeys(sdk.Uint64ToBigEndian(dealID), []byte(dataHash), voterAddress)...)
 }

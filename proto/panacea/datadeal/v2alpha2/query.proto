@@ -24,6 +24,10 @@ service Query {
   rpc DataSale(QueryDataSaleRequest) returns (QueryDataSaleResponse) {
     option (google.api.http).get = "/panacea/datadeal/v2alpha2/datasales/{deal_id}/{data_hash}";
   }
+  // DataSales returns a list of DataSale.
+  rpc DataSales(QueryDataSalesRequest) returns (QueryDataSalesResponse) {
+    option (google.api.http).get = "/panacea/datadeal/v2alpha2/datasales/{deal_id}";
+  }
   // DataVerificationVote returns a DataVerificationVote.
   rpc DataVerificationVote(QueryDataVerificationVoteRequest) returns (QueryDataVerificationVoteResponse) {
     option (google.api.http).get = "/panacea/datadeal/v2alpha2/data_verification_votes/{deal_id}/{data_hash}/{voter_address}";
@@ -64,6 +68,18 @@ message QueryDataSaleRequest {
 // QueryDataSaleResponse defines the response type for the Query/DataSale RPC method.
 message QueryDataSaleResponse {
   DataSale data_sale = 1;
+}
+
+// QueryDataSalesRequest defines the request type for the Query/DataSales RPC method.
+message QueryDataSalesRequest {
+  uint64 deal_id = 1;
+  cosmos.base.query.v1beta1.PageRequest pagination = 2;
+}
+
+// QueryDataSalesResponse defines the response type for the Query/DataSales RPC method.
+message QueryDataSalesResponse {
+  repeated DataSale data_sale = 1;
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 
 // QueryDataVerificationRequest defines the request type for the Query/DataVerificationVote RPC method.
