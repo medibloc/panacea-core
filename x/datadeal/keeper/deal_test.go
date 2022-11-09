@@ -454,7 +454,8 @@ func (suite *dealTestSuite) TestDataVerificationVoteFailedVerifySignature() {
 	suite.Require().NoError(err)
 
 	err = suite.DataDealKeeper.VoteDataVerification(suite.Ctx, dataVerificationVote, signature)
-	suite.Require().Error(err, oracletypes.ErrDetectionMaliciousBehavior)
+	suite.Require().ErrorIs(err, types.ErrDataVerificationVote)
+	suite.Require().ErrorContains(err, "failed to signature validation")
 }
 
 func (suite *dealTestSuite) TestDataVerificationInvalidDataSaleStatus() {
@@ -695,7 +696,8 @@ func (suite *dealTestSuite) TestDataDeliveryVoteFailedVerifySignature() {
 	suite.Require().NoError(err)
 
 	err = suite.DataDealKeeper.VoteDataDelivery(ctx, dataDeliveryVote, signature)
-	suite.Require().ErrorIs(err, oracletypes.ErrDetectionMaliciousBehavior)
+	suite.Require().ErrorIs(err, types.ErrDataDeliveryVote)
+	suite.Require().ErrorContains(err, "failed to signature validation")
 }
 
 func (suite *dealTestSuite) TestDataDeliveryVoteFailedInvalidStatus() {
@@ -804,6 +806,65 @@ func (suite *dealTestSuite) TestRequestDeactivateDealStatusNotActive() {
 	err = suite.DataDealKeeper.RequestDeactivateDeal(ctx, msgDeactivateDeal)
 	suite.Require().ErrorIs(err, types.ErrDealDeactivate)
 	suite.Require().ErrorContains(err, "deal's status is not 'ACTIVE'")
+}
+
+func (suite *dealTestSuite) TestRequestDataDeliveryVoteSuccess() {
+	ctx := suite.Ctx
+
+	dataSale := suite.MakeNewDataSaleDeliveryFailed(suite.sellerAccAddr, suite.dataHash1, suite.verifiableCID1)
+	err := suite.DataDealKeeper.SetDataSale(suite.Ctx, dataSale)
+	suite.Require().NoError(err)
+
+	msgRequestDataDeliveryVote := &types.MsgReRequestDataDeliveryVote{
+		DealId:           1,
+		DataHash:         dataSale.DataHash,
+		RequesterAddress: suite.buyerAccAddr.String(),
+	}
+
+	err = suite.DataDealKeeper.ReRequestDataDeliveryVote(ctx, msgRequestDataDeliveryVote)
+	suite.Require().NoError(err)
+
+	dataSale, err = suite.DataDealKeeper.GetDataSale(ctx, dataSale.DataHash, 1)
+	suite.Require().NoError(err)
+
+	suite.Require().Equal(types.DATA_SALE_STATUS_DELIVERY_VOTING_PERIOD, dataSale.Status)
+
+	events := ctx.EventManager().Events()
+	requiredEvents := map[string]bool{
+		types.EventTypeDataDeliveryVote: false,
+	}
+
+	for _, e := range events {
+		if e.Type == types.EventTypeDataDeliveryVote {
+			requiredEvents[e.Type] = true
+			suite.Require().Equal(3, len(e.Attributes))
+			suite.Require().Equal(types.AttributeKeyVoteStatus, string(e.Attributes[0].Key))
+			suite.Require().Equal(types.AttributeValueVoteStatusStarted, string(e.Attributes[0].Value))
+			suite.Require().Equal(types.AttributeKeyDataHash, string(e.Attributes[1].Key))
+			suite.Require().Equal(types.AttributeKeyDealID, string(e.Attributes[2].Key))
+		}
+	}
+
+	for _, v := range requiredEvents {
+		suite.Require().True(v)
+	}
+}
+
+func (suite *dealTestSuite) TestRequestDataDeliveryVoteFailedInvalidStatus() {
+	ctx := suite.Ctx
+
+	dataSale := suite.MakeNewDataSale(suite.sellerAccAddr, suite.dataHash1, suite.verifiableCID1)
+	err := suite.DataDealKeeper.SetDataSale(suite.Ctx, dataSale)
+	suite.Require().NoError(err)
+
+	msgReRequestDataDeliveryVote := &types.MsgReRequestDataDeliveryVote{
+		DealId:           1,
+		DataHash:         dataSale.DataHash,
+		RequesterAddress: suite.buyerAccAddr.String(),
+	}
+
+	err = suite.DataDealKeeper.ReRequestDataDeliveryVote(ctx, msgReRequestDataDeliveryVote)
+	suite.Require().ErrorIs(err, types.ErrReRequestDataDeliveryVote)
 }
 
 func (suite *dealTestSuite) TestDeactivateDeal() {

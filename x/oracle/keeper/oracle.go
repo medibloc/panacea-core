@@ -115,9 +115,8 @@ func (k Keeper) VoteOracleRegistration(ctx sdk.Context, vote *types.OracleRegist
 		return sdkerrors.Wrap(types.ErrOracleRegistrationVote, err.Error())
 	}
 
-	if !k.VerifyVoteSignature(ctx, vote, signature) {
-		// TODO implements request slashing
-		return sdkerrors.Wrap(types.ErrDetectionMaliciousBehavior, "")
+	if err := k.VerifyVoteBasic(ctx, vote, signature); err != nil {
+		return sdkerrors.Wrap(types.ErrOracleRegistrationVote, err.Error())
 	}
 
 	// Check if the oracle can be voted to be registered.
@@ -134,12 +133,21 @@ func (k Keeper) VoteOracleRegistration(ctx sdk.Context, vote *types.OracleRegist
 	return nil
 }
 
-// VerifyVoteSignature verifies the signature of vote with oracle public key
-func (k Keeper) VerifyVoteSignature(ctx sdk.Context, vote types.Vote, signature []byte) bool {
-	voteBz := k.cdc.MustMarshal(vote)
+// VerifyVoteBasic verifies that the vote is correct.
+// - Is it a valid voter's uniqueID
+// - Is the vote signed with a valid oracle's private key?
+func (k Keeper) VerifyVoteBasic(ctx sdk.Context, vote types.Vote, signature []byte) error {
+	uniqueID := k.GetParams(ctx).UniqueId
+	if uniqueID != vote.GetVoterUniqueId() {
+		return fmt.Errorf("voter's unique_id does not matched activated unique_id. voterUniqueID(%s), activeUniqueID(%s)", uniqueID, vote.GetVoterUniqueId())
+	}
 
+	voteBz := k.cdc.MustMarshal(vote)
 	oraclePubKeyBz := k.GetParams(ctx).MustDecodeOraclePublicKey()
-	return secp256k1.PubKey(oraclePubKeyBz).VerifySignature(voteBz, signature)
+	if !secp256k1.PubKey(oraclePubKeyBz).VerifySignature(voteBz, signature) {
+		return fmt.Errorf("failed to signature validation")
+	}
+	return nil
 }
 
 // validateOracleRegistrationVote checks the oracle/registration status in the Panacea to ensure that the oracle can be voted to be registered.

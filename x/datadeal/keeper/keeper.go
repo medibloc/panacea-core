@@ -56,6 +56,31 @@ func (k Keeper) AddDataVerificationQueue(ctx sdk.Context, dataHash string, dealI
 	store.Set(types.GetDataVerificationQueueKey(dataHash, dealID, endTime), []byte(dataHash))
 }
 
+func (k Keeper) GetAllDataVerificationQueueElements(ctx sdk.Context) ([]types.DataVerificationQueueElement, error) {
+	store := ctx.KVStore(k.storeKey)
+	iterator := sdk.KVStorePrefixIterator(store, types.DataVerificationQueueKey)
+	defer iterator.Close()
+
+	dataVerificationQueues := make([]types.DataVerificationQueueElement, 0)
+
+	for ; iterator.Valid(); iterator.Next() {
+		votingEndTime, dealID, dataHash, err := types.SplitDataQueueKey(iterator.Key())
+		if err != nil {
+			panic(err)
+		}
+
+		dataVerificationQueue := types.DataVerificationQueueElement{
+			DataHash:      dataHash,
+			DealId:        dealID,
+			VotingEndTime: *votingEndTime,
+		}
+
+		dataVerificationQueues = append(dataVerificationQueues, dataVerificationQueue)
+	}
+
+	return dataVerificationQueues, nil
+}
+
 func (k Keeper) GetClosedDataVerificationQueueIterator(ctx sdk.Context, endTime time.Time) sdk.Iterator {
 	store := ctx.KVStore(k.storeKey)
 	return store.Iterator(types.DataVerificationQueueKey, sdk.PrefixEndBytes(types.GetDataVerificationQueueKeyByTimeKey(endTime)))
@@ -72,7 +97,7 @@ func (k Keeper) IterateClosedDataVerificationQueue(ctx sdk.Context, endTime time
 	defer iter.Close()
 
 	for ; iter.Valid(); iter.Next() {
-		dealID, dataHash := types.SplitDataVerificationQueueKey(iter.Key())
+		_, dealID, dataHash, _ := types.SplitDataQueueKey(iter.Key())
 
 		dataSale, err := k.GetDataSale(ctx, dataHash, dealID)
 
@@ -91,6 +116,31 @@ func (k Keeper) AddDataDeliveryQueue(ctx sdk.Context, dataHash string, dealID ui
 	store.Set(types.GetDataDeliveryQueueKey(dealID, dataHash, endTime), []byte(dataHash))
 }
 
+func (k Keeper) GetAllDataDeliveryQueueElements(ctx sdk.Context) ([]types.DataDeliveryQueueElement, error) {
+	store := ctx.KVStore(k.storeKey)
+	iterator := sdk.KVStorePrefixIterator(store, types.DataDeliveryQueueKey)
+	defer iterator.Close()
+
+	dataDeliveryQueues := make([]types.DataDeliveryQueueElement, 0)
+
+	for ; iterator.Valid(); iterator.Next() {
+		votingEndTime, dealID, dataHash, err := types.SplitDataQueueKey(iterator.Key())
+		if err != nil {
+			panic(err)
+		}
+
+		dataDeliveryQueue := types.DataDeliveryQueueElement{
+			DataHash:      dataHash,
+			DealId:        dealID,
+			VotingEndTime: *votingEndTime,
+		}
+
+		dataDeliveryQueues = append(dataDeliveryQueues, dataDeliveryQueue)
+	}
+
+	return dataDeliveryQueues, nil
+}
+
 func (k Keeper) GetClosedDataDeliveryQueueIterator(ctx sdk.Context, endTime time.Time) sdk.Iterator {
 	store := ctx.KVStore(k.storeKey)
 	return store.Iterator(types.DataDeliveryQueueKey, sdk.PrefixEndBytes(types.GetDataDeliveryQueueByTimeKey(endTime)))
@@ -107,7 +157,10 @@ func (k Keeper) IterateClosedDataDeliveryQueue(ctx sdk.Context, endTime time.Tim
 	defer iter.Close()
 
 	for ; iter.Valid(); iter.Next() {
-		dealId, dataHash := types.SplitDataDeliveryQueueKey(iter.Key())
+		_, dealId, dataHash, err := types.SplitDataQueueKey(iter.Key())
+		if err != nil {
+			panic(err)
+		}
 
 		dataSale, err := k.GetDataSale(ctx, dataHash, dealId)
 

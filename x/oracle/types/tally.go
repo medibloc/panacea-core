@@ -12,6 +12,8 @@ type (
 	Vote interface {
 		codec.ProtoMarshaler
 
+		GetVoterUniqueId() string
+
 		GetVoterAddress() string
 
 		GetVoteOption() VoteOption

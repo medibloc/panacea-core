@@ -350,10 +350,11 @@ var xxx_messageInfo_MsgVoteDataVerificationResponse proto.InternalMessageInfo
 
 // DataVerificationVote defines the vote info for verifying data.
 type DataVerificationVote struct {
-	VoterAddress string            `protobuf:"bytes,1,opt,name=voter_address,json=voterAddress,proto3" json:"voter_address,omitempty"`
-	DealId       uint64            `protobuf:"varint,2,opt,name=deal_id,json=dealId,proto3" json:"deal_id,omitempty"`
-	DataHash     string            `protobuf:"bytes,3,opt,name=data_hash,json=dataHash,proto3" json:"data_hash,omitempty"`
-	VoteOption   types1.VoteOption `protobuf:"varint,4,opt,name=vote_option,json=voteOption,proto3,enum=panacea.oracle.v2alpha2.VoteOption" json:"vote_option,omitempty"`
+	VoterUniqueId string            `protobuf:"bytes,1,opt,name=voter_unique_id,json=voterUniqueId,proto3" json:"voter_unique_id,omitempty"`
+	VoterAddress  string            `protobuf:"bytes,2,opt,name=voter_address,json=voterAddress,proto3" json:"voter_address,omitempty"`
+	DealId        uint64            `protobuf:"varint,3,opt,name=deal_id,json=dealId,proto3" json:"deal_id,omitempty"`
+	DataHash      string            `protobuf:"bytes,4,opt,name=data_hash,json=dataHash,proto3" json:"data_hash,omitempty"`
+	VoteOption    types1.VoteOption `protobuf:"varint,5,opt,name=vote_option,json=voteOption,proto3,enum=panacea.oracle.v2alpha2.VoteOption" json:"vote_option,omitempty"`
 }
 
 func (m *DataVerificationVote) Reset()         { *m = DataVerificationVote{} }
@@ -388,6 +389,13 @@ func (m *DataVerificationVote) XXX_DiscardUnknown() {
 }
 
 var xxx_messageInfo_DataVerificationVote proto.InternalMessageInfo
+
+func (m *DataVerificationVote) GetVoterUniqueId() string {
+	if m != nil {
+		return m.VoterUniqueId
+	}
+	return ""
+}
 
 func (m *DataVerificationVote) GetVoterAddress() string {
 	if m != nil {
@@ -509,11 +517,12 @@ var xxx_messageInfo_MsgVoteDataDeliveryResponse proto.InternalMessageInfo
 
 // DataDeliveryVote defines the vote info for delivering data.
 type DataDeliveryVote struct {
-	VoterAddress string            `protobuf:"bytes,1,opt,name=voter_address,json=voterAddress,proto3" json:"voter_address,omitempty"`
-	DealId       uint64            `protobuf:"varint,2,opt,name=deal_id,json=dealId,proto3" json:"deal_id,omitempty"`
-	DataHash     string            `protobuf:"bytes,3,opt,name=data_hash,json=dataHash,proto3" json:"data_hash,omitempty"`
-	DeliveredCid string            `protobuf:"bytes,4,opt,name=delivered_cid,json=deliveredCid,proto3" json:"delivered_cid,omitempty"`
-	VoteOption   types1.VoteOption `protobuf:"varint,5,opt,name=vote_option,json=voteOption,proto3,enum=panacea.oracle.v2alpha2.VoteOption" json:"vote_option,omitempty"`
+	VoterUniqueId string            `protobuf:"bytes,1,opt,name=voter_unique_id,json=voterUniqueId,proto3" json:"voter_unique_id,omitempty"`
+	VoterAddress  string            `protobuf:"bytes,2,opt,name=voter_address,json=voterAddress,proto3" json:"voter_address,omitempty"`
+	DealId        uint64            `protobuf:"varint,3,opt,name=deal_id,json=dealId,proto3" json:"deal_id,omitempty"`
+	DataHash      string            `protobuf:"bytes,4,opt,name=data_hash,json=dataHash,proto3" json:"data_hash,omitempty"`
+	DeliveredCid  string            `protobuf:"bytes,5,opt,name=delivered_cid,json=deliveredCid,proto3" json:"delivered_cid,omitempty"`
+	VoteOption    types1.VoteOption `protobuf:"varint,6,opt,name=vote_option,json=voteOption,proto3,enum=panacea.oracle.v2alpha2.VoteOption" json:"vote_option,omitempty"`
 }
 
 func (m *DataDeliveryVote) Reset()         { *m = DataDeliveryVote{} }
@@ -548,6 +557,13 @@ func (m *DataDeliveryVote) XXX_DiscardUnknown() {
 }
 
 var xxx_messageInfo_DataDeliveryVote proto.InternalMessageInfo
+
+func (m *DataDeliveryVote) GetVoterUniqueId() string {
+	if m != nil {
+		return m.VoterUniqueId
+	}
+	return ""
+}
 
 func (m *DataDeliveryVote) GetVoterAddress() string {
 	if m != nil {
@@ -674,6 +690,104 @@ func (m *MsgDeactivateDealResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgDeactivateDealResponse proto.InternalMessageInfo
 
+// MsgReRequestDataDeliveryVote defines the Msg/ReRequestDataDeliveryVote request type.
+type MsgReRequestDataDeliveryVote struct {
+	DealId           uint64 `protobuf:"varint,1,opt,name=deal_id,json=dealId,proto3" json:"deal_id,omitempty"`
+	DataHash         string `protobuf:"bytes,2,opt,name=data_hash,json=dataHash,proto3" json:"data_hash,omitempty"`
+	RequesterAddress string `protobuf:"bytes,3,opt,name=requester_address,json=requesterAddress,proto3" json:"requester_address,omitempty"`
+}
+
+func (m *MsgReRequestDataDeliveryVote) Reset()         { *m = MsgReRequestDataDeliveryVote{} }
+func (m *MsgReRequestDataDeliveryVote) String() string { return proto.CompactTextString(m) }
+func (*MsgReRequestDataDeliveryVote) ProtoMessage()    {}
+func (*MsgReRequestDataDeliveryVote) Descriptor() ([]byte, []int) {
+	return fileDescriptor_49dbc965b6b631a7, []int{12}
+}
+func (m *MsgReRequestDataDeliveryVote) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgReRequestDataDeliveryVote) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgReRequestDataDeliveryVote.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgReRequestDataDeliveryVote) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgReRequestDataDeliveryVote.Merge(m, src)
+}
+func (m *MsgReRequestDataDeliveryVote) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgReRequestDataDeliveryVote) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgReRequestDataDeliveryVote.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgReRequestDataDeliveryVote proto.InternalMessageInfo
+
+func (m *MsgReRequestDataDeliveryVote) GetDealId() uint64 {
+	if m != nil {
+		return m.DealId
+	}
+	return 0
+}
+
+func (m *MsgReRequestDataDeliveryVote) GetDataHash() string {
+	if m != nil {
+		return m.DataHash
+	}
+	return ""
+}
+
+func (m *MsgReRequestDataDeliveryVote) GetRequesterAddress() string {
+	if m != nil {
+		return m.RequesterAddress
+	}
+	return ""
+}
+
+// MsgReRequestDataDeliveryVoteResponse defines the Msg/ReRequestDataDeliveryVote response type.
+type MsgReRequestDataDeliveryVoteResponse struct {
+}
+
+func (m *MsgReRequestDataDeliveryVoteResponse) Reset()         { *m = MsgReRequestDataDeliveryVoteResponse{} }
+func (m *MsgReRequestDataDeliveryVoteResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgReRequestDataDeliveryVoteResponse) ProtoMessage()    {}
+func (*MsgReRequestDataDeliveryVoteResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_49dbc965b6b631a7, []int{13}
+}
+func (m *MsgReRequestDataDeliveryVoteResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgReRequestDataDeliveryVoteResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgReRequestDataDeliveryVoteResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgReRequestDataDeliveryVoteResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgReRequestDataDeliveryVoteResponse.Merge(m, src)
+}
+func (m *MsgReRequestDataDeliveryVoteResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgReRequestDataDeliveryVoteResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgReRequestDataDeliveryVoteResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgReRequestDataDeliveryVoteResponse proto.InternalMessageInfo
+
 func init() {
 	proto.RegisterType((*MsgCreateDeal)(nil), "panacea.datadeal.v2alpha2.MsgCreateDeal")
 	proto.RegisterType((*MsgCreateDealResponse)(nil), "panacea.datadeal.v2alpha2.MsgCreateDealResponse")
@@ -687,6 +801,8 @@ func init() {
 	proto.RegisterType((*DataDeliveryVote)(nil), "panacea.datadeal.v2alpha2.DataDeliveryVote")
 	proto.RegisterType((*MsgDeactivateDeal)(nil), "panacea.datadeal.v2alpha2.MsgDeactivateDeal")
 	proto.RegisterType((*MsgDeactivateDealResponse)(nil), "panacea.datadeal.v2alpha2.MsgDeactivateDealResponse")
+	proto.RegisterType((*MsgReRequestDataDeliveryVote)(nil), "panacea.datadeal.v2alpha2.MsgReRequestDataDeliveryVote")
+	proto.RegisterType((*MsgReRequestDataDeliveryVoteResponse)(nil), "panacea.datadeal.v2alpha2.MsgReRequestDataDeliveryVoteResponse")
 }
 
 func init() {
@@ -694,57 +810,62 @@ func init() {
 }
 
 var fileDescriptor_49dbc965b6b631a7 = []byte{
-	// 790 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xb4, 0x56, 0xcd, 0x6e, 0xd3, 0x4a,
-	0x14, 0xee, 0xf4, 0xef, 0x36, 0x27, 0x49, 0x95, 0xfa, 0xa6, 0xb7, 0x69, 0x7a, 0x49, 0x83, 0x0b,
-	0x28, 0x52, 0xc1, 0x6e, 0x43, 0xc5, 0x82, 0x1d, 0x34, 0x0b, 0x58, 0xa4, 0x48, 0xae, 0x54, 0xa9,
-	0x6c, 0xac, 0xb1, 0x3d, 0x38, 0x96, 0x6c, 0x4f, 0xf0, 0x38, 0x56, 0xca, 0x03, 0xb0, 0x44, 0xf0,
-	0x02, 0xbc, 0x06, 0x5b, 0x96, 0xac, 0x50, 0x97, 0x5d, 0xa2, 0xf6, 0x45, 0xd0, 0x8c, 0x7f, 0xf2,
-	0xd3, 0x24, 0x6d, 0x91, 0xd8, 0x65, 0x3e, 0x7f, 0x73, 0xbe, 0x73, 0xbe, 0xe3, 0x73, 0x1c, 0x90,
-	0xbb, 0xd8, 0xc7, 0x26, 0xc1, 0xaa, 0x85, 0x43, 0x6c, 0x11, 0xec, 0xaa, 0x51, 0x13, 0xbb, 0xdd,
-	0x0e, 0x6e, 0xaa, 0x61, 0x5f, 0xe9, 0x06, 0x34, 0xa4, 0xd2, 0x66, 0xc2, 0x51, 0x52, 0x8e, 0x92,
-	0x72, 0xaa, 0x65, 0x9b, 0xda, 0x54, 0xb0, 0x54, 0xfe, 0x2b, 0xbe, 0x50, 0xad, 0x99, 0x94, 0x79,
-	0x94, 0xa9, 0x06, 0x66, 0x44, 0x8d, 0xf6, 0x0d, 0x12, 0xe2, 0x7d, 0xd5, 0xa4, 0x8e, 0x9f, 0x3c,
-	0x7f, 0x90, 0x8a, 0xd2, 0x00, 0x9b, 0x2e, 0x19, 0x48, 0xc6, 0xe7, 0x98, 0x25, 0x7f, 0x47, 0x50,
-	0x6c, 0x33, 0xfb, 0x30, 0x20, 0x38, 0x24, 0x2d, 0x82, 0x5d, 0x69, 0x1b, 0xf2, 0x3c, 0x05, 0x9d,
-	0x99, 0x1d, 0xe2, 0xe1, 0x0a, 0xaa, 0x2f, 0x34, 0x72, 0x1a, 0x70, 0xe8, 0x58, 0x20, 0xd2, 0x3e,
-	0x2c, 0x1b, 0x3d, 0xcb, 0x26, 0x61, 0x65, 0xbe, 0x8e, 0x1a, 0xf9, 0xe6, 0xa6, 0x12, 0x67, 0xa2,
-	0xf0, 0x4c, 0x94, 0x24, 0x13, 0xe5, 0x90, 0x3a, 0xbe, 0x96, 0x10, 0xa5, 0x3a, 0x14, 0x3c, 0xdc,
-	0xd7, 0xfd, 0x9e, 0xa7, 0xf3, 0x40, 0x95, 0x85, 0x3a, 0x6a, 0x2c, 0x6a, 0xe0, 0xe1, 0xfe, 0x51,
-	0xcf, 0x6b, 0xe1, 0x10, 0x4b, 0x3b, 0x50, 0x34, 0x7a, 0x67, 0x24, 0xd0, 0xb1, 0x65, 0x05, 0x84,
-	0xb1, 0xca, 0x62, 0x1d, 0x35, 0x72, 0x5a, 0x41, 0x80, 0x2f, 0x62, 0x4c, 0x2a, 0xc3, 0x92, 0x4f,
-	0x7d, 0x93, 0x54, 0x96, 0xea, 0xa8, 0x51, 0xd0, 0xe2, 0x83, 0xbc, 0x07, 0xeb, 0x23, 0x15, 0x68,
-	0x84, 0x75, 0xa9, 0xcf, 0x88, 0xb4, 0x01, 0xff, 0x70, 0x23, 0x75, 0xc7, 0xaa, 0x20, 0x21, 0xb8,
-	0xcc, 0x8f, 0xaf, 0x2d, 0xf9, 0x0b, 0x82, 0x7c, 0x9b, 0xd9, 0xc7, 0xc4, 0x75, 0x85, 0xf8, 0x34,
-	0xa2, 0xf4, 0x10, 0x56, 0x23, 0x12, 0x38, 0xef, 0x1c, 0x6c, 0xb8, 0x44, 0x37, 0x1d, 0x4b, 0x94,
-	0x9c, 0xd3, 0x8a, 0x03, 0xf4, 0xd0, 0xb1, 0xa4, 0x2d, 0xc8, 0x09, 0xcb, 0x3a, 0x98, 0x75, 0x44,
-	0x6d, 0x39, 0x6d, 0x85, 0x03, 0xaf, 0x30, 0xeb, 0xf0, 0x18, 0x8c, 0xb8, 0xee, 0xb5, 0xd2, 0x8a,
-	0x31, 0x9a, 0xd4, 0x26, 0xaf, 0xc3, 0xbf, 0x43, 0x29, 0xa5, 0x35, 0xc8, 0x5f, 0x11, 0x6c, 0xb4,
-	0x99, 0x7d, 0x42, 0x43, 0xc2, 0xf1, 0x13, 0xa1, 0x6b, 0xe2, 0xd0, 0xa1, 0xbe, 0x44, 0xe0, 0x3f,
-	0x21, 0x1b, 0x0d, 0x81, 0x7a, 0x44, 0x43, 0x22, 0xaa, 0xc8, 0x37, 0x55, 0x65, 0xea, 0x3b, 0xa5,
-	0x8c, 0x07, 0xe3, 0x02, 0x5a, 0xd9, 0x9a, 0x80, 0x4a, 0xff, 0x43, 0x8e, 0x39, 0xb6, 0x8f, 0xc3,
-	0x5e, 0x40, 0x44, 0xfd, 0x05, 0x6d, 0x00, 0xc8, 0xf7, 0x61, 0x7b, 0x4a, 0x7e, 0x59, 0x0d, 0xdf,
-	0x10, 0x94, 0x27, 0xe9, 0xf1, 0xa6, 0xf3, 0x74, 0x07, 0xce, 0xa0, 0xb8, 0xe9, 0x02, 0x4c, 0x9b,
-	0x3e, 0xd4, 0x9c, 0xf9, 0x91, 0xe6, 0xcc, 0x74, 0xbd, 0x05, 0x79, 0x1e, 0x45, 0xa7, 0x5d, 0xae,
-	0x26, 0x2c, 0x5f, 0x6d, 0xee, 0x64, 0x86, 0x24, 0x33, 0x90, 0xd9, 0xc1, 0xd3, 0x79, 0x23, 0xa8,
-	0x1a, 0x44, 0xd9, 0x6f, 0xf9, 0x13, 0x12, 0x5d, 0x49, 0xab, 0x6b, 0x11, 0xd7, 0x89, 0x48, 0x70,
-	0x26, 0x9d, 0x82, 0x24, 0xa4, 0xad, 0x04, 0x18, 0x76, 0x7d, 0xf7, 0x06, 0xd7, 0xd3, 0x20, 0xc2,
-	0xf1, 0x92, 0x35, 0x86, 0xdc, 0xe0, 0xf6, 0x3d, 0xd8, 0x9a, 0x90, 0x4f, 0xe6, 0xf4, 0x05, 0x82,
-	0xd2, 0xb8, 0xc6, 0xdf, 0x74, 0x79, 0x07, 0x8a, 0x89, 0x05, 0xc4, 0x12, 0xe3, 0x91, 0x4c, 0x6d,
-	0x06, 0xf2, 0xe9, 0x18, 0x6b, 0xc5, 0xd2, 0x9f, 0xb5, 0xe2, 0x14, 0xd6, 0xda, 0xcc, 0x6e, 0x11,
-	0x6c, 0x86, 0x4e, 0x94, 0xee, 0xaa, 0xa9, 0x83, 0xbb, 0x0b, 0x6b, 0x01, 0x79, 0xdf, 0x23, 0x6c,
-	0xb8, 0xee, 0x78, 0x76, 0x4b, 0xd9, 0x83, 0x74, 0xf4, 0xb6, 0x60, 0xf3, 0x5a, 0xe8, 0xd4, 0xd2,
-	0xe6, 0xcf, 0x45, 0x58, 0x68, 0x33, 0x5b, 0xea, 0x00, 0x0c, 0x2d, 0xc9, 0xc6, 0x8c, 0x26, 0x8f,
-	0x2c, 0xa3, 0xea, 0xde, 0x6d, 0x99, 0xd9, 0xda, 0x32, 0x60, 0x25, 0xdb, 0x4c, 0x8f, 0x66, 0xdf,
-	0x4e, 0x79, 0x55, 0xe5, 0x76, 0xbc, 0x4c, 0xe3, 0x23, 0x82, 0xf2, 0xc4, 0x9d, 0xd2, 0x9c, 0x1d,
-	0x68, 0xd2, 0x9d, 0xea, 0xf3, 0xbb, 0xdf, 0xc9, 0x12, 0xf9, 0x00, 0xa5, 0x6b, 0xd3, 0xa5, 0xdc,
-	0x2e, 0x5e, 0xca, 0xaf, 0x3e, 0xbb, 0x1b, 0x3f, 0xd3, 0x0e, 0x61, 0x75, 0xec, 0x7d, 0x7a, 0x3c,
-	0x3b, 0xd2, 0x28, 0xbb, 0x7a, 0x70, 0x17, 0x76, 0xaa, 0xfa, 0xf2, 0xe8, 0xc7, 0x65, 0x0d, 0x9d,
-	0x5f, 0xd6, 0xd0, 0xaf, 0xcb, 0x1a, 0xfa, 0x7c, 0x55, 0x9b, 0x3b, 0xbf, 0xaa, 0xcd, 0x5d, 0x5c,
-	0xd5, 0xe6, 0xde, 0x1e, 0xd8, 0x4e, 0xd8, 0xe9, 0x19, 0x8a, 0x49, 0x3d, 0xd5, 0x23, 0x96, 0x63,
-	0xb8, 0xd4, 0x54, 0x13, 0x89, 0x27, 0x26, 0x0d, 0xf8, 0x37, 0x5c, 0xed, 0x0f, 0xfe, 0x44, 0x84,
-	0x67, 0x5d, 0xc2, 0x8c, 0x65, 0xf1, 0x21, 0x7f, 0xfa, 0x3b, 0x00, 0x00, 0xff, 0xff, 0x03, 0xd8,
-	0xf9, 0x86, 0x65, 0x08, 0x00, 0x00,
+	// 872 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xcc, 0x56, 0xcf, 0x8f, 0xdb, 0x44,
+	0x14, 0xde, 0xd9, 0xec, 0x2e, 0xcd, 0x4b, 0xb2, 0x6c, 0x4d, 0x4a, 0xb3, 0xd9, 0x92, 0x06, 0x6f,
+	0x59, 0x45, 0x2a, 0xd8, 0xdd, 0x50, 0x81, 0xc4, 0x05, 0xc1, 0xe6, 0x40, 0x0f, 0x29, 0x92, 0x2b,
+	0x2a, 0x95, 0x8b, 0x35, 0xb6, 0x1f, 0x8e, 0x25, 0xdb, 0x93, 0x7a, 0x6c, 0x6b, 0x97, 0x13, 0x5c,
+	0x38, 0x22, 0x38, 0x70, 0xe5, 0x6f, 0xe1, 0xc8, 0xb1, 0x47, 0x6e, 0xa0, 0x5d, 0x89, 0xbf, 0x03,
+	0xcd, 0xf8, 0x47, 0x7e, 0x3a, 0xdd, 0xed, 0x89, 0x5b, 0xfc, 0xf9, 0x9b, 0xf7, 0x7d, 0xef, 0x7d,
+	0x33, 0x13, 0x83, 0x3a, 0xa5, 0x21, 0xb5, 0x91, 0xea, 0x0e, 0x8d, 0xa9, 0x83, 0xd4, 0xd7, 0xd3,
+	0x21, 0xf5, 0xa7, 0x13, 0x3a, 0xd4, 0xe3, 0x73, 0x6d, 0x1a, 0xb1, 0x98, 0x29, 0x87, 0x39, 0x47,
+	0x2b, 0x38, 0x5a, 0xc1, 0xe9, 0xb6, 0x5d, 0xe6, 0x32, 0xc9, 0xd2, 0xc5, 0xaf, 0x6c, 0x41, 0xb7,
+	0x67, 0x33, 0x1e, 0x30, 0xae, 0x5b, 0x94, 0xa3, 0x9e, 0x9e, 0x5a, 0x18, 0xd3, 0x53, 0xdd, 0x66,
+	0x5e, 0x98, 0xbf, 0x7f, 0x50, 0x88, 0xb2, 0x88, 0xda, 0x3e, 0xce, 0x24, 0xb3, 0xe7, 0x8c, 0xa5,
+	0xfe, 0x41, 0xa0, 0x35, 0xe6, 0xee, 0x59, 0x84, 0x34, 0xc6, 0x11, 0x52, 0x5f, 0xb9, 0x0f, 0x0d,
+	0x61, 0xc1, 0xe4, 0xf6, 0x04, 0x03, 0xda, 0x21, 0xfd, 0xda, 0xa0, 0x6e, 0x80, 0x80, 0x9e, 0x49,
+	0x44, 0x39, 0x85, 0x3d, 0x2b, 0x71, 0x5c, 0x8c, 0x3b, 0xdb, 0x7d, 0x32, 0x68, 0x0c, 0x0f, 0xb5,
+	0xcc, 0x89, 0x26, 0x9c, 0x68, 0xb9, 0x13, 0xed, 0x8c, 0x79, 0xa1, 0x91, 0x13, 0x95, 0x3e, 0x34,
+	0x03, 0x7a, 0x6e, 0x86, 0x49, 0x60, 0x8a, 0x42, 0x9d, 0x5a, 0x9f, 0x0c, 0x76, 0x0c, 0x08, 0xe8,
+	0xf9, 0xd3, 0x24, 0x18, 0xd1, 0x98, 0x2a, 0xc7, 0xd0, 0xb2, 0x92, 0x0b, 0x8c, 0x4c, 0xea, 0x38,
+	0x11, 0x72, 0xde, 0xd9, 0xe9, 0x93, 0x41, 0xdd, 0x68, 0x4a, 0xf0, 0x8b, 0x0c, 0x53, 0xda, 0xb0,
+	0x1b, 0xb2, 0xd0, 0xc6, 0xce, 0x6e, 0x9f, 0x0c, 0x9a, 0x46, 0xf6, 0xa0, 0x3e, 0x82, 0x3b, 0x0b,
+	0x1d, 0x18, 0xc8, 0xa7, 0x2c, 0xe4, 0xa8, 0xdc, 0x85, 0xb7, 0xc4, 0x20, 0x4d, 0xcf, 0xe9, 0x10,
+	0x29, 0xb8, 0x27, 0x1e, 0x9f, 0x38, 0xea, 0xaf, 0x04, 0x1a, 0x63, 0xee, 0x3e, 0x43, 0xdf, 0x97,
+	0xe2, 0x55, 0x44, 0xe5, 0x03, 0xd8, 0x4f, 0x31, 0xf2, 0xbe, 0xf3, 0xa8, 0xe5, 0xa3, 0x69, 0x7b,
+	0x8e, 0x6c, 0xb9, 0x6e, 0xb4, 0x66, 0xe8, 0x99, 0xe7, 0x28, 0x47, 0x50, 0x97, 0x23, 0x9b, 0x50,
+	0x3e, 0x91, 0xbd, 0xd5, 0x8d, 0x5b, 0x02, 0xf8, 0x8a, 0xf2, 0x89, 0xa8, 0xc1, 0xd1, 0xf7, 0x57,
+	0x5a, 0x6b, 0x65, 0x68, 0xde, 0x9b, 0x7a, 0x07, 0xde, 0x99, 0xb3, 0x54, 0xf4, 0xa0, 0xfe, 0x4e,
+	0xe0, 0xee, 0x98, 0xbb, 0xcf, 0x59, 0x8c, 0x02, 0x7f, 0x2e, 0x75, 0x6d, 0x1a, 0x7b, 0x2c, 0x54,
+	0x10, 0xde, 0x95, 0xb2, 0xe9, 0x1c, 0x68, 0xa6, 0x2c, 0x46, 0xd9, 0x45, 0x63, 0xa8, 0x6b, 0x95,
+	0x7b, 0x4a, 0x5b, 0x2e, 0x26, 0x04, 0x8c, 0xb6, 0xb3, 0x06, 0x55, 0xee, 0x41, 0x9d, 0x7b, 0x6e,
+	0x48, 0xe3, 0x24, 0x42, 0xd9, 0x7f, 0xd3, 0x98, 0x01, 0xea, 0xfb, 0x70, 0xbf, 0xc2, 0x5f, 0xd9,
+	0xc3, 0xdf, 0x04, 0xda, 0xeb, 0xf4, 0x94, 0x13, 0x78, 0x5b, 0xd8, 0x8d, 0xcc, 0x24, 0xf4, 0x5e,
+	0x26, 0x58, 0xcc, 0x5f, 0xcc, 0x57, 0xc0, 0xdf, 0x48, 0xf4, 0x89, 0x23, 0x36, 0x47, 0xc6, 0x2b,
+	0x26, 0x98, 0xa5, 0xd0, 0x94, 0x60, 0xb1, 0x39, 0xe6, 0x42, 0xac, 0x2d, 0x84, 0xb8, 0x90, 0xce,
+	0xce, 0x52, 0x3a, 0x23, 0x68, 0x88, 0x2a, 0x26, 0x9b, 0x0a, 0x57, 0x72, 0x63, 0xed, 0x0f, 0x8f,
+	0xcb, 0xc1, 0xe5, 0x67, 0xa5, 0x1c, 0x9b, 0xb0, 0xfd, 0xb5, 0xa4, 0x1a, 0x90, 0x96, 0xbf, 0xd5,
+	0x9f, 0x89, 0x4c, 0xaf, 0x98, 0xc2, 0x08, 0x7d, 0x2f, 0xc5, 0xe8, 0x42, 0x79, 0x01, 0x8a, 0x94,
+	0x76, 0x72, 0x60, 0x3e, 0x9d, 0x87, 0xaf, 0x49, 0xa7, 0x28, 0x22, 0x93, 0x39, 0x70, 0x96, 0x90,
+	0xd7, 0xa4, 0xf2, 0x1e, 0x1c, 0xad, 0xf1, 0x53, 0x26, 0xf2, 0xc3, 0x36, 0x1c, 0x2c, 0x6b, 0xfc,
+	0x1f, 0xd2, 0x38, 0x86, 0x56, 0x3e, 0x2a, 0x74, 0xe4, 0x71, 0xdb, 0xcd, 0x4a, 0x97, 0xa0, 0x38,
+	0x6d, 0x4b, 0x91, 0xed, 0xbd, 0x59, 0x64, 0x2f, 0xe0, 0xf6, 0x98, 0xbb, 0x23, 0xa4, 0x76, 0xec,
+	0xa5, 0xc5, 0xdd, 0x57, 0x79, 0x11, 0x3c, 0x84, 0xdb, 0x11, 0xbe, 0x4c, 0x90, 0xaf, 0xf6, 0x7d,
+	0x50, 0xbe, 0x28, 0x8e, 0xf2, 0x11, 0x1c, 0xae, 0x94, 0x2e, 0x47, 0xff, 0x23, 0x81, 0x7b, 0x63,
+	0xee, 0x1a, 0x68, 0x64, 0xcb, 0x56, 0x62, 0xa8, 0xf4, 0xb0, 0x30, 0xb9, 0xed, 0xa5, 0xc9, 0xad,
+	0x35, 0x58, 0xab, 0x30, 0x78, 0x02, 0x0f, 0x36, 0x59, 0x28, 0xbc, 0x0e, 0xff, 0xdd, 0x85, 0xda,
+	0x98, 0xbb, 0xca, 0x04, 0x60, 0xee, 0x0f, 0x62, 0xb0, 0x61, 0xe3, 0x2e, 0x5c, 0xc4, 0xdd, 0x47,
+	0xd7, 0x65, 0x96, 0x57, 0xb6, 0x05, 0xb7, 0xca, 0x5b, 0xf9, 0x64, 0xf3, 0xea, 0x82, 0xd7, 0xd5,
+	0xae, 0xc7, 0x2b, 0x35, 0x7e, 0x22, 0xd0, 0x5e, 0x7b, 0x9f, 0x0e, 0x37, 0x17, 0x5a, 0xb7, 0xa6,
+	0xfb, 0xd9, 0xcd, 0xd7, 0x94, 0x46, 0xbe, 0x87, 0x83, 0x95, 0x1b, 0x43, 0xbb, 0x5e, 0xbd, 0x82,
+	0xdf, 0xfd, 0xe4, 0x66, 0xfc, 0x52, 0x3b, 0x86, 0xfd, 0xa5, 0xbd, 0xff, 0xe1, 0xe6, 0x4a, 0x8b,
+	0xec, 0xee, 0xe3, 0x9b, 0xb0, 0x4b, 0xd5, 0xdf, 0x08, 0x1c, 0x56, 0xef, 0xfc, 0x4f, 0x37, 0xd7,
+	0xac, 0x5c, 0xd8, 0xfd, 0xfc, 0x0d, 0x17, 0x16, 0xbe, 0xbe, 0x7c, 0xfa, 0xe7, 0x65, 0x8f, 0xbc,
+	0xba, 0xec, 0x91, 0x7f, 0x2e, 0x7b, 0xe4, 0x97, 0xab, 0xde, 0xd6, 0xab, 0xab, 0xde, 0xd6, 0x5f,
+	0x57, 0xbd, 0xad, 0x6f, 0x1f, 0xbb, 0x5e, 0x3c, 0x49, 0x2c, 0xcd, 0x66, 0x81, 0x1e, 0xa0, 0xe3,
+	0x59, 0x3e, 0xb3, 0xf5, 0x5c, 0xed, 0x23, 0x9b, 0x45, 0xe2, 0xbb, 0x4a, 0x3f, 0x9f, 0x7d, 0xd8,
+	0xc5, 0x17, 0x53, 0xe4, 0xd6, 0x9e, 0xfc, 0xb8, 0xfa, 0xf8, 0xbf, 0x00, 0x00, 0x00, 0xff, 0xff,
+	0x6b, 0xf6, 0x3a, 0x2b, 0xf9, 0x09, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -769,6 +890,8 @@ type MsgClient interface {
 	VoteDataDelivery(ctx context.Context, in *MsgVoteDataDelivery, opts ...grpc.CallOption) (*MsgVoteDataDeliveryResponse, error)
 	// DeactivateDeal defines a method for deactivating the deal.
 	DeactivateDeal(ctx context.Context, in *MsgDeactivateDeal, opts ...grpc.CallOption) (*MsgDeactivateDealResponse, error)
+	// ReRequestDataDeliveryVote defines a method for requesting DataDeliveryVote.
+	ReRequestDataDeliveryVote(ctx context.Context, in *MsgReRequestDataDeliveryVote, opts ...grpc.CallOption) (*MsgReRequestDataDeliveryVoteResponse, error)
 }
 
 type msgClient struct {
@@ -824,6 +947,15 @@ func (c *msgClient) DeactivateDeal(ctx context.Context, in *MsgDeactivateDeal, o
 	return out, nil
 }
 
+func (c *msgClient) ReRequestDataDeliveryVote(ctx context.Context, in *MsgReRequestDataDeliveryVote, opts ...grpc.CallOption) (*MsgReRequestDataDeliveryVoteResponse, error) {
+	out := new(MsgReRequestDataDeliveryVoteResponse)
+	err := c.cc.Invoke(ctx, "/panacea.datadeal.v2alpha2.Msg/ReRequestDataDeliveryVote", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // MsgServer is the server API for Msg service.
 type MsgServer interface {
 	// CreateDeal defines a method for creating a deal.
@@ -836,6 +968,8 @@ type MsgServer interface {
 	VoteDataDelivery(context.Context, *MsgVoteDataDelivery) (*MsgVoteDataDeliveryResponse, error)
 	// DeactivateDeal defines a method for deactivating the deal.
 	DeactivateDeal(context.Context, *MsgDeactivateDeal) (*MsgDeactivateDealResponse, error)
+	// ReRequestDataDeliveryVote defines a method for requesting DataDeliveryVote.
+	ReRequestDataDeliveryVote(context.Context, *MsgReRequestDataDeliveryVote) (*MsgReRequestDataDeliveryVoteResponse, error)
 }
 
 // UnimplementedMsgServer can be embedded to have forward compatible implementations.
@@ -856,6 +990,9 @@ func (*UnimplementedMsgServer) VoteDataDelivery(ctx context.Context, req *MsgVot
 }
 func (*UnimplementedMsgServer) DeactivateDeal(ctx context.Context, req *MsgDeactivateDeal) (*MsgDeactivateDealResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeactivateDeal not implemented")
+}
+func (*UnimplementedMsgServer) ReRequestDataDeliveryVote(ctx context.Context, req *MsgReRequestDataDeliveryVote) (*MsgReRequestDataDeliveryVoteResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ReRequestDataDeliveryVote not implemented")
 }
 
 func RegisterMsgServer(s grpc1.Server, srv MsgServer) {
@@ -952,6 +1089,24 @@ func _Msg_DeactivateDeal_Handler(srv interface{}, ctx context.Context, dec func(
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Msg_ReRequestDataDeliveryVote_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgReRequestDataDeliveryVote)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).ReRequestDataDeliveryVote(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/panacea.datadeal.v2alpha2.Msg/ReRequestDataDeliveryVote",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).ReRequestDataDeliveryVote(ctx, req.(*MsgReRequestDataDeliveryVote))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _Msg_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "panacea.datadeal.v2alpha2.Msg",
 	HandlerType: (*MsgServer)(nil),
@@ -975,6 +1130,10 @@ var _Msg_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeactivateDeal",
 			Handler:    _Msg_DeactivateDeal_Handler,
+		},
+		{
+			MethodName: "ReRequestDataDeliveryVote",
+			Handler:    _Msg_ReRequestDataDeliveryVote_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
@@ -1232,24 +1391,31 @@ func (m *DataVerificationVote) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	if m.VoteOption != 0 {
 		i = encodeVarintTx(dAtA, i, uint64(m.VoteOption))
 		i--
-		dAtA[i] = 0x20
+		dAtA[i] = 0x28
 	}
 	if len(m.DataHash) > 0 {
 		i -= len(m.DataHash)
 		copy(dAtA[i:], m.DataHash)
 		i = encodeVarintTx(dAtA, i, uint64(len(m.DataHash)))
 		i--
-		dAtA[i] = 0x1a
+		dAtA[i] = 0x22
 	}
 	if m.DealId != 0 {
 		i = encodeVarintTx(dAtA, i, uint64(m.DealId))
 		i--
-		dAtA[i] = 0x10
+		dAtA[i] = 0x18
 	}
 	if len(m.VoterAddress) > 0 {
 		i -= len(m.VoterAddress)
 		copy(dAtA[i:], m.VoterAddress)
 		i = encodeVarintTx(dAtA, i, uint64(len(m.VoterAddress)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.VoterUniqueId) > 0 {
+		i -= len(m.VoterUniqueId)
+		copy(dAtA[i:], m.VoterUniqueId)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.VoterUniqueId)))
 		i--
 		dAtA[i] = 0xa
 	}
@@ -1344,31 +1510,38 @@ func (m *DataDeliveryVote) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	if m.VoteOption != 0 {
 		i = encodeVarintTx(dAtA, i, uint64(m.VoteOption))
 		i--
-		dAtA[i] = 0x28
+		dAtA[i] = 0x30
 	}
 	if len(m.DeliveredCid) > 0 {
 		i -= len(m.DeliveredCid)
 		copy(dAtA[i:], m.DeliveredCid)
 		i = encodeVarintTx(dAtA, i, uint64(len(m.DeliveredCid)))
 		i--
-		dAtA[i] = 0x22
+		dAtA[i] = 0x2a
 	}
 	if len(m.DataHash) > 0 {
 		i -= len(m.DataHash)
 		copy(dAtA[i:], m.DataHash)
 		i = encodeVarintTx(dAtA, i, uint64(len(m.DataHash)))
 		i--
-		dAtA[i] = 0x1a
+		dAtA[i] = 0x22
 	}
 	if m.DealId != 0 {
 		i = encodeVarintTx(dAtA, i, uint64(m.DealId))
 		i--
-		dAtA[i] = 0x10
+		dAtA[i] = 0x18
 	}
 	if len(m.VoterAddress) > 0 {
 		i -= len(m.VoterAddress)
 		copy(dAtA[i:], m.VoterAddress)
 		i = encodeVarintTx(dAtA, i, uint64(len(m.VoterAddress)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.VoterUniqueId) > 0 {
+		i -= len(m.VoterUniqueId)
+		copy(dAtA[i:], m.VoterUniqueId)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.VoterUniqueId)))
 		i--
 		dAtA[i] = 0xa
 	}
@@ -1426,6 +1599,71 @@ func (m *MsgDeactivateDealResponse) MarshalTo(dAtA []byte) (int, error) {
 }
 
 func (m *MsgDeactivateDealResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgReRequestDataDeliveryVote) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgReRequestDataDeliveryVote) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgReRequestDataDeliveryVote) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.RequesterAddress) > 0 {
+		i -= len(m.RequesterAddress)
+		copy(dAtA[i:], m.RequesterAddress)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.RequesterAddress)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if len(m.DataHash) > 0 {
+		i -= len(m.DataHash)
+		copy(dAtA[i:], m.DataHash)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.DataHash)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if m.DealId != 0 {
+		i = encodeVarintTx(dAtA, i, uint64(m.DealId))
+		i--
+		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgReRequestDataDeliveryVoteResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgReRequestDataDeliveryVoteResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgReRequestDataDeliveryVoteResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -1551,6 +1789,10 @@ func (m *DataVerificationVote) Size() (n int) {
 	}
 	var l int
 	_ = l
+	l = len(m.VoterUniqueId)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
 	l = len(m.VoterAddress)
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
@@ -1600,6 +1842,10 @@ func (m *DataDeliveryVote) Size() (n int) {
 	}
 	var l int
 	_ = l
+	l = len(m.VoterUniqueId)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
 	l = len(m.VoterAddress)
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
@@ -1638,6 +1884,35 @@ func (m *MsgDeactivateDeal) Size() (n int) {
 }
 
 func (m *MsgDeactivateDealResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	return n
+}
+
+func (m *MsgReRequestDataDeliveryVote) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.DealId != 0 {
+		n += 1 + sovTx(uint64(m.DealId))
+	}
+	l = len(m.DataHash)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.RequesterAddress)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	return n
+}
+
+func (m *MsgReRequestDataDeliveryVoteResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -2340,6 +2615,38 @@ func (m *DataVerificationVote) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field VoterUniqueId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.VoterUniqueId = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field VoterAddress", wireType)
 			}
 			var stringLen uint64
@@ -2370,7 +2677,7 @@ func (m *DataVerificationVote) Unmarshal(dAtA []byte) error {
 			}
 			m.VoterAddress = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 2:
+		case 3:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field DealId", wireType)
 			}
@@ -2389,7 +2696,7 @@ func (m *DataVerificationVote) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
-		case 3:
+		case 4:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field DataHash", wireType)
 			}
@@ -2421,7 +2728,7 @@ func (m *DataVerificationVote) Unmarshal(dAtA []byte) error {
 			}
 			m.DataHash = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 4:
+		case 5:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field VoteOption", wireType)
 			}
@@ -2662,6 +2969,38 @@ func (m *DataDeliveryVote) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field VoterUniqueId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.VoterUniqueId = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field VoterAddress", wireType)
 			}
 			var stringLen uint64
@@ -2692,7 +3031,7 @@ func (m *DataDeliveryVote) Unmarshal(dAtA []byte) error {
 			}
 			m.VoterAddress = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 2:
+		case 3:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field DealId", wireType)
 			}
@@ -2711,7 +3050,7 @@ func (m *DataDeliveryVote) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
-		case 3:
+		case 4:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field DataHash", wireType)
 			}
@@ -2743,7 +3082,7 @@ func (m *DataDeliveryVote) Unmarshal(dAtA []byte) error {
 			}
 			m.DataHash = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 4:
+		case 5:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field DeliveredCid", wireType)
 			}
@@ -2775,7 +3114,7 @@ func (m *DataDeliveryVote) Unmarshal(dAtA []byte) error {
 			}
 			m.DeliveredCid = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 5:
+		case 6:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field VoteOption", wireType)
 			}
@@ -2943,6 +3282,189 @@ func (m *MsgDeactivateDealResponse) Unmarshal(dAtA []byte) error {
 		}
 		if fieldNum <= 0 {
 			return fmt.Errorf("proto: MsgDeactivateDealResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgReRequestDataDeliveryVote) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgReRequestDataDeliveryVote: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgReRequestDataDeliveryVote: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field DealId", wireType)
+			}
+			m.DealId = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.DealId |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field DataHash", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.DataHash = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field RequesterAddress", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.RequesterAddress = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgReRequestDataDeliveryVoteResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgReRequestDataDeliveryVoteResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgReRequestDataDeliveryVoteResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		default:

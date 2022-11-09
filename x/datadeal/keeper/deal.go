@@ -291,8 +291,8 @@ func (k Keeper) VoteDataVerification(ctx sdk.Context, vote *types.DataVerificati
 		return sdkerrors.Wrapf(types.ErrDataVerificationVote, err.Error())
 	}
 
-	if !k.oracleKeeper.VerifyVoteSignature(ctx, vote, signature) {
-		return sdkerrors.Wrap(oracletypes.ErrDetectionMaliciousBehavior, "")
+	if err := k.oracleKeeper.VerifyVoteBasic(ctx, vote, signature); err != nil {
+		return sdkerrors.Wrap(types.ErrDataVerificationVote, err.Error())
 	}
 
 	if err := k.validateDataVerificationVote(ctx, vote); err != nil {
@@ -311,8 +311,8 @@ func (k Keeper) VoteDataDelivery(ctx sdk.Context, vote *types.DataDeliveryVote, 
 		return sdkerrors.Wrap(types.ErrDataDeliveryVote, err.Error())
 	}
 
-	if !k.oracleKeeper.VerifyVoteSignature(ctx, vote, signature) {
-		return sdkerrors.Wrap(oracletypes.ErrDetectionMaliciousBehavior, "")
+	if err := k.oracleKeeper.VerifyVoteBasic(ctx, vote, signature); err != nil {
+		return sdkerrors.Wrap(types.ErrDataDeliveryVote, err.Error())
 	}
 
 	// Check if the dataSale vote status
@@ -602,4 +602,36 @@ func (k Keeper) DeactivateDeal(ctx sdk.Context, dealID uint64) error {
 	//Remove DataVerification/DeliveryVote Queue
 
 	return nil
+}
+
+func (k Keeper) ReRequestDataDeliveryVote(ctx sdk.Context, msg *types.MsgReRequestDataDeliveryVote) error {
+
+	dataSale, err := k.GetDataSale(ctx, msg.DataHash, msg.DealId)
+	if err != nil {
+		return sdkerrors.Wrapf(types.ErrGetDataSale, err.Error())
+	}
+
+	if dataSale.Status != types.DATA_SALE_STATUS_DELIVERY_FAILED {
+		return sdkerrors.Wrapf(types.ErrReRequestDataDeliveryVote, "can't request data delivery vote when status is not `DELIVERY_FAILED`")
+	}
+
+	dataSale.Status = types.DATA_SALE_STATUS_DELIVERY_VOTING_PERIOD
+	dataSale.DeliveryVotingPeriod = k.oracleKeeper.GetVotingPeriod(ctx)
+
+	if err := k.SetDataSale(ctx, dataSale); err != nil {
+		return sdkerrors.Wrapf(types.ErrReRequestDataDeliveryVote, err.Error())
+	}
+
+	k.AddDataDeliveryQueue(ctx, dataSale.DataHash, dataSale.DealId, dataSale.DeliveryVotingPeriod.VotingEndTime)
+
+	ctx.EventManager().EmitEvent(
+		sdk.NewEvent(
+			types.EventTypeDataDeliveryVote,
+			sdk.NewAttribute(types.AttributeKeyVoteStatus, types.AttributeValueVoteStatusStarted),
+			sdk.NewAttribute(types.AttributeKeyDataHash, dataSale.DataHash),
+			sdk.NewAttribute(types.AttributeKeyDealID, strconv.FormatUint(dataSale.DealId, 10))),
+	)
+
+	return nil
+
 }

@@ -8,27 +8,27 @@ import (
 
 var _ sdk.Msg = &MsgCreateDeal{}
 
-func (msg *MsgCreateDeal) Route() string {
+func (m *MsgCreateDeal) Route() string {
 	return RouterKey
 }
 
-func (msg *MsgCreateDeal) Type() string {
+func (m *MsgCreateDeal) Type() string {
 	return "CreateDeal"
 }
 
 // ValidateBasic is validation for MsgCreateDeal.
-func (msg *MsgCreateDeal) ValidateBasic() error {
-	_, err := sdk.AccAddressFromBech32(msg.BuyerAddress)
+func (m *MsgCreateDeal) ValidateBasic() error {
+	_, err := sdk.AccAddressFromBech32(m.BuyerAddress)
 	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
 
-	schema := msg.DataSchema
+	schema := m.DataSchema
 	if len(schema) == 0 {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "no data schema")
 	}
 
-	budget := msg.Budget
+	budget := m.Budget
 	if budget == nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "budget is empty")
 	}
@@ -36,7 +36,7 @@ func (msg *MsgCreateDeal) ValidateBasic() error {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "budget is not a valid Coin object")
 	}
 
-	data := msg.MaxNumData
+	data := m.MaxNumData
 	if data <= 0 {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "max num of data is negative number")
 	}
@@ -44,13 +44,13 @@ func (msg *MsgCreateDeal) ValidateBasic() error {
 	return nil
 }
 
-func (msg *MsgCreateDeal) GetSignBytes() []byte {
-	bz := ModuleCdc.MustMarshalJSON(msg)
+func (m *MsgCreateDeal) GetSignBytes() []byte {
+	bz := ModuleCdc.MustMarshalJSON(m)
 	return sdk.MustSortJSON(bz)
 }
 
-func (msg *MsgCreateDeal) GetSigners() []sdk.AccAddress {
-	creator, err := sdk.AccAddressFromBech32(msg.BuyerAddress)
+func (m *MsgCreateDeal) GetSigners() []sdk.AccAddress {
+	creator, err := sdk.AccAddressFromBech32(m.BuyerAddress)
 	if err != nil {
 		panic(err)
 	}
@@ -68,42 +68,42 @@ func NewMsgSellData(dealID uint64, verifiableCID, dataHash, sellerAddress string
 	}
 }
 
-func (msg *MsgSellData) Route() string {
+func (m *MsgSellData) Route() string {
 	return RouterKey
 }
 
-func (msg *MsgSellData) Type() string {
+func (m *MsgSellData) Type() string {
 	return "SellData"
 }
 
 // ValidateBasic is validation for MsgSellData.
-func (msg *MsgSellData) ValidateBasic() error {
-	_, err := sdk.AccAddressFromBech32(msg.SellerAddress)
+func (m *MsgSellData) ValidateBasic() error {
+	_, err := sdk.AccAddressFromBech32(m.SellerAddress)
 	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid seller address (%s)", err)
 	}
 
-	if msg.DealId == 0 {
+	if m.DealId == 0 {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "empty deal ID")
 	}
 
-	if len(msg.VerifiableCid) == 0 {
+	if len(m.VerifiableCid) == 0 {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "empty verifiableCID")
 	}
-	if len(msg.DataHash) == 0 {
+	if len(m.DataHash) == 0 {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "empty dataHash")
 	}
 
 	return nil
 }
 
-func (msg *MsgSellData) GetSignBytes() []byte {
-	bz := ModuleCdc.MustMarshalJSON(msg)
+func (m *MsgSellData) GetSignBytes() []byte {
+	bz := ModuleCdc.MustMarshalJSON(m)
 	return sdk.MustSortJSON(bz)
 }
 
-func (msg *MsgSellData) GetSigners() []sdk.AccAddress {
-	seller, err := sdk.AccAddressFromBech32(msg.SellerAddress)
+func (m *MsgSellData) GetSigners() []sdk.AccAddress {
+	seller, err := sdk.AccAddressFromBech32(m.SellerAddress)
 	if err != nil {
 		panic(err)
 	}
@@ -112,43 +112,43 @@ func (msg *MsgSellData) GetSigners() []sdk.AccAddress {
 
 var _ sdk.Msg = &MsgVoteDataVerification{}
 
-func (msg *MsgVoteDataVerification) Route() string {
+func (m *MsgVoteDataVerification) Route() string {
 	return RouterKey
 }
 
-func (msg *MsgVoteDataVerification) Type() string {
+func (m *MsgVoteDataVerification) Type() string {
 	return "VoteDataVerification"
 }
 
-func (msg *MsgVoteDataVerification) ValidateBasic() error {
-	if msg.DataVerificationVote == nil {
+func (m *MsgVoteDataVerification) ValidateBasic() error {
+	if m.DataVerificationVote == nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "dataVerificationVote cannot be nil")
 	}
 
-	if _, err := sdk.AccAddressFromBech32(msg.DataVerificationVote.VoterAddress); err != nil {
+	if _, err := sdk.AccAddressFromBech32(m.DataVerificationVote.VoterAddress); err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid voter address (%s)", err)
 	}
-	if len(msg.DataVerificationVote.DataHash) == 0 {
+	if len(m.DataVerificationVote.DataHash) == 0 {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "DataHash cannot be empty")
 	}
-	if msg.DataVerificationVote.DealId == 0 {
+	if m.DataVerificationVote.DealId == 0 {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "deal ID must be bigger than zero(0)")
 	}
 
-	if msg.Signature == nil {
+	if m.Signature == nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "signature cannot be nil")
 	}
 
 	return nil
 }
 
-func (msg *MsgVoteDataVerification) GetSignBytes() []byte {
-	bz := ModuleCdc.MustMarshalJSON(msg)
+func (m *MsgVoteDataVerification) GetSignBytes() []byte {
+	bz := ModuleCdc.MustMarshalJSON(m)
 	return sdk.MustSortJSON(bz)
 }
 
-func (msg *MsgVoteDataVerification) GetSigners() []sdk.AccAddress {
-	voterAddress, err := sdk.AccAddressFromBech32(msg.DataVerificationVote.VoterAddress)
+func (m *MsgVoteDataVerification) GetSigners() []sdk.AccAddress {
+	voterAddress, err := sdk.AccAddressFromBech32(m.DataVerificationVote.VoterAddress)
 	if err != nil {
 		panic(err)
 	}
@@ -157,44 +157,44 @@ func (msg *MsgVoteDataVerification) GetSigners() []sdk.AccAddress {
 
 var _ sdk.Msg = &MsgVoteDataDelivery{}
 
-func (msg *MsgVoteDataDelivery) Route() string {
+func (m *MsgVoteDataDelivery) Route() string {
 	return RouterKey
 }
 
-func (msg *MsgVoteDataDelivery) Type() string {
+func (m *MsgVoteDataDelivery) Type() string {
 	return "VoteDataDelivery"
 }
 
-func (msg *MsgVoteDataDelivery) ValidateBasic() error {
-	if msg.DataDeliveryVote == nil {
+func (m *MsgVoteDataDelivery) ValidateBasic() error {
+	if m.DataDeliveryVote == nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "DataDeliveryVote cannot be nil")
 	}
 
-	if msg.DataDeliveryVote.DealId == 0 {
+	if m.DataDeliveryVote.DealId == 0 {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "deal ID cannot be 0")
 	}
-	if _, err := sdk.AccAddressFromBech32(msg.DataDeliveryVote.VoterAddress); err != nil {
+	if _, err := sdk.AccAddressFromBech32(m.DataDeliveryVote.VoterAddress); err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid voter address (%s)", err)
 	}
-	if len(msg.DataDeliveryVote.DeliveredCid) == 0 && msg.DataDeliveryVote.VoteOption == oracletypes.VOTE_OPTION_YES {
+	if len(m.DataDeliveryVote.DeliveredCid) == 0 && m.DataDeliveryVote.VoteOption == oracletypes.VOTE_OPTION_YES {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "Delivered Cid can not be empty when vote option is yes")
 	}
-	if len(msg.DataDeliveryVote.DataHash) == 0 {
+	if len(m.DataDeliveryVote.DataHash) == 0 {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "DataHash can not be empty")
 	}
-	if msg.Signature == nil {
+	if m.Signature == nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "signature cannot be nil")
 	}
 	return nil
 }
 
-func (msg *MsgVoteDataDelivery) GetSignBytes() []byte {
-	bz := ModuleCdc.MustMarshalJSON(msg)
+func (m *MsgVoteDataDelivery) GetSignBytes() []byte {
+	bz := ModuleCdc.MustMarshalJSON(m)
 	return sdk.MustSortJSON(bz)
 }
 
-func (msg *MsgVoteDataDelivery) GetSigners() []sdk.AccAddress {
-	voterAddress, err := sdk.AccAddressFromBech32(msg.DataDeliveryVote.VoterAddress)
+func (m *MsgVoteDataDelivery) GetSigners() []sdk.AccAddress {
+	voterAddress, err := sdk.AccAddressFromBech32(m.DataDeliveryVote.VoterAddress)
 	if err != nil {
 		panic(err)
 	}
@@ -208,34 +208,81 @@ func NewMsgDeactivateDeal(dealID uint64, requesterAddress string) *MsgDeactivate
 	}
 }
 
-func (msg *MsgDeactivateDeal) Route() string {
+func (m *MsgDeactivateDeal) Route() string {
 	return RouterKey
 }
 
-func (msg *MsgDeactivateDeal) Type() string {
+func (m *MsgDeactivateDeal) Type() string {
 	return "DeactivateDeal"
 }
 
-// ValidateBasic is validation for MsgCreateDeal.
-func (msg *MsgDeactivateDeal) ValidateBasic() error {
-	_, err := sdk.AccAddressFromBech32(msg.RequesterAddress)
+func (m *MsgDeactivateDeal) ValidateBasic() error {
+	_, err := sdk.AccAddressFromBech32(m.RequesterAddress)
 	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid requester address (%s)", err)
 	}
 
-	if msg.DealId == 0 {
+	if m.DealId == 0 {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "invalid deal id format")
 	}
 	return nil
 }
 
-func (msg *MsgDeactivateDeal) GetSignBytes() []byte {
-	bz := ModuleCdc.MustMarshalJSON(msg)
+func (m *MsgDeactivateDeal) GetSignBytes() []byte {
+	bz := ModuleCdc.MustMarshalJSON(m)
 	return sdk.MustSortJSON(bz)
 }
 
-func (msg *MsgDeactivateDeal) GetSigners() []sdk.AccAddress {
-	creator, err := sdk.AccAddressFromBech32(msg.RequesterAddress)
+func (m *MsgDeactivateDeal) GetSigners() []sdk.AccAddress {
+	creator, err := sdk.AccAddressFromBech32(m.RequesterAddress)
+	if err != nil {
+		panic(err)
+	}
+	return []sdk.AccAddress{creator}
+}
+
+var _ sdk.Msg = &MsgReRequestDataDeliveryVote{}
+
+func NewMsgReRequestDataDeliveryVote(dealID uint64, dataHash string, requesterAddress string) *MsgReRequestDataDeliveryVote {
+	return &MsgReRequestDataDeliveryVote{
+		DealId:           dealID,
+		DataHash:         dataHash,
+		RequesterAddress: requesterAddress,
+	}
+}
+
+func (m *MsgReRequestDataDeliveryVote) Route() string {
+	return RouterKey
+}
+
+func (m *MsgReRequestDataDeliveryVote) Type() string {
+	return "RequestDeliveredCid"
+}
+
+func (m *MsgReRequestDataDeliveryVote) ValidateBasic() error {
+
+	_, err := sdk.AccAddressFromBech32(m.RequesterAddress)
+	if err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid requester address (%s)", err)
+	}
+
+	if m.DealId == 0 {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "invalid deal id format")
+	}
+
+	if len(m.DataHash) == 0 {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "DataHash can not be empty")
+	}
+	return nil
+}
+
+func (m *MsgReRequestDataDeliveryVote) GetSignBytes() []byte {
+	bz := ModuleCdc.MustMarshalJSON(m)
+	return sdk.MustSortJSON(bz)
+}
+
+func (m *MsgReRequestDataDeliveryVote) GetSigners() []sdk.AccAddress {
+	creator, err := sdk.AccAddressFromBech32(m.RequesterAddress)
 	if err != nil {
 		panic(err)
 	}

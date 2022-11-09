@@ -37,7 +37,13 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 		}
 	}
 
-	// TODO: Add an InitGenesis of DataVerification/Delivery Queue
+	for _, dataVerificationQueueElement := range genState.DataVerificationQueueElements {
+		k.AddDataVerificationQueue(ctx, dataVerificationQueueElement.DataHash, dataVerificationQueueElement.DealId, dataVerificationQueueElement.VotingEndTime)
+	}
+
+	for _, dataDeliveryQueueElement := range genState.DataDeliveryQueueElements {
+		k.AddDataDeliveryQueue(ctx, dataDeliveryQueueElement.DataHash, dataDeliveryQueueElement.DealId, dataDeliveryQueueElement.VotingEndTime)
+	}
 }
 
 // ExportGenesis returns the capability module's exported genesis.
@@ -74,6 +80,18 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	}
 	genesis.DataDeliveryVotes = dataDeliveryVotes
 
-	// TODO: Add an ExportGenesis of DataVerification/Delivery Queue
+	dataVerificationQueueElements, err := k.GetAllDataVerificationQueueElements(ctx)
+	if err != nil {
+		panic(err)
+	}
+	genesis.DataVerificationQueueElements = dataVerificationQueueElements
+
+	dataDeliveryQueuesElements, err := k.GetAllDataDeliveryQueueElements(ctx)
+	if err != nil {
+		panic(err)
+	}
+
+	genesis.DataDeliveryQueueElements = dataDeliveryQueuesElements
+
 	return genesis
 }

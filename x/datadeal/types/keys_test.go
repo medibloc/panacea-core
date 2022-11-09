@@ -15,20 +15,22 @@ func TestSplitDataVerificationVoteQueueKey(t *testing.T) {
 
 	key := types.GetDataVerificationQueueKey(dataHash, dealID, now)
 
-	splitDealID, splitCID := types.SplitDataVerificationQueueKey(key)
+	_, splitDealID, splitCID, err := types.SplitDataQueueKey(key)
+	require.NoError(t, err)
 
 	require.Equal(t, dealID, splitDealID)
 	require.Equal(t, dataHash, splitCID)
 }
 
-func TestSpliDataDeliveryVoteQueueKey(t *testing.T) {
+func TestSplitDataDeliveryVoteQueueKey(t *testing.T) {
 	dealID := uint64(1)
 	dataHash := "dataHash"
 	now := time.Now()
 
 	key := types.GetDataDeliveryQueueKey(dealID, dataHash, now)
 
-	splitDealID, splitCID := types.SplitDataDeliveryQueueKey(key)
+	_, splitDealID, splitCID, err := types.SplitDataQueueKey(key)
+	require.NoError(t, err)
 
 	require.Equal(t, dealID, splitDealID)
 	require.Equal(t, dataHash, splitCID)
