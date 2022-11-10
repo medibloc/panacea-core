@@ -771,7 +771,6 @@ func (suite *dealTestSuite) TestRequestDeactivateDeal() {
 
 	suite.Require().Equal(getDeal.Status, types.DEAL_STATUS_DEACTIVATING)
 
-	//TODO: Check the DealQueue
 }
 
 func (suite *dealTestSuite) TestRequestDeactivateDealInvalidRequester() {

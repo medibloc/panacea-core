@@ -15,6 +15,11 @@ import (
 	oracletypes "github.com/medibloc/panacea-core/v2/x/oracle/types"
 )
 
+const (
+	BlockPeriod           = 6 * time.Second
+	DealDeactivationParam = int64(3) // Todo: make DealDeactivationParam to Params of DataDeal
+)
+
 func (k Keeper) CreateDeal(ctx sdk.Context, buyerAddress sdk.AccAddress, msg *types.MsgCreateDeal) (uint64, error) {
 
 	dealID, err := k.GetNextDealNumberAndIncrement(ctx)
@@ -552,11 +557,10 @@ func (k Keeper) RequestDeactivateDeal(ctx sdk.Context, msg *types.MsgDeactivateD
 		return sdkerrors.Wrapf(types.ErrDealDeactivate, err.Error())
 	}
 
-	BlockPeriod := 6 * time.Second // need to fix
 	params := k.oracleKeeper.GetParams(ctx)
 	VotingPeriod := params.VoteParams.VotingPeriod
 
-	deactivationHeight := ctx.BlockHeader().Height + 3*int64(VotingPeriod/BlockPeriod) // need to fix
+	deactivationHeight := ctx.BlockHeader().Height + DealDeactivationParam*int64(VotingPeriod/BlockPeriod)
 
 	k.AddDealQueue(ctx, deal.Id, deactivationHeight)
 
@@ -599,12 +603,21 @@ func (k Keeper) DeactivateDeal(ctx sdk.Context, dealID uint64) error {
 		return sdkerrors.Wrapf(types.ErrDealDeactivate, err.Error())
 	}
 
-	//Remove DataVerification/DeliveryVote Queue
+	//Todo:Remove DataVerification/DeliveryVote Queue
 
 	return nil
 }
 
 func (k Keeper) ReRequestDataDeliveryVote(ctx sdk.Context, msg *types.MsgReRequestDataDeliveryVote) error {
+
+	deal, err := k.GetDeal(ctx, msg.DealId)
+	if err != nil {
+		return sdkerrors.Wrapf(types.ErrReRequestDataDeliveryVote, err.Error())
+	}
+
+	if deal.Status != types.DEAL_STATUS_ACTIVE && deal.Status != types.DEAL_STATUS_COMPLETED {
+		return fmt.Errorf("not in deal state to make a request. Deal Status(%v)", deal.Status)
+	}
 
 	dataSale, err := k.GetDataSale(ctx, msg.DataHash, msg.DealId)
 	if err != nil {
@@ -612,7 +625,7 @@ func (k Keeper) ReRequestDataDeliveryVote(ctx sdk.Context, msg *types.MsgReReque
 	}
 
 	if dataSale.Status != types.DATA_SALE_STATUS_DELIVERY_FAILED {
-		return sdkerrors.Wrapf(types.ErrReRequestDataDeliveryVote, "can't request data delivery vote when status is not `DELIVERY_FAILED`")
+		return sdkerrors.Wrapf(types.ErrReRequestDataDeliveryVote, "can't request data delivery vote when dataSale status is not `DELIVERY_FAILED`")
 	}
 
 	dataSale.Status = types.DATA_SALE_STATUS_DELIVERY_VOTING_PERIOD
