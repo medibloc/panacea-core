@@ -603,7 +603,7 @@ func (k Keeper) DeactivateDeal(ctx sdk.Context, dealID uint64) error {
 		return sdkerrors.Wrapf(types.ErrDealDeactivate, err.Error())
 	}
 
-	//Todo:Remove DataVerification/DeliveryVote Queue
+	//ToDo:Remove DataVerification/DeliveryVote Queue
 
 	return nil
 }
