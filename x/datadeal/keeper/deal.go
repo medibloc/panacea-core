@@ -603,7 +603,7 @@ func (k Keeper) DeactivateDeal(ctx sdk.Context, dealID uint64) error {
 		return sdkerrors.Wrapf(types.ErrDealDeactivate, err.Error())
 	}
 
-	//ToDo:Remove DataVerification/DeliveryVote Queue
+	//Todo:Remove DataVerification/DeliveryVote Queue
 
 	return nil
 }
@@ -616,7 +616,7 @@ func (k Keeper) ReRequestDataDeliveryVote(ctx sdk.Context, msg *types.MsgReReque
 	}
 
 	if deal.Status != types.DEAL_STATUS_ACTIVE && deal.Status != types.DEAL_STATUS_COMPLETED {
-		return fmt.Errorf("not in deal state to make a request. Deal Status(%v)", deal.Status)
+		return sdkerrors.Wrapf(types.ErrReRequestDataDeliveryVote, "not in deal state to make a request")
 	}
 
 	dataSale, err := k.GetDataSale(ctx, msg.DataHash, msg.DealId)

@@ -992,7 +992,6 @@ func (suite *abciTestSuite) TestDealDeactivateEndBlockerPass() {
 
 	getDeal, err = suite.DataDealKeeper.GetDeal(ctx, suite.dealID)
 	suite.Require().NoError(err)
-
 	suite.Require().Equal(types.DEAL_STATUS_DEACTIVATED, getDeal.Status)
 
 }
