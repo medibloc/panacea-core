@@ -35,6 +35,12 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 		}
 	}
 
+	if genState.OracleRegistrationVoteQueueElements != nil {
+		for _, element := range genState.OracleRegistrationVoteQueueElements {
+			k.AddOracleRegistrationQueue(ctx, element.UniqueId, element.Address, element.VotingEndTime)
+		}
+	}
+
 }
 
 // ExportGenesis returns the capability module's exported genesis.
@@ -66,6 +72,12 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 		panic(err)
 	}
 	genesis.OracleUpgradeInfo = upgradeInfo
+
+	queueElements, err := k.GetAllOracleRegistrationVoteQueueElements(ctx)
+	if err != nil {
+		panic(err)
+	}
+	genesis.OracleRegistrationVoteQueueElements = queueElements
 
 	return genesis
 }
