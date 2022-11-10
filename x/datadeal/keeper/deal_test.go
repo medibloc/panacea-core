@@ -888,9 +888,7 @@ func (suite *dealTestSuite) TestDeactivateDeal() {
 	dealAddress, err := sdk.AccAddressFromBech32(deactivatingDeal.Address)
 	suite.Require().NoError(err)
 
-	acc := suite.AccountKeeper.GetAccount(ctx, dealAddress)
-
-	acc = suite.AccountKeeper.NewAccount(ctx, authtypes.NewModuleAccount(
+	acc := suite.AccountKeeper.NewAccount(ctx, authtypes.NewModuleAccount(
 		authtypes.NewBaseAccountWithAddress(
 			dealAddress,
 		),
