@@ -164,9 +164,12 @@ func (suite *oracleTestSuite) TestApplyUpgradeSuccess() {
 
 	events := suite.Ctx.EventManager().Events()
 	suite.Require().Equal(1, len(events))
-	suite.Require().Equal(types.EventTypeOracleUpgraded, events[0].Type)
+	suite.Require().Equal(types.EventTypeUpgradeVote, events[0].Type)
+	suite.Require().Equal(2, len(events[0].Attributes))
 	suite.Require().Equal(types.AttributeKeyUniqueID, string(events[0].Attributes[0].Key))
 	suite.Require().Equal(upgradeInfo.UniqueId, string(events[0].Attributes[0].Value))
+	suite.Require().Equal(types.AttributeKeyVoteStatus, string(events[0].Attributes[1].Key))
+	suite.Require().Equal(types.AttributeValueUpgradeStatusEnded, string(events[0].Attributes[1].Value))
 }
 
 func (suite *oracleTestSuite) TestOracleUpgradeVoteSuccess() {

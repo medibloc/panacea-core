@@ -365,11 +365,12 @@ func (suite *abciTestSuite) TestOracleUpgradeSuccess() {
 
 	events := ctx.EventManager().Events()
 	suite.Require().Equal(1, len(events))
-	suite.Require().Equal(types.EventTypeOracleUpgraded, events[0].Type)
-	eventAttributes := events[0].Attributes
-	suite.Require().Equal(1, len(eventAttributes))
-	suite.Require().Equal(types.AttributeKeyUniqueID, string(eventAttributes[0].Key))
-	suite.Require().Equal(upgradeUniqueID, string(eventAttributes[0].Value))
+	suite.Require().Equal(types.EventTypeUpgradeVote, events[0].Type)
+	suite.Require().Equal(2, len(events[0].Attributes))
+	suite.Require().Equal(types.AttributeKeyUniqueID, string(events[0].Attributes[0].Key))
+	suite.Require().Equal(upgradeInfo.UniqueId, string(events[0].Attributes[0].Value))
+	suite.Require().Equal(types.AttributeKeyVoteStatus, string(events[0].Attributes[1].Key))
+	suite.Require().Equal(types.AttributeValueUpgradeStatusEnded, string(events[0].Attributes[1].Value))
 }
 
 func (suite *abciTestSuite) TestOracleUpgradeEmptyUpgradeData() {
