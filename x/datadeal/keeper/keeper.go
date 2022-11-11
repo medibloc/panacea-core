@@ -53,7 +53,7 @@ func (k Keeper) GetOracleKeeper() oraclekeeper.Keeper {
 
 func (k Keeper) AddDataVerificationQueue(ctx sdk.Context, dataHash string, dealID uint64, endTime time.Time) {
 	store := ctx.KVStore(k.storeKey)
-	store.Set(types.GetDataVerificationQueueKey(dataHash, dealID, endTime), []byte(dataHash))
+	store.Set(types.GetDataVerificationQueueKey(dealID, dataHash, endTime), []byte(dataHash))
 }
 
 func (k Keeper) GetAllDataVerificationQueueElements(ctx sdk.Context) ([]types.DataVerificationQueueElement, error) {
@@ -88,7 +88,7 @@ func (k Keeper) GetClosedDataVerificationQueueIterator(ctx sdk.Context, endTime 
 
 func (k Keeper) RemoveDataVerificationQueue(ctx sdk.Context, dealID uint64, dataHash string, endTime time.Time) {
 	store := ctx.KVStore(k.storeKey)
-	store.Delete(types.GetDataVerificationQueueKey(dataHash, dealID, endTime))
+	store.Delete(types.GetDataVerificationQueueKey(dealID, dataHash, endTime))
 }
 
 func (k Keeper) IterateClosedDataVerificationQueue(ctx sdk.Context, endTime time.Time, cb func(dataSale *types.DataSale) (stop bool)) {

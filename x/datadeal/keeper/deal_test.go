@@ -5,6 +5,7 @@ import (
 	"sort"
 	"strconv"
 	"testing"
+	"time"
 
 	"github.com/btcsuite/btcd/btcec"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
@@ -905,6 +906,23 @@ func (suite *dealTestSuite) TestDeactivateDeal() {
 	beforeBuyerBalance := suite.BankKeeper.GetBalance(ctx, suite.buyerAccAddr, assets.MicroMedDenom)
 	suite.Require().Equal(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(9000000000)), beforeBuyerBalance)
 
+	suite.DataDealKeeper.AddDataVerificationQueue(ctx, suite.dataHash1, 1, time.Now())
+	suite.DataDealKeeper.AddDataVerificationQueue(ctx, suite.dataHash2, 1, time.Now())
+	suite.DataDealKeeper.AddDataVerificationQueue(ctx, suite.dataHash3, 2, time.Now())
+
+	DataVerificationQueue, err := suite.DataDealKeeper.GetAllDataVerificationQueueElements(ctx)
+	suite.Require().NoError(err)
+	suite.Require().Equal(3, len(DataVerificationQueue))
+
+	suite.DataDealKeeper.AddDataDeliveryQueue(ctx, suite.dataHash1, 1, time.Now())
+	suite.DataDealKeeper.AddDataDeliveryQueue(ctx, suite.dataHash2, 2, time.Now())
+	suite.DataDealKeeper.AddDataDeliveryQueue(ctx, suite.dataHash3, 2, time.Now())
+
+	DataDeliveryQueue, err := suite.DataDealKeeper.GetAllDataDeliveryQueueElements(ctx)
+	suite.Require().NoError(err)
+	suite.Require().Equal(3, len(DataDeliveryQueue))
+
+	// after deactivateDeal
 	err = suite.DataDealKeeper.DeactivateDeal(ctx, 2)
 	suite.Require().NoError(err)
 
@@ -913,9 +931,14 @@ func (suite *dealTestSuite) TestDeactivateDeal() {
 
 	getDeal, err := suite.DataDealKeeper.GetDeal(ctx, 2)
 	suite.Require().NoError(err)
-
 	suite.Require().Equal(getDeal.Status, types.DEAL_STATUS_DEACTIVATED)
 
-	//TODO: Check the DataVerification/DeliveryVote Queue are removed well
+	DataVerificationQueue, err = suite.DataDealKeeper.GetAllDataVerificationQueueElements(ctx)
+	suite.Require().NoError(err)
+	suite.Require().Equal(2, len(DataVerificationQueue))
+
+	DataDeliveryQueue, err = suite.DataDealKeeper.GetAllDataDeliveryQueueElements(ctx)
+	suite.Require().NoError(err)
+	suite.Require().Equal(1, len(DataDeliveryQueue))
 
 }

@@ -238,7 +238,7 @@ func (k Keeper) checkDataSaleStatus(ctx sdk.Context, sellerAddress, dataHash str
 
 func (k Keeper) GetDataSale(ctx sdk.Context, dataHash string, dealID uint64) (*types.DataSale, error) {
 	store := ctx.KVStore(k.storeKey)
-	key := types.GetDataSaleKey(dataHash, dealID)
+	key := types.GetDataSaleKey(dealID, dataHash)
 
 	bz := store.Get(key)
 	if bz == nil {
@@ -257,7 +257,7 @@ func (k Keeper) GetDataSale(ctx sdk.Context, dataHash string, dealID uint64) (*t
 
 func (k Keeper) SetDataSale(ctx sdk.Context, dataSale *types.DataSale) error {
 	store := ctx.KVStore(k.storeKey)
-	key := types.GetDataSaleKey(dataSale.DataHash, dataSale.DealId)
+	key := types.GetDataSaleKey(dataSale.DealId, dataSale.DataHash)
 
 	bz, err := k.cdc.MarshalLengthPrefixed(dataSale)
 	if err != nil {
@@ -384,7 +384,7 @@ func (k Keeper) GetDataVerificationVote(ctx sdk.Context, dataHash, voterAddress 
 	if err != nil {
 		return nil, err
 	}
-	key := types.GetDataVerificationVoteKey(dataHash, voterAccAddr, dealID)
+	key := types.GetDataVerificationVoteKey(dealID, dataHash, voterAccAddr)
 	bz := store.Get(key)
 	if bz == nil {
 		return nil, fmt.Errorf("DataVerificationyVote does not exist. dataHash: %s, voterAddress: %s, dealID: %d", dataHash, voterAddress, dealID)
@@ -407,7 +407,7 @@ func (k Keeper) SetDataVerificationVote(ctx sdk.Context, vote *types.DataVerific
 		return err
 	}
 
-	key := types.GetDataVerificationVoteKey(vote.DataHash, voterAccAddr, vote.DealId)
+	key := types.GetDataVerificationVoteKey(vote.DealId, vote.DataHash, voterAccAddr)
 	bz, err := k.cdc.MarshalLengthPrefixed(vote)
 	if err != nil {
 		return err
@@ -420,7 +420,7 @@ func (k Keeper) SetDataVerificationVote(ctx sdk.Context, vote *types.DataVerific
 
 func (k Keeper) GetDataVerificationVoteIterator(ctx sdk.Context, dealID uint64, dataHash string) sdk.Iterator {
 	store := ctx.KVStore(k.storeKey)
-	return sdk.KVStorePrefixIterator(store, types.GetDataVerificationVotesKey(dataHash, dealID))
+	return sdk.KVStorePrefixIterator(store, types.GetDataVerificationVotesKey(dealID, dataHash))
 }
 
 func (k Keeper) GetAllDataVerificationVoteList(ctx sdk.Context) ([]types.DataVerificationVote, error) {
@@ -450,7 +450,7 @@ func (k Keeper) RemoveDataVerificationVote(ctx sdk.Context, vote *types.DataVeri
 	if err != nil {
 		return err
 	}
-	key := types.GetDataVerificationVoteKey(vote.DataHash, voterAccAddr, vote.DealId)
+	key := types.GetDataVerificationVoteKey(vote.DealId, vote.DataHash, voterAccAddr)
 
 	store.Delete(key)
 
@@ -585,6 +585,12 @@ func (k Keeper) DeactivateDeal(ctx sdk.Context, dealID uint64) error {
 		return sdkerrors.Wrapf(types.ErrDealDeactivate, err.Error())
 	}
 
+	//remove DataVerification/DeliveryVote Queue
+	err = k.RemoveVotingQueue(ctx, dealID)
+	if err != nil {
+		return sdkerrors.Wrapf(types.ErrDealDeactivate, err.Error())
+	}
+
 	// refund remaining budget to buyer
 	dealAcc, err := sdk.AccAddressFromBech32(deal.Address)
 	if err != nil {
@@ -603,7 +609,36 @@ func (k Keeper) DeactivateDeal(ctx sdk.Context, dealID uint64) error {
 		return sdkerrors.Wrapf(types.ErrDealDeactivate, err.Error())
 	}
 
-	//Todo:Remove DataVerification/DeliveryVote Queue
+	return nil
+}
+
+func (k Keeper) RemoveVotingQueue(ctx sdk.Context, DeactivateDealID uint64) error {
+	store := ctx.KVStore(k.storeKey)
+	VerificationIterator := sdk.KVStorePrefixIterator(store, types.DataVerificationQueueKey)
+	defer VerificationIterator.Close()
+
+	for ; VerificationIterator.Valid(); VerificationIterator.Next() {
+		votingEndTime, dealID, dataHash, err := types.SplitDataQueueKey(VerificationIterator.Key())
+		if err != nil {
+			return err
+		}
+		if dealID == DeactivateDealID {
+			store.Delete(types.GetDataVerificationQueueKey(dealID, dataHash, *votingEndTime))
+		}
+	}
+
+	DeliveryIterator := sdk.KVStorePrefixIterator(store, types.DataDeliveryQueueKey)
+	defer DeliveryIterator.Close()
+
+	for ; DeliveryIterator.Valid(); DeliveryIterator.Next() {
+		votingEndTime, dealID, dataHash, err := types.SplitDataQueueKey(DeliveryIterator.Key())
+		if err != nil {
+			return err
+		}
+		if dealID == DeactivateDealID {
+			store.Delete(types.GetDataDeliveryQueueKey(dealID, dataHash, *votingEndTime))
+		}
+	}
 
 	return nil
 }

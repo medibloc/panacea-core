@@ -13,7 +13,7 @@ func TestSplitDataVerificationVoteQueueKey(t *testing.T) {
 	dataHash := "dataHash"
 	now := time.Now()
 
-	key := types.GetDataVerificationQueueKey(dataHash, dealID, now)
+	key := types.GetDataVerificationQueueKey(dealID, dataHash, now)
 
 	_, splitDealID, splitCID, err := types.SplitDataQueueKey(key)
 	require.NoError(t, err)
