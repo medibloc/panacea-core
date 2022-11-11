@@ -22,6 +22,7 @@ message GenesisState {
   Params params = 9 [(gogoproto.nullable) = false];
 }
 
+// Params defines the datadeal module's params.
 message Params {
   int64 deal_deactivation_param = 1;
 }

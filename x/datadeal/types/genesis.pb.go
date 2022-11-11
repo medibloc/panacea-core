@@ -136,6 +136,7 @@ func (m *GenesisState) GetParams() Params {
 	return Params{}
 }
 
+// Params defines the datadeal module's params.
 type Params struct {
 	DealDeactivationParam int64 `protobuf:"varint,1,opt,name=deal_deactivation_param,json=dealDeactivationParam,proto3" json:"deal_deactivation_param,omitempty"`
 }
