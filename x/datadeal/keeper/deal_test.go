@@ -93,6 +93,8 @@ func (suite *dealTestSuite) BeforeTest(_, _ string) {
 			SlashFractionForgery:  sdk.NewDecWithPrec(1, 1),
 		},
 	})
+	suite.DataDealKeeper.SetParams(suite.Ctx, types.DefaultParams())
+
 }
 
 func (suite *dealTestSuite) TestCreateNewDeal() {

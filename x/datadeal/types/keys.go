@@ -105,8 +105,8 @@ func GetDealQueueByHeight(deactivationHeight int64) []byte {
 	return append(DealQueueKey, sdk.Uint64ToBigEndian(uint64(deactivationHeight))...)
 }
 
-func SplitDealQueueKey(key []byte) uint64 {
-	return sdk.BigEndianToUint64(key[10:])
+func SplitDealQueueKey(key []byte) (int64, uint64) {
+	return int64(sdk.BigEndianToUint64(key[1:10])), sdk.BigEndianToUint64(key[10:])
 }
 
 // CombineKeys function defines combines deal_id with data_hash.

@@ -16,8 +16,7 @@ import (
 )
 
 const (
-	BlockPeriod           = 6 * time.Second
-	DealDeactivationParam = int64(3) // Todo: make DealDeactivationParam to Params of DataDeal
+	BlockPeriod = 6 * time.Second
 )
 
 func (k Keeper) CreateDeal(ctx sdk.Context, buyerAddress sdk.AccAddress, msg *types.MsgCreateDeal) (uint64, error) {
@@ -557,10 +556,12 @@ func (k Keeper) RequestDeactivateDeal(ctx sdk.Context, msg *types.MsgDeactivateD
 		return sdkerrors.Wrapf(types.ErrDealDeactivate, err.Error())
 	}
 
-	params := k.oracleKeeper.GetParams(ctx)
-	VotingPeriod := params.VoteParams.VotingPeriod
+	oracleParams := k.oracleKeeper.GetParams(ctx)
+	VotingPeriod := oracleParams.VoteParams.VotingPeriod
+	datadealParams := k.GetParams(ctx)
+	dealDeactivationParam := datadealParams.DealDeactivationParam
 
-	deactivationHeight := ctx.BlockHeader().Height + DealDeactivationParam*int64(VotingPeriod/BlockPeriod)
+	deactivationHeight := ctx.BlockHeader().Height + dealDeactivationParam*int64(VotingPeriod/BlockPeriod)
 
 	k.AddDealQueue(ctx, deal.Id, deactivationHeight)
 
