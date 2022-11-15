@@ -61,8 +61,12 @@ func GetOracleRegistrationVoteQueueByTimeKey(endTime time.Time) []byte {
 	return append(OracleRegistrationsQueueKey, sdk.FormatTimeBytes(endTime)...)
 }
 
-func SplitOracleRegistrationVoteQueueKey(key []byte) (string, sdk.AccAddress) {
-	return string(key[1+lenTime+1 : len(key)-21]), key[len(key)-20:]
+func SplitOracleRegistrationVoteQueueKey(key []byte) (time.Time, string, sdk.AccAddress, error) {
+	votingEndTime, err := sdk.ParseTimeBytes(key[1 : 1+lenTime])
+	if err != nil {
+		return time.Time{}, "", nil, err
+	}
+	return votingEndTime, string(key[1+lenTime+1 : len(key)-21]), key[len(key)-20:], nil
 }
 
 func CombineKeys(keys ...[]byte) []byte {

@@ -10,11 +10,12 @@ import (
 // DefaultGenesis returns the default Capability genesis state
 func DefaultGenesis() *GenesisState {
 	return &GenesisState{
-		Oracles:                 []Oracle{},
-		OracleRegistrations:     []OracleRegistration{},
-		OracleRegistrationVotes: []OracleRegistrationVote{},
-		Params:                  DefaultParams(),
-		OracleUpgradeInfo:       nil,
+		Oracles:                             []Oracle{},
+		OracleRegistrations:                 []OracleRegistration{},
+		OracleRegistrationVotes:             []OracleRegistrationVote{},
+		Params:                              DefaultParams(),
+		OracleUpgradeInfo:                   nil,
+		OracleRegistrationVoteQueueElements: nil,
 	}
 }
 
@@ -54,9 +55,32 @@ func (m GenesisState) Validate() error {
 
 	if m.OracleUpgradeInfo != nil {
 		if err := m.OracleUpgradeInfo.ValidateBasic(); err != nil {
-			return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, err.Error())
+			return err
 		}
 	}
 
+	if m.OracleRegistrationVoteQueueElements != nil {
+		for _, element := range m.OracleRegistrationVoteQueueElements {
+			if err := element.ValidateBasic(); err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
+}
+
+func (m *OracleRegistrationVoteQueueElement) ValidateBasic() error {
+	if len(m.UniqueId) == 0 {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "uniqueID is empty")
+	}
+
+	if m.Address == nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "address is empty")
+	}
+
+	if m.VotingEndTime.IsZero() {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "voting end time can not be 0")
+	}
 	return nil
 }

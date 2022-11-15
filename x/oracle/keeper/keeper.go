@@ -72,7 +72,11 @@ func (k Keeper) IterateClosedOracleRegistrationQueue(ctx sdk.Context, endTime ti
 	defer iter.Close()
 
 	for ; iter.Valid(); iter.Next() {
-		uniqueID, accAddr := types.SplitOracleRegistrationVoteQueueKey(iter.Key())
+		_, uniqueID, accAddr, err := types.SplitOracleRegistrationVoteQueueKey(iter.Key())
+		if err != nil {
+			panic(fmt.Errorf("failed split by oracleRegistfationVoteQueue key. err: %w", err))
+		}
+
 		votingTargetAddress := accAddr.String()
 
 		oracleRegistration, err := k.GetOracleRegistration(ctx, uniqueID, votingTargetAddress)
@@ -136,4 +140,29 @@ func (k Keeper) IterateOracleValidator(ctx sdk.Context, cb func(info *types.Orac
 			break
 		}
 	}
+}
+
+func (k Keeper) GetAllOracleRegistrationVoteQueueElements(ctx sdk.Context) ([]types.OracleRegistrationVoteQueueElement, error) {
+	store := ctx.KVStore(k.storeKey)
+	iterator := sdk.KVStorePrefixIterator(store, types.OracleRegistrationsQueueKey)
+	defer iterator.Close()
+
+	queues := make([]types.OracleRegistrationVoteQueueElement, 0)
+
+	for ; iterator.Valid(); iterator.Next() {
+		votingEndTime, uniqueID, address, err := types.SplitOracleRegistrationVoteQueueKey(iterator.Key())
+		if err != nil {
+			return nil, err
+		}
+
+		queueElement := types.OracleRegistrationVoteQueueElement{
+			UniqueId:      uniqueID,
+			Address:       address,
+			VotingEndTime: votingEndTime,
+		}
+
+		queues = append(queues, queueElement)
+	}
+
+	return queues, nil
 }
