@@ -15,6 +15,7 @@ message GenesisState {
   repeated OracleRegistrationVote oracle_registration_votes = 3 [(gogoproto.nullable) = false];
   Params params = 4 [(gogoproto.nullable) = false];
   OracleUpgradeInfo oracle_upgrade_info = 5;
+  repeated OracleRegistrationVoteQueueElement oracle_registration_vote_queue_elements = 6 [(gogoproto.nullable) = false];
 }
 
 // Params defines the oracle module's params.
@@ -60,5 +61,16 @@ message SlashParams {
   string slash_fraction_forgery = 2 [
     (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
     (gogoproto.nullable) = false
+  ];
+}
+
+// OracleRegistrationVoteQueueElement defines a oracle registration vote queue.
+message OracleRegistrationVoteQueueElement {
+  string unique_id = 1;
+  bytes address = 2;
+  google.protobuf.Timestamp voting_end_time = 3 [
+    (gogoproto.stdtime) = true,
+    (gogoproto.nullable) = false,
+    (gogoproto.moretags) = "yaml:\"voting_end_time\""
   ];
 }

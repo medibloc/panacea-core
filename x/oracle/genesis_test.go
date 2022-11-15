@@ -35,7 +35,7 @@ func TestGenesisTestSuite(t *testing.T) {
 	suite.Run(t, new(genesisTestSuite))
 }
 
-func makeSampleDate() (types.Oracle, types.OracleRegistration, types.OracleRegistrationVote, *types.OracleUpgradeInfo) {
+func makeSampleDate() (types.Oracle, types.OracleRegistration, types.OracleRegistrationVote, *types.OracleUpgradeInfo, []types.OracleRegistrationVoteQueueElement) {
 	return types.Oracle{
 			Address:  oracleAcc.String(),
 			Status:   types.ORACLE_STATUS_ACTIVE,
@@ -83,11 +83,23 @@ func makeSampleDate() (types.Oracle, types.OracleRegistration, types.OracleRegis
 		&types.OracleUpgradeInfo{
 			UniqueId: "UpgradeUniqueID",
 			Height:   10000,
+		},
+		[]types.OracleRegistrationVoteQueueElement{
+			{
+				UniqueId:      uniqueID,
+				Address:       oracleAcc,
+				VotingEndTime: time.Now().UTC(),
+			},
+			{
+				UniqueId:      uniqueID,
+				Address:       oracle2Acc,
+				VotingEndTime: time.Now().UTC().Add(time.Second),
+			},
 		}
 }
 
 func (m *genesisTestSuite) TestInitGenesis() {
-	oracle1, oracleRegistration, oracleRegistrationVote, upgradeInfo := makeSampleDate()
+	oracle1, oracleRegistration, oracleRegistrationVote, upgradeInfo, queueElements := makeSampleDate()
 
 	genesis := types.GenesisState{
 		Oracles: []types.Oracle{
@@ -99,8 +111,9 @@ func (m *genesisTestSuite) TestInitGenesis() {
 		OracleRegistrationVotes: []types.OracleRegistrationVote{
 			oracleRegistrationVote,
 		},
-		Params:            types.DefaultParams(),
-		OracleUpgradeInfo: upgradeInfo,
+		Params:                              types.DefaultParams(),
+		OracleUpgradeInfo:                   upgradeInfo,
+		OracleRegistrationVoteQueueElements: queueElements,
 	}
 
 	oracle.InitGenesis(m.Ctx, m.OracleKeeper, genesis)
@@ -112,10 +125,14 @@ func (m *genesisTestSuite) TestInitGenesis() {
 	oracleUpgradeInfo, err := m.OracleKeeper.GetOracleUpgradeInfo(m.Ctx)
 	m.Require().NoError(err)
 	m.Require().Equal(genesis.OracleUpgradeInfo, oracleUpgradeInfo)
+
+	getQueueElements, err := m.OracleKeeper.GetAllOracleRegistrationVoteQueueElements(m.Ctx)
+	m.Require().NoError(err)
+	m.Require().Equal(genesis.OracleRegistrationVoteQueueElements, getQueueElements)
 }
 
 func (m *genesisTestSuite) TestExportGenesis() {
-	oracle1, oracleRegistration, oracleRegistrationVote, upgradeInfo := makeSampleDate()
+	oracle1, oracleRegistration, oracleRegistrationVote, upgradeInfo, queueElements := makeSampleDate()
 
 	err := m.OracleKeeper.SetOracle(m.Ctx, &oracle1)
 	m.Require().NoError(err)
@@ -131,6 +148,9 @@ func (m *genesisTestSuite) TestExportGenesis() {
 
 	err = m.OracleKeeper.SetOracleUpgradeInfo(m.Ctx, upgradeInfo)
 	m.Require().NoError(err)
+	for _, el := range queueElements {
+		m.OracleKeeper.AddOracleRegistrationQueue(m.Ctx, el.UniqueId, el.Address, el.VotingEndTime)
+	}
 
 	genesisStatus := oracle.ExportGenesis(m.Ctx, m.OracleKeeper)
 	m.Require().Equal(oracle1, genesisStatus.Oracles[0])
@@ -148,4 +168,12 @@ func (m *genesisTestSuite) TestExportGenesis() {
 	m.Require().Equal(oracleRegistrationVote, genesisStatus.OracleRegistrationVotes[0])
 	m.Require().Equal(params, genesisStatus.Params)
 	m.Require().Equal(upgradeInfo, genesisStatus.OracleUpgradeInfo)
+	voteQueueElements := genesisStatus.OracleRegistrationVoteQueueElements
+	m.Require().Equal(2, len(voteQueueElements))
+	m.Require().Equal(queueElements[0].UniqueId, voteQueueElements[0].UniqueId)
+	m.Require().Equal(queueElements[0].Address, voteQueueElements[0].Address)
+	m.Require().Equal(queueElements[0].VotingEndTime, voteQueueElements[0].VotingEndTime)
+	m.Require().Equal(queueElements[1].UniqueId, voteQueueElements[1].UniqueId)
+	m.Require().Equal(queueElements[1].Address, voteQueueElements[1].Address)
+	m.Require().Equal(queueElements[1].VotingEndTime, voteQueueElements[1].VotingEndTime)
 }
