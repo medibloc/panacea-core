@@ -477,6 +477,7 @@ func New(
 		appCodec,
 		keys[datadealtypes.StoreKey],
 		keys[datadealtypes.MemStoreKey],
+		app.GetSubspace(datadealtypes.ModuleName),
 		app.oracleKeeper,
 		app.AccountKeeper,
 		app.BankKeeper,

@@ -125,6 +125,16 @@ func (suite *genesisTestSuite) TestInitGenesis() {
 		VotingEndTime: dataSaleDeliveryVoting2.DeliveryVotingPeriod.VotingEndTime,
 	}
 
+	dealQueueElement1 := &types.DealQueueElement{
+		DealId:             deal1.Id,
+		DeactivationHeight: 5,
+	}
+
+	dealQueueElement2 := &types.DealQueueElement{
+		DealId:             deal1.Id,
+		DeactivationHeight: 10,
+	}
+
 	genesis := types.GenesisState{
 		Deals:                         []types.Deal{*deal1, *deal2},
 		NextDealNumber:                3,
@@ -133,6 +143,8 @@ func (suite *genesisTestSuite) TestInitGenesis() {
 		DataDeliveryVotes:             []types.DataDeliveryVote{*dataDeliveryVote1, *dataDeliveryVote2},
 		DataVerificationQueueElements: []types.DataVerificationQueueElement{*verificationQueue1, *verificationQueue2},
 		DataDeliveryQueueElements:     []types.DataDeliveryQueueElement{*deliveryQueue1, *deliveryQueue2},
+		DealQueueElements:             []types.DealQueueElement{*dealQueueElement1, *dealQueueElement2},
+		Params:                        types.DefaultParams(),
 	}
 
 	datadeal.InitGenesis(suite.Ctx, suite.DataDealKeeper, genesis)
@@ -152,8 +164,6 @@ func (suite *genesisTestSuite) TestInitGenesis() {
 	suite.Require().Equal(genesis.DataSales[0].VerifiableCid, getDataSale1.VerifiableCid)
 	suite.Require().Equal(genesis.DataSales[0].DeliveredCid, getDataSale1.DeliveredCid)
 	suite.Require().Equal(genesis.DataSales[0].Status, getDataSale1.Status)
-	//suite.Require().Equal(genesis.DataSales[0].VotingPeriod.VotingStartTime.Local(), getDataSale1.VotingPeriod.VotingStartTime.Local())
-	//suite.Require().Equal(genesis.DataSales[0].VotingPeriod.VotingEndTime.Local(), getDataSale1.VotingPeriod.VotingEndTime.Local())
 	suite.Require().Equal(genesis.DataSales[0].VerificationTallyResult, getDataSale1.VerificationTallyResult)
 	suite.Require().Equal(genesis.DataSales[0].DeliveryTallyResult, getDataSale1.DeliveryTallyResult)
 
@@ -164,8 +174,6 @@ func (suite *genesisTestSuite) TestInitGenesis() {
 	suite.Require().Equal(genesis.DataSales[1].VerifiableCid, getDataSale2.VerifiableCid)
 	suite.Require().Equal(genesis.DataSales[1].DeliveredCid, getDataSale2.DeliveredCid)
 	suite.Require().Equal(genesis.DataSales[1].Status, getDataSale2.Status)
-	//suite.Require().Equal(genesis.DataSales[1].VotingPeriod.VotingStartTime, getDataSale2.VotingPeriod.VotingStartTime.Local())
-	//suite.Require().Equal(genesis.DataSales[1].VotingPeriod.VotingEndTime, getDataSale2.VotingPeriod.VotingEndTime.Local())
 	suite.Require().Equal(genesis.DataSales[1].VerificationTallyResult, getDataSale2.VerificationTallyResult)
 	suite.Require().Equal(genesis.DataSales[1].DeliveryTallyResult, getDataSale2.DeliveryTallyResult)
 
@@ -199,6 +207,16 @@ func (suite *genesisTestSuite) TestInitGenesis() {
 	suite.Require().Equal(genesis.DataDeliveryQueueElements[0].DealId, dataDeliveryQueueElements[0].DealId)
 	suite.Require().Equal(genesis.DataDeliveryQueueElements[1].DataHash, dataDeliveryQueueElements[1].DataHash)
 	suite.Require().Equal(genesis.DataDeliveryQueueElements[1].DealId, dataDeliveryQueueElements[1].DealId)
+
+	dealQueueElements, err := suite.DataDealKeeper.GetAllDealQueueElements(suite.Ctx)
+	suite.Require().NoError(err)
+	suite.Require().Equal(genesis.DealQueueElements[0].DealId, dealQueueElements[0].DealId)
+	suite.Require().Equal(genesis.DealQueueElements[0].DeactivationHeight, dealQueueElements[0].DeactivationHeight)
+	suite.Require().Equal(genesis.DealQueueElements[1].DealId, dealQueueElements[1].DealId)
+	suite.Require().Equal(genesis.DealQueueElements[1].DeactivationHeight, dealQueueElements[1].DeactivationHeight)
+
+	params := suite.DataDealKeeper.GetParams(suite.Ctx)
+	suite.Require().Equal(genesis.Params.DealDeactivationParam, params.DealDeactivationParam)
 }
 
 func (suite *genesisTestSuite) TestExportGenesis() {
@@ -253,6 +271,16 @@ func (suite *genesisTestSuite) TestExportGenesis() {
 		VotingEndTime: dataSaleDeliveryVoting2.DeliveryVotingPeriod.VotingEndTime,
 	}
 
+	dealQueueElement1 := &types.DealQueueElement{
+		DealId:             deal1.Id,
+		DeactivationHeight: 5,
+	}
+
+	dealQueueElement2 := &types.DealQueueElement{
+		DealId:             deal1.Id,
+		DeactivationHeight: 10,
+	}
+
 	genesis := types.GenesisState{
 		Deals:                         []types.Deal{*deal1},
 		NextDealNumber:                2,
@@ -261,6 +289,8 @@ func (suite *genesisTestSuite) TestExportGenesis() {
 		DataDeliveryVotes:             []types.DataDeliveryVote{*dataDeliveryVote1},
 		DataVerificationQueueElements: []types.DataVerificationQueueElement{*verificationQueueElement1},
 		DataDeliveryQueueElements:     []types.DataDeliveryQueueElement{*deliveryQueueElement1},
+		DealQueueElements:             []types.DealQueueElement{*dealQueueElement1},
+		Params:                        types.DefaultParams(),
 	}
 
 	msgCreateDeal := &types.MsgCreateDeal{
@@ -298,6 +328,8 @@ func (suite *genesisTestSuite) TestExportGenesis() {
 
 	err = suite.DataDealKeeper.VoteDataDelivery(suite.Ctx, dataDeliveryVote2, signature2)
 	suite.Require().NoError(err)
+
+	suite.DataDealKeeper.AddDealQueue(suite.Ctx, dealQueueElement2.DealId, dealQueueElement2.DeactivationHeight)
 
 	genesisStatus := datadeal.ExportGenesis(suite.Ctx, suite.DataDealKeeper)
 
@@ -355,4 +387,9 @@ func (suite *genesisTestSuite) TestExportGenesis() {
 	suite.Require().Equal(deliveryQueueElement1.DealId, genesisStatus.DataDeliveryQueueElements[0].DealId)
 	suite.Require().Equal(deliveryQueueElement2.DataHash, genesisStatus.DataDeliveryQueueElements[1].DataHash)
 	suite.Require().Equal(deliveryQueueElement2.DealId, genesisStatus.DataDeliveryQueueElements[1].DealId)
+
+	suite.Require().Equal(dealQueueElement1.DealId, genesisStatus.DealQueueElements[0].DealId)
+	suite.Require().Equal(dealQueueElement1.DeactivationHeight, genesisStatus.DealQueueElements[0].DeactivationHeight)
+	suite.Require().Equal(dealQueueElement2.DealId, genesisStatus.DealQueueElements[1].DealId)
+	suite.Require().Equal(dealQueueElement2.DeactivationHeight, genesisStatus.DealQueueElements[1].DeactivationHeight)
 }

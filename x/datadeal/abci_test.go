@@ -46,8 +46,7 @@ type abciTestSuite struct {
 	uniqueID string
 	dealID   uint64
 
-	BlockPeriod           time.Duration
-	DealDeactivationParam int64
+	BlockPeriod time.Duration
 }
 
 func TestAbciTestSuite(t *testing.T) {
@@ -98,6 +97,7 @@ func (suite *abciTestSuite) BeforeTest(_, _ string) {
 			SlashFractionForgery:  sdk.NewDecWithPrec(1, 1),
 		},
 	})
+	suite.DataDealKeeper.SetParams(suite.Ctx, types.DefaultParams())
 
 	err = suite.DataDealKeeper.SetNextDealNumber(ctx, 1)
 	suite.Require().NoError(err)
@@ -120,8 +120,6 @@ func (suite *abciTestSuite) BeforeTest(_, _ string) {
 	suite.dealID = dealID
 
 	suite.BlockPeriod = 6 * time.Second
-	suite.DealDeactivationParam = 3
-
 }
 
 func (suite *abciTestSuite) TestDataVerificationEndBlockerVotePass() {
@@ -982,9 +980,12 @@ func (suite *abciTestSuite) TestDealDeactivateEndBlockerPass() {
 	suite.Require().ErrorContains(err, "deal status is not ACTIVE")
 
 	// block height reached deactivationHeight
-	params := suite.OracleKeeper.GetParams(ctx)
-	VotingPeriod := params.VoteParams.VotingPeriod
-	deactivationHeight := ctx.BlockHeader().Height + suite.DealDeactivationParam*int64(VotingPeriod/suite.BlockPeriod) + 1
+	oracleParams := suite.OracleKeeper.GetParams(ctx)
+	VotingPeriod := oracleParams.VoteParams.VotingPeriod
+	datadealParams := suite.DataDealKeeper.GetParams(ctx)
+	dealDeactivationParam := datadealParams.DealDeactivationParam
+
+	deactivationHeight := ctx.BlockHeader().Height + dealDeactivationParam*int64(VotingPeriod/suite.BlockPeriod) + 1
 
 	ctx = ctx.WithBlockHeight(deactivationHeight)
 

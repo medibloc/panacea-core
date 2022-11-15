@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	oraclekeeper "github.com/medibloc/panacea-core/v2/x/oracle/keeper"
 
 	"github.com/tendermint/tendermint/libs/log"
@@ -15,9 +16,11 @@ import (
 
 type (
 	Keeper struct {
-		cdc           codec.Codec
-		storeKey      sdk.StoreKey
-		memKey        sdk.StoreKey
+		cdc      codec.Codec
+		storeKey sdk.StoreKey
+		memKey   sdk.StoreKey
+
+		paramSpace    paramtypes.Subspace
 		oracleKeeper  oraclekeeper.Keeper
 		accountKeeper types.AccountKeeper
 		bankKeeper    types.BankKeeper
@@ -28,15 +31,20 @@ func NewKeeper(
 	cdc codec.Codec,
 	storeKey,
 	memKey sdk.StoreKey,
+	paramSpace paramtypes.Subspace,
 	oracleKeeper oraclekeeper.Keeper,
 	accountKeeper types.AccountKeeper,
 	bankKeeper types.BankKeeper,
 
 ) *Keeper {
+	if !paramSpace.HasKeyTable() {
+		paramSpace = paramSpace.WithKeyTable(types.ParamKeyTable())
+	}
 	return &Keeper{
 		cdc:           cdc,
 		storeKey:      storeKey,
 		memKey:        memKey,
+		paramSpace:    paramSpace,
 		oracleKeeper:  oracleKeeper,
 		accountKeeper: accountKeeper,
 		bankKeeper:    bankKeeper,
@@ -179,6 +187,27 @@ func (k Keeper) AddDealQueue(ctx sdk.Context, dealID uint64, deactivationHeight 
 	store.Set(types.GetDealQueueKey(dealID, deactivationHeight), sdk.Uint64ToBigEndian(dealID))
 }
 
+func (k Keeper) GetAllDealQueueElements(ctx sdk.Context) ([]types.DealQueueElement, error) {
+	store := ctx.KVStore(k.storeKey)
+	iterator := sdk.KVStorePrefixIterator(store, types.DealQueueKey)
+	defer iterator.Close()
+
+	dealQueue := make([]types.DealQueueElement, 0)
+
+	for ; iterator.Valid(); iterator.Next() {
+		deactivationHeight, dealID := types.SplitDealQueueKey(iterator.Key())
+
+		dealQueueElement := types.DealQueueElement{
+			DealId:             dealID,
+			DeactivationHeight: deactivationHeight,
+		}
+
+		dealQueue = append(dealQueue, dealQueueElement)
+	}
+
+	return dealQueue, nil
+}
+
 func (k Keeper) GetClosedDealQueueIterator(ctx sdk.Context, deactivationHeight int64) sdk.Iterator {
 	store := ctx.KVStore(k.storeKey)
 	return store.Iterator(types.DealQueueKey, sdk.PrefixEndBytes(types.GetDealQueueByHeight(deactivationHeight)))
@@ -195,7 +224,7 @@ func (k Keeper) IteratedClosedDealQueue(ctx sdk.Context, deactivationHeight int6
 	defer iter.Close()
 
 	for ; iter.Valid(); iter.Next() {
-		dealId := types.SplitDealQueueKey(iter.Key())
+		_, dealId := types.SplitDealQueueKey(iter.Key())
 
 		deal, err := k.GetDeal(ctx, dealId)
 

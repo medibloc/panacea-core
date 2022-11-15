@@ -254,6 +254,7 @@ func (suite *TestSuite) SetupTest() {
 		cdc.Marshaler,
 		keyParams[datadealtypes.StoreKey],
 		memKeys[datadealtypes.MemStoreKey],
+		paramsKeeper.Subspace(datadealtypes.ModuleName),
 		suite.OracleKeeper,
 		suite.AccountKeeper,
 		suite.BankKeeper,

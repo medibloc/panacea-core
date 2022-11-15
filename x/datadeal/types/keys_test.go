@@ -42,6 +42,7 @@ func TestSplitDealQueueKey(t *testing.T) {
 
 	key := types.GetDealQueueKey(dealID, deactivationHeight)
 
-	splitDealID := types.SplitDealQueueKey(key)
+	splitDeactivationHeight, splitDealID := types.SplitDealQueueKey(key)
+	require.Equal(t, deactivationHeight, splitDeactivationHeight)
 	require.Equal(t, dealID, splitDealID)
 }
