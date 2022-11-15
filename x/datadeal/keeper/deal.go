@@ -10,13 +10,14 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	gogotypes "github.com/gogo/protobuf/types"
+	"github.com/medibloc/panacea-core/v2/cmd/panacead/cmd"
 	"github.com/medibloc/panacea-core/v2/types/assets"
 	"github.com/medibloc/panacea-core/v2/x/datadeal/types"
 	oracletypes "github.com/medibloc/panacea-core/v2/x/oracle/types"
 )
 
 const (
-	BlockPeriod = 6 * time.Second
+	BlockPeriod = cmd.BlockTimeSec * time.Second
 )
 
 func (k Keeper) CreateDeal(ctx sdk.Context, buyerAddress sdk.AccAddress, msg *types.MsgCreateDeal) (uint64, error) {
@@ -561,7 +562,7 @@ func (k Keeper) RequestDeactivateDeal(ctx sdk.Context, msg *types.MsgDeactivateD
 	datadealParams := k.GetParams(ctx)
 	dealDeactivationParam := datadealParams.DealDeactivationParam
 
-	deactivationHeight := ctx.BlockHeader().Height + dealDeactivationParam*int64(VotingPeriod/BlockPeriod) +1
+	deactivationHeight := ctx.BlockHeader().Height + dealDeactivationParam*int64(VotingPeriod/BlockPeriod) + 1
 
 	k.AddDealQueue(ctx, deal.Id, deactivationHeight)
 
