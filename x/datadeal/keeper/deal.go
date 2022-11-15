@@ -561,7 +561,7 @@ func (k Keeper) RequestDeactivateDeal(ctx sdk.Context, msg *types.MsgDeactivateD
 	datadealParams := k.GetParams(ctx)
 	dealDeactivationParam := datadealParams.DealDeactivationParam
 
-	deactivationHeight := ctx.BlockHeader().Height + dealDeactivationParam*int64(VotingPeriod/BlockPeriod)
+	deactivationHeight := ctx.BlockHeader().Height + dealDeactivationParam*int64(VotingPeriod/BlockPeriod) +1
 
 	k.AddDealQueue(ctx, deal.Id, deactivationHeight)
 
@@ -603,8 +603,6 @@ func (k Keeper) DeactivateDeal(ctx sdk.Context, dealID uint64) error {
 	if err != nil {
 		return sdkerrors.Wrapf(types.ErrDealDeactivate, err.Error())
 	}
-
-	//Todo:Remove DataVerification/DeliveryVote Queue
 
 	return nil
 }
