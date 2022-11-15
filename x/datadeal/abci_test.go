@@ -985,7 +985,7 @@ func (suite *abciTestSuite) TestDealDeactivateEndBlockerPass() {
 	datadealParams := suite.DataDealKeeper.GetParams(ctx)
 	dealDeactivationParam := datadealParams.DealDeactivationParam
 
-	deactivationHeight := ctx.BlockHeader().Height + dealDeactivationParam*int64(VotingPeriod/suite.BlockPeriod)
+	deactivationHeight := ctx.BlockHeader().Height + dealDeactivationParam*int64(VotingPeriod/suite.BlockPeriod) + 1
 
 	ctx = ctx.WithBlockHeight(deactivationHeight)
 
