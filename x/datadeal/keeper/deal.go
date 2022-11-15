@@ -560,7 +560,7 @@ func (k Keeper) RequestDeactivateDeal(ctx sdk.Context, msg *types.MsgDeactivateD
 	params := k.oracleKeeper.GetParams(ctx)
 	VotingPeriod := params.VoteParams.VotingPeriod
 
-	deactivationHeight := ctx.BlockHeader().Height + DealDeactivationParam*int64(VotingPeriod/BlockPeriod)
+	deactivationHeight := ctx.BlockHeader().Height + DealDeactivationParam*int64(VotingPeriod/BlockPeriod) +1
 
 	k.AddDealQueue(ctx, deal.Id, deactivationHeight)
 
