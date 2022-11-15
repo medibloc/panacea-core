@@ -12,7 +12,6 @@ import (
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
-	"github.com/medibloc/panacea-core/v2/cmd/panacead/cmd"
 	"github.com/medibloc/panacea-core/v2/types/assets"
 	"github.com/medibloc/panacea-core/v2/x/datadeal"
 	"github.com/medibloc/panacea-core/v2/x/datadeal/testutil"
@@ -120,7 +119,7 @@ func (suite *abciTestSuite) BeforeTest(_, _ string) {
 	suite.Require().Equal(uint64(1), dealID)
 	suite.dealID = dealID
 
-	suite.BlockPeriod = cmd.BlockTimeSec * time.Second
+	suite.BlockPeriod = 6 * time.Second
 }
 
 func (suite *abciTestSuite) TestDataVerificationEndBlockerVotePass() {
