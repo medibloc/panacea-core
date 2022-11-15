@@ -984,7 +984,7 @@ func (suite *abciTestSuite) TestDealDeactivateEndBlockerPass() {
 	// block height reached deactivationHeight
 	params := suite.OracleKeeper.GetParams(ctx)
 	VotingPeriod := params.VoteParams.VotingPeriod
-	deactivationHeight := ctx.BlockHeader().Height + suite.DealDeactivationParam*int64(VotingPeriod/suite.BlockPeriod)
+	deactivationHeight := ctx.BlockHeader().Height + suite.DealDeactivationParam*int64(VotingPeriod/suite.BlockPeriod) + 1
 
 	ctx = ctx.WithBlockHeight(deactivationHeight)
 
