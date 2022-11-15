@@ -918,6 +918,4 @@ func (suite *dealTestSuite) TestDeactivateDeal() {
 
 	suite.Require().Equal(getDeal.Status, types.DEAL_STATUS_DEACTIVATED)
 
-	//TODO: Check the DataVerification/DeliveryVote Queue are removed well
-
 }

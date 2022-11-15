@@ -16,10 +16,6 @@ import (
 	oracletypes "github.com/medibloc/panacea-core/v2/x/oracle/types"
 )
 
-const (
-	BlockPeriod = cmd.BlockTimeSec * time.Second
-)
-
 func (k Keeper) CreateDeal(ctx sdk.Context, buyerAddress sdk.AccAddress, msg *types.MsgCreateDeal) (uint64, error) {
 
 	dealID, err := k.GetNextDealNumberAndIncrement(ctx)
@@ -562,7 +558,7 @@ func (k Keeper) RequestDeactivateDeal(ctx sdk.Context, msg *types.MsgDeactivateD
 	datadealParams := k.GetParams(ctx)
 	dealDeactivationParam := datadealParams.DealDeactivationParam
 
-	deactivationHeight := ctx.BlockHeader().Height + dealDeactivationParam*int64(VotingPeriod/BlockPeriod) + 1
+	deactivationHeight := ctx.BlockHeader().Height + dealDeactivationParam*int64(VotingPeriod/(cmd.BlockTimeSec*time.Second)) + 1
 
 	k.AddDealQueue(ctx, deal.Id, deactivationHeight)
 
