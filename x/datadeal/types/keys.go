@@ -105,7 +105,8 @@ func GetDealQueueByHeight(deactivationHeight int64) []byte {
 	return append(DealQueueKey, sdk.Uint64ToBigEndian(uint64(deactivationHeight))...)
 }
 
-func SplitDealQueueKey(key []byte) (deactivationHeight int64, dealID uint64) {
+// SplitDealQueueKey splits key to deactivationHeight and dealID
+func SplitDealQueueKey(key []byte) (int64, uint64) {
 	return int64(sdk.BigEndianToUint64(key[1:10])), sdk.BigEndianToUint64(key[10:])
 }
 
