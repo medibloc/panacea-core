@@ -32,38 +32,36 @@ func handleDataVerificationVote(ctx sdk.Context, keeper keeper.Keeper) {
 	keeper.IterateClosedDataVerificationQueue(ctx, ctx.BlockHeader().Time, func(dataSale *types.DataSale) bool {
 
 		keeper.RemoveDataVerificationQueue(ctx, dataSale.DealId, dataSale.DataHash, dataSale.VerificationVotingPeriod.VotingEndTime)
+		iterator := keeper.GetDataVerificationVoteIterator(ctx, dataSale.DealId, dataSale.DataHash)
 
-		deal, err := keeper.GetDeal(ctx, dataSale.DealId)
+		defer iterator.Close()
+
+		oracleKeeper := keeper.GetOracleKeeper()
+
+		tallyResult, err := oracleKeeper.Tally(
+			ctx,
+			iterator,
+			func() oracletypes.Vote {
+				return &types.DataVerificationVote{}
+			},
+			func(vote oracletypes.Vote) error {
+				return keeper.RemoveDataVerificationVote(ctx, vote.(*types.DataVerificationVote))
+			},
+		)
+
 		if err != nil {
 			panic(err)
 		}
 
-		switch deal.Status {
-		case types.DEAL_STATUS_DEACTIVATED, types.DEAL_STATUS_UNSPECIFIED:
-			return false
-		case types.DEAL_STATUS_COMPLETED:
-			dataSale.Status = types.DATA_SALE_STATUS_DEAL_COMPLETED
-		case types.DEAL_STATUS_ACTIVE, types.DEAL_STATUS_DEACTIVATING:
-			iterator := keeper.GetDataVerificationVoteIterator(ctx, dataSale.DealId, dataSale.DataHash)
-			defer iterator.Close()
-
-			oracleKeeper := keeper.GetOracleKeeper()
-
-			tallyResult, err := oracleKeeper.Tally(
-				ctx,
-				iterator,
-				func() oracletypes.Vote {
-					return &types.DataVerificationVote{}
-				},
-				func(vote oracletypes.Vote) error {
-					return keeper.RemoveDataVerificationVote(ctx, vote.(*types.DataVerificationVote))
-				},
-			)
-
+		if tallyResult.IsPassed() {
+			isDealCompleted, err := keeper.IsDealCompleted(ctx, dataSale.DealId)
 			if err != nil {
 				panic(err)
 			}
-			if tallyResult.IsPassed() {
+
+			if isDealCompleted {
+				dataSale.Status = types.DATA_SALE_STATUS_DEAL_COMPLETED
+			} else {
 				if err = keeper.IncrementCurNumDataAtDeal(ctx, dataSale.DealId); err != nil {
 					panic(err)
 				}
@@ -83,11 +81,12 @@ func handleDataVerificationVote(ctx sdk.Context, keeper keeper.Keeper) {
 						sdk.NewAttribute(types.AttributeKeyDataHash, dataSale.DataHash),
 						sdk.NewAttribute(types.AttributeKeyDealID, strconv.FormatUint(dataSale.DealId, 10))),
 				)
-			} else {
-				dataSale.Status = types.DATA_SALE_STATUS_VERIFICATION_FAILED
 			}
-			dataSale.VerificationTallyResult = tallyResult
+		} else {
+			dataSale.Status = types.DATA_SALE_STATUS_VERIFICATION_FAILED
 		}
+
+		dataSale.VerificationTallyResult = tallyResult
 
 		if err := keeper.SetDataSale(ctx, dataSale); err != nil {
 			panic(err)
@@ -101,20 +100,13 @@ func handleDataVerificationVote(ctx sdk.Context, keeper keeper.Keeper) {
 				sdk.NewAttribute(types.AttributeKeyDealID, strconv.FormatUint(dataSale.DealId, 10)),
 			),
 		})
+
 		return false
 	})
 }
 
 func handleDataDeliveryVote(ctx sdk.Context, keeper keeper.Keeper) {
 	keeper.IterateClosedDataDeliveryQueue(ctx, ctx.BlockHeader().Time, func(dataSale *types.DataSale) bool {
-
-		deal, err := keeper.GetDeal(ctx, dataSale.DealId)
-		if err != nil {
-			panic(err)
-		}
-		if deal.Status == types.DEAL_STATUS_DEACTIVATED || deal.Status == types.DEAL_STATUS_UNSPECIFIED {
-			return false
-		}
 
 		keeper.RemoveDataDeliveryQueue(ctx, dataSale.DealId, dataSale.DataHash, dataSale.DeliveryVotingPeriod.VotingEndTime)
 		iterator := keeper.GetDataDeliveryVoteIterator(ctx, dataSale.DealId, dataSale.DataHash)
