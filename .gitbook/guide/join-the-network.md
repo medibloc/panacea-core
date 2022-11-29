@@ -122,6 +122,7 @@ Your node can rapidly sync with the network using state sync without replaying h
 To set state sync enabled, RPC servers and trusted block info (height and hash) are required.
 
 You can use the following public RPC endpoints provided by Medibloc team.
+- 3.35.82.40:26657
 - 13.124.96.254:26657
 - 52.79.108.35:26657
 
@@ -140,7 +141,7 @@ Then, you need to edit several things in `~/.panacea/config/config.toml` file.
 
 enable = true
 
-rpc_servers = "13.124.96.254:26657,52.79.108.35:26657" # rpc addresses
+rpc_servers = "3.35.82.40:26657,13.124.96.254:26657,52.79.108.35:26657" # rpc addresses
 trust_height = <trusted-block-height>
 trust_hash = "<trusted-block-hash>"
 trust_period = "336h0m0s" # 2/3 of 21 days (unbonding period)
