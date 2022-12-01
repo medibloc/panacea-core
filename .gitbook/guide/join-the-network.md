@@ -115,6 +115,43 @@ persistent_peers = "8c41cc8a6fc59f05138ae6c16a9eec05d601ef71@13.209.177.91:26656
 
 For more information on seeds and peers, see the [Using Tendermint: Peers](https://docs.tendermint.com/master/tendermint-core/using-tendermint.html#peers).
 
+### State Sync
+
+Your node can rapidly sync with the network using state sync without replaying historical blocks. For more details, please refer to [this](https://docs.tendermint.com/v0.34/tendermint-core/state-sync.html).
+
+To set state sync enabled, RPC servers and trusted block info (height and hash) are required.
+
+You can use the following public RPC endpoints provided by Medibloc team.
+- 3.35.82.40:26657
+- 13.124.96.254:26657
+- 52.79.108.35:26657
+
+trusted block info can be obtained via RPC.
+
+```shell
+curl -s 13.124.96.254:26657/block | jq -r '.result.block.header.height + "\n" + .result.block_id.hash'
+# 7700000 (height)
+# 0D3E53F02ABCDDA8AAC1520342D37A290DDABE4C28190EE6E2C6B0C819F74D4A (hash)
+```
+
+Then, you need to edit several things in `~/.panacea/config/config.toml` file.
+
+```toml
+[statesync]
+
+enable = true
+
+rpc_servers = "3.35.82.40:26657,13.124.96.254:26657,52.79.108.35:26657" # rpc addresses
+trust_height = <trusted-block-height>
+trust_hash = "<trusted-block-hash>"
+trust_period = "336h0m0s" # 2/3 of 21 days (unbonding period)
+```
+
+If your node have block history data previously synced, you need to clear the data first.
+
+```shell
+panacead tendermint unsafe-reset-all
+```
 
 ## Run a Full Node
 
