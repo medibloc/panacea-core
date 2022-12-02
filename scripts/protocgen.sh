@@ -30,5 +30,6 @@ Mgoogle/protobuf/any.proto=github.com/cosmos/cosmos-sdk/codec/types:. \
 done
 
 ## move proto files to the right places
-cp -r github.com/medibloc/panacea-core/* ./
-rm -rf github.com
+find ./x -type f -name "*.pb*.go" -exec rm {} \;
+cp -rv github.com/medibloc/panacea-core/x/* ./x/
+rm -rfv github.com
