@@ -8,9 +8,14 @@ import "panacea/datadeal/v2/deal.proto";
 
 // Certificate defines a certificate
 message Certificate {
-  string cid = 1;
-  string operator_address = 2;
-  int64 deal_id = 3;
-  string provider_address = 4;
-  string data_hash = 5;
+  UnsignedCertificate unsigned_certificate = 1;
+  bytes signature = 2;
+}
+
+message UnsignedCertificate {
+    string cid = 1;
+    string operator_address = 2;
+    int64 deal_id = 3;
+    string provider_address = 4;
+    string data_hash = 5;
 }

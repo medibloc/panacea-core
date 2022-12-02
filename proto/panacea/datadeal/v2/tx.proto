@@ -47,7 +47,6 @@ message MsgDeactivateDealResponse {
 // MsgSubmitConsent defines the Msg/SubmitConsent request type.
 message MsgSubmitConsent {
   Certificate certificate = 1;
-  bytes signature = 2;
 }
 
 // MsgSubmitConsentResponse defines the Msg/SubmitConsent response type.
