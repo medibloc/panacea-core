@@ -16,7 +16,7 @@ service Msg {
   // DeactivateDeal defines a method for deactivating the deal.
   rpc DeactivateDeal(MsgDeactivateDeal) returns (MsgDeactivateDealResponse);
 
-  // SubmitConsent
+  // SubmitConsent defines a method for provider's submit consent
   rpc SubmitConsent(MsgSubmitConsent) returns (MsgSubmitConsentResponse);
 }
 
