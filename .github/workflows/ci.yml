@@ -3,7 +3,7 @@ name: ci
 on:
   push:
     branches:    # only for pushes on master
-    - master
+      - master
   pull_request:  # for all PRs regardless of its base branch
 
 jobs:
@@ -12,29 +12,43 @@ jobs:
     name: Build and Test
     runs-on: ubuntu-latest
     steps:
+      - name: Set up Go 1.x
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.19
+        id: go
 
-    - name: Set up Go 1.x
-      uses: actions/setup-go@v3
-      with:
-        go-version: 1.19
-      id: go
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v3
 
-    - name: Check out code into the Go module directory
-      uses: actions/checkout@v3
+      - name: Build (+ generating proto and docs)
+        run: make build-all
 
-    - name: Build (+ generating proto and docs)
-      run: make build-all
+      - name: Test
+        run: make test
 
-    - name: Test
-      run: make test
+      - name: Publish coverage.html as an artifact
+        uses: actions/upload-artifact@master
+        with:
+          name: coverage
+          path: artifacts/coverage.html
 
-    - name: Lint
-      uses: golangci/golangci-lint-action@v3
-      with:
-        version: latest
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
 
-    - name: Publish coverage.html as an artifact
-      uses: actions/upload-artifact@master
-      with:
-        name: coverage
-        path: artifacts/coverage.html
+    steps:
+      - name: Set up Go 1.x
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.18
+        id: go
+
+      - name: Checkout code into the Go module directory
+        uses: actions/checkout@v3
+
+      - name: Lint
+        uses: golangci/golangci-lint-action@v3
+        with:
+          version: latest
+          args: --timeout=5m
