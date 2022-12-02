@@ -324,6 +324,7 @@ func (m *QueryCertificatesResponse) GetPagination() *query.PageResponse {
 	return nil
 }
 
+// QueryCertificate defines the request type for the Query/Certificate RPC method.
 type QueryCertificate struct {
 	DealId   uint64 `protobuf:"varint,1,opt,name=deal_id,json=dealId,proto3" json:"deal_id,omitempty"`
 	DataHash string `protobuf:"bytes,2,opt,name=data_hash,json=dataHash,proto3" json:"data_hash,omitempty"`
@@ -376,6 +377,7 @@ func (m *QueryCertificate) GetDataHash() string {
 	return ""
 }
 
+// QueryCertificateResponse defines the response type for the Query/Certificate RPC method.
 type QueryCertificateResponse struct {
 	Certificate *Certificate `protobuf:"bytes,1,opt,name=certificate,proto3" json:"certificate,omitempty"`
 }

@@ -396,7 +396,7 @@ type MsgClient interface {
 	CreateDeal(ctx context.Context, in *MsgCreateDeal, opts ...grpc.CallOption) (*MsgCreateDealResponse, error)
 	// DeactivateDeal defines a method for deactivating the deal.
 	DeactivateDeal(ctx context.Context, in *MsgDeactivateDeal, opts ...grpc.CallOption) (*MsgDeactivateDealResponse, error)
-	// SubmitConsent
+	// SubmitConsent defines a method for provider's submit consent
 	SubmitConsent(ctx context.Context, in *MsgSubmitConsent, opts ...grpc.CallOption) (*MsgSubmitConsentResponse, error)
 }
 
@@ -441,7 +441,7 @@ type MsgServer interface {
 	CreateDeal(context.Context, *MsgCreateDeal) (*MsgCreateDealResponse, error)
 	// DeactivateDeal defines a method for deactivating the deal.
 	DeactivateDeal(context.Context, *MsgDeactivateDeal) (*MsgDeactivateDealResponse, error)
-	// SubmitConsent
+	// SubmitConsent defines a method for provider's submit consent
 	SubmitConsent(context.Context, *MsgSubmitConsent) (*MsgSubmitConsentResponse, error)
 }
 

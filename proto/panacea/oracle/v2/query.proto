@@ -10,6 +10,7 @@ import "google/api/annotations.proto";
 import "panacea/oracle/v2/oracle.proto";
 import "panacea/oracle/v2/genesis.proto";
 
+// Query defines the gRPC querier service.
 service Query {
   // Oracles returns a list of oracles.
   rpc Oracles(QueryOraclesRequest) returns (QueryOraclesResponse) {

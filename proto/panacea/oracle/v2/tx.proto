@@ -40,7 +40,7 @@ message MsgRegisterOracleResponse {
 
 // MsgApproveOracleRegistration defines the Msg/ApproveOracleRegistration
 message MsgApproveOracleRegistration {
-  ApproveOracleRegistration approveOracleRegistration = 1;
+  ApproveOracleRegistration approve_oracle_registration = 1;
   bytes signature = 2;
 }
 
