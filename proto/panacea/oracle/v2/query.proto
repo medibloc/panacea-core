@@ -19,7 +19,7 @@ service Query {
 
   // Oracle returns a oracle.
   rpc Oracle(QueryOracleRequest) returns (QueryOracleResponse) {
-    option (google.api.http).get = "/panacea/oracle/v2/oracles/{operator_address}";
+    option (google.api.http).get = "/panacea/oracle/v2/oracles/{oracle_address}";
   }
 
   // OracleRegistrations returns a list of OracleRegistration.
@@ -29,7 +29,7 @@ service Query {
 
   // OracleRegistration returns a OracleRegistration details.
   rpc OracleRegistration(QueryOracleRegistrationRequest) returns (QueryOracleRegistrationResponse) {
-    option (google.api.http).get = "/panacea/oracle/v2/oracle_registrations/{unique_id}/{operator_address}";
+    option (google.api.http).get = "/panacea/oracle/v2/oracle_registrations/{unique_id}/{oracle_address}";
   }
 
   // Params returns params of oracle module.
@@ -51,7 +51,7 @@ message QueryOraclesResponse {
 
 // QueryOracleRequest is the request type for the Query/Oracle RPC method.
 message QueryOracleRequest {
-  string operator_address = 1;
+  string oracle_address = 1;
 }
 
 // QueryOracleResponse is the response type for the Query/Oracle RPC method.
@@ -73,7 +73,7 @@ message QueryOracleRegistrationsResponse {
 // QueryOracleRegistrationRequest is the request type for the Query/OracleRegistration RPC method.
 message QueryOracleRegistrationRequest {
   string unique_id = 1;
-  string operator_address = 2;
+  string oracle_address = 2;
 }
 
 // QueryOracleRegistrationResponse is the response type for the Query/OracleRegistration RPC method.

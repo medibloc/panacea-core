@@ -7,31 +7,16 @@ import "gogoproto/gogo.proto";
 
 // Oracle defines a detail of oracle.
 message Oracle {
-  string operator_address = 1;
-  OracleStatus status = 2;
-  string unique_id = 3;
-  string endpoint = 4;
-  string oracle_commission_rate = 5 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false];
-}
-
-// OracleStatus enumerates the status of oracle.
-enum OracleStatus {
-  option (gogoproto.goproto_enum_prefix) = false;
-
-  // ORACLE_STATUS_UNSPECIFIED
-  ORACLE_STATUS_UNSPECIFIED = 0;
-
-  // ORACLE_STATUS_ACTIVE defines the oracle status that is active
-  ORACLE_STATUS_ACTIVE = 1;
-
-  // ORACLE_STATUS_INACTIVE defines the oracle status that is inactive
-  ORACLE_STATUS_INACTIVE = 2;
+  string oracle_address = 1;
+  string unique_id = 2;
+  string endpoint = 3;
+  string oracle_commission_rate = 4 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false];
 }
 
 // OracleRegistration defines the detailed states of the registration of oracle.
 message OracleRegistration {
   string unique_id = 1;
-  string operator_address = 2;
+  string oracle_address = 2;
   // Node public key is a pair with a node private key which is generated in SGX by each oracle.
   // This key is used to share the oracle private key from other oracles.
   bytes node_pub_key = 3;

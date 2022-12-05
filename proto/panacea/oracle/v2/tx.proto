@@ -25,7 +25,7 @@ service Msg {
 // MsgRegisterOracle defines the Msg/RegisterOracle request type.
 message MsgRegisterOracle {
   string unique_id = 1;
-  string operator_address = 2;  // panacea1.. account address
+  string oracle_address = 2;  // panacea1.. account address
   bytes node_pub_key = 3;
   bytes node_pub_key_remote_report = 4;
   int64 trusted_block_height = 5;
@@ -47,7 +47,7 @@ message MsgApproveOracleRegistration {
 // ApproveOracleRegistration defines for oracle registration approval
 message ApproveOracleRegistration {
   string unique_id = 1;
-  string target_operator_address = 2;
+  string target_oracle_address = 2;
   bytes encrypted_oracle_priv_key = 3;
 }
 
@@ -57,7 +57,7 @@ message MsgApproveOracleRegistrationResponse {
 
 // MsgUpdateOracleInfo defines the Msg/UpdateOracleInfo
 message MsgUpdateOracleInfo {
-  string operator_address = 1;  // panacea1.. account address
+  string oracle_address = 1;  // panacea1.. account address
   string endpoint = 2;
   string oracle_commission_rate = 3 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false];
 }

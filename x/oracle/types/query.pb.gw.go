@@ -78,15 +78,15 @@ func request_Query_Oracle_0(ctx context.Context, marshaler runtime.Marshaler, cl
 		_   = err
 	)
 
-	val, ok = pathParams["operator_address"]
+	val, ok = pathParams["oracle_address"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "operator_address")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "oracle_address")
 	}
 
-	protoReq.OperatorAddress, err = runtime.String(val)
+	protoReq.OracleAddress, err = runtime.String(val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "operator_address", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "oracle_address", err)
 	}
 
 	msg, err := client.Oracle(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -105,15 +105,15 @@ func local_request_Query_Oracle_0(ctx context.Context, marshaler runtime.Marshal
 		_   = err
 	)
 
-	val, ok = pathParams["operator_address"]
+	val, ok = pathParams["oracle_address"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "operator_address")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "oracle_address")
 	}
 
-	protoReq.OperatorAddress, err = runtime.String(val)
+	protoReq.OracleAddress, err = runtime.String(val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "operator_address", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "oracle_address", err)
 	}
 
 	msg, err := server.Oracle(ctx, &protoReq)
@@ -179,15 +179,15 @@ func request_Query_OracleRegistration_0(ctx context.Context, marshaler runtime.M
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "unique_id", err)
 	}
 
-	val, ok = pathParams["operator_address"]
+	val, ok = pathParams["oracle_address"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "operator_address")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "oracle_address")
 	}
 
-	protoReq.OperatorAddress, err = runtime.String(val)
+	protoReq.OracleAddress, err = runtime.String(val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "operator_address", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "oracle_address", err)
 	}
 
 	msg, err := client.OracleRegistration(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -217,15 +217,15 @@ func local_request_Query_OracleRegistration_0(ctx context.Context, marshaler run
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "unique_id", err)
 	}
 
-	val, ok = pathParams["operator_address"]
+	val, ok = pathParams["oracle_address"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "operator_address")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "oracle_address")
 	}
 
-	protoReq.OperatorAddress, err = runtime.String(val)
+	protoReq.OracleAddress, err = runtime.String(val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "operator_address", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "oracle_address", err)
 	}
 
 	msg, err := server.OracleRegistration(ctx, &protoReq)
@@ -504,11 +504,11 @@ func RegisterQueryHandlerClient(ctx context.Context, mux *runtime.ServeMux, clie
 var (
 	pattern_Query_Oracles_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"panacea", "oracle", "v2", "oracles"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_Oracle_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"panacea", "oracle", "v2", "oracles", "operator_address"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_Oracle_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"panacea", "oracle", "v2", "oracles", "oracle_address"}, "", runtime.AssumeColonVerbOpt(true)))
 
 	pattern_Query_OracleRegistrations_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"panacea", "oracle", "v2", "oracle_registrations"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_OracleRegistration_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5}, []string{"panacea", "oracle", "v2", "oracle_registrations", "unique_id", "operator_address"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_OracleRegistration_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5}, []string{"panacea", "oracle", "v2", "oracle_registrations", "unique_id", "oracle_address"}, "", runtime.AssumeColonVerbOpt(true)))
 
 	pattern_Query_Params_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"panacea", "oracle", "v2", "params"}, "", runtime.AssumeColonVerbOpt(true)))
 )

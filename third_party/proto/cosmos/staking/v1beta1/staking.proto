@@ -85,8 +85,8 @@ message Validator {
   option (gogoproto.goproto_stringer) = false;
   option (gogoproto.goproto_getters)  = false;
 
-  // operator_address defines the address of the validator's operator; bech encoded in JSON.
-  string              operator_address = 1 [(gogoproto.moretags) = "yaml:\"operator_address\""];
+  // oracle_address defines the address of the validator's operator; bech encoded in JSON.
+  string              oracle_address = 1 [(gogoproto.moretags) = "yaml:\"oracle_address\""];
   // consensus_pubkey is the consensus public key of the validator, as a Protobuf Any.
   google.protobuf.Any consensus_pubkey = 2
       [(cosmos_proto.accepts_interface) = "cosmos.crypto.PubKey", (gogoproto.moretags) = "yaml:\"consensus_pubkey\""];
