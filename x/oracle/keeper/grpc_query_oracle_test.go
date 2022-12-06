@@ -189,5 +189,17 @@ func (suite *queryOracleTestSuite) TestOracleRegistration() {
 	}
 	err := oracleKeeper.SetOracleRegistration(ctx, oracleRegistration)
 	suite.Require().NoError(err)
+}
 
+func (suite *queryOracleTestSuite) TestOracleParams() {
+	ctx := suite.Ctx
+	oracleKeeper := suite.OracleKeeper
+
+	oracleKeeper.SetParams(ctx, types.DefaultParams())
+
+	req := types.QueryOracleParamsRequest{}
+	res, err := oracleKeeper.Params(sdk.WrapSDKContext(ctx), &req)
+	suite.Require().NoError(err)
+
+	suite.Require().Equal(types.DefaultParams(), *res.Params)
 }
