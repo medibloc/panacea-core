@@ -1,0 +1,26 @@
+syntax = "proto3";
+package panacea.oracle.v2;
+
+option go_package = "github.com/medibloc/panacea-core/x/oracle/types";
+
+import "gogoproto/gogo.proto";
+import "google/protobuf/timestamp.proto";
+import "panacea/oracle/v2/oracle.proto";
+
+// GenesisState defines the oracle module's genesis state.
+message GenesisState {
+  repeated Oracle oracles = 1 [(gogoproto.nullable) = false];
+  repeated OracleRegistration oracle_registrations = 2 [(gogoproto.nullable) = false];
+}
+
+// Params defines the oracle module's params.
+message Params {
+  // A base64-encoded oracle public key which is paired with an oracle private key generated in SGX by the first oracle.
+  // This key is used to encrypt data, so that the data can be decrypted and verified securely only in SGX
+  string oracle_public_key = 1;
+  // A base64-encoded SGX remote report which contains an oracle public key.
+  // Using this report, anyone can validate that the oracle key pair was generated in SGX.
+  string oracle_pub_key_remote_report = 2;
+  // The unique ID of current version of oracle.
+  string unique_id = 3;
+}
