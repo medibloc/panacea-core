@@ -11,6 +11,7 @@ import "panacea/oracle/v2/oracle.proto";
 message GenesisState {
   repeated Oracle oracles = 1 [(gogoproto.nullable) = false];
   repeated OracleRegistration oracle_registrations = 2 [(gogoproto.nullable) = false];
+  Params params = 3 [(gogoproto.nullable) = false];
 }
 
 // Params defines the oracle module's params.
