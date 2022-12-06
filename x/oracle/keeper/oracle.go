@@ -15,11 +15,10 @@ func (k Keeper) RegisterOracle(ctx sdk.Context, msg *types.MsgRegisterOracle) er
 		return err
 	}
 
-	// TODO implement required to params
-	/*params := k.GetParams(ctx)
+	params := k.GetParams(ctx)
 	if params.UniqueId != oracleRegistration.UniqueId {
 		return sdkerrors.Wrapf(types.ErrOracleRegistration, "is not match the currently active uniqueID")
-	}*/
+	}
 
 	if oracle, err := k.GetOracle(ctx, oracleRegistration.OracleAddress); !errors.Is(types.ErrOracleNotFound, err) {
 		if oracle != nil {

@@ -1,6 +1,7 @@
 package keeper_test
 
 import (
+	"encoding/base64"
 	"fmt"
 	"testing"
 
@@ -69,6 +70,12 @@ func (suite *oracleTestSuite) BeforeTest(_, _ string) {
 
 	suite.endpoint = "https://my-validator.org"
 	suite.oracleCommissionRate = sdk.NewDecWithPrec(1, 1)
+
+	suite.OracleKeeper.SetParams(suite.Ctx, types.Params{
+		OraclePublicKey:          base64.StdEncoding.EncodeToString(suite.oraclePubKey.SerializeCompressed()),
+		OraclePubKeyRemoteReport: "",
+		UniqueId:                 suite.uniqueID,
+	})
 }
 
 func (suite *oracleTestSuite) TestRegisterOracleSuccess() {
@@ -194,4 +201,23 @@ func (suite *oracleTestSuite) TestRegisterOracleAlreadyExistOracle() {
 	err = suite.OracleKeeper.RegisterOracle(ctx, msgRegisterOracle)
 	suite.Require().Error(err, types.ErrOracleRegistration)
 	suite.Require().ErrorContains(err, fmt.Sprintf("already registered oracle. address(%s)", msgRegisterOracle.OracleAddress))
+}
+
+func (suite *oracleTestSuite) TestRegisterOracleNotSameUniqueID() {
+	ctx := suite.Ctx
+
+	msgRegisterOracle := &types.MsgRegisterOracle{
+		UniqueId:               "wrongUniqueID",
+		OracleAddress:          suite.oracleAccAddr.String(),
+		NodePubKey:             suite.nodePubKey.SerializeCompressed(),
+		NodePubKeyRemoteReport: suite.nodePubKeyRemoteReport,
+		TrustedBlockHeight:     suite.trustedBlockHeight,
+		TrustedBlockHash:       suite.trustedBlockHash,
+		Endpoint:               suite.endpoint,
+		OracleCommissionRate:   suite.oracleCommissionRate,
+	}
+
+	err := suite.OracleKeeper.RegisterOracle(ctx, msgRegisterOracle)
+	suite.Require().Error(err, types.ErrOracleRegistration)
+	suite.Require().ErrorContains(err, "is not match the currently active uniqueID")
 }
