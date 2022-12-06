@@ -9,7 +9,7 @@ func (m *MsgCreateDeal) Route() string {
 }
 
 func (m *MsgCreateDeal) Type() string {
-	return "RegisterOracle"
+	return "CreateDeal"
 }
 
 func (m *MsgCreateDeal) ValidateBasic() error {
