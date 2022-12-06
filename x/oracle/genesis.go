@@ -10,11 +10,10 @@ import (
 // state.
 func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) {
 	//TODO implement me
-	panic("implement me")
 }
 
 // ExportGenesis returns the capability module's exported genesis.
 func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	//TODO implement me
-	panic("implement me")
+	return &types.GenesisState{}
 }
