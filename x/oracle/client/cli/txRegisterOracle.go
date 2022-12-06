@@ -55,6 +55,9 @@ func CmdRegisterOracle() *cobra.Command {
 			}
 
 			oracleCommissionRate, err := sdk.NewDecFromStr(oracleCommissionRateStr)
+			if err != nil {
+				return err
+			}
 
 			msg := types.NewMsgRegisterOracle(
 				args[0],
