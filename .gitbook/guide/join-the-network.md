@@ -42,14 +42,14 @@ Type | Protocol | Port range |  Description
 SSH | TCP | 22 |
 Custom TCP | TCP | 26656 | P2P with other nodes
 Custom TCP | TCP | 26657 | RPC
-Custom TCP | TCP | 1317 | HTTP
+Custom TCP | TCP | 1317 | REST API
 
 The P2P `26656` port must be exposed to other Panacea nodes.
 If your node will be in the VPC guarded by Sentry nodes, expose `26656` to only Sentry nodes (recommended).
 If not, expose it to anywhere.
 For details about Sentry nodes, please see the [Tendermint guide](https://docs.tendermint.com/master/nodes/validators.html#local-configuration).
 
-The RPC `26657` and HTTP `1317` ports are for sending transactions/queries to your node.
+The RPC `26657` and REST API `1317` ports are for sending transactions/queries to your node.
 So, expose them to the network where you perform operational actions.
 
 
@@ -76,14 +76,14 @@ panacead init <your_custom_moniker>
 The `moniker` can contains only ASCII characters. Using Unicode characters will render your node unreachable.
 {% endhint %}
 
-Then, modify the `timeout_commit` in the `~/.panacead/config/config.toml` as below.
+Then, modify the `timeout_commit` in the `~/.panacea/config/config.toml` as below.
 ```toml
 [consensus]
 
 timeout_commit = "5s"
 ```
 
-After that, edit the `~/.panacead/config/app.toml` file in order to enable the anti-spam mechanism and reject incoming transactions with less than the `minimum-gas-prices`:
+After that, edit the `~/.panacea/config/app.toml` file in order to enable the anti-spam mechanism and reject incoming transactions with less than the `minimum-gas-prices`:
 ```toml
 # Validators reject any tx from the mempool with less than the minimum-gas-prices.
 minimum-gas-prices = "5umed"
@@ -95,23 +95,19 @@ Now, your full node has been initialized!
 
 ### Copy the Genesis file
 
-Fetch the `genesis.json` file of the latest chain from the following links, and place it to `~/.panacead/config/genesis.json`.
+Fetch the `genesis.json` file of the latest chain from the following links, and place it to `~/.panacea/config/genesis.json`.
 - Mainnet: https://github.com/medibloc/panacea-mainnet
 - Testnet: https://github.com/medibloc/panacea-testnet
 
-### Configure Seed Nodes
+### Configure Persistent Peers
 
-Your node needs to know how to find peers.
+MediBloc is not operating seed nodes, but will provide them in near future.
 
-Seed nodes can be found in:
-- Mainnet: https://github.com/medibloc/panacea-mainnet#seed-nodes
-- Testnet: https://github.com/medibloc/panacea-testnet#seed-nodes
+Until then, please use public full nodes provided by MediBloc.
+- Mainnet: https://github.com/medibloc/panacea-mainnet#persistent-peers
+- Testnet: https://github.com/medibloc/panacea-testnet#persistent-peers
 
-Insert those `<node_id>@<ip>`s with 26656 port to the `persistent_peers` field in `~/.panacead/config/config.toml`.
-```toml
-# Comma separated list of nodes to keep persistent connections to
-persistent_peers = "8c41cc8a6fc59f05138ae6c16a9eec05d601ef71@13.209.177.91:26656,cc0285c4d9cec8489f8bfed0a749dd8636406a0d@54.180.169.37:26656,1fc4a41660986ee22106445b67444ec094221e76@52.78.132.151:26656"
-```
+Insert those public nodes to the `persistent_peers` field in the `~/.panacea/config/config.toml`.
 
 For more information on seeds and peers, see the [Using Tendermint: Peers](https://docs.tendermint.com/master/tendermint-core/using-tendermint.html#peers).
 
@@ -167,17 +163,67 @@ Check that everything is running smoothly:
 panacead status
 ```
 
-View the status of the network with the Block Explorer
-- Mainnet: https://explorer.medibloc.org
-- Testnet: ~~https://testnet-explorer.medibloc.org~~ https://dev.mintscan.io/hygieia
+In production, it is recommended to run the process in background by following the guide below.
+
+### Background Process
+
+To run the node in a background process with automatic restarts, you can use a service manager like [systemd](https://wiki.archlinux.org/title/systemd).
+This is more reliable way to run a background process in the long term.
+To set this up, run the following:
+```bash
+sudo tee /etc/systemd/system/panacead.service > /dev/null <<EOF  
+[Unit]
+Description=Panacea Daemon
+After=network-online.target
+
+[Service]
+User=$USER
+ExecStart=$(which panacead) start
+Restart=always
+RestartSec=3
+LimitNOFILE=4096
+
+[Install]
+WantedBy=multi-user.target
+EOF
+```
+
+It is very important to set the `LimitNOFILE=4096` since Panacea opens many DB files.
+
+If you're using Cosmovisor, add the following environment variables after the `LimitNOFILE` line and replace `$(which panacead)` with `$(which cosmovisor)`.
+```
+Environment="DAEMON_HOME=$HOME/.panacea"
+Environment="DAEMON_NAME=panacead"
+Environment="DAEMON_ALLOW_DOWNLOAD_BINARIES=false"
+Environment="DAEMON_RESTART_AFTER_UPGRADE=true"
+```
+For more details about those environment variables, please see the [Cosmovisor guide](cosmovisor.md).
+
+Then, setup the daemon.
+```bash
+sudo -S systemctl daemon-reload
+sudo -S systemctl enable panacead  # the process will be started automatically whenever your system is booted.
+```
+
+You can then start the process and confirm that it is running.
+```bash
+sudo -S systemctl start panacead
+sudo service panacead status
+
+sudo journalctl -u panacead -f --output cat   # See logs from panacead
+```
+
+## Monitor the chain using block explorers
+
+View the status of the network with block explorers.
+- Mainnet: https://www.mintscan.io/medibloc or https://explorer.gopanacea.org/
+- Testnet: https://testnet-explorer.gopanacea.org/
 
 ## Join as a validator
 
 If you want to participate in validating blocks as a validator,
 you can register yourself into the validator set by submitting a transaction.
 
-For more details, see the [CLI guide](interaction-with-the-network-cli.md#staking).
+For more details, see the [CLI guide: Create your validator](interaction-with-the-network-cli.md#create-your-validator).
 
-
-
-
+If you already joined as a validator and if you want to modify your validator details, please see the [CLI guide: Edit validator description](interaction-with-the-network-cli.md#edit-validator-description).
