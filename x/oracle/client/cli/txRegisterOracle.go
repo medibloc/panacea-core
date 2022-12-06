@@ -78,16 +78,3 @@ func CmdRegisterOracle() *cobra.Command {
 
 	return cmd
 }
-
-func getOracleCommissionRate(oracleCommissionRateStr string) (*sdk.Dec, error) {
-	if len(oracleCommissionRateStr) == 1 {
-		return nil, fmt.Errorf("oracleCommissionRate is empty")
-	}
-
-	if len(oracleCommissionRateStr) != 0 {
-		oracleCommissionRate, err := sdk.NewDecFromStr(oracleCommissionRateStr)
-		return &oracleCommissionRate, err
-	}
-
-	return nil, nil
-}
