@@ -28,6 +28,4 @@ message OracleRegistration {
   bytes trusted_block_hash = 6;
   string endpoint = 7;
   string oracle_commission_rate = 8 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false];
-  // Nonce required for AES256-GCM encryption
-  bytes nonce = 9;
 }

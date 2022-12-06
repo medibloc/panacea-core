@@ -7,7 +7,7 @@ import "gogoproto/gogo.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";
 import "google/api/annotations.proto";
 import "panacea/datadeal/v2/deal.proto";
-import "panacea/datadeal/v2/consent.proto";
+import "panacea/datadeal/v2/certificate.proto";
 
 // Query defines the gRPC querier service.
 service Query {
