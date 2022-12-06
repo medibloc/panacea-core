@@ -99,7 +99,7 @@ func (m *MsgApproveOracleRegistration) GetSignBytes() []byte {
 }
 
 func (m *MsgApproveOracleRegistration) GetSigners() []sdk.AccAddress {
-	oracleAddress, err := sdk.AccAddressFromBech32(m.ApproveOracleRegistration.ApprovedOracleAddress)
+	oracleAddress, err := sdk.AccAddressFromBech32(m.ApproveOracleRegistration.ApproverOracleAddress)
 	if err != nil {
 		panic(err)
 	}
@@ -111,8 +111,8 @@ func (m *ApproveOracleRegistration) ValidateBasic() error {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "uniqueId is empty")
 	}
 
-	if len(m.ApprovedOracleAddress) == 0 {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "approvedOracleAddress is empty")
+	if len(m.ApproverOracleAddress) == 0 {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "approverOracleAddress is empty")
 	}
 
 	if len(m.TargetOracleAddress) == 0 {
