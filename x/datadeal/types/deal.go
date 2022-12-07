@@ -18,7 +18,7 @@ func NewDeal(dealID uint64, msg *MsgCreateDeal) *Deal {
 		Budget:          msg.Budget,
 		MaxNumData:      msg.MaxNumData,
 		CurNumData:      0,
-		ConsumerAddress: msg.BuyerAddress,
+		ConsumerAddress: msg.ConsumerAddress,
 		Status:          DEAL_STATUS_ACTIVE,
 	}
 }

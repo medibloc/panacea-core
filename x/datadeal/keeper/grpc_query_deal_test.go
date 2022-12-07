@@ -12,7 +12,7 @@ import (
 type queryDealTestSuite struct {
 	testutil.DataDealBaseTestSuite
 
-	buyerAccAddr sdk.AccAddress
+	consumerAccAddr sdk.AccAddress
 }
 
 func TestQueryDealTest(t *testing.T) {
@@ -20,7 +20,7 @@ func TestQueryDealTest(t *testing.T) {
 }
 
 func (suite *queryDealTestSuite) TestQueryDeal() {
-	deal := suite.MakeTestDeal(1, suite.buyerAccAddr, 100)
+	deal := suite.MakeTestDeal(1, suite.consumerAccAddr, 100)
 	err := suite.DataDealKeeper.SetDeal(suite.Ctx, deal)
 	suite.Require().NoError(err)
 	err = suite.DataDealKeeper.SetNextDealNumber(suite.Ctx, 2)

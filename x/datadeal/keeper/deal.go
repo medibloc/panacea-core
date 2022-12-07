@@ -10,7 +10,7 @@ import (
 	"github.com/medibloc/panacea-core/v2/x/datadeal/types"
 )
 
-func (k Keeper) CreateDeal(ctx sdk.Context, buyerAddress sdk.AccAddress, msg *types.MsgCreateDeal) (uint64, error) {
+func (k Keeper) CreateDeal(ctx sdk.Context, consumerAddress sdk.AccAddress, msg *types.MsgCreateDeal) (uint64, error) {
 	dealID, err := k.GetNextDealNumberAndIncrement(ctx)
 	if err != nil {
 		return 0, sdkerrors.Wrapf(err, "failed to get next deal num")
@@ -38,7 +38,7 @@ func (k Keeper) CreateDeal(ctx sdk.Context, buyerAddress sdk.AccAddress, msg *ty
 	)
 	k.accountKeeper.SetAccount(ctx, acc)
 
-	if err = k.bankKeeper.SendCoins(ctx, buyerAddress, dealAddress, coins); err != nil {
+	if err = k.bankKeeper.SendCoins(ctx, consumerAddress, dealAddress, coins); err != nil {
 		return 0, sdkerrors.Wrapf(err, "Failed to send coins to deal account")
 	}
 

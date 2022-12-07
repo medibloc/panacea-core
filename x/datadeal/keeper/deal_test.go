@@ -14,8 +14,8 @@ import (
 type dealTestSuite struct {
 	testutil.DataDealBaseTestSuite
 
-	defaultFunds sdk.Coins
-	buyerAccAddr sdk.AccAddress
+	defaultFunds    sdk.Coins
+	consumerAccAddr sdk.AccAddress
 }
 
 func TestDealTestSuite(t *testing.T) {
@@ -23,10 +23,10 @@ func TestDealTestSuite(t *testing.T) {
 }
 
 func (suite *dealTestSuite) BeforeTest(_, _ string) {
-	suite.buyerAccAddr = sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address())
+	suite.consumerAccAddr = sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address())
 	suite.defaultFunds = sdk.NewCoins(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(10000000000)))
 
-	testDeal := suite.MakeTestDeal(1, suite.buyerAccAddr, 100)
+	testDeal := suite.MakeTestDeal(1, suite.consumerAccAddr, 100)
 	err := suite.DataDealKeeper.SetNextDealNumber(suite.Ctx, 2)
 	suite.Require().NoError(err)
 	err = suite.DataDealKeeper.SetDeal(suite.Ctx, testDeal)
@@ -35,22 +35,22 @@ func (suite *dealTestSuite) BeforeTest(_, _ string) {
 
 func (suite *dealTestSuite) TestCreateNewDeal() {
 
-	err := suite.FundAccount(suite.Ctx, suite.buyerAccAddr, suite.defaultFunds)
+	err := suite.FundAccount(suite.Ctx, suite.consumerAccAddr, suite.defaultFunds)
 	suite.Require().NoError(err)
 
 	budget := &sdk.Coin{Denom: assets.MicroMedDenom, Amount: sdk.NewInt(10000000)}
 
 	msgCreateDeal := &types.MsgCreateDeal{
-		DataSchema:   []string{"http://jsonld.com"},
-		Budget:       budget,
-		MaxNumData:   10000,
-		BuyerAddress: suite.buyerAccAddr.String(),
+		DataSchema:      []string{"http://jsonld.com"},
+		Budget:          budget,
+		MaxNumData:      10000,
+		ConsumerAddress: suite.consumerAccAddr.String(),
 	}
 
-	buyer, err := sdk.AccAddressFromBech32(msgCreateDeal.BuyerAddress)
+	consumer, err := sdk.AccAddressFromBech32(msgCreateDeal.ConsumerAddress)
 	suite.Require().NoError(err)
 
-	dealID, err := suite.DataDealKeeper.CreateDeal(suite.Ctx, buyer, msgCreateDeal)
+	dealID, err := suite.DataDealKeeper.CreateDeal(suite.Ctx, consumer, msgCreateDeal)
 	suite.Require().NoError(err)
 
 	expectedId, err := suite.DataDealKeeper.GetNextDealNumberAndIncrement(suite.Ctx)
@@ -62,24 +62,24 @@ func (suite *dealTestSuite) TestCreateNewDeal() {
 	suite.Require().Equal(deal.GetDataSchema(), msgCreateDeal.GetDataSchema())
 	suite.Require().Equal(deal.GetBudget(), msgCreateDeal.GetBudget())
 	suite.Require().Equal(deal.GetMaxNumData(), msgCreateDeal.GetMaxNumData())
-	suite.Require().Equal(deal.GetConsumerAddress(), msgCreateDeal.GetBuyerAddress())
+	suite.Require().Equal(deal.GetConsumerAddress(), msgCreateDeal.GetConsumerAddress())
 	suite.Require().Equal(deal.GetStatus(), types.DEAL_STATUS_ACTIVE)
 }
 
 func (suite *dealTestSuite) TestCheckDealCurNumDataAndIncrement() {
-	err := suite.FundAccount(suite.Ctx, suite.buyerAccAddr, suite.defaultFunds)
+	err := suite.FundAccount(suite.Ctx, suite.consumerAccAddr, suite.defaultFunds)
 	suite.Require().NoError(err)
 
 	budget := &sdk.Coin{Denom: assets.MicroMedDenom, Amount: sdk.NewInt(10000000)}
 
 	msgCreateDeal := &types.MsgCreateDeal{
-		DataSchema:   []string{"http://jsonld.com"},
-		Budget:       budget,
-		MaxNumData:   1,
-		BuyerAddress: suite.buyerAccAddr.String(),
+		DataSchema:      []string{"http://jsonld.com"},
+		Budget:          budget,
+		MaxNumData:      1,
+		ConsumerAddress: suite.consumerAccAddr.String(),
 	}
 
-	buyer, err := sdk.AccAddressFromBech32(msgCreateDeal.BuyerAddress)
+	buyer, err := sdk.AccAddressFromBech32(msgCreateDeal.ConsumerAddress)
 	suite.Require().NoError(err)
 
 	dealID, err := suite.DataDealKeeper.CreateDeal(suite.Ctx, buyer, msgCreateDeal)
