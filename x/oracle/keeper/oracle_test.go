@@ -110,6 +110,7 @@ func (suite *oracleTestSuite) TestApproveOracleRegistrationSuccess() {
 		Key: suite.oraclePrivKey.Serialize(),
 	}
 	signature, err := oraclePrivKeySecp256k1.Sign(approveOracleRegistrationBz)
+	suite.Require().NoError(err)
 
 	msgApproveOracleRegistration := types.NewMsgApproveOracleRegistration(approveOracleRegistration, signature)
 
@@ -166,6 +167,7 @@ func (suite *oracleTestSuite) TestApproveOracleRegistrationFailedInvalidUniqueID
 	oraclePrivKeySecp256k1 := secp256k1.PrivKey{
 		Key: suite.oraclePrivKey.Serialize(),
 	}
+
 	signature, err := oraclePrivKeySecp256k1.Sign(approveOracleRegistrationBz)
 	suite.Require().NoError(err)
 
@@ -234,6 +236,7 @@ func (suite *oracleTestSuite) TestApproveOracleRegistrationFailedAlreadyExistOra
 	oracleRegistration := types.NewOracleRegistration(msgRegisterOracle)
 
 	err = suite.OracleKeeper.SetOracleRegistration(ctx, oracleRegistration)
+	suite.Require().NoError(err)
 
 	encryptedOraclePrivKey, err := btcec.Encrypt(suite.nodePubKey, suite.oraclePrivKey.Serialize())
 	suite.Require().NoError(err)
