@@ -165,16 +165,15 @@ func (suite *oracleTestSuite) TestRegisterOracleFailedValidateToMsgOracleRegistr
 	suite.Require().ErrorContains(err, "trusted block hash should not be nil")
 
 	msgRegisterOracle.TrustedBlockHash = suite.trustedBlockHash
-	msgRegisterOracle.Endpoint = ""
-	err = suite.OracleKeeper.RegisterOracle(ctx, msgRegisterOracle)
-	suite.Require().Error(err, sdkerrors.ErrInvalidRequest)
-	suite.Require().ErrorContains(err, "endpoint is empty")
-
-	msgRegisterOracle.Endpoint = suite.endpoint
 	msgRegisterOracle.OracleCommissionRate = sdk.NewInt(-1).ToDec()
 	err = suite.OracleKeeper.RegisterOracle(ctx, msgRegisterOracle)
 	suite.Require().Error(err, sdkerrors.ErrInvalidRequest)
-	suite.Require().ErrorContains(err, "oracle commission rate cannot be negative")
+	suite.Require().ErrorContains(err, "oracleCommissionRate must be between 0 and 1")
+
+	msgRegisterOracle.OracleCommissionRate = sdk.NewInt(2).ToDec()
+	err = suite.OracleKeeper.RegisterOracle(ctx, msgRegisterOracle)
+	suite.Require().Error(err, sdkerrors.ErrInvalidRequest)
+	suite.Require().ErrorContains(err, "oracleCommissionRate must be between 0 and 1")
 
 	events := suite.Ctx.EventManager().Events()
 	suite.Require().Equal(0, len(events))
