@@ -106,13 +106,10 @@ func (suite *oracleTestSuite) TestApproveOracleRegistrationSuccess() {
 
 	approveOracleRegistrationBz, err := suite.Cdc.Marshaler.Marshal(approveOracleRegistration)
 	suite.Require().NoError(err)
-	oraclePrivKeySecp256k1 := secp256k1.PrivKey{
-		Key: suite.oraclePrivKey.Serialize(),
-	}
-	signature, err := oraclePrivKeySecp256k1.Sign(approveOracleRegistrationBz)
+	signature, err := suite.oraclePrivKey.Sign(approveOracleRegistrationBz)
 	suite.Require().NoError(err)
 
-	msgApproveOracleRegistration := types.NewMsgApproveOracleRegistration(approveOracleRegistration, signature)
+	msgApproveOracleRegistration := types.NewMsgApproveOracleRegistration(approveOracleRegistration, signature.Serialize())
 
 	err = suite.OracleKeeper.ApproveOracleRegistration(ctx, msgApproveOracleRegistration)
 	suite.Require().NoError(err)
@@ -164,14 +161,10 @@ func (suite *oracleTestSuite) TestApproveOracleRegistrationFailedInvalidUniqueID
 	}
 	approveOracleRegistrationBz, err := suite.Cdc.Marshaler.Marshal(approveOracleRegistration)
 	suite.Require().NoError(err)
-	oraclePrivKeySecp256k1 := secp256k1.PrivKey{
-		Key: suite.oraclePrivKey.Serialize(),
-	}
-
-	signature, err := oraclePrivKeySecp256k1.Sign(approveOracleRegistrationBz)
+	signature, err := suite.oraclePrivKey.Sign(approveOracleRegistrationBz)
 	suite.Require().NoError(err)
 
-	msgApproveOracleRegistration := types.NewMsgApproveOracleRegistration(approveOracleRegistration, signature)
+	msgApproveOracleRegistration := types.NewMsgApproveOracleRegistration(approveOracleRegistration, signature.Serialize())
 
 	err = suite.OracleKeeper.ApproveOracleRegistration(ctx, msgApproveOracleRegistration)
 	suite.Require().Error(err, types.ErrInvalidUniqueId)
@@ -205,11 +198,12 @@ func (suite *oracleTestSuite) TestApproveOracleRegistrationFailedInvalidSignatur
 	}
 	approveOracleRegistrationBz, err := suite.Cdc.Marshaler.Marshal(approveOracleRegistration)
 	suite.Require().NoError(err)
-	newPrivateKey := secp256k1.GenPrivKey()
+	newPrivateKey, err := btcec.NewPrivateKey(btcec.S256())
+	suite.Require().NoError(err)
 	signature, err := newPrivateKey.Sign(approveOracleRegistrationBz)
 	suite.Require().NoError(err)
 
-	msgApproveOracleRegistration := types.NewMsgApproveOracleRegistration(approveOracleRegistration, signature)
+	msgApproveOracleRegistration := types.NewMsgApproveOracleRegistration(approveOracleRegistration, signature.Serialize())
 
 	err = suite.OracleKeeper.ApproveOracleRegistration(ctx, msgApproveOracleRegistration)
 	suite.Require().Error(err, "failed to signature validation")
@@ -249,13 +243,10 @@ func (suite *oracleTestSuite) TestApproveOracleRegistrationFailedAlreadyExistOra
 	}
 	approveOracleRegistrationBz, err := suite.Cdc.Marshaler.Marshal(approveOracleRegistration)
 	suite.Require().NoError(err)
-	oraclePrivKeySecp256k1 := secp256k1.PrivKey{
-		Key: suite.oraclePrivKey.Serialize(),
-	}
-	signature, err := oraclePrivKeySecp256k1.Sign(approveOracleRegistrationBz)
+	signature, err := suite.oraclePrivKey.Sign(approveOracleRegistrationBz)
 	suite.Require().NoError(err)
 
-	msgApproveOracleRegistration := types.NewMsgApproveOracleRegistration(approveOracleRegistration, signature)
+	msgApproveOracleRegistration := types.NewMsgApproveOracleRegistration(approveOracleRegistration, signature.Serialize())
 
 	err = suite.OracleKeeper.ApproveOracleRegistration(ctx, msgApproveOracleRegistration)
 	suite.Require().Error(err, types.ErrOracleRegistration)

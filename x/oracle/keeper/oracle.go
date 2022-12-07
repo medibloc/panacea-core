@@ -7,7 +7,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/medibloc/panacea-core/v2/x/oracle/types"
-	"github.com/tendermint/tendermint/crypto/secp256k1"
 )
 
 func (k Keeper) RegisterOracle(ctx sdk.Context, msg *types.MsgRegisterOracle) error {
@@ -91,11 +90,8 @@ func (k Keeper) validateApproveOracleRegistration(ctx sdk.Context, msg *types.Ms
 	}
 
 	// verify signature
-	ApproveOracleRegistrationBz := k.cdc.MustMarshal(msg.ApproveOracleRegistration)
-	oraclePubKeyBz := k.GetParams(ctx).MustDecodeOraclePublicKey()
-
-	if !secp256k1.PubKey(oraclePubKeyBz).VerifySignature(ApproveOracleRegistrationBz, msg.Signature) {
-		return fmt.Errorf("failed to signature validation")
+	if err := k.VerifySignature(ctx, msg.ApproveOracleRegistration, msg.Signature); err != nil {
+		return err
 	}
 
 	// check if the oracle has been already registered
