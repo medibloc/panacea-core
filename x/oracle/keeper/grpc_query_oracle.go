@@ -61,7 +61,7 @@ func (k Keeper) OracleRegistrations(goCtx context.Context, request *types.QueryO
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	store := ctx.KVStore(k.storeKey)
-	oracleRegistrationStore := prefix.NewStore(store, types.OracleRegistrationKey)
+	oracleRegistrationStore := prefix.NewStore(store, append(types.OracleRegistrationKey, []byte(request.UniqueId)...))
 
 	var oracleRegistrations []*types.OracleRegistration
 	pageRes, err := query.Paginate(oracleRegistrationStore, request.Pagination, func(_, value []byte) error {
