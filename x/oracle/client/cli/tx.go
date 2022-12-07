@@ -18,7 +18,5 @@ func GetTxCmd() *cobra.Command {
 		RunE:                       client.ValidateCmd,
 	}
 
-	cmd.AddCommand(CmdApproveOracleRegistration())
-
 	return cmd
 }
