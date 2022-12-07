@@ -98,5 +98,4 @@ func (suite *dealTestSuite) TestCheckDealCurNumDataAndIncrement() {
 	check, err = suite.DataDealKeeper.IsDealCompleted(suite.Ctx, dealID)
 	suite.Require().NoError(err)
 	suite.Require().Equal(true, check)
-
 }

@@ -10,4 +10,5 @@ var (
 	ErrDealNotInitialized = sdkerrors.Register(ModuleName, 1, "deal has not been initialized")
 	ErrDealAlreadyExist   = sdkerrors.Register(ModuleName, 2, "deal already exist")
 	ErrDealNotFound       = sdkerrors.Register(ModuleName, 3, "deal is not found")
+	ErrGetDeal            = sdkerrors.Register(ModuleName, 4, "error while get deal")
 )
