@@ -34,6 +34,8 @@ import (
 	aoltypes "github.com/medibloc/panacea-core/v2/x/aol/types"
 	burnkeeper "github.com/medibloc/panacea-core/v2/x/burn/keeper"
 	burntypes "github.com/medibloc/panacea-core/v2/x/burn/types"
+	oraclekeeper "github.com/medibloc/panacea-core/v2/x/oracle/keeper"
+	oracletypes "github.com/medibloc/panacea-core/v2/x/oracle/types"
 	"github.com/stretchr/testify/suite"
 	"github.com/tendermint/tendermint/crypto/secp256k1"
 	"github.com/tendermint/tendermint/libs/log"
@@ -52,6 +54,7 @@ type TestSuite struct {
 	suite.Suite
 
 	Ctx sdk.Context
+	Cdc params.EncodingConfig
 
 	AccountKeeper    authkeeper.AccountKeeper
 	StakingKeeper    stakingkeeper.Keeper
@@ -65,6 +68,8 @@ type TestSuite struct {
 	TransferKeeper   ibctransferkeeper.Keeper
 	DIDMsgServer     didtypes.MsgServer
 	DIDKeeper        didkeeper.Keeper
+	OracleKeeper     oraclekeeper.Keeper
+	OracleMsgServer  oracletypes.MsgServer
 	WasmKeeper       wasm.Keeper
 	UpgradeKeeper    upgradekeeper.Keeper
 }
@@ -76,6 +81,7 @@ func (suite *TestSuite) SetupTest() {
 		banktypes.StoreKey,
 		paramstypes.StoreKey,
 		didtypes.StoreKey,
+		oracletypes.StoreKey,
 		wasm.StoreKey,
 		ibchost.StoreKey,
 		capabilitytypes.StoreKey,
@@ -202,6 +208,15 @@ func (suite *TestSuite) SetupTest() {
 		memKeys[didtypes.MemStoreKey],
 	)
 	suite.DIDMsgServer = didkeeper.NewMsgServerImpl(suite.DIDKeeper)
+
+	suite.OracleKeeper = *oraclekeeper.NewKeeper(
+		cdc.Marshaler,
+		keyParams[oracletypes.StoreKey],
+		memKeys[oracletypes.MemStoreKey],
+		paramsKeeper.Subspace(oracletypes.ModuleName),
+	)
+
+	suite.OracleMsgServer = oraclekeeper.NewMsgServerImpl(suite.OracleKeeper)
 }
 
 func (suite *TestSuite) BeforeTest(suiteName, testName string) {
@@ -218,6 +233,7 @@ func newTestCodec() params.EncodingConfig {
 	authtypes.RegisterInterfaces(interfaceRegistry)
 	banktypes.RegisterInterfaces(interfaceRegistry)
 	didtypes.RegisterInterfaces(interfaceRegistry)
+	oracletypes.RegisterInterfaces(interfaceRegistry)
 	marshaler := codec.NewProtoCodec(interfaceRegistry)
 
 	return params.EncodingConfig{
