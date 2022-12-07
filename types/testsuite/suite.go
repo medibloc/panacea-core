@@ -133,6 +133,7 @@ func (suite *TestSuite) SetupTest() {
 	scopedIBCKeeper := suite.CapabilityKeeper.ScopeToModule(ibchost.ModuleName)
 
 	suite.Ctx = ctx
+	suite.Cdc = cdc
 	suite.AccountKeeper = authkeeper.NewAccountKeeper(
 		cdc.Marshaler,
 		keyParams[authtypes.StoreKey],

@@ -104,7 +104,7 @@ func (k Keeper) validateApproveOracleRegistration(ctx sdk.Context, msg *types.Ms
 		return err
 	}
 	if hasOracle {
-		return fmt.Errorf("oracle address(%v) is already registered", targetOracleAddress)
+		return fmt.Errorf("already registered oracle. address(%s)", targetOracleAddress)
 	}
 
 	return nil

@@ -97,8 +97,16 @@ func (m *ApproveOracleRegistration) ValidateBasic() error {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "approverOracleAddress is empty")
 	}
 
+	if _, err := sdk.AccAddressFromBech32(m.ApproverOracleAddress); err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "approverOracleAddress is invalid. address: %s, error: %s", m.ApproverOracleAddress, err.Error())
+	}
+
 	if len(m.TargetOracleAddress) == 0 {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "targetOracleAddress is empty")
+	}
+
+	if _, err := sdk.AccAddressFromBech32(m.TargetOracleAddress); err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "targetOracleAddress is invalid. address: %s, error: %s", m.TargetOracleAddress, err.Error())
 	}
 
 	if m.EncryptedOraclePrivKey == nil {

@@ -2,6 +2,7 @@ package keeper_test
 
 import (
 	"encoding/base64"
+	"fmt"
 	"testing"
 
 	"github.com/btcsuite/btcd/btcec"
@@ -109,7 +110,6 @@ func (suite *oracleTestSuite) TestApproveOracleRegistrationSuccess() {
 		Key: suite.oraclePrivKey.Serialize(),
 	}
 	signature, err := oraclePrivKeySecp256k1.Sign(approveOracleRegistrationBz)
-	suite.Require().NoError(err)
 
 	msgApproveOracleRegistration := types.NewMsgApproveOracleRegistration(approveOracleRegistration, signature)
 
@@ -133,4 +133,128 @@ func (suite *oracleTestSuite) TestApproveOracleRegistrationSuccess() {
 	suite.Require().Equal(suite.oracleAccAddr.String(), getOracle.OracleAddress)
 	suite.Require().Equal(suite.endpoint, getOracle.Endpoint)
 	suite.Require().Equal(suite.oracleCommissionRate, getOracle.OracleCommissionRate)
+}
+
+func (suite *oracleTestSuite) TestApproveOracleRegistrationFailedInvalidUniqueID() {
+	ctx := suite.Ctx
+
+	msgRegisterOracle := &types.MsgRegisterOracle{
+		UniqueId:               suite.uniqueID,
+		OracleAddress:          suite.oracleAccAddr.String(),
+		NodePubKey:             suite.nodePubKey.SerializeCompressed(),
+		NodePubKeyRemoteReport: suite.nodePubKeyRemoteReport,
+		TrustedBlockHeight:     suite.trustedBlockHeight,
+		TrustedBlockHash:       suite.trustedBlockHash,
+		Endpoint:               suite.endpoint,
+		OracleCommissionRate:   suite.oracleCommissionRate,
+	}
+
+	err := suite.OracleKeeper.RegisterOracle(ctx, msgRegisterOracle)
+	suite.Require().NoError(err)
+
+	encryptedOraclePrivKey, err := btcec.Encrypt(suite.nodePubKey, suite.oraclePrivKey.Serialize())
+	suite.Require().NoError(err)
+
+	approveOracleRegistration := &types.ApproveOracleRegistration{
+		UniqueId:               "uniqueID2",
+		ApproverOracleAddress:  suite.oracleAccAddr.String(),
+		TargetOracleAddress:    suite.oracleAccAddr.String(),
+		EncryptedOraclePrivKey: encryptedOraclePrivKey,
+	}
+	approveOracleRegistrationBz, err := suite.Cdc.Marshaler.Marshal(approveOracleRegistration)
+	suite.Require().NoError(err)
+	oraclePrivKeySecp256k1 := secp256k1.PrivKey{
+		Key: suite.oraclePrivKey.Serialize(),
+	}
+	signature, err := oraclePrivKeySecp256k1.Sign(approveOracleRegistrationBz)
+	suite.Require().NoError(err)
+
+	msgApproveOracleRegistration := types.NewMsgApproveOracleRegistration(approveOracleRegistration, signature)
+
+	err = suite.OracleKeeper.ApproveOracleRegistration(ctx, msgApproveOracleRegistration)
+	suite.Require().Error(err, types.ErrInvalidUniqueId)
+}
+
+func (suite *oracleTestSuite) TestApproveOracleRegistrationFailedInvalidSignature() {
+	ctx := suite.Ctx
+
+	msgRegisterOracle := &types.MsgRegisterOracle{
+		UniqueId:               suite.uniqueID,
+		OracleAddress:          suite.oracleAccAddr.String(),
+		NodePubKey:             suite.nodePubKey.SerializeCompressed(),
+		NodePubKeyRemoteReport: suite.nodePubKeyRemoteReport,
+		TrustedBlockHeight:     suite.trustedBlockHeight,
+		TrustedBlockHash:       suite.trustedBlockHash,
+		Endpoint:               suite.endpoint,
+		OracleCommissionRate:   suite.oracleCommissionRate,
+	}
+
+	err := suite.OracleKeeper.RegisterOracle(ctx, msgRegisterOracle)
+	suite.Require().NoError(err)
+
+	encryptedOraclePrivKey, err := btcec.Encrypt(suite.nodePubKey, suite.oraclePrivKey.Serialize())
+	suite.Require().NoError(err)
+
+	approveOracleRegistration := &types.ApproveOracleRegistration{
+		UniqueId:               "uniqueID",
+		ApproverOracleAddress:  suite.oracleAccAddr.String(),
+		TargetOracleAddress:    suite.oracleAccAddr.String(),
+		EncryptedOraclePrivKey: encryptedOraclePrivKey,
+	}
+	approveOracleRegistrationBz, err := suite.Cdc.Marshaler.Marshal(approveOracleRegistration)
+	suite.Require().NoError(err)
+	newPrivateKey := secp256k1.GenPrivKey()
+	signature, err := newPrivateKey.Sign(approveOracleRegistrationBz)
+	suite.Require().NoError(err)
+
+	msgApproveOracleRegistration := types.NewMsgApproveOracleRegistration(approveOracleRegistration, signature)
+
+	err = suite.OracleKeeper.ApproveOracleRegistration(ctx, msgApproveOracleRegistration)
+	suite.Require().Error(err, "failed to signature validation")
+}
+
+func (suite *oracleTestSuite) TestApproveOracleRegistrationFailedAlreadyExistOracle() {
+	ctx := suite.Ctx
+
+	oracle := types.NewOracle(suite.oracleAccAddr.String(), suite.uniqueID, suite.endpoint, suite.oracleCommissionRate)
+	err := suite.OracleKeeper.SetOracle(ctx, oracle)
+	suite.Require().NoError(err)
+
+	msgRegisterOracle := &types.MsgRegisterOracle{
+		UniqueId:               suite.uniqueID,
+		OracleAddress:          suite.oracleAccAddr.String(),
+		NodePubKey:             suite.nodePubKey.SerializeCompressed(),
+		NodePubKeyRemoteReport: suite.nodePubKeyRemoteReport,
+		TrustedBlockHeight:     suite.trustedBlockHeight,
+		TrustedBlockHash:       suite.trustedBlockHash,
+		Endpoint:               suite.endpoint,
+		OracleCommissionRate:   suite.oracleCommissionRate,
+	}
+
+	oracleRegistration := types.NewOracleRegistration(msgRegisterOracle)
+
+	err = suite.OracleKeeper.SetOracleRegistration(ctx, oracleRegistration)
+
+	encryptedOraclePrivKey, err := btcec.Encrypt(suite.nodePubKey, suite.oraclePrivKey.Serialize())
+	suite.Require().NoError(err)
+
+	approveOracleRegistration := &types.ApproveOracleRegistration{
+		UniqueId:               "uniqueID",
+		ApproverOracleAddress:  suite.oracleAccAddr.String(),
+		TargetOracleAddress:    suite.oracleAccAddr.String(),
+		EncryptedOraclePrivKey: encryptedOraclePrivKey,
+	}
+	approveOracleRegistrationBz, err := suite.Cdc.Marshaler.Marshal(approveOracleRegistration)
+	suite.Require().NoError(err)
+	oraclePrivKeySecp256k1 := secp256k1.PrivKey{
+		Key: suite.oraclePrivKey.Serialize(),
+	}
+	signature, err := oraclePrivKeySecp256k1.Sign(approveOracleRegistrationBz)
+	suite.Require().NoError(err)
+
+	msgApproveOracleRegistration := types.NewMsgApproveOracleRegistration(approveOracleRegistration, signature)
+
+	err = suite.OracleKeeper.ApproveOracleRegistration(ctx, msgApproveOracleRegistration)
+	suite.Require().Error(err, types.ErrOracleRegistration)
+	suite.Require().ErrorContains(err, fmt.Sprintf("already registered oracle. address(%s)", msgRegisterOracle.OracleAddress))
 }

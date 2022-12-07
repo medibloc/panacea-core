@@ -18,7 +18,6 @@ func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 		&MsgRegisterOracle{},
 		&MsgApproveOracleRegistration{},
 		&MsgUpdateOracleInfo{},
-		&ApproveOracleRegistration{},
 	)
 
 	msgservice.RegisterMsgServiceDesc(registry, &_Msg_serviceDesc)
