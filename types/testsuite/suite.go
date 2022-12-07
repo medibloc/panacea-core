@@ -42,6 +42,8 @@ import (
 	dbm "github.com/tendermint/tm-db"
 
 	"github.com/medibloc/panacea-core/v2/app/params"
+	datadealkeeper "github.com/medibloc/panacea-core/v2/x/datadeal/keeper"
+	datadealtypes "github.com/medibloc/panacea-core/v2/x/datadeal/types"
 	didkeeper "github.com/medibloc/panacea-core/v2/x/did/keeper"
 	didtypes "github.com/medibloc/panacea-core/v2/x/did/types"
 )
@@ -65,6 +67,7 @@ type TestSuite struct {
 	TransferKeeper   ibctransferkeeper.Keeper
 	DIDMsgServer     didtypes.MsgServer
 	DIDKeeper        didkeeper.Keeper
+	DataDealKeeper   datadealkeeper.Keeper
 	WasmKeeper       wasm.Keeper
 	UpgradeKeeper    upgradekeeper.Keeper
 }
@@ -76,6 +79,7 @@ func (suite *TestSuite) SetupTest() {
 		banktypes.StoreKey,
 		paramstypes.StoreKey,
 		didtypes.StoreKey,
+		datadealtypes.StoreKey,
 		wasm.StoreKey,
 		ibchost.StoreKey,
 		capabilitytypes.StoreKey,
@@ -202,6 +206,14 @@ func (suite *TestSuite) SetupTest() {
 		memKeys[didtypes.MemStoreKey],
 	)
 	suite.DIDMsgServer = didkeeper.NewMsgServerImpl(suite.DIDKeeper)
+
+	suite.DataDealKeeper = *datadealkeeper.NewKeeper(
+		cdc.Marshaler,
+		keyParams[datadealtypes.StoreKey],
+		memKeys[datadealtypes.MemStoreKey],
+		suite.AccountKeeper,
+		suite.BankKeeper,
+	)
 }
 
 func (suite *TestSuite) BeforeTest(suiteName, testName string) {
