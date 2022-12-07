@@ -1,0 +1,90 @@
+syntax = "proto3";
+package panacea.oracle.v2;
+
+option go_package = "github.com/medibloc/panacea-core/x/oracle/types";
+
+import "gogoproto/gogo.proto";
+import "google/protobuf/timestamp.proto";
+import "cosmos/base/query/v1beta1/pagination.proto";
+import "google/api/annotations.proto";
+import "panacea/oracle/v2/oracle.proto";
+import "panacea/oracle/v2/genesis.proto";
+
+// Query defines the gRPC querier service.
+service Query {
+  // Oracles returns a list of oracles.
+  rpc Oracles(QueryOraclesRequest) returns (QueryOraclesResponse) {
+    option (google.api.http).get = "/panacea/oracle/v2/oracles";
+  }
+
+  // Oracle returns a oracle.
+  rpc Oracle(QueryOracleRequest) returns (QueryOracleResponse) {
+    option (google.api.http).get = "/panacea/oracle/v2/oracles/{oracle_address}";
+  }
+
+  // OracleRegistrations returns a list of OracleRegistration.
+  rpc OracleRegistrations(QueryOracleRegistrationsRequest) returns (QueryOracleRegistrationsResponse) {
+    option (google.api.http).get = "/panacea/oracle/v2/oracle_registrations";
+  }
+
+  // OracleRegistration returns a OracleRegistration details.
+  rpc OracleRegistration(QueryOracleRegistrationRequest) returns (QueryOracleRegistrationResponse) {
+    option (google.api.http).get = "/panacea/oracle/v2/oracle_registrations/{unique_id}/{oracle_address}";
+  }
+
+  // Params returns params of oracle module.
+  rpc Params(QueryOracleParamsRequest) returns (QueryParamsResponse) {
+    option (google.api.http).get = "/panacea/oracle/v2/params";
+  }
+}
+
+// QueryOraclesRequest is the request type for the Query/Oracles RPC method.
+message QueryOraclesRequest {
+  cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+// QueryOracleResponse is the response type for the Query/Oracles RPC method.
+message QueryOraclesResponse {
+  repeated Oracle oracles = 1;
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+// QueryOracleRequest is the request type for the Query/Oracle RPC method.
+message QueryOracleRequest {
+  string oracle_address = 1;
+}
+
+// QueryOracleResponse is the response type for the Query/Oracle RPC method.
+message QueryOracleResponse {
+  Oracle oracle = 1;
+}
+
+// QueryOracleRegistrationsRequest is the request type for the Query/OracleRegistrations RPC method.
+message QueryOracleRegistrationsRequest {
+  cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+// QueryOracleRegistrationsResponse is the response type for the Query/OracleRegistrations RPC method.
+message QueryOracleRegistrationsResponse {
+  repeated OracleRegistration oracle_registrations = 1;
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+// QueryOracleRegistrationRequest is the request type for the Query/OracleRegistration RPC method.
+message QueryOracleRegistrationRequest {
+  string unique_id = 1;
+  string oracle_address = 2;
+}
+
+// QueryOracleRegistrationResponse is the response type for the Query/OracleRegistration RPC method.
+message QueryOracleRegistrationResponse {
+  OracleRegistration oracle_registration = 1;
+}
+
+// QueryOracleParamsRequest is the request type for the Query/OracleParams RPC method.
+message QueryOracleParamsRequest {}
+
+// QueryParamsResponse is the response type for the Query/OracleParams RPC method.
+message QueryParamsResponse {
+  Params params = 1;
+}
