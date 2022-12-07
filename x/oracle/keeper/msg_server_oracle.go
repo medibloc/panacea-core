@@ -21,7 +21,6 @@ func (m msgServer) ApproveOracleRegistration(goCtx context.Context, msg *types.M
 
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(
-
 			sdk.EventTypeMessage,
 			sdk.NewAttribute(sdk.AttributeKeyModule, types.ModuleName),
 		),
