@@ -23,7 +23,7 @@ func (m *MsgCreateDeal) GetSignBytes() []byte {
 }
 
 func (m *MsgCreateDeal) GetSigners() []sdk.AccAddress {
-	buyerAddress, err := sdk.AccAddressFromBech32(m.BuyerAddress)
+	buyerAddress, err := sdk.AccAddressFromBech32(m.ConsumerAddress)
 	if err != nil {
 		panic(err)
 	}
