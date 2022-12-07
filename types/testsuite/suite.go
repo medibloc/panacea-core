@@ -34,6 +34,8 @@ import (
 	aoltypes "github.com/medibloc/panacea-core/v2/x/aol/types"
 	burnkeeper "github.com/medibloc/panacea-core/v2/x/burn/keeper"
 	burntypes "github.com/medibloc/panacea-core/v2/x/burn/types"
+	oraclekeeper "github.com/medibloc/panacea-core/v2/x/oracle/keeper"
+	oracletypes "github.com/medibloc/panacea-core/v2/x/oracle/types"
 	"github.com/stretchr/testify/suite"
 	"github.com/tendermint/tendermint/crypto/secp256k1"
 	"github.com/tendermint/tendermint/libs/log"
@@ -68,6 +70,7 @@ type TestSuite struct {
 	DIDMsgServer     didtypes.MsgServer
 	DIDKeeper        didkeeper.Keeper
 	DataDealKeeper   datadealkeeper.Keeper
+	OracleKeeper     oraclekeeper.Keeper
 	WasmKeeper       wasm.Keeper
 	UpgradeKeeper    upgradekeeper.Keeper
 }
@@ -207,12 +210,20 @@ func (suite *TestSuite) SetupTest() {
 	)
 	suite.DIDMsgServer = didkeeper.NewMsgServerImpl(suite.DIDKeeper)
 
+	suite.OracleKeeper = *oraclekeeper.NewKeeper(
+		cdc.Marshaler,
+		keyParams[oracletypes.StoreKey],
+		memKeys[oracletypes.MemStoreKey],
+		paramsKeeper.Subspace(oracletypes.ModuleName),
+	)
+
 	suite.DataDealKeeper = *datadealkeeper.NewKeeper(
 		cdc.Marshaler,
 		keyParams[datadealtypes.StoreKey],
 		memKeys[datadealtypes.MemStoreKey],
 		suite.AccountKeeper,
 		suite.BankKeeper,
+		suite.OracleKeeper,
 	)
 }
 

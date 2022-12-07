@@ -144,5 +144,6 @@ func (k Keeper) IncrementCurNumDataAtDeal(ctx sdk.Context, dealID uint64) error 
 	if err = k.SetDeal(ctx, deal); err != nil {
 		return err
 	}
+
 	return nil
 }

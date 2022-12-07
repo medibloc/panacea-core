@@ -34,7 +34,6 @@ func (suite *dealTestSuite) BeforeTest(_, _ string) {
 }
 
 func (suite *dealTestSuite) TestCreateNewDeal() {
-
 	err := suite.FundAccount(suite.Ctx, suite.consumerAccAddr, suite.defaultFunds)
 	suite.Require().NoError(err)
 
@@ -98,5 +97,4 @@ func (suite *dealTestSuite) TestCheckDealCurNumDataAndIncrement() {
 	check, err = suite.DataDealKeeper.IsDealCompleted(suite.Ctx, dealID)
 	suite.Require().NoError(err)
 	suite.Require().Equal(true, check)
-
 }

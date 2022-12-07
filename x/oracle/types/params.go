@@ -36,7 +36,7 @@ func (p *Params) ParamSetPairs() paramtypes.ParamSetPairs {
 	}
 }
 
-func (p Params) Validate() error {
+func (p *Params) Validate() error {
 	if err := validateOraclePublicKey(p.OraclePublicKey); err != nil {
 		return err
 	}
@@ -48,6 +48,18 @@ func (p Params) Validate() error {
 	}
 
 	return nil
+}
+
+func (p Params) MustDecodeOraclePubKey() []byte {
+	return mustDecodeBase64Str(p.OraclePublicKey)
+}
+
+func mustDecodeBase64Str(s string) []byte {
+	decoded, err := base64.StdEncoding.DecodeString(s)
+	if err != nil {
+		panic(err)
+	}
+	return decoded
 }
 
 func validateOraclePublicKey(i interface{}) error {
