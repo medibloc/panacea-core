@@ -10,11 +10,7 @@ import (
 func (m msgServer) CreateDeal(goCtx context.Context, msg *types.MsgCreateDeal) (*types.MsgCreateDealResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	consumer, err := sdk.AccAddressFromBech32(msg.ConsumerAddress)
-	if err != nil {
-		return nil, err
-	}
-	newDealID, err := m.Keeper.CreateDeal(ctx, consumer, msg)
+	newDealID, err := m.Keeper.CreateDeal(ctx, msg)
 	if err != nil {
 		return nil, err
 	}

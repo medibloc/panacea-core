@@ -57,22 +57,24 @@ type TestSuite struct {
 
 	Ctx sdk.Context
 
-	AccountKeeper    authkeeper.AccountKeeper
-	StakingKeeper    stakingkeeper.Keeper
-	AolKeeper        aolkeeper.Keeper
-	AolMsgServer     aoltypes.MsgServer
-	BankKeeper       bankkeeper.Keeper
-	BurnKeeper       burnkeeper.Keeper
-	CapabilityKeeper *capabilitykeeper.Keeper
-	DistrKeeper      distrkeeper.Keeper
-	IBCKeeper        *ibckeeper.Keeper
-	TransferKeeper   ibctransferkeeper.Keeper
-	DIDMsgServer     didtypes.MsgServer
-	DIDKeeper        didkeeper.Keeper
-	DataDealKeeper   datadealkeeper.Keeper
-	OracleKeeper     oraclekeeper.Keeper
-	WasmKeeper       wasm.Keeper
-	UpgradeKeeper    upgradekeeper.Keeper
+	AccountKeeper     authkeeper.AccountKeeper
+	StakingKeeper     stakingkeeper.Keeper
+	AolKeeper         aolkeeper.Keeper
+	AolMsgServer      aoltypes.MsgServer
+	BankKeeper        bankkeeper.Keeper
+	BurnKeeper        burnkeeper.Keeper
+	CapabilityKeeper  *capabilitykeeper.Keeper
+	DistrKeeper       distrkeeper.Keeper
+	IBCKeeper         *ibckeeper.Keeper
+	TransferKeeper    ibctransferkeeper.Keeper
+	DIDMsgServer      didtypes.MsgServer
+	DIDKeeper         didkeeper.Keeper
+	DataDealKeeper    datadealkeeper.Keeper
+	DataDealMsgServer datadealtypes.MsgServer
+	OracleKeeper      oraclekeeper.Keeper
+	OracleMsgServer   oracletypes.MsgServer
+	WasmKeeper        wasm.Keeper
+	UpgradeKeeper     upgradekeeper.Keeper
 }
 
 func (suite *TestSuite) SetupTest() {
@@ -83,6 +85,7 @@ func (suite *TestSuite) SetupTest() {
 		paramstypes.StoreKey,
 		didtypes.StoreKey,
 		datadealtypes.StoreKey,
+		oracletypes.StoreKey,
 		wasm.StoreKey,
 		ibchost.StoreKey,
 		capabilitytypes.StoreKey,
@@ -210,13 +213,6 @@ func (suite *TestSuite) SetupTest() {
 	)
 	suite.DIDMsgServer = didkeeper.NewMsgServerImpl(suite.DIDKeeper)
 
-	suite.OracleKeeper = *oraclekeeper.NewKeeper(
-		cdc.Marshaler,
-		keyParams[oracletypes.StoreKey],
-		memKeys[oracletypes.MemStoreKey],
-		paramsKeeper.Subspace(oracletypes.ModuleName),
-	)
-
 	suite.DataDealKeeper = *datadealkeeper.NewKeeper(
 		cdc.Marshaler,
 		keyParams[datadealtypes.StoreKey],
@@ -225,6 +221,16 @@ func (suite *TestSuite) SetupTest() {
 		suite.BankKeeper,
 		suite.OracleKeeper,
 	)
+	suite.DataDealMsgServer = datadealkeeper.NewMsgServerImpl(suite.DataDealKeeper)
+
+	suite.OracleKeeper = *oraclekeeper.NewKeeper(
+		cdc.Marshaler,
+		keyParams[oracletypes.StoreKey],
+		memKeys[oracletypes.MemStoreKey],
+		paramsKeeper.Subspace(oracletypes.ModuleName),
+	)
+
+	suite.OracleMsgServer = oraclekeeper.NewMsgServerImpl(suite.OracleKeeper)
 }
 
 func (suite *TestSuite) BeforeTest(suiteName, testName string) {
@@ -241,6 +247,8 @@ func newTestCodec() params.EncodingConfig {
 	authtypes.RegisterInterfaces(interfaceRegistry)
 	banktypes.RegisterInterfaces(interfaceRegistry)
 	didtypes.RegisterInterfaces(interfaceRegistry)
+	//TODO: When other Msgs are implemented, I'll remove this comment.
+	//datadealtypes.RegisterInterfaces(interfaceRegistry)
 	marshaler := codec.NewProtoCodec(interfaceRegistry)
 
 	return params.EncodingConfig{

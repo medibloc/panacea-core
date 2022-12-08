@@ -34,3 +34,26 @@ func (suite *queryDealTestSuite) TestQueryDeal() {
 	suite.Require().NotNil(res)
 	suite.Require().Equal(deal, res.Deal)
 }
+
+func (suite *queryDealTestSuite) TestQueryDeals() {
+	deal1 := suite.MakeTestDeal(1, suite.consumerAccAddr, 100)
+	err := suite.DataDealKeeper.SetDeal(suite.Ctx, deal1)
+	suite.Require().NoError(err)
+
+	deal2 := suite.MakeTestDeal(2, suite.consumerAccAddr, 100)
+	err = suite.DataDealKeeper.SetDeal(suite.Ctx, deal2)
+	suite.Require().NoError(err)
+
+	deal3 := suite.MakeTestDeal(3, suite.consumerAccAddr, 100)
+	err = suite.DataDealKeeper.SetDeal(suite.Ctx, deal3)
+	suite.Require().NoError(err)
+
+	req := types.QueryDealsRequest{}
+
+	res, err := suite.DataDealKeeper.Deals(sdk.WrapSDKContext(suite.Ctx), &req)
+	suite.Require().NoError(err)
+	suite.Require().Len(res.Deal, 3)
+	suite.Require().Equal(res.Deal[0].Address, deal1.Address)
+	suite.Require().Equal(res.Deal[1].Address, deal2.Address)
+	suite.Require().Equal(res.Deal[2].Address, deal3.Address)
+}

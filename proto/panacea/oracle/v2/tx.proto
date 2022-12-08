@@ -47,8 +47,9 @@ message MsgApproveOracleRegistration {
 // ApproveOracleRegistration defines for oracle registration approval
 message ApproveOracleRegistration {
   string unique_id = 1;
-  string target_oracle_address = 2;
-  bytes encrypted_oracle_priv_key = 3;
+  string approver_oracle_address = 2;
+  string target_oracle_address = 3;
+  bytes encrypted_oracle_priv_key = 4;
 }
 
 // MsgApproveOracleRegistrationResponse defines the Msg/ApproveOracleRegistration

@@ -46,13 +46,10 @@ func (suite *dealTestSuite) TestCreateNewDeal() {
 		ConsumerAddress: suite.consumerAccAddr.String(),
 	}
 
-	consumer, err := sdk.AccAddressFromBech32(msgCreateDeal.ConsumerAddress)
+	dealID, err := suite.DataDealKeeper.CreateDeal(suite.Ctx, msgCreateDeal)
 	suite.Require().NoError(err)
 
-	dealID, err := suite.DataDealKeeper.CreateDeal(suite.Ctx, consumer, msgCreateDeal)
-	suite.Require().NoError(err)
-
-	expectedId, err := suite.DataDealKeeper.GetNextDealNumberAndIncrement(suite.Ctx)
+	expectedId, err := suite.DataDealKeeper.GetAndIncreaseNextDealNumber(suite.Ctx)
 	suite.Require().NoError(err)
 	suite.Require().Equal(dealID, expectedId-uint64(1))
 
@@ -78,23 +75,21 @@ func (suite *dealTestSuite) TestCheckDealCurNumDataAndIncrement() {
 		ConsumerAddress: suite.consumerAccAddr.String(),
 	}
 
-	buyer, err := sdk.AccAddressFromBech32(msgCreateDeal.ConsumerAddress)
+	dealID, err := suite.DataDealKeeper.CreateDeal(suite.Ctx, msgCreateDeal)
 	suite.Require().NoError(err)
 
-	dealID, err := suite.DataDealKeeper.CreateDeal(suite.Ctx, buyer, msgCreateDeal)
+	deal, err := suite.DataDealKeeper.GetDeal(suite.Ctx, dealID)
 	suite.Require().NoError(err)
 
-	check, err := suite.DataDealKeeper.IsDealCompleted(suite.Ctx, dealID)
-	suite.Require().NoError(err)
+	check := deal.IsCompleted()
 	suite.Equal(false, check)
 
-	err = suite.DataDealKeeper.IncrementCurNumDataAtDeal(suite.Ctx, dealID)
+	err = suite.DataDealKeeper.IncreaseCurNumDataOfDeal(suite.Ctx, dealID)
 	suite.Require().NoError(err)
 	updatedDeal, err := suite.DataDealKeeper.GetDeal(suite.Ctx, dealID)
 	suite.Require().NoError(err)
 	suite.Require().Equal(uint64(1), updatedDeal.CurNumData)
 
-	check, err = suite.DataDealKeeper.IsDealCompleted(suite.Ctx, dealID)
-	suite.Require().NoError(err)
+	check = updatedDeal.IsCompleted()
 	suite.Require().Equal(true, check)
 }
