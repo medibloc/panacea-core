@@ -1,7 +1,10 @@
 package cmd
 
 import (
+	"encoding/base64"
 	"encoding/hex"
+	"os"
+
 	"github.com/btcsuite/btcd/btcec"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -10,7 +13,6 @@ import (
 	oracletypes "github.com/medibloc/panacea-core/v2/x/oracle/types"
 	"github.com/spf13/cobra"
 	"github.com/tendermint/tendermint/libs/cli"
-	"os"
 )
 
 func EncryptDataCmd(defaultNodeHome string) *cobra.Command {
@@ -83,7 +85,7 @@ func encrypt(clientCtx client.Context, keyName string, origData []byte, oraclePu
 	privKey, _ := btcec.PrivKeyFromBytes(btcec.S256(), privKeyBz)
 
 	// oracle public key
-	oraclePubKeyBz, err := hex.DecodeString(oraclePubKeyStr)
+	oraclePubKeyBz, err := base64.StdEncoding.DecodeString(oraclePubKeyStr)
 	if err != nil {
 		return nil, err
 	}
