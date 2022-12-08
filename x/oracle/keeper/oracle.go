@@ -46,31 +46,30 @@ func (k Keeper) RegisterOracle(ctx sdk.Context, msg *types.MsgRegisterOracle) er
 func (k Keeper) ApproveOracleRegistration(ctx sdk.Context, msg *types.MsgApproveOracleRegistration) error {
 
 	if err := k.validateApproveOracleRegistration(ctx, msg); err != nil {
-		return err
+		return sdkerrors.Wrapf(types.ErrApproveOracleRegistration, err.Error())
 	}
 
 	oracleRegistration, err := k.GetOracleRegistration(ctx, msg.ApproveOracleRegistration.UniqueId, msg.ApproveOracleRegistration.TargetOracleAddress)
 	if err != nil {
-		return err
+		return sdkerrors.Wrapf(types.ErrApproveOracleRegistration, err.Error())
 	}
 
-	newOracle := &types.Oracle{
-		OracleAddress:        msg.ApproveOracleRegistration.TargetOracleAddress,
-		UniqueId:             msg.ApproveOracleRegistration.UniqueId,
-		Endpoint:             oracleRegistration.Endpoint,
-		OracleCommissionRate: oracleRegistration.OracleCommissionRate,
-	}
+	newOracle := types.NewOracle(
+		msg.ApproveOracleRegistration.TargetOracleAddress,
+		msg.ApproveOracleRegistration.UniqueId,
+		oracleRegistration.Endpoint,
+		oracleRegistration.OracleCommissionRate,
+	)
 
 	// append new oracle info
 	if err := k.SetOracle(ctx, newOracle); err != nil {
-		return err
+		return sdkerrors.Wrapf(types.ErrApproveOracleRegistration, err.Error())
 	}
 
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(
 			types.EventTypeApproveOracleRegistration,
 			sdk.NewAttribute(types.AttributeKeyOracleAddress, msg.ApproveOracleRegistration.TargetOracleAddress),
-			sdk.NewAttribute(types.AttributeKeyEncryptedOraclePrivKey, string(msg.ApproveOracleRegistration.EncryptedOraclePrivKey)),
 		),
 	)
 
