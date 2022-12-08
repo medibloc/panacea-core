@@ -30,7 +30,12 @@ func (m msgServer) ApproveOracleRegistration(ctx context.Context, registration *
 	panic("implement me")
 }
 
-func (m msgServer) UpdateOracleInfo(ctx context.Context, info *types.MsgUpdateOracleInfo) (*types.MsgUpdateOracleInfoResponse, error) {
-	//TODO implement me
-	panic("implement me")
+func (m msgServer) UpdateOracleInfo(goCtx context.Context, msg *types.MsgUpdateOracleInfo) (*types.MsgUpdateOracleInfoResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	if err := m.Keeper.UpdateOracleInfo(ctx, msg); err != nil {
+		return nil, err
+	}
+
+	return &types.MsgUpdateOracleInfoResponse{}, nil
 }

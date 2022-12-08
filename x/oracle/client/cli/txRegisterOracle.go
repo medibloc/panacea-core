@@ -16,9 +16,9 @@ import (
 
 func CmdRegisterOracle() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "register-oracle [unique ID] [node public key] [node public key remote report] [trusted block height] [trusted block hash] [endpoint] [oracle's commission rate]",
+		Use:   "register-oracle [unique-ID] [node-public-key] [node-public-key-remote-report] [trusted-block-height] [trusted-block-hash] [endpoint] [oracle-commission-rate] [oracle-commission-max-rate] [oracle-commission-max-change-rate]",
 		Short: "Register a new oracle",
-		Args:  cobra.ExactArgs(7),
+		Args:  cobra.ExactArgs(9),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
@@ -59,6 +59,28 @@ func CmdRegisterOracle() *cobra.Command {
 				return err
 			}
 
+			oracleCommissionMaxRateStr := args[7]
+
+			if len(oracleCommissionMaxRateStr) == 0 {
+				return fmt.Errorf("oracleCommissionMaxRate is empty")
+			}
+
+			oracleCommissionMaxRate, err := sdk.NewDecFromStr(oracleCommissionMaxRateStr)
+			if err != nil {
+				return err
+			}
+
+			oracleCommissionMaxChangeRateStr := args[8]
+
+			if len(oracleCommissionMaxChangeRateStr) == 0 {
+				return fmt.Errorf("oracleCommissionMaxChangeRate is empty")
+			}
+
+			oracleCommissionMaxChangeRate, err := sdk.NewDecFromStr(oracleCommissionMaxChangeRateStr)
+			if err != nil {
+				return err
+			}
+
 			msg := types.NewMsgRegisterOracle(
 				args[0],
 				oracleAddress,
@@ -68,6 +90,8 @@ func CmdRegisterOracle() *cobra.Command {
 				trustedBlockHash,
 				endpoint,
 				oracleCommissionRate,
+				oracleCommissionMaxRate,
+				oracleCommissionMaxChangeRate,
 			)
 			if err := msg.ValidateBasic(); err != nil {
 				return err

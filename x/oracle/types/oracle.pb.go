@@ -8,15 +8,19 @@ import (
 	github_com_cosmos_cosmos_sdk_types "github.com/cosmos/cosmos-sdk/types"
 	_ "github.com/gogo/protobuf/gogoproto"
 	proto "github.com/gogo/protobuf/proto"
+	github_com_gogo_protobuf_types "github.com/gogo/protobuf/types"
+	_ "google.golang.org/protobuf/types/known/timestamppb"
 	io "io"
 	math "math"
 	math_bits "math/bits"
+	time "time"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal
 var _ = fmt.Errorf
 var _ = math.Inf
+var _ = time.Kitchen
 
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the proto package it is being compiled against.
@@ -26,10 +30,13 @@ const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 // Oracle defines a detail of oracle.
 type Oracle struct {
-	OracleAddress        string                                 `protobuf:"bytes,1,opt,name=oracle_address,json=oracleAddress,proto3" json:"oracle_address,omitempty"`
-	UniqueId             string                                 `protobuf:"bytes,2,opt,name=unique_id,json=uniqueId,proto3" json:"unique_id,omitempty"`
-	Endpoint             string                                 `protobuf:"bytes,3,opt,name=endpoint,proto3" json:"endpoint,omitempty"`
-	OracleCommissionRate github_com_cosmos_cosmos_sdk_types.Dec `protobuf:"bytes,4,opt,name=oracle_commission_rate,json=oracleCommissionRate,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Dec" json:"oracle_commission_rate"`
+	OracleAddress                 string                                 `protobuf:"bytes,1,opt,name=oracle_address,json=oracleAddress,proto3" json:"oracle_address,omitempty"`
+	UniqueId                      string                                 `protobuf:"bytes,2,opt,name=unique_id,json=uniqueId,proto3" json:"unique_id,omitempty"`
+	Endpoint                      string                                 `protobuf:"bytes,3,opt,name=endpoint,proto3" json:"endpoint,omitempty"`
+	UpdateTime                    time.Time                              `protobuf:"bytes,4,opt,name=update_time,json=updateTime,proto3,stdtime" json:"update_time"`
+	OracleCommissionRate          github_com_cosmos_cosmos_sdk_types.Dec `protobuf:"bytes,5,opt,name=oracle_commission_rate,json=oracleCommissionRate,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Dec" json:"oracle_commission_rate"`
+	OracleCommissionMaxRate       github_com_cosmos_cosmos_sdk_types.Dec `protobuf:"bytes,6,opt,name=oracle_commission_max_rate,json=oracleCommissionMaxRate,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Dec" json:"oracle_commission_max_rate"`
+	OracleCommissionMaxChangeRate github_com_cosmos_cosmos_sdk_types.Dec `protobuf:"bytes,7,opt,name=oracle_commission_max_change_rate,json=oracleCommissionMaxChangeRate,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Dec" json:"oracle_commission_max_change_rate"`
 }
 
 func (m *Oracle) Reset()         { *m = Oracle{} }
@@ -86,6 +93,13 @@ func (m *Oracle) GetEndpoint() string {
 	return ""
 }
 
+func (m *Oracle) GetUpdateTime() time.Time {
+	if m != nil {
+		return m.UpdateTime
+	}
+	return time.Time{}
+}
+
 // OracleRegistration defines the detailed states of the registration of oracle.
 type OracleRegistration struct {
 	UniqueId      string `protobuf:"bytes,1,opt,name=unique_id,json=uniqueId,proto3" json:"unique_id,omitempty"`
@@ -97,10 +111,12 @@ type OracleRegistration struct {
 	NodePubKeyRemoteReport []byte `protobuf:"bytes,4,opt,name=node_pub_key_remote_report,json=nodePubKeyRemoteReport,proto3" json:"node_pub_key_remote_report,omitempty"`
 	// The trusted block info is required for light client.
 	// Other oracle can validate whether the oracle set correct trusted block info.
-	TrustedBlockHeight   int64                                  `protobuf:"varint,5,opt,name=trusted_block_height,json=trustedBlockHeight,proto3" json:"trusted_block_height,omitempty"`
-	TrustedBlockHash     []byte                                 `protobuf:"bytes,6,opt,name=trusted_block_hash,json=trustedBlockHash,proto3" json:"trusted_block_hash,omitempty"`
-	Endpoint             string                                 `protobuf:"bytes,7,opt,name=endpoint,proto3" json:"endpoint,omitempty"`
-	OracleCommissionRate github_com_cosmos_cosmos_sdk_types.Dec `protobuf:"bytes,8,opt,name=oracle_commission_rate,json=oracleCommissionRate,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Dec" json:"oracle_commission_rate"`
+	TrustedBlockHeight            int64                                  `protobuf:"varint,5,opt,name=trusted_block_height,json=trustedBlockHeight,proto3" json:"trusted_block_height,omitempty"`
+	TrustedBlockHash              []byte                                 `protobuf:"bytes,6,opt,name=trusted_block_hash,json=trustedBlockHash,proto3" json:"trusted_block_hash,omitempty"`
+	Endpoint                      string                                 `protobuf:"bytes,7,opt,name=endpoint,proto3" json:"endpoint,omitempty"`
+	OracleCommissionRate          github_com_cosmos_cosmos_sdk_types.Dec `protobuf:"bytes,8,opt,name=oracle_commission_rate,json=oracleCommissionRate,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Dec" json:"oracle_commission_rate"`
+	OracleCommissionMaxRate       github_com_cosmos_cosmos_sdk_types.Dec `protobuf:"bytes,9,opt,name=oracle_commission_max_rate,json=oracleCommissionMaxRate,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Dec" json:"oracle_commission_max_rate"`
+	OracleCommissionMaxChangeRate github_com_cosmos_cosmos_sdk_types.Dec `protobuf:"bytes,10,opt,name=oracle_commission_max_change_rate,json=oracleCommissionMaxChangeRate,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Dec" json:"oracle_commission_max_change_rate"`
 }
 
 func (m *OracleRegistration) Reset()         { *m = OracleRegistration{} }
@@ -193,34 +209,41 @@ func init() {
 func init() { proto.RegisterFile("panacea/oracle/v2/oracle.proto", fileDescriptor_35c1a1e2fbbbc7ea) }
 
 var fileDescriptor_35c1a1e2fbbbc7ea = []byte{
-	// 424 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x92, 0x31, 0x6f, 0xd4, 0x30,
-	0x14, 0xc7, 0x2f, 0x3d, 0x38, 0xae, 0xd6, 0x81, 0xc0, 0x3a, 0x55, 0xd1, 0x21, 0xa5, 0xa7, 0x4a,
-	0xa0, 0x0e, 0x34, 0x41, 0x65, 0x63, 0xe3, 0x60, 0xa0, 0x62, 0x00, 0x79, 0x64, 0xb1, 0x1c, 0xfb,
-	0x29, 0xb1, 0xae, 0xc9, 0x0b, 0xb6, 0x53, 0x71, 0xdf, 0x82, 0x91, 0x8f, 0xd4, 0x09, 0x75, 0x44,
-	0x0c, 0x15, 0xba, 0xfb, 0x22, 0x28, 0x76, 0x0a, 0xbd, 0xc2, 0xc0, 0xd0, 0x29, 0xce, 0xff, 0xff,
-	0xf3, 0xf3, 0xfb, 0xeb, 0x3d, 0x92, 0x34, 0xa2, 0x16, 0x12, 0x44, 0x86, 0x46, 0xc8, 0x53, 0xc8,
-	0xce, 0x8e, 0xfb, 0x53, 0xda, 0x18, 0x74, 0x48, 0x1f, 0xf5, 0x7e, 0xda, 0xab, 0x67, 0xc7, 0xb3,
-	0x69, 0x81, 0x05, 0x7a, 0x37, 0xeb, 0x4e, 0x01, 0x3c, 0xf8, 0x16, 0x91, 0xd1, 0x7b, 0xcf, 0xd0,
-	0x27, 0xe4, 0x41, 0xa0, 0xb9, 0x50, 0xca, 0x80, 0xb5, 0x71, 0x34, 0x8f, 0x0e, 0x77, 0xd9, 0xfd,
-	0xa0, 0xbe, 0x0a, 0x22, 0x7d, 0x4c, 0x76, 0xdb, 0x5a, 0x7f, 0x6a, 0x81, 0x6b, 0x15, 0xef, 0x78,
-	0x62, 0x1c, 0x84, 0x13, 0x45, 0x67, 0x64, 0x0c, 0xb5, 0x6a, 0x50, 0xd7, 0x2e, 0x1e, 0x06, 0xef,
-	0xea, 0x9f, 0x2a, 0xb2, 0xd7, 0xd7, 0x97, 0x58, 0x55, 0xda, 0x5a, 0x8d, 0x35, 0x37, 0xc2, 0x41,
-	0x7c, 0xa7, 0x23, 0x17, 0xe9, 0xf9, 0xe5, 0xfe, 0xe0, 0xc7, 0xe5, 0xfe, 0xd3, 0x42, 0xbb, 0xb2,
-	0xcd, 0x53, 0x89, 0x55, 0x26, 0xd1, 0x56, 0x68, 0xfb, 0xcf, 0x91, 0x55, 0xcb, 0xcc, 0xad, 0x1a,
-	0xb0, 0xe9, 0x1b, 0x90, 0x6c, 0x1a, 0xaa, 0xbd, 0xfe, 0x5d, 0x8c, 0x09, 0x07, 0x07, 0x5f, 0x87,
-	0x84, 0x86, 0x40, 0x0c, 0x0a, 0x6d, 0x9d, 0x11, 0x4e, 0x63, 0xbd, 0xdd, 0x75, 0x74, 0xa3, 0xeb,
-	0xbf, 0x93, 0xef, 0xfc, 0x2b, 0xf9, 0x9c, 0x4c, 0x6a, 0x54, 0xc0, 0x9b, 0x36, 0xe7, 0x4b, 0x58,
-	0xf9, 0x80, 0x13, 0x46, 0x3a, 0xed, 0x43, 0x9b, 0xbf, 0x83, 0x15, 0x7d, 0x49, 0x66, 0xd7, 0x09,
-	0x6e, 0xa0, 0x42, 0x07, 0xdc, 0x40, 0x83, 0xc6, 0xf9, 0x98, 0x13, 0xb6, 0xf7, 0x87, 0x67, 0xde,
-	0x66, 0xde, 0xa5, 0xcf, 0xc9, 0xd4, 0x99, 0xd6, 0x3a, 0x50, 0x3c, 0x3f, 0x45, 0xb9, 0xe4, 0x25,
-	0xe8, 0xa2, 0x74, 0xf1, 0xdd, 0x79, 0x74, 0x38, 0x64, 0xb4, 0xf7, 0x16, 0x9d, 0xf5, 0xd6, 0x3b,
-	0xf4, 0x19, 0xa1, 0x37, 0x6e, 0x08, 0x5b, 0xc6, 0x23, 0xff, 0xca, 0xc3, 0x2d, 0x5e, 0xd8, 0x72,
-	0x6b, 0x34, 0xf7, 0xfe, 0x7b, 0x34, 0xe3, 0xdb, 0x1b, 0xcd, 0xe2, 0xe4, 0x7c, 0x9d, 0x44, 0x17,
-	0xeb, 0x24, 0xfa, 0xb9, 0x4e, 0xa2, 0x2f, 0x9b, 0x64, 0x70, 0xb1, 0x49, 0x06, 0xdf, 0x37, 0xc9,
-	0xe0, 0x63, 0x76, 0xad, 0x6e, 0x05, 0x4a, 0x77, 0x71, 0xb2, 0x7e, 0x85, 0x8f, 0x24, 0x1a, 0xc8,
-	0x3e, 0x5f, 0x6d, 0xba, 0x7f, 0x24, 0x1f, 0xf9, 0xed, 0x7d, 0xf1, 0x2b, 0x00, 0x00, 0xff, 0xff,
-	0x0a, 0x9b, 0xc2, 0xd2, 0x08, 0x03, 0x00, 0x00,
+	// 538 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xc4, 0x94, 0x41, 0x6f, 0xd3, 0x30,
+	0x14, 0xc7, 0x9b, 0x75, 0x74, 0xad, 0x57, 0x10, 0x58, 0xd5, 0x88, 0x82, 0x48, 0xcb, 0x24, 0xd0,
+	0x0e, 0x2c, 0x41, 0xe5, 0xc6, 0x8d, 0x0e, 0x24, 0x26, 0x84, 0x40, 0x16, 0x27, 0x2e, 0x91, 0x13,
+	0x3f, 0x12, 0xab, 0x4d, 0x1c, 0x62, 0x67, 0x6a, 0xbf, 0xc5, 0x3e, 0xd6, 0x8e, 0x3b, 0x22, 0x0e,
+	0x03, 0xb5, 0x5f, 0x03, 0x09, 0x14, 0x3b, 0x85, 0xb5, 0x2b, 0x97, 0x49, 0xc0, 0x29, 0xf1, 0xfb,
+	0xff, 0xfd, 0x7e, 0x4f, 0x7a, 0x7f, 0x19, 0xb9, 0x39, 0xcd, 0x68, 0x04, 0xd4, 0x17, 0x05, 0x8d,
+	0x26, 0xe0, 0x9f, 0x0c, 0xeb, 0x3f, 0x2f, 0x2f, 0x84, 0x12, 0xf8, 0x4e, 0xad, 0x7b, 0x75, 0xf5,
+	0x64, 0xe8, 0xf4, 0x62, 0x11, 0x0b, 0xad, 0xfa, 0xd5, 0x9f, 0x31, 0x3a, 0xfd, 0x58, 0x88, 0x78,
+	0x02, 0xbe, 0x3e, 0x85, 0xe5, 0x47, 0x5f, 0xf1, 0x14, 0xa4, 0xa2, 0x69, 0x6e, 0x0c, 0xfb, 0xdf,
+	0x9b, 0xa8, 0xf5, 0x56, 0x37, 0xc1, 0x0f, 0xd1, 0x2d, 0xd3, 0x2e, 0xa0, 0x8c, 0x15, 0x20, 0xa5,
+	0x6d, 0x0d, 0xac, 0x83, 0x0e, 0xb9, 0x69, 0xaa, 0xcf, 0x4d, 0x11, 0xdf, 0x43, 0x9d, 0x32, 0xe3,
+	0x9f, 0x4a, 0x08, 0x38, 0xb3, 0xb7, 0xb4, 0xa3, 0x6d, 0x0a, 0xc7, 0x0c, 0x3b, 0xa8, 0x0d, 0x19,
+	0xcb, 0x05, 0xcf, 0x94, 0xdd, 0x34, 0xda, 0xf2, 0x8c, 0x5f, 0xa2, 0xdd, 0x32, 0x67, 0x54, 0x41,
+	0x50, 0x0d, 0x61, 0x6f, 0x0f, 0xac, 0x83, 0xdd, 0xa1, 0xe3, 0x99, 0x09, 0xbd, 0xe5, 0x84, 0xde,
+	0xfb, 0xe5, 0x84, 0xa3, 0xf6, 0xd9, 0x45, 0xbf, 0x71, 0xfa, 0xb5, 0x6f, 0x11, 0x64, 0x2e, 0x56,
+	0x12, 0x66, 0x68, 0xaf, 0x1e, 0x33, 0x12, 0x69, 0xca, 0xa5, 0xe4, 0x22, 0x0b, 0x0a, 0xaa, 0xc0,
+	0xbe, 0x51, 0x01, 0x47, 0x5e, 0x75, 0xeb, 0xcb, 0x45, 0xff, 0x51, 0xcc, 0x55, 0x52, 0x86, 0x5e,
+	0x24, 0x52, 0x3f, 0x12, 0x32, 0x15, 0xb2, 0xfe, 0x1c, 0x4a, 0x36, 0xf6, 0xd5, 0x2c, 0x07, 0xe9,
+	0xbd, 0x80, 0x88, 0xf4, 0x4c, 0xb7, 0xa3, 0x5f, 0xcd, 0x08, 0x55, 0x80, 0xc7, 0xc8, 0xb9, 0x4a,
+	0x49, 0xe9, 0xd4, 0x90, 0x5a, 0xd7, 0x22, 0xdd, 0x5d, 0x27, 0xbd, 0xa1, 0x53, 0x0d, 0x9b, 0xa2,
+	0x07, 0x9b, 0x61, 0x51, 0x42, 0xb3, 0x18, 0x0c, 0x73, 0xe7, 0x5a, 0xcc, 0xfb, 0x1b, 0x98, 0x47,
+	0xba, 0x6b, 0x45, 0xde, 0xff, 0xb1, 0x8d, 0xb0, 0x59, 0x3f, 0x81, 0x98, 0x4b, 0x55, 0x50, 0xc5,
+	0x45, 0xb6, 0xba, 0x63, 0x6b, 0x6d, 0xc7, 0x57, 0x73, 0xb2, 0xb5, 0x29, 0x27, 0x03, 0xd4, 0xcd,
+	0x04, 0x83, 0x20, 0x2f, 0xc3, 0x60, 0x0c, 0x33, 0x1d, 0x87, 0x2e, 0x41, 0x55, 0xed, 0x5d, 0x19,
+	0xbe, 0x86, 0x19, 0x7e, 0x86, 0x9c, 0xcb, 0x8e, 0xa0, 0x80, 0x54, 0x28, 0x08, 0x0a, 0xc8, 0x45,
+	0xa1, 0x74, 0x3e, 0xba, 0x64, 0xef, 0xb7, 0x9f, 0x68, 0x99, 0x68, 0x15, 0x3f, 0x41, 0x3d, 0x55,
+	0x94, 0x52, 0x01, 0x0b, 0xc2, 0x89, 0x88, 0xc6, 0x41, 0x02, 0x3c, 0x4e, 0x94, 0xce, 0x40, 0x93,
+	0xe0, 0x5a, 0x1b, 0x55, 0xd2, 0x2b, 0xad, 0xe0, 0xc7, 0x08, 0xaf, 0xdd, 0xa0, 0x32, 0xd1, 0x9b,
+	0xec, 0x92, 0xdb, 0x2b, 0x7e, 0x2a, 0x93, 0x95, 0x20, 0xef, 0xac, 0x05, 0xf9, 0xcf, 0x09, 0x6c,
+	0xff, 0xb3, 0x04, 0x76, 0xfe, 0x43, 0x02, 0xd1, 0x5f, 0x48, 0xe0, 0xe8, 0xf8, 0x6c, 0xee, 0x5a,
+	0xe7, 0x73, 0xd7, 0xfa, 0x36, 0x77, 0xad, 0xd3, 0x85, 0xdb, 0x38, 0x5f, 0xb8, 0x8d, 0xcf, 0x0b,
+	0xb7, 0xf1, 0xc1, 0xbf, 0x04, 0x48, 0x81, 0xf1, 0x6a, 0x6b, 0x7e, 0xfd, 0xf0, 0x1d, 0x46, 0xa2,
+	0x00, 0x7f, 0xba, 0x7c, 0x1f, 0x35, 0x2d, 0x6c, 0xe9, 0x37, 0xe4, 0xe9, 0xcf, 0x00, 0x00, 0x00,
+	0xff, 0xff, 0x2a, 0x97, 0xb1, 0xf9, 0x3e, 0x05, 0x00, 0x00,
 }
 
 func (m *Oracle) Marshal() (dAtA []byte, err error) {
@@ -244,6 +267,26 @@ func (m *Oracle) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	var l int
 	_ = l
 	{
+		size := m.OracleCommissionMaxChangeRate.Size()
+		i -= size
+		if _, err := m.OracleCommissionMaxChangeRate.MarshalTo(dAtA[i:]); err != nil {
+			return 0, err
+		}
+		i = encodeVarintOracle(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x3a
+	{
+		size := m.OracleCommissionMaxRate.Size()
+		i -= size
+		if _, err := m.OracleCommissionMaxRate.MarshalTo(dAtA[i:]); err != nil {
+			return 0, err
+		}
+		i = encodeVarintOracle(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x32
+	{
 		size := m.OracleCommissionRate.Size()
 		i -= size
 		if _, err := m.OracleCommissionRate.MarshalTo(dAtA[i:]); err != nil {
@@ -251,6 +294,14 @@ func (m *Oracle) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		}
 		i = encodeVarintOracle(dAtA, i, uint64(size))
 	}
+	i--
+	dAtA[i] = 0x2a
+	n1, err1 := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.UpdateTime, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(m.UpdateTime):])
+	if err1 != nil {
+		return 0, err1
+	}
+	i -= n1
+	i = encodeVarintOracle(dAtA, i, uint64(n1))
 	i--
 	dAtA[i] = 0x22
 	if len(m.Endpoint) > 0 {
@@ -297,6 +348,26 @@ func (m *OracleRegistration) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
+	{
+		size := m.OracleCommissionMaxChangeRate.Size()
+		i -= size
+		if _, err := m.OracleCommissionMaxChangeRate.MarshalTo(dAtA[i:]); err != nil {
+			return 0, err
+		}
+		i = encodeVarintOracle(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x52
+	{
+		size := m.OracleCommissionMaxRate.Size()
+		i -= size
+		if _, err := m.OracleCommissionMaxRate.MarshalTo(dAtA[i:]); err != nil {
+			return 0, err
+		}
+		i = encodeVarintOracle(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x4a
 	{
 		size := m.OracleCommissionRate.Size()
 		i -= size
@@ -386,7 +457,13 @@ func (m *Oracle) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovOracle(uint64(l))
 	}
+	l = github_com_gogo_protobuf_types.SizeOfStdTime(m.UpdateTime)
+	n += 1 + l + sovOracle(uint64(l))
 	l = m.OracleCommissionRate.Size()
+	n += 1 + l + sovOracle(uint64(l))
+	l = m.OracleCommissionMaxRate.Size()
+	n += 1 + l + sovOracle(uint64(l))
+	l = m.OracleCommissionMaxChangeRate.Size()
 	n += 1 + l + sovOracle(uint64(l))
 	return n
 }
@@ -425,6 +502,10 @@ func (m *OracleRegistration) Size() (n int) {
 		n += 1 + l + sovOracle(uint64(l))
 	}
 	l = m.OracleCommissionRate.Size()
+	n += 1 + l + sovOracle(uint64(l))
+	l = m.OracleCommissionMaxRate.Size()
+	n += 1 + l + sovOracle(uint64(l))
+	l = m.OracleCommissionMaxChangeRate.Size()
 	n += 1 + l + sovOracle(uint64(l))
 	return n
 }
@@ -562,6 +643,39 @@ func (m *Oracle) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 4:
 			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field UpdateTime", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowOracle
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthOracle
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthOracle
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(&m.UpdateTime, dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 5:
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field OracleCommissionRate", wireType)
 			}
 			var stringLen uint64
@@ -591,6 +705,74 @@ func (m *Oracle) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if err := m.OracleCommissionRate.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 6:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field OracleCommissionMaxRate", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowOracle
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthOracle
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthOracle
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.OracleCommissionMaxRate.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 7:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field OracleCommissionMaxChangeRate", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowOracle
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthOracle
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthOracle
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.OracleCommissionMaxChangeRate.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -892,6 +1074,74 @@ func (m *OracleRegistration) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if err := m.OracleCommissionRate.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 9:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field OracleCommissionMaxRate", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowOracle
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthOracle
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthOracle
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.OracleCommissionMaxRate.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 10:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field OracleCommissionMaxChangeRate", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowOracle
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthOracle
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthOracle
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.OracleCommissionMaxChangeRate.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex

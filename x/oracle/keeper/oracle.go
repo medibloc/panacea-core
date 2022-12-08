@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"errors"
+	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -39,6 +40,53 @@ func (k Keeper) RegisterOracle(ctx sdk.Context, msg *types.MsgRegisterOracle) er
 			sdk.NewAttribute(types.AttributeKeyOracleAddress, oracleRegistration.OracleAddress),
 		),
 	)
+	return nil
+}
+
+func (k Keeper) UpdateOracleInfo(ctx sdk.Context, msg *types.MsgUpdateOracleInfo) error {
+	oracle, err := k.GetOracle(ctx, msg.OracleAddress)
+	if err != nil {
+		return sdkerrors.Wrapf(types.ErrUpdateOracle, err.Error())
+	}
+
+	blockTime := ctx.BlockHeader().Time
+
+	if !oracle.OracleCommissionRate.Equal(msg.OracleCommissionRate) {
+		if err := k.ValidateOracleCommission(oracle, blockTime, msg.OracleCommissionRate); err != nil {
+			return sdkerrors.Wrapf(types.ErrUpdateOracle, err.Error())
+		}
+	}
+
+	oracle.UpdateTime = blockTime
+	oracle.Endpoint = msg.Endpoint
+	oracle.OracleCommissionRate = msg.OracleCommissionRate
+
+	if err := k.SetOracle(ctx, oracle); err != nil {
+		return sdkerrors.Wrapf(types.ErrUpdateOracle, err.Error())
+	}
+	return nil
+}
+
+// ValidateOracleCommission validate an oracle's commission rate.
+// An error is returned if the new commission rate is invalid.
+func (k Keeper) ValidateOracleCommission(oracle *types.Oracle, blockTime time.Time, newRate sdk.Dec) error {
+	switch {
+	case blockTime.Sub(oracle.UpdateTime).Hours() < 24:
+		return types.ErrCommissionUpdateTime
+
+	case newRate.IsNegative():
+		// new rate cannot be negative
+		return types.ErrCommissionNegative
+
+	case newRate.GT(oracle.OracleCommissionMaxRate):
+		// new rate cannot be greater than the max rate
+		return types.ErrCommissionGTMaxRate
+
+	case newRate.Sub(oracle.OracleCommissionRate).GT(oracle.OracleCommissionMaxChangeRate):
+		// new rate % points change cannot be greater than the max change rate
+		return types.ErrCommissionGTMaxChangeRate
+	}
+
 	return nil
 }
 

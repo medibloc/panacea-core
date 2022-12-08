@@ -8,16 +8,18 @@ import (
 
 var _ sdk.Msg = &MsgRegisterOracle{}
 
-func NewMsgRegisterOracle(uniqueID, oracleAddress string, nodePubKey, nodePubKeyRemoteReport []byte, trustedBlockHeight int64, trustedBlockHash []byte, endpoint string, oracleCommissionRate sdk.Dec) *MsgRegisterOracle {
+func NewMsgRegisterOracle(uniqueID, oracleAddress string, nodePubKey, nodePubKeyRemoteReport []byte, trustedBlockHeight int64, trustedBlockHash []byte, endpoint string, oracleCommissionRate, oracleCommissionMaxRate, oracleCommissionMaxChangeRate sdk.Dec) *MsgRegisterOracle {
 	return &MsgRegisterOracle{
-		UniqueId:               uniqueID,
-		OracleAddress:          oracleAddress,
-		NodePubKey:             nodePubKey,
-		NodePubKeyRemoteReport: nodePubKeyRemoteReport,
-		TrustedBlockHeight:     trustedBlockHeight,
-		TrustedBlockHash:       trustedBlockHash,
-		Endpoint:               endpoint,
-		OracleCommissionRate:   oracleCommissionRate,
+		UniqueId:                      uniqueID,
+		OracleAddress:                 oracleAddress,
+		NodePubKey:                    nodePubKey,
+		NodePubKeyRemoteReport:        nodePubKeyRemoteReport,
+		TrustedBlockHeight:            trustedBlockHeight,
+		TrustedBlockHash:              trustedBlockHash,
+		Endpoint:                      endpoint,
+		OracleCommissionRate:          oracleCommissionRate,
+		OracleCommissionMaxRate:       oracleCommissionMaxRate,
+		OracleCommissionMaxChangeRate: oracleCommissionMaxChangeRate,
 	}
 }
 
@@ -58,6 +60,12 @@ func (m *MsgRegisterOracle) ValidateBasic() error {
 
 	if m.OracleCommissionRate.LT(sdk.ZeroDec()) || m.OracleCommissionRate.GT(sdk.OneDec()) {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "oracleCommissionRate must be between 0 and 1")
+	}
+	if m.OracleCommissionMaxRate.LT(sdk.ZeroDec()) || m.OracleCommissionMaxRate.GT(sdk.OneDec()) {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "OracleCommissionMaxRate must be between 0 and 1")
+	}
+	if m.OracleCommissionMaxChangeRate.LT(sdk.ZeroDec()) || m.OracleCommissionMaxChangeRate.GT(sdk.OneDec()) {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "OracleCommissionMaxChangeRate must be between 0 and 1")
 	}
 
 	return nil
