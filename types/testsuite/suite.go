@@ -44,6 +44,8 @@ import (
 	dbm "github.com/tendermint/tm-db"
 
 	"github.com/medibloc/panacea-core/v2/app/params"
+	datadealkeeper "github.com/medibloc/panacea-core/v2/x/datadeal/keeper"
+	datadealtypes "github.com/medibloc/panacea-core/v2/x/datadeal/types"
 	didkeeper "github.com/medibloc/panacea-core/v2/x/did/keeper"
 	didtypes "github.com/medibloc/panacea-core/v2/x/did/types"
 )
@@ -56,22 +58,24 @@ type TestSuite struct {
 	Ctx sdk.Context
 	Cdc params.EncodingConfig
 
-	AccountKeeper    authkeeper.AccountKeeper
-	StakingKeeper    stakingkeeper.Keeper
-	AolKeeper        aolkeeper.Keeper
-	AolMsgServer     aoltypes.MsgServer
-	BankKeeper       bankkeeper.Keeper
-	BurnKeeper       burnkeeper.Keeper
-	CapabilityKeeper *capabilitykeeper.Keeper
-	DistrKeeper      distrkeeper.Keeper
-	IBCKeeper        *ibckeeper.Keeper
-	TransferKeeper   ibctransferkeeper.Keeper
-	DIDMsgServer     didtypes.MsgServer
-	DIDKeeper        didkeeper.Keeper
-	OracleKeeper     oraclekeeper.Keeper
-	OracleMsgServer  oracletypes.MsgServer
-	WasmKeeper       wasm.Keeper
-	UpgradeKeeper    upgradekeeper.Keeper
+	AccountKeeper     authkeeper.AccountKeeper
+	StakingKeeper     stakingkeeper.Keeper
+	AolKeeper         aolkeeper.Keeper
+	AolMsgServer      aoltypes.MsgServer
+	BankKeeper        bankkeeper.Keeper
+	BurnKeeper        burnkeeper.Keeper
+	CapabilityKeeper  *capabilitykeeper.Keeper
+	DistrKeeper       distrkeeper.Keeper
+	IBCKeeper         *ibckeeper.Keeper
+	TransferKeeper    ibctransferkeeper.Keeper
+	DIDMsgServer      didtypes.MsgServer
+	DIDKeeper         didkeeper.Keeper
+	DataDealKeeper    datadealkeeper.Keeper
+	DataDealMsgServer datadealtypes.MsgServer
+	OracleKeeper      oraclekeeper.Keeper
+	OracleMsgServer   oracletypes.MsgServer
+	WasmKeeper        wasm.Keeper
+	UpgradeKeeper     upgradekeeper.Keeper
 }
 
 func (suite *TestSuite) SetupTest() {
@@ -81,6 +85,7 @@ func (suite *TestSuite) SetupTest() {
 		banktypes.StoreKey,
 		paramstypes.StoreKey,
 		didtypes.StoreKey,
+		datadealtypes.StoreKey,
 		oracletypes.StoreKey,
 		wasm.StoreKey,
 		ibchost.StoreKey,
@@ -210,6 +215,15 @@ func (suite *TestSuite) SetupTest() {
 	)
 	suite.DIDMsgServer = didkeeper.NewMsgServerImpl(suite.DIDKeeper)
 
+	suite.DataDealKeeper = *datadealkeeper.NewKeeper(
+		cdc.Marshaler,
+		keyParams[datadealtypes.StoreKey],
+		memKeys[datadealtypes.MemStoreKey],
+		suite.AccountKeeper,
+		suite.BankKeeper,
+	)
+	suite.DataDealMsgServer = datadealkeeper.NewMsgServerImpl(suite.DataDealKeeper)
+
 	suite.OracleKeeper = *oraclekeeper.NewKeeper(
 		cdc.Marshaler,
 		keyParams[oracletypes.StoreKey],
@@ -235,6 +249,8 @@ func newTestCodec() params.EncodingConfig {
 	banktypes.RegisterInterfaces(interfaceRegistry)
 	didtypes.RegisterInterfaces(interfaceRegistry)
 	oracletypes.RegisterInterfaces(interfaceRegistry)
+	//TODO: When other Msgs are implemented, I'll remove this comment.
+	//datadealtypes.RegisterInterfaces(interfaceRegistry)
 	marshaler := codec.NewProtoCodec(interfaceRegistry)
 
 	return params.EncodingConfig{
