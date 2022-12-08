@@ -191,6 +191,7 @@ var (
 		aol.AppModuleBasic{},
 		did.AppModuleBasic{},
 		burn.AppModuleBasic{},
+		oracle.AppModuleBasic{},
 		wasm.AppModuleBasic{},
 		feegrantmodule.AppModuleBasic{},
 		authzmodule.AppModuleBasic{},
@@ -311,6 +312,7 @@ func New(
 		aoltypes.StoreKey,
 		didtypes.StoreKey,
 		burntypes.StoreKey,
+		oracletypes.StoreKey,
 		wasm.StoreKey,
 		feegrant.StoreKey,
 		oracletypes.StoreKey,
@@ -426,6 +428,13 @@ func New(
 		app.BankKeeper,
 	)
 
+	app.oracleKeeper = *oraclekeeper.NewKeeper(
+		appCodec,
+		keys[oracletypes.StoreKey],
+		keys[oracletypes.MemStoreKey],
+		app.GetSubspace(oracletypes.ModuleName),
+	)
+
 	wasmDir := filepath.Join(homePath, wasm.ModuleName)
 	wasmConfig, err := wasm.ReadWasmConfig(appOpts)
 	if err != nil {
@@ -511,6 +520,7 @@ func New(
 		aol.NewAppModule(appCodec, app.aolKeeper),
 		did.NewAppModule(appCodec, app.didKeeper),
 		burn.NewAppModule(appCodec, app.burnKeeper),
+		oracle.NewAppModule(appCodec, app.oracleKeeper),
 		wasm.NewAppModule(appCodec, &app.wasmKeeper, app.StakingKeeper),
 		oracle.NewAppModule(appCodec, app.oracleKeeper),
 	)
@@ -823,6 +833,7 @@ func initParamsKeeper(appCodec codec.Codec, legacyAmino *codec.LegacyAmino, key,
 	paramsKeeper.Subspace(aoltypes.ModuleName)
 	paramsKeeper.Subspace(didtypes.ModuleName)
 	paramsKeeper.Subspace(burntypes.ModuleName)
+	paramsKeeper.Subspace(oracletypes.ModuleName)
 	paramsKeeper.Subspace(wasm.ModuleName)
 	paramsKeeper.Subspace(oracletypes.ModuleName)
 
