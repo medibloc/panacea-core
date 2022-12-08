@@ -54,7 +54,7 @@ func (m *OracleRegistration) ValidateBasic() error {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "uniqueID is empty")
 	}
 	if _, err := sdk.AccAddressFromBech32(m.OracleAddress); err != nil {
-		return sdkerrors.Wrapf(err, "oracle address is invalid. address: %s", m.OracleAddress)
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "oracleAddress is invalid. address: %s, error: %s", m.OracleAddress, err.Error())
 	}
 
 	if m.NodePubKey == nil {
@@ -75,12 +75,9 @@ func (m *OracleRegistration) ValidateBasic() error {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "trusted block hash should not be nil")
 	}
 
-	if len(m.Endpoint) == 0 {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "endpoint is empty")
+	if m.OracleCommissionRate.LT(sdk.ZeroDec()) || m.OracleCommissionRate.GT(sdk.OneDec()) {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "oracleCommissionRate must be between 0 and 1")
 	}
 
-	if m.OracleCommissionRate.IsNegative() {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "oracle commission rate cannot be negative")
-	}
 	return nil
 }

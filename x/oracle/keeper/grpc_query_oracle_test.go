@@ -137,9 +137,23 @@ func (suite *queryOracleTestSuite) TestOracleRegistrations() {
 		OracleCommissionRate:   suite.oracle2CommissionRate,
 	}
 
+	anotherUniqueID := "uniqueID2"
+	oracleRegistration3 := &types.OracleRegistration{
+		UniqueId:               anotherUniqueID,
+		OracleAddress:          suite.oracle2AccAddr.String(),
+		NodePubKey:             suite.nodePubKey.SerializeCompressed(),
+		NodePubKeyRemoteReport: remoteReport,
+		TrustedBlockHeight:     10,
+		TrustedBlockHash:       trustedBlockHash,
+		Endpoint:               suite.oracle2Endpoint,
+		OracleCommissionRate:   suite.oracle2CommissionRate,
+	}
+
 	err := oracleKeeper.SetOracleRegistration(ctx, oracleRegistration)
 	suite.Require().NoError(err)
 	err = oracleKeeper.SetOracleRegistration(ctx, oracleRegistration2)
+	suite.Require().NoError(err)
+	err = oracleKeeper.SetOracleRegistration(ctx, oracleRegistration3)
 	suite.Require().NoError(err)
 
 	req := types.QueryOracleRegistrationsRequest{
@@ -171,6 +185,20 @@ func (suite *queryOracleTestSuite) TestOracleRegistrations() {
 			panic("not found oracle address. address: " + oracleRegistration.OracleAddress)
 		}
 	}
+
+	req.UniqueId = anotherUniqueID
+	res, err = oracleKeeper.OracleRegistrations(sdk.WrapSDKContext(ctx), &req)
+	suite.Require().NoError(err)
+	suite.Require().Equal(1, len(res.OracleRegistrations))
+
+	suite.Require().Equal(suite.oracle2AccAddr.String(), res.OracleRegistrations[0].OracleAddress)
+	suite.Require().Equal(anotherUniqueID, res.OracleRegistrations[0].UniqueId)
+	suite.Require().Equal(suite.nodePubKey.SerializeCompressed(), res.OracleRegistrations[0].NodePubKey)
+	suite.Require().Equal(remoteReport, res.OracleRegistrations[0].NodePubKeyRemoteReport)
+	suite.Require().Equal(int64(10), res.OracleRegistrations[0].TrustedBlockHeight)
+	suite.Require().Equal(trustedBlockHash, res.OracleRegistrations[0].TrustedBlockHash)
+	suite.Require().Equal(suite.oracle2Endpoint, res.OracleRegistrations[0].Endpoint)
+	suite.Require().Equal(suite.oracle2CommissionRate, res.OracleRegistrations[0].OracleCommissionRate)
 }
 
 func (suite *queryOracleTestSuite) TestOracleRegistration() {
@@ -189,5 +217,17 @@ func (suite *queryOracleTestSuite) TestOracleRegistration() {
 	}
 	err := oracleKeeper.SetOracleRegistration(ctx, oracleRegistration)
 	suite.Require().NoError(err)
+}
 
+func (suite *queryOracleTestSuite) TestOracleParams() {
+	ctx := suite.Ctx
+	oracleKeeper := suite.OracleKeeper
+
+	oracleKeeper.SetParams(ctx, types.DefaultParams())
+
+	req := types.QueryOracleParamsRequest{}
+	res, err := oracleKeeper.Params(sdk.WrapSDKContext(ctx), &req)
+	suite.Require().NoError(err)
+
+	suite.Require().Equal(types.DefaultParams(), *res.Params)
 }

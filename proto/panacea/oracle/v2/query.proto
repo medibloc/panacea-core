@@ -24,12 +24,12 @@ service Query {
 
   // OracleRegistrations returns a list of OracleRegistration.
   rpc OracleRegistrations(QueryOracleRegistrationsRequest) returns (QueryOracleRegistrationsResponse) {
-    option (google.api.http).get = "/panacea/oracle/v2/oracle_registrations";
+    option (google.api.http).get = "/panacea/oracle/v2/oracle-registrations/{unique_id}";
   }
 
   // OracleRegistration returns a OracleRegistration details.
   rpc OracleRegistration(QueryOracleRegistrationRequest) returns (QueryOracleRegistrationResponse) {
-    option (google.api.http).get = "/panacea/oracle/v2/oracle_registrations/{unique_id}/{oracle_address}";
+    option (google.api.http).get = "/panacea/oracle/v2/oracle-registrations/{unique_id}/{oracle_address}";
   }
 
   // Params returns params of oracle module.

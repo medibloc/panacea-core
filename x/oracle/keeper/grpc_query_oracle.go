@@ -61,7 +61,7 @@ func (k Keeper) OracleRegistrations(goCtx context.Context, request *types.QueryO
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	store := ctx.KVStore(k.storeKey)
-	oracleRegistrationStore := prefix.NewStore(store, types.OracleRegistrationKey)
+	oracleRegistrationStore := prefix.NewStore(store, append(types.OracleRegistrationKey, []byte(request.UniqueId)...))
 
 	var oracleRegistrations []*types.OracleRegistration
 	pageRes, err := query.Paginate(oracleRegistrationStore, request.Pagination, func(_, value []byte) error {
@@ -93,7 +93,7 @@ func (k Keeper) OracleRegistration(goCtx context.Context, request *types.QueryOr
 	return &types.QueryOracleRegistrationResponse{OracleRegistration: oracleRegistration}, nil
 }
 
-func (k Keeper) Params(ctx context.Context, request *types.QueryOracleParamsRequest) (*types.QueryParamsResponse, error) {
-	//TODO implement me
-	panic("implement me")
+func (k Keeper) Params(goCtx context.Context, _ *types.QueryOracleParamsRequest) (*types.QueryParamsResponse, error) {
+	params := k.GetParams(sdk.UnwrapSDKContext(goCtx))
+	return &types.QueryParamsResponse{Params: &params}, nil
 }
