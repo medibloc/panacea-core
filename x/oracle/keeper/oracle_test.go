@@ -322,3 +322,21 @@ func (suite *oracleTestSuite) TestUpdateOracleInfoFailedGTMaxChangeRate() {
 	suite.Require().Error(err, types.ErrUpdateOracle)
 	suite.Require().ErrorContains(err, "commission cannot be changed more than max change rate")
 }
+
+func (suite *oracleTestSuite) TestUpdateOracleInfoFailedGTMaxRate() {
+	ctx := suite.Ctx
+
+	oracle := types.NewOracle(suite.oracleAccAddr.String(), suite.uniqueID, suite.endpoint, suite.oracleCommissionRate, suite.oracleCommissionMaxRate, sdk.NewDecWithPrec(3, 1), ctx.BlockTime())
+	err := suite.OracleKeeper.SetOracle(ctx, oracle)
+	suite.Require().NoError(err)
+
+	msgUpdateOracleInfo := &types.MsgUpdateOracleInfo{
+		OracleAddress:        suite.oracleAccAddr.String(),
+		Endpoint:             suite.newEndpoint,
+		OracleCommissionRate: sdk.NewDecWithPrec(3, 1),
+	}
+	ctx = ctx.WithBlockTime(ctx.BlockTime().Add(30 * time.Hour))
+	err = suite.OracleKeeper.UpdateOracleInfo(ctx, msgUpdateOracleInfo)
+	suite.Require().Error(err, types.ErrUpdateOracle)
+	suite.Require().ErrorContains(err, "commission cannot be more than the max rate")
+}
