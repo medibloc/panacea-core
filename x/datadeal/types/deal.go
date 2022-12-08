@@ -63,6 +63,6 @@ func (m *Deal) GetPricePerData() sdk.Dec {
 	return totalBudget.Quo(maxNumData).TruncateDec()
 }
 
-func (m *Deal) IncrementCurNumData() {
+func (m *Deal) IncreaseCurNumData() {
 	m.CurNumData += 1
 }

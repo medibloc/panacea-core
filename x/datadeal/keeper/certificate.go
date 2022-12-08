@@ -85,7 +85,7 @@ func (k Keeper) sendReward(ctx sdk.Context, deal *types.Deal, unsignedCert *type
 }
 
 func (k Keeper) postProcessingOfDeal(ctx sdk.Context, deal *types.Deal) error {
-	deal.IncrementCurNumData()
+	deal.IncreaseCurNumData()
 
 	if deal.CurNumData == deal.MaxNumData {
 		deal.Status = types.DEAL_STATUS_COMPLETED
