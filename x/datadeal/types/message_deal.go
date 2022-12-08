@@ -16,7 +16,21 @@ func (m *MsgCreateDeal) Type() string {
 }
 
 func (m *MsgCreateDeal) ValidateBasic() error {
-
+	if len(m.DataSchema) == 0 {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "dataSchema is empty")
+	}
+	if m.MaxNumData <= 0 {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "MaxNumData should be bigger than 0")
+	}
+	if m.Budget == nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "budget is empty")
+	}
+	if !m.Budget.IsValid() {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "budget is not a valid Coin object")
+	}
+	if _, err := sdk.AccAddressFromBech32(m.ConsumerAddress); err != nil {
+		return sdkerrors.Wrapf(err, "consumer address is invalid. address: %s", m.ConsumerAddress)
+	}
 	return nil
 }
 
@@ -106,4 +120,38 @@ func (m *UnsignedCertificate) ValidateBasic() error {
 	}
 
 	return nil
+}
+
+var _ sdk.Msg = &MsgDeactivateDeal{}
+
+func (m *MsgDeactivateDeal) Route() string {
+	return RouterKey
+}
+
+func (m *MsgDeactivateDeal) Type() string {
+	return "DeactivateDeal"
+}
+
+func (m *MsgDeactivateDeal) ValidateBasic() error {
+	if _, err := sdk.AccAddressFromBech32(m.RequesterAddress); err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "requesterAddress is invalid. address: %s, error: %s", m.RequesterAddress, err.Error())
+	}
+	if m.DealId <= 0 {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "dealId is greater than 0")
+	}
+
+	return nil
+}
+
+func (m *MsgDeactivateDeal) GetSignBytes() []byte {
+	bz := ModuleCdc.MustMarshalJSON(m)
+	return sdk.MustSortJSON(bz)
+}
+
+func (m *MsgDeactivateDeal) GetSigners() []sdk.AccAddress {
+	requesterAddress, err := sdk.AccAddressFromBech32(m.RequesterAddress)
+	if err != nil {
+		panic(err)
+	}
+	return []sdk.AccAddress{requesterAddress}
 }
