@@ -11,7 +11,7 @@ import (
 
 func (k Keeper) SubmitConsent(ctx sdk.Context, cert *types.Certificate) error {
 	unsignedCert := cert.UnsignedCertificate
-	if err := k.oracleKeeper.VerifySignature(ctx, unsignedCert, cert.Signature); err != nil {
+	if err := k.oracleKeeper.VerifyOracleSignature(ctx, unsignedCert, cert.Signature); err != nil {
 		return sdkerrors.Wrapf(types.ErrSubmitConsent, err.Error())
 	}
 
