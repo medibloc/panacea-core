@@ -9,6 +9,9 @@ import (
 	"strings"
 
 	"github.com/cosmos/cosmos-sdk/x/authz"
+	"github.com/medibloc/panacea-core/v2/x/oracle"
+	oraclekeeper "github.com/medibloc/panacea-core/v2/x/oracle/keeper"
+	oracletypes "github.com/medibloc/panacea-core/v2/x/oracle/types"
 
 	"github.com/CosmWasm/wasmd/x/wasm"
 	wasmclient "github.com/CosmWasm/wasmd/x/wasm/client"
@@ -261,10 +264,11 @@ type App struct {
 	ScopedTransferKeeper capabilitykeeper.ScopedKeeper
 	ScopedWasmKeeper     capabilitykeeper.ScopedKeeper
 
-	aolKeeper  aolkeeper.Keeper
-	didKeeper  didkeeper.Keeper
-	burnKeeper burnkeeper.Keeper
-	wasmKeeper wasm.Keeper
+	aolKeeper    aolkeeper.Keeper
+	didKeeper    didkeeper.Keeper
+	burnKeeper   burnkeeper.Keeper
+	wasmKeeper   wasm.Keeper
+	oracleKeeper oraclekeeper.Keeper
 
 	// the module manager
 	mm *module.Manager
@@ -309,6 +313,7 @@ func New(
 		burntypes.StoreKey,
 		wasm.StoreKey,
 		feegrant.StoreKey,
+		oracletypes.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
@@ -448,6 +453,13 @@ func New(
 		wasmOpts...,
 	)
 
+	app.oracleKeeper = *oraclekeeper.NewKeeper(
+		appCodec,
+		keys[oracletypes.StoreKey],
+		keys[oracletypes.MemStoreKey],
+		app.GetSubspace(oracletypes.ModuleName),
+	)
+
 	// The gov proposal types can be individually enabled
 	if len(enabledWasmProposals) != 0 {
 		govRouter.AddRoute(wasm.RouterKey, wasm.NewWasmProposalHandler(app.wasmKeeper, enabledWasmProposals))
@@ -500,6 +512,7 @@ func New(
 		did.NewAppModule(appCodec, app.didKeeper),
 		burn.NewAppModule(appCodec, app.burnKeeper),
 		wasm.NewAppModule(appCodec, &app.wasmKeeper, app.StakingKeeper),
+		oracle.NewAppModule(appCodec, app.oracleKeeper),
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -523,6 +536,7 @@ func New(
 		authtypes.ModuleName,
 		aoltypes.ModuleName,
 		didtypes.ModuleName,
+		oracletypes.ModuleName,
 		wasm.ModuleName,
 		banktypes.ModuleName,
 		crisistypes.ModuleName,
@@ -551,6 +565,7 @@ func New(
 		slashingtypes.ModuleName,
 		ibctransfertypes.ModuleName,
 		aoltypes.ModuleName,
+		oracletypes.ModuleName,
 		wasm.ModuleName,
 		paramstypes.ModuleName,
 		authz.ModuleName,
@@ -579,6 +594,7 @@ func New(
 		aoltypes.ModuleName,
 		didtypes.ModuleName,
 		burntypes.ModuleName,
+		oracletypes.ModuleName,
 		wasm.ModuleName,
 		paramstypes.ModuleName,
 		upgradetypes.ModuleName,
@@ -808,6 +824,7 @@ func initParamsKeeper(appCodec codec.Codec, legacyAmino *codec.LegacyAmino, key,
 	paramsKeeper.Subspace(didtypes.ModuleName)
 	paramsKeeper.Subspace(burntypes.ModuleName)
 	paramsKeeper.Subspace(wasm.ModuleName)
+	paramsKeeper.Subspace(oracletypes.ModuleName)
 
 	return paramsKeeper
 }

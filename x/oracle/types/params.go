@@ -36,7 +36,7 @@ func (p *Params) ParamSetPairs() paramtypes.ParamSetPairs {
 	}
 }
 
-func (p Params) Validate() error {
+func (p *Params) Validate() error {
 	if err := validateOraclePublicKey(p.OraclePublicKey); err != nil {
 		return err
 	}
