@@ -30,7 +30,7 @@ func (k Keeper) SubmitConsent(ctx sdk.Context, cert *types.Certificate) error {
 		return sdkerrors.Wrapf(types.ErrSubmitConsent, err.Error())
 	}
 
-	if err := k.SetCertificate(ctx, unsignedCert); err != nil {
+	if err := k.SetCertificate(ctx, cert); err != nil {
 		return sdkerrors.Wrapf(types.ErrSubmitConsent, err.Error())
 	}
 
@@ -64,7 +64,7 @@ func (k Keeper) sendReward(ctx sdk.Context, deal *types.Deal, unsignedCert *type
 	}
 
 	providerAccAddr, err := sdk.AccAddressFromBech32(unsignedCert.ProviderAddress)
-	if err := k.SetCertificate(ctx, unsignedCert); err != nil {
+	if err != nil {
 		return err
 	}
 
@@ -97,11 +97,11 @@ func (k Keeper) postProcessingOfDeal(ctx sdk.Context, deal *types.Deal) error {
 	return nil
 }
 
-func (k Keeper) SetCertificate(ctx sdk.Context, unsignedCert *types.UnsignedCertificate) error {
+func (k Keeper) SetCertificate(ctx sdk.Context, cert *types.Certificate) error {
 	store := ctx.KVStore(k.storeKey)
-	key := types.GetCertificateKey(unsignedCert.DealId, unsignedCert.DataHash)
+	key := types.GetCertificateKey(cert.UnsignedCertificate.DealId, cert.UnsignedCertificate.DataHash)
 
-	bz, err := k.cdc.MarshalLengthPrefixed(unsignedCert)
+	bz, err := k.cdc.MarshalLengthPrefixed(cert)
 
 	if err != nil {
 		return err
@@ -112,7 +112,7 @@ func (k Keeper) SetCertificate(ctx sdk.Context, unsignedCert *types.UnsignedCert
 	return nil
 }
 
-func (k Keeper) GetCertificate(ctx sdk.Context, dealID uint64, dataHash string) (*types.UnsignedCertificate, error) {
+func (k Keeper) GetCertificate(ctx sdk.Context, dealID uint64, dataHash string) (*types.Certificate, error) {
 	store := ctx.KVStore(k.storeKey)
 	key := types.GetCertificateKey(dealID, dataHash)
 
@@ -121,7 +121,7 @@ func (k Keeper) GetCertificate(ctx sdk.Context, dealID uint64, dataHash string) 
 		return nil, types.ErrCertificateNotFound
 	}
 
-	certificate := &types.UnsignedCertificate{}
+	certificate := &types.Certificate{}
 
 	err := k.cdc.UnmarshalLengthPrefixed(bz, certificate)
 	if err != nil {

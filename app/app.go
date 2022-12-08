@@ -9,6 +9,8 @@ import (
 	"strings"
 
 	"github.com/cosmos/cosmos-sdk/x/authz"
+	oraclekeeper "github.com/medibloc/panacea-core/v2/x/oracle/keeper"
+	oracletypes "github.com/medibloc/panacea-core/v2/x/oracle/types"
 
 	"github.com/CosmWasm/wasmd/x/wasm"
 	wasmclient "github.com/CosmWasm/wasmd/x/wasm/client"
@@ -271,6 +273,7 @@ type App struct {
 	burnKeeper     burnkeeper.Keeper
 	wasmKeeper     wasm.Keeper
 	datadealKeeper datadealkeeper.Keeper
+	oracleKeeper   oraclekeeper.Keeper
 
 	// the module manager
 	mm *module.Manager
@@ -428,12 +431,20 @@ func New(
 		app.BankKeeper,
 	)
 
+	app.oracleKeeper = *oraclekeeper.NewKeeper(
+		appCodec,
+		keys[oracletypes.StoreKey],
+		keys[oracletypes.MemStoreKey],
+		app.GetSubspace(oracletypes.ModuleName),
+	)
+
 	app.datadealKeeper = *datadealkeeper.NewKeeper(
 		appCodec,
 		keys[datadealtypes.StoreKey],
 		keys[datadealtypes.MemStoreKey],
 		app.AccountKeeper,
 		app.BankKeeper,
+		app.oracleKeeper,
 	)
 
 	wasmDir := filepath.Join(homePath, wasm.ModuleName)
