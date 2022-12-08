@@ -80,10 +80,7 @@ func (suite *certificateTestSuite) createSampleDeal(budgetAmount, maxNumData uin
 		ConsumerAddress: suite.consumerAccAddr.String(),
 	}
 
-	consumer, err := sdk.AccAddressFromBech32(msgCreateDeal.ConsumerAddress)
-	suite.Require().NoError(err)
-
-	dealID, err := suite.DataDealKeeper.CreateDeal(suite.Ctx, consumer, msgCreateDeal)
+	dealID, err := suite.DataDealKeeper.CreateDeal(suite.Ctx, msgCreateDeal)
 	suite.Require().NoError(err)
 
 	return dealID
