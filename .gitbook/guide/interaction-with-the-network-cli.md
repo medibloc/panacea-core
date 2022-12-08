@@ -276,6 +276,7 @@ Don't use more `umed` than you have!
 panacead tx staking create-validator \
   --pubkey $(panacead tendermint show-validator) \
   --moniker "choose a moniker" \
+  --details "This is a detail description" \
   --chain-id <chain-id> \
   --commission-rate "0.10" \
   --commission-max-rate "0.20" \
@@ -290,6 +291,7 @@ panacead tx staking create-validator \
   The public key can be resolved by `panacead tendermint show-validator` in the node that you want to make as a validator.
   For details about various key types, please see this [guide](interaction-with-the-network-cli.md#keys).
 - `moniker`: A validator nickname that will be displayed publicly
+- `details`: A detail description of the validator
 - `commission-rate`: An initial commission rate on block rewards and fees charged to delegators
   - This shouldn't be smaller than the minimum commission rate (a genesis parameter) that can be queried by `panacead query staking params`.
 - `commission-max-rate`: A maximum commission rate which this validator can charge. This cannot be changed after the
@@ -330,11 +332,15 @@ panacead tx staking edit-validator \
   --fees "1000000umed"
 ```
 
+For more details of each flag, please see the [`Create your validator`](#create-your-validator) guide.
+
 **Note**: The `--commission-rate` value must adhere to the following invariants:
 
 - Must be between the minimum commission rate (a genesis parameter) and the validator's `commission-max-rate`
 - Must not exceed the validator's `commission-max-change-rate` which is maximum % point change rate **per day**.
   In other words, a validator can only change its commission once per day and within `commission-max-change-rate` bounds.
+
+If you want to set a logo image of your validator which will be displayed on Mintscan and Cosmostation, please refer to [this guide](https://github.com/cosmostation/cosmostation_token_resource).
 
 ### Delegate to a Validator
 
@@ -492,7 +498,30 @@ With the `pool` command you will get the values for:
 
 * Not-bonded and bonded tokens
 
-## Fee Distribution
+## Reward Distribution
+
+### Withdraw rewards (and commissions)
+
+You can withdraw rewards proportional to your stake delegated to a specific validator.
+```bash
+panacead tx distribution withdraw-rewards <valoper-address> --from <delegator-address>
+```
+The `<valoper-address>` is an unique ID of a validator which starts with `panaceavaloper1`, while the `<delegator-address>` starts with `panacea1`.
+
+If you are a validator operator, you can withdraw commissions (collected from delegators) as well as rewards, by adding a `--commission` flag as below.
+```bash
+panacead tx distribution withdraw-rewards <valoper-address> --from <operator-address> --commission
+```
+
+If you are delegating to multiple validators, you can withdraw rewards from all validators that you are delegating to.
+```bash
+panacead tx distribution withdraw-all-rewards --from <delegator-address>
+```
+
+If you want to make your rewards to be withdrawn to another wallet, you can set an withdraw address as below. Then, whenever you execute `withdraw-rewards` or `withdraw-all-rewards` transactions, all rewards and commissions will be withdrawn to the withdraw address.
+```bash
+panacead tx distribution set-withdraw-addr <withdraw-address> --from <delegator-address>
+```
 
 ### Query distribution parameters
 
@@ -775,75 +804,3 @@ so that Panacea can verify that you are the DID owner.
 
 Deactivating a DID is not the same as deleting a DID. DIDs cannot be deleted permanently. They can just be deactivated.
 And DIDs cannot be reused to create another DID Documents forever.
-
-## Token
-
-### Issue a new token
-
-A new token can be issued by the following command. Anyone can issue a new token with fee paid.
-After issuing, the token would appear in the issuer's account.
-
-The symbol doesn't have to be unique. `-` followed by random 3 letters will be appended to the provided symbol to avoid uniqueness constraint.
-Those 3 letters are the first three letters of the Tx hash of the `issue` transaction.
-The generated symbol will be returned as a Tx response.
-
-For more details of each parameter, please see the [Token specification](../specifications/token.md).
-
-```bash
-# Note that the total supply must be in micro unit without a denomination.
-panacead tx token issue \
-    "my token" \
-    KAI \
-    1000000000 \
-    --mintable \
-    --from panacea126r28pr7sstg7yfmedv3qq4st4a4exlwccx2vc \
-    --chain-id testing
-```
-
-### Query a token
-
-```bash
-# List all token symbols
-$ panacead query token list-tokens --chain-id testing
-
-- KAI-0C5
-- KAI-0EA
-
-# Query a token
-$ panacead query token get-token KAI-0EA
-
-name: my secret token
-symbol: KAI-0EA
-totalsupply:
-  denom: ukai0ea
-  amount: "1000000000"
-mintable: true
-owneraddress: panacea126r28pr7sstg7yfmedv3qq4st4a4exlwccx2vc
-```
-
-### Query account balances and send tokens
-
-Of course, the new token is visible in the account balance.
-```bash
-$ panacead query account panacea126r28pr7sstg7yfmedv3qq4st4a4exlwccx2vc
-
-  address: panacea126r28pr7sstg7yfmedv3qq4st4a4exlwccx2vc
-  coins:
-  - denom: ukai0c5
-    amount: "1000000000"
-  - denom: ukai0ea
-    amount: "999999900"
-  - denom: ukai62e
-    amount: "1000000000"
-  - denom: umed
-    amount: "99000000000000"
-  pubkey: panaceapub1addwnpepqf2m7rxgazcem4e6x4hjnwexeagrqjfdlkvz65e0jpxv5sn76jurgpqmpd5
-  accountnumber: 0
-  sequence: 6
-```
-
-Also, the new token can be sent to other accounts.
-Note that the `amount` must be specified with the micro-denomination that contains the 3-letter suffix (without `-`).
-```bash
-panacead tx send <from-address> <to-address> 1000000ukai0ea
-```
