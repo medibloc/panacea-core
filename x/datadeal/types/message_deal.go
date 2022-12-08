@@ -17,10 +17,10 @@ func (m *MsgCreateDeal) Type() string {
 
 func (m *MsgCreateDeal) ValidateBasic() error {
 	if len(m.DataSchema) == 0 {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "dataSchema is empty")
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "no data schema")
 	}
 	if m.MaxNumData <= 0 {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "MaxNumData should be bigger than 0")
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "max num of data is negative number")
 	}
 	if m.Budget == nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "budget is empty")
@@ -29,7 +29,7 @@ func (m *MsgCreateDeal) ValidateBasic() error {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "budget is not a valid Coin object")
 	}
 	if _, err := sdk.AccAddressFromBech32(m.ConsumerAddress); err != nil {
-		return sdkerrors.Wrapf(err, "consumer address is invalid. address: %s", m.ConsumerAddress)
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid consumer address (%s)", err)
 	}
 	return nil
 }
