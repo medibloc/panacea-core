@@ -2,7 +2,6 @@ package keeper_test
 
 import (
 	"encoding/base64"
-	"fmt"
 	"testing"
 
 	"github.com/btcsuite/btcd/btcec"
@@ -290,5 +289,5 @@ func (suite *certificateTestSuite) TestSubmitConsentExistSameCertificate() {
 	}
 	err = suite.DataDealKeeper.SubmitConsent(suite.Ctx, certificate)
 	suite.Require().ErrorIs(err, types.ErrSubmitConsent)
-	suite.Require().ErrorContains(err, fmt.Sprintf("already exist certificate. dataHash: %s", suite.dataHash))
+	suite.Require().ErrorContains(err, "already provided certificate")
 }
