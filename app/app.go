@@ -321,7 +321,6 @@ func New(
 		oracletypes.StoreKey,
 		wasm.StoreKey,
 		feegrant.StoreKey,
-		oracletypes.StoreKey,
 		datadealtypes.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
@@ -477,13 +476,6 @@ func New(
 		wasmOpts...,
 	)
 
-	app.oracleKeeper = *oraclekeeper.NewKeeper(
-		appCodec,
-		keys[oracletypes.StoreKey],
-		keys[oracletypes.MemStoreKey],
-		app.GetSubspace(oracletypes.ModuleName),
-	)
-
 	// The gov proposal types can be individually enabled
 	if len(enabledWasmProposals) != 0 {
 		govRouter.AddRoute(wasm.RouterKey, wasm.NewWasmProposalHandler(app.wasmKeeper, enabledWasmProposals))
@@ -538,7 +530,6 @@ func New(
 		oracle.NewAppModule(appCodec, app.oracleKeeper),
 		wasm.NewAppModule(appCodec, &app.wasmKeeper, app.StakingKeeper),
 		datadeal.NewAppModule(appCodec, app.datadealKeeper),
-		oracle.NewAppModule(appCodec, app.oracleKeeper),
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -855,7 +846,6 @@ func initParamsKeeper(appCodec codec.Codec, legacyAmino *codec.LegacyAmino, key,
 	paramsKeeper.Subspace(oracletypes.ModuleName)
 	paramsKeeper.Subspace(wasm.ModuleName)
 	paramsKeeper.Subspace(datadealtypes.ModuleName)
-	paramsKeeper.Subspace(oracletypes.ModuleName)
 
 	return paramsKeeper
 }
