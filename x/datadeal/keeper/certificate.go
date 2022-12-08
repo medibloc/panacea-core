@@ -26,7 +26,7 @@ func (k Keeper) SubmitConsent(ctx sdk.Context, cert *types.Certificate) error {
 		return sdkerrors.Wrapf(types.ErrSubmitConsent, "deal status is not ACTIVE")
 	}
 
-	if err := k.verifyExistCertificate(ctx, unsignedCert.DealId, unsignedCert.DataHash); err != nil {
+	if err := k.verifyUnsignedCertificate(ctx, unsignedCert); err != nil {
 		return sdkerrors.Wrapf(types.ErrSubmitConsent, err.Error())
 	}
 
@@ -45,16 +45,21 @@ func (k Keeper) SubmitConsent(ctx sdk.Context, cert *types.Certificate) error {
 	return nil
 }
 
-func (k Keeper) verifyExistCertificate(ctx sdk.Context, dealID uint64, dataHash string) error {
-	existUnsignedCert, err := k.GetCertificate(ctx, dealID, dataHash)
-	if err != types.ErrCertificateNotFound {
-		if existUnsignedCert != nil {
-			return fmt.Errorf("already exist certificate. dataHash: %s", dataHash)
-		} else {
-			return err
-		}
+func (k Keeper) verifyUnsignedCertificate(ctx sdk.Context, unsignedCert *types.UnsignedCertificate) error {
+	activeUniqueID := k.oracleKeeper.GetParams(ctx).UniqueId
+	if activeUniqueID != unsignedCert.UniqueId {
+		return fmt.Errorf("does not match active uniqueID. certificateUniqueID(%s) activeUniqueID(%s)", unsignedCert.UniqueId, activeUniqueID)
+	}
+
+	if k.isProvidedCertificate(ctx, unsignedCert.DealId, unsignedCert.DataHash) {
+		return fmt.Errorf("already provided certificate")
 	}
 	return nil
+}
+
+func (k Keeper) isProvidedCertificate(ctx sdk.Context, dealID uint64, dataHash string) bool {
+	store := ctx.KVStore(k.storeKey)
+	return store.Has(types.GetCertificateKey(dealID, dataHash))
 }
 
 func (k Keeper) sendReward(ctx sdk.Context, deal *types.Deal, unsignedCert *types.UnsignedCertificate) error {
