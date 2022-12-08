@@ -28,6 +28,10 @@ func NewDealAddress(dealID uint64) sdk.AccAddress {
 	return authtypes.NewModuleAddress(dealKey)
 }
 
+func (m Deal) IsCompleted() bool {
+	return m.Status == DEAL_STATUS_COMPLETED
+}
+
 func (m Deal) ValidateBasic() error {
 	if _, err := sdk.AccAddressFromBech32(m.ConsumerAddress); err != nil {
 		return sdkerrors.Wrapf(err, "consumer address is invalid. address: %s", m.ConsumerAddress)

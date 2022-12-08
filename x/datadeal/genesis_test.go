@@ -69,7 +69,7 @@ func (suite *genesisTestSuite) TestExportGenesis() {
 	err := suite.FundAccount(suite.Ctx, suite.consumerAccAddr, suite.defaultFunds)
 	suite.Require().NoError(err)
 
-	_, err = suite.DataDealKeeper.CreateDeal(suite.Ctx, suite.consumerAccAddr, msgCreateDeal)
+	_, err = suite.DataDealKeeper.CreateDeal(suite.Ctx, msgCreateDeal)
 	suite.Require().NoError(err)
 
 	genesisStatus := datadeal.ExportGenesis(suite.Ctx, suite.DataDealKeeper)

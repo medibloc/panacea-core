@@ -10,15 +10,15 @@ import (
 	"github.com/medibloc/panacea-core/v2/x/datadeal/types"
 )
 
-func (k Keeper) CreateDeal(ctx sdk.Context, consumerAddress sdk.AccAddress, msg *types.MsgCreateDeal) (uint64, error) {
-	dealID, err := k.GetNextDealNumberAndIncrement(ctx)
+func (k Keeper) CreateDeal(ctx sdk.Context, msg *types.MsgCreateDeal) (uint64, error) {
+	dealID, err := k.GetAndIncreaseNextDealNumber(ctx)
 	if err != nil {
 		return 0, sdkerrors.Wrapf(err, "failed to get next deal num")
 	}
 
 	newDeal := types.NewDeal(dealID, msg)
 
-	coins := sdk.NewCoins(*msg.Budget)
+	budget := sdk.NewCoins(*msg.Budget)
 
 	dealAddress, err := sdk.AccAddressFromBech32(newDeal.Address)
 	if err != nil {
@@ -38,8 +38,13 @@ func (k Keeper) CreateDeal(ctx sdk.Context, consumerAddress sdk.AccAddress, msg 
 	)
 	k.accountKeeper.SetAccount(ctx, acc)
 
-	if err = k.bankKeeper.SendCoins(ctx, consumerAddress, dealAddress, coins); err != nil {
-		return 0, sdkerrors.Wrapf(err, "Failed to send coins to deal account")
+	consumerAccAddr, err := sdk.AccAddressFromBech32(msg.ConsumerAddress)
+	if err != nil {
+		return 0, nil
+	}
+
+	if err = k.bankKeeper.SendCoins(ctx, consumerAccAddr, dealAddress, budget); err != nil {
+		return 0, sdkerrors.Wrapf(err, "Failed to send budget to deal account")
 	}
 
 	if err = k.SetDeal(ctx, newDeal); err != nil {
@@ -80,7 +85,7 @@ func (k Keeper) GetNextDealNumber(ctx sdk.Context) (uint64, error) {
 	return dealNumber, nil
 }
 
-func (k Keeper) GetNextDealNumberAndIncrement(ctx sdk.Context) (uint64, error) {
+func (k Keeper) GetAndIncreaseNextDealNumber(ctx sdk.Context) (uint64, error) {
 	dealNumber, err := k.GetNextDealNumber(ctx)
 	if err != nil {
 		return 0, err
@@ -141,19 +146,7 @@ func (k Keeper) GetAllDeals(ctx sdk.Context) ([]types.Deal, error) {
 	return deals, nil
 }
 
-func (k Keeper) IsDealCompleted(ctx sdk.Context, dealID uint64) (bool, error) {
-	deal, err := k.GetDeal(ctx, dealID)
-	if err != nil {
-		return false, err
-	}
-	if deal.Status == types.DEAL_STATUS_COMPLETED {
-		return true, nil
-	} else {
-		return false, nil
-	}
-}
-
-func (k Keeper) IncrementCurNumDataAtDeal(ctx sdk.Context, dealID uint64) error {
+func (k Keeper) IncreaseCurNumDataOfDeal(ctx sdk.Context, dealID uint64) error {
 	deal, err := k.GetDeal(ctx, dealID)
 	if err != nil {
 		return err
