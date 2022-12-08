@@ -246,6 +246,8 @@ func newTestCodec() params.EncodingConfig {
 	authtypes.RegisterInterfaces(interfaceRegistry)
 	banktypes.RegisterInterfaces(interfaceRegistry)
 	didtypes.RegisterInterfaces(interfaceRegistry)
+	//TODO: When other Msgs are implemented, I'll remove this comment.
+	//datadealtypes.RegisterInterfaces(interfaceRegistry)
 	marshaler := codec.NewProtoCodec(interfaceRegistry)
 
 	return params.EncodingConfig{
