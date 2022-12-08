@@ -11,6 +11,6 @@ var (
 	ErrDealAlreadyExist    = sdkerrors.Register(ModuleName, 2, "deal already exist")
 	ErrDealNotFound        = sdkerrors.Register(ModuleName, 3, "deal is not found")
 	ErrCertificateNotFound = sdkerrors.Register(ModuleName, 4, "certificate is not found")
-	ErrGetCertificate      = sdkerrors.Register(ModuleName, 5, "certificate is not found")
+	ErrGetCertificate      = sdkerrors.Register(ModuleName, 5, "error while get certificate")
 	ErrSubmitConsent       = sdkerrors.Register(ModuleName, 6, "error while submit consent")
 )
