@@ -143,7 +143,16 @@ trust_hash = "<trusted-block-hash>"
 trust_period = "336h0m0s" # 2/3 of 21 days (unbonding period)
 ```
 
-If your node have block history data previously synced, you need to clear the data first.
+If your node has block history data previously synced, you need to clear the database of your node first.
+
+{% hint style="danger" %}
+The `unsafe-reset-all` command will erase your node database. If you are running a validator node, be sure you backed up the following files, prior to running the `unsafe-reset-all` command.
+- `~/.panacea/data/priv_validator_state.json`
+- `~/.panacea/config/priv_validator_key.json`
+- `~/.panacea/config/node_key.json`
+
+And, restore these files after `unsafe-reset-all` to avoid potential double signing.
+{% endhint %}
 
 ```shell
 panacead tendermint unsafe-reset-all
