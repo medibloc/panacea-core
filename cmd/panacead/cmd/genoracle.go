@@ -44,9 +44,10 @@ func AddGenesisOracleCmd(defaultNodeHome string) *cobra.Command {
 			If you set oracle public key path for oracle module params, the flags for oracle public key and remote report would be ignored.
 
 			The desired format of oracle public key file is:
-
-			"public_key_base64" : <base64-encoded-oracle-public-key>
-			"remote_report_base64" : <base64-encoded-oracle-remote-report>
+			{
+				"public_key_base64" : "<base64-encoded-oracle-public-key>",
+				"remote_report_base64" : "<base64-encoded-oracle-remote-report>"
+			}
 		`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
@@ -113,66 +114,68 @@ func setOracle(cmd *cobra.Command, genState *oracletypes.GenesisState) error {
 		return fmt.Errorf("failed to get oracle account flag: %w", err)
 	}
 
-	if len(oracleAddressOrKey) > 0 {
-		oracleAccAddr, err := sdk.AccAddressFromBech32(oracleAddressOrKey)
-
-		// if err is not nil, get address from key store
-		if err != nil {
-			inBuf := bufio.NewReader(cmd.InOrStdin())
-			keyringBackend, err := cmd.Flags().GetString(flags.FlagKeyringBackend)
-			if err != nil {
-				return fmt.Errorf("failed to get keyring backend: %w", err)
-			}
-
-			kb, err := keyring.New(sdk.KeyringServiceName(), keyringBackend, clientCtx.HomeDir, inBuf)
-			if err != nil {
-				return fmt.Errorf("failed to create new keyring instance: %w", err)
-			}
-
-			info, err := kb.Key(oracleAddressOrKey)
-			if err != nil {
-				return fmt.Errorf("failed to get address from Keybase: %w", err)
-			}
-			oracleAccAddr = info.GetAddress()
-		}
-
-		for _, oracle := range genState.Oracles {
-			if oracle.OracleAddress == oracleAccAddr.String() {
-				return fmt.Errorf("existing oracle. address: %s", oracleAccAddr.String())
-			}
-		}
-
-		uniqueID, err := cmd.Flags().GetString(flagOracleUniqueID)
-		if err != nil {
-			return fmt.Errorf("failed to get oracle unique ID: %w", err)
-		}
-
-		endpoint, err := cmd.Flags().GetString(flagOracleEndpoint)
-		if err != nil {
-			return fmt.Errorf("failed to get oracle endpoint: %w", err)
-		}
-
-		commRateStr, err := cmd.Flags().GetString(flagOracleCommRate)
-		if err != nil {
-			return fmt.Errorf("failed to get oracle commission rate: %w", err)
-		}
-
-		commRate, err := sdk.NewDecFromStr(commRateStr)
-		if err != nil {
-			return fmt.Errorf("inavlid commission rate: %w", err)
-		}
-
-		if commRate.IsNegative() || commRate.GT(sdk.OneDec()) {
-			return fmt.Errorf("oracle commission rate should be between 0 and 1")
-		}
-
-		genState.Oracles = append(genState.Oracles, oracletypes.Oracle{
-			UniqueId:             uniqueID,
-			OracleAddress:        oracleAccAddr.String(),
-			Endpoint:             endpoint,
-			OracleCommissionRate: commRate,
-		})
+	if len(oracleAddressOrKey) == 0 {
+		return nil
 	}
+
+	oracleAccAddr, err := sdk.AccAddressFromBech32(oracleAddressOrKey)
+
+	// if err is not nil, get address from key store
+	if err != nil {
+		inBuf := bufio.NewReader(cmd.InOrStdin())
+		keyringBackend, err := cmd.Flags().GetString(flags.FlagKeyringBackend)
+		if err != nil {
+			return fmt.Errorf("failed to get keyring backend: %w", err)
+		}
+
+		kb, err := keyring.New(sdk.KeyringServiceName(), keyringBackend, clientCtx.HomeDir, inBuf)
+		if err != nil {
+			return fmt.Errorf("failed to create new keyring instance: %w", err)
+		}
+
+		info, err := kb.Key(oracleAddressOrKey)
+		if err != nil {
+			return fmt.Errorf("failed to get address from Keybase: %w", err)
+		}
+		oracleAccAddr = info.GetAddress()
+	}
+
+	for _, oracle := range genState.Oracles {
+		if oracle.OracleAddress == oracleAccAddr.String() {
+			return fmt.Errorf("existing oracle. address: %s", oracleAccAddr.String())
+		}
+	}
+
+	uniqueID, err := cmd.Flags().GetString(flagOracleUniqueID)
+	if err != nil {
+		return fmt.Errorf("failed to get oracle unique ID: %w", err)
+	}
+
+	endpoint, err := cmd.Flags().GetString(flagOracleEndpoint)
+	if err != nil {
+		return fmt.Errorf("failed to get oracle endpoint: %w", err)
+	}
+
+	commRateStr, err := cmd.Flags().GetString(flagOracleCommRate)
+	if err != nil {
+		return fmt.Errorf("failed to get oracle commission rate: %w", err)
+	}
+
+	commRate, err := sdk.NewDecFromStr(commRateStr)
+	if err != nil {
+		return fmt.Errorf("inavlid commission rate: %w", err)
+	}
+
+	if commRate.IsNegative() || commRate.GT(sdk.OneDec()) {
+		return fmt.Errorf("oracle commission rate should be between 0 and 1")
+	}
+
+	genState.Oracles = append(genState.Oracles, oracletypes.Oracle{
+		UniqueId:             uniqueID,
+		OracleAddress:        oracleAccAddr.String(),
+		Endpoint:             endpoint,
+		OracleCommissionRate: commRate,
+	})
 
 	return nil
 }
