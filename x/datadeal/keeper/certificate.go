@@ -75,11 +75,22 @@ func (k Keeper) sendReward(ctx sdk.Context, deal *types.Deal, unsignedCert *type
 		return fmt.Errorf("not enough balance in deal")
 	}
 
-	// TODO calculate oracle commission
+	oracle, err := k.oracleKeeper.GetOracle(ctx, unsignedCert.OracleAddress)
+	if err != nil {
+		return fmt.Errorf("failed to get oracle. %w", err)
+	}
+	oracleCommissionRate := oracle.OracleCommissionRate
 
-	providerReward := sdk.NewCoin(assets.MicroMedDenom, pricePerData.TruncateInt())
+	oracleReward := sdk.NewCoin(assets.MicroMedDenom, pricePerData.Mul(oracleCommissionRate).TruncateInt())
+	providerReward := sdk.NewCoin(assets.MicroMedDenom, pricePerData.Mul(sdk.OneDec().Sub(oracleCommissionRate)).TruncateInt())
 	if err := k.bankKeeper.SendCoins(ctx, dealAccAddr, providerAccAddr, sdk.NewCoins(providerReward)); err != nil {
 		return fmt.Errorf("failed to send reward to provider. %w", err)
+	}
+
+	// We already do oracle address verification above.
+	oracleAccAddr, _ := sdk.AccAddressFromBech32(unsignedCert.OracleAddress)
+	if err := k.bankKeeper.SendCoins(ctx, dealAccAddr, oracleAccAddr, sdk.NewCoins(oracleReward)); err != nil {
+		return fmt.Errorf("failed to send reward to oracle. %w", err)
 	}
 	return nil
 }

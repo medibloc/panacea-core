@@ -64,14 +64,19 @@ func (k Keeper) VerifySignature(ctx sdk.Context, msg codec.ProtoMarshaler, sigBz
 }
 
 func (k Keeper) VerifyOracle(ctx sdk.Context, oracleAddress string) error {
-	_, err := sdk.AccAddressFromBech32(oracleAddress)
+	oracle, err := k.GetOracle(ctx, oracleAddress)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to oracle validation. address(%s) %w", oracleAddress, err)
 	}
 
-	// TODO Check is oracle registered?
-
-	// TODO Check is registered oracle's uniqueId correct?
+	activeUniqueID := k.GetParams(ctx).UniqueId
+	if activeUniqueID != oracle.UniqueId {
+		return fmt.Errorf("is not active an oracle. oracleAddress(%s), oracleUniqueID(%s), activeUniqueID(%s)",
+			oracle.OracleAddress,
+			oracle.UniqueId,
+			activeUniqueID,
+		)
+	}
 
 	return nil
 }

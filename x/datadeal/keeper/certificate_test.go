@@ -18,6 +18,8 @@ import (
 type certificateTestSuite struct {
 	dealTestSuite
 
+	uniqueID string
+
 	oracleAccPrivKey cryptotypes.PrivKey
 	oracleAccPubKey  cryptotypes.PubKey
 	oracleAccAddr    sdk.AccAddress
@@ -42,6 +44,7 @@ func (suite *certificateTestSuite) BeforeTest(_, _ string) {
 	suite.consumerAccAddr = sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address())
 	suite.defaultFunds = sdk.NewCoins(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(10000000000)))
 
+	suite.uniqueID = "uniqueID"
 	suite.oracleAccPrivKey = secp256k1.GenPrivKey()
 	suite.oracleAccPubKey = suite.oracleAccPrivKey.PubKey()
 	suite.oracleAccAddr = sdk.AccAddress(suite.oracleAccPubKey.Address())
@@ -60,7 +63,7 @@ func (suite *certificateTestSuite) BeforeTest(_, _ string) {
 	suite.OracleKeeper.SetParams(suite.Ctx, oracletypes.Params{
 		OraclePublicKey:          base64.StdEncoding.EncodeToString(suite.oraclePubKey.SerializeCompressed()),
 		OraclePubKeyRemoteReport: "",
-		UniqueId:                 "",
+		UniqueId:                 suite.uniqueID,
 	})
 
 	err := suite.DataDealKeeper.SetNextDealNumber(suite.Ctx, 1)
@@ -86,11 +89,26 @@ func (suite *certificateTestSuite) createSampleDeal(budgetAmount, maxNumData uin
 	return dealID
 }
 
+func (suite *certificateTestSuite) storeSampleOracle(address, uniqueID string, commissionRate sdk.Dec) *oracletypes.Oracle {
+	oracle := &oracletypes.Oracle{
+		OracleAddress:        address,
+		UniqueId:             uniqueID,
+		Endpoint:             "https://my-validator.org",
+		OracleCommissionRate: commissionRate,
+	}
+	suite.OracleKeeper.SetOracle(suite.Ctx, oracle)
+
+	return oracle
+}
+
 func (suite *certificateTestSuite) TestSubmitConsentSuccess() {
 	budgetAmount := uint64(10000)
 	dealID := suite.createSampleDeal(budgetAmount, 10)
 	deal, err := suite.DataDealKeeper.GetDeal(suite.Ctx, dealID)
 	suite.Require().NoError(err)
+
+	oracleCommissionRate := sdk.NewDecWithPrec(1, 1) // 10%
+	suite.storeSampleOracle(suite.oracleAccAddr.String(), suite.uniqueID, oracleCommissionRate)
 
 	unsignedCert := &types.UnsignedCertificate{
 		Cid:             "cid",
@@ -115,6 +133,9 @@ func (suite *certificateTestSuite) TestSubmitConsentSuccess() {
 	providerBalance := suite.BankKeeper.GetBalance(suite.Ctx, suite.providerAccAddr, assets.MicroMedDenom)
 	suite.Require().Equal(sdk.ZeroInt(), providerBalance.Amount)
 
+	oracleBalance := suite.BankKeeper.GetBalance(suite.Ctx, suite.oracleAccAddr, assets.MicroMedDenom)
+	suite.Require().Equal(sdk.ZeroInt(), oracleBalance.Amount)
+
 	dealAccAddr, err := sdk.AccAddressFromBech32(deal.Address)
 	suite.Require().NoError(err)
 	dealBalance := suite.BankKeeper.GetBalance(suite.Ctx, dealAccAddr, assets.MicroMedDenom)
@@ -124,7 +145,10 @@ func (suite *certificateTestSuite) TestSubmitConsentSuccess() {
 	suite.Require().NoError(err)
 
 	providerBalance = suite.BankKeeper.GetBalance(suite.Ctx, suite.providerAccAddr, assets.MicroMedDenom)
-	suite.Require().Equal(sdk.NewInt(1000), providerBalance.Amount)
+	suite.Require().Equal(sdk.NewInt(900), providerBalance.Amount)
+
+	oracleBalance = suite.BankKeeper.GetBalance(suite.Ctx, suite.oracleAccAddr, assets.MicroMedDenom)
+	suite.Require().Equal(sdk.NewInt(100), oracleBalance.Amount)
 
 	dealAccAddr, err = sdk.AccAddressFromBech32(deal.Address)
 	suite.Require().NoError(err)
@@ -143,6 +167,9 @@ func (suite *certificateTestSuite) TestSubmitConsentChangeStatusComplete() {
 	deal, err := suite.DataDealKeeper.GetDeal(suite.Ctx, dealID)
 	suite.Require().NoError(err)
 
+	oracleCommissionRate := sdk.NewDecWithPrec(1, 1) // 10%
+	suite.storeSampleOracle(suite.oracleAccAddr.String(), suite.uniqueID, oracleCommissionRate)
+
 	unsignedCert := &types.UnsignedCertificate{
 		Cid:             "cid",
 		OracleAddress:   suite.oracleAccAddr.String(),
@@ -165,6 +192,9 @@ func (suite *certificateTestSuite) TestSubmitConsentChangeStatusComplete() {
 	providerBalance := suite.BankKeeper.GetBalance(suite.Ctx, suite.providerAccAddr, assets.MicroMedDenom)
 	suite.Require().Equal(sdk.ZeroInt(), providerBalance.Amount)
 
+	oracleBalance := suite.BankKeeper.GetBalance(suite.Ctx, suite.oracleAccAddr, assets.MicroMedDenom)
+	suite.Require().Equal(sdk.ZeroInt(), oracleBalance.Amount)
+
 	dealAccAddr, err := sdk.AccAddressFromBech32(deal.Address)
 	suite.Require().NoError(err)
 	dealBalance := suite.BankKeeper.GetBalance(suite.Ctx, dealAccAddr, assets.MicroMedDenom)
@@ -174,7 +204,10 @@ func (suite *certificateTestSuite) TestSubmitConsentChangeStatusComplete() {
 	suite.Require().NoError(err)
 
 	providerBalance = suite.BankKeeper.GetBalance(suite.Ctx, suite.providerAccAddr, assets.MicroMedDenom)
-	suite.Require().Equal(sdk.NewInt(10000), providerBalance.Amount)
+	suite.Require().Equal(sdk.NewInt(9000), providerBalance.Amount)
+
+	oracleBalance = suite.BankKeeper.GetBalance(suite.Ctx, suite.oracleAccAddr, assets.MicroMedDenom)
+	suite.Require().Equal(sdk.NewInt(1000), oracleBalance.Amount)
 
 	dealAccAddr, err = sdk.AccAddressFromBech32(deal.Address)
 	suite.Require().NoError(err)
@@ -187,9 +220,71 @@ func (suite *certificateTestSuite) TestSubmitConsentChangeStatusComplete() {
 	suite.Require().Equal(types.DEAL_STATUS_COMPLETED, deal.Status)
 }
 
+func (suite *certificateTestSuite) TestSubmitConsentNotRegisteredOracle() {
+	budgetAmount := uint64(10000)
+	dealID := suite.createSampleDeal(budgetAmount, 1)
+
+	unsignedCert := &types.UnsignedCertificate{
+		Cid:             "cid",
+		OracleAddress:   suite.providerAccAddr.String(),
+		DealId:          dealID,
+		ProviderAddress: suite.providerAccAddr.String(),
+		DataHash:        suite.dataHash,
+	}
+
+	unsignedCertBz, err := unsignedCert.Marshal()
+	suite.Require().NoError(err)
+
+	sign, err := suite.oraclePrivKey.Sign(unsignedCertBz)
+	suite.Require().NoError(err)
+
+	certificate := &types.Certificate{
+		UnsignedCertificate: unsignedCert,
+		Signature:           sign.Serialize(),
+	}
+
+	err = suite.DataDealKeeper.SubmitConsent(suite.Ctx, certificate)
+	suite.Require().ErrorIs(err, types.ErrSubmitConsent)
+	suite.Require().ErrorContains(err, fmt.Sprintf("failed to oracle validation. address(%s)", suite.providerAccAddr.String()))
+}
+
+func (suite *certificateTestSuite) TestSubmitConsentNotSameUniqueID() {
+	budgetAmount := uint64(10000)
+	dealID := suite.createSampleDeal(budgetAmount, 1)
+
+	oracleCommissionRate := sdk.NewDecWithPrec(1, 1) // 10%
+	suite.storeSampleOracle(suite.oracleAccAddr.String(), "invalidUniqueID", oracleCommissionRate)
+
+	unsignedCert := &types.UnsignedCertificate{
+		Cid:             "cid",
+		OracleAddress:   suite.oracleAccAddr.String(),
+		DealId:          dealID,
+		ProviderAddress: suite.providerAccAddr.String(),
+		DataHash:        suite.dataHash,
+	}
+
+	unsignedCertBz, err := unsignedCert.Marshal()
+	suite.Require().NoError(err)
+
+	sign, err := suite.oraclePrivKey.Sign(unsignedCertBz)
+	suite.Require().NoError(err)
+
+	certificate := &types.Certificate{
+		UnsignedCertificate: unsignedCert,
+		Signature:           sign.Serialize(),
+	}
+
+	err = suite.DataDealKeeper.SubmitConsent(suite.Ctx, certificate)
+	suite.Require().ErrorIs(err, types.ErrSubmitConsent)
+	suite.Require().ErrorContains(err, "is not active an oracle.")
+}
+
 func (suite *certificateTestSuite) TestSubmitConsentInvalidSignature() {
 	budgetAmount := uint64(10000)
 	dealID := suite.createSampleDeal(budgetAmount, 1)
+
+	oracleCommissionRate := sdk.NewDecWithPrec(1, 1) // 10%
+	suite.storeSampleOracle(suite.oracleAccAddr.String(), suite.uniqueID, oracleCommissionRate)
 
 	unsignedCert := &types.UnsignedCertificate{
 		Cid:             "cid",
@@ -216,6 +311,9 @@ func (suite *certificateTestSuite) TestSubmitConsentInvalidSignature() {
 }
 
 func (suite *certificateTestSuite) TestSubmitConsentNotExistDeal() {
+	oracleCommissionRate := sdk.NewDecWithPrec(1, 1) // 10%
+	suite.storeSampleOracle(suite.oracleAccAddr.String(), suite.uniqueID, oracleCommissionRate)
+
 	unsignedCert := &types.UnsignedCertificate{
 		Cid:             "cid",
 		OracleAddress:   suite.oracleAccAddr.String(),
