@@ -116,6 +116,10 @@ import (
 	"github.com/medibloc/panacea-core/v2/x/did"
 	didkeeper "github.com/medibloc/panacea-core/v2/x/did/keeper"
 	didtypes "github.com/medibloc/panacea-core/v2/x/did/types"
+
+	"github.com/medibloc/panacea-core/v2/x/datadeal"
+	datadealkeeper "github.com/medibloc/panacea-core/v2/x/datadeal/keeper"
+	datadealtypes "github.com/medibloc/panacea-core/v2/x/datadeal/types"
 )
 
 const Name = "panacea"
@@ -195,6 +199,7 @@ var (
 		wasm.AppModuleBasic{},
 		feegrantmodule.AppModuleBasic{},
 		authzmodule.AppModuleBasic{},
+		datadeal.AppModuleBasic{},
 	)
 
 	// module account permissions
@@ -265,11 +270,12 @@ type App struct {
 	ScopedTransferKeeper capabilitykeeper.ScopedKeeper
 	ScopedWasmKeeper     capabilitykeeper.ScopedKeeper
 
-	aolKeeper    aolkeeper.Keeper
-	didKeeper    didkeeper.Keeper
-	burnKeeper   burnkeeper.Keeper
-	wasmKeeper   wasm.Keeper
-	oracleKeeper oraclekeeper.Keeper
+	aolKeeper      aolkeeper.Keeper
+	didKeeper      didkeeper.Keeper
+	burnKeeper     burnkeeper.Keeper
+	wasmKeeper     wasm.Keeper
+	oracleKeeper   oraclekeeper.Keeper
+	datadealKeeper datadealkeeper.Keeper
 
 	// the module manager
 	mm *module.Manager
@@ -315,6 +321,7 @@ func New(
 		oracletypes.StoreKey,
 		wasm.StoreKey,
 		feegrant.StoreKey,
+		datadealtypes.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
@@ -427,6 +434,14 @@ func New(
 		app.BankKeeper,
 	)
 
+	app.datadealKeeper = *datadealkeeper.NewKeeper(
+		appCodec,
+		keys[datadealtypes.StoreKey],
+		keys[datadealtypes.MemStoreKey],
+		app.AccountKeeper,
+		app.BankKeeper,
+	)
+
 	app.oracleKeeper = *oraclekeeper.NewKeeper(
 		appCodec,
 		keys[oracletypes.StoreKey],
@@ -514,6 +529,7 @@ func New(
 		burn.NewAppModule(appCodec, app.burnKeeper),
 		oracle.NewAppModule(appCodec, app.oracleKeeper),
 		wasm.NewAppModule(appCodec, &app.wasmKeeper, app.StakingKeeper),
+		datadeal.NewAppModule(appCodec, app.datadealKeeper),
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -544,6 +560,7 @@ func New(
 		burntypes.ModuleName,
 		genutiltypes.ModuleName,
 		authz.ModuleName,
+		datadealtypes.ModuleName,
 	)
 
 	app.mm.SetOrderEndBlockers(
@@ -570,6 +587,7 @@ func New(
 		wasm.ModuleName,
 		paramstypes.ModuleName,
 		authz.ModuleName,
+		datadealtypes.ModuleName,
 	)
 
 	// NOTE: The genutils module must occur after staking so that pools are
@@ -601,6 +619,7 @@ func New(
 		upgradetypes.ModuleName,
 		vestingtypes.ModuleName,
 		authz.ModuleName,
+		datadealtypes.ModuleName,
 	)
 
 	app.mm.RegisterInvariants(&app.CrisisKeeper)
@@ -826,6 +845,7 @@ func initParamsKeeper(appCodec codec.Codec, legacyAmino *codec.LegacyAmino, key,
 	paramsKeeper.Subspace(burntypes.ModuleName)
 	paramsKeeper.Subspace(oracletypes.ModuleName)
 	paramsKeeper.Subspace(wasm.ModuleName)
+	paramsKeeper.Subspace(datadealtypes.ModuleName)
 
 	return paramsKeeper
 }
