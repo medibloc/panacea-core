@@ -309,7 +309,7 @@ func (suite *oracleTestSuite) TestApproveOracleRegistrationFailedInvalidUniqueID
 	msgApproveOracleRegistration := types.NewMsgApproveOracleRegistration(approveOracleRegistration, signature.Serialize())
 
 	err = suite.OracleKeeper.ApproveOracleRegistration(ctx, msgApproveOracleRegistration)
-	suite.Require().Error(err, types.ErrInvalidUniqueId)
+	suite.Require().Error(err, types.ErrInvalidUniqueID)
 }
 
 func (suite *oracleTestSuite) TestApproveOracleRegistrationFailedInvalidSignature() {
