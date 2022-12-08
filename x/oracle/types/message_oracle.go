@@ -30,6 +30,14 @@ func (m *MsgRegisterOracle) Type() string {
 }
 
 func (m *MsgRegisterOracle) ValidateBasic() error {
+	if len(m.UniqueId) == 0 {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "uniqueId is empty")
+	}
+
+	if _, err := sdk.AccAddressFromBech32(m.OracleAddress); err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "oracleAddress is invalid. address: %s, error: %s", m.OracleAddress, err.Error())
+	}
+
 	if m.NodePubKey == nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "node public key is empty")
 	} else if _, err := btcec.ParsePubKey(m.NodePubKey, btcec.S256()); err != nil {
@@ -46,6 +54,10 @@ func (m *MsgRegisterOracle) ValidateBasic() error {
 
 	if m.TrustedBlockHash == nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "trusted block hash should not be nil")
+	}
+
+	if m.OracleCommissionRate.LT(sdk.ZeroDec()) || m.OracleCommissionRate.GT(sdk.OneDec()) {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "oracleCommissionRate must be between 0 and 1")
 	}
 
 	return nil
@@ -99,7 +111,7 @@ func (m *MsgApproveOracleRegistration) GetSignBytes() []byte {
 }
 
 func (m *MsgApproveOracleRegistration) GetSigners() []sdk.AccAddress {
-	oracleAddress, err := sdk.AccAddressFromBech32(m.ApproveOracleRegistration.ApprovedOracleAddress)
+	oracleAddress, err := sdk.AccAddressFromBech32(m.ApproveOracleRegistration.ApproverOracleAddress)
 	if err != nil {
 		panic(err)
 	}
@@ -111,12 +123,12 @@ func (m *ApproveOracleRegistration) ValidateBasic() error {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "uniqueId is empty")
 	}
 
-	if len(m.ApprovedOracleAddress) == 0 {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "approvedOracleAddress is empty")
+	if _, err := sdk.AccAddressFromBech32(m.ApproverOracleAddress); err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "approverOracleAddress is invalid. address: %s, error: %s", m.ApproverOracleAddress, err.Error())
 	}
 
-	if len(m.TargetOracleAddress) == 0 {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "targetOracleAddress is empty")
+	if _, err := sdk.AccAddressFromBech32(m.TargetOracleAddress); err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "targetOracleAddress is invalid. address: %s, error: %s", m.TargetOracleAddress, err.Error())
 	}
 
 	if m.EncryptedOraclePrivKey == nil {
@@ -145,8 +157,8 @@ func (m *MsgUpdateOracleInfo) Type() string {
 }
 
 func (m *MsgUpdateOracleInfo) ValidateBasic() error {
-	if len(m.OracleAddress) == 0 {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "oracleAddress is empty")
+	if _, err := sdk.AccAddressFromBech32(m.OracleAddress); err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "oracleAddress is invalid. address: %s, error: %s", m.OracleAddress, err.Error())
 	}
 
 	return nil
