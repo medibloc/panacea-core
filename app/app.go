@@ -9,6 +9,9 @@ import (
 	"strings"
 
 	"github.com/cosmos/cosmos-sdk/x/authz"
+	"github.com/medibloc/panacea-core/v2/x/oracle"
+	oraclekeeper "github.com/medibloc/panacea-core/v2/x/oracle/keeper"
+	oracletypes "github.com/medibloc/panacea-core/v2/x/oracle/types"
 
 	"github.com/CosmWasm/wasmd/x/wasm"
 	wasmclient "github.com/CosmWasm/wasmd/x/wasm/client"
@@ -192,6 +195,7 @@ var (
 		aol.AppModuleBasic{},
 		did.AppModuleBasic{},
 		burn.AppModuleBasic{},
+		oracle.AppModuleBasic{},
 		wasm.AppModuleBasic{},
 		feegrantmodule.AppModuleBasic{},
 		authzmodule.AppModuleBasic{},
@@ -270,6 +274,7 @@ type App struct {
 	didKeeper      didkeeper.Keeper
 	burnKeeper     burnkeeper.Keeper
 	wasmKeeper     wasm.Keeper
+	oracleKeeper   oraclekeeper.Keeper
 	datadealKeeper datadealkeeper.Keeper
 
 	// the module manager
@@ -313,8 +318,10 @@ func New(
 		aoltypes.StoreKey,
 		didtypes.StoreKey,
 		burntypes.StoreKey,
+		oracletypes.StoreKey,
 		wasm.StoreKey,
 		feegrant.StoreKey,
+		oracletypes.StoreKey,
 		datadealtypes.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
@@ -436,6 +443,13 @@ func New(
 		app.BankKeeper,
 	)
 
+	app.oracleKeeper = *oraclekeeper.NewKeeper(
+		appCodec,
+		keys[oracletypes.StoreKey],
+		keys[oracletypes.MemStoreKey],
+		app.GetSubspace(oracletypes.ModuleName),
+	)
+
 	wasmDir := filepath.Join(homePath, wasm.ModuleName)
 	wasmConfig, err := wasm.ReadWasmConfig(appOpts)
 	if err != nil {
@@ -461,6 +475,13 @@ func New(
 		wasmConfig,
 		supportedFeatures,
 		wasmOpts...,
+	)
+
+	app.oracleKeeper = *oraclekeeper.NewKeeper(
+		appCodec,
+		keys[oracletypes.StoreKey],
+		keys[oracletypes.MemStoreKey],
+		app.GetSubspace(oracletypes.ModuleName),
 	)
 
 	// The gov proposal types can be individually enabled
@@ -514,8 +535,10 @@ func New(
 		aol.NewAppModule(appCodec, app.aolKeeper),
 		did.NewAppModule(appCodec, app.didKeeper),
 		burn.NewAppModule(appCodec, app.burnKeeper),
+		oracle.NewAppModule(appCodec, app.oracleKeeper),
 		wasm.NewAppModule(appCodec, &app.wasmKeeper, app.StakingKeeper),
 		datadeal.NewAppModule(appCodec, app.datadealKeeper),
+		oracle.NewAppModule(appCodec, app.oracleKeeper),
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -539,6 +562,7 @@ func New(
 		authtypes.ModuleName,
 		aoltypes.ModuleName,
 		didtypes.ModuleName,
+		oracletypes.ModuleName,
 		wasm.ModuleName,
 		banktypes.ModuleName,
 		crisistypes.ModuleName,
@@ -568,6 +592,7 @@ func New(
 		slashingtypes.ModuleName,
 		ibctransfertypes.ModuleName,
 		aoltypes.ModuleName,
+		oracletypes.ModuleName,
 		wasm.ModuleName,
 		paramstypes.ModuleName,
 		authz.ModuleName,
@@ -597,6 +622,7 @@ func New(
 		aoltypes.ModuleName,
 		didtypes.ModuleName,
 		burntypes.ModuleName,
+		oracletypes.ModuleName,
 		wasm.ModuleName,
 		paramstypes.ModuleName,
 		upgradetypes.ModuleName,
@@ -826,8 +852,10 @@ func initParamsKeeper(appCodec codec.Codec, legacyAmino *codec.LegacyAmino, key,
 	paramsKeeper.Subspace(aoltypes.ModuleName)
 	paramsKeeper.Subspace(didtypes.ModuleName)
 	paramsKeeper.Subspace(burntypes.ModuleName)
+	paramsKeeper.Subspace(oracletypes.ModuleName)
 	paramsKeeper.Subspace(wasm.ModuleName)
 	paramsKeeper.Subspace(datadealtypes.ModuleName)
+	paramsKeeper.Subspace(oracletypes.ModuleName)
 
 	return paramsKeeper
 }
