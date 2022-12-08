@@ -19,6 +19,10 @@ func GetQueryCmd(queryRoute string) *cobra.Command {
 		RunE:                       client.ValidateCmd,
 	}
 
+	cmd.AddCommand(CmdGetOracles())
+	cmd.AddCommand(CmdGetOracle())
+	cmd.AddCommand(CmdGetOracleRegistrations())
+	cmd.AddCommand(CmdGetOracleRegistration())
 	cmd.AddCommand(CmdGetParams())
 
 	return cmd
