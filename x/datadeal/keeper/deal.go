@@ -120,6 +120,27 @@ func (k Keeper) SetDeal(ctx sdk.Context, deal *types.Deal) error {
 	return nil
 }
 
+func (k Keeper) GetAllDeals(ctx sdk.Context) ([]types.Deal, error) {
+	store := ctx.KVStore(k.storeKey)
+	iterator := sdk.KVStorePrefixIterator(store, types.DealKey)
+	defer iterator.Close()
+
+	deals := make([]types.Deal, 0)
+
+	for ; iterator.Valid(); iterator.Next() {
+		bz := iterator.Value()
+		var deal types.Deal
+
+		if err := k.cdc.UnmarshalLengthPrefixed(bz, &deal); err != nil {
+			return nil, sdkerrors.Wrapf(types.ErrGetDeal, err.Error())
+		}
+
+		deals = append(deals, deal)
+	}
+
+	return deals, nil
+}
+
 func (k Keeper) IsDealCompleted(ctx sdk.Context, dealID uint64) (bool, error) {
 	deal, err := k.GetDeal(ctx, dealID)
 	if err != nil {
