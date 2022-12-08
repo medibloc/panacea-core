@@ -85,7 +85,7 @@ func (k Keeper) validateApproveOracleRegistration(ctx sdk.Context, msg *types.Ms
 
 	// check unique id
 	if msg.ApproveOracleRegistration.UniqueId != params.UniqueId {
-		return types.ErrInvalidUniqueId
+		return types.ErrInvalidUniqueID
 	}
 
 	// verify signature
