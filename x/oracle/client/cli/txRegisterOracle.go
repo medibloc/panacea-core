@@ -148,6 +148,31 @@ func CmdRegisterOracle() *cobra.Command {
 	cmd.Flags().String(flagOracleCommMaxRate, "", "oracle's commission max rate")
 	cmd.Flags().String(flagOracleCommMaxChangeRate, "", "oracle's commission max change rate")
 
+	if err := cmd.MarkFlagRequired(flagOracleUniqueID); err != nil {
+		panic(err)
+	}
+	if err := cmd.MarkFlagRequired(flagNodePublicKey); err != nil {
+		panic(err)
+	}
+	if err := cmd.MarkFlagRequired(flagNodePubKeyRemoteReport); err != nil {
+		panic(err)
+	}
+	if err := cmd.MarkFlagRequired(flagTrustedBlockHeight); err != nil {
+		panic(err)
+	}
+	if err := cmd.MarkFlagRequired(flagTrustedBlockHash); err != nil {
+		panic(err)
+	}
+	if err := cmd.MarkFlagRequired(flagOracleCommRate); err != nil {
+		panic(err)
+	}
+	if err := cmd.MarkFlagRequired(flagOracleCommMaxRate); err != nil {
+		panic(err)
+	}
+	if err := cmd.MarkFlagRequired(flagOracleCommMaxChangeRate); err != nil {
+		panic(err)
+	}
+
 	flags.AddTxFlagsToCmd(cmd)
 
 	return cmd
