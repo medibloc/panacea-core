@@ -37,5 +37,13 @@ func (m msgServer) UpdateOracleInfo(goCtx context.Context, msg *types.MsgUpdateO
 		return nil, err
 	}
 
+	ctx.EventManager().EmitEvent(
+		sdk.NewEvent(
+
+			sdk.EventTypeMessage,
+			sdk.NewAttribute(sdk.AttributeKeyModule, types.ModuleName),
+		),
+	)
+
 	return &types.MsgUpdateOracleInfoResponse{}, nil
 }

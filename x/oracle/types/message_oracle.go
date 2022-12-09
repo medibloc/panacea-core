@@ -64,8 +64,8 @@ func (m *MsgRegisterOracle) ValidateBasic() error {
 	if m.OracleCommissionMaxRate.LT(sdk.ZeroDec()) || m.OracleCommissionMaxRate.GT(sdk.OneDec()) {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "OracleCommissionMaxRate must be between 0 and 1")
 	}
-	if m.OracleCommissionMaxChangeRate.LT(sdk.ZeroDec()) || m.OracleCommissionMaxChangeRate.GT(sdk.OneDec()) {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "OracleCommissionMaxChangeRate must be between 0 and 1")
+	if m.OracleCommissionMaxChangeRate.LT(sdk.ZeroDec()) || m.OracleCommissionMaxChangeRate.GT(m.OracleCommissionMaxRate) {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "OracleCommissionMaxChangeRate must be between 0 and OracleCommissionMaxRate")
 	}
 
 	return nil
