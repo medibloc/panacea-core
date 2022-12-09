@@ -13,9 +13,8 @@ import (
 
 func CmdUpdateOracleInfo() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "update-oracle-info [endpoint] [oracle-commission-rate]",
+		Use:   "update-oracle-info",
 		Short: "update an oracle information",
-		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
@@ -24,9 +23,15 @@ func CmdUpdateOracleInfo() *cobra.Command {
 
 			oracleAddress := clientCtx.GetFromAddress().String()
 
-			endpoint := args[0]
+			endpoint, err := cmd.Flags().GetString(flagOracleEndpoint)
+			if err != nil {
+				return fmt.Errorf("failed to get oralce end point")
+			}
 
-			oracleCommissionRateStr := args[1]
+			oracleCommissionRateStr, err := cmd.Flags().GetString(flagOracleCommRate)
+			if err != nil {
+				return fmt.Errorf("failed to get oralce commission rate")
+			}
 
 			if len(oracleCommissionRateStr) == 0 {
 				return fmt.Errorf("oracleCommissionRate is empty")
@@ -45,6 +50,9 @@ func CmdUpdateOracleInfo() *cobra.Command {
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
 	}
+
+	cmd.Flags().String(flagOracleEndpoint, "", "oracle's endpoint")
+	cmd.Flags().String(flagOracleCommRate, "", "oracle's commission rate")
 
 	flags.AddTxFlagsToCmd(cmd)
 

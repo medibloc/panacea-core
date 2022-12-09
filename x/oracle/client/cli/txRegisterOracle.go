@@ -16,9 +16,8 @@ import (
 
 func CmdRegisterOracle() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "register-oracle [unique-ID] [node-public-key] [node-public-key-remote-report] [trusted-block-height] [trusted-block-hash] [endpoint] [oracle-commission-rate] [oracle-commission-max-rate] [oracle-commission-max-change-rate]",
+		Use:   "register-oracle",
 		Short: "Register a new oracle",
-		Args:  cobra.ExactArgs(9),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
@@ -26,29 +25,61 @@ func CmdRegisterOracle() *cobra.Command {
 			}
 
 			oracleAddress := clientCtx.GetFromAddress().String()
-			nodePubKey, err := base64.StdEncoding.DecodeString(args[1])
+
+			uniqueID, err := cmd.Flags().GetString(flagOracleUniqueID)
+			if err != nil {
+				return fmt.Errorf("failed to get oracle unique ID")
+			}
+
+			nodePubkeyStr, err := cmd.Flags().GetString(flagNodePublicKey)
+			if err != nil {
+				return fmt.Errorf("failed to get node public key")
+			}
+
+			nodePubKey, err := base64.StdEncoding.DecodeString(nodePubkeyStr)
 			if err != nil {
 				return err
 			}
 
-			nodePubKeyRemoteReport, err := base64.StdEncoding.DecodeString(args[2])
+			nodePubkeyRemoteReportStr, err := cmd.Flags().GetString(flagNodePubKeyRemoteReport)
+			if err != nil {
+				return fmt.Errorf("failed to get node public key remote report")
+			}
+
+			nodePubKeyRemoteReport, err := base64.StdEncoding.DecodeString(nodePubkeyRemoteReportStr)
 			if err != nil {
 				return err
 			}
 
-			trustedBlockHeight, err := strconv.ParseInt(args[3], 10, 64)
+			trustedBlockHeightStr, err := cmd.Flags().GetString(flagTrustedBlockHeight)
+			if err != nil {
+				return fmt.Errorf("failed to get trsuted block height")
+			}
+
+			trustedBlockHeight, err := strconv.ParseInt(trustedBlockHeightStr, 10, 64)
 			if err != nil {
 				return err
 			}
 
-			trustedBlockHash, err := hex.DecodeString(args[4])
+			trustedBlockHashStr, err := cmd.Flags().GetString(flagTrustedBlockHash)
+			if err != nil {
+				return fmt.Errorf("failed to get trsuted block hash")
+			}
+
+			trustedBlockHash, err := hex.DecodeString(trustedBlockHashStr)
 			if err != nil {
 				return err
 			}
 
-			endpoint := args[5]
+			endpoint, err := cmd.Flags().GetString(flagOracleEndpoint)
+			if err != nil {
+				return fmt.Errorf("failed to get oralce end point")
+			}
 
-			oracleCommissionRateStr := args[6]
+			oracleCommissionRateStr, err := cmd.Flags().GetString(flagOracleCommRate)
+			if err != nil {
+				return fmt.Errorf("failed to get oralce commission rate")
+			}
 
 			if len(oracleCommissionRateStr) == 0 {
 				return fmt.Errorf("oracleCommissionRate is empty")
@@ -59,7 +90,10 @@ func CmdRegisterOracle() *cobra.Command {
 				return err
 			}
 
-			oracleCommissionMaxRateStr := args[7]
+			oracleCommissionMaxRateStr, err := cmd.Flags().GetString(flagOracleCommMaxRate)
+			if err != nil {
+				return fmt.Errorf("failed to get oralce commission max rate")
+			}
 
 			if len(oracleCommissionMaxRateStr) == 0 {
 				return fmt.Errorf("oracleCommissionMaxRate is empty")
@@ -70,7 +104,10 @@ func CmdRegisterOracle() *cobra.Command {
 				return err
 			}
 
-			oracleCommissionMaxChangeRateStr := args[8]
+			oracleCommissionMaxChangeRateStr, err := cmd.Flags().GetString(flagOracleCommMaxChangeRate)
+			if err != nil {
+				return fmt.Errorf("failed to get oralce commission max change rate")
+			}
 
 			if len(oracleCommissionMaxChangeRateStr) == 0 {
 				return fmt.Errorf("oracleCommissionMaxChangeRate is empty")
@@ -82,7 +119,7 @@ func CmdRegisterOracle() *cobra.Command {
 			}
 
 			msg := types.NewMsgRegisterOracle(
-				args[0],
+				uniqueID,
 				oracleAddress,
 				nodePubKey,
 				nodePubKeyRemoteReport,
@@ -100,6 +137,16 @@ func CmdRegisterOracle() *cobra.Command {
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
 	}
+
+	cmd.Flags().String(flagOracleUniqueID, "", "unique ID for oracle")
+	cmd.Flags().String(flagNodePublicKey, "", "node public key for oracle")
+	cmd.Flags().String(flagNodePubKeyRemoteReport, "", "node public key remote report for oracle")
+	cmd.Flags().String(flagTrustedBlockHeight, "", "trusted block height of panacea trusted block")
+	cmd.Flags().String(flagTrustedBlockHash, "", "trusted block hash of panacea trusted block")
+	cmd.Flags().String(flagOracleEndpoint, "", "oracle's endpoint")
+	cmd.Flags().String(flagOracleCommRate, "", "oracle's commission rate")
+	cmd.Flags().String(flagOracleCommMaxRate, "", "oracle's commission max rate")
+	cmd.Flags().String(flagOracleCommMaxChangeRate, "", "oracle's commission max change rate")
 
 	flags.AddTxFlagsToCmd(cmd)
 
