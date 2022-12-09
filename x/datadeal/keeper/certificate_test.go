@@ -2,6 +2,7 @@ package keeper_test
 
 import (
 	"encoding/base64"
+	"fmt"
 	"testing"
 
 	"github.com/btcsuite/btcd/btcec"
@@ -95,7 +96,8 @@ func (suite *certificateTestSuite) storeSampleOracle(address, uniqueID string, c
 		Endpoint:             "https://my-validator.org",
 		OracleCommissionRate: commissionRate,
 	}
-	suite.OracleKeeper.SetOracle(suite.Ctx, oracle)
+	err := suite.OracleKeeper.SetOracle(suite.Ctx, oracle)
+	suite.Require().NoError(err)
 
 	return oracle
 }
