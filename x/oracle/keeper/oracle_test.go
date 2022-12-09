@@ -340,3 +340,21 @@ func (suite *oracleTestSuite) TestUpdateOracleInfoFailedGTMaxRate() {
 	suite.Require().Error(err, types.ErrUpdateOracle)
 	suite.Require().ErrorContains(err, "commission cannot be more than the max rate")
 }
+
+func (suite *oracleTestSuite) TestUpdateOracleInfoFailedNegativeRate() {
+	ctx := suite.Ctx
+
+	oracle := types.NewOracle(suite.oracleAccAddr.String(), suite.uniqueID, suite.endpoint, suite.oracleCommissionRate, suite.oracleCommissionMaxRate, suite.oracleCommissionMaxChangeRate, ctx.BlockTime())
+	err := suite.OracleKeeper.SetOracle(ctx, oracle)
+	suite.Require().NoError(err)
+
+	msgUpdateOracleInfo := &types.MsgUpdateOracleInfo{
+		OracleAddress:        suite.oracleAccAddr.String(),
+		Endpoint:             suite.newEndpoint,
+		OracleCommissionRate: sdk.NewDecWithPrec(-1, 1),
+	}
+	ctx = ctx.WithBlockTime(ctx.BlockTime().Add(30 * time.Hour))
+	err = suite.OracleKeeper.UpdateOracleInfo(ctx, msgUpdateOracleInfo)
+	suite.Require().Error(err, types.ErrUpdateOracle)
+	suite.Require().ErrorContains(err, "commission must be positive")
+}
