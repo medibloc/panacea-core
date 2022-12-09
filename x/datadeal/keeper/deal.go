@@ -182,5 +182,21 @@ func (k Keeper) DeactivateDeal(ctx sdk.Context, msg *types.MsgDeactivateDeal) er
 		return sdkerrors.Wrapf(types.ErrDeactivateDeal, err.Error())
 	}
 
+	dealAccAddr, err := sdk.AccAddressFromBech32(deal.Address)
+	if err != nil {
+		return sdkerrors.Wrapf(types.ErrDeactivateDeal, err.Error())
+	}
+
+	consumerAccAddr, err := sdk.AccAddressFromBech32(deal.ConsumerAddress)
+	if err != nil {
+		return sdkerrors.Wrapf(types.ErrDeactivateDeal, err.Error())
+	}
+
+	// refund a budget to consumer
+	err = k.bankKeeper.SendCoins(ctx, dealAccAddr, consumerAccAddr, sdk.NewCoins(*deal.Budget))
+	if err != nil {
+		return sdkerrors.Wrapf(types.ErrDeactivateDeal, err.Error())
+	}
+
 	return nil
 }

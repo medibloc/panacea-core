@@ -118,13 +118,19 @@ func (suite *dealTestSuite) TestRequestDeactivateDeal() {
 		RequesterAddress: suite.consumerAccAddr.String(),
 	}
 
+	// Consumer Balance = Original Consumer Balance(10000000000umed) - Deal's Budget(1000000000umed) --> 9000000000umed
+	beforeConsumerBalance := suite.BankKeeper.GetBalance(suite.Ctx, suite.consumerAccAddr, assets.MicroMedDenom)
+
 	err = suite.DataDealKeeper.DeactivateDeal(ctx, msgDeactivateDeal)
 	suite.Require().NoError(err)
 
 	getDeal, err = suite.DataDealKeeper.GetDeal(ctx, 1)
 	suite.Require().NoError(err)
-
 	suite.Require().Equal(getDeal.Status, types.DEAL_STATUS_INACTIVE)
+
+	// After deactivating a deal, the consumer get the refund from deal.
+	afterConsumerBalance := suite.BankKeeper.GetBalance(suite.Ctx, suite.consumerAccAddr, assets.MicroMedDenom)
+	suite.Require().Equal(beforeConsumerBalance.Add(*getDeal.Budget), afterConsumerBalance)
 }
 
 func (suite *dealTestSuite) TestRequestDeactivateDealInvalidRequester() {
