@@ -18,6 +18,13 @@ message GenesisState {
   repeated DataDeliveryVote data_delivery_votes = 5 [(gogoproto.nullable) = false];
   repeated DataVerificationQueueElement data_verification_queue_elements = 6 [(gogoproto.nullable) = false];
   repeated DataDeliveryQueueElement data_delivery_queue_elements = 7 [(gogoproto.nullable) = false];
+  repeated DealQueueElement deal_queue_elements = 8 [(gogoproto.nullable) = false];
+  Params params = 9 [(gogoproto.nullable) = false];
+}
+
+// Params defines the datadeal module's params.
+message Params {
+  int64 deal_deactivation_param = 1;
 }
 
 // DataVerificationQueue defines a data verification queue.
@@ -40,4 +47,10 @@ message DataDeliveryQueueElement {
     (gogoproto.nullable) = false,
     (gogoproto.moretags) = "yaml:\"voting_end_time\""
   ];
+}
+
+// DealQueue defines a deal queue.
+message DealQueueElement {
+  uint64 deal_id = 1;
+  int64 deactivation_height = 2;
 }

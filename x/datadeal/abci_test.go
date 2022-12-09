@@ -45,6 +45,8 @@ type abciTestSuite struct {
 
 	uniqueID string
 	dealID   uint64
+
+	BlockPeriod time.Duration
 }
 
 func TestAbciTestSuite(t *testing.T) {
@@ -86,8 +88,8 @@ func (suite *abciTestSuite) BeforeTest(_, _ string) {
 		UniqueId:                 suite.uniqueID,
 		OracleCommissionRate:     sdk.NewDecWithPrec(1, 1),
 		VoteParams: oracletypes.VoteParams{
-			VotingPeriod: 100,
-			JailPeriod:   60,
+			VotingPeriod: 30 * time.Second,
+			JailPeriod:   10 * time.Minute,
 			Threshold:    sdk.NewDec(2).Quo(sdk.NewDec(3)),
 		},
 		SlashParams: oracletypes.SlashParams{
@@ -95,6 +97,7 @@ func (suite *abciTestSuite) BeforeTest(_, _ string) {
 			SlashFractionForgery:  sdk.NewDecWithPrec(1, 1),
 		},
 	})
+	suite.DataDealKeeper.SetParams(suite.Ctx, types.DefaultParams())
 
 	err = suite.DataDealKeeper.SetNextDealNumber(ctx, 1)
 	suite.Require().NoError(err)
@@ -115,6 +118,8 @@ func (suite *abciTestSuite) BeforeTest(_, _ string) {
 	suite.Require().NoError(err)
 	suite.Require().Equal(uint64(1), dealID)
 	suite.dealID = dealID
+
+	suite.BlockPeriod = 6 * time.Second
 }
 
 func (suite *abciTestSuite) TestDataVerificationEndBlockerVotePass() {
@@ -946,4 +951,48 @@ func (suite *abciTestSuite) TestDataDeliveryEndBlockerVoteRejectSamePower() {
 	for _, v := range requiredEvents {
 		suite.Require().True(v)
 	}
+}
+
+func (suite *abciTestSuite) TestDealDeactivateEndBlockerPass() {
+	ctx := suite.Ctx
+
+	msgDeactivateDeal := &types.MsgDeactivateDeal{
+		DealId:           suite.dealID,
+		RequesterAddress: suite.buyerAccAddr.String(),
+	}
+
+	err := suite.DataDealKeeper.RequestDeactivateDeal(ctx, msgDeactivateDeal)
+	suite.Require().NoError(err)
+
+	// start block height of deactivation
+	datadeal.EndBlocker(ctx, suite.DataDealKeeper)
+	getDeal, err := suite.DataDealKeeper.GetDeal(ctx, suite.dealID)
+	suite.Require().NoError(err)
+	suite.Require().Equal(types.DEAL_STATUS_DEACTIVATING, getDeal.Status)
+
+	msgSellData := &types.MsgSellData{
+		DealId:        suite.dealID,
+		VerifiableCid: suite.verifiableCID,
+		DataHash:      suite.dataHash,
+		SellerAddress: suite.sellerAccAddr.String(),
+	}
+	err = suite.DataDealKeeper.SellData(ctx, msgSellData)
+	suite.Require().ErrorContains(err, "deal status is not ACTIVE")
+
+	// block height reached deactivationHeight
+	oracleParams := suite.OracleKeeper.GetParams(ctx)
+	VotingPeriod := oracleParams.VoteParams.VotingPeriod
+	datadealParams := suite.DataDealKeeper.GetParams(ctx)
+	dealDeactivationParam := datadealParams.DealDeactivationParam
+
+	deactivationHeight := ctx.BlockHeader().Height + dealDeactivationParam*int64(VotingPeriod/suite.BlockPeriod) + 1
+
+	ctx = ctx.WithBlockHeight(deactivationHeight)
+
+	datadeal.EndBlocker(ctx, suite.DataDealKeeper)
+
+	getDeal, err = suite.DataDealKeeper.GetDeal(ctx, suite.dealID)
+	suite.Require().NoError(err)
+	suite.Require().Equal(types.DEAL_STATUS_DEACTIVATED, getDeal.Status)
+
 }

@@ -35,3 +35,14 @@ func TestSplitDataDeliveryVoteQueueKey(t *testing.T) {
 	require.Equal(t, dealID, splitDealID)
 	require.Equal(t, dataHash, splitCID)
 }
+
+func TestSplitDealQueueKey(t *testing.T) {
+	dealID := uint64(1)
+	deactivationHeight := int64(5)
+
+	key := types.GetDealQueueKey(dealID, deactivationHeight)
+
+	splitDeactivationHeight, splitDealID := types.SplitDealQueueKey(key)
+	require.Equal(t, deactivationHeight, splitDeactivationHeight)
+	require.Equal(t, dealID, splitDealID)
+}

@@ -44,6 +44,12 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 	for _, dataDeliveryQueueElement := range genState.DataDeliveryQueueElements {
 		k.AddDataDeliveryQueue(ctx, dataDeliveryQueueElement.DataHash, dataDeliveryQueueElement.DealId, dataDeliveryQueueElement.VotingEndTime)
 	}
+
+	for _, dealQueueElement := range genState.DealQueueElements {
+		k.AddDealQueue(ctx, dealQueueElement.DealId, dealQueueElement.DeactivationHeight)
+	}
+
+	k.SetParams(ctx, genState.Params)
 }
 
 // ExportGenesis returns the capability module's exported genesis.
@@ -90,8 +96,15 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	if err != nil {
 		panic(err)
 	}
-
 	genesis.DataDeliveryQueueElements = dataDeliveryQueuesElements
+
+	dealQueueElements, err := k.GetAllDealQueueElements(ctx)
+	if err != nil {
+		panic(err)
+	}
+	genesis.DealQueueElements = dealQueueElements
+
+	genesis.Params = k.GetParams(ctx)
 
 	return genesis
 }
