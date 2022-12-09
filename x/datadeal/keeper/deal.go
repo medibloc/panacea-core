@@ -160,3 +160,27 @@ func (k Keeper) IncreaseCurNumDataOfDeal(ctx sdk.Context, dealID uint64) error {
 	}
 	return nil
 }
+
+func (k Keeper) DeactivateDeal(ctx sdk.Context, msg *types.MsgDeactivateDeal) error {
+	deal, err := k.GetDeal(ctx, msg.DealId)
+	if err != nil {
+		return sdkerrors.Wrapf(types.ErrDeactivateDeal, err.Error())
+	}
+
+	if deal.ConsumerAddress != msg.RequesterAddress {
+		return sdkerrors.Wrapf(types.ErrDeactivateDeal, "requester address is invalid")
+	}
+
+	if deal.Status != types.DEAL_STATUS_ACTIVE {
+		return sdkerrors.Wrapf(types.ErrDeactivateDeal, "deal's status is not 'ACTIVE'")
+	}
+
+	deal.Status = types.DEAL_STATUS_INACTIVE
+
+	err = k.SetDeal(ctx, deal)
+	if err != nil {
+		return sdkerrors.Wrapf(types.ErrDeactivateDeal, err.Error())
+	}
+
+	return nil
+}

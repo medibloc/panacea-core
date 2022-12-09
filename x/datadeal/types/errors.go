@@ -11,4 +11,5 @@ var (
 	ErrDealAlreadyExist   = sdkerrors.Register(ModuleName, 2, "deal already exist")
 	ErrDealNotFound       = sdkerrors.Register(ModuleName, 3, "deal is not found")
 	ErrGetDeal            = sdkerrors.Register(ModuleName, 4, "error while get deal")
+	ErrDeactivateDeal     = sdkerrors.Register(ModuleName, 5, "error while deactivate deal")
 )

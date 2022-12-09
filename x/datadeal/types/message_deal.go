@@ -53,3 +53,45 @@ func (m *MsgCreateDeal) GetSigners() []sdk.AccAddress {
 	}
 	return []sdk.AccAddress{consumerAddress}
 }
+
+var _ sdk.Msg = &MsgDeactivateDeal{}
+
+func NewMsgDeactivateDeal(dealID uint64, requesterAddress string) *MsgDeactivateDeal {
+	return &MsgDeactivateDeal{
+		DealId:           dealID,
+		RequesterAddress: requesterAddress,
+	}
+}
+
+func (m *MsgDeactivateDeal) Route() string {
+	return RouterKey
+}
+
+func (m *MsgDeactivateDeal) Type() string {
+	return "DeactivateDeal"
+}
+
+func (m *MsgDeactivateDeal) ValidateBasic() error {
+	_, err := sdk.AccAddressFromBech32(m.RequesterAddress)
+	if err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid requester address (%s)", err)
+	}
+
+	if m.DealId == 0 {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "invalid deal id format")
+	}
+	return nil
+}
+
+func (m *MsgDeactivateDeal) GetSignBytes() []byte {
+	bz := ModuleCdc.MustMarshalJSON(m)
+	return sdk.MustSortJSON(bz)
+}
+
+func (m *MsgDeactivateDeal) GetSigners() []sdk.AccAddress {
+	creator, err := sdk.AccAddressFromBech32(m.RequesterAddress)
+	if err != nil {
+		panic(err)
+	}
+	return []sdk.AccAddress{creator}
+}
