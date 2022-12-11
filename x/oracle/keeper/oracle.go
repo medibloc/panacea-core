@@ -54,6 +54,13 @@ func (k Keeper) ApproveOracleRegistration(ctx sdk.Context, msg *types.MsgApprove
 		return sdkerrors.Wrapf(types.ErrApproveOracleRegistration, err.Error())
 	}
 
+	oracleRegistration.EncryptedOraclePrivKey = msg.ApproveOracleRegistration.EncryptedOraclePrivKey
+
+	// add an encrypted oracle private key to oracleRegistration
+	if err := k.SetOracleRegistration(ctx, oracleRegistration); err != nil {
+		return sdkerrors.Wrapf(types.ErrApproveOracleRegistration, err.Error())
+	}
+
 	newOracle := types.NewOracle(
 		msg.ApproveOracleRegistration.TargetOracleAddress,
 		msg.ApproveOracleRegistration.UniqueId,
