@@ -215,21 +215,22 @@ func (suite *TestSuite) SetupTest() {
 	)
 	suite.DIDMsgServer = didkeeper.NewMsgServerImpl(suite.DIDKeeper)
 
-	suite.DataDealKeeper = *datadealkeeper.NewKeeper(
-		cdc.Marshaler,
-		keyParams[datadealtypes.StoreKey],
-		memKeys[datadealtypes.MemStoreKey],
-		suite.AccountKeeper,
-		suite.BankKeeper,
-	)
-	suite.DataDealMsgServer = datadealkeeper.NewMsgServerImpl(suite.DataDealKeeper)
-
 	suite.OracleKeeper = *oraclekeeper.NewKeeper(
 		cdc.Marshaler,
 		keyParams[oracletypes.StoreKey],
 		memKeys[oracletypes.MemStoreKey],
 		paramsKeeper.Subspace(oracletypes.ModuleName),
 	)
+
+	suite.DataDealKeeper = *datadealkeeper.NewKeeper(
+		cdc.Marshaler,
+		keyParams[datadealtypes.StoreKey],
+		memKeys[datadealtypes.MemStoreKey],
+		suite.AccountKeeper,
+		suite.BankKeeper,
+		suite.OracleKeeper,
+	)
+	suite.DataDealMsgServer = datadealkeeper.NewMsgServerImpl(suite.DataDealKeeper)
 
 	suite.OracleMsgServer = oraclekeeper.NewMsgServerImpl(suite.OracleKeeper)
 }
