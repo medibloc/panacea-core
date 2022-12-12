@@ -124,6 +124,7 @@ func (suite *queryOracleTestSuite) TestOracleRegistrations() {
 		TrustedBlockHash:       trustedBlockHash,
 		Endpoint:               suite.oracleEndpoint,
 		OracleCommissionRate:   suite.oracleCommissionRate,
+		EncryptedOraclePrivKey: nil,
 	}
 
 	oracleRegistration2 := &types.OracleRegistration{
@@ -135,6 +136,7 @@ func (suite *queryOracleTestSuite) TestOracleRegistrations() {
 		TrustedBlockHash:       trustedBlockHash,
 		Endpoint:               suite.oracle2Endpoint,
 		OracleCommissionRate:   suite.oracle2CommissionRate,
+		EncryptedOraclePrivKey: nil,
 	}
 
 	anotherUniqueID := "uniqueID2"
@@ -147,6 +149,7 @@ func (suite *queryOracleTestSuite) TestOracleRegistrations() {
 		TrustedBlockHash:       trustedBlockHash,
 		Endpoint:               suite.oracle2Endpoint,
 		OracleCommissionRate:   suite.oracle2CommissionRate,
+		EncryptedOraclePrivKey: nil,
 	}
 
 	err := oracleKeeper.SetOracleRegistration(ctx, oracleRegistration)
@@ -214,6 +217,7 @@ func (suite *queryOracleTestSuite) TestOracleRegistration() {
 		TrustedBlockHash:       []byte("hash"),
 		Endpoint:               suite.oracleEndpoint,
 		OracleCommissionRate:   suite.oracleCommissionRate,
+		EncryptedOraclePrivKey: nil,
 	}
 	err := oracleKeeper.SetOracleRegistration(ctx, oracleRegistration)
 	suite.Require().NoError(err)
