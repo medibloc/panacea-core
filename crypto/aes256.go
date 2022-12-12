@@ -3,8 +3,10 @@ package crypto
 import (
 	"crypto/aes"
 	"crypto/cipher"
+	"crypto/rand"
 	"crypto/sha256"
 	"fmt"
+	"io"
 
 	"github.com/btcsuite/btcd/btcec"
 )
@@ -23,37 +25,41 @@ func KDFSHA256(in []byte) []byte {
 	return out[:]
 }
 
-// Encrypt encrypts data using a AES256 cryptography.
-func Encrypt(secretKey, nonce, data []byte) ([]byte, error) {
+// Encrypt combines secretKey and secondKey to encrypt with AES256-GCM method.
+func Encrypt(secretKey, additional, data []byte) ([]byte, error) {
 	if len(secretKey) != 32 {
 		return nil, fmt.Errorf("secret key is not for AES-256: total %d bits", 8*len(secretKey))
 	}
 
+	// prepare AES-256-GSM cipher
 	block, err := aes.NewCipher(secretKey)
 	if err != nil {
 		return nil, err
 	}
 
-	aesgcm, err := cipher.NewGCM(block)
+	aesGCM, err := cipher.NewGCM(block)
 	if err != nil {
 		return nil, err
 	}
 
-	if len(nonce) != aesgcm.NonceSize() {
-		return nil, fmt.Errorf("nonce length must be %v", aesgcm.NonceSize())
+	// make random nonce
+	nonce := make([]byte, aesGCM.NonceSize())
+	if _, err := io.ReadFull(rand.Reader, nonce); err != nil {
+		return nil, err
 	}
 
-	cipherText := aesgcm.Seal(nonce, nonce, data, nil)
-
+	// encrypt data with second key
+	cipherText := aesGCM.Seal(nonce, nonce, data, additional)
 	return cipherText, nil
 }
 
-// Decrypt decrypts data using a AES256 cryptography.
-func Decrypt(secretKey, ciphertext []byte) ([]byte, error) {
+// Decrypt combines secretKey and secondKey to decrypt AES256-GCM.
+func Decrypt(secretKey []byte, additional []byte, ciphertext []byte) ([]byte, error) {
 	if len(secretKey) != 32 {
 		return nil, fmt.Errorf("secret key is not for AES-256: total %d bits", 8*len(secretKey))
 	}
 
+	// prepare AES-256-GCM cipher
 	block, err := aes.NewCipher(secretKey)
 	if err != nil {
 		return nil, err
@@ -64,10 +70,14 @@ func Decrypt(secretKey, ciphertext []byte) ([]byte, error) {
 		return nil, err
 	}
 
-	plainText, err := aesgcm.Open(nil, ciphertext[:aesgcm.NonceSize()], ciphertext[aesgcm.NonceSize():], nil)
+	nonceSize := aesgcm.NonceSize()
+	nonce, pureCiphertext := ciphertext[:nonceSize], ciphertext[nonceSize:]
+
+	// decrypt ciphertext with second key
+	plaintext, err := aesgcm.Open(nil, nonce, pureCiphertext, additional)
 	if err != nil {
 		return nil, err
 	}
 
-	return plainText, nil
+	return plaintext, nil
 }
