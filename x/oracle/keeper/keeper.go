@@ -62,3 +62,21 @@ func (k Keeper) VerifyOracleSignature(ctx sdk.Context, msg codec.ProtoMarshaler,
 
 	return nil
 }
+
+func (k Keeper) VerifyOracle(ctx sdk.Context, oracleAddress string) error {
+	oracle, err := k.GetOracle(ctx, oracleAddress)
+	if err != nil {
+		return fmt.Errorf("failed to oracle validation. address(%s) %w", oracleAddress, err)
+	}
+
+	activeUniqueID := k.GetParams(ctx).UniqueId
+	if activeUniqueID != oracle.UniqueId {
+		return fmt.Errorf("is not active an oracle. oracleAddress(%s), oracleUniqueID(%s), activeUniqueID(%s)",
+			oracle.OracleAddress,
+			oracle.UniqueId,
+			activeUniqueID,
+		)
+	}
+
+	return nil
+}

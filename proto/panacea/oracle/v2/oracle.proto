@@ -28,4 +28,5 @@ message OracleRegistration {
   bytes trusted_block_hash = 6;
   string endpoint = 7;
   string oracle_commission_rate = 8 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false];
+  bytes encrypted_oracle_priv_key = 9;
 }

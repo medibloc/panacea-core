@@ -15,8 +15,9 @@ message Certificate {
 // UnsignedCertificate defines a certificate information
 message UnsignedCertificate {
     string cid = 1;
-    string oracle_address = 2;
-    uint64 deal_id = 3;
-    string provider_address = 4;
-    string data_hash = 5;
+    string unique_id = 2;
+    string oracle_address = 3;
+    uint64 deal_id = 4;
+    string provider_address = 5;
+    string data_hash = 6;
 }

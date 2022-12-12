@@ -273,6 +273,10 @@ func (suite *oracleTestSuite) TestApproveOracleRegistrationSuccess() {
 	suite.Require().Equal(suite.oracleAccAddr.String(), getOracle.OracleAddress)
 	suite.Require().Equal(suite.endpoint, getOracle.Endpoint)
 	suite.Require().Equal(suite.oracleCommissionRate, getOracle.OracleCommissionRate)
+
+	getOracleRegistration, err := suite.OracleKeeper.GetOracleRegistration(suite.Ctx, suite.uniqueID, suite.oracleAccAddr.String())
+	suite.Require().NoError(err)
+	suite.Require().Equal(approveOracleRegistration.EncryptedOraclePrivKey, getOracleRegistration.EncryptedOraclePrivKey)
 }
 
 func (suite *oracleTestSuite) TestApproveOracleRegistrationFailedInvalidUniqueID() {
