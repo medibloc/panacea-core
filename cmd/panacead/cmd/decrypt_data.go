@@ -97,10 +97,10 @@ func decrypt(clientCtx client.Context, keyName string, encryptedCombinedKey, ora
 
 	sharedKey := crypto.DeriveSharedKey(consumerPrivKey, oraclePubkey, crypto.KDFSHA256)
 
-	combinedKey, err := crypto.Decrypt(sharedKey, encryptedCombinedKey)
+	combinedKey, err := crypto.Decrypt(sharedKey, nil, encryptedCombinedKey)
 	if err != nil {
 		return nil, err
 	}
 
-	return crypto.Decrypt(combinedKey, encryptedData)
+	return crypto.Decrypt(combinedKey, nil, encryptedData)
 }
