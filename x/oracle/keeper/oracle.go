@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"errors"
+	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -39,6 +40,68 @@ func (k Keeper) RegisterOracle(ctx sdk.Context, msg *types.MsgRegisterOracle) er
 			sdk.NewAttribute(types.AttributeKeyOracleAddress, oracleRegistration.OracleAddress),
 		),
 	)
+	return nil
+}
+
+func (k Keeper) ApproveOracleRegistration(ctx sdk.Context, msg *types.MsgApproveOracleRegistration) error {
+
+	if err := k.validateApproveOracleRegistration(ctx, msg); err != nil {
+		return sdkerrors.Wrapf(types.ErrApproveOracleRegistration, err.Error())
+	}
+
+	oracleRegistration, err := k.GetOracleRegistration(ctx, msg.ApproveOracleRegistration.UniqueId, msg.ApproveOracleRegistration.TargetOracleAddress)
+	if err != nil {
+		return sdkerrors.Wrapf(types.ErrApproveOracleRegistration, err.Error())
+	}
+
+	newOracle := types.NewOracle(
+		msg.ApproveOracleRegistration.TargetOracleAddress,
+		msg.ApproveOracleRegistration.UniqueId,
+		oracleRegistration.Endpoint,
+		oracleRegistration.OracleCommissionRate,
+	)
+
+	// append new oracle info
+	if err := k.SetOracle(ctx, newOracle); err != nil {
+		return sdkerrors.Wrapf(types.ErrApproveOracleRegistration, err.Error())
+	}
+
+	ctx.EventManager().EmitEvent(
+		sdk.NewEvent(
+			types.EventTypeApproveOracleRegistration,
+			sdk.NewAttribute(types.AttributeKeyOracleAddress, msg.ApproveOracleRegistration.TargetOracleAddress),
+		),
+	)
+
+	return nil
+
+}
+
+// validateApproveOracleRegistration checks signature
+func (k Keeper) validateApproveOracleRegistration(ctx sdk.Context, msg *types.MsgApproveOracleRegistration) error {
+
+	params := k.GetParams(ctx)
+	targetOracleAddress := msg.ApproveOracleRegistration.TargetOracleAddress
+
+	// check unique id
+	if msg.ApproveOracleRegistration.UniqueId != params.UniqueId {
+		return types.ErrInvalidUniqueID
+	}
+
+	// verify signature
+	if err := k.VerifySignature(ctx, msg.ApproveOracleRegistration, msg.Signature); err != nil {
+		return err
+	}
+
+	// check if the oracle has been already registered
+	hasOracle, err := k.HasOracle(ctx, targetOracleAddress)
+	if err != nil {
+		return err
+	}
+	if hasOracle {
+		return fmt.Errorf("already registered oracle. address(%s)", targetOracleAddress)
+	}
+
 	return nil
 }
 
@@ -188,4 +251,14 @@ func (k Keeper) GetOracle(ctx sdk.Context, address string) (*types.Oracle, error
 	}
 
 	return oracle, nil
+}
+
+func (k Keeper) HasOracle(ctx sdk.Context, address string) (bool, error) {
+	store := ctx.KVStore(k.storeKey)
+	accAddr, err := sdk.AccAddressFromBech32(address)
+	if err != nil {
+		return false, err
+	}
+
+	return store.Has(types.GetOracleKey(accAddr)), nil
 }

@@ -1,6 +1,9 @@
 package keeper
 
 import (
+	"fmt"
+
+	"github.com/btcsuite/btcd/btcec"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/medibloc/panacea-core/v2/x/oracle/types"
@@ -34,4 +37,28 @@ func NewKeeper(
 		memKey:     memKey,
 		paramSpace: paramSpace,
 	}
+}
+
+func (k Keeper) VerifySignature(ctx sdk.Context, msg codec.ProtoMarshaler, sigBz []byte) error {
+	bz, err := k.cdc.Marshal(msg)
+	if err != nil {
+		return err
+	}
+
+	oraclePubKeyBz := k.GetParams(ctx).MustDecodeOraclePublicKey()
+	oraclePubKey, err := btcec.ParsePubKey(oraclePubKeyBz, btcec.S256())
+	if err != nil {
+		return err
+	}
+
+	signature, err := btcec.ParseSignature(sigBz, btcec.S256())
+	if err != nil {
+		return err
+	}
+
+	if !signature.Verify(bz, oraclePubKey) {
+		return fmt.Errorf("failed to signature validation")
+	}
+
+	return nil
 }

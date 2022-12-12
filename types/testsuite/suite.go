@@ -56,6 +56,7 @@ type TestSuite struct {
 	suite.Suite
 
 	Ctx sdk.Context
+	Cdc params.EncodingConfig
 
 	AccountKeeper     authkeeper.AccountKeeper
 	StakingKeeper     stakingkeeper.Keeper
@@ -137,6 +138,7 @@ func (suite *TestSuite) SetupTest() {
 	scopedIBCKeeper := suite.CapabilityKeeper.ScopeToModule(ibchost.ModuleName)
 
 	suite.Ctx = ctx
+	suite.Cdc = cdc
 	suite.AccountKeeper = authkeeper.NewAccountKeeper(
 		cdc.Marshaler,
 		keyParams[authtypes.StoreKey],
@@ -246,6 +248,7 @@ func newTestCodec() params.EncodingConfig {
 	authtypes.RegisterInterfaces(interfaceRegistry)
 	banktypes.RegisterInterfaces(interfaceRegistry)
 	didtypes.RegisterInterfaces(interfaceRegistry)
+	oracletypes.RegisterInterfaces(interfaceRegistry)
 	//TODO: When other Msgs are implemented, I'll remove this comment.
 	//datadealtypes.RegisterInterfaces(interfaceRegistry)
 	marshaler := codec.NewProtoCodec(interfaceRegistry)
