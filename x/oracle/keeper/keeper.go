@@ -39,7 +39,7 @@ func NewKeeper(
 	}
 }
 
-func (k Keeper) VerifySignature(ctx sdk.Context, msg codec.ProtoMarshaler, sigBz []byte) error {
+func (k Keeper) VerifyOracleSignature(ctx sdk.Context, msg codec.ProtoMarshaler, sigBz []byte) error {
 	bz, err := k.cdc.Marshal(msg)
 	if err != nil {
 		return err
@@ -58,6 +58,24 @@ func (k Keeper) VerifySignature(ctx sdk.Context, msg codec.ProtoMarshaler, sigBz
 
 	if !signature.Verify(bz, oraclePubKey) {
 		return fmt.Errorf("failed to signature validation")
+	}
+
+	return nil
+}
+
+func (k Keeper) VerifyOracle(ctx sdk.Context, oracleAddress string) error {
+	oracle, err := k.GetOracle(ctx, oracleAddress)
+	if err != nil {
+		return fmt.Errorf("failed to oracle validation. address(%s) %w", oracleAddress, err)
+	}
+
+	activeUniqueID := k.GetParams(ctx).UniqueId
+	if activeUniqueID != oracle.UniqueId {
+		return fmt.Errorf("is not active an oracle. oracleAddress(%s), oracleUniqueID(%s), activeUniqueID(%s)",
+			oracle.OracleAddress,
+			oracle.UniqueId,
+			activeUniqueID,
+		)
 	}
 
 	return nil

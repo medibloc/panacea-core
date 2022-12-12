@@ -4,6 +4,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/medibloc/panacea-core/v2/x/datadeal/types"
+	oraclekeeper "github.com/medibloc/panacea-core/v2/x/oracle/keeper"
 )
 
 type (
@@ -13,6 +14,7 @@ type (
 		memKey        sdk.StoreKey
 		accountKeeper types.AccountKeeper
 		bankKeeper    types.BankKeeper
+		oracleKeeper  oraclekeeper.Keeper
 	}
 )
 
@@ -22,6 +24,7 @@ func NewKeeper(
 	memKey sdk.StoreKey,
 	accountKeeper types.AccountKeeper,
 	bankKeeper types.BankKeeper,
+	oracleKeeper oraclekeeper.Keeper,
 ) *Keeper {
 
 	return &Keeper{
@@ -30,5 +33,6 @@ func NewKeeper(
 		memKey:        memKey,
 		accountKeeper: accountKeeper,
 		bankKeeper:    bankKeeper,
+		oracleKeeper:  oracleKeeper,
 	}
 }
