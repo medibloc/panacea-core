@@ -18,9 +18,15 @@ func (m msgServer) CreateDeal(goCtx context.Context, msg *types.MsgCreateDeal) (
 	return &types.MsgCreateDealResponse{DealId: newDealID}, nil
 }
 
-func (m msgServer) DeactivateDeal(ctx context.Context, deal *types.MsgDeactivateDeal) (*types.MsgDeactivateDealResponse, error) {
-	//TODO implement me
-	panic("implement me")
+func (m msgServer) DeactivateDeal(goCtx context.Context, msg *types.MsgDeactivateDeal) (*types.MsgDeactivateDealResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	err := m.Keeper.DeactivateDeal(ctx, msg)
+	if err != nil {
+		return nil, err
+	}
+
+	return &types.MsgDeactivateDealResponse{}, nil
 }
 
 func (m msgServer) SubmitConsent(goCtx context.Context, msg *types.MsgSubmitConsent) (*types.MsgSubmitConsentResponse, error) {

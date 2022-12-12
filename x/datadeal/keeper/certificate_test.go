@@ -10,15 +10,19 @@ import (
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/medibloc/panacea-core/v2/types/assets"
+	"github.com/medibloc/panacea-core/v2/types/testsuite"
 	"github.com/medibloc/panacea-core/v2/x/datadeal/types"
 	oracletypes "github.com/medibloc/panacea-core/v2/x/oracle/types"
 	"github.com/stretchr/testify/suite"
 )
 
 type certificateTestSuite struct {
-	dealTestSuite
+	testsuite.TestSuite
 
 	uniqueID string
+
+	defaultFunds    sdk.Coins
+	consumerAccAddr sdk.AccAddress
 
 	oracleAccPrivKey cryptotypes.PrivKey
 	oracleAccPubKey  cryptotypes.PubKey

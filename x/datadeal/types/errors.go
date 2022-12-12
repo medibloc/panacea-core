@@ -14,4 +14,5 @@ var (
 	ErrCertificateNotFound = sdkerrors.Register(ModuleName, 5, "certificate is not found")
 	ErrGetCertificate      = sdkerrors.Register(ModuleName, 6, "error while get certificate")
 	ErrSubmitConsent       = sdkerrors.Register(ModuleName, 7, "error while submit consent")
+	ErrDeactivateDeal      = sdkerrors.Register(ModuleName, 8, "error while deactivate deal")
 )

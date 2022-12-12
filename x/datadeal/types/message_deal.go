@@ -84,6 +84,13 @@ func (m *MsgSubmitConsent) GetSigners() []sdk.AccAddress {
 
 var _ sdk.Msg = &MsgDeactivateDeal{}
 
+func NewMsgDeactivateDeal(dealID uint64, requesterAddress string) *MsgDeactivateDeal {
+	return &MsgDeactivateDeal{
+		DealId:           dealID,
+		RequesterAddress: requesterAddress,
+	}
+}
+
 func (m *MsgDeactivateDeal) Route() string {
 	return RouterKey
 }
@@ -93,6 +100,7 @@ func (m *MsgDeactivateDeal) Type() string {
 }
 
 func (m *MsgDeactivateDeal) ValidateBasic() error {
+
 	if _, err := sdk.AccAddressFromBech32(m.RequesterAddress); err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "requesterAddress is invalid. address: %s, error: %s", m.RequesterAddress, err.Error())
 	}
