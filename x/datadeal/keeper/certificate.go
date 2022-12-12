@@ -15,10 +15,6 @@ func (k Keeper) SubmitConsent(ctx sdk.Context, cert *types.Certificate) error {
 		return sdkerrors.Wrapf(types.ErrSubmitConsent, err.Error())
 	}
 
-	if err := k.oracleKeeper.VerifyOracle(ctx, unsignedCert.OracleAddress); err != nil {
-		return sdkerrors.Wrapf(types.ErrSubmitConsent, err.Error())
-	}
-
 	deal, err := k.GetDeal(ctx, unsignedCert.DealId)
 	if err != nil {
 		return sdkerrors.Wrapf(types.ErrSubmitConsent, "failed to get deal. %v", err)

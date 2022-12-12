@@ -45,7 +45,7 @@ func (k Keeper) VerifyOracleSignature(ctx sdk.Context, msg codec.ProtoMarshaler,
 		return err
 	}
 
-	oraclePubKeyBz := k.GetParams(ctx).MustDecodeOraclePubKey()
+	oraclePubKeyBz := k.GetParams(ctx).MustDecodeOraclePublicKey()
 	oraclePubKey, err := btcec.ParsePubKey(oraclePubKeyBz, btcec.S256())
 	if err != nil {
 		return err
@@ -59,19 +59,6 @@ func (k Keeper) VerifyOracleSignature(ctx sdk.Context, msg codec.ProtoMarshaler,
 	if !signature.Verify(bz, oraclePubKey) {
 		return fmt.Errorf("failed to signature validation")
 	}
-
-	return nil
-}
-
-func (k Keeper) VerifyOracle(ctx sdk.Context, oracleAddress string) error {
-	_, err := sdk.AccAddressFromBech32(oracleAddress)
-	if err != nil {
-		return err
-	}
-
-	// TODO Check is oracle registered?
-
-	// TODO Check is registered oracle's uniqueId correct?
 
 	return nil
 }
