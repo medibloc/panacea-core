@@ -29,7 +29,7 @@ func (m *MsgCreateDeal) ValidateBasic() error {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "budget is not a valid Coin object")
 	}
 	if _, err := sdk.AccAddressFromBech32(m.ConsumerAddress); err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid consumer address. %v", err)
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid consumer address (%s)", err)
 	}
 	return nil
 }

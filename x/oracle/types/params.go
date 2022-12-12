@@ -50,10 +50,6 @@ func (p *Params) Validate() error {
 	return nil
 }
 
-func (p Params) MustDecodeOraclePubKey() []byte {
-	return mustDecodeBase64Str(p.OraclePublicKey)
-}
-
 func mustDecodeBase64Str(s string) []byte {
 	decoded, err := base64.StdEncoding.DecodeString(s)
 	if err != nil {
@@ -104,4 +100,10 @@ func validateUniqueID(i interface{}) error {
 	}
 
 	return nil
+}
+
+// MustDecodeOraclePublicKey decodes a base64-encoded Params.OraclePublicKey.
+// It panics if the decoding is failed, assuming that the Params was already validated by Params.Validate().
+func (p Params) MustDecodeOraclePublicKey() []byte {
+	return mustDecodeBase64Str(p.OraclePublicKey)
 }
