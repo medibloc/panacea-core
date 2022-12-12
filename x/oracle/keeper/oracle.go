@@ -59,6 +59,9 @@ func (k Keeper) ApproveOracleRegistration(ctx sdk.Context, msg *types.MsgApprove
 		msg.ApproveOracleRegistration.UniqueId,
 		oracleRegistration.Endpoint,
 		oracleRegistration.OracleCommissionRate,
+		oracleRegistration.OracleCommissionMaxRate,
+		oracleRegistration.OracleCommissionMaxChangeRate,
+		ctx.BlockTime(),
 	)
 
 	// append new oracle info
