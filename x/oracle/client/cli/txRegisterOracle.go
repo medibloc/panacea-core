@@ -81,10 +81,6 @@ func CmdRegisterOracle() *cobra.Command {
 				return fmt.Errorf("failed to get oralce commission rate")
 			}
 
-			if len(oracleCommissionRateStr) == 0 {
-				return fmt.Errorf("oracleCommissionRate is empty")
-			}
-
 			oracleCommissionRate, err := sdk.NewDecFromStr(oracleCommissionRateStr)
 			if err != nil {
 				return err
@@ -95,10 +91,6 @@ func CmdRegisterOracle() *cobra.Command {
 				return fmt.Errorf("failed to get oralce commission max rate")
 			}
 
-			if len(oracleCommissionMaxRateStr) == 0 {
-				return fmt.Errorf("oracleCommissionMaxRate is empty")
-			}
-
 			oracleCommissionMaxRate, err := sdk.NewDecFromStr(oracleCommissionMaxRateStr)
 			if err != nil {
 				return err
@@ -107,10 +99,6 @@ func CmdRegisterOracle() *cobra.Command {
 			oracleCommissionMaxChangeRateStr, err := cmd.Flags().GetString(flagOracleCommMaxChangeRate)
 			if err != nil {
 				return fmt.Errorf("failed to get oralce commission max change rate")
-			}
-
-			if len(oracleCommissionMaxChangeRateStr) == 0 {
-				return fmt.Errorf("oracleCommissionMaxChangeRate is empty")
 			}
 
 			oracleCommissionMaxChangeRate, err := sdk.NewDecFromStr(oracleCommissionMaxChangeRateStr)

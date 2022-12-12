@@ -7,6 +7,7 @@ import (
 	"github.com/btcsuite/btcd/btcec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	"github.com/cosmos/cosmos-sdk/x/staking/types"
 )
 
 func NewOracle(oracleAddress, uniqueID, endpoint string, rate, maxRate, maxChangeRate sdk.Dec, updatedAt time.Time) *Oracle {
@@ -96,6 +97,29 @@ func (m *OracleRegistration) ValidateBasic() error {
 
 	if m.OracleCommissionMaxChangeRate.LT(sdk.ZeroDec()) || m.OracleCommissionMaxChangeRate.GT(sdk.OneDec()) {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "OracleCommissionMaxChangeRate must be between 0 and 1")
+	}
+
+	return nil
+}
+
+// ValidateOracleCommission validate an oracle's commission rate.
+// An error is returned if the new commission rate is invalid.
+func (m *Oracle) ValidateOracleCommission(blockTime time.Time, newRate sdk.Dec) error {
+	switch {
+	case blockTime.Sub(m.UpdateTime).Hours() < 24:
+		return types.ErrCommissionUpdateTime
+
+	case newRate.IsNegative():
+		// new rate cannot be negative
+		return types.ErrCommissionNegative
+
+	case newRate.GT(m.OracleCommissionMaxRate):
+		// new rate cannot be greater than the max rate
+		return types.ErrCommissionGTMaxRate
+
+	case newRate.Sub(m.OracleCommissionRate).GT(m.OracleCommissionMaxChangeRate):
+		// new rate % points change cannot be greater than the max change rate
+		return types.ErrCommissionGTMaxChangeRate
 	}
 
 	return nil
