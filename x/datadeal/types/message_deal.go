@@ -77,7 +77,7 @@ func (m *MsgDeactivateDeal) ValidateBasic() error {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid requester address (%s)", err)
 	}
 
-	if m.DealId == 0 {
+	if m.DealId <= 0 {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "invalid deal id format")
 	}
 	return nil

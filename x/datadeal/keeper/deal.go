@@ -168,7 +168,7 @@ func (k Keeper) DeactivateDeal(ctx sdk.Context, msg *types.MsgDeactivateDeal) er
 	}
 
 	if deal.ConsumerAddress != msg.RequesterAddress {
-		return sdkerrors.Wrapf(types.ErrDeactivateDeal, "requester address is invalid")
+		return sdkerrors.Wrapf(types.ErrDeactivateDeal, "only consumer can deactivate the deal")
 	}
 
 	if deal.Status != types.DEAL_STATUS_ACTIVE {
