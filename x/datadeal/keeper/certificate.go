@@ -26,8 +26,8 @@ func (k Keeper) SubmitConsent(ctx sdk.Context, cert *types.Certificate) error {
 		return sdkerrors.Wrapf(types.ErrSubmitConsent, "deal status is not ACTIVE")
 	}
 
-	if k.isProvidedCertificate(ctx, unsignedCert.DealId, unsignedCert.DataHash){
-		return sdkerrors.Wrapf(types.ErrSubmitConsent, "already provided certificate")
+	if err := k.verifyUnsignedCertificate(ctx, unsignedCert); err != nil {
+		return sdkerrors.Wrapf(types.ErrSubmitConsent, err.Error())
 	}
 
 	if err := k.SetCertificate(ctx, cert); err != nil {
@@ -42,6 +42,18 @@ func (k Keeper) SubmitConsent(ctx sdk.Context, cert *types.Certificate) error {
 		return sdkerrors.Wrapf(types.ErrSubmitConsent, err.Error())
 	}
 
+	return nil
+}
+
+func (k Keeper) verifyUnsignedCertificate(ctx sdk.Context, unsignedCert *types.UnsignedCertificate) error {
+	activeUniqueID := k.oracleKeeper.GetParams(ctx).UniqueId
+	if activeUniqueID != unsignedCert.UniqueId {
+		return fmt.Errorf("does not match active uniqueID. certificateUniqueID(%s) activeUniqueID(%s)", unsignedCert.UniqueId, activeUniqueID)
+	}
+
+	if k.isProvidedCertificate(ctx, unsignedCert.DealId, unsignedCert.DataHash) {
+		return fmt.Errorf("already provided certificate")
+	}
 	return nil
 }
 

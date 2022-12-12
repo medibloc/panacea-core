@@ -113,6 +113,7 @@ func (suite *certificateTestSuite) TestSubmitConsentSuccess() {
 
 	unsignedCert := &types.UnsignedCertificate{
 		Cid:             "cid",
+		UniqueId:        suite.uniqueID,
 		OracleAddress:   suite.oracleAccAddr.String(),
 		DealId:          dealID,
 		ProviderAddress: suite.providerAccAddr.String(),
@@ -173,6 +174,7 @@ func (suite *certificateTestSuite) TestSubmitConsentChangeStatusComplete() {
 
 	unsignedCert := &types.UnsignedCertificate{
 		Cid:             "cid",
+		UniqueId:        suite.uniqueID,
 		OracleAddress:   suite.oracleAccAddr.String(),
 		DealId:          dealID,
 		ProviderAddress: suite.providerAccAddr.String(),
@@ -227,6 +229,7 @@ func (suite *certificateTestSuite) TestSubmitConsentNotRegisteredOracle() {
 
 	unsignedCert := &types.UnsignedCertificate{
 		Cid:             "cid",
+		UniqueId:        suite.uniqueID,
 		OracleAddress:   suite.providerAccAddr.String(),
 		DealId:          dealID,
 		ProviderAddress: suite.providerAccAddr.String(),
@@ -249,7 +252,7 @@ func (suite *certificateTestSuite) TestSubmitConsentNotRegisteredOracle() {
 	suite.Require().ErrorContains(err, fmt.Sprintf("failed to oracle validation. address(%s)", suite.providerAccAddr.String()))
 }
 
-func (suite *certificateTestSuite) TestSubmitConsentNotSameUniqueID() {
+func (suite *certificateTestSuite) TestSubmitConsentNotSameUniqueIDOfOracle() {
 	budgetAmount := uint64(10000)
 	dealID := suite.createSampleDeal(budgetAmount, 1)
 
@@ -258,6 +261,7 @@ func (suite *certificateTestSuite) TestSubmitConsentNotSameUniqueID() {
 
 	unsignedCert := &types.UnsignedCertificate{
 		Cid:             "cid",
+		UniqueId:        suite.uniqueID,
 		OracleAddress:   suite.oracleAccAddr.String(),
 		DealId:          dealID,
 		ProviderAddress: suite.providerAccAddr.String(),
@@ -289,6 +293,7 @@ func (suite *certificateTestSuite) TestSubmitConsentInvalidSignature() {
 
 	unsignedCert := &types.UnsignedCertificate{
 		Cid:             "cid",
+		UniqueId:        suite.uniqueID,
 		OracleAddress:   suite.oracleAccAddr.String(),
 		DealId:          dealID,
 		ProviderAddress: suite.providerAccAddr.String(),
@@ -317,6 +322,7 @@ func (suite *certificateTestSuite) TestSubmitConsentNotExistDeal() {
 
 	unsignedCert := &types.UnsignedCertificate{
 		Cid:             "cid",
+		UniqueId:        suite.uniqueID,
 		OracleAddress:   suite.oracleAccAddr.String(),
 		DealId:          1,
 		ProviderAddress: suite.providerAccAddr.String(),
@@ -344,6 +350,7 @@ func (suite *certificateTestSuite) TestSubmitConsentAlreadyDealStatusComplete() 
 
 	unsignedCert := &types.UnsignedCertificate{
 		Cid:             "cid",
+		UniqueId:        suite.uniqueID,
 		OracleAddress:   suite.oracleAccAddr.String(),
 		DealId:          1,
 		ProviderAddress: suite.providerAccAddr.String(),
@@ -371,6 +378,7 @@ func (suite *certificateTestSuite) TestSubmitConsentExistSameCertificate() {
 
 	unsignedCert := &types.UnsignedCertificate{
 		Cid:             "cid",
+		UniqueId:        suite.uniqueID,
 		OracleAddress:   suite.oracleAccAddr.String(),
 		DealId:          1,
 		ProviderAddress: suite.providerAccAddr.String(),
@@ -389,5 +397,38 @@ func (suite *certificateTestSuite) TestSubmitConsentExistSameCertificate() {
 	}
 	err = suite.DataDealKeeper.SubmitConsent(suite.Ctx, certificate)
 	suite.Require().ErrorIs(err, types.ErrSubmitConsent)
-	suite.Require().ErrorContains(err, "already provided certificate")
+	suite.Require().ErrorContains(err, "already provided certificate: error while submit consent")
+}
+
+func (suite *certificateTestSuite) TestSubmitConsentNotSameUniqueIDOfCertificate() {
+	budgetAmount := uint64(10000)
+	dealID := suite.createSampleDeal(budgetAmount, 1)
+
+	oracleCommissionRate := sdk.NewDecWithPrec(1, 1) // 10%
+	suite.storeSampleOracle(suite.oracleAccAddr.String(), suite.uniqueID, oracleCommissionRate)
+
+	invalidUniqueID := "invalidUniqueID"
+	unsignedCert := &types.UnsignedCertificate{
+		Cid:             "cid",
+		UniqueId:        invalidUniqueID,
+		OracleAddress:   suite.oracleAccAddr.String(),
+		DealId:          dealID,
+		ProviderAddress: suite.providerAccAddr.String(),
+		DataHash:        suite.dataHash,
+	}
+
+	unsignedCertBz, err := unsignedCert.Marshal()
+	suite.Require().NoError(err)
+
+	sign, err := suite.oraclePrivKey.Sign(unsignedCertBz)
+	suite.Require().NoError(err)
+
+	certificate := &types.Certificate{
+		UnsignedCertificate: unsignedCert,
+		Signature:           sign.Serialize(),
+	}
+
+	err = suite.DataDealKeeper.SubmitConsent(suite.Ctx, certificate)
+	suite.Require().ErrorIs(err, types.ErrSubmitConsent)
+	suite.Require().ErrorContains(err, fmt.Sprintf("does not match active uniqueID. certificateUniqueID(%s) activeUniqueID(%s)", invalidUniqueID, suite.uniqueID))
 }
