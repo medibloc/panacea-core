@@ -45,7 +45,7 @@ func (k Keeper) VerifyOracleSignature(ctx sdk.Context, msg codec.ProtoMarshaler,
 		return err
 	}
 
-	oraclePubKeyBz := k.GetParams(ctx).MustDecodeOraclePubKey()
+	oraclePubKeyBz := k.GetParams(ctx).MustDecodeOraclePublicKey()
 	oraclePubKey, err := btcec.ParsePubKey(oraclePubKeyBz, btcec.S256())
 	if err != nil {
 		return err

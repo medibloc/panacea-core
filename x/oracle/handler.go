@@ -20,9 +20,9 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 		case *types.MsgRegisterOracle:
 			res, err := msgServer.RegisterOracle(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)
-		//case *types.MsgApproveOracleRegistration:
-		//	res, err := msgServer.ApproveOracleRegistration(sdk.WrapSDKContext(ctx), msg)
-		//	return sdk.WrapServiceResult(ctx, res, err)
+		case *types.MsgApproveOracleRegistration:
+			res, err := msgServer.ApproveOracleRegistration(sdk.WrapSDKContext(ctx), msg)
+			return sdk.WrapServiceResult(ctx, res, err)
 		//case *types.MsgUpdateOracleInfo:
 		//	res, err := msgServer.UpdateOracleInfo(sdk.WrapSDKContext(ctx), msg)
 		//	return sdk.WrapServiceResult(ctx, res, err)
