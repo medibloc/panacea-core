@@ -100,6 +100,10 @@ func (k Keeper) validateApproveOracleRegistration(ctx sdk.Context, msg *types.Ms
 		return err
 	}
 
+	if msg.ApproveOracleRegistration.EncryptedOraclePrivKey == nil {
+		return fmt.Errorf("encrypted oracle private key is nil")
+	}
+
 	// check if the oracle has been already registered
 	hasOracle, err := k.HasOracle(ctx, targetOracleAddress)
 	if err != nil {
