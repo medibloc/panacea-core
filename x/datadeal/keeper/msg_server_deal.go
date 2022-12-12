@@ -29,7 +29,19 @@ func (m msgServer) DeactivateDeal(goCtx context.Context, msg *types.MsgDeactivat
 	return &types.MsgDeactivateDealResponse{}, nil
 }
 
-func (m msgServer) SubmitConsent(ctx context.Context, consent *types.MsgSubmitConsent) (*types.MsgSubmitConsentResponse, error) {
-	//TODO implement me
-	panic("implement me")
+func (m msgServer) SubmitConsent(goCtx context.Context, msg *types.MsgSubmitConsent) (*types.MsgSubmitConsentResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	if err := m.Keeper.SubmitConsent(ctx, msg.Certificate); err != nil {
+		return nil, err
+	}
+
+	ctx.EventManager().EmitEvent(
+		sdk.NewEvent(
+			sdk.EventTypeMessage,
+			sdk.NewAttribute(sdk.AttributeKeyModule, types.ModuleName),
+		),
+	)
+
+	return &types.MsgSubmitConsentResponse{}, nil
 }

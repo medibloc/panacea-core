@@ -36,7 +36,6 @@ func (suite *dealTestSuite) BeforeTest(_, _ string) {
 }
 
 func (suite *dealTestSuite) TestCreateNewDeal() {
-
 	err := suite.FundAccount(suite.Ctx, suite.consumerAccAddr, suite.defaultFunds)
 	suite.Require().NoError(err)
 

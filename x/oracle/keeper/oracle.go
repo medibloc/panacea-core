@@ -89,7 +89,7 @@ func (k Keeper) validateApproveOracleRegistration(ctx sdk.Context, msg *types.Ms
 	}
 
 	// verify signature
-	if err := k.VerifySignature(ctx, msg.ApproveOracleRegistration, msg.Signature); err != nil {
+	if err := k.VerifyOracleSignature(ctx, msg.ApproveOracleRegistration, msg.Signature); err != nil {
 		return err
 	}
 

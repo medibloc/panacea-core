@@ -14,4 +14,5 @@ type AccountKeeper interface {
 
 type BankKeeper interface {
 	SendCoins(sdk.Context, sdk.AccAddress, sdk.AccAddress, sdk.Coins) error
+	GetBalance(sdk.Context, sdk.AccAddress, string) sdk.Coin
 }
