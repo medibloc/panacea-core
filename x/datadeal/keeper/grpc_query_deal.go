@@ -52,17 +52,53 @@ func (k Keeper) Deals(goCtx context.Context, req *types.QueryDealsRequest) (*typ
 	}
 
 	return &types.QueryDealsResponse{
-		Deal:       deals,
+		Deals:       deals,
 		Pagination: pageRes,
 	}, nil
 }
 
-func (k Keeper) Certificates(ctx context.Context, certificates *types.QueryCertificates) (*types.QueryCertificatesResponse, error) {
-	//TODO implement me
-	panic("implement me")
+func (k Keeper) Certificates(goCtx context.Context, req *types.QueryCertificates) (*types.QueryCertificatesResponse, error) {
+	if req == nil {
+		return nil, status.Error(codes.InvalidArgument, "invalid request")
+	}
+
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	store := ctx.KVStore(k.storeKey)
+
+	certsStore := prefix.NewStore(store, append(types.CertificateKey, sdk.Uint64ToBigEndian(req.DealId)...))
+
+	var certs []*types.Certificate
+	pageRes, err := query.Paginate(certsStore, req.Pagination, func(_ []byte, value []byte) error {
+		var cert types.Certificate
+		err := k.cdc.UnmarshalLengthPrefixed(value, &cert)
+		if err != nil {
+			return err
+		}
+		certs = append(certs, &cert)
+		return nil
+	})
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	return &types.QueryCertificatesResponse{
+		Certificates: certs,
+		Pagination:   pageRes,
+	}, nil
 }
 
-func (k Keeper) Certificate(ctx context.Context, certificate *types.QueryCertificate) (*types.QueryCertificateResponse, error) {
-	//TODO implement me
-	panic("implement me")
+func (k Keeper) Certificate(goCtx context.Context, req *types.QueryCertificate) (*types.QueryCertificateResponse, error) {
+	if req == nil {
+		return nil, status.Error(codes.InvalidArgument, "invalid request")
+	}
+
+	cert, err := k.GetCertificate(sdk.UnwrapSDKContext(goCtx), req.DealId, req.DataHash)
+	if err != nil {
+		return nil, err
+	}
+
+	return &types.QueryCertificateResponse{
+		Certificate: cert,
+	}, nil
 }

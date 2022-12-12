@@ -3,7 +3,9 @@ package keeper_test
 import (
 	"testing"
 
+	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/query"
 	"github.com/medibloc/panacea-core/v2/x/datadeal/testutil"
 	"github.com/medibloc/panacea-core/v2/x/datadeal/types"
 	"github.com/stretchr/testify/suite"
@@ -12,11 +14,19 @@ import (
 type queryDealTestSuite struct {
 	testutil.DataDealBaseTestSuite
 
+	oracleAccAddr   sdk.AccAddress
+	providerAccAddr sdk.AccAddress
 	consumerAccAddr sdk.AccAddress
 }
 
 func TestQueryDealTest(t *testing.T) {
 	suite.Run(t, new(queryDealTestSuite))
+}
+
+func (suite *queryDealTestSuite) BeforeTest(_, _ string) {
+	suite.oracleAccAddr = sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address())
+	suite.providerAccAddr = sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address())
+	suite.consumerAccAddr = sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address())
 }
 
 func (suite *queryDealTestSuite) TestQueryDeal() {
@@ -36,24 +46,104 @@ func (suite *queryDealTestSuite) TestQueryDeal() {
 }
 
 func (suite *queryDealTestSuite) TestQueryDeals() {
-	deal1 := suite.MakeTestDeal(1, suite.consumerAccAddr, 100)
-	err := suite.DataDealKeeper.SetDeal(suite.Ctx, deal1)
+	deal := suite.MakeTestDeal(1, suite.consumerAccAddr, 100)
+	err := suite.DataDealKeeper.SetDeal(suite.Ctx, deal)
 	suite.Require().NoError(err)
 
-	deal2 := suite.MakeTestDeal(2, suite.consumerAccAddr, 100)
+	deal2 := suite.MakeTestDeal(2, suite.consumerAccAddr, 10)
 	err = suite.DataDealKeeper.SetDeal(suite.Ctx, deal2)
 	suite.Require().NoError(err)
 
-	deal3 := suite.MakeTestDeal(3, suite.consumerAccAddr, 100)
-	err = suite.DataDealKeeper.SetDeal(suite.Ctx, deal3)
-	suite.Require().NoError(err)
-
 	req := types.QueryDealsRequest{}
-
 	res, err := suite.DataDealKeeper.Deals(sdk.WrapSDKContext(suite.Ctx), &req)
 	suite.Require().NoError(err)
-	suite.Require().Len(res.Deal, 3)
-	suite.Require().Equal(res.Deal[0].Address, deal1.Address)
-	suite.Require().Equal(res.Deal[1].Address, deal2.Address)
-	suite.Require().Equal(res.Deal[2].Address, deal3.Address)
+	suite.Require().NotNil(res)
+	suite.Require().Equal(2, len(res.Deals))
+	suite.Require().Equal(deal, res.Deals[0])
+	suite.Require().Equal(deal2, res.Deals[1])
+}
+
+func (suite *queryDealTestSuite) TestQueryCert() {
+	cert := &types.Certificate{
+		UnsignedCertificate: &types.UnsignedCertificate{
+			Cid:             "cid1",
+			OracleAddress:   suite.oracleAccAddr.String(),
+			DealId:          1,
+			ProviderAddress: suite.providerAccAddr.String(),
+			DataHash:        "dataHash",
+		},
+		Signature: []byte("signature"),
+	}
+
+	err := suite.DataDealKeeper.SetCertificate(suite.Ctx, cert)
+	suite.Require().NoError(err)
+
+	req := &types.QueryCertificate{
+		DealId:   cert.UnsignedCertificate.DealId,
+		DataHash: cert.UnsignedCertificate.DataHash,
+	}
+	res, err := suite.DataDealKeeper.Certificate(sdk.WrapSDKContext(suite.Ctx), req)
+	suite.Require().NoError(err)
+	suite.Require().NotNil(res)
+	suite.Require().Equal(cert, res.Certificate)
+}
+
+func (suite *queryDealTestSuite) TestQueryCerts() {
+	cert := &types.Certificate{
+		UnsignedCertificate: &types.UnsignedCertificate{
+			Cid:             "cid1",
+			OracleAddress:   suite.oracleAccAddr.String(),
+			DealId:          1,
+			ProviderAddress: suite.providerAccAddr.String(),
+			DataHash:        "dataHash",
+		},
+		Signature: []byte("signature"),
+	}
+
+	err := suite.DataDealKeeper.SetCertificate(suite.Ctx, cert)
+	suite.Require().NoError(err)
+
+	cert2 := &types.Certificate{
+		UnsignedCertificate: &types.UnsignedCertificate{
+			Cid:             "cid2",
+			OracleAddress:   suite.oracleAccAddr.String(),
+			DealId:          1,
+			ProviderAddress: suite.providerAccAddr.String(),
+			DataHash:        "dataHash2",
+		},
+		Signature: []byte("signature"),
+	}
+
+	err = suite.DataDealKeeper.SetCertificate(suite.Ctx, cert2)
+	suite.Require().NoError(err)
+
+	cert3 := &types.Certificate{
+		UnsignedCertificate: &types.UnsignedCertificate{
+			Cid:             "cid2",
+			OracleAddress:   suite.oracleAccAddr.String(),
+			DealId:          2,
+			ProviderAddress: suite.providerAccAddr.String(),
+			DataHash:        "dataHash2",
+		},
+		Signature: []byte("signature"),
+	}
+
+	err = suite.DataDealKeeper.SetCertificate(suite.Ctx, cert3)
+	suite.Require().NoError(err)
+
+	req := &types.QueryCertificates{
+		DealId:     1,
+		Pagination: &query.PageRequest{},
+	}
+	res, err := suite.DataDealKeeper.Certificates(sdk.WrapSDKContext(suite.Ctx), req)
+	suite.Require().NoError(err)
+	suite.Require().Equal(2, len(res.Certificates))
+	suite.Require().Equal(cert, res.Certificates[0])
+	suite.Require().Equal(cert2, res.Certificates[1])
+
+	req.DealId = 2
+	res, err = suite.DataDealKeeper.Certificates(sdk.WrapSDKContext(suite.Ctx), req)
+	suite.Require().NoError(err)
+	suite.Require().Equal(1, len(res.Certificates))
+	suite.Require().Equal(cert3, res.Certificates[0])
 }
