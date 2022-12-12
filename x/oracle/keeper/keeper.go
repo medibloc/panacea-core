@@ -39,7 +39,7 @@ func NewKeeper(
 	}
 }
 
-func (k Keeper) VerifySignature(ctx sdk.Context, msg codec.ProtoMarshaler, sigBz []byte) error {
+func (k Keeper) VerifyOracleSignature(ctx sdk.Context, msg codec.ProtoMarshaler, sigBz []byte) error {
 	bz, err := k.cdc.Marshal(msg)
 	if err != nil {
 		return err

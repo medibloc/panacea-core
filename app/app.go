@@ -434,19 +434,20 @@ func New(
 		app.BankKeeper,
 	)
 
+	app.oracleKeeper = *oraclekeeper.NewKeeper(
+		appCodec,
+		keys[oracletypes.StoreKey],
+		keys[oracletypes.MemStoreKey],
+		app.GetSubspace(oracletypes.ModuleName),
+	)
+
 	app.datadealKeeper = *datadealkeeper.NewKeeper(
 		appCodec,
 		keys[datadealtypes.StoreKey],
 		keys[datadealtypes.MemStoreKey],
 		app.AccountKeeper,
 		app.BankKeeper,
-	)
-
-	app.oracleKeeper = *oraclekeeper.NewKeeper(
-		appCodec,
-		keys[oracletypes.StoreKey],
-		keys[oracletypes.MemStoreKey],
-		app.GetSubspace(oracletypes.ModuleName),
+		app.oracleKeeper,
 	)
 
 	wasmDir := filepath.Join(homePath, wasm.ModuleName)

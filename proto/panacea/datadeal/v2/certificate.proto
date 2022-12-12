@@ -16,7 +16,7 @@ message Certificate {
 message UnsignedCertificate {
     string cid = 1;
     string oracle_address = 2;
-    int64 deal_id = 3;
+    uint64 deal_id = 3;
     string provider_address = 4;
     string data_hash = 5;
 }
