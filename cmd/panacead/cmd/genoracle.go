@@ -115,7 +115,7 @@ func setOracle(cmd *cobra.Command, genState *oracletypes.GenesisState) error {
 	}
 
 	if len(oracleAddressOrKey) == 0 {
-		return nil
+		return fmt.Errorf("empty oracle address or key. please enter a valid oracle account")
 	}
 
 	oracleAccAddr, err := sdk.AccAddressFromBech32(oracleAddressOrKey)
