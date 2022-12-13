@@ -51,7 +51,9 @@ func EncryptDataCmd(defaultNodeHome string) *cobra.Command {
 				return err
 			}
 
-			if err := os.WriteFile(args[1], encryptedData, 0644); err != nil {
+			encryptedDataBase64 := []byte(base64.StdEncoding.EncodeToString(encryptedData))
+
+			if err := os.WriteFile(args[1], encryptedDataBase64, 0644); err != nil {
 				return err
 			}
 
