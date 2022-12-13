@@ -114,19 +114,24 @@ func (k Keeper) UpdateOracleInfo(ctx sdk.Context, msg *types.MsgUpdateOracleInfo
 		return sdkerrors.Wrapf(types.ErrUpdateOracle, err.Error())
 	}
 
+	if oracle.OracleCommissionRate.Equal(msg.OracleCommissionRate) && len(msg.Endpoint) == 0 {
+		return sdkerrors.Wrapf(types.ErrUpdateOracle, "no information to be updated")
+	}
+
 	blockTime := ctx.BlockHeader().Time
 
 	if !oracle.OracleCommissionRate.Equal(msg.OracleCommissionRate) {
 		if err := oracle.ValidateOracleCommission(blockTime, msg.OracleCommissionRate); err != nil {
 			return sdkerrors.Wrapf(types.ErrUpdateOracle, err.Error())
 		}
+		oracle.OracleCommissionRate = msg.OracleCommissionRate
 	}
 
-	oracle.UpdateTime = blockTime
 	if len(msg.Endpoint) > 0 {
 		oracle.Endpoint = msg.Endpoint
 	}
-	oracle.OracleCommissionRate = msg.OracleCommissionRate
+
+	oracle.UpdateTime = blockTime
 
 	if err := k.SetOracle(ctx, oracle); err != nil {
 		return sdkerrors.Wrapf(types.ErrUpdateOracle, err.Error())

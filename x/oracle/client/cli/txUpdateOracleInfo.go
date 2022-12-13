@@ -54,6 +54,10 @@ func CmdUpdateOracleInfo() *cobra.Command {
 	cmd.Flags().String(flagOracleEndpoint, "", "oracle's endpoint")
 	cmd.Flags().String(flagOracleCommRate, "", "oracle's commission rate")
 
+	if err := cmd.MarkFlagRequired(flagOracleCommRate); err != nil {
+		panic(err)
+	}
+
 	flags.AddTxFlagsToCmd(cmd)
 
 	return cmd
