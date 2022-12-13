@@ -115,7 +115,7 @@ func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
 		AddGenesisWasmMsgCmd(app.DefaultNodeHome),
 		AddGenesisOracleCmd(app.DefaultNodeHome),
 		EncryptDataCmd(app.DefaultNodeHome),
-		DecryptData(app.DefaultNodeHome),
+		DecryptDataCmd(app.DefaultNodeHome),
 	)
 
 	a := appCreator{encodingConfig}
