@@ -49,8 +49,8 @@ func Encrypt(secretKey, additional, data []byte) ([]byte, error) {
 	}
 
 	// encrypt data with second key
-	ciphertext := aesGCM.Seal(nonce, nonce, data, additional)
-	return ciphertext, nil
+	cipherText := aesGCM.Seal(nonce, nonce, data, additional)
+	return cipherText, nil
 }
 
 // Decrypt combines secretKey and secondKey to decrypt AES256-GCM.
