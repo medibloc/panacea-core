@@ -32,14 +32,16 @@ func CmdUpdateOracleInfo() *cobra.Command {
 			if err != nil {
 				return fmt.Errorf("failed to get oralce commission rate")
 			}
+			var oracleCommissionRate *sdk.Dec
 
-			if len(oracleCommissionRateStr) == 0 {
-				return fmt.Errorf("oracleCommissionRate is empty")
-			}
-
-			oracleCommissionRate, err := sdk.NewDecFromStr(oracleCommissionRateStr)
-			if err != nil {
-				return err
+			if len(oracleCommissionRateStr) != 0 {
+				commissionRate, err := sdk.NewDecFromStr(oracleCommissionRateStr)
+				if err != nil {
+					return err
+				}
+				oracleCommissionRate = &commissionRate
+			} else {
+				oracleCommissionRate = nil
 			}
 
 			msg := types.NewMsgUpdateOracleInfo(oracleAddress, endpoint, oracleCommissionRate)
@@ -53,10 +55,6 @@ func CmdUpdateOracleInfo() *cobra.Command {
 
 	cmd.Flags().String(flagOracleEndpoint, "", "oracle's endpoint")
 	cmd.Flags().String(flagOracleCommRate, "", "oracle's commission rate")
-
-	if err := cmd.MarkFlagRequired(flagOracleCommRate); err != nil {
-		panic(err)
-	}
 
 	flags.AddTxFlagsToCmd(cmd)
 

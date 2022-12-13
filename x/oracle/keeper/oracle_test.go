@@ -438,7 +438,7 @@ func (suite *oracleTestSuite) TestUpdateOracleInfoSuccess() {
 	msgUpdateOracleInfo := &types.MsgUpdateOracleInfo{
 		OracleAddress:        suite.oracleAccAddr.String(),
 		Endpoint:             suite.newEndpoint,
-		OracleCommissionRate: suite.newOracleCommissionRate,
+		OracleCommissionRate: &suite.newOracleCommissionRate,
 	}
 	ctx = ctx.WithBlockTime(ctx.BlockTime().Add(30 * time.Hour))
 	err = suite.OracleKeeper.UpdateOracleInfo(ctx, msgUpdateOracleInfo)
@@ -461,7 +461,7 @@ func (suite *oracleTestSuite) TestUpdateOracleInfoSuccessWithNoCommissionChange(
 	msgUpdateOracleInfo := &types.MsgUpdateOracleInfo{
 		OracleAddress:        suite.oracleAccAddr.String(),
 		Endpoint:             suite.newEndpoint,
-		OracleCommissionRate: suite.oracleCommissionRate,
+		OracleCommissionRate: &suite.oracleCommissionRate,
 	}
 	err = suite.OracleKeeper.UpdateOracleInfo(ctx, msgUpdateOracleInfo)
 	suite.Require().NoError(err)
@@ -483,7 +483,7 @@ func (suite *oracleTestSuite) TestUpdateOracleInfoFailedUpdateTime() {
 	msgUpdateOracleInfo := &types.MsgUpdateOracleInfo{
 		OracleAddress:        suite.oracleAccAddr.String(),
 		Endpoint:             suite.newEndpoint,
-		OracleCommissionRate: suite.newOracleCommissionRate,
+		OracleCommissionRate: &suite.newOracleCommissionRate,
 	}
 
 	err = suite.OracleKeeper.UpdateOracleInfo(ctx, msgUpdateOracleInfo)
@@ -498,10 +498,11 @@ func (suite *oracleTestSuite) TestUpdateOracleInfoFailedGTMaxChangeRate() {
 	err := suite.OracleKeeper.SetOracle(ctx, oracle)
 	suite.Require().NoError(err)
 
+	updateCommissionRate := sdk.NewDecWithPrec(12, 2)
 	msgUpdateOracleInfo := &types.MsgUpdateOracleInfo{
 		OracleAddress:        suite.oracleAccAddr.String(),
 		Endpoint:             suite.newEndpoint,
-		OracleCommissionRate: sdk.NewDecWithPrec(12, 2),
+		OracleCommissionRate: &updateCommissionRate,
 	}
 	ctx = ctx.WithBlockTime(ctx.BlockTime().Add(30 * time.Hour))
 	err = suite.OracleKeeper.UpdateOracleInfo(ctx, msgUpdateOracleInfo)
@@ -516,10 +517,11 @@ func (suite *oracleTestSuite) TestUpdateOracleInfoFailedGTMaxRate() {
 	err := suite.OracleKeeper.SetOracle(ctx, oracle)
 	suite.Require().NoError(err)
 
+	updateCommissionRate := sdk.NewDecWithPrec(3, 1)
 	msgUpdateOracleInfo := &types.MsgUpdateOracleInfo{
 		OracleAddress:        suite.oracleAccAddr.String(),
 		Endpoint:             suite.newEndpoint,
-		OracleCommissionRate: sdk.NewDecWithPrec(3, 1),
+		OracleCommissionRate: &updateCommissionRate,
 	}
 	ctx = ctx.WithBlockTime(ctx.BlockTime().Add(30 * time.Hour))
 	err = suite.OracleKeeper.UpdateOracleInfo(ctx, msgUpdateOracleInfo)
@@ -534,10 +536,11 @@ func (suite *oracleTestSuite) TestUpdateOracleInfoFailedNegativeRate() {
 	err := suite.OracleKeeper.SetOracle(ctx, oracle)
 	suite.Require().NoError(err)
 
+	updateCommissionRate := sdk.NewDecWithPrec(-1, 1)
 	msgUpdateOracleInfo := &types.MsgUpdateOracleInfo{
 		OracleAddress:        suite.oracleAccAddr.String(),
 		Endpoint:             suite.newEndpoint,
-		OracleCommissionRate: sdk.NewDecWithPrec(-1, 1),
+		OracleCommissionRate: &updateCommissionRate,
 	}
 	ctx = ctx.WithBlockTime(ctx.BlockTime().Add(30 * time.Hour))
 	err = suite.OracleKeeper.UpdateOracleInfo(ctx, msgUpdateOracleInfo)

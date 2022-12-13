@@ -148,7 +148,7 @@ func (m *ApproveOracleRegistration) ValidateBasic() error {
 
 var _ sdk.Msg = &MsgUpdateOracleInfo{}
 
-func NewMsgUpdateOracleInfo(address, endpoint string, commissionRate sdk.Dec) *MsgUpdateOracleInfo {
+func NewMsgUpdateOracleInfo(address, endpoint string, commissionRate *sdk.Dec) *MsgUpdateOracleInfo {
 	return &MsgUpdateOracleInfo{
 		OracleAddress:        address,
 		Endpoint:             endpoint,

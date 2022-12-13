@@ -62,7 +62,7 @@ message MsgApproveOracleRegistrationResponse {
 message MsgUpdateOracleInfo {
   string oracle_address = 1;  // panacea1.. account address
   string endpoint = 2;
-  string oracle_commission_rate = 3 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false];
+  string oracle_commission_rate = 3 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",(gogoproto.nullable) = true];
 }
 
 // MsgUpdateOracleInfoResponse defines the Msg/UpdateOracleInfo
