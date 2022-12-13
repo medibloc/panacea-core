@@ -25,6 +25,10 @@ func CmdSubmitConsent() *cobra.Command {
 			}
 
 			msg, err := newSubmitConsentMsg(args[0])
+			if err != nil {
+				return err
+			}
+
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
