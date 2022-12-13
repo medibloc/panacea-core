@@ -25,7 +25,7 @@ func CmdUpdateOracleInfo() *cobra.Command {
 
 			endpoint, err := cmd.Flags().GetString(flagOracleEndpoint)
 			if err != nil {
-				return fmt.Errorf("failed to get oralce end point")
+				return fmt.Errorf("failed to get oracle end point")
 			}
 
 			oracleCommissionRateStr, err := cmd.Flags().GetString(flagOracleCommRate)

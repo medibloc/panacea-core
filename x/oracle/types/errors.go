@@ -9,8 +9,7 @@ var (
 	ErrOracleNotFound            = sdkerrors.Register(ModuleName, 4, "oracle not found")
 	ErrInvalidUniqueID           = sdkerrors.Register(ModuleName, 5, "invalid unique id")
 	ErrApproveOracleRegistration = sdkerrors.Register(ModuleName, 6, "error while approving an oracle registration")
-	ErrUpdateOracle          = sdkerrors.Register(ModuleName, 7, "error while updating oracle info")
-
+	ErrUpdateOracle              = sdkerrors.Register(ModuleName, 7, "error while updating oracle info")
 	ErrCommissionNegative        = sdkerrors.Register(ModuleName, 8, "commission must be positive")
 	ErrCommissionGTMaxRate       = sdkerrors.Register(ModuleName, 9, "commission cannot be more than the max rate")
 	ErrCommissionUpdateTime      = sdkerrors.Register(ModuleName, 10, "commission cannot be changed more than once in 24h")
