@@ -114,7 +114,7 @@ func (k Keeper) UpdateOracleInfo(ctx sdk.Context, msg *types.MsgUpdateOracleInfo
 		return sdkerrors.Wrapf(types.ErrUpdateOracle, err.Error())
 	}
 
-	if oracle.OracleCommissionRate.Equal(msg.OracleCommissionRate) && len(msg.Endpoint) == 0 {
+	if oracle.OracleCommissionRate.Equal(msg.OracleCommissionRate) && oracle.Endpoint == msg.Endpoint {
 		return sdkerrors.Wrapf(types.ErrUpdateOracle, "no information to be updated")
 	}
 
