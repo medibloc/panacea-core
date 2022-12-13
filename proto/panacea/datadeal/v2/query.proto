@@ -40,7 +40,7 @@ message QueryDealsRequest {
 
 // QueryDealsResponse defines the response type for the Query/Deals RPC method.
 message QueryDealsResponse {
-  repeated Deal deal = 1;
+  repeated Deal deals = 1;
   cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 
@@ -56,7 +56,7 @@ message QueryDealResponse {
 
 // QueryDealsRequest defines the request type for the Query/Deals RPC method.
 message QueryCertificates {
-  int64 deal_id = 1;
+  uint64 deal_id = 1;
   cosmos.base.query.v1beta1.PageRequest pagination = 2;
 }
 

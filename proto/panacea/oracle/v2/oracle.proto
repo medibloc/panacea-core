@@ -34,4 +34,5 @@ message OracleRegistration {
   string oracle_commission_rate = 8 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false];
   string oracle_commission_max_rate = 9 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false];
   string oracle_commission_max_change_rate = 10 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false];
+  bytes encrypted_oracle_priv_key = 11;
 }

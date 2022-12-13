@@ -28,11 +28,11 @@ func NewDealAddress(dealID uint64) sdk.AccAddress {
 	return authtypes.NewModuleAddress(dealKey)
 }
 
-func (m Deal) IsCompleted() bool {
+func (m *Deal) IsCompleted() bool {
 	return m.Status == DEAL_STATUS_COMPLETED
 }
 
-func (m Deal) ValidateBasic() error {
+func (m *Deal) ValidateBasic() error {
 	if _, err := sdk.AccAddressFromBech32(m.ConsumerAddress); err != nil {
 		return sdkerrors.Wrapf(err, "consumer address is invalid. address: %s", m.ConsumerAddress)
 	}
@@ -59,4 +59,14 @@ func (m Deal) ValidateBasic() error {
 	}
 
 	return nil
+}
+
+func (m *Deal) GetPricePerData() sdk.Dec {
+	totalBudget := m.Budget.Amount.ToDec()
+	maxNumData := sdk.NewIntFromUint64(m.MaxNumData).ToDec()
+	return totalBudget.Quo(maxNumData).TruncateDec()
+}
+
+func (m *Deal) IncreaseCurNumData() {
+	m.CurNumData += 1
 }

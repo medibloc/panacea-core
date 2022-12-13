@@ -140,6 +140,7 @@ func (suite *queryOracleTestSuite) TestOracleRegistrations() {
 		OracleCommissionRate:          suite.oracleCommissionRate,
 		OracleCommissionMaxRate:       suite.oracleCommissionMaxRate,
 		OracleCommissionMaxChangeRate: suite.oracleCommissionMaxChangeRate,
+		EncryptedOraclePrivKey: nil,
 	}
 
 	oracleRegistration2 := &types.OracleRegistration{
@@ -153,6 +154,7 @@ func (suite *queryOracleTestSuite) TestOracleRegistrations() {
 		OracleCommissionRate:          suite.oracle2CommissionRate,
 		OracleCommissionMaxRate:       suite.oracle2CommissionMaxRate,
 		OracleCommissionMaxChangeRate: suite.oracle2CommissionMaxChangeRate,
+		EncryptedOraclePrivKey: nil,
 	}
 
 	anotherUniqueID := "uniqueID2"
@@ -167,6 +169,7 @@ func (suite *queryOracleTestSuite) TestOracleRegistrations() {
 		OracleCommissionRate:          suite.oracle2CommissionRate,
 		OracleCommissionMaxRate:       suite.oracle2CommissionMaxRate,
 		OracleCommissionMaxChangeRate: suite.oracle2CommissionMaxChangeRate,
+		EncryptedOraclePrivKey: nil,
 	}
 
 	err := oracleKeeper.SetOracleRegistration(ctx, oracleRegistration)
@@ -242,6 +245,7 @@ func (suite *queryOracleTestSuite) TestOracleRegistration() {
 		OracleCommissionRate:          suite.oracleCommissionRate,
 		OracleCommissionMaxRate:       suite.oracleCommissionMaxRate,
 		OracleCommissionMaxChangeRate: suite.oracleCommissionMaxChangeRate,
+		EncryptedOraclePrivKey: nil,
 	}
 	err := oracleKeeper.SetOracleRegistration(ctx, oracleRegistration)
 	suite.Require().NoError(err)
