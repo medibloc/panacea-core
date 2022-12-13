@@ -16,6 +16,7 @@ type dealTestSuite struct {
 
 	defaultFunds    sdk.Coins
 	consumerAccAddr sdk.AccAddress
+	providerAccAddr sdk.AccAddress
 }
 
 func TestDealTestSuite(t *testing.T) {
@@ -24,6 +25,7 @@ func TestDealTestSuite(t *testing.T) {
 
 func (suite *dealTestSuite) BeforeTest(_, _ string) {
 	suite.consumerAccAddr = sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address())
+	suite.providerAccAddr = sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address())
 	suite.defaultFunds = sdk.NewCoins(sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(10000000000)))
 
 	testDeal := suite.MakeTestDeal(1, suite.consumerAccAddr, 100)
@@ -92,4 +94,72 @@ func (suite *dealTestSuite) TestCheckDealCurNumDataAndIncrement() {
 
 	check = updatedDeal.IsCompleted()
 	suite.Require().Equal(true, check)
+}
+
+func (suite *dealTestSuite) TestRequestDeactivateDeal() {
+	ctx := suite.Ctx
+
+	err := suite.FundAccount(ctx, suite.consumerAccAddr, suite.defaultFunds)
+	suite.Require().NoError(err)
+
+	getDeal, err := suite.DataDealKeeper.GetDeal(ctx, 1)
+	suite.Require().NoError(err)
+
+	dealAccAddr, err := sdk.AccAddressFromBech32(getDeal.Address)
+	suite.Require().NoError(err)
+
+	// Sending Budget from buyer to deal
+	err = suite.BankKeeper.SendCoins(suite.Ctx, suite.consumerAccAddr, dealAccAddr, sdk.NewCoins(*getDeal.Budget))
+	suite.Require().NoError(err)
+
+	msgDeactivateDeal := &types.MsgDeactivateDeal{
+		DealId:           1,
+		RequesterAddress: suite.consumerAccAddr.String(),
+	}
+
+	// Consumer Balance = Original Consumer Balance(10000000000umed) - Deal's Budget(1000000000umed) --> 9000000000umed
+	beforeConsumerBalance := suite.BankKeeper.GetBalance(suite.Ctx, suite.consumerAccAddr, assets.MicroMedDenom)
+
+	err = suite.DataDealKeeper.DeactivateDeal(ctx, msgDeactivateDeal)
+	suite.Require().NoError(err)
+
+	getDeal, err = suite.DataDealKeeper.GetDeal(ctx, 1)
+	suite.Require().NoError(err)
+	suite.Require().Equal(getDeal.Status, types.DEAL_STATUS_INACTIVE)
+
+	// After deactivating a deal, the consumer get the refund from deal.
+	afterConsumerBalance := suite.BankKeeper.GetBalance(suite.Ctx, suite.consumerAccAddr, assets.MicroMedDenom)
+	suite.Require().Equal(beforeConsumerBalance.Add(*getDeal.Budget), afterConsumerBalance)
+}
+
+func (suite *dealTestSuite) TestRequestDeactivateDealInvalidRequester() {
+	ctx := suite.Ctx
+
+	msgDeactivateDeal := &types.MsgDeactivateDeal{
+		DealId:           1,
+		RequesterAddress: suite.providerAccAddr.String(),
+	}
+
+	err := suite.DataDealKeeper.DeactivateDeal(ctx, msgDeactivateDeal)
+	suite.Require().ErrorIs(err, types.ErrDeactivateDeal)
+}
+
+func (suite *dealTestSuite) TestRequestDeactivateDealStatusNotActive() {
+	ctx := suite.Ctx
+
+	getDeal, err := suite.DataDealKeeper.GetDeal(ctx, 1)
+	suite.Require().NoError(err)
+
+	getDeal.Status = types.DEAL_STATUS_COMPLETED
+
+	err = suite.DataDealKeeper.SetDeal(ctx, getDeal)
+	suite.Require().NoError(err)
+
+	msgDeactivateDeal := &types.MsgDeactivateDeal{
+		DealId:           1,
+		RequesterAddress: suite.consumerAccAddr.String(),
+	}
+
+	err = suite.DataDealKeeper.DeactivateDeal(ctx, msgDeactivateDeal)
+	suite.Require().ErrorIs(err, types.ErrDeactivateDeal)
 }

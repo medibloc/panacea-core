@@ -160,3 +160,43 @@ func (k Keeper) IncreaseCurNumDataOfDeal(ctx sdk.Context, dealID uint64) error {
 	}
 	return nil
 }
+
+func (k Keeper) DeactivateDeal(ctx sdk.Context, msg *types.MsgDeactivateDeal) error {
+	deal, err := k.GetDeal(ctx, msg.DealId)
+	if err != nil {
+		return sdkerrors.Wrapf(types.ErrDeactivateDeal, err.Error())
+	}
+
+	if deal.ConsumerAddress != msg.RequesterAddress {
+		return sdkerrors.Wrapf(types.ErrDeactivateDeal, "only consumer can deactivate the deal")
+	}
+
+	if deal.Status != types.DEAL_STATUS_ACTIVE {
+		return sdkerrors.Wrapf(types.ErrDeactivateDeal, "deal's status is not 'ACTIVE'")
+	}
+
+	deal.Status = types.DEAL_STATUS_INACTIVE
+
+	err = k.SetDeal(ctx, deal)
+	if err != nil {
+		return sdkerrors.Wrapf(types.ErrDeactivateDeal, err.Error())
+	}
+
+	dealAccAddr, err := sdk.AccAddressFromBech32(deal.Address)
+	if err != nil {
+		return sdkerrors.Wrapf(types.ErrDeactivateDeal, err.Error())
+	}
+
+	consumerAccAddr, err := sdk.AccAddressFromBech32(deal.ConsumerAddress)
+	if err != nil {
+		return sdkerrors.Wrapf(types.ErrDeactivateDeal, err.Error())
+	}
+
+	// refund a budget to consumer
+	err = k.bankKeeper.SendCoins(ctx, dealAccAddr, consumerAccAddr, sdk.NewCoins(*deal.Budget))
+	if err != nil {
+		return sdkerrors.Wrapf(types.ErrDeactivateDeal, err.Error())
+	}
+
+	return nil
+}
