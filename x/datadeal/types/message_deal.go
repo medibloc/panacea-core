@@ -49,6 +49,11 @@ func (m *MsgCreateDeal) GetSigners() []sdk.AccAddress {
 
 var _ sdk.Msg = &MsgSubmitConsent{}
 
+func NewMsgSubmitConsent(dataCert *Certificate) *MsgSubmitConsent {
+	return &MsgSubmitConsent{
+		Certificate: dataCert,
+	}
+}
 func (m *MsgSubmitConsent) Route() string {
 	return RouterKey
 }

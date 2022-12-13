@@ -8,7 +8,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/medibloc/panacea-core/v2/x/datadeal/types"
 	"github.com/spf13/cobra"
 )
@@ -24,10 +23,12 @@ func CmdSubmitConsent() *cobra.Command {
 				return err
 			}
 
-			msg, err := newSubmitConsentMsg(args[0])
+			cert, err := newDataCertificate(args[0])
 			if err != nil {
 				return err
 			}
+
+			msg := types.NewMsgSubmitConsent(cert)
 
 			if err := msg.ValidateBasic(); err != nil {
 				return err
@@ -41,17 +42,17 @@ func CmdSubmitConsent() *cobra.Command {
 	return cmd
 }
 
-func newSubmitConsentMsg(file string) (sdk.Msg, error) {
-	var msg *types.MsgSubmitConsent
+func newDataCertificate(file string) (*types.Certificate, error) {
+	var cert *types.Certificate
 
 	contents, err := os.ReadFile(file)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read file: %w", err)
 	}
 
-	if err := json.Unmarshal(contents, &msg); err != nil {
+	if err := json.Unmarshal(contents, &cert); err != nil {
 		return nil, err
 	}
 
-	return msg, nil
+	return cert, nil
 }
