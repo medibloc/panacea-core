@@ -77,6 +77,7 @@ func (k Keeper) ApproveOracleRegistration(ctx sdk.Context, msg *types.MsgApprove
 		sdk.NewEvent(
 			types.EventTypeApproveOracleRegistration,
 			sdk.NewAttribute(types.AttributeKeyOracleAddress, msg.ApproveOracleRegistration.TargetOracleAddress),
+			sdk.NewAttribute(types.AttributeKeyUniqueID, msg.ApproveOracleRegistration.UniqueId),
 		),
 	)
 
