@@ -707,6 +707,10 @@ func (app *App) InitChainer(ctx sdk.Context, req abci.RequestInitChain) abci.Res
 	if err := tmjson.Unmarshal(req.AppStateBytes, &genesisState); err != nil {
 		panic(err)
 	}
+
+	// set module version map
+	// https://docs.cosmos.network/main/core/upgrade#genesis-state
+	app.UpgradeKeeper.SetModuleVersionMap(ctx, app.mm.GetVersionMap())
 	return app.mm.InitGenesis(ctx, app.appCodec, genesisState)
 }
 
@@ -891,20 +895,22 @@ func (app *App) registerUpgradeHandlers() error {
 		// use custom genesis state for genesis oracle
 		fromVM["oracle"] = oracle.AppModule{}.ConsensusVersion()
 
-		uniqueID := "test-unique-id"
+		uniqueID := "desired-unique-id"
 
 		genesisState := oracletypes.DefaultGenesis()
 		genesisState.Oracles = append(genesisState.Oracles, oracletypes.Oracle{
-			OracleAddress:                 "panacea1ewugvs354xput6xydl5cd5tvkzcuymkejekwk3",
+			OracleAddress:                 "panacea1ewugvs354xput6xydl5cd5tvkzcuymkejekwk3", // desired oracle address
 			UniqueId:                      uniqueID,
-			Endpoint:                      "myendpoint.org",
-			UpdateTime:                    ctx.BlockTime(),
+			Endpoint:                      "medibloc-oracle.com", // desired endpoint
+			UpdateTime:                    ctx.BlockTime(),       // current time
 			OracleCommissionRate:          sdk.NewDecWithPrec(1, 1),
-			OracleCommissionMaxRate:       sdk.NewDecWithPrec(1, 1),
-			OracleCommissionMaxChangeRate: sdk.NewDecWithPrec(1, 1),
+			OracleCommissionMaxRate:       sdk.NewDecWithPrec(2, 1),
+			OracleCommissionMaxChangeRate: sdk.NewDecWithPrec(2, 2),
 		})
 
 		genesisState.Params.UniqueId = uniqueID
+		//genesisState.Params.OraclePublicKey = <desired-oracle-pub-key>
+		//genesisState.Params.OraclePubKeyRemoteReport = <desired-remote-report>
 
 		oracle.InitGenesis(ctx, app.oracleKeeper, *genesisState)
 
