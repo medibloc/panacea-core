@@ -49,6 +49,11 @@ func (m *MsgCreateDeal) GetSigners() []sdk.AccAddress {
 
 var _ sdk.Msg = &MsgSubmitConsent{}
 
+func NewMsgSubmitConsent(dataCert *Certificate) *MsgSubmitConsent {
+	return &MsgSubmitConsent{
+		Certificate: dataCert,
+	}
+}
 func (m *MsgSubmitConsent) Route() string {
 	return RouterKey
 }
@@ -75,11 +80,11 @@ func (m *MsgSubmitConsent) GetSignBytes() []byte {
 }
 
 func (m *MsgSubmitConsent) GetSigners() []sdk.AccAddress {
-	oracleAddress, err := sdk.AccAddressFromBech32(m.Certificate.UnsignedCertificate.OracleAddress)
+	providerAddress, err := sdk.AccAddressFromBech32(m.Certificate.UnsignedCertificate.ProviderAddress)
 	if err != nil {
 		panic(err)
 	}
-	return []sdk.AccAddress{oracleAddress}
+	return []sdk.AccAddress{providerAddress}
 }
 
 var _ sdk.Msg = &MsgDeactivateDeal{}
