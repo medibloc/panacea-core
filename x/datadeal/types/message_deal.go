@@ -80,7 +80,7 @@ func (m *MsgSubmitConsent) GetSignBytes() []byte {
 }
 
 func (m *MsgSubmitConsent) GetSigners() []sdk.AccAddress {
-	oracleAddress, err := sdk.AccAddressFromBech32(m.Certificate.UnsignedCertificate.OracleAddress)
+	oracleAddress, err := sdk.AccAddressFromBech32(m.Certificate.UnsignedCertificate.ProviderAddress)
 	if err != nil {
 		panic(err)
 	}
