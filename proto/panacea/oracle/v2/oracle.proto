@@ -4,13 +4,17 @@ package panacea.oracle.v2;
 option go_package = "github.com/medibloc/panacea-core/x/oracle/types";
 
 import "gogoproto/gogo.proto";
+import "google/protobuf/timestamp.proto";
 
 // Oracle defines a detail of oracle.
 message Oracle {
   string oracle_address = 1;
   string unique_id = 2;
   string endpoint = 3;
-  string oracle_commission_rate = 4 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false];
+  google.protobuf.Timestamp update_time = 4 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  string oracle_commission_rate = 5 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false];
+  string oracle_commission_max_rate = 6 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false];
+  string oracle_commission_max_change_rate = 7 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false];
 }
 
 // OracleRegistration defines the detailed states of the registration of oracle.
@@ -28,5 +32,7 @@ message OracleRegistration {
   bytes trusted_block_hash = 6;
   string endpoint = 7;
   string oracle_commission_rate = 8 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false];
-  bytes encrypted_oracle_priv_key = 9;
+  string oracle_commission_max_rate = 9 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false];
+  string oracle_commission_max_change_rate = 10 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false];
+  bytes encrypted_oracle_priv_key = 11;
 }

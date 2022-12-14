@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/btcsuite/btcd/btcec"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
@@ -39,8 +40,13 @@ type oracleTestSuite struct {
 	trustedBlockHeight int64
 	trustedBlockHash   []byte
 
-	endpoint             string
-	oracleCommissionRate sdk.Dec
+	endpoint                      string
+	oracleCommissionRate          sdk.Dec
+	oracleCommissionMaxRate       sdk.Dec
+	oracleCommissionMaxChangeRate sdk.Dec
+
+	newEndpoint             string
+	newOracleCommissionRate sdk.Dec
 }
 
 func TestOracleTestSuite(t *testing.T) {
@@ -70,6 +76,11 @@ func (suite *oracleTestSuite) BeforeTest(_, _ string) {
 
 	suite.endpoint = "https://my-validator.org"
 	suite.oracleCommissionRate = sdk.NewDecWithPrec(1, 1)
+	suite.oracleCommissionMaxRate = sdk.NewDecWithPrec(2, 1)
+	suite.oracleCommissionMaxChangeRate = sdk.NewDecWithPrec(1, 2)
+
+	suite.newEndpoint = "https://my-validator2.org"
+	suite.newOracleCommissionRate = sdk.NewDecWithPrec(11, 2)
 
 	suite.OracleKeeper.SetParams(suite.Ctx, types.Params{
 		OraclePublicKey:          base64.StdEncoding.EncodeToString(suite.oraclePubKey.SerializeCompressed()),
@@ -82,14 +93,16 @@ func (suite *oracleTestSuite) TestRegisterOracleSuccess() {
 	ctx := suite.Ctx
 
 	msgRegisterOracle := &types.MsgRegisterOracle{
-		UniqueId:               suite.uniqueID,
-		OracleAddress:          suite.oracleAccAddr.String(),
-		NodePubKey:             suite.nodePubKey.SerializeCompressed(),
-		NodePubKeyRemoteReport: suite.nodePubKeyRemoteReport,
-		TrustedBlockHeight:     suite.trustedBlockHeight,
-		TrustedBlockHash:       suite.trustedBlockHash,
-		Endpoint:               suite.endpoint,
-		OracleCommissionRate:   suite.oracleCommissionRate,
+		UniqueId:                      suite.uniqueID,
+		OracleAddress:                 suite.oracleAccAddr.String(),
+		NodePubKey:                    suite.nodePubKey.SerializeCompressed(),
+		NodePubKeyRemoteReport:        suite.nodePubKeyRemoteReport,
+		TrustedBlockHeight:            suite.trustedBlockHeight,
+		TrustedBlockHash:              suite.trustedBlockHash,
+		Endpoint:                      suite.endpoint,
+		OracleCommissionRate:          suite.oracleCommissionRate,
+		OracleCommissionMaxRate:       suite.oracleCommissionMaxRate,
+		OracleCommissionMaxChangeRate: suite.oracleCommissionMaxChangeRate,
 	}
 
 	err := suite.OracleKeeper.RegisterOracle(ctx, msgRegisterOracle)
@@ -116,19 +129,23 @@ func (suite *oracleTestSuite) TestRegisterOracleSuccess() {
 	suite.Require().Equal(suite.trustedBlockHash, oracleFromKeeper.TrustedBlockHash)
 	suite.Require().Equal(suite.endpoint, oracleFromKeeper.Endpoint)
 	suite.Require().Equal(suite.oracleCommissionRate, oracleFromKeeper.OracleCommissionRate)
+	suite.Require().Equal(suite.oracleCommissionMaxRate, oracleFromKeeper.OracleCommissionMaxRate)
+	suite.Require().Equal(suite.oracleCommissionMaxChangeRate, oracleFromKeeper.OracleCommissionMaxChangeRate)
 }
 
 func (suite *oracleTestSuite) TestRegisterOracleFailedValidateToMsgOracleRegistration() {
 	ctx := suite.Ctx
 
 	msgRegisterOracle := &types.MsgRegisterOracle{
-		OracleAddress:          suite.oracleAccAddr.String(),
-		NodePubKey:             suite.nodePubKey.SerializeCompressed(),
-		NodePubKeyRemoteReport: suite.nodePubKeyRemoteReport,
-		TrustedBlockHeight:     suite.trustedBlockHeight,
-		TrustedBlockHash:       suite.trustedBlockHash,
-		Endpoint:               suite.endpoint,
-		OracleCommissionRate:   suite.oracleCommissionRate,
+		OracleAddress:                 suite.oracleAccAddr.String(),
+		NodePubKey:                    suite.nodePubKey.SerializeCompressed(),
+		NodePubKeyRemoteReport:        suite.nodePubKeyRemoteReport,
+		TrustedBlockHeight:            suite.trustedBlockHeight,
+		TrustedBlockHash:              suite.trustedBlockHash,
+		Endpoint:                      suite.endpoint,
+		OracleCommissionRate:          suite.oracleCommissionRate,
+		OracleCommissionMaxRate:       suite.oracleCommissionMaxRate,
+		OracleCommissionMaxChangeRate: suite.oracleCommissionMaxChangeRate,
 	}
 
 	err := suite.OracleKeeper.RegisterOracle(ctx, msgRegisterOracle)
@@ -182,19 +199,21 @@ func (suite *oracleTestSuite) TestRegisterOracleFailedValidateToMsgOracleRegistr
 func (suite *oracleTestSuite) TestRegisterOracleAlreadyExistOracle() {
 	ctx := suite.Ctx
 
-	oracle := types.NewOracle(suite.oracleAccAddr.String(), suite.uniqueID, suite.endpoint, suite.oracleCommissionRate)
+	oracle := types.NewOracle(suite.oracleAccAddr.String(), suite.uniqueID, suite.endpoint, suite.oracleCommissionRate, suite.oracleCommissionMaxRate, suite.oracleCommissionMaxChangeRate, ctx.BlockTime())
 	err := suite.OracleKeeper.SetOracle(ctx, oracle)
 	suite.Require().NoError(err)
 
 	msgRegisterOracle := &types.MsgRegisterOracle{
-		UniqueId:               suite.uniqueID,
-		OracleAddress:          suite.oracleAccAddr.String(),
-		NodePubKey:             suite.nodePubKey.SerializeCompressed(),
-		NodePubKeyRemoteReport: suite.nodePubKeyRemoteReport,
-		TrustedBlockHeight:     suite.trustedBlockHeight,
-		TrustedBlockHash:       suite.trustedBlockHash,
-		Endpoint:               suite.endpoint,
-		OracleCommissionRate:   suite.oracleCommissionRate,
+		UniqueId:                      suite.uniqueID,
+		OracleAddress:                 suite.oracleAccAddr.String(),
+		NodePubKey:                    suite.nodePubKey.SerializeCompressed(),
+		NodePubKeyRemoteReport:        suite.nodePubKeyRemoteReport,
+		TrustedBlockHeight:            suite.trustedBlockHeight,
+		TrustedBlockHash:              suite.trustedBlockHash,
+		Endpoint:                      suite.endpoint,
+		OracleCommissionRate:          suite.oracleCommissionRate,
+		OracleCommissionMaxRate:       suite.oracleCommissionMaxRate,
+		OracleCommissionMaxChangeRate: suite.oracleCommissionMaxChangeRate,
 	}
 
 	err = suite.OracleKeeper.RegisterOracle(ctx, msgRegisterOracle)
@@ -206,14 +225,16 @@ func (suite *oracleTestSuite) TestRegisterOracleNotSameUniqueID() {
 	ctx := suite.Ctx
 
 	msgRegisterOracle := &types.MsgRegisterOracle{
-		UniqueId:               "wrongUniqueID",
-		OracleAddress:          suite.oracleAccAddr.String(),
-		NodePubKey:             suite.nodePubKey.SerializeCompressed(),
-		NodePubKeyRemoteReport: suite.nodePubKeyRemoteReport,
-		TrustedBlockHeight:     suite.trustedBlockHeight,
-		TrustedBlockHash:       suite.trustedBlockHash,
-		Endpoint:               suite.endpoint,
-		OracleCommissionRate:   suite.oracleCommissionRate,
+		UniqueId:                      "wrongUniqueID",
+		OracleAddress:                 suite.oracleAccAddr.String(),
+		NodePubKey:                    suite.nodePubKey.SerializeCompressed(),
+		NodePubKeyRemoteReport:        suite.nodePubKeyRemoteReport,
+		TrustedBlockHeight:            suite.trustedBlockHeight,
+		TrustedBlockHash:              suite.trustedBlockHash,
+		Endpoint:                      suite.endpoint,
+		OracleCommissionRate:          suite.oracleCommissionRate,
+		OracleCommissionMaxRate:       suite.oracleCommissionMaxRate,
+		OracleCommissionMaxChangeRate: suite.oracleCommissionMaxChangeRate,
 	}
 
 	err := suite.OracleKeeper.RegisterOracle(ctx, msgRegisterOracle)
@@ -225,14 +246,16 @@ func (suite *oracleTestSuite) TestApproveOracleRegistrationSuccess() {
 	ctx := suite.Ctx
 
 	msgRegisterOracle := &types.MsgRegisterOracle{
-		UniqueId:               suite.uniqueID,
-		OracleAddress:          suite.oracleAccAddr.String(),
-		NodePubKey:             suite.nodePubKey.SerializeCompressed(),
-		NodePubKeyRemoteReport: suite.nodePubKeyRemoteReport,
-		TrustedBlockHeight:     suite.trustedBlockHeight,
-		TrustedBlockHash:       suite.trustedBlockHash,
-		Endpoint:               suite.endpoint,
-		OracleCommissionRate:   suite.oracleCommissionRate,
+		UniqueId:                      suite.uniqueID,
+		OracleAddress:                 suite.oracleAccAddr.String(),
+		NodePubKey:                    suite.nodePubKey.SerializeCompressed(),
+		NodePubKeyRemoteReport:        suite.nodePubKeyRemoteReport,
+		TrustedBlockHeight:            suite.trustedBlockHeight,
+		TrustedBlockHash:              suite.trustedBlockHash,
+		Endpoint:                      suite.endpoint,
+		OracleCommissionRate:          suite.oracleCommissionRate,
+		OracleCommissionMaxRate:       suite.oracleCommissionMaxRate,
+		OracleCommissionMaxChangeRate: suite.oracleCommissionMaxChangeRate,
 	}
 
 	err := suite.OracleKeeper.RegisterOracle(ctx, msgRegisterOracle)
@@ -283,14 +306,16 @@ func (suite *oracleTestSuite) TestApproveOracleRegistrationFailedInvalidUniqueID
 	ctx := suite.Ctx
 
 	msgRegisterOracle := &types.MsgRegisterOracle{
-		UniqueId:               suite.uniqueID,
-		OracleAddress:          suite.oracleAccAddr.String(),
-		NodePubKey:             suite.nodePubKey.SerializeCompressed(),
-		NodePubKeyRemoteReport: suite.nodePubKeyRemoteReport,
-		TrustedBlockHeight:     suite.trustedBlockHeight,
-		TrustedBlockHash:       suite.trustedBlockHash,
-		Endpoint:               suite.endpoint,
-		OracleCommissionRate:   suite.oracleCommissionRate,
+		UniqueId:                      suite.uniqueID,
+		OracleAddress:                 suite.oracleAccAddr.String(),
+		NodePubKey:                    suite.nodePubKey.SerializeCompressed(),
+		NodePubKeyRemoteReport:        suite.nodePubKeyRemoteReport,
+		TrustedBlockHeight:            suite.trustedBlockHeight,
+		TrustedBlockHash:              suite.trustedBlockHash,
+		Endpoint:                      suite.endpoint,
+		OracleCommissionRate:          suite.oracleCommissionRate,
+		OracleCommissionMaxRate:       suite.oracleCommissionMaxRate,
+		OracleCommissionMaxChangeRate: suite.oracleCommissionMaxChangeRate,
 	}
 
 	err := suite.OracleKeeper.RegisterOracle(ctx, msgRegisterOracle)
@@ -320,14 +345,16 @@ func (suite *oracleTestSuite) TestApproveOracleRegistrationFailedInvalidSignatur
 	ctx := suite.Ctx
 
 	msgRegisterOracle := &types.MsgRegisterOracle{
-		UniqueId:               suite.uniqueID,
-		OracleAddress:          suite.oracleAccAddr.String(),
-		NodePubKey:             suite.nodePubKey.SerializeCompressed(),
-		NodePubKeyRemoteReport: suite.nodePubKeyRemoteReport,
-		TrustedBlockHeight:     suite.trustedBlockHeight,
-		TrustedBlockHash:       suite.trustedBlockHash,
-		Endpoint:               suite.endpoint,
-		OracleCommissionRate:   suite.oracleCommissionRate,
+		UniqueId:                      suite.uniqueID,
+		OracleAddress:                 suite.oracleAccAddr.String(),
+		NodePubKey:                    suite.nodePubKey.SerializeCompressed(),
+		NodePubKeyRemoteReport:        suite.nodePubKeyRemoteReport,
+		TrustedBlockHeight:            suite.trustedBlockHeight,
+		TrustedBlockHash:              suite.trustedBlockHash,
+		Endpoint:                      suite.endpoint,
+		OracleCommissionRate:          suite.oracleCommissionRate,
+		OracleCommissionMaxRate:       suite.oracleCommissionMaxRate,
+		OracleCommissionMaxChangeRate: suite.oracleCommissionMaxChangeRate,
 	}
 
 	err := suite.OracleKeeper.RegisterOracle(ctx, msgRegisterOracle)
@@ -358,19 +385,21 @@ func (suite *oracleTestSuite) TestApproveOracleRegistrationFailedInvalidSignatur
 func (suite *oracleTestSuite) TestApproveOracleRegistrationFailedAlreadyExistOracle() {
 	ctx := suite.Ctx
 
-	oracle := types.NewOracle(suite.oracleAccAddr.String(), suite.uniqueID, suite.endpoint, suite.oracleCommissionRate)
+	oracle := types.NewOracle(suite.oracleAccAddr.String(), suite.uniqueID, suite.endpoint, suite.oracleCommissionRate, suite.oracleCommissionMaxRate, suite.oracleCommissionMaxChangeRate, ctx.BlockTime())
 	err := suite.OracleKeeper.SetOracle(ctx, oracle)
 	suite.Require().NoError(err)
 
 	msgRegisterOracle := &types.MsgRegisterOracle{
-		UniqueId:               suite.uniqueID,
-		OracleAddress:          suite.oracleAccAddr.String(),
-		NodePubKey:             suite.nodePubKey.SerializeCompressed(),
-		NodePubKeyRemoteReport: suite.nodePubKeyRemoteReport,
-		TrustedBlockHeight:     suite.trustedBlockHeight,
-		TrustedBlockHash:       suite.trustedBlockHash,
-		Endpoint:               suite.endpoint,
-		OracleCommissionRate:   suite.oracleCommissionRate,
+		UniqueId:                      suite.uniqueID,
+		OracleAddress:                 suite.oracleAccAddr.String(),
+		NodePubKey:                    suite.nodePubKey.SerializeCompressed(),
+		NodePubKeyRemoteReport:        suite.nodePubKeyRemoteReport,
+		TrustedBlockHeight:            suite.trustedBlockHeight,
+		TrustedBlockHash:              suite.trustedBlockHash,
+		Endpoint:                      suite.endpoint,
+		OracleCommissionRate:          suite.oracleCommissionRate,
+		OracleCommissionMaxRate:       suite.oracleCommissionMaxRate,
+		OracleCommissionMaxChangeRate: suite.oracleCommissionMaxChangeRate,
 	}
 
 	oracleRegistration := types.NewOracleRegistration(msgRegisterOracle)
@@ -397,4 +426,124 @@ func (suite *oracleTestSuite) TestApproveOracleRegistrationFailedAlreadyExistOra
 	err = suite.OracleKeeper.ApproveOracleRegistration(ctx, msgApproveOracleRegistration)
 	suite.Require().Error(err, types.ErrOracleRegistration)
 	suite.Require().ErrorContains(err, fmt.Sprintf("already registered oracle. address(%s)", msgRegisterOracle.OracleAddress))
+}
+
+func (suite *oracleTestSuite) TestUpdateOracleInfoSuccess() {
+	ctx := suite.Ctx
+
+	oracle := types.NewOracle(suite.oracleAccAddr.String(), suite.uniqueID, suite.endpoint, suite.oracleCommissionRate, suite.oracleCommissionMaxRate, suite.oracleCommissionMaxChangeRate, ctx.BlockTime())
+	err := suite.OracleKeeper.SetOracle(ctx, oracle)
+	suite.Require().NoError(err)
+
+	msgUpdateOracleInfo := &types.MsgUpdateOracleInfo{
+		OracleAddress:        suite.oracleAccAddr.String(),
+		Endpoint:             suite.newEndpoint,
+		OracleCommissionRate: &suite.newOracleCommissionRate,
+	}
+	ctx = ctx.WithBlockTime(ctx.BlockTime().Add(30 * time.Hour))
+	err = suite.OracleKeeper.UpdateOracleInfo(ctx, msgUpdateOracleInfo)
+	suite.Require().NoError(err)
+
+	getOracle, err := suite.OracleKeeper.GetOracle(ctx, suite.oracleAccAddr.String())
+	suite.Require().NoError(err)
+	suite.Require().Equal(suite.newEndpoint, getOracle.Endpoint)
+	suite.Require().Equal(suite.newOracleCommissionRate, getOracle.OracleCommissionRate)
+	suite.Require().Equal(ctx.BlockTime(), getOracle.UpdateTime)
+}
+
+func (suite *oracleTestSuite) TestUpdateOracleInfoSuccessWithNoCommissionChange() {
+	ctx := suite.Ctx
+
+	oracle := types.NewOracle(suite.oracleAccAddr.String(), suite.uniqueID, suite.endpoint, suite.oracleCommissionRate, suite.oracleCommissionMaxRate, suite.oracleCommissionMaxChangeRate, ctx.BlockTime())
+	err := suite.OracleKeeper.SetOracle(ctx, oracle)
+	suite.Require().NoError(err)
+
+	msgUpdateOracleInfo := &types.MsgUpdateOracleInfo{
+		OracleAddress:        suite.oracleAccAddr.String(),
+		Endpoint:             suite.newEndpoint,
+		OracleCommissionRate: &suite.oracleCommissionRate,
+	}
+	err = suite.OracleKeeper.UpdateOracleInfo(ctx, msgUpdateOracleInfo)
+	suite.Require().NoError(err)
+
+	getOracle, err := suite.OracleKeeper.GetOracle(ctx, suite.oracleAccAddr.String())
+	suite.Require().NoError(err)
+	suite.Require().Equal(suite.newEndpoint, getOracle.Endpoint)
+	suite.Require().Equal(suite.oracleCommissionRate, getOracle.OracleCommissionRate)
+	suite.Require().Equal(ctx.BlockTime(), getOracle.UpdateTime)
+}
+
+func (suite *oracleTestSuite) TestUpdateOracleInfoFailedUpdateTime() {
+	ctx := suite.Ctx
+
+	oracle := types.NewOracle(suite.oracleAccAddr.String(), suite.uniqueID, suite.endpoint, suite.oracleCommissionRate, suite.oracleCommissionMaxRate, suite.oracleCommissionMaxChangeRate, ctx.BlockTime())
+	err := suite.OracleKeeper.SetOracle(ctx, oracle)
+	suite.Require().NoError(err)
+
+	msgUpdateOracleInfo := &types.MsgUpdateOracleInfo{
+		OracleAddress:        suite.oracleAccAddr.String(),
+		Endpoint:             suite.newEndpoint,
+		OracleCommissionRate: &suite.newOracleCommissionRate,
+	}
+
+	err = suite.OracleKeeper.UpdateOracleInfo(ctx, msgUpdateOracleInfo)
+	suite.Require().Error(err, types.ErrUpdateOracle)
+	suite.Require().ErrorContains(err, "commission cannot be changed more than once in 24h")
+}
+
+func (suite *oracleTestSuite) TestUpdateOracleInfoFailedGTMaxChangeRate() {
+	ctx := suite.Ctx
+
+	oracle := types.NewOracle(suite.oracleAccAddr.String(), suite.uniqueID, suite.endpoint, suite.oracleCommissionRate, suite.oracleCommissionMaxRate, suite.oracleCommissionMaxChangeRate, ctx.BlockTime())
+	err := suite.OracleKeeper.SetOracle(ctx, oracle)
+	suite.Require().NoError(err)
+
+	updateCommissionRate := sdk.NewDecWithPrec(12, 2)
+	msgUpdateOracleInfo := &types.MsgUpdateOracleInfo{
+		OracleAddress:        suite.oracleAccAddr.String(),
+		Endpoint:             suite.newEndpoint,
+		OracleCommissionRate: &updateCommissionRate,
+	}
+	ctx = ctx.WithBlockTime(ctx.BlockTime().Add(30 * time.Hour))
+	err = suite.OracleKeeper.UpdateOracleInfo(ctx, msgUpdateOracleInfo)
+	suite.Require().Error(err, types.ErrUpdateOracle)
+	suite.Require().ErrorContains(err, "commission cannot be changed more than max change rate")
+}
+
+func (suite *oracleTestSuite) TestUpdateOracleInfoFailedGTMaxRate() {
+	ctx := suite.Ctx
+
+	oracle := types.NewOracle(suite.oracleAccAddr.String(), suite.uniqueID, suite.endpoint, suite.oracleCommissionRate, suite.oracleCommissionMaxRate, sdk.NewDecWithPrec(3, 1), ctx.BlockTime())
+	err := suite.OracleKeeper.SetOracle(ctx, oracle)
+	suite.Require().NoError(err)
+
+	updateCommissionRate := sdk.NewDecWithPrec(3, 1)
+	msgUpdateOracleInfo := &types.MsgUpdateOracleInfo{
+		OracleAddress:        suite.oracleAccAddr.String(),
+		Endpoint:             suite.newEndpoint,
+		OracleCommissionRate: &updateCommissionRate,
+	}
+	ctx = ctx.WithBlockTime(ctx.BlockTime().Add(30 * time.Hour))
+	err = suite.OracleKeeper.UpdateOracleInfo(ctx, msgUpdateOracleInfo)
+	suite.Require().Error(err, types.ErrUpdateOracle)
+	suite.Require().ErrorContains(err, "commission cannot be more than the max rate")
+}
+
+func (suite *oracleTestSuite) TestUpdateOracleInfoFailedNegativeRate() {
+	ctx := suite.Ctx
+
+	oracle := types.NewOracle(suite.oracleAccAddr.String(), suite.uniqueID, suite.endpoint, suite.oracleCommissionRate, suite.oracleCommissionMaxRate, suite.oracleCommissionMaxChangeRate, ctx.BlockTime())
+	err := suite.OracleKeeper.SetOracle(ctx, oracle)
+	suite.Require().NoError(err)
+
+	updateCommissionRate := sdk.NewDecWithPrec(-1, 1)
+	msgUpdateOracleInfo := &types.MsgUpdateOracleInfo{
+		OracleAddress:        suite.oracleAccAddr.String(),
+		Endpoint:             suite.newEndpoint,
+		OracleCommissionRate: &updateCommissionRate,
+	}
+	ctx = ctx.WithBlockTime(ctx.BlockTime().Add(30 * time.Hour))
+	err = suite.OracleKeeper.UpdateOracleInfo(ctx, msgUpdateOracleInfo)
+	suite.Require().Error(err, types.ErrUpdateOracle)
+	suite.Require().ErrorContains(err, "commission must be positive")
 }
