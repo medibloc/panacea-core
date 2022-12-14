@@ -94,6 +94,10 @@ func (m *OracleRegistration) ValidateBasic() error {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "OracleCommissionMaxRate must be between 0 and 1")
 	}
 
+	if m.OracleCommissionRate.GT(m.OracleCommissionMaxRate) {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "OracleCommissionRate cannot be greater than OracleCommissionMaxRate")
+	}
+
 	if m.OracleCommissionMaxChangeRate.LT(sdk.ZeroDec()) || m.OracleCommissionMaxChangeRate.GT(sdk.OneDec()) {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "OracleCommissionMaxChangeRate must be between 0 and 1")
 	}
