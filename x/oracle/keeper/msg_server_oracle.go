@@ -42,7 +42,19 @@ func (m msgServer) ApproveOracleRegistration(goCtx context.Context, msg *types.M
 	return &types.MsgApproveOracleRegistrationResponse{}, nil
 }
 
-func (m msgServer) UpdateOracleInfo(ctx context.Context, info *types.MsgUpdateOracleInfo) (*types.MsgUpdateOracleInfoResponse, error) {
-	//TODO implement me
-	panic("implement me")
+func (m msgServer) UpdateOracleInfo(goCtx context.Context, msg *types.MsgUpdateOracleInfo) (*types.MsgUpdateOracleInfoResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	if err := m.Keeper.UpdateOracleInfo(ctx, msg); err != nil {
+		return nil, err
+	}
+
+	ctx.EventManager().EmitEvent(
+		sdk.NewEvent(
+			sdk.EventTypeMessage,
+			sdk.NewAttribute(sdk.AttributeKeyModule, types.ModuleName),
+		),
+	)
+
+	return &types.MsgUpdateOracleInfoResponse{}, nil
 }

@@ -66,6 +66,9 @@ func (k Keeper) ApproveOracleRegistration(ctx sdk.Context, msg *types.MsgApprove
 		msg.ApproveOracleRegistration.UniqueId,
 		oracleRegistration.Endpoint,
 		oracleRegistration.OracleCommissionRate,
+		oracleRegistration.OracleCommissionMaxRate,
+		oracleRegistration.OracleCommissionMaxChangeRate,
+		ctx.BlockTime(),
 	)
 
 	// append new oracle info
@@ -113,6 +116,31 @@ func (k Keeper) validateApproveOracleRegistration(ctx sdk.Context, msg *types.Ms
 		return fmt.Errorf("already registered oracle. address(%s)", targetOracleAddress)
 	}
 
+	return nil
+}
+
+func (k Keeper) UpdateOracleInfo(ctx sdk.Context, msg *types.MsgUpdateOracleInfo) error {
+	oracle, err := k.GetOracle(ctx, msg.OracleAddress)
+	if err != nil {
+		return sdkerrors.Wrapf(types.ErrUpdateOracle, err.Error())
+	}
+
+	if msg.OracleCommissionRate != nil && !oracle.OracleCommissionRate.Equal(*msg.OracleCommissionRate) {
+		blockTime := ctx.BlockHeader().Time
+		if err := oracle.ValidateOracleCommission(blockTime, *msg.OracleCommissionRate); err != nil {
+			return sdkerrors.Wrapf(types.ErrUpdateOracle, err.Error())
+		}
+		oracle.OracleCommissionRate = *msg.OracleCommissionRate
+		oracle.UpdateTime = blockTime
+	}
+
+	if len(msg.Endpoint) > 0 {
+		oracle.Endpoint = msg.Endpoint
+	}
+
+	if err := k.SetOracle(ctx, oracle); err != nil {
+		return sdkerrors.Wrapf(types.ErrUpdateOracle, err.Error())
+	}
 	return nil
 }
 
