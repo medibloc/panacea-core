@@ -891,16 +891,20 @@ func (app *App) registerUpgradeHandlers() error {
 		// use custom genesis state for genesis oracle
 		fromVM["oracle"] = oracle.AppModule{}.ConsensusVersion()
 
+		uniqueID := "test-unique-id"
+
 		genesisState := oracletypes.DefaultGenesis()
 		genesisState.Oracles = append(genesisState.Oracles, oracletypes.Oracle{
 			OracleAddress:                 "panacea1ewugvs354xput6xydl5cd5tvkzcuymkejekwk3",
-			UniqueId:                      "uniqueId",
+			UniqueId:                      uniqueID,
 			Endpoint:                      "myendpoint.org",
 			UpdateTime:                    ctx.BlockTime(),
 			OracleCommissionRate:          sdk.NewDecWithPrec(1, 1),
 			OracleCommissionMaxRate:       sdk.NewDecWithPrec(1, 1),
 			OracleCommissionMaxChangeRate: sdk.NewDecWithPrec(1, 1),
 		})
+
+		genesisState.Params.UniqueId = uniqueID
 
 		oracle.InitGenesis(ctx, app.oracleKeeper, *genesisState)
 
