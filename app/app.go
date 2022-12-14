@@ -886,6 +886,27 @@ func (app *App) registerUpgradeHandlers() error {
 		return app.mm.RunMigrations(ctx, app.configurator, fromVM)
 	})
 
+	// v2.1.0
+	app.UpgradeKeeper.SetUpgradeHandler("v2.1.0", func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
+		// use custom genesis state for genesis oracle
+		fromVM["oracle"] = oracle.AppModule{}.ConsensusVersion()
+
+		genesisState := oracletypes.DefaultGenesis()
+		genesisState.Oracles = append(genesisState.Oracles, oracletypes.Oracle{
+			OracleAddress:                 "panacea1ewugvs354xput6xydl5cd5tvkzcuymkejekwk3",
+			UniqueId:                      "uniqueId",
+			Endpoint:                      "myendpoint.org",
+			UpdateTime:                    ctx.BlockTime(),
+			OracleCommissionRate:          sdk.NewDecWithPrec(1, 1),
+			OracleCommissionMaxRate:       sdk.NewDecWithPrec(1, 1),
+			OracleCommissionMaxChangeRate: sdk.NewDecWithPrec(1, 1),
+		})
+
+		oracle.InitGenesis(ctx, app.oracleKeeper, *genesisState)
+
+		return app.mm.RunMigrations(ctx, app.configurator, fromVM)
+	})
+
 	upgradeInfo, err := app.UpgradeKeeper.ReadUpgradeInfoFromDisk()
 	if err != nil {
 		return err
@@ -898,6 +919,14 @@ func (app *App) registerUpgradeHandlers() error {
 		}
 
 		// configure store loader that checks if version == upgradeHeight and applies store upgrades
+		app.SetStoreLoader(upgradetypes.UpgradeStoreLoader(upgradeInfo.Height, &storeUpgrades))
+	}
+
+	if upgradeInfo.Name == "v2.1.0" && !app.UpgradeKeeper.IsSkipHeight(upgradeInfo.Height) {
+		storeUpgrades := storetypes.StoreUpgrades{
+			Added: []string{"datadeal", "oracle"},
+		}
+
 		app.SetStoreLoader(upgradetypes.UpgradeStoreLoader(upgradeInfo.Height, &storeUpgrades))
 	}
 
