@@ -286,9 +286,11 @@ func (suite *oracleTestSuite) TestApproveOracleRegistrationSuccess() {
 	suite.Require().Equal(types.EventTypeApproveOracleRegistration, events[1].Type)
 
 	eventVoteAttributes := events[1].Attributes
-	suite.Require().Equal(1, len(eventVoteAttributes))
+	suite.Require().Equal(2, len(eventVoteAttributes))
 	suite.Require().Equal(types.AttributeKeyOracleAddress, string(eventVoteAttributes[0].Key))
 	suite.Require().Equal(suite.oracleAccAddr.String(), string(eventVoteAttributes[0].Value))
+	suite.Require().Equal(types.AttributeKeyUniqueID, string(eventVoteAttributes[1].Key))
+	suite.Require().Equal(suite.uniqueID, string(eventVoteAttributes[1].Value))
 
 	getOracle, err := suite.OracleKeeper.GetOracle(ctx, suite.oracleAccAddr.String())
 	suite.Require().NoError(err)
