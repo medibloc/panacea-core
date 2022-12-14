@@ -2,6 +2,7 @@ package oracle_test
 
 import (
 	"testing"
+	"time"
 
 	"github.com/btcsuite/btcd/btcec"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
@@ -59,34 +60,44 @@ func (suite *genesisTestSuite) TestInitGenesis() {
 				suite.uniqueID,
 				suite.endpoint,
 				sdk.NewDecWithPrec(1, 1),
+				sdk.NewDecWithPrec(2, 1),
+				sdk.NewDecWithPrec(1, 2),
+				time.Unix(0, 0).UTC(),
 			),
 			*types.NewOracle(
 				suite.oracle2AccAddr.String(),
 				suite.uniqueID,
 				suite.endpoint,
+				sdk.NewDecWithPrec(1, 1),
+				sdk.NewDecWithPrec(2, 1),
 				sdk.NewDecWithPrec(1, 2),
+				time.Unix(0, 0).UTC(),
 			),
 		},
 		OracleRegistrations: []types.OracleRegistration{
 			{
-				UniqueId:               suite.uniqueID,
-				OracleAddress:          suite.oracleAccAddr.String(),
-				NodePubKey:             suite.nodePubKey.SerializeCompressed(),
-				NodePubKeyRemoteReport: []byte("nodePubKeyRemoteReport"),
-				TrustedBlockHeight:     10,
-				TrustedBlockHash:       nil,
-				Endpoint:               suite.endpoint,
-				OracleCommissionRate:   sdk.NewDecWithPrec(1, 1),
+				UniqueId:                      suite.uniqueID,
+				OracleAddress:                 suite.oracleAccAddr.String(),
+				NodePubKey:                    suite.nodePubKey.SerializeCompressed(),
+				NodePubKeyRemoteReport:        []byte("nodePubKeyRemoteReport"),
+				TrustedBlockHeight:            10,
+				TrustedBlockHash:              nil,
+				Endpoint:                      suite.endpoint,
+				OracleCommissionRate:          sdk.NewDecWithPrec(1, 1),
+				OracleCommissionMaxRate:       sdk.NewDecWithPrec(2, 1),
+				OracleCommissionMaxChangeRate: sdk.NewDecWithPrec(1, 2),
 			},
 			{
-				UniqueId:               suite.uniqueID,
-				OracleAddress:          suite.oracle2AccAddr.String(),
-				NodePubKey:             suite.nodePubKey.SerializeCompressed(),
-				NodePubKeyRemoteReport: []byte("nodePubKeyRemoteReport"),
-				TrustedBlockHeight:     10,
-				TrustedBlockHash:       nil,
-				Endpoint:               suite.endpoint,
-				OracleCommissionRate:   sdk.NewDecWithPrec(1, 2),
+				UniqueId:                      suite.uniqueID,
+				OracleAddress:                 suite.oracle2AccAddr.String(),
+				NodePubKey:                    suite.nodePubKey.SerializeCompressed(),
+				NodePubKeyRemoteReport:        []byte("nodePubKeyRemoteReport"),
+				TrustedBlockHeight:            10,
+				TrustedBlockHash:              nil,
+				Endpoint:                      suite.endpoint,
+				OracleCommissionRate:          sdk.NewDecWithPrec(1, 1),
+				OracleCommissionMaxRate:       sdk.NewDecWithPrec(2, 1),
+				OracleCommissionMaxChangeRate: sdk.NewDecWithPrec(1, 2),
 			},
 		},
 		Params: types.DefaultParams(),
@@ -111,23 +122,28 @@ func (suite *genesisTestSuite) TestInitGenesis() {
 
 func (suite *genesisTestSuite) TestExportGenesis() {
 	ora := &types.Oracle{
-		OracleAddress:        suite.oracleAccAddr.String(),
-		UniqueId:             suite.uniqueID,
-		Endpoint:             suite.endpoint,
-		OracleCommissionRate: sdk.NewDecWithPrec(1, 1),
+		OracleAddress:                 suite.oracleAccAddr.String(),
+		UniqueId:                      suite.uniqueID,
+		Endpoint:                      suite.endpoint,
+		UpdateTime:                    time.Unix(0, 0).UTC(),
+		OracleCommissionRate:          sdk.NewDecWithPrec(1, 1),
+		OracleCommissionMaxRate:       sdk.NewDecWithPrec(2, 1),
+		OracleCommissionMaxChangeRate: sdk.NewDecWithPrec(1, 2),
 	}
 	err := suite.OracleKeeper.SetOracle(suite.Ctx, ora)
 	suite.Require().NoError(err)
 
 	oraRegistration := &types.OracleRegistration{
-		UniqueId:               suite.uniqueID,
-		OracleAddress:          suite.oracleAccAddr.String(),
-		NodePubKey:             suite.nodePubKey.SerializeCompressed(),
-		NodePubKeyRemoteReport: []byte("nodePubKeyRemoteReport"),
-		TrustedBlockHeight:     10,
-		TrustedBlockHash:       nil,
-		Endpoint:               suite.endpoint,
-		OracleCommissionRate:   sdk.NewDecWithPrec(1, 1),
+		UniqueId:                      suite.uniqueID,
+		OracleAddress:                 suite.oracleAccAddr.String(),
+		NodePubKey:                    suite.nodePubKey.SerializeCompressed(),
+		NodePubKeyRemoteReport:        []byte("nodePubKeyRemoteReport"),
+		TrustedBlockHeight:            10,
+		TrustedBlockHash:              nil,
+		Endpoint:                      suite.endpoint,
+		OracleCommissionRate:          sdk.NewDecWithPrec(1, 1),
+		OracleCommissionMaxRate:       sdk.NewDecWithPrec(2, 1),
+		OracleCommissionMaxChangeRate: sdk.NewDecWithPrec(1, 2),
 	}
 	err = suite.OracleKeeper.SetOracleRegistration(suite.Ctx, oraRegistration)
 	suite.Require().NoError(err)

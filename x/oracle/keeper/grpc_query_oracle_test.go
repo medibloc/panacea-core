@@ -18,17 +18,21 @@ type queryOracleTestSuite struct {
 
 	uniqueID string
 
-	oracleAccPrivKey     cryptotypes.PrivKey
-	oracleAccPubKey      cryptotypes.PubKey
-	oracleAccAddr        sdk.AccAddress
-	oracleEndpoint       string
-	oracleCommissionRate sdk.Dec
+	oracleAccPrivKey              cryptotypes.PrivKey
+	oracleAccPubKey               cryptotypes.PubKey
+	oracleAccAddr                 sdk.AccAddress
+	oracleEndpoint                string
+	oracleCommissionRate          sdk.Dec
+	oracleCommissionMaxRate       sdk.Dec
+	oracleCommissionMaxChangeRate sdk.Dec
 
-	oracle2AccPrivKey     cryptotypes.PrivKey
-	oracle2AccPubKey      cryptotypes.PubKey
-	oracle2AccAddr        sdk.AccAddress
-	oracle2Endpoint       string
-	oracle2CommissionRate sdk.Dec
+	oracle2AccPrivKey              cryptotypes.PrivKey
+	oracle2AccPubKey               cryptotypes.PubKey
+	oracle2AccAddr                 sdk.AccAddress
+	oracle2Endpoint                string
+	oracle2CommissionRate          sdk.Dec
+	oracle2CommissionMaxRate       sdk.Dec
+	oracle2CommissionMaxChangeRate sdk.Dec
 
 	nodePrivKey *btcec.PrivateKey
 	nodePubKey  *btcec.PublicKey
@@ -45,13 +49,17 @@ func (suite *queryOracleTestSuite) BeforeTest(_, _ string) {
 	suite.oracleAccPubKey = suite.oracleAccPrivKey.PubKey()
 	suite.oracleAccAddr = sdk.AccAddress(suite.oracleAccPubKey.Address())
 	suite.oracleEndpoint = "https://my-validator.org"
-	suite.oracleCommissionRate = sdk.NewDecWithPrec(1, 1)
+	suite.oracleCommissionRate = sdk.NewDecWithPrec(1, 1)          // 0.1
+	suite.oracleCommissionMaxRate = sdk.NewDecWithPrec(2, 1)       // 0.2
+	suite.oracleCommissionMaxChangeRate = sdk.NewDecWithPrec(1, 2) // 0.01
 
 	suite.oracle2AccPrivKey = secp256k1.GenPrivKey()
 	suite.oracle2AccPubKey = suite.oracle2AccPrivKey.PubKey()
 	suite.oracle2AccAddr = sdk.AccAddress(suite.oracle2AccPubKey.Address())
 	suite.oracle2Endpoint = "https://my-validator2.org"
-	suite.oracle2CommissionRate = sdk.NewDecWithPrec(1, 2)
+	suite.oracle2CommissionRate = sdk.NewDecWithPrec(1, 1)          // 0.1
+	suite.oracle2CommissionMaxRate = sdk.NewDecWithPrec(3, 1)       // 0.3
+	suite.oracle2CommissionMaxChangeRate = sdk.NewDecWithPrec(2, 2) // 0.02
 
 	suite.nodePrivKey, _ = btcec.NewPrivateKey(btcec.S256())
 	suite.nodePubKey = suite.nodePrivKey.PubKey()
@@ -61,11 +69,11 @@ func (suite *queryOracleTestSuite) TestOracles() {
 	ctx := suite.Ctx
 	oracleKeeper := suite.OracleKeeper
 
-	oracle := types.NewOracle(suite.oracleAccAddr.String(), suite.uniqueID, suite.oracleEndpoint, suite.oracleCommissionRate)
+	oracle := types.NewOracle(suite.oracleAccAddr.String(), suite.uniqueID, suite.oracleEndpoint, suite.oracleCommissionRate, suite.oracleCommissionMaxRate, suite.oracleCommissionMaxChangeRate, ctx.BlockTime())
 	err := oracleKeeper.SetOracle(ctx, oracle)
 	suite.Require().NoError(err)
 
-	oracle2 := types.NewOracle(suite.oracle2AccAddr.String(), suite.uniqueID, suite.oracle2Endpoint, suite.oracle2CommissionRate)
+	oracle2 := types.NewOracle(suite.oracle2AccAddr.String(), suite.uniqueID, suite.oracle2Endpoint, suite.oracle2CommissionRate, suite.oracle2CommissionMaxRate, suite.oracle2CommissionMaxChangeRate, ctx.BlockTime())
 	err = oracleKeeper.SetOracle(ctx, oracle2)
 	suite.Require().NoError(err)
 
@@ -81,11 +89,17 @@ func (suite *queryOracleTestSuite) TestOracles() {
 		case suite.oracleAccAddr.String():
 			suite.Require().Equal(suite.uniqueID, oracle.UniqueId)
 			suite.Require().Equal(suite.oracleEndpoint, oracle.Endpoint)
+			suite.Require().Equal(ctx.BlockTime(), oracle.UpdateTime)
 			suite.Require().Equal(suite.oracleCommissionRate, oracle.OracleCommissionRate)
+			suite.Require().Equal(suite.oracleCommissionMaxRate, oracle.OracleCommissionMaxRate)
+			suite.Require().Equal(suite.oracleCommissionMaxChangeRate, oracle.OracleCommissionMaxChangeRate)
 		case suite.oracle2AccAddr.String():
 			suite.Require().Equal(suite.uniqueID, oracle.UniqueId)
 			suite.Require().Equal(suite.oracle2Endpoint, oracle.Endpoint)
+			suite.Require().Equal(ctx.BlockTime(), oracle.UpdateTime)
 			suite.Require().Equal(suite.oracle2CommissionRate, oracle.OracleCommissionRate)
+			suite.Require().Equal(suite.oracle2CommissionMaxRate, oracle.OracleCommissionMaxRate)
+			suite.Require().Equal(suite.oracle2CommissionMaxChangeRate, oracle.OracleCommissionMaxChangeRate)
 		default:
 			panic("not found oracle address. address: " + oracle.OracleAddress)
 		}
@@ -96,7 +110,7 @@ func (suite *queryOracleTestSuite) TestOracle() {
 	ctx := suite.Ctx
 	oracleKeeper := suite.OracleKeeper
 
-	oracle := types.NewOracle(suite.oracleAccAddr.String(), suite.uniqueID, suite.oracleEndpoint, suite.oracleCommissionRate)
+	oracle := types.NewOracle(suite.oracleAccAddr.String(), suite.uniqueID, suite.oracleEndpoint, suite.oracleCommissionRate, suite.oracleCommissionMaxRate, suite.oracleCommissionMaxChangeRate, ctx.BlockTime())
 	err := oracleKeeper.SetOracle(ctx, oracle)
 	suite.Require().NoError(err)
 
@@ -116,39 +130,45 @@ func (suite *queryOracleTestSuite) TestOracleRegistrations() {
 	trustedBlockHash := []byte("hash")
 
 	oracleRegistration := &types.OracleRegistration{
-		UniqueId:               suite.uniqueID,
-		OracleAddress:          suite.oracleAccAddr.String(),
-		NodePubKey:             suite.nodePubKey.SerializeCompressed(),
-		NodePubKeyRemoteReport: remoteReport,
-		TrustedBlockHeight:     10,
-		TrustedBlockHash:       trustedBlockHash,
-		Endpoint:               suite.oracleEndpoint,
-		OracleCommissionRate:   suite.oracleCommissionRate,
+		UniqueId:                      suite.uniqueID,
+		OracleAddress:                 suite.oracleAccAddr.String(),
+		NodePubKey:                    suite.nodePubKey.SerializeCompressed(),
+		NodePubKeyRemoteReport:        remoteReport,
+		TrustedBlockHeight:            10,
+		TrustedBlockHash:              trustedBlockHash,
+		Endpoint:                      suite.oracleEndpoint,
+		OracleCommissionRate:          suite.oracleCommissionRate,
+		OracleCommissionMaxRate:       suite.oracleCommissionMaxRate,
+		OracleCommissionMaxChangeRate: suite.oracleCommissionMaxChangeRate,
 		EncryptedOraclePrivKey: nil,
 	}
 
 	oracleRegistration2 := &types.OracleRegistration{
-		UniqueId:               suite.uniqueID,
-		OracleAddress:          suite.oracle2AccAddr.String(),
-		NodePubKey:             suite.nodePubKey.SerializeCompressed(),
-		NodePubKeyRemoteReport: remoteReport,
-		TrustedBlockHeight:     10,
-		TrustedBlockHash:       trustedBlockHash,
-		Endpoint:               suite.oracle2Endpoint,
-		OracleCommissionRate:   suite.oracle2CommissionRate,
+		UniqueId:                      suite.uniqueID,
+		OracleAddress:                 suite.oracle2AccAddr.String(),
+		NodePubKey:                    suite.nodePubKey.SerializeCompressed(),
+		NodePubKeyRemoteReport:        remoteReport,
+		TrustedBlockHeight:            10,
+		TrustedBlockHash:              trustedBlockHash,
+		Endpoint:                      suite.oracle2Endpoint,
+		OracleCommissionRate:          suite.oracle2CommissionRate,
+		OracleCommissionMaxRate:       suite.oracle2CommissionMaxRate,
+		OracleCommissionMaxChangeRate: suite.oracle2CommissionMaxChangeRate,
 		EncryptedOraclePrivKey: nil,
 	}
 
 	anotherUniqueID := "uniqueID2"
 	oracleRegistration3 := &types.OracleRegistration{
-		UniqueId:               anotherUniqueID,
-		OracleAddress:          suite.oracle2AccAddr.String(),
-		NodePubKey:             suite.nodePubKey.SerializeCompressed(),
-		NodePubKeyRemoteReport: remoteReport,
-		TrustedBlockHeight:     10,
-		TrustedBlockHash:       trustedBlockHash,
-		Endpoint:               suite.oracle2Endpoint,
-		OracleCommissionRate:   suite.oracle2CommissionRate,
+		UniqueId:                      anotherUniqueID,
+		OracleAddress:                 suite.oracle2AccAddr.String(),
+		NodePubKey:                    suite.nodePubKey.SerializeCompressed(),
+		NodePubKeyRemoteReport:        remoteReport,
+		TrustedBlockHeight:            10,
+		TrustedBlockHash:              trustedBlockHash,
+		Endpoint:                      suite.oracle2Endpoint,
+		OracleCommissionRate:          suite.oracle2CommissionRate,
+		OracleCommissionMaxRate:       suite.oracle2CommissionMaxRate,
+		OracleCommissionMaxChangeRate: suite.oracle2CommissionMaxChangeRate,
 		EncryptedOraclePrivKey: nil,
 	}
 
@@ -176,6 +196,8 @@ func (suite *queryOracleTestSuite) TestOracleRegistrations() {
 			suite.Require().Equal(trustedBlockHash, oracleRegistration.TrustedBlockHash)
 			suite.Require().Equal(suite.oracleEndpoint, oracleRegistration.Endpoint)
 			suite.Require().Equal(suite.oracleCommissionRate, oracleRegistration.OracleCommissionRate)
+			suite.Require().Equal(suite.oracleCommissionMaxRate, oracleRegistration.OracleCommissionMaxRate)
+			suite.Require().Equal(suite.oracleCommissionMaxChangeRate, oracleRegistration.OracleCommissionMaxChangeRate)
 		case suite.oracle2AccAddr.String():
 			suite.Require().Equal(suite.uniqueID, oracleRegistration.UniqueId)
 			suite.Require().Equal(suite.nodePubKey.SerializeCompressed(), oracleRegistration.NodePubKey)
@@ -184,6 +206,8 @@ func (suite *queryOracleTestSuite) TestOracleRegistrations() {
 			suite.Require().Equal(trustedBlockHash, oracleRegistration.TrustedBlockHash)
 			suite.Require().Equal(suite.oracle2Endpoint, oracleRegistration.Endpoint)
 			suite.Require().Equal(suite.oracle2CommissionRate, oracleRegistration.OracleCommissionRate)
+			suite.Require().Equal(suite.oracle2CommissionMaxRate, oracleRegistration.OracleCommissionMaxRate)
+			suite.Require().Equal(suite.oracle2CommissionMaxChangeRate, oracleRegistration.OracleCommissionMaxChangeRate)
 		default:
 			panic("not found oracle address. address: " + oracleRegistration.OracleAddress)
 		}
@@ -202,6 +226,8 @@ func (suite *queryOracleTestSuite) TestOracleRegistrations() {
 	suite.Require().Equal(trustedBlockHash, res.OracleRegistrations[0].TrustedBlockHash)
 	suite.Require().Equal(suite.oracle2Endpoint, res.OracleRegistrations[0].Endpoint)
 	suite.Require().Equal(suite.oracle2CommissionRate, res.OracleRegistrations[0].OracleCommissionRate)
+	suite.Require().Equal(suite.oracle2CommissionMaxRate, res.OracleRegistrations[0].OracleCommissionMaxRate)
+	suite.Require().Equal(suite.oracle2CommissionMaxChangeRate, res.OracleRegistrations[0].OracleCommissionMaxChangeRate)
 }
 
 func (suite *queryOracleTestSuite) TestOracleRegistration() {
@@ -209,14 +235,16 @@ func (suite *queryOracleTestSuite) TestOracleRegistration() {
 	oracleKeeper := suite.OracleKeeper
 
 	oracleRegistration := &types.OracleRegistration{
-		UniqueId:               suite.uniqueID,
-		OracleAddress:          suite.oracleAccAddr.String(),
-		NodePubKey:             suite.nodePubKey.SerializeCompressed(),
-		NodePubKeyRemoteReport: []byte("nodePubKeyRemoteReport"),
-		TrustedBlockHeight:     10,
-		TrustedBlockHash:       []byte("hash"),
-		Endpoint:               suite.oracleEndpoint,
-		OracleCommissionRate:   suite.oracleCommissionRate,
+		UniqueId:                      suite.uniqueID,
+		OracleAddress:                 suite.oracleAccAddr.String(),
+		NodePubKey:                    suite.nodePubKey.SerializeCompressed(),
+		NodePubKeyRemoteReport:        []byte("nodePubKeyRemoteReport"),
+		TrustedBlockHeight:            10,
+		TrustedBlockHash:              []byte("hash"),
+		Endpoint:                      suite.oracleEndpoint,
+		OracleCommissionRate:          suite.oracleCommissionRate,
+		OracleCommissionMaxRate:       suite.oracleCommissionMaxRate,
+		OracleCommissionMaxChangeRate: suite.oracleCommissionMaxChangeRate,
 		EncryptedOraclePrivKey: nil,
 	}
 	err := oracleKeeper.SetOracleRegistration(ctx, oracleRegistration)
