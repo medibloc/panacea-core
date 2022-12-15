@@ -185,12 +185,12 @@ func (suite *oracleTestSuite) TestRegisterOracleFailedValidateToMsgOracleRegistr
 	msgRegisterOracle.OracleCommissionRate = sdk.NewInt(-1).ToDec()
 	err = suite.OracleKeeper.RegisterOracle(ctx, msgRegisterOracle)
 	suite.Require().Error(err, sdkerrors.ErrInvalidRequest)
-	suite.Require().ErrorContains(err, "oracleCommissionRate must be between 0 and 1")
+	suite.Require().ErrorContains(err, "oracleCommissionRate must be between 0 and OracleCommissionMaxRate")
 
 	msgRegisterOracle.OracleCommissionRate = sdk.NewInt(2).ToDec()
 	err = suite.OracleKeeper.RegisterOracle(ctx, msgRegisterOracle)
 	suite.Require().Error(err, sdkerrors.ErrInvalidRequest)
-	suite.Require().ErrorContains(err, "oracleCommissionRate must be between 0 and 1")
+	suite.Require().ErrorContains(err, "oracleCommissionRate must be between 0 and OracleCommissionMaxRate")
 
 	events := suite.Ctx.EventManager().Events()
 	suite.Require().Equal(0, len(events))
