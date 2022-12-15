@@ -707,6 +707,10 @@ func (app *App) InitChainer(ctx sdk.Context, req abci.RequestInitChain) abci.Res
 	if err := tmjson.Unmarshal(req.AppStateBytes, &genesisState); err != nil {
 		panic(err)
 	}
+
+	// set module version map
+	// https://docs.cosmos.network/main/core/upgrade#genesis-state
+	app.UpgradeKeeper.SetModuleVersionMap(ctx, app.mm.GetVersionMap())
 	return app.mm.InitGenesis(ctx, app.appCodec, genesisState)
 }
 
@@ -886,6 +890,33 @@ func (app *App) registerUpgradeHandlers() error {
 		return app.mm.RunMigrations(ctx, app.configurator, fromVM)
 	})
 
+	// v2.1.0
+	app.UpgradeKeeper.SetUpgradeHandler("v2.1.0", func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
+		// use custom genesis state for genesis oracle
+		fromVM["oracle"] = oracle.AppModule{}.ConsensusVersion()
+
+		uniqueID := "" // desired unique ID
+
+		genesisState := oracletypes.DefaultGenesis()
+		genesisState.Oracles = append(genesisState.Oracles, oracletypes.Oracle{
+			OracleAddress:                 "", // desired oracle address
+			UniqueId:                      uniqueID,
+			Endpoint:                      "",                       // desired endpoint
+			UpdateTime:                    ctx.BlockTime(),          // current time
+			OracleCommissionRate:          sdk.NewDecWithPrec(1, 1), // set your commission rate
+			OracleCommissionMaxRate:       sdk.NewDecWithPrec(2, 1), // set your commission max rate
+			OracleCommissionMaxChangeRate: sdk.NewDecWithPrec(2, 2), // set your commission max change rate
+		})
+
+		genesisState.Params.UniqueId = uniqueID
+		genesisState.Params.OraclePublicKey = ""          // desired base64 encoded oracle public key
+		genesisState.Params.OraclePubKeyRemoteReport = "" // desired base64 encoded remote report
+
+		oracle.InitGenesis(ctx, app.oracleKeeper, *genesisState)
+
+		return app.mm.RunMigrations(ctx, app.configurator, fromVM)
+	})
+
 	upgradeInfo, err := app.UpgradeKeeper.ReadUpgradeInfoFromDisk()
 	if err != nil {
 		return err
@@ -898,6 +929,14 @@ func (app *App) registerUpgradeHandlers() error {
 		}
 
 		// configure store loader that checks if version == upgradeHeight and applies store upgrades
+		app.SetStoreLoader(upgradetypes.UpgradeStoreLoader(upgradeInfo.Height, &storeUpgrades))
+	}
+
+	if upgradeInfo.Name == "v2.1.0" && !app.UpgradeKeeper.IsSkipHeight(upgradeInfo.Height) {
+		storeUpgrades := storetypes.StoreUpgrades{
+			Added: []string{"datadeal", "oracle"},
+		}
+
 		app.SetStoreLoader(upgradetypes.UpgradeStoreLoader(upgradeInfo.Height, &storeUpgrades))
 	}
 
