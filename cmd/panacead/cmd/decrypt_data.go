@@ -57,7 +57,9 @@ func DecryptDataCmd(defaultNodeHome string) *cobra.Command {
 				return err
 			}
 
-			cmd.Println(decryptedData)
+			decryptedDataBase64 := base64.StdEncoding.EncodeToString(decryptedData)
+
+			cmd.Println(decryptedDataBase64)
 
 			return nil
 		},
