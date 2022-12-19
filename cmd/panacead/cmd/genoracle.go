@@ -76,6 +76,10 @@ func AddGenesisOracleCmd(defaultNodeHome string) *cobra.Command {
 				return fmt.Errorf("failed to set oracle params: %w", err)
 			}
 
+			if err := oracleGenState.Validate(); err != nil {
+				return err
+			}
+
 			oracleGenStateBz, err := cdc.MarshalJSON(oracleGenState)
 			if err != nil {
 				return fmt.Errorf("failed to marshal oracle genesis state: %w", err)
@@ -160,20 +164,6 @@ func setOracle(cmd *cobra.Command, genState *oracletypes.GenesisState) error {
 		return fmt.Errorf("failed to get oracle endpoint: %w", err)
 	}
 
-	commMaxRateStr, err := cmd.Flags().GetString(flagOracleCommMaxRate)
-	if err != nil {
-		return fmt.Errorf("failed to get oracle commission max rate: %w", err)
-	}
-
-	commMaxRate, err := sdk.NewDecFromStr(commMaxRateStr)
-	if err != nil {
-		return fmt.Errorf("inavlid commission max rate: %w", err)
-	}
-
-	if commMaxRate.IsNegative() || commMaxRate.GT(sdk.OneDec()) {
-		return fmt.Errorf("oracle max commission rate should be between 0 and 1")
-	}
-
 	commRateStr, err := cmd.Flags().GetString(flagOracleCommRate)
 	if err != nil {
 		return fmt.Errorf("failed to get oracle commission rate: %w", err)
@@ -184,8 +174,14 @@ func setOracle(cmd *cobra.Command, genState *oracletypes.GenesisState) error {
 		return fmt.Errorf("inavlid commission rate: %w", err)
 	}
 
-	if commRate.IsNegative() || commRate.GT(commMaxRate) {
-		return fmt.Errorf("oracle commission rate should be between 0 and commission max rate")
+	commMaxRateStr, err := cmd.Flags().GetString(flagOracleCommMaxRate)
+	if err != nil {
+		return fmt.Errorf("failed to get oracle commission max rate: %w", err)
+	}
+
+	commMaxRate, err := sdk.NewDecFromStr(commMaxRateStr)
+	if err != nil {
+		return fmt.Errorf("inavlid commission max rate: %w", err)
 	}
 
 	commMaxChangeRateStr, err := cmd.Flags().GetString(flagOracleCommMaxChangeRate)
