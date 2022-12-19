@@ -25,9 +25,11 @@ const (
 	flagOracleRemoteReport  = "oracle-remote-report"
 	flagOraclePublicKeyPath = "oracle-public-key-path"
 
-	flagOracleAccount  = "oracle-account"
-	flagOracleEndpoint = "oracle-endpoint"
-	flagOracleCommRate = "oracle-commission-rate"
+	flagOracleAccount           = "oracle-account"
+	flagOracleEndpoint          = "oracle-endpoint"
+	flagOracleCommRate          = "oracle-commission-rate"
+	flagOracleCommMaxRate       = "oracle-commission-max-rate"
+	flagOracleCommMaxChangeRate = "oracle-commission-max-change-rate"
 )
 
 type OraclePubKeyInfo struct {
@@ -99,6 +101,8 @@ func AddGenesisOracleCmd(defaultNodeHome string) *cobra.Command {
 	cmd.Flags().String(flagOracleAccount, "", "address or keyName")
 	cmd.Flags().String(flagOracleEndpoint, "", "oracle's endpoint")
 	cmd.Flags().String(flagOracleCommRate, "", "oracle's commission rate")
+	cmd.Flags().String(flagOracleCommMaxRate, "", "oracle's commission max rate")
+	cmd.Flags().String(flagOracleCommMaxChangeRate, "", "oracle's commission max change rate")
 	cmd.Flags().String(flags.FlagHome, defaultNodeHome, "The application home directory")
 
 	flags.AddQueryFlagsToCmd(cmd)
@@ -156,6 +160,20 @@ func setOracle(cmd *cobra.Command, genState *oracletypes.GenesisState) error {
 		return fmt.Errorf("failed to get oracle endpoint: %w", err)
 	}
 
+	commMaxRateStr, err := cmd.Flags().GetString(flagOracleCommMaxRate)
+	if err != nil {
+		return fmt.Errorf("failed to get oracle commission max rate: %w", err)
+	}
+
+	commMaxRate, err := sdk.NewDecFromStr(commMaxRateStr)
+	if err != nil {
+		return fmt.Errorf("inavlid commission max rate: %w", err)
+	}
+
+	if commMaxRate.IsNegative() || commMaxRate.GT(sdk.OneDec()) {
+		return fmt.Errorf("oracle max commission rate should be between 0 and 1")
+	}
+
 	commRateStr, err := cmd.Flags().GetString(flagOracleCommRate)
 	if err != nil {
 		return fmt.Errorf("failed to get oracle commission rate: %w", err)
@@ -166,15 +184,27 @@ func setOracle(cmd *cobra.Command, genState *oracletypes.GenesisState) error {
 		return fmt.Errorf("inavlid commission rate: %w", err)
 	}
 
-	if commRate.IsNegative() || commRate.GT(sdk.OneDec()) {
-		return fmt.Errorf("oracle commission rate should be between 0 and 1")
+	if commRate.IsNegative() || commRate.GT(commMaxRate) {
+		return fmt.Errorf("oracle commission rate should be between 0 and commission max rate")
+	}
+
+	commMaxChangeRateStr, err := cmd.Flags().GetString(flagOracleCommMaxChangeRate)
+	if err != nil {
+		return fmt.Errorf("failed to get oracle commission max change rate: %w", err)
+	}
+
+	commMaxChangeRate, err := sdk.NewDecFromStr(commMaxChangeRateStr)
+	if err != nil {
+		return fmt.Errorf("inavlid commission max change rate: %w", err)
 	}
 
 	genState.Oracles = append(genState.Oracles, oracletypes.Oracle{
-		UniqueId:             uniqueID,
-		OracleAddress:        oracleAccAddr.String(),
-		Endpoint:             endpoint,
-		OracleCommissionRate: commRate,
+		UniqueId:                      uniqueID,
+		OracleAddress:                 oracleAccAddr.String(),
+		Endpoint:                      endpoint,
+		OracleCommissionRate:          commRate,
+		OracleCommissionMaxRate:       commMaxRate,
+		OracleCommissionMaxChangeRate: commMaxChangeRate,
 	})
 
 	return nil
