@@ -109,8 +109,12 @@ type OracleRegistration struct {
 	NodePubKey []byte `protobuf:"bytes,3,opt,name=node_pub_key,json=nodePubKey,proto3" json:"node_pub_key,omitempty"`
 	// Anyone can validate that the node key pair is generated in SGX using this node key remote report.
 	NodePubKeyRemoteReport []byte `protobuf:"bytes,4,opt,name=node_pub_key_remote_report,json=nodePubKeyRemoteReport,proto3" json:"node_pub_key_remote_report,omitempty"`
-	// The trusted block info is required for light client.
-	// Other oracle can validate whether the oracle set correct trusted block info.
+	// A newly joining oracle must report a trusted block info which was used to initialize its light client.
+	// Other oracles will validate whether this trusted block info is correct,
+	//   in order to prevent malicious operators from making the oracle look at a malicious chain node.
+	// Other oracles don't have to worry about whether this block info was set by a malicious operator,
+	//   because this message has to be generated inside SGX.
+	// Also, after this oracle registration is complete, the light client is protected from malicious operators by SGX.
 	TrustedBlockHeight            int64                                  `protobuf:"varint,5,opt,name=trusted_block_height,json=trustedBlockHeight,proto3" json:"trusted_block_height,omitempty"`
 	TrustedBlockHash              []byte                                 `protobuf:"bytes,6,opt,name=trusted_block_hash,json=trustedBlockHash,proto3" json:"trusted_block_hash,omitempty"`
 	Endpoint                      string                                 `protobuf:"bytes,7,opt,name=endpoint,proto3" json:"endpoint,omitempty"`
