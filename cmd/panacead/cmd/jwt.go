@@ -22,7 +22,7 @@ func JwtCmd(defaultNodeHome string) *cobra.Command {
 		Long: `
 This command issue a JWT(Json Web Token) from account in panacea. 
 The key to be used for issuing a JWT should be stored in the localStore.
-If not stored, please add the key first via the following command.
+If not stored, please add the key first.
 The [expiration] should use the format such as "1h", "30m", "2h45m" etc. 
 Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
 		`,
