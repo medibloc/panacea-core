@@ -5,3 +5,4 @@
 - [For dApp Developers](dapp-devs/overview.md)
 - [For Protocol Developers](protocol-devs/overview.md)
 - [For Validators](validators/overview.md)
+- [For Oracles](oracles/overview.md)

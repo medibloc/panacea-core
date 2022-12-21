@@ -51,3 +51,12 @@
   * [Ledger Nano](validators/ledger-nano.md)
 * Software Upgrade Guide
 * [FAQ](validators/faq.md)
+
+## For Oracles
+
+* [Overview](oracles/overview.md)
+* Data Exchange Protocol
+  * Concepts
+  * Oracle
+* Operate Oracle Nodes
+* FAQ
