@@ -14,7 +14,7 @@
 * Key Management
   * CLI Keyring
   * GUI Wallets
-* Data Exchange Protocol
+* Data Exchange
   * Concepts
   * Consume data
   * Provide data
