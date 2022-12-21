@@ -26,7 +26,7 @@ message OracleRegistration {
   bytes node_pub_key = 3;
   // Anyone can validate that the node key pair is generated in SGX using this node key remote report.
   bytes node_pub_key_remote_report = 4;
-  // A new oracle must report a trusted block info which was used to initialize its light client.
+  // A newly joining oracle must report a trusted block info which was used to initialize its light client.
   // Other oracles will validate whether this trusted block info is correct,
   //   in order to prevent malicious operators from making the oracle look at a malicious chain node.
   // Other oracles don't have to worry about whether this block info was set by a malicious operator,
