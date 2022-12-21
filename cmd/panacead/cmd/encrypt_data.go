@@ -54,8 +54,6 @@ func EncryptDataCmd(defaultNodeHome string) *cobra.Command {
 
 			encryptedDataBase64 := base64.StdEncoding.EncodeToString(encryptedData)
 
-			//cmd.Println(encryptedDataBase64)
-
 			_, err = fmt.Fprintln(cmd.OutOrStdout(), encryptedDataBase64)
 			if err != nil {
 				return err
