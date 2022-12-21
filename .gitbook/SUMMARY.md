@@ -10,7 +10,7 @@
 * Basic Concepts
   * MED
   * Transactions, Gas & Fees
-* Account Management
+* Key Management
   * CLI Keyring
   * GUI Wallets
 * Data Exchange Protocol
