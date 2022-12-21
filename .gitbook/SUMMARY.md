@@ -44,6 +44,6 @@
 * Security
   * Sentry Nodes
   * Validator Backup
-  * [Ledger Nano](validators/ledger-nano-support.md)
+  * [Ledger Nano](validators/ledger-nano.md)
 * Software Upgrade Guide
 * [FAQ](validators/faq.md)
