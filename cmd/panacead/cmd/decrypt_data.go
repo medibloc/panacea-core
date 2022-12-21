@@ -21,7 +21,7 @@ func DecryptDataCmd(defaultNodeHome string) *cobra.Command {
 		Use:   "decrypt-data [input-file-path] [key-name] [encrypted-secret-key]",
 		Short: "Decrypt data with encryptedCombinedKey",
 		Long: `
-			This command decrypts the encrypted data with the encrypted combinedKey.
+			This command decrypts the encrypted data with the encrypted secret key.
 			The encrypted combinedKey can be obtained from Oracle.
 			The key to be used for encryption should be stored in the localStore.
 			If not stored, please add the key first via the following command.
@@ -57,9 +57,7 @@ func DecryptDataCmd(defaultNodeHome string) *cobra.Command {
 				return err
 			}
 
-			decryptedDataBase64 := base64.StdEncoding.EncodeToString(decryptedData)
-
-			cmd.Println(decryptedDataBase64)
+			cmd.Println(decryptedData)
 
 			return nil
 		},
@@ -68,7 +66,7 @@ func DecryptDataCmd(defaultNodeHome string) *cobra.Command {
 	cmd.PersistentFlags().String(flags.FlagHome, defaultNodeHome, "The application home directory")
 	cmd.PersistentFlags().String(flags.FlagKeyringDir, "", "The client Keyring directory; if omitted, the default 'home' directory will be used")
 	cmd.PersistentFlags().String(flags.FlagKeyringBackend, flags.DefaultKeyringBackend, "Select keyring's backend (os|file|test)")
-	cmd.PersistentFlags().String(cli.OutputFlag, "texㅂt", "Output format (text|json)")
+	cmd.PersistentFlags().String(cli.OutputFlag, "text", "Output format (text|json)")
 	cmd.PersistentFlags().String(flags.FlagChainID, "", "The network chain ID")
 
 	flags.AddQueryFlagsToCmd(cmd)
