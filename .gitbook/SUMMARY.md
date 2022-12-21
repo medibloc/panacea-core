@@ -2,8 +2,8 @@
 
 ## Overview
 
-* [Panacea Ecosystem](overview/panacea-ecosystem.md)
-* [Roadmap](overview/roadmap.md)
+* [Panacea Ecosystem](about-panacea/panacea-ecosystem.md)
+* [Roadmap](about-panacea/roadmap.md)
 
 ## For Users
 
