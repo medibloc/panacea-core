@@ -19,7 +19,15 @@ func JwtCmd(defaultNodeHome string) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "issue-jwt [key-name] [expiration]",
 		Short: "Issue a JWT(Json Web Token) from account",
-		Args: func(cmd *cobra.Command, args []string) error {
+		Long: `
+This command issue a JWT(Json Web Token) from account in panacea. 
+The key to be used for issuing a JWT should be stored in the localStore.
+If not stored, please add the key first via the following command.
+The [expiration] should use the format such as "1h", "30m", "2h45m" etc. 
+Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
+		`,
+		Args: cobra.ExactArgs(2),
+		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 
 			fromAddress := clientCtx.GetFromAddress()
