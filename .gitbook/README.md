@@ -1,8 +1,8 @@
-# Introduction
+# MediBloc Panacea Documentation
 
-Welcome to the Panacea Core docs.
+## Getting Started
 
-* Features covers what you can do with the Panacea Core, and gives a high level intuition of its core mechanisms.
-* Guide offers setup instructions on how to setup a node, join existing networks.
-* Specifications contains detailed specifications for each module in the Panacea Core.
-
+- [For users](for-users/)
+- [For dApp devs](for-dapp-devs/)
+- [For protocol devs](for-protocol-devs/)
+- [For validators](for-validators/)
