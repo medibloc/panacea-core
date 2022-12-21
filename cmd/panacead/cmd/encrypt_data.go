@@ -3,6 +3,7 @@ package cmd
 import (
 	"encoding/base64"
 	"encoding/hex"
+	"fmt"
 	"os"
 
 	"github.com/btcsuite/btcd/btcec"
@@ -17,7 +18,7 @@ import (
 
 func EncryptDataCmd(defaultNodeHome string) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "encrypt-data [input-file-path] [output-file-path] [key-name]",
+		Use:   "encrypt-data [input-file-path] [key-name]",
 		Short: "Encrypt data with shared key which consists of oracle public key and provider's private key",
 		Long: `
 			This command can encrypt data with shared key which consists of oracle public key and provider's private key.
@@ -25,7 +26,7 @@ func EncryptDataCmd(defaultNodeHome string) *cobra.Command {
 			If not stored, please add the key first via the following command.
 			panacead keys add ...
 		`,
-		Args: cobra.ExactArgs(3),
+		Args: cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientQueryContext(cmd)
 			if err != nil {
@@ -46,17 +47,17 @@ func EncryptDataCmd(defaultNodeHome string) *cobra.Command {
 
 			oraclePubKey := params.GetParams().GetOraclePublicKey()
 
-			encryptedData, err := encrypt(clientCtx, args[2], origData, oraclePubKey)
+			encryptedData, err := encrypt(clientCtx, args[1], origData, oraclePubKey)
 			if err != nil {
 				return err
 			}
 
-			encryptedDataBase64 := []byte(base64.StdEncoding.EncodeToString(encryptedData))
+			encryptedDataBase64 := base64.StdEncoding.EncodeToString(encryptedData)
 
-			if err := os.WriteFile(args[1], encryptedDataBase64, 0644); err != nil {
+			_, err = fmt.Fprintln(cmd.OutOrStdout(), encryptedDataBase64)
+			if err != nil {
 				return err
 			}
-
 			return nil
 		},
 	}
