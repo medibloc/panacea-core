@@ -45,4 +45,4 @@
   * Validator Backup
   * [Ledger Nano](validators/ledger-nano-support.md)
 * Software Upgrade Guide
-* [FAQ](resources/faq.md)
+* [FAQ](validators/faq.md)
