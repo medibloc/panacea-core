@@ -12,31 +12,37 @@
   * Transactions, Gas & Fees
 * Key Management
 * GUI Wallets
+* Data Exchange Protocol
+  * Concepts
+  * Consume data
+  * Provide data
+* Staking
 * Governance
   * Overview
   * Proposal Process
-  * Submit a Proposal
-  * Vote to a Proposal
+  * Submit Proposals
+  * Vote to Proposals
 
 ## For dApp Devs
 
 * Endpoints
-* Localnet
 * Client Libraries
 
 ## For Protocol Devs
 
-* Data Exchange Protocol
+* Data Exchange Protocol Specs
 * Modules
 * Dev Guides
 
 ## For Validators
 
-* [Getting started](guide/getting-started.md)
-* [Installation](guide/installation.md)
-* [Join the Network](guide/join-the-network.md)
-* [Deploy a Testnet](guide/deploy-a-testnet.md)
-* [Interaction with the network: CLI](guide/interaction-with-the-network-cli.md)
-* [Ledger Nano Support](guide/ledger-nano-support.md)
-* [Cosmovisor](guide/cosmovisor.md)
-* [Validator FAQ](resources/validator-faq.md)
+* [CLI Installation](validators/cli-installation.md)
+* [Deploy Localnet](validators/deploy-localnet.md)
+* [Join Mainnet/Testnet](validators/join-mainnet-testnet.md)
+* [Cosmovisor](validators/cosmovisor.md)
+* Security
+  * Sentry Nodes
+  * Validator Backup
+  * [Ledger Nano](validators/ledger-nano-support.md)
+* Software Upgrade Guide
+* [FAQ](resources/faq.md)

@@ -46,7 +46,7 @@ not a passive role. Delegators should actively monitor the actions of their vali
 ### How to become a validator?
 
 Any participant in the network can signal that they want to become a validator by sending a `create-validator` transaction,
-where they must fill out the following parameters: [link](../guide/interaction-with-the-network-cli.md#staking).
+where they must fill out the following parameters: [link](interaction-with-the-network-cli.md#staking).
 
 Once a validator is created, MED holders can delegate MEDs to them, effectively adding stake to their pool.
 The total stake of an address is the combination of MEDs bonded by delegators and MEDs self-bonded by the entity
@@ -74,7 +74,7 @@ After a validator is created with a `create-validator` transaction, they can be 
 
 Self-delegation is delegation from a validator to themselves.
 This amount can be increases by sending a delegate transaction from your validator's application key.
-For details about the application key, please see the [Key Types](../guide/interaction-with-the-network-cli.md#key-types) guide.
+For details about the application key, please see the [Key Types](interaction-with-the-network-cli.md#key-types) guide.
 
 ### Is there a minimum amount of MEDs that must be delegated to be an active (=bonded) validator?
 
@@ -258,7 +258,7 @@ There are currently two faults that can result in slashing of funds for a valida
 Validators should expect to provision one or more data center locations with redundant power, networking, firewalls, HSMs and servers.
 
 We expect that a modest level of hardware specifications will be needed initially and that they might rise as network use increases.
-For details, please see the [Join the Network](../guide/join-the-network.md) guide.
+For details, please see the [Join the Network](join-mainnet-testnet.md) guide.
 
 ### What are software requirements?
 
