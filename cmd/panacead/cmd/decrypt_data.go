@@ -3,6 +3,7 @@ package cmd
 import (
 	"encoding/base64"
 	"encoding/hex"
+	"fmt"
 	"os"
 
 	"github.com/btcsuite/btcd/btcec"
@@ -57,7 +58,10 @@ func DecryptDataCmd(defaultNodeHome string) *cobra.Command {
 				return err
 			}
 
-			cmd.Println(decryptedData)
+			_, err = fmt.Fprintln(cmd.OutOrStdout(), decryptedData)
+			if err != nil {
+				return err
+			}
 
 			return nil
 		},

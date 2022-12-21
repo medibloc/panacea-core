@@ -3,6 +3,7 @@ package cmd
 import (
 	"encoding/base64"
 	"encoding/hex"
+	"fmt"
 	"os"
 
 	"github.com/btcsuite/btcd/btcec"
@@ -53,8 +54,12 @@ func EncryptDataCmd(defaultNodeHome string) *cobra.Command {
 
 			encryptedDataBase64 := base64.StdEncoding.EncodeToString(encryptedData)
 
-			cmd.Println(encryptedDataBase64)
+			//cmd.Println(encryptedDataBase64)
 
+			_, err = fmt.Fprintln(cmd.OutOrStdout(), encryptedDataBase64)
+			if err != nil {
+				return err
+			}
 			return nil
 		},
 	}
