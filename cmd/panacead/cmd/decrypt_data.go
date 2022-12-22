@@ -58,7 +58,7 @@ func DecryptDataCmd(defaultNodeHome string) *cobra.Command {
 				return err
 			}
 
-			_, err = fmt.Fprintln(cmd.OutOrStdout(), decryptedData)
+			_, err = fmt.Fprintln(cmd.OutOrStdout(), string(decryptedData))
 			if err != nil {
 				return err
 			}
