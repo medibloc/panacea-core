@@ -17,7 +17,7 @@ import (
 
 func JwtCmd(defaultNodeHome string) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "issue-jwt [key-name] [expiration]",
+		Use:   "issue-jwt [expiration]",
 		Short: "Issue a JWT(Json Web Token) from account",
 		Long: `
 This command issue a JWT(Json Web Token) from account in panacea. 
@@ -26,21 +26,21 @@ If not stored, please add the key first.
 The [expiration] should use the format such as "1h", "30m", "2h45m" etc. 
 Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
 		`,
-		Args: cobra.ExactArgs(2),
+		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
 
-			expirationDuration, err := time.ParseDuration(args[1])
+			expirationDuration, err := time.ParseDuration(args[0])
 			if err != nil {
 				return err
 			}
 
 			fromAddress := clientCtx.GetFromAddress()
 
-			issuedJWT, err := issueJWT(clientCtx, fromAddress.String(), args[0], expirationDuration)
+			issuedJWT, err := issueJWT(clientCtx, fromAddress.String(), clientCtx.GetFromName(), expirationDuration)
 			if err != nil {
 				return err
 			}
@@ -61,6 +61,7 @@ Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
 	cmd.PersistentFlags().String(flags.FlagChainID, "", "The network chain ID")
 
 	flags.AddTxFlagsToCmd(cmd)
+
 	return cmd
 }
 
