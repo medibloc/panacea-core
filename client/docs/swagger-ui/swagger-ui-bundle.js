@@ -36904,18 +36904,18 @@
                         i = t.taggedOperations(),
                         a = o("Collapse");
                     return s.default.createElement("div", null, s.default.createElement("h4", {
-                        className: "overview-title"
+                        className: "about-panacea-title"
                     }, "Overview"), i.map(function(e, t) {
                         var o = e.get("operations"),
-                            i = ["overview-tags", t],
+                            i = ["about-panacea-tags", t],
                             u = n.isShown(i, !0);
                         return s.default.createElement("div", {
-                            key: "overview-" + t
+                            key: "about-panacea-" + t
                         }, s.default.createElement("h4", {
                             onClick: function() {
                                 return r.show(i, !u)
                             },
-                            className: "link overview-tag"
+                            className: "link about-panacea-tag"
                         }, " ", u ? "-" : "+", t), s.default.createElement(a, {
                             isOpened: u,
                             animated: !0

@@ -1,27 +1,62 @@
 # Table of contents
 
-* [Introduction](README.md)
-
 ## Overview
 
-* [Panacea Ecosystem](overview/panacea-ecosystem.md)
-* [Roadmap](overview/roadmap.md)
+* [Panacea Ecosystem](about-panacea/panacea-ecosystem.md)
+* [Roadmap](about-panacea/roadmap.md)
 
-## Guide
+## For Users
 
-* [Getting started](guide/getting-started.md)
-* [Installation](guide/installation.md)
-* [Join the Network](guide/join-the-network.md)
-* [Deploy a Testnet](guide/deploy-a-testnet.md)
-* [Interaction with the network: CLI](guide/interaction-with-the-network-cli.md)
-* [Ledger Nano Support](guide/ledger-nano-support.md)
-* [Cosmovisor](guide/cosmovisor.md)
+* [Overview](users/overview.md)
+* Basic Concepts
+  * MED
+  * Transactions, Gas & Fees
+* Key Management
+  * CLI Keyring
+  * GUI Wallets
+* Data Exchange
+  * Concepts
+  * Consume data
+  * Provide data
+* Staking
+* Governance
+  * Overview
+  * Proposal Process
+  * Submit Proposals
+  * Vote to Proposals
 
-## Specifications
+## For dApp Devs
 
-* [AOL](specifications/aol.md)
-* [DID](specifications/did.md)
+* [Overview](dapp-devs/overview.md)
+* Endpoints
+* Client Libraries
 
-## Resources
+## For Protocol Devs
 
-* [Validator FAQ](resources/validator-faq.md)
+* [Overview](protocol-devs/overview.md)
+* Data Exchange Protocol Specs
+* Modules
+* Dev Guides
+
+## For Validators
+
+* [Overview](validators/overview.md)
+* [CLI Installation](validators/cli-installation.md)
+* [Deploy Localnet](validators/deploy-localnet.md)
+* [Join Mainnet/Testnet](validators/join-mainnet-testnet.md)
+* [Cosmovisor](validators/cosmovisor.md)
+* Security
+  * Sentry Nodes
+  * Validator Backup
+  * [Ledger Nano](validators/ledger-nano.md)
+* Software Upgrade Guide
+* [FAQ](validators/faq.md)
+
+## For Oracles
+
+* [Overview](oracles/overview.md)
+* Data Exchange Protocol
+  * Concepts
+  * Oracle
+* Operate Oracle Nodes
+* FAQ

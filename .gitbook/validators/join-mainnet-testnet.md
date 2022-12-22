@@ -59,7 +59,7 @@ So, expose them to the network where you perform operational actions.
 ssh ubuntu@<your-ec2-ip> -i <your-key>.pem
 ```
 
-Install prerequisites by following the [Installation](installation.md) guide.
+Install prerequisites by following the [Installation](cli-installation.md) guide.
 
 
 ## Setup a New Node
