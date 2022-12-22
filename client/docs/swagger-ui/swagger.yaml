@@ -2054,7 +2054,7 @@ paths:
         x-example: cosmos16xyempempp92x9hyzz9wrgf94r6j9h5f06pxxv
     get:
       deprecated: true
-      summary: Query all validators that a delegator is bonded to
+      summary: Query all 4-validators that a delegator is bonded to
       tags:
         - Staking
       produces:
@@ -2531,8 +2531,8 @@ paths:
   /slashing/signing_infos:
     get:
       deprecated: true
-      summary: Get sign info of given all validators
-      description: Get sign info of all validators
+      summary: Get sign info of given all 4-validators
+      description: Get sign info of all 4-validators
       produces:
         - application/json
       tags:
@@ -2567,7 +2567,7 @@ paths:
                 missed_blocks_counter:
                   type: string
         '400':
-          description: Invalid validator public key for one of the validators
+          description: Invalid validator public key for one of the 4-validators
         '500':
           description: Internal Server Error
   '/slashing/validators/{validatorAddr}/unjail':
@@ -3011,7 +3011,7 @@ paths:
                 x-example: Param Change
               description:
                 type: string
-                x-example: Update max validators
+                x-example: Update max 4-validators
               proposer:
                 type: string
                 description: bech32 encoded address
@@ -8904,7 +8904,7 @@ paths:
         - Query
   '/cosmos/distribution/v1beta1/delegators/{delegator_address}/validators':
     get:
-      summary: DelegatorValidators queries the validators of a delegator.
+      summary: DelegatorValidators queries the 4-validators of a delegator.
       operationId: DelegatorValidators
       responses:
         '200':
@@ -13067,7 +13067,7 @@ paths:
         - Query
   /cosmos/slashing/v1beta1/signing_infos:
     get:
-      summary: SigningInfos queries signing info of all validators
+      summary: SigningInfos queries signing info of all 4-validators
       operationId: SigningInfos
       responses:
         '200':
@@ -13115,7 +13115,7 @@ paths:
                     monitoring their
 
                     liveness activity.
-                title: info is the signing info of all validators
+                title: info is the signing info of all 4-validators
               pagination:
                 type: object
                 properties:
@@ -14693,7 +14693,7 @@ paths:
                     bonded shares
 
                     multiplied by exchange rate.
-                description: validators defines the the validators' info of a delegator.
+                description: 4-validators defines the the 4-validators' info of a delegator.
               pagination:
                 description: pagination defines the pagination in the response.
                 type: object
@@ -16113,7 +16113,7 @@ paths:
                   max_validators:
                     type: integer
                     format: int64
-                    description: max_validators is the maximum number of validators.
+                    description: max_validators is the maximum number of 4-validators.
                   max_entries:
                     type: integer
                     format: int64
@@ -16540,7 +16540,7 @@ paths:
         - Query
   /cosmos/staking/v1beta1/validators:
     get:
-      summary: Validators queries all validators that match the given status.
+      summary: Validators queries all 4-validators that match the given status.
       operationId: Validators
       responses:
         '200':
@@ -16861,7 +16861,7 @@ paths:
                     bonded shares
 
                     multiplied by exchange rate.
-                description: validators contains all the queried validators.
+                description: 4-validators contains all the queried 4-validators.
               pagination:
                 description: pagination defines the pagination in the response.
                 type: object
@@ -17074,7 +17074,7 @@ paths:
                         }
       parameters:
         - name: status
-          description: status enables to query for validators matching a given status.
+          description: status enables to query for 4-validators matching a given status.
           in: query
           required: false
           type: string
@@ -36774,7 +36774,7 @@ definitions:
         type: array
         items:
           type: string
-        description: validators defines the validators a delegator is delegating for.
+        description: 4-validators defines the 4-validators a delegator is delegating for.
     description: |-
       QueryDelegatorValidatorsResponse is the response type for the
       Query/DelegatorValidators RPC method.
@@ -38689,7 +38689,7 @@ definitions:
             monitoring their
 
             liveness activity.
-        title: info is the signing info of all validators
+        title: info is the signing info of all 4-validators
       pagination:
         type: object
         properties:
@@ -39281,7 +39281,7 @@ definitions:
       max_validators:
         type: integer
         format: int64
-        description: max_validators is the maximum number of validators.
+        description: max_validators is the maximum number of 4-validators.
       max_entries:
         type: integer
         format: int64
@@ -40100,7 +40100,7 @@ definitions:
             exchange rate. Voting power can be calculated as total bonded shares
 
             multiplied by exchange rate.
-        description: validators defines the the validators' info of a delegator.
+        description: 4-validators defines the the 4-validators' info of a delegator.
       pagination:
         description: pagination defines the pagination in the response.
         type: object
@@ -40526,7 +40526,7 @@ definitions:
           max_validators:
             type: integer
             format: int64
-            description: max_validators is the maximum number of validators.
+            description: max_validators is the maximum number of 4-validators.
           max_entries:
             type: integer
             format: int64
@@ -41472,7 +41472,7 @@ definitions:
             exchange rate. Voting power can be calculated as total bonded shares
 
             multiplied by exchange rate.
-        description: validators contains all the queried validators.
+        description: 4-validators contains all the queried 4-validators.
       pagination:
         description: pagination defines the pagination in the response.
         type: object

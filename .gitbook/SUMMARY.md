@@ -2,12 +2,12 @@
 
 ## Overview
 
-* [Panacea Ecosystem](about-panacea/panacea-ecosystem.md)
-* [Roadmap](about-panacea/roadmap.md)
+* [Panacea Ecosystem](0-about-panacea/panacea-ecosystem.md)
+* [Roadmap](0-about-panacea/roadmap.md)
 
 ## For Users
 
-* [Overview](users/overview.md)
+* [Overview](1-users/0-overview.md)
 * Basic Concepts
   * MED
   * Transactions, Gas & Fees
@@ -27,34 +27,34 @@
 
 ## For dApp Devs
 
-* [Overview](dapp-devs/overview.md)
+* [Overview](2-dapp-devs/overview.md)
 * Endpoints
 * Client Libraries
 
 ## For Protocol Devs
 
-* [Overview](protocol-devs/overview.md)
+* [Overview](3-protocol-devs/0-overview.md)
 * Data Exchange Protocol Specs
 * Modules
 * Dev Guides
 
 ## For Validators
 
-* [Overview](validators/overview.md)
-* [CLI Installation](validators/cli-installation.md)
-* [Deploy Localnet](validators/deploy-localnet.md)
-* [Join Mainnet/Testnet](validators/join-mainnet-testnet.md)
-* [Cosmovisor](validators/cosmovisor.md)
+* [Overview](4-validators/overview.md)
+* [CLI Installation](4-validators/cli-installation.md)
+* [Deploy Localnet](4-validators/deploy-localnet.md)
+* [Join Mainnet/Testnet](4-validators/join-mainnet-testnet.md)
+* [Cosmovisor](4-validators/cosmovisor.md)
 * Security
   * Sentry Nodes
   * Validator Backup
-  * [Ledger Nano](validators/ledger-nano.md)
+  * [Ledger Nano](4-validators/ledger-nano.md)
 * Software Upgrade Guide
-* [FAQ](validators/faq.md)
+* [FAQ](4-validators/faq.md)
 
 ## For Oracles
 
-* [Overview](oracles/overview.md)
+* [Overview](5-oracles/overview.md)
 * Data Exchange Protocol
   * Concepts
   * Oracle

@@ -14,12 +14,12 @@ import "panacea/oracle/v2/genesis.proto";
 service Query {
   // Oracles returns a list of oracles.
   rpc Oracles(QueryOraclesRequest) returns (QueryOraclesResponse) {
-    option (google.api.http).get = "/panacea/oracle/v2/oracles";
+    option (google.api.http).get = "/panacea/oracle/v2/5-oracles";
   }
 
   // Oracle returns a oracle.
   rpc Oracle(QueryOracleRequest) returns (QueryOracleResponse) {
-    option (google.api.http).get = "/panacea/oracle/v2/oracles/{oracle_address}";
+    option (google.api.http).get = "/panacea/oracle/v2/5-oracles/{oracle_address}";
   }
 
   // OracleRegistrations returns a list of OracleRegistration.

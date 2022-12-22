@@ -26,7 +26,7 @@ const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 // GenesisState defines the oracle module's genesis state.
 type GenesisState struct {
-	Oracles             []Oracle             `protobuf:"bytes,1,rep,name=oracles,proto3" json:"oracles"`
+	Oracles             []Oracle             `protobuf:"bytes,1,rep,name=5-oracles,proto3" json:"5-oracles"`
 	OracleRegistrations []OracleRegistration `protobuf:"bytes,2,rep,name=oracle_registrations,json=oracleRegistrations,proto3" json:"oracle_registrations"`
 	Params              Params               `protobuf:"bytes,3,opt,name=params,proto3" json:"params"`
 }
