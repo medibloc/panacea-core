@@ -61,9 +61,6 @@
 
 ## For Oracles
 
-* [Overview](5-oracles/overview.md)
-* Data Exchange Protocol
-  * Concepts
-  * Oracle
+* [About DEP Oracle](5-oracles/0-about-dep-oracle.md)
 * Operate Oracle Nodes
 * FAQ
