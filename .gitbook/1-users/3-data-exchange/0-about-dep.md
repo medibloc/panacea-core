@@ -36,3 +36,8 @@ the data content must not be exposed to anyone other than the consumer intended 
 ### Generalized data exchange
 
 Not only healthcare data, but various types of data should be covered through this protocol.
+
+### Open-sourced protocol
+
+All protocol specifications and implementations must be open-sourced, so any participants can understand
+how data is exchanged and how privacy is guaranteed.

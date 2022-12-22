@@ -15,9 +15,9 @@
   * CLI Keyring
   * GUI Wallets
 * Data Exchange
-  * Concepts
-  * Consume data
-  * Provide data
+  * [About DEP](1-users/3-data-exchange/0-about-dep.md)
+  * [Consume data](1-users/3-data-exchange/1-consume-data.md)
+  * [Provide data](1-users/3-data-exchange/2-provide-data.md)
 * Staking
 * Governance
   * Overview
@@ -35,6 +35,13 @@
 
 * [Overview](3-protocol-devs/0-overview.md)
 * Data Exchange Protocol Specs
+  * [Overview](3-protocol-devs/1-dep-specs/0-overview.md)
+  * [User Flow](3-protocol-devs/1-dep-specs/1-user-flow.md)
+  * [Data Deal](3-protocol-devs/1-dep-specs/2-data-deal.md)
+  * [Data Provider Consent](3-protocol-devs/1-dep-specs/3-data-provider-consent.md)
+  * [Data Validation](3-protocol-devs/1-dep-specs/4-data-validation.md)
+  * [Confidential Oracle](3-protocol-devs/1-dep-specs/5-confidential-oracle.md)
+  * [Incentives](3-protocol-devs/1-dep-specs/6-incentives.md)
 * Modules
 * Dev Guides
 
