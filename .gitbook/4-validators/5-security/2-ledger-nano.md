@@ -23,7 +23,7 @@ Note: You need to [install the `Panacea` app](#install-the-panacea-ledger-app) o
 
 ### Before you begin
 
-Install `panacead` by following the [guide](cli-installation.md).
+Install `panacead` by following the [guide](../1-cli-installation.md).
 
 ### Add your Ledger key
 

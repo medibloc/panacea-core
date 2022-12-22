@@ -2,8 +2,8 @@
 
 ## Overview
 
-* [Panacea Ecosystem](0-about-panacea/panacea-ecosystem.md)
-* [Roadmap](0-about-panacea/roadmap.md)
+* [Panacea Ecosystem](0-about-panacea/0-panacea-ecosystem.md)
+* [Roadmap](0-about-panacea/1-roadmap.md)
 
 ## For Users
 
@@ -27,7 +27,7 @@
 
 ## For dApp Devs
 
-* [Overview](2-dapp-devs/overview.md)
+* [Overview](2-dapp-devs/0-overview.md)
 * Endpoints
 * Client Libraries
 
@@ -47,17 +47,17 @@
 
 ## For Validators
 
-* [Overview](4-validators/overview.md)
-* [CLI Installation](4-validators/cli-installation.md)
-* [Deploy Localnet](4-validators/deploy-localnet.md)
-* [Join Mainnet/Testnet](4-validators/join-mainnet-testnet.md)
-* [Cosmovisor](4-validators/cosmovisor.md)
+* [Overview](4-validators/0-overview.md)
+* [CLI Installation](4-validators/1-cli-installation.md)
+* [Deploy Localnet](4-validators/2-deploy-localnet.md)
+* [Join Mainnet/Testnet](4-validators/3-join-mainnet-testnet.md)
+* [Cosmovisor](4-validators/4-cosmovisor.md)
 * Security
   * Sentry Nodes
   * Validator Backup
-  * [Ledger Nano](4-validators/ledger-nano.md)
+  * [Ledger Nano](4-validators/5-security/2-ledger-nano.md)
 * Software Upgrade Guide
-* [FAQ](4-validators/faq.md)
+* [FAQ](4-validators/7-faq.md)
 
 ## For Oracles
 

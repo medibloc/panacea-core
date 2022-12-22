@@ -59,7 +59,7 @@ So, expose them to the network where you perform operational actions.
 ssh ubuntu@<your-ec2-ip> -i <your-key>.pem
 ```
 
-Install prerequisites by following the [Installation](cli-installation.md) guide.
+Install prerequisites by following the [Installation](1-cli-installation.md) guide.
 
 
 ## Setup a New Node
@@ -206,7 +206,7 @@ Environment="DAEMON_NAME=panacead"
 Environment="DAEMON_ALLOW_DOWNLOAD_BINARIES=false"
 Environment="DAEMON_RESTART_AFTER_UPGRADE=true"
 ```
-For more details about those environment variables, please see the [Cosmovisor guide](cosmovisor.md).
+For more details about those environment variables, please see the [Cosmovisor guide](4-cosmovisor.md).
 
 Then, setup the daemon.
 ```bash

@@ -257,7 +257,7 @@ panacead query slashing params
 ### Create your validator
 
 {% hint style="info" %}
-This guide assumes that you have already set up your full node by following [the guide](join-mainnet-testnet.md).
+This guide assumes that you have already set up your full node by following [the guide](3-join-mainnet-testnet.md).
 {% endhint %}
 
 Your `panaceavalconspub` address (public key) can be used to create a new validator by staking tokens.
