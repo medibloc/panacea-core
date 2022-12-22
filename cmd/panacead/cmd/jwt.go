@@ -28,14 +28,17 @@ Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
 		`,
 		Args: cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx := client.GetClientContextFromCmd(cmd)
-
-			fromAddress := clientCtx.GetFromAddress()
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
 
 			expirationDuration, err := time.ParseDuration(args[1])
 			if err != nil {
 				return err
 			}
+
+			fromAddress := clientCtx.GetFromAddress()
 
 			issuedJWT, err := issueJWT(clientCtx, fromAddress.String(), args[0], expirationDuration)
 			if err != nil {
@@ -57,6 +60,7 @@ Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
 	cmd.PersistentFlags().String(cli.OutputFlag, "text", "Output format (text|json)")
 	cmd.PersistentFlags().String(flags.FlagChainID, "", "The network chain ID")
 
+	flags.AddTxFlagsToCmd(cmd)
 	return cmd
 }
 
@@ -84,10 +88,5 @@ func issueJWT(clientCtx client.Context, issuer, keyName string, expiration time.
 		return nil, err
 	}
 
-	signedJWT, err := jwt.Sign(token, jwt.WithKey(jwa.ES256K, privKey.ToECDSA()))
-	if err != nil {
-		return nil, err
-	}
-
-	return signedJWT, nil
+	return jwt.Sign(token, jwt.WithKey(jwa.ES256K, privKey.ToECDSA()))
 }
