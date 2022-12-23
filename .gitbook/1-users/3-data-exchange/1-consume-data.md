@@ -16,7 +16,7 @@ panacead tx datadeal create-deal ${deal-file-path} \
   --node ${chain-node-rpc-addr}
 ```
 
-For `[deal-file-path]`, create a following JSON file.
+For `deal-file-path`, create a following JSON file.
 ```json
 {
   
