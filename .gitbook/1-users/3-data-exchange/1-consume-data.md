@@ -76,7 +76,12 @@ curl -v -X GET -H "Authorization: Bearer ${jwt}" \
   "${oracle-url}/v0/data-deal/secret-key?deal-id=${deal-id}&data-hash=${data-hash}"
 ```
 You must specify a JWT issued by yourself in order to prove that you are the data consumer who created the data deal.
-Please note that the returned secret key is also encrypted, so that also the specific data consumer decrypt the key using his/her Panacea account private key.
+For that authentication, the JWT must be signed by your (data consumer's) chain account private key.
+
+We highly recommend to set the expiration of JWT as short as possible for security reasons.
+In near future, the protocol will adopt the 'nonce' concept to improve the security of authentications.
+
+Please note that the returned secret key is also encrypted, so that also the specific data consumer decrypt the key using his/her chain account private key.
 Nevertheless, we highly recommend you to communicate with oracles who provides an HTTPS endpoint with SSL/TLS encryption.
 
 Using the encrypted secret key that you obtained from the oracle, you can decrypt data by the following CLI.
