@@ -20,9 +20,9 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 		case *types.MsgCreateDeal:
 			res, err := msgServer.CreateDeal(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)
-		//case *types.MsgDeactivateDeal:
-		//	res, err := msgServer.DeactivateDeal(sdk.WrapSDKContext(ctx), msg)
-		//	return sdk.WrapServiceResult(ctx, res, err)
+		case *types.MsgDeactivateDeal:
+			res, err := msgServer.DeactivateDeal(sdk.WrapSDKContext(ctx), msg)
+			return sdk.WrapServiceResult(ctx, res, err)
 		case *types.MsgSubmitConsent:
 			res, err := msgServer.SubmitConsent(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)
