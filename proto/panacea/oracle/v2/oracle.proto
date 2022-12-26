@@ -36,3 +36,12 @@ message OracleRegistration {
   string oracle_commission_max_change_rate = 10 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false];
   bytes encrypted_oracle_priv_key = 11;
 }
+
+// OracleUpgradeInfo defines the info of oracle upgrade, which includes the target height of upgrade and unique ID of the new version of oracle
+message OracleUpgradeInfo {
+  option (gogoproto.equal) = true;
+
+  string unique_id = 1;
+
+  int64 height = 2;
+}
