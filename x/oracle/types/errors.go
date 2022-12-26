@@ -14,4 +14,6 @@ var (
 	ErrCommissionGTMaxRate       = sdkerrors.Register(ModuleName, 9, "commission cannot be more than the max rate")
 	ErrCommissionUpdateTime      = sdkerrors.Register(ModuleName, 10, "commission cannot be changed more than once in 24h")
 	ErrCommissionGTMaxChangeRate = sdkerrors.Register(ModuleName, 11, "commission cannot be changed more than max change rate")
+	ErrOracleUpgradeInfoNotFound = sdkerrors.Register(ModuleName, 12, "oracle upgrade information not found")
+	ErrGetOracleUpgradeInfo      = sdkerrors.Register(ModuleName, 13, "error while get oracleUpgradeInfo")
 )

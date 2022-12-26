@@ -10,6 +10,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/x/authz"
 	"github.com/medibloc/panacea-core/v2/x/oracle"
+	oracleclient "github.com/medibloc/panacea-core/v2/x/oracle/client"
 	oraclekeeper "github.com/medibloc/panacea-core/v2/x/oracle/keeper"
 	oracletypes "github.com/medibloc/panacea-core/v2/x/oracle/types"
 
@@ -162,6 +163,7 @@ func getGovProposalHandlers() []govclient.ProposalHandler {
 		upgradeclient.ProposalHandler,
 		upgradeclient.CancelProposalHandler,
 		// this line is used by starport scaffolding # stargate/app/govProposalHandler
+		oracleclient.ProposalHandler,
 	)
 	govProposalHandlers = append(govProposalHandlers, wasmclient.ProposalHandlers...)
 
@@ -440,6 +442,7 @@ func New(
 		keys[oracletypes.MemStoreKey],
 		app.GetSubspace(oracletypes.ModuleName),
 	)
+	govRouter.AddRoute(oracletypes.RouterKey, oracle.NewOracleProposalHandler(app.oracleKeeper))
 
 	app.datadealKeeper = *datadealkeeper.NewKeeper(
 		appCodec,
