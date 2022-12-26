@@ -58,3 +58,13 @@ func (m msgServer) UpdateOracleInfo(goCtx context.Context, msg *types.MsgUpdateO
 
 	return &types.MsgUpdateOracleInfoResponse{}, nil
 }
+
+func (m msgServer) UpgradeOracle(goCtx context.Context, msg *types.MsgUpgradeOracle) (*types.MsgUpgradeOracleResponse, error) {
+	// TODO: Implementation
+	return &types.MsgUpgradeOracleResponse{}, nil
+}
+
+func (m msgServer) ApproveOracleUpgrade(goCtx context.Context, msg *types.MsgApproveOracleUpgrade) (*types.MsgApproveOracleUpgradeResponse, error) {
+	// TODO: Implementation
+	return &types.MsgApproveOracleUpgradeResponse{}, nil
+}
