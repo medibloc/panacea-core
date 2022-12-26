@@ -140,7 +140,7 @@ func (suite *queryOracleTestSuite) TestOracleRegistrations() {
 		OracleCommissionRate:          suite.oracleCommissionRate,
 		OracleCommissionMaxRate:       suite.oracleCommissionMaxRate,
 		OracleCommissionMaxChangeRate: suite.oracleCommissionMaxChangeRate,
-		EncryptedOraclePrivKey: nil,
+		EncryptedOraclePrivKey:        nil,
 	}
 
 	oracleRegistration2 := &types.OracleRegistration{
@@ -154,7 +154,7 @@ func (suite *queryOracleTestSuite) TestOracleRegistrations() {
 		OracleCommissionRate:          suite.oracle2CommissionRate,
 		OracleCommissionMaxRate:       suite.oracle2CommissionMaxRate,
 		OracleCommissionMaxChangeRate: suite.oracle2CommissionMaxChangeRate,
-		EncryptedOraclePrivKey: nil,
+		EncryptedOraclePrivKey:        nil,
 	}
 
 	anotherUniqueID := "uniqueID2"
@@ -169,7 +169,7 @@ func (suite *queryOracleTestSuite) TestOracleRegistrations() {
 		OracleCommissionRate:          suite.oracle2CommissionRate,
 		OracleCommissionMaxRate:       suite.oracle2CommissionMaxRate,
 		OracleCommissionMaxChangeRate: suite.oracle2CommissionMaxChangeRate,
-		EncryptedOraclePrivKey: nil,
+		EncryptedOraclePrivKey:        nil,
 	}
 
 	err := oracleKeeper.SetOracleRegistration(ctx, oracleRegistration)
@@ -245,7 +245,7 @@ func (suite *queryOracleTestSuite) TestOracleRegistration() {
 		OracleCommissionRate:          suite.oracleCommissionRate,
 		OracleCommissionMaxRate:       suite.oracleCommissionMaxRate,
 		OracleCommissionMaxChangeRate: suite.oracleCommissionMaxChangeRate,
-		EncryptedOraclePrivKey: nil,
+		EncryptedOraclePrivKey:        nil,
 	}
 	err := oracleKeeper.SetOracleRegistration(ctx, oracleRegistration)
 	suite.Require().NoError(err)
@@ -262,4 +262,20 @@ func (suite *queryOracleTestSuite) TestOracleParams() {
 	suite.Require().NoError(err)
 
 	suite.Require().Equal(types.DefaultParams(), *res.Params)
+}
+
+func (suite *queryOracleTestSuite) TestOracleUpgradeInfo() {
+	ctx := suite.Ctx
+	oracleKeeper := suite.OracleKeeper
+
+	upgradeInfo := &types.OracleUpgradeInfo{
+		UniqueId: "UpgradeUniqueID",
+		Height:   1000000,
+	}
+	suite.Require().NoError(oracleKeeper.SetOracleUpgradeInfo(ctx, upgradeInfo))
+
+	getUpgradeInfo, err := oracleKeeper.OracleUpgradeInfo(sdk.WrapSDKContext(ctx), nil)
+	suite.Require().NoError(err)
+	suite.Require().Equal(upgradeInfo.UniqueId, getUpgradeInfo.OracleUpgradeInfo.UniqueId)
+	suite.Require().Equal(upgradeInfo.Height, getUpgradeInfo.OracleUpgradeInfo.Height)
 }
