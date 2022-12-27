@@ -17,7 +17,7 @@ const (
 
 func CmdUpgradeOracleProposal() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "oracle-upgrade",
+		Use:   "oracle-upgrade (--upgrade-unique-id [uniqueID]) (--upgrade-height [height]) [flags]",
 		Args:  cobra.ExactArgs(0),
 		Short: "Submit an oracle upgrade proposal",
 		Long: "Submit an oracle upgrade proposal along with an initial deposit.\n + " +
