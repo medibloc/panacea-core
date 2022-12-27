@@ -22,7 +22,7 @@ func handlerOracleUpgrade(ctx sdk.Context, keeper keeper.Keeper) {
 		}
 	}
 
-	if upgradeInfo.ValidateOracleUpgradeInfo(ctx) {
+	if upgradeInfo.ShouldExecute(ctx) {
 		if err := keeper.ApplyUpgrade(ctx, upgradeInfo); err != nil {
 			panic(err)
 		}
