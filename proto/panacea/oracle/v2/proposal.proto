@@ -19,7 +19,7 @@ message Plan {
 message OracleUpgradeProposal {
   option (gogoproto.equal) = true;
 
-  string title = 1;
+  string title       = 1;
   string description = 2;
-  Plan   plan = 3 [(gogoproto.nullable) = false];
+  Plan   plan        = 3 [(gogoproto.nullable) = false];
 }

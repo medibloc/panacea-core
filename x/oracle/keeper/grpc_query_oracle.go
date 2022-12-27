@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"context"
+	"errors"
 
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -91,6 +92,19 @@ func (k Keeper) OracleRegistration(goCtx context.Context, request *types.QueryOr
 	}
 
 	return &types.QueryOracleRegistrationResponse{OracleRegistration: oracleRegistration}, nil
+}
+
+func (k Keeper) OracleUpgradeInfo(ctx context.Context, _ *types.QueryOracleUpgradeInfoRequest) (*types.QueryOracleUpgradeInfoResponse, error) {
+	upgradeInfo, err := k.GetOracleUpgradeInfo(sdk.UnwrapSDKContext(ctx))
+	if err != nil {
+		if errors.Is(err, types.ErrOracleUpgradeInfoNotFound) {
+			return &types.QueryOracleUpgradeInfoResponse{}, nil
+		}
+		return nil, err
+	}
+	return &types.QueryOracleUpgradeInfoResponse{
+		OracleUpgradeInfo: upgradeInfo,
+	}, nil
 }
 
 func (k Keeper) Params(goCtx context.Context, _ *types.QueryOracleParamsRequest) (*types.QueryParamsResponse, error) {
