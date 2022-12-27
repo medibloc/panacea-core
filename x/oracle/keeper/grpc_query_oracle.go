@@ -112,11 +112,6 @@ func (k Keeper) Params(goCtx context.Context, _ *types.QueryOracleParamsRequest)
 	return &types.QueryParamsResponse{Params: &params}, nil
 }
 
-func (k Keeper) OracleUpgradeInfo(goCtx context.Context, request *types.QueryOracleUpgradeInfoRequest) (*types.QueryOracleUpgradeInfoResponse, error) {
-	// TODO: Implementation
-	return &types.QueryOracleUpgradeInfoResponse{}, nil
-}
-
 func (k Keeper) OracleUpgrade(goCtx context.Context, request *types.QueryOracleUpgradeRequest) (*types.QueryOracleUpgradeResponse, error) {
 	// TODO: Implementation
 	return &types.QueryOracleUpgradeResponse{}, nil
