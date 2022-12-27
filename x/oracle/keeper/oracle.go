@@ -145,6 +145,40 @@ func (k Keeper) UpdateOracleInfo(ctx sdk.Context, msg *types.MsgUpdateOracleInfo
 	return nil
 }
 
+func (k Keeper) UpgradeOracle(ctx sdk.Context, msg *types.MsgUpgradeOracle) error {
+	//oracleUpgrade := types.NewUpgradeOracle(msg)
+
+	//if err := oracleUpgrade.ValidateBasic(); err != nil {
+	//	return err
+	//}
+	//
+	//upgradeInfo := k.GetOracleUpgradeInfo(ctx)
+	//if upgradeInfo.UniqueId != oracleUpgrade.UniqueId {
+	//	return sdkerrors.Wrapf(types.ErrOracleRegistration, "is not match the currently active uniqueID")
+	//}
+	//
+	//if oracle, err := k.GetOracle(ctx, oracleRegistration.OracleAddress); !errors.Is(types.ErrOracleNotFound, err) {
+	//	if oracle != nil {
+	//		return sdkerrors.Wrapf(types.ErrOracleRegistration, "already registered oracle. address(%s)", oracleRegistration.OracleAddress)
+	//	} else {
+	//		return sdkerrors.Wrapf(types.ErrOracleRegistration, err.Error())
+	//	}
+	//}
+	//
+	//if err := k.SetOracleRegistration(ctx, oracleRegistration); err != nil {
+	//	return err
+	//}
+	//
+	//ctx.EventManager().EmitEvent(
+	//	sdk.NewEvent(
+	//		types.EventTypeRegistration,
+	//		sdk.NewAttribute(types.AttributeKeyUniqueID, oracleRegistration.UniqueId),
+	//		sdk.NewAttribute(types.AttributeKeyOracleAddress, oracleRegistration.OracleAddress),
+	//	),
+	//)
+	return nil
+}
+
 func (k Keeper) SetOracleRegistration(ctx sdk.Context, regOracle *types.OracleRegistration) error {
 	store := ctx.KVStore(k.storeKey)
 

@@ -104,6 +104,5 @@ func (k Keeper) OracleUpgradeInfo(goCtx context.Context, request *types.QueryOra
 }
 
 func (k Keeper) OracleUpgrade(goCtx context.Context, request *types.QueryOracleUpgradeRequest) (*types.QueryOracleUpgradeResponse, error) {
-	// TODO: Implementation
 	return &types.QueryOracleUpgradeResponse{}, nil
 }
