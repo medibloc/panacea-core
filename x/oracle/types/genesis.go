@@ -28,7 +28,7 @@ func GetGenesisStateFromAppState(cdc codec.Codec, appState map[string]json.RawMe
 
 // Validate performs basic genesis state validation returning an error upon any
 // failure.
-func (m GenesisState) Validate() error {
+func (m *GenesisState) Validate() error {
 
 	for _, oracle := range m.Oracles {
 		if err := oracle.ValidateBasic(); err != nil {
