@@ -64,7 +64,7 @@ func (m msgServer) UpgradeOracle(goCtx context.Context, msg *types.MsgUpgradeOra
 	return &types.MsgUpgradeOracleResponse{}, nil
 }
 
-func (m msgServer) ApproveOracleUpgrade(goCtx context.Context, msg *types.MsgApproveOracleUpgrade) (*types.MsgApproveOracleUpgradeResponse, error) {
+func (m msgServer) ApproveOracleUpgrade(goCtx context.Context, msg *types.MsgApproveOracleRegistration) (*types.MsgApproveOracleRegistrationResponse, error) {
 	// TODO: Implementation
-	return &types.MsgApproveOracleUpgradeResponse{}, nil
+	return &types.MsgApproveOracleRegistrationResponse{}, nil
 }

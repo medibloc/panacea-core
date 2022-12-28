@@ -210,29 +210,3 @@ func (m *MsgUpgradeOracle) GetSigners() []sdk.AccAddress {
 	}
 	return []sdk.AccAddress{oracleAddress}
 }
-
-func (m *MsgApproveOracleUpgrade) Route() string {
-	return RouterKey
-}
-
-func (m *MsgApproveOracleUpgrade) Type() string {
-	return "ApproveOracleUpgrade"
-}
-
-func (m *MsgApproveOracleUpgrade) ValidateBasic() error {
-	// TODO: Implementation
-	return nil
-}
-
-func (m *MsgApproveOracleUpgrade) GetSignBytes() []byte {
-	bz := ModuleCdc.MustMarshalJSON(m)
-	return sdk.MustSortJSON(bz)
-}
-
-func (m *MsgApproveOracleUpgrade) GetSigners() []sdk.AccAddress {
-	oracleAddress, err := sdk.AccAddressFromBech32(m.ApproverOracleAddress)
-	if err != nil {
-		panic(err)
-	}
-	return []sdk.AccAddress{oracleAddress}
-}
