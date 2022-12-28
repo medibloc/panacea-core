@@ -264,7 +264,7 @@ func (suite *oracleTestSuite) TestApproveOracleRegistrationSuccess() {
 	encryptedOraclePrivKey, err := btcec.Encrypt(suite.nodePubKey, suite.oraclePrivKey.Serialize())
 	suite.Require().NoError(err)
 
-	approveOracleRegistration := &types.ApproveOracleRegistration{
+	approveOracleRegistration := &types.ApprovalSharingOracleKey{
 		UniqueId:               suite.uniqueID,
 		ApproverOracleAddress:  suite.oracleAccAddr.String(),
 		TargetOracleAddress:    suite.oracleAccAddr.String(),
@@ -326,7 +326,7 @@ func (suite *oracleTestSuite) TestApproveOracleRegistrationFailedInvalidUniqueID
 	encryptedOraclePrivKey, err := btcec.Encrypt(suite.nodePubKey, suite.oraclePrivKey.Serialize())
 	suite.Require().NoError(err)
 
-	approveOracleRegistration := &types.ApproveOracleRegistration{
+	approveOracleRegistration := &types.ApprovalSharingOracleKey{
 		UniqueId:               "uniqueID2",
 		ApproverOracleAddress:  suite.oracleAccAddr.String(),
 		TargetOracleAddress:    suite.oracleAccAddr.String(),
@@ -365,7 +365,7 @@ func (suite *oracleTestSuite) TestApproveOracleRegistrationFailedInvalidSignatur
 	encryptedOraclePrivKey, err := btcec.Encrypt(suite.nodePubKey, suite.oraclePrivKey.Serialize())
 	suite.Require().NoError(err)
 
-	approveOracleRegistration := &types.ApproveOracleRegistration{
+	approveOracleRegistration := &types.ApprovalSharingOracleKey{
 		UniqueId:               "uniqueID",
 		ApproverOracleAddress:  suite.oracleAccAddr.String(),
 		TargetOracleAddress:    suite.oracleAccAddr.String(),
@@ -412,7 +412,7 @@ func (suite *oracleTestSuite) TestApproveOracleRegistrationFailedAlreadyExistOra
 	encryptedOraclePrivKey, err := btcec.Encrypt(suite.nodePubKey, suite.oraclePrivKey.Serialize())
 	suite.Require().NoError(err)
 
-	approveOracleRegistration := &types.ApproveOracleRegistration{
+	approveOracleRegistration := &types.ApprovalSharingOracleKey{
 		UniqueId:               "uniqueID",
 		ApproverOracleAddress:  suite.oracleAccAddr.String(),
 		TargetOracleAddress:    suite.oracleAccAddr.String(),
