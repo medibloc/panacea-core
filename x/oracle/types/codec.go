@@ -13,6 +13,7 @@ func RegisterCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&MsgApproveOracleRegistration{}, "oracle/ApproveOracleRegistration", nil)
 	cdc.RegisterConcrete(&MsgUpdateOracleInfo{}, "oracle/UpdateOracleInfo", nil)
 	cdc.RegisterConcrete(&MsgUpgradeOracle{}, "oracle/UpgradeOracle", nil)
+	cdc.RegisterConcrete(&MsgApproveOracleUpgrade{}, "oracle/ApproveOracleUpgrade", nil)
 }
 
 func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
@@ -21,6 +22,7 @@ func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 		&MsgApproveOracleRegistration{},
 		&MsgUpdateOracleInfo{},
 		&MsgUpgradeOracle{},
+		&MsgApproveOracleUpgrade{},
 	)
 	registry.RegisterImplementations((*govtypes.Content)(nil),
 		&OracleUpgradeProposal{},
