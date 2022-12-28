@@ -27,9 +27,8 @@ var (
 	// OraclesKey defines key to store oracle
 	OraclesKey            = []byte{0x01}
 	OracleRegistrationKey = []byte{0x02}
-
-	OracleUpgradeKey      = []byte{0x03}
-	OracleUpgradeInfoKey  = []byte{0x04}
+	OracleUpgradeInfoKey      = []byte{0x03}
+	OracleUpgradeKey  = []byte{0x04}
 
 	IndexSeparator = []byte{0xFF}
 )

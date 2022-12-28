@@ -94,6 +94,11 @@ func (k Keeper) OracleRegistration(goCtx context.Context, request *types.QueryOr
 	return &types.QueryOracleRegistrationResponse{OracleRegistration: oracleRegistration}, nil
 }
 
+func (k Keeper) Params(goCtx context.Context, _ *types.QueryOracleParamsRequest) (*types.QueryParamsResponse, error) {
+	params := k.GetParams(sdk.UnwrapSDKContext(goCtx))
+	return &types.QueryParamsResponse{Params: &params}, nil
+}
+
 func (k Keeper) OracleUpgradeInfo(ctx context.Context, _ *types.QueryOracleUpgradeInfoRequest) (*types.QueryOracleUpgradeInfoResponse, error) {
 	upgradeInfo, err := k.GetOracleUpgradeInfo(sdk.UnwrapSDKContext(ctx))
 	if err != nil {
@@ -115,9 +120,4 @@ func (k Keeper) OracleUpgrade(goCtx context.Context, request *types.QueryOracleU
 	}
 
 	return &types.QueryOracleUpgradeResponse{OracleUpgrade: oracleUpgrade}, nil
-}
-
-func (k Keeper) Params(goCtx context.Context, _ *types.QueryOracleParamsRequest) (*types.QueryParamsResponse, error) {
-	params := k.GetParams(sdk.UnwrapSDKContext(goCtx))
-	return &types.QueryParamsResponse{Params: &params}, nil
 }
