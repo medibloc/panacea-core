@@ -25,7 +25,7 @@ service Msg {
   rpc UpgradeOracle(MsgUpgradeOracle) returns (MsgUpgradeOracleResponse);
 
   // ApproveOracleUpgrade defines a method for approval of oracle upgrade
-  rpc ApproveOracleUpgrade(MsgApproveOracleUpgrade) returns (MsgApproveOracleUpgradeResponse);
+  rpc ApproveOracleUpgrade(MsgApproveOracleRegistration) returns (MsgApproveOracleRegistrationResponse);
 }
 
 // MsgRegisterOracle defines the Msg/RegisterOracle request type.
@@ -87,14 +87,3 @@ message MsgUpgradeOracle {
 
 // MsgUpgradeOracleResponse defines the response of Msg/UpgradeOracle
 message MsgUpgradeOracleResponse {}
-
-// MsgApproveOracleUpgrade defines the Msg/ApproveOracleUpgrade
-message MsgApproveOracleUpgrade {
-  string unique_id = 1;
-  string approver_oracle_address = 2;
-  string target_oracle_address = 3;
-  bytes encrypted_oracle_priv_key = 4;
-}
-
-// MsgApproveOracleUpgradeResponse defines the response of Msg/ApproveOracleUpgrade
-message MsgApproveOracleUpgradeResponse {}
