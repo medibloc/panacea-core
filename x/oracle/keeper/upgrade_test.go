@@ -380,6 +380,7 @@ func (suite *oracleUpgradeTestSuite) TestApproveOracleUpgradeFailAlreadyApproved
 	msgApproveOracleUpgrade := types.NewMsgApproveOracleUpgrade(approveOracleUpgrade, signature.Serialize())
 
 	err = suite.OracleKeeper.ApproveOracleUpgrade(ctx, msgApproveOracleUpgrade)
+	suite.Require().NoError(err)
 
 	// do second approve
 	secondApprove := &types.ApprovalSharingOracleKey{
