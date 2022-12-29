@@ -177,31 +177,3 @@ func NewUpgradeOracle(msg *MsgUpgradeOracle) *OracleUpgrade {
 		TrustedBlockHash:       msg.TrustedBlockHash,
 	}
 }
-
-func (m *OracleUpgrade) ValidateBasic() error {
-	if len(m.UniqueId) == 0 {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "uniqueID is empty")
-	}
-	if _, err := sdk.AccAddressFromBech32(m.OracleAddress); err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "oracleAddress is invalid. address: %s, error: %s", m.OracleAddress, err.Error())
-	}
-
-	if m.NodePubKey == nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "node public key is empty")
-	} else if _, err := btcec.ParsePubKey(m.NodePubKey, btcec.S256()); err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid node public key")
-	}
-
-	if m.NodePubKeyRemoteReport == nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "remote report of node public key is empty")
-	}
-
-	if m.TrustedBlockHeight <= 0 {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "trusted block height must be greater than zero")
-	}
-
-	if m.TrustedBlockHash == nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "trusted block hash should not be nil")
-	}
-	return nil
-}

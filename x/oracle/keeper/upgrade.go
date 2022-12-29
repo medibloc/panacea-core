@@ -129,3 +129,25 @@ func (k Keeper) SetOracleUpgrade(ctx sdk.Context, upgrade *types.OracleUpgrade) 
 	store.Set(key, bz)
 	return nil
 }
+
+func (k Keeper) GetAllOracleUpgradeList(ctx sdk.Context) ([]types.OracleUpgrade, error) {
+	store := ctx.KVStore(k.storeKey)
+	iterator := sdk.KVStorePrefixIterator(store, types.OracleUpgradeKey)
+	defer iterator.Close()
+
+	oracleUpgrades := make([]types.OracleUpgrade, 0)
+
+	for ; iterator.Valid(); iterator.Next() {
+		bz := iterator.Value()
+		var oracleUpgrade types.OracleUpgrade
+
+		err := k.cdc.UnmarshalLengthPrefixed(bz, &oracleUpgrade)
+		if err != nil {
+			return nil, sdkerrors.Wrapf(types.ErrGetOracleUpgrade, err.Error())
+		}
+
+		oracleUpgrades = append(oracleUpgrades, oracleUpgrade)
+	}
+
+	return oracleUpgrades, nil
+}

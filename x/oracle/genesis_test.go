@@ -17,8 +17,9 @@ import (
 type genesisTestSuite struct {
 	testsuite.TestSuite
 
-	uniqueID string
-	endpoint string
+	uniqueID  string
+	uniqueID2 string
+	endpoint  string
 
 	oracleAccPrivKey cryptotypes.PrivKey
 	oracleAccPubKey  cryptotypes.PubKey
@@ -38,6 +39,7 @@ func TestGenesisTestSuite(t *testing.T) {
 
 func (suite *genesisTestSuite) BeforeTest(_, _ string) {
 	suite.uniqueID = "uniqueID"
+	suite.uniqueID2 = "uniqueID2"
 	suite.endpoint = "https://my-validator.org"
 
 	suite.oracleAccPrivKey = secp256k1.GenPrivKey()
@@ -86,6 +88,7 @@ func (suite *genesisTestSuite) TestInitGenesis() {
 				OracleCommissionRate:          sdk.NewDecWithPrec(1, 1),
 				OracleCommissionMaxRate:       sdk.NewDecWithPrec(2, 1),
 				OracleCommissionMaxChangeRate: sdk.NewDecWithPrec(1, 2),
+				EncryptedOraclePrivKey:        nil,
 			},
 			{
 				UniqueId:                      suite.uniqueID,
@@ -98,7 +101,32 @@ func (suite *genesisTestSuite) TestInitGenesis() {
 				OracleCommissionRate:          sdk.NewDecWithPrec(1, 1),
 				OracleCommissionMaxRate:       sdk.NewDecWithPrec(2, 1),
 				OracleCommissionMaxChangeRate: sdk.NewDecWithPrec(1, 2),
+				EncryptedOraclePrivKey:        nil,
 			},
+		},
+		OracleUpgrades: []types.OracleUpgrade{
+			{
+				UniqueId:               suite.uniqueID2,
+				OracleAddress:          suite.oracleAccAddr.String(),
+				NodePubKey:             suite.nodePubKey.SerializeCompressed(),
+				NodePubKeyRemoteReport: []byte("nodePubKeyRemoteReport"),
+				TrustedBlockHeight:     10,
+				TrustedBlockHash:       nil,
+				EncryptedOraclePrivKey: nil,
+			},
+			{
+				UniqueId:               suite.uniqueID2,
+				OracleAddress:          suite.oracle2AccAddr.String(),
+				NodePubKey:             suite.nodePubKey.SerializeCompressed(),
+				NodePubKeyRemoteReport: []byte("nodePubKeyRemoteReport"),
+				TrustedBlockHeight:     10,
+				TrustedBlockHash:       nil,
+				EncryptedOraclePrivKey: nil,
+			},
+		},
+		OracleUpgradeInfo: &types.OracleUpgradeInfo{
+			UniqueId: suite.uniqueID2,
+			Height:   100,
 		},
 		Params: types.DefaultParams(),
 	}
@@ -118,6 +146,18 @@ func (suite *genesisTestSuite) TestInitGenesis() {
 	getOracleRegistration, err = suite.OracleKeeper.GetOracleRegistration(suite.Ctx, suite.uniqueID, suite.oracle2AccAddr.String())
 	suite.Require().NoError(err)
 	suite.Require().Equal(genesis.OracleRegistrations[1], *getOracleRegistration)
+
+	getOracleUpgrade, err := suite.OracleKeeper.GetOracleUpgrade(suite.Ctx, suite.uniqueID2, suite.oracleAccAddr.String())
+	suite.Require().NoError(err)
+	suite.Require().Equal(genesis.OracleUpgrades[0], *getOracleUpgrade)
+	getOracleUpgrade, err = suite.OracleKeeper.GetOracleUpgrade(suite.Ctx, suite.uniqueID2, suite.oracle2AccAddr.String())
+	suite.Require().NoError(err)
+	suite.Require().Equal(genesis.OracleUpgrades[1], *getOracleUpgrade)
+
+	getOracleUpgradeInfo, err := suite.OracleKeeper.GetOracleUpgradeInfo(suite.Ctx)
+	suite.Require().NoError(err)
+	suite.Require().Equal(genesis.OracleUpgradeInfo, getOracleUpgradeInfo)
+
 }
 
 func (suite *genesisTestSuite) TestExportGenesis() {
@@ -144,8 +184,31 @@ func (suite *genesisTestSuite) TestExportGenesis() {
 		OracleCommissionRate:          sdk.NewDecWithPrec(1, 1),
 		OracleCommissionMaxRate:       sdk.NewDecWithPrec(2, 1),
 		OracleCommissionMaxChangeRate: sdk.NewDecWithPrec(1, 2),
+		EncryptedOraclePrivKey:        nil,
 	}
+
 	err = suite.OracleKeeper.SetOracleRegistration(suite.Ctx, oraRegistration)
+	suite.Require().NoError(err)
+
+	oracleUpgrade := &types.OracleUpgrade{
+		UniqueId:               suite.uniqueID2,
+		OracleAddress:          suite.oracleAccAddr.String(),
+		NodePubKey:             suite.nodePubKey.SerializeCompressed(),
+		NodePubKeyRemoteReport: []byte("nodePubKeyRemoteReport"),
+		TrustedBlockHeight:     10,
+		TrustedBlockHash:       nil,
+		EncryptedOraclePrivKey: nil,
+	}
+
+	err = suite.OracleKeeper.SetOracleUpgrade(suite.Ctx, oracleUpgrade)
+	suite.Require().NoError(err)
+
+	oracleUpgradeInfo := &types.OracleUpgradeInfo{
+		UniqueId: suite.uniqueID2,
+		Height:   100,
+	}
+
+	err = suite.OracleKeeper.SetOracleUpgradeInfo(suite.Ctx, oracleUpgradeInfo)
 	suite.Require().NoError(err)
 
 	params := types.DefaultParams()
@@ -154,5 +217,7 @@ func (suite *genesisTestSuite) TestExportGenesis() {
 	genesisStatus := oracle.ExportGenesis(suite.Ctx, suite.OracleKeeper)
 	suite.Require().Equal(*ora, genesisStatus.Oracles[0])
 	suite.Require().Equal(*oraRegistration, genesisStatus.OracleRegistrations[0])
+	suite.Require().Equal(*oracleUpgrade, genesisStatus.OracleUpgrades[0])
+	suite.Require().Equal(oracleUpgradeInfo, genesisStatus.OracleUpgradeInfo)
 	suite.Require().Equal(params, genesisStatus.Params)
 }
