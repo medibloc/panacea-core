@@ -101,7 +101,8 @@ func (k Keeper) validateApprovalSharingOracleKey(ctx sdk.Context, approval *type
 	}
 
 	// check if the approver oracle exists
-	if _, err := k.HasOracle(ctx, approval.ApproverOracleAddress); err != nil {
+	existing, err := k.HasOracle(ctx, approval.ApproverOracleAddress)
+	if err != nil || !existing {
 		return fmt.Errorf("failed to check if the approver oracle exists or not. address(%s)", approval.ApproverOracleAddress)
 	}
 
