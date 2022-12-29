@@ -239,7 +239,7 @@ func (suite *oracleTestSuite) TestRegisterOracleNotSameUniqueID() {
 
 	err := suite.OracleKeeper.RegisterOracle(ctx, msgRegisterOracle)
 	suite.Require().Error(err, types.ErrRegisterOracle)
-	suite.Require().ErrorContains(err, "is not match the currently active uniqueID")
+	suite.Require().ErrorContains(err, types.ErrInvalidUniqueID.Error())
 }
 
 func (suite *oracleTestSuite) TestApproveOracleRegistrationSuccess() {

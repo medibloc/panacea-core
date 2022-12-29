@@ -251,6 +251,13 @@ func (m *MsgUpgradeOracle) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{oracleAddress}
 }
 
+func NewMsgApproveOracleUpgrade(approve *ApprovalSharingOracleKey, signature []byte) *MsgApproveOracleUpgrade {
+	return &MsgApproveOracleUpgrade{
+		ApprovalSharingOracleKey: approve,
+		Signature:                signature,
+	}
+}
+
 func (m *MsgApproveOracleUpgrade) Route() string {
 	return RouterKey
 }
@@ -260,7 +267,14 @@ func (m *MsgApproveOracleUpgrade) Type() string {
 }
 
 func (m *MsgApproveOracleUpgrade) ValidateBasic() error {
-	// TODO: Implementation
+	if err := m.GetApprovalSharingOracleKey().ValidateBasic(); err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, err.Error())
+	}
+
+	if m.Signature == nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "signature is empty")
+	}
+
 	return nil
 }
 

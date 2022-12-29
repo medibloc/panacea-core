@@ -18,7 +18,7 @@ func (k Keeper) RegisterOracle(ctx sdk.Context, msg *types.MsgRegisterOracle) er
 
 	params := k.GetParams(ctx)
 	if params.UniqueId != msg.UniqueId {
-		return sdkerrors.Wrapf(types.ErrRegisterOracle, "is not match the currently active uniqueID")
+		return sdkerrors.Wrapf(types.ErrRegisterOracle, types.ErrInvalidUniqueID.Error())
 	}
 
 	if _, err := k.GetOracleRegistration(ctx, msg.GetUniqueId(), msg.GetOracleAddress()); !errors.Is(err, types.ErrOracleRegistrationNotFound) {
@@ -98,6 +98,11 @@ func (k Keeper) validateApprovalSharingOracleKey(ctx sdk.Context, approval *type
 	// check unique id
 	if approval.UniqueId != params.UniqueId {
 		return types.ErrInvalidUniqueID
+	}
+
+	// check if the approver oracle exists
+	if _, err := k.HasOracle(ctx, approval.ApproverOracleAddress); err != nil {
+		return fmt.Errorf("failed to check if the approver oracle exists or not. address(%s)", approval.ApproverOracleAddress)
 	}
 
 	// verify signature
