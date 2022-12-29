@@ -245,6 +245,10 @@ func (suite *oracleTestSuite) TestRegisterOracleNotSameUniqueID() {
 func (suite *oracleTestSuite) TestApproveOracleRegistrationSuccess() {
 	ctx := suite.Ctx
 
+	oracle := types.NewOracle(suite.oracleAccAddr.String(), suite.uniqueID, suite.endpoint, suite.oracleCommissionRate, suite.oracleCommissionMaxRate, suite.oracleCommissionMaxChangeRate, ctx.BlockTime())
+	err := suite.OracleKeeper.SetOracle(ctx, oracle)
+	suite.Require().NoError(err)
+
 	msgRegisterOracle := &types.MsgRegisterOracle{
 		UniqueId:                      suite.uniqueID,
 		OracleAddress:                 suite.oracleAccAddr.String(),
@@ -258,7 +262,7 @@ func (suite *oracleTestSuite) TestApproveOracleRegistrationSuccess() {
 		OracleCommissionMaxChangeRate: suite.oracleCommissionMaxChangeRate,
 	}
 
-	err := suite.OracleKeeper.RegisterOracle(ctx, msgRegisterOracle)
+	err = suite.OracleKeeper.RegisterOracle(ctx, msgRegisterOracle)
 	suite.Require().NoError(err)
 
 	encryptedOraclePrivKey, err := btcec.Encrypt(suite.nodePubKey, suite.oraclePrivKey.Serialize())
@@ -387,6 +391,10 @@ func (suite *oracleTestSuite) TestApproveOracleRegistrationFailedInvalidSignatur
 func (suite *oracleTestSuite) TestApproveOracleRegistrationFailedAlreadyApprovedOracleRegistration() {
 	ctx := suite.Ctx
 
+	oracle := types.NewOracle(suite.oracleAccAddr.String(), suite.uniqueID, suite.endpoint, suite.oracleCommissionRate, suite.oracleCommissionMaxRate, suite.oracleCommissionMaxChangeRate, ctx.BlockTime())
+	err := suite.OracleKeeper.SetOracle(ctx, oracle)
+	suite.Require().NoError(err)
+
 	msgRegisterOracle := &types.MsgRegisterOracle{
 		UniqueId:                      suite.uniqueID,
 		OracleAddress:                 suite.oracleAccAddr.String(),
@@ -403,7 +411,7 @@ func (suite *oracleTestSuite) TestApproveOracleRegistrationFailedAlreadyApproved
 	oracleRegistration := types.NewOracleRegistration(msgRegisterOracle)
 	oracleRegistration.EncryptedOraclePrivKey = []byte("already registered")
 
-	err := suite.OracleKeeper.SetOracleRegistration(ctx, oracleRegistration)
+	err = suite.OracleKeeper.SetOracleRegistration(ctx, oracleRegistration)
 	suite.Require().NoError(err)
 
 	encryptedOraclePrivKey, err := btcec.Encrypt(suite.nodePubKey, suite.oraclePrivKey.Serialize())
