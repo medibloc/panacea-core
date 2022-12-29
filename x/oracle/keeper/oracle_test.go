@@ -196,12 +196,8 @@ func (suite *oracleTestSuite) TestRegisterOracleFailedValidateToMsgOracleRegistr
 	suite.Require().Equal(0, len(events))
 }
 
-func (suite *oracleTestSuite) TestRegisterOracleAlreadyExistOracle() {
+func (suite *oracleTestSuite) TestRegisterOracleAlreadyExistOracleRegistration() {
 	ctx := suite.Ctx
-
-	oracle := types.NewOracle(suite.oracleAccAddr.String(), suite.uniqueID, suite.endpoint, suite.oracleCommissionRate, suite.oracleCommissionMaxRate, suite.oracleCommissionMaxChangeRate, ctx.BlockTime())
-	err := suite.OracleKeeper.SetOracle(ctx, oracle)
-	suite.Require().NoError(err)
 
 	msgRegisterOracle := &types.MsgRegisterOracle{
 		UniqueId:                      suite.uniqueID,
@@ -216,8 +212,12 @@ func (suite *oracleTestSuite) TestRegisterOracleAlreadyExistOracle() {
 		OracleCommissionMaxChangeRate: suite.oracleCommissionMaxChangeRate,
 	}
 
+	// first registration
+	err := suite.OracleKeeper.RegisterOracle(ctx, msgRegisterOracle)
+	suite.Require().NoError(err)
+
 	err = suite.OracleKeeper.RegisterOracle(ctx, msgRegisterOracle)
-	suite.Require().Error(err, types.ErrOracleRegistration)
+	suite.Require().Error(err, types.ErrRegisterOracle)
 	suite.Require().ErrorContains(err, fmt.Sprintf("already registered oracle. address(%s)", msgRegisterOracle.OracleAddress))
 }
 
@@ -238,7 +238,7 @@ func (suite *oracleTestSuite) TestRegisterOracleNotSameUniqueID() {
 	}
 
 	err := suite.OracleKeeper.RegisterOracle(ctx, msgRegisterOracle)
-	suite.Require().Error(err, types.ErrOracleRegistration)
+	suite.Require().Error(err, types.ErrRegisterOracle)
 	suite.Require().ErrorContains(err, "is not match the currently active uniqueID")
 }
 
@@ -384,12 +384,8 @@ func (suite *oracleTestSuite) TestApproveOracleRegistrationFailedInvalidSignatur
 	suite.Require().Error(err, "failed to signature validation")
 }
 
-func (suite *oracleTestSuite) TestApproveOracleRegistrationFailedAlreadyExistOracle() {
+func (suite *oracleTestSuite) TestApproveOracleRegistrationFailedAlreadyApprovedOracleRegistration() {
 	ctx := suite.Ctx
-
-	oracle := types.NewOracle(suite.oracleAccAddr.String(), suite.uniqueID, suite.endpoint, suite.oracleCommissionRate, suite.oracleCommissionMaxRate, suite.oracleCommissionMaxChangeRate, ctx.BlockTime())
-	err := suite.OracleKeeper.SetOracle(ctx, oracle)
-	suite.Require().NoError(err)
 
 	msgRegisterOracle := &types.MsgRegisterOracle{
 		UniqueId:                      suite.uniqueID,
@@ -405,8 +401,9 @@ func (suite *oracleTestSuite) TestApproveOracleRegistrationFailedAlreadyExistOra
 	}
 
 	oracleRegistration := types.NewOracleRegistration(msgRegisterOracle)
+	oracleRegistration.EncryptedOraclePrivKey = []byte("already registered")
 
-	err = suite.OracleKeeper.SetOracleRegistration(ctx, oracleRegistration)
+	err := suite.OracleKeeper.SetOracleRegistration(ctx, oracleRegistration)
 	suite.Require().NoError(err)
 
 	encryptedOraclePrivKey, err := btcec.Encrypt(suite.nodePubKey, suite.oraclePrivKey.Serialize())
@@ -426,8 +423,8 @@ func (suite *oracleTestSuite) TestApproveOracleRegistrationFailedAlreadyExistOra
 	msgApproveOracleRegistration := types.NewMsgApproveOracleRegistration(approveOracleRegistration, signature.Serialize())
 
 	err = suite.OracleKeeper.ApproveOracleRegistration(ctx, msgApproveOracleRegistration)
-	suite.Require().Error(err, types.ErrOracleRegistration)
-	suite.Require().ErrorContains(err, fmt.Sprintf("already registered oracle. address(%s)", msgRegisterOracle.OracleAddress))
+	suite.Require().Error(err, types.ErrRegisterOracle)
+	suite.Require().ErrorContains(err, "already approved oracle registration")
 }
 
 func (suite *oracleTestSuite) TestUpdateOracleInfoSuccess() {
