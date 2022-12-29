@@ -21,7 +21,11 @@ func (k Keeper) RegisterOracle(ctx sdk.Context, msg *types.MsgRegisterOracle) er
 		return sdkerrors.Wrapf(types.ErrRegisterOracle, types.ErrInvalidUniqueID.Error())
 	}
 
-	if _, err := k.GetOracleRegistration(ctx, msg.GetUniqueId(), msg.GetOracleAddress()); !errors.Is(err, types.ErrOracleRegistrationNotFound) {
+	oracleRegistration, err := k.GetOracleRegistration(ctx, msg.GetUniqueId(), msg.GetOracleAddress())
+	if err != nil && !errors.Is(err, types.ErrOracleRegistrationNotFound) {
+		return sdkerrors.Wrapf(types.ErrRegisterOracle, err.Error())
+	}
+	if oracleRegistration != nil {
 		return sdkerrors.Wrapf(types.ErrRegisterOracle, fmt.Sprintf("already registered oracle. address(%s)", msg.OracleAddress))
 	}
 
