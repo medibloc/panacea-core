@@ -58,3 +58,74 @@ func (k Keeper) ApplyUpgrade(ctx sdk.Context, info *types.OracleUpgradeInfo) err
 	ctx.Logger().Info("Oracle upgrade was successful.", fmt.Sprintf("uniqueID: %s, height: %v", info.UniqueId, info.Height))
 	return nil
 }
+
+func (k Keeper) UpgradeOracle(ctx sdk.Context, msg *types.MsgUpgradeOracle) error {
+	oracleUpgrade := types.NewUpgradeOracle(msg)
+
+	if err := oracleUpgrade.ValidateBasic(); err != nil {
+		return err
+	}
+
+	upgradeInfo, err := k.GetOracleUpgradeInfo(ctx)
+	if err != nil {
+		return sdkerrors.Wrapf(types.ErrUpgradeOracle, "failed to get oracle upgrade info")
+	}
+	if oracleUpgrade.UniqueId != upgradeInfo.UniqueId {
+		return sdkerrors.Wrapf(types.ErrUpgradeOracle, "does not match the upgrade uniqueID")
+	}
+
+	if _, err := k.GetOracle(ctx, oracleUpgrade.OracleAddress); err != nil {
+		return sdkerrors.Wrapf(types.ErrUpgradeOracle, "is not registered oracle")
+	}
+
+	if err := k.SetOracleUpgrade(ctx, oracleUpgrade); err != nil {
+		return sdkerrors.Wrapf(types.ErrUpgradeOracle, "failed to set oracle upgrade info")
+	}
+
+	ctx.EventManager().EmitEvent(
+		sdk.NewEvent(
+			types.EventTypeUpgrade,
+			sdk.NewAttribute(types.AttributeKeyUniqueID, oracleUpgrade.UniqueId),
+			sdk.NewAttribute(types.AttributeKeyOracleAddress, oracleUpgrade.OracleAddress),
+		),
+	)
+	return nil
+}
+
+func (k Keeper) GetOracleUpgrade(ctx sdk.Context, uniqueID, address string) (*types.OracleUpgrade, error) {
+	store := ctx.KVStore(k.storeKey)
+	accAddr, err := sdk.AccAddressFromBech32(address)
+	if err != nil {
+		return nil, err
+	}
+	key := types.GetOracleUpgradeKey(uniqueID, accAddr)
+	bz := store.Get(key)
+	if bz == nil {
+		return nil, sdkerrors.Wrapf(types.ErrGetOracleUpgrade, "oracle registration not found")
+	}
+
+	oracleUpgrade := &types.OracleUpgrade{}
+
+	if err := k.cdc.UnmarshalLengthPrefixed(bz, oracleUpgrade); err != nil {
+		return nil, err
+	}
+
+	return oracleUpgrade, nil
+}
+
+func (k Keeper) SetOracleUpgrade(ctx sdk.Context, upgrade *types.OracleUpgrade) error {
+	store := ctx.KVStore(k.storeKey)
+
+	accAddr, err := sdk.AccAddressFromBech32(upgrade.OracleAddress)
+	if err != nil {
+		return err
+	}
+	key := types.GetOracleUpgradeKey(upgrade.UniqueId, accAddr)
+	bz, err := k.cdc.MarshalLengthPrefixed(upgrade)
+	if err != nil {
+		return err
+	}
+
+	store.Set(key, bz)
+	return nil
+}
