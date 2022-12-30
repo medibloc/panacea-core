@@ -12,10 +12,6 @@ import (
 func (k Keeper) RegisterOracle(ctx sdk.Context, msg *types.MsgRegisterOracle) error {
 	oracleRegistration := types.NewOracleRegistration(msg)
 
-	if err := oracleRegistration.ValidateBasic(); err != nil {
-		return sdkerrors.Wrapf(types.ErrRegisterOracle, err.Error())
-	}
-
 	params := k.GetParams(ctx)
 	if params.UniqueId != msg.UniqueId {
 		return sdkerrors.Wrapf(types.ErrRegisterOracle, types.ErrInvalidUniqueID.Error())
