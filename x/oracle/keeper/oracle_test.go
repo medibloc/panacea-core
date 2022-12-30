@@ -10,7 +10,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/medibloc/panacea-core/v2/types/testsuite"
 	"github.com/medibloc/panacea-core/v2/x/oracle/types"
 	"github.com/stretchr/testify/suite"
@@ -131,69 +130,6 @@ func (suite *oracleTestSuite) TestRegisterOracleSuccess() {
 	suite.Require().Equal(suite.oracleCommissionRate, oracleFromKeeper.OracleCommissionRate)
 	suite.Require().Equal(suite.oracleCommissionMaxRate, oracleFromKeeper.OracleCommissionMaxRate)
 	suite.Require().Equal(suite.oracleCommissionMaxChangeRate, oracleFromKeeper.OracleCommissionMaxChangeRate)
-}
-
-func (suite *oracleTestSuite) TestRegisterOracleFailedValidateToMsgOracleRegistration() {
-	ctx := suite.Ctx
-
-	msgRegisterOracle := &types.MsgRegisterOracle{
-		OracleAddress:                 suite.oracleAccAddr.String(),
-		NodePubKey:                    suite.nodePubKey.SerializeCompressed(),
-		NodePubKeyRemoteReport:        suite.nodePubKeyRemoteReport,
-		TrustedBlockHeight:            suite.trustedBlockHeight,
-		TrustedBlockHash:              suite.trustedBlockHash,
-		Endpoint:                      suite.endpoint,
-		OracleCommissionRate:          suite.oracleCommissionRate,
-		OracleCommissionMaxRate:       suite.oracleCommissionMaxRate,
-		OracleCommissionMaxChangeRate: suite.oracleCommissionMaxChangeRate,
-	}
-
-	err := suite.OracleKeeper.RegisterOracle(ctx, msgRegisterOracle)
-	suite.Require().Error(err, sdkerrors.ErrInvalidRequest)
-	suite.Require().ErrorContains(err, "uniqueID is empty")
-
-	msgRegisterOracle.UniqueId = suite.uniqueID
-	msgRegisterOracle.NodePubKey = nil
-	err = suite.OracleKeeper.RegisterOracle(ctx, msgRegisterOracle)
-	suite.Require().Error(err, sdkerrors.ErrInvalidRequest)
-	suite.Require().ErrorContains(err, "node public key is empty")
-
-	msgRegisterOracle.NodePubKey = []byte("invalidNodePubKey")
-	err = suite.OracleKeeper.RegisterOracle(ctx, msgRegisterOracle)
-	suite.Require().Error(err, sdkerrors.ErrInvalidRequest)
-	suite.Require().ErrorContains(err, "invalid node public key")
-
-	msgRegisterOracle.NodePubKey = suite.nodePubKey.SerializeCompressed()
-	msgRegisterOracle.NodePubKeyRemoteReport = nil
-	err = suite.OracleKeeper.RegisterOracle(ctx, msgRegisterOracle)
-	suite.Require().Error(err, sdkerrors.ErrInvalidRequest)
-	suite.Require().ErrorContains(err, "remote report of node public key is empty")
-
-	msgRegisterOracle.NodePubKeyRemoteReport = suite.nodePubKeyRemoteReport
-	msgRegisterOracle.TrustedBlockHeight = 0
-	err = suite.OracleKeeper.RegisterOracle(ctx, msgRegisterOracle)
-	suite.Require().Error(err, sdkerrors.ErrInvalidRequest)
-	suite.Require().ErrorContains(err, "trusted block height must be greater than zero")
-
-	msgRegisterOracle.TrustedBlockHeight = suite.trustedBlockHeight
-	msgRegisterOracle.TrustedBlockHash = nil
-	err = suite.OracleKeeper.RegisterOracle(ctx, msgRegisterOracle)
-	suite.Require().Error(err, sdkerrors.ErrInvalidRequest)
-	suite.Require().ErrorContains(err, "trusted block hash should not be nil")
-
-	msgRegisterOracle.TrustedBlockHash = suite.trustedBlockHash
-	msgRegisterOracle.OracleCommissionRate = sdk.NewInt(-1).ToDec()
-	err = suite.OracleKeeper.RegisterOracle(ctx, msgRegisterOracle)
-	suite.Require().Error(err, sdkerrors.ErrInvalidRequest)
-	suite.Require().ErrorContains(err, "oracleCommissionRate must be between 0 and OracleCommissionMaxRate")
-
-	msgRegisterOracle.OracleCommissionRate = sdk.NewInt(2).ToDec()
-	err = suite.OracleKeeper.RegisterOracle(ctx, msgRegisterOracle)
-	suite.Require().Error(err, sdkerrors.ErrInvalidRequest)
-	suite.Require().ErrorContains(err, "oracleCommissionRate must be between 0 and OracleCommissionMaxRate")
-
-	events := suite.Ctx.EventManager().Events()
-	suite.Require().Equal(0, len(events))
 }
 
 func (suite *oracleTestSuite) TestRegisterOracleAlreadyExistOracleRegistration() {
