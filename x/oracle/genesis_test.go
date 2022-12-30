@@ -166,6 +166,5 @@ func (suite *genesisTestSuite) TestExportGenesis() {
 	suite.Require().Equal(*ora, genesisStatus.Oracles[0])
 	suite.Require().Equal(*oraRegistration, genesisStatus.OracleRegistrations[0])
 	suite.Require().Equal(params, genesisStatus.Params)
-	suite.Require().Equal(suite.oracleAccAddr.String(), genesisStatus.OracleUpgradeQueueElements[0])
-	suite.Require().Equal(suite.oracle2AccAddr.String(), genesisStatus.OracleUpgradeQueueElements[1])
+	suite.Require().Equal(2, len(genesisStatus.OracleUpgradeQueueElements))
 }
