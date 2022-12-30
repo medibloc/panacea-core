@@ -101,6 +101,10 @@ func (suite *genesisTestSuite) TestInitGenesis() {
 			},
 		},
 		Params: types.DefaultParams(),
+		OracleUpgradeQueueElements: []string{
+			suite.oracleAccAddr.String(),
+			suite.oracle2AccAddr.String(),
+		},
 	}
 
 	oracle.InitGenesis(suite.Ctx, suite.OracleKeeper, genesis)
@@ -118,6 +122,12 @@ func (suite *genesisTestSuite) TestInitGenesis() {
 	getOracleRegistration, err = suite.OracleKeeper.GetOracleRegistration(suite.Ctx, suite.uniqueID, suite.oracle2AccAddr.String())
 	suite.Require().NoError(err)
 	suite.Require().Equal(genesis.OracleRegistrations[1], *getOracleRegistration)
+
+	getOracleUpgradeQueue, err := suite.OracleKeeper.GetAllOracleUpgradeQueueElements(suite.Ctx)
+	suite.Require().NoError(err)
+	suite.Require().Equal(2, len(getOracleUpgradeQueue))
+	suite.Require().Equal(suite.oracleAccAddr.String(), getOracleUpgradeQueue[0])
+	suite.Require().Equal(suite.oracle2AccAddr.String(), getOracleUpgradeQueue[1])
 }
 
 func (suite *genesisTestSuite) TestExportGenesis() {
@@ -151,8 +161,13 @@ func (suite *genesisTestSuite) TestExportGenesis() {
 	params := types.DefaultParams()
 	suite.OracleKeeper.SetParams(suite.Ctx, params)
 
+	suite.OracleKeeper.AddOracleUpgradeQueue(suite.Ctx, suite.oracleAccAddr)
+	suite.OracleKeeper.AddOracleUpgradeQueue(suite.Ctx, suite.oracle2AccAddr)
+
 	genesisStatus := oracle.ExportGenesis(suite.Ctx, suite.OracleKeeper)
 	suite.Require().Equal(*ora, genesisStatus.Oracles[0])
 	suite.Require().Equal(*oraRegistration, genesisStatus.OracleRegistrations[0])
 	suite.Require().Equal(params, genesisStatus.Params)
+	suite.Require().Equal(suite.oracleAccAddr.String(), genesisStatus.OracleUpgradeQueueElements[0])
+	suite.Require().Equal(suite.oracle2AccAddr.String(), genesisStatus.OracleUpgradeQueueElements[1])
 }

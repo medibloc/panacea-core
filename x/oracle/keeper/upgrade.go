@@ -207,3 +207,18 @@ func (k Keeper) RemoveOracleUpgradeQueue(ctx sdk.Context, addr sdk.AccAddress) {
 	store := ctx.KVStore(k.storeKey)
 	store.Delete(types.GetOracleUpgradeQueueKey(addr))
 }
+
+func (k Keeper) GetAllOracleUpgradeQueueElements(ctx sdk.Context) ([]string, error) {
+	store := ctx.KVStore(k.storeKey)
+	iterator := sdk.KVStorePrefixIterator(store, types.OracleUpgradeQueueKey)
+	defer iterator.Close()
+
+	queues := make([]string, 0)
+
+	for ; iterator.Valid(); iterator.Next() {
+		accAddr := sdk.AccAddress(iterator.Value())
+		queues = append(queues, accAddr.String())
+	}
+
+	return queues, nil
+}

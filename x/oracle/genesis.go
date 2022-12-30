@@ -22,6 +22,16 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 	}
 
 	k.SetParams(ctx, genState.Params)
+
+	if genState.OracleUpgradeQueueElements != nil {
+		for _, address := range genState.OracleUpgradeQueueElements {
+			accAddr, err := sdk.AccAddressFromBech32(address)
+			if err != nil {
+				panic(err)
+			}
+			k.AddOracleUpgradeQueue(ctx, accAddr)
+		}
+	}
 }
 
 // ExportGenesis returns the capability module's exported genesis.
@@ -41,6 +51,12 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	genesis.OracleRegistrations = oracleRegistrations
 
 	genesis.Params = k.GetParams(ctx)
+
+	queueElements, err := k.GetAllOracleUpgradeQueueElements(ctx)
+	if err != nil {
+		panic(err)
+	}
+	genesis.OracleUpgradeQueueElements = queueElements
 
 	return genesis
 }

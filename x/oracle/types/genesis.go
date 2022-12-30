@@ -10,9 +10,10 @@ import (
 // DefaultGenesis returns the default Capability genesis state
 func DefaultGenesis() *GenesisState {
 	return &GenesisState{
-		Oracles:             []Oracle{},
-		OracleRegistrations: []OracleRegistration{},
-		Params:              DefaultParams(),
+		Oracles:                    []Oracle{},
+		OracleRegistrations:        []OracleRegistration{},
+		Params:                     DefaultParams(),
+		OracleUpgradeQueueElements: nil,
 	}
 }
 
@@ -43,6 +44,14 @@ func (m *GenesisState) Validate() error {
 
 	if err := m.Params.Validate(); err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, err.Error())
+	}
+
+	if m.OracleUpgradeQueueElements != nil {
+		for _, address := range m.OracleUpgradeQueueElements {
+			if len(address) == 0 {
+				return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "address is empty")
+			}
+		}
 	}
 
 	return nil
