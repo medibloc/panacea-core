@@ -62,10 +62,6 @@ func (k Keeper) ApplyUpgrade(ctx sdk.Context, info *types.OracleUpgradeInfo) err
 func (k Keeper) UpgradeOracle(ctx sdk.Context, msg *types.MsgUpgradeOracle) error {
 	oracleUpgrade := types.NewUpgradeOracle(msg)
 
-	if err := oracleUpgrade.ValidateBasic(); err != nil {
-		return err
-	}
-
 	upgradeInfo, err := k.GetOracleUpgradeInfo(ctx)
 	if err != nil {
 		return sdkerrors.Wrapf(types.ErrUpgradeOracle, "failed to get oracle upgrade info")
@@ -96,12 +92,12 @@ func (k Keeper) GetOracleUpgrade(ctx sdk.Context, uniqueID, address string) (*ty
 	store := ctx.KVStore(k.storeKey)
 	accAddr, err := sdk.AccAddressFromBech32(address)
 	if err != nil {
-		return nil, err
+		return nil, sdkerrors.Wrapf(types.ErrGetOracleUpgrade, err.Error())
 	}
 	key := types.GetOracleUpgradeKey(uniqueID, accAddr)
 	bz := store.Get(key)
 	if bz == nil {
-		return nil, sdkerrors.Wrapf(types.ErrGetOracleUpgrade, "oracle registration not found")
+		return nil, types.ErrOracleUpgradeNotFound
 	}
 
 	oracleUpgrade := &types.OracleUpgrade{}
