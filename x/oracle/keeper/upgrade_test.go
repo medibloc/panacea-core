@@ -21,6 +21,10 @@ type oracleUpgradeTestSuite struct {
 	oracleAccPubKey  cryptotypes.PubKey
 	oracleAccAddr    sdk.AccAddress
 
+	oracle2AccPrivKey cryptotypes.PrivKey
+	oracle2AccPubKey  cryptotypes.PubKey
+	oracle2AccAddr    sdk.AccAddress
+
 	approverAccPrivKey cryptotypes.PrivKey
 	approverAccPubKey  cryptotypes.PubKey
 	approverAccAddr    sdk.AccAddress
@@ -45,6 +49,10 @@ func (suite *oracleUpgradeTestSuite) BeforeTest(_, _ string) {
 	suite.oracleAccPrivKey = secp256k1.GenPrivKey()
 	suite.oracleAccPubKey = suite.oracleAccPrivKey.PubKey()
 	suite.oracleAccAddr = sdk.AccAddress(suite.oracleAccPubKey.Address())
+
+	suite.oracle2AccPrivKey = secp256k1.GenPrivKey()
+	suite.oracle2AccPubKey = suite.oracle2AccPrivKey.PubKey()
+	suite.oracle2AccAddr = sdk.AccAddress(suite.oracle2AccPubKey.Address())
 
 	suite.approverAccPrivKey = secp256k1.GenPrivKey()
 	suite.approverAccPubKey = suite.approverAccPrivKey.PubKey()
@@ -100,8 +108,42 @@ func (suite *oracleUpgradeTestSuite) TestApplyUpgradeSuccess() {
 		Height:   1,
 	}
 
+	oracle1 := &types.Oracle{
+		OracleAddress:                 suite.oracleAccAddr.String(),
+		UniqueId:                      suite.currentUniqueID,
+		Endpoint:                      "test.com",
+		UpdateTime:                    ctx.BlockTime(),
+		OracleCommissionRate:          sdk.NewDecWithPrec(1, 1),
+		OracleCommissionMaxRate:       sdk.NewDecWithPrec(2, 1),
+		OracleCommissionMaxChangeRate: sdk.NewDecWithPrec(1, 2),
+	}
+
+	oracle2 := &types.Oracle{
+		OracleAddress:                 suite.oracle2AccAddr.String(),
+		UniqueId:                      suite.currentUniqueID,
+		Endpoint:                      "test.com",
+		UpdateTime:                    ctx.BlockTime(),
+		OracleCommissionRate:          sdk.NewDecWithPrec(1, 1),
+		OracleCommissionMaxRate:       sdk.NewDecWithPrec(2, 1),
+		OracleCommissionMaxChangeRate: sdk.NewDecWithPrec(1, 2),
+	}
+
+	suite.Require().NoError(suite.OracleKeeper.SetOracle(ctx, oracle1))
+	suite.Require().NoError(suite.OracleKeeper.SetOracle(ctx, oracle2))
+
+	suite.OracleKeeper.AddOracleUpgradeQueue(suite.Ctx, suite.upgradeUniqueID, suite.oracleAccAddr)
+	suite.OracleKeeper.AddOracleUpgradeQueue(suite.Ctx, suite.upgradeUniqueID, suite.oracle2AccAddr)
+
 	suite.Require().NoError(suite.OracleKeeper.ApplyUpgrade(ctx, upgradeInfo))
 	suite.Require().Equal(upgradeInfo.UniqueId, suite.OracleKeeper.GetParams(ctx).UniqueId)
+
+	getOracle1, err := suite.OracleKeeper.GetOracle(ctx, suite.oracleAccAddr.String())
+	suite.Require().NoError(err)
+	suite.Require().Equal(suite.upgradeUniqueID, getOracle1.UniqueId)
+
+	getOracle2, err := suite.OracleKeeper.GetOracle(ctx, suite.oracle2AccAddr.String())
+	suite.Require().NoError(err)
+	suite.Require().Equal(suite.upgradeUniqueID, getOracle2.UniqueId)
 }
 
 func (suite *oracleUpgradeTestSuite) TestUpgradeOracleSuccess() {
@@ -309,6 +351,17 @@ func (suite *oracleUpgradeTestSuite) TestApproveOracleUpgradeSuccess() {
 	for _, v := range requiredEvents {
 		suite.Require().True(v)
 	}
+
+	// check OracleUpgradeQueue
+	iterator := suite.OracleKeeper.GetOracleUpgradeQueueIterator(ctx, suite.upgradeUniqueID)
+	iteratorSize := 0
+	for ; iterator.Valid(); iterator.Next() {
+		uniqueID, accAddr := types.SplitOracleUpgradeQueueKey(iterator.Key())
+		suite.Require().Equal(uniqueID, suite.upgradeUniqueID)
+		suite.Require().Equal(accAddr, suite.oracleAccAddr)
+		iteratorSize++
+	}
+	suite.Require().Equal(1, iteratorSize)
 }
 
 func (suite *oracleUpgradeTestSuite) TestApproveOracleUpgradeFailAlreadyApproved() {
