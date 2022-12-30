@@ -101,9 +101,12 @@ func (k Keeper) validateApprovalSharingOracleKey(ctx sdk.Context, approval *type
 	}
 
 	// check if the approver oracle exists
-	existing, err := k.HasOracle(ctx, approval.ApproverOracleAddress)
-	if err != nil || !existing {
-		return fmt.Errorf("failed to check if the approver oracle exists or not. address(%s)", approval.ApproverOracleAddress)
+	isActive, err := k.IsActiveOracle(ctx, approval.ApproverOracleAddress)
+	if err != nil {
+		return fmt.Errorf("error occurs while checking if the oracle(%s) exists: %w", approval.ApproverOracleAddress, err)
+	}
+	if !isActive {
+		return fmt.Errorf("oracle(%s) is not an active oracle", approval.ApproverOracleAddress)
 	}
 
 	// verify signature
@@ -247,7 +250,7 @@ func (k Keeper) GetOracle(ctx sdk.Context, address string) (*types.Oracle, error
 	store := ctx.KVStore(k.storeKey)
 	accAddr, err := sdk.AccAddressFromBech32(address)
 	if err != nil {
-		return nil, err
+		return nil, sdkerrors.Wrapf(types.ErrGetOracle, err.Error())
 	}
 	key := types.GetOracleKey(accAddr)
 	bz := store.Get(key)
@@ -265,12 +268,17 @@ func (k Keeper) GetOracle(ctx sdk.Context, address string) (*types.Oracle, error
 	return oracle, nil
 }
 
-func (k Keeper) HasOracle(ctx sdk.Context, address string) (bool, error) {
-	store := ctx.KVStore(k.storeKey)
-	accAddr, err := sdk.AccAddressFromBech32(address)
+func (k Keeper) IsActiveOracle(ctx sdk.Context, oracleAddress string) (bool, error) {
+	oracle, err := k.GetOracle(ctx, oracleAddress)
 	if err != nil {
 		return false, err
 	}
 
-	return store.Has(types.GetOracleKey(accAddr)), nil
+	params := k.GetParams(ctx)
+
+	if oracle.GetUniqueId() != params.GetUniqueId() {
+		return false, types.ErrInvalidUniqueID
+	}
+
+	return true, nil
 }
