@@ -126,8 +126,6 @@ func (suite *genesisTestSuite) TestInitGenesis() {
 	getOracleUpgradeQueue, err := suite.OracleKeeper.GetAllOracleUpgradeQueueElements(suite.Ctx)
 	suite.Require().NoError(err)
 	suite.Require().Equal(2, len(getOracleUpgradeQueue))
-	suite.Require().Equal(suite.oracleAccAddr.String(), getOracleUpgradeQueue[0])
-	suite.Require().Equal(suite.oracle2AccAddr.String(), getOracleUpgradeQueue[1])
 }
 
 func (suite *genesisTestSuite) TestExportGenesis() {
