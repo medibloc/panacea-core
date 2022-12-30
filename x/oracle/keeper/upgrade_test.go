@@ -131,8 +131,8 @@ func (suite *oracleUpgradeTestSuite) TestApplyUpgradeSuccess() {
 	suite.Require().NoError(suite.OracleKeeper.SetOracle(ctx, oracle1))
 	suite.Require().NoError(suite.OracleKeeper.SetOracle(ctx, oracle2))
 
-	suite.OracleKeeper.AddOracleUpgradeQueue(suite.Ctx, suite.upgradeUniqueID, suite.oracleAccAddr)
-	suite.OracleKeeper.AddOracleUpgradeQueue(suite.Ctx, suite.upgradeUniqueID, suite.oracle2AccAddr)
+	suite.OracleKeeper.AddOracleUpgradeQueue(suite.Ctx, suite.oracleAccAddr)
+	suite.OracleKeeper.AddOracleUpgradeQueue(suite.Ctx, suite.oracle2AccAddr)
 
 	suite.Require().NoError(suite.OracleKeeper.ApplyUpgrade(ctx, upgradeInfo))
 	suite.Require().Equal(upgradeInfo.UniqueId, suite.OracleKeeper.GetParams(ctx).UniqueId)
@@ -353,11 +353,10 @@ func (suite *oracleUpgradeTestSuite) TestApproveOracleUpgradeSuccess() {
 	}
 
 	// check OracleUpgradeQueue
-	iterator := suite.OracleKeeper.GetOracleUpgradeQueueIterator(ctx, suite.upgradeUniqueID)
+	iterator := suite.OracleKeeper.GetOracleUpgradeQueueIterator(ctx)
 	iteratorSize := 0
 	for ; iterator.Valid(); iterator.Next() {
-		uniqueID, accAddr := types.SplitOracleUpgradeQueueKey(iterator.Key())
-		suite.Require().Equal(uniqueID, suite.upgradeUniqueID)
+		accAddr := sdk.AccAddress(iterator.Value())
 		suite.Require().Equal(accAddr, suite.oracleAccAddr)
 		iteratorSize++
 	}

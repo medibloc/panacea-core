@@ -53,21 +53,21 @@ func (k Keeper) ApplyUpgrade(ctx sdk.Context, info *types.OracleUpgradeInfo) err
 	}
 	k.SetParams(ctx, params)
 
-	iterator := k.GetOracleUpgradeQueueIterator(ctx, info.UniqueId)
+	iterator := k.GetOracleUpgradeQueueIterator(ctx)
 	defer iterator.Close()
 
 	for ; iterator.Valid(); iterator.Next() {
-		uniqueID, accAddr := types.SplitOracleUpgradeQueueKey(iterator.Key())
+		accAddr := sdk.AccAddress(iterator.Value())
 		upgradeOracleAddress := accAddr.String()
 		oracle, err := k.GetOracle(ctx, upgradeOracleAddress)
 		if err != nil {
 			return err
 		}
-		oracle.UniqueId = uniqueID
+		oracle.UniqueId = info.UniqueId
 		if err := k.SetOracle(ctx, oracle); err != nil {
 			return err
 		}
-		k.RemoveOracleUpgradeQueue(ctx, uniqueID, accAddr)
+		k.RemoveOracleUpgradeQueue(ctx, accAddr)
 	}
 
 	ctx.Logger().Info("Oracle upgrade was successful.", fmt.Sprintf("uniqueID: %s, height: %v", info.UniqueId, info.Height))
@@ -189,21 +189,21 @@ func (k Keeper) ApproveOracleUpgrade(ctx sdk.Context, msg *types.MsgApproveOracl
 	if err != nil {
 		return sdkerrors.Wrapf(types.ErrApproveOracleUpgrade, err.Error())
 	}
-	k.AddOracleUpgradeQueue(ctx, oracleUpgrade.UniqueId, accAddr)
+	k.AddOracleUpgradeQueue(ctx, accAddr)
 
 	return nil
 }
 
-func (k Keeper) AddOracleUpgradeQueue(ctx sdk.Context, uniqueID string, addr sdk.AccAddress) {
+func (k Keeper) AddOracleUpgradeQueue(ctx sdk.Context, addr sdk.AccAddress) {
 	store := ctx.KVStore(k.storeKey)
-	store.Set(types.GetOracleUpgradeQueueKey(uniqueID, addr), addr)
+	store.Set(types.GetOracleUpgradeQueueKey(addr), addr)
 }
-func (k Keeper) GetOracleUpgradeQueueIterator(ctx sdk.Context, uniqueID string) sdk.Iterator {
+func (k Keeper) GetOracleUpgradeQueueIterator(ctx sdk.Context) sdk.Iterator {
 	store := ctx.KVStore(k.storeKey)
-	return sdk.KVStorePrefixIterator(store, types.GetOracleUpgradesKey(uniqueID))
+	return sdk.KVStorePrefixIterator(store, types.OracleUpgradeQueueKey)
 }
 
-func (k Keeper) RemoveOracleUpgradeQueue(ctx sdk.Context, uniqueID string, addr sdk.AccAddress) {
+func (k Keeper) RemoveOracleUpgradeQueue(ctx sdk.Context, addr sdk.AccAddress) {
 	store := ctx.KVStore(k.storeKey)
-	store.Delete(types.GetOracleUpgradeQueueKey(uniqueID, addr))
+	store.Delete(types.GetOracleUpgradeQueueKey(addr))
 }

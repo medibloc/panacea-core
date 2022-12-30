@@ -46,16 +46,8 @@ func GetOracleUpgradeKey(uniqueID string, address sdk.AccAddress) []byte {
 	return append(OracleUpgradeKey, CombineKeys([]byte(uniqueID), address)...)
 }
 
-func GetOracleUpgradeQueueKey(uniqueID string, addr sdk.AccAddress) []byte {
-	return append(OracleUpgradeQueueKey, CombineKeys([]byte(uniqueID), addr)...)
-}
-
-func GetOracleUpgradesKey(uniqueID string) []byte {
-	return append(OracleUpgradeQueueKey, []byte(uniqueID)...)
-}
-
-func SplitOracleUpgradeQueueKey(key []byte) (string, sdk.AccAddress) {
-	return string(key[1 : len(key)-21]), key[len(key)-20:]
+func GetOracleUpgradeQueueKey(addr sdk.AccAddress) []byte {
+	return append(OracleUpgradeQueueKey, addr...)
 }
 
 func CombineKeys(keys ...[]byte) []byte {
