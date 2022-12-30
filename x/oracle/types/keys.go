@@ -29,7 +29,6 @@ var (
 	OracleRegistrationKey = []byte{0x02}
 	OracleUpgradeInfoKey  = []byte{0x03}
 	OracleUpgradeKey      = []byte{0x04}
-	OracleUpgradeQueueKey = []byte{0x05}
 
 	IndexSeparator = []byte{0xFF}
 )
@@ -44,18 +43,6 @@ func GetOracleRegistrationKey(uniqueID string, address sdk.AccAddress) []byte {
 
 func GetOracleUpgradeKey(uniqueID string, address sdk.AccAddress) []byte {
 	return append(OracleUpgradeKey, CombineKeys([]byte(uniqueID), address)...)
-}
-
-func GetOracleUpgradeQueueKey(uniqueID string, addr sdk.AccAddress) []byte {
-	return append(OracleUpgradeQueueKey, CombineKeys([]byte(uniqueID), addr)...)
-}
-
-func GetOracleUpgradesKey(uniqueID string) []byte {
-	return append(OracleUpgradeQueueKey, []byte(uniqueID)...)
-}
-
-func SplitOracleUpgradeQueueKey(key []byte) (string, sdk.AccAddress) {
-	return string(key[1 : len(key)-21]), key[len(key)-20:]
 }
 
 func CombineKeys(keys ...[]byte) []byte {
