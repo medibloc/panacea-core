@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	"errors"
 	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -61,6 +62,14 @@ func (k Keeper) ApplyUpgrade(ctx sdk.Context, info *types.OracleUpgradeInfo) err
 
 func (k Keeper) UpgradeOracle(ctx sdk.Context, msg *types.MsgUpgradeOracle) error {
 	oracleUpgrade := types.NewUpgradeOracle(msg)
+
+	existing, err := k.GetOracleUpgrade(ctx, msg.UniqueId, msg.OracleAddress)
+	if err != nil && !errors.Is(err, types.ErrOracleUpgradeNotFound) {
+		return sdkerrors.Wrapf(types.ErrUpgradeOracle, err.Error())
+	}
+	if existing != nil {
+		return sdkerrors.Wrapf(types.ErrUpgradeOracle, fmt.Sprintf("oracle that already received an upgrade request. address(%s)", msg.OracleAddress))
+	}
 
 	upgradeInfo, err := k.GetOracleUpgradeInfo(ctx)
 	if err != nil {
