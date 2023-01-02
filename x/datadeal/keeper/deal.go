@@ -7,6 +7,7 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	gogotypes "github.com/gogo/protobuf/types"
+	"github.com/medibloc/panacea-core/v2/types/assets"
 	"github.com/medibloc/panacea-core/v2/x/datadeal/types"
 )
 
@@ -192,8 +193,10 @@ func (k Keeper) DeactivateDeal(ctx sdk.Context, msg *types.MsgDeactivateDeal) er
 		return sdkerrors.Wrapf(types.ErrDeactivateDeal, err.Error())
 	}
 
+	dealAmount := k.bankKeeper.GetBalance(ctx, dealAccAddr, assets.MicroMedDenom)
+
 	// refund a budget to consumer
-	err = k.bankKeeper.SendCoins(ctx, dealAccAddr, consumerAccAddr, sdk.NewCoins(*deal.Budget))
+	err = k.bankKeeper.SendCoins(ctx, dealAccAddr, consumerAccAddr, sdk.NewCoins(dealAmount))
 	if err != nil {
 		return sdkerrors.Wrapf(types.ErrDeactivateDeal, err.Error())
 	}
