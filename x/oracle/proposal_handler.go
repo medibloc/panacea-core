@@ -33,5 +33,14 @@ func handlerOracleUpgradeProposal(ctx sdk.Context, k keeper.Keeper, p *types.Ora
 		return err
 	}
 
+	// clear OracleUpgradeQueue
+	iterator := k.GetOracleUpgradeQueueIterator(ctx)
+	defer iterator.Close()
+
+	for ; iterator.Valid(); iterator.Next() {
+		accAddr := sdk.AccAddress(iterator.Value())
+		k.RemoveOracleUpgradeQueue(ctx, accAddr)
+	}
+
 	return nil
 }
