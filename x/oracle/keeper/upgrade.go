@@ -39,13 +39,8 @@ func (k Keeper) GetOracleUpgradeInfo(ctx sdk.Context) (*types.OracleUpgradeInfo,
 	return &upgradeInfo, nil
 }
 
-func (k Keeper) RemoveOracleUpgradeInfo(ctx sdk.Context) {
-	store := ctx.KVStore(k.storeKey)
-
-	store.Delete(types.OracleUpgradeInfoKey)
-}
-
 func (k Keeper) ApplyUpgrade(ctx sdk.Context, info *types.OracleUpgradeInfo) error {
+
 	params := k.GetParams(ctx)
 	params.UniqueId = info.UniqueId
 	if err := params.Validate(); err != nil {
@@ -53,7 +48,26 @@ func (k Keeper) ApplyUpgrade(ctx sdk.Context, info *types.OracleUpgradeInfo) err
 	}
 	k.SetParams(ctx, params)
 
-	//TODO: update `Oracles` that already upgraded
+	iterator := k.GetOracleUpgradeIterator(ctx, info.UniqueId)
+	defer iterator.Close()
+
+	for ; iterator.Valid(); iterator.Next() {
+		uniqueID, address := types.SplitOracleUpgradeKey(iterator.Key())
+		oracleUpgrade, err := k.GetOracleUpgrade(ctx, uniqueID, address.String())
+		if err != nil {
+			return err
+		}
+		if oracleUpgrade.EncryptedOraclePrivKey != nil {
+			oracle, err := k.GetOracle(ctx, address.String())
+			if err != nil {
+				return err
+			}
+			oracle.UniqueId = info.UniqueId
+			if err := k.SetOracle(ctx, oracle); err != nil {
+				return err
+			}
+		}
+	}
 
 	ctx.Logger().Info("Oracle upgrade was successful.", fmt.Sprintf("uniqueID: %s, height: %v", info.UniqueId, info.Height))
 	return nil
@@ -169,7 +183,10 @@ func (k Keeper) ApproveOracleUpgrade(ctx sdk.Context, msg *types.MsgApproveOracl
 		),
 	)
 
-	// TODO: add to queue(?) for update unique ID
-
 	return nil
+}
+
+func (k Keeper) GetOracleUpgradeIterator(ctx sdk.Context, uniqueID string) sdk.Iterator {
+	store := ctx.KVStore(k.storeKey)
+	return sdk.KVStorePrefixIterator(store, types.GetOracleUpgradeByUniqueIDKey(uniqueID))
 }
