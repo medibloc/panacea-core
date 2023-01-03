@@ -124,7 +124,7 @@ func (m *Oracle) ValidateOracleCommission(blockTime time.Time, newRate sdk.Dec) 
 
 func (m *OracleUpgradeInfo) ShouldExecute(ctx sdk.Context) bool {
 	if m.Height > 0 {
-		return m.Height <= ctx.BlockHeight()
+		return m.Height == ctx.BlockHeight()
 	}
 	return false
 }
