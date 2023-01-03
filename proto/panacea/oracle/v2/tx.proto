@@ -55,10 +55,11 @@ message MsgApproveOracleRegistration {
 // ApprovalSharingOracleKey defines approval for sharing oracle key encrypted with target oracle's node public key
 message ApprovalSharingOracleKey {
   // approver's unique ID
-  string unique_id = 1;
+  string approver_unique_id = 1;
   string approver_oracle_address = 2;
-  string target_oracle_address = 3;
-  bytes encrypted_oracle_priv_key = 4;
+  string target_unique_id = 3;
+  string target_oracle_address = 4;
+  bytes encrypted_oracle_priv_key = 5;
 }
 
 // MsgApproveOracleRegistrationResponse defines the Msg/ApproveOracleRegistration

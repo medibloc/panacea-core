@@ -273,8 +273,9 @@ func (suite *oracleUpgradeTestSuite) TestApproveOracleUpgradeSuccess() {
 	suite.Require().NoError(err)
 
 	approveOracleUpgrade := &types.ApprovalSharingOracleKey{
-		UniqueId:               suite.currentUniqueID,
+		ApproverUniqueId:       suite.currentUniqueID,
 		ApproverOracleAddress:  suite.approverAccAddr.String(),
+		TargetUniqueId:         suite.upgradeUniqueID,
 		TargetOracleAddress:    suite.oracleAccAddr.String(),
 		EncryptedOraclePrivKey: encryptedOraclePrivKey,
 	}
@@ -366,8 +367,9 @@ func (suite *oracleUpgradeTestSuite) TestApproveOracleUpgradeFailAlreadyApproved
 	suite.Require().NoError(err)
 
 	approveOracleUpgrade := &types.ApprovalSharingOracleKey{
-		UniqueId:               suite.currentUniqueID,
+		ApproverUniqueId:       suite.currentUniqueID,
 		ApproverOracleAddress:  suite.approverAccAddr.String(),
+		TargetUniqueId:         suite.upgradeUniqueID,
 		TargetOracleAddress:    suite.oracleAccAddr.String(),
 		EncryptedOraclePrivKey: encryptedOraclePrivKey,
 	}
@@ -384,8 +386,9 @@ func (suite *oracleUpgradeTestSuite) TestApproveOracleUpgradeFailAlreadyApproved
 
 	// do second approve
 	secondApprove := &types.ApprovalSharingOracleKey{
-		UniqueId:               suite.currentUniqueID,
+		ApproverUniqueId:       suite.currentUniqueID,
 		ApproverOracleAddress:  suite.oracleAccAddr.String(),
+		TargetUniqueId:         suite.upgradeUniqueID,
 		TargetOracleAddress:    suite.oracleAccAddr.String(),
 		EncryptedOraclePrivKey: encryptedOraclePrivKey,
 	}

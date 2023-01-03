@@ -151,8 +151,9 @@ func (suite *abciTestSuite) TestOracleUpgradeSuccess() {
 	suite.Require().NoError(err)
 
 	approveOracleUpgrade := &types.ApprovalSharingOracleKey{
-		UniqueId:               suite.currentUniqueID,
+		ApproverUniqueId:       suite.currentUniqueID,
 		ApproverOracleAddress:  suite.approverAccAddr.String(),
+		TargetUniqueId:         suite.upgradeUniqueID,
 		TargetOracleAddress:    suite.oracleAccAddr.String(),
 		EncryptedOraclePrivKey: encryptedOraclePrivKey,
 	}
@@ -166,8 +167,9 @@ func (suite *abciTestSuite) TestOracleUpgradeSuccess() {
 	suite.Require().NoError(suite.OracleKeeper.ApproveOracleUpgrade(ctx, msgApproveOracleUpgrade))
 
 	approveOracle2Upgrade := &types.ApprovalSharingOracleKey{
-		UniqueId:               suite.currentUniqueID,
+		ApproverUniqueId:       suite.currentUniqueID,
 		ApproverOracleAddress:  suite.approverAccAddr.String(),
+		TargetUniqueId:         suite.upgradeUniqueID,
 		TargetOracleAddress:    suite.oracle2AccAddr.String(),
 		EncryptedOraclePrivKey: encryptedOraclePrivKey,
 	}
