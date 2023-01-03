@@ -167,7 +167,7 @@ func (suite *oracleUpgradeTestSuite) TestUpgradeOracleFailedNotMatchedUniqueID()
 	suite.Require().ErrorContains(err, "does not match the upgrade uniqueID")
 }
 
-func (suite *oracleUpgradeTestSuite) TestUpgradeOracleFaileNoRegisteredOracle() {
+func (suite *oracleUpgradeTestSuite) TestUpgradeOracleFailedNoRegisteredOracle() {
 	ctx := suite.Ctx
 
 	upgradeInfo := &types.OracleUpgradeInfo{
