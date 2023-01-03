@@ -49,10 +49,6 @@ func GetOracleUpgradeByUniqueIDKey(uniqueID string) []byte {
 	return append(OracleUpgradeKey, []byte(uniqueID)...)
 }
 
-func SplitOracleUpgradeKey(key []byte) (string, sdk.AccAddress) {
-	return string(key[1 : len(key)-21]), key[len(key)-20:]
-}
-
 func CombineKeys(keys ...[]byte) []byte {
 	return bytes.Join(keys, IndexSeparator)
 }

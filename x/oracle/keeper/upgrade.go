@@ -52,13 +52,13 @@ func (k Keeper) ApplyUpgrade(ctx sdk.Context, info *types.OracleUpgradeInfo) err
 	defer iterator.Close()
 
 	for ; iterator.Valid(); iterator.Next() {
-		uniqueID, address := types.SplitOracleUpgradeKey(iterator.Key())
-		oracleUpgrade, err := k.GetOracleUpgrade(ctx, uniqueID, address.String())
-		if err != nil {
+		bz := iterator.Value()
+		oracleUpgrade := &types.OracleUpgrade{}
+		if err := k.cdc.UnmarshalLengthPrefixed(bz, oracleUpgrade); err != nil {
 			return err
 		}
 		if oracleUpgrade.EncryptedOraclePrivKey != nil {
-			oracle, err := k.GetOracle(ctx, address.String())
+			oracle, err := k.GetOracle(ctx, oracleUpgrade.OracleAddress)
 			if err != nil {
 				return err
 			}
