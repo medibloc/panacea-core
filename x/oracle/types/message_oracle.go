@@ -184,3 +184,55 @@ func (m *MsgUpdateOracleInfo) GetSigners() []sdk.AccAddress {
 	}
 	return []sdk.AccAddress{oracleAddress}
 }
+
+func (m *MsgUpgradeOracle) Route() string {
+	return RouterKey
+}
+
+func (m *MsgUpgradeOracle) Type() string {
+	return "UpgradeOracle"
+}
+
+func (m *MsgUpgradeOracle) ValidateBasic() error {
+	// TODO: Implementation
+	return nil
+}
+
+func (m *MsgUpgradeOracle) GetSignBytes() []byte {
+	bz := ModuleCdc.MustMarshalJSON(m)
+	return sdk.MustSortJSON(bz)
+}
+
+func (m *MsgUpgradeOracle) GetSigners() []sdk.AccAddress {
+	oracleAddress, err := sdk.AccAddressFromBech32(m.OracleAddress)
+	if err != nil {
+		panic(err)
+	}
+	return []sdk.AccAddress{oracleAddress}
+}
+
+func (m *MsgApproveOracleUpgrade) Route() string {
+	return RouterKey
+}
+
+func (m *MsgApproveOracleUpgrade) Type() string {
+	return "ApproveOracleUpgrade"
+}
+
+func (m *MsgApproveOracleUpgrade) ValidateBasic() error {
+	// TODO: Implementation
+	return nil
+}
+
+func (m *MsgApproveOracleUpgrade) GetSignBytes() []byte {
+	bz := ModuleCdc.MustMarshalJSON(m)
+	return sdk.MustSortJSON(bz)
+}
+
+func (m *MsgApproveOracleUpgrade) GetSigners() []sdk.AccAddress {
+	oracleAddress, err := sdk.AccAddressFromBech32(m.ApproverOracleAddress)
+	if err != nil {
+		panic(err)
+	}
+	return []sdk.AccAddress{oracleAddress}
+}

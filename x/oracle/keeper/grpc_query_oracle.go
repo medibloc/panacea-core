@@ -111,3 +111,8 @@ func (k Keeper) Params(goCtx context.Context, _ *types.QueryOracleParamsRequest)
 	params := k.GetParams(sdk.UnwrapSDKContext(goCtx))
 	return &types.QueryParamsResponse{Params: &params}, nil
 }
+
+func (k Keeper) OracleUpgrade(goCtx context.Context, request *types.QueryOracleUpgradeRequest) (*types.QueryOracleUpgradeResponse, error) {
+	// TODO: Implementation
+	return &types.QueryOracleUpgradeResponse{}, nil
+}
