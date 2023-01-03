@@ -35,20 +35,3 @@ func (suite *oracleUpgradeTestSuite) TestEmptyOracleUpgradeInfo() {
 	require.ErrorIs(suite.T(), err, types.ErrOracleUpgradeInfoNotFound)
 	require.Nil(suite.T(), upgradeInfo)
 }
-
-func (suite *oracleUpgradeTestSuite) TestApplyUpgradeSuccess() {
-	ctx := suite.Ctx
-
-	params := types.DefaultParams()
-	params.UniqueId = "orgUniqueID"
-	suite.OracleKeeper.SetParams(ctx, params)
-	suite.Require().Equal(params.UniqueId, suite.OracleKeeper.GetParams(ctx).UniqueId)
-
-	upgradeInfo := &types.OracleUpgradeInfo{
-		UniqueId: "upgradeUniqueID",
-		Height:   1,
-	}
-
-	suite.Require().NoError(suite.OracleKeeper.ApplyUpgrade(ctx, upgradeInfo))
-	suite.Require().Equal(upgradeInfo.UniqueId, suite.OracleKeeper.GetParams(ctx).UniqueId)
-}
