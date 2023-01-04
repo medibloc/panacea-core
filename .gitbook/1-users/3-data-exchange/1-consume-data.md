@@ -89,5 +89,5 @@ Using the encrypted secret key that you obtained from the oracle, you can decryp
 panacead decrypt-data ${input-file-path} ${your-account-key-name} ${encrypted-secret-key} \
   --node ${chain-node-rpc-addr}
 ```
-This command will decrypt the secret key using your account key first, and decrypt the data using the secret key.
+This command will decrypt the secret key using your account key first, and decrypt the data using the decrypted secret key.
 So, please note that you should specify the `your-account-key-name` which is registered in the `panacead` keyring.
