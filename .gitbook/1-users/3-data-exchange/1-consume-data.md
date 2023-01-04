@@ -81,7 +81,7 @@ For this authentication, the JWT must be signed by your (data consumer's) chain 
 We highly recommend to set the expiration of JWT as short as possible for security reasons.
 In near future, the protocol will adopt the 'nonce' concept to improve the security of authentications.
 
-Please note that the returned secret key is also encrypted, so that also the specific data consumer decrypt the key using his/her chain account private key.
+Please note that the returned secret key is also encrypted, so that only the specific data consumers can decrypt the key using his/her chain account private key.
 Nevertheless, we highly recommend you to communicate with oracles who provides an HTTPS endpoint with SSL/TLS encryption.
 
 Using the encrypted secret key that you obtained from the oracle, you can decrypt data by the following CLI.
