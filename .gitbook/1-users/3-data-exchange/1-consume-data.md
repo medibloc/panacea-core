@@ -7,7 +7,7 @@ Data deals are registered in the Panacea public blockchain, so all data provider
 
 ## Create a data deal
 
-Broadcast the following `create-deal` transaction with specifying data schema, a data count, and a budget.
+Broadcast the following `create-deal` transaction with specifying data schema, a data count, and a budget in the deal-file in JSON format.
 ```bash
 panacead tx datadeal create-deal ${deal-file-path} \
   --from ${data-consumer-addr} \
