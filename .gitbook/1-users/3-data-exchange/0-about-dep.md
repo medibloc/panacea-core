@@ -6,7 +6,7 @@ between two parties in decentralized environments.
 
 ## What is DEP?
 
-Data consumers can open data deals by specifying what type of data and how much they want, and how much they can pay for it.
+Data consumers can open data deals by specifying the type, the quantity, and the pricing of the data that they are willing to consume. 
 
 Data providers can choose deals that match the data they have and they are willing to provide.
 
