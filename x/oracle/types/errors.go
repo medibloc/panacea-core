@@ -20,4 +20,5 @@ var (
 	ErrUpgradeOracle              = sdkerrors.Register(ModuleName, 15, "error while upgrading a oracle")
 	ErrGetOracleUpgrade           = sdkerrors.Register(ModuleName, 16, "error while get oracleUpgrade")
 	ErrApproveOracleUpgrade       = sdkerrors.Register(ModuleName, 17, "error while approving oracle upgrade")
+	ErrOracleUpgradeNotFound      = sdkerrors.Register(ModuleName, 18, "oracle upgrade not found")
 )

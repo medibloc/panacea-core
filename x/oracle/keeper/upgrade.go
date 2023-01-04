@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	"errors"
 	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -76,8 +77,12 @@ func (k Keeper) ApplyUpgrade(ctx sdk.Context, info *types.OracleUpgradeInfo) err
 func (k Keeper) UpgradeOracle(ctx sdk.Context, msg *types.MsgUpgradeOracle) error {
 	oracleUpgrade := types.NewUpgradeOracle(msg)
 
-	if err := oracleUpgrade.ValidateBasic(); err != nil {
-		return err
+	existing, err := k.GetOracleUpgrade(ctx, msg.UniqueId, msg.OracleAddress)
+	if err != nil && !errors.Is(err, types.ErrOracleUpgradeNotFound) {
+		return sdkerrors.Wrapf(types.ErrUpgradeOracle, err.Error())
+	}
+	if existing != nil {
+		return sdkerrors.Wrapf(types.ErrUpgradeOracle, fmt.Sprintf("oracle that already received an upgrade request. address(%s)", msg.OracleAddress))
 	}
 
 	upgradeInfo, err := k.GetOracleUpgradeInfo(ctx)
@@ -110,12 +115,12 @@ func (k Keeper) GetOracleUpgrade(ctx sdk.Context, uniqueID, address string) (*ty
 	store := ctx.KVStore(k.storeKey)
 	accAddr, err := sdk.AccAddressFromBech32(address)
 	if err != nil {
-		return nil, err
+		return nil, sdkerrors.Wrapf(types.ErrGetOracleUpgrade, err.Error())
 	}
 	key := types.GetOracleUpgradeKey(uniqueID, accAddr)
 	bz := store.Get(key)
 	if bz == nil {
-		return nil, sdkerrors.Wrapf(types.ErrGetOracleUpgrade, "oracle registration not found")
+		return nil, types.ErrOracleUpgradeNotFound
 	}
 
 	oracleUpgrade := &types.OracleUpgrade{}
@@ -142,6 +147,28 @@ func (k Keeper) SetOracleUpgrade(ctx sdk.Context, upgrade *types.OracleUpgrade) 
 
 	store.Set(key, bz)
 	return nil
+}
+
+func (k Keeper) GetAllOracleUpgradeList(ctx sdk.Context) ([]types.OracleUpgrade, error) {
+	store := ctx.KVStore(k.storeKey)
+	iterator := sdk.KVStorePrefixIterator(store, types.OracleUpgradeKey)
+	defer iterator.Close()
+
+	oracleUpgrades := make([]types.OracleUpgrade, 0)
+
+	for ; iterator.Valid(); iterator.Next() {
+		bz := iterator.Value()
+		var oracleUpgrade types.OracleUpgrade
+
+		err := k.cdc.UnmarshalLengthPrefixed(bz, &oracleUpgrade)
+		if err != nil {
+			return nil, sdkerrors.Wrapf(types.ErrGetOracleUpgrade, err.Error())
+		}
+
+		oracleUpgrades = append(oracleUpgrades, oracleUpgrade)
+	}
+
+	return oracleUpgrades, nil
 }
 
 func (k Keeper) ApproveOracleUpgrade(ctx sdk.Context, msg *types.MsgApproveOracleUpgrade) error {
