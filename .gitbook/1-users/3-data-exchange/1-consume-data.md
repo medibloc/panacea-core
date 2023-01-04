@@ -22,7 +22,7 @@ For `deal-file-path`, create a following JSON file.
   
 }
 ```
-It is very important to set data schema specifically, so that data being provided can be validated accurately by oracles.
+It is very important to set data schema specifically and correctly, so that data being provided can be validated accurately by oracles.
 
 For more details about data deals, please see the [Data Deal](../../3-protocol-devs/1-dep-specs/2-data-deal.md) specification.
 
