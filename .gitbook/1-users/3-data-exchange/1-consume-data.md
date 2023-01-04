@@ -2,7 +2,7 @@
 
 Data consumers can open data deals by specifying the type, the quantity, and the pricing of the data that they are willing to consume. 
 
-Data deals are registered in the Panacea public blockchain, so all data providers can find data deals which match their data.
+Data deals are registered in the Panacea public blockchain, so all data providers can find data deals, which match their data.
 
 
 ## Create a data deal
