@@ -52,7 +52,7 @@ As soon as data providers submit their consents, you can query all consents subm
 panacead query datadeal consents ${deal-id} \
   --node ${chain-node-rpc-addr}
 ```
-Or, you can query a specific consent which contains a certain data hash.
+Or, you can query a specific consent, which contains a certain data hash.
 ```bash
 panacead query datadeal consent ${deal-id} ${data-hash} \
   --node ${chain-node-rpc-addr}
