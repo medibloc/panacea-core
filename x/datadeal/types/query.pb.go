@@ -219,23 +219,23 @@ func (m *QueryDealResponse) GetDeal() *Deal {
 }
 
 // QueryDealsRequest defines the request type for the Query/Deals RPC method.
-type QueryCertificates struct {
+type QueryConsents struct {
 	DealId     uint64             `protobuf:"varint,1,opt,name=deal_id,json=dealId,proto3" json:"deal_id,omitempty"`
 	Pagination *query.PageRequest `protobuf:"bytes,2,opt,name=pagination,proto3" json:"pagination,omitempty"`
 }
 
-func (m *QueryCertificates) Reset()         { *m = QueryCertificates{} }
-func (m *QueryCertificates) String() string { return proto.CompactTextString(m) }
-func (*QueryCertificates) ProtoMessage()    {}
-func (*QueryCertificates) Descriptor() ([]byte, []int) {
+func (m *QueryConsents) Reset()         { *m = QueryConsents{} }
+func (m *QueryConsents) String() string { return proto.CompactTextString(m) }
+func (*QueryConsents) ProtoMessage()    {}
+func (*QueryConsents) Descriptor() ([]byte, []int) {
 	return fileDescriptor_4c7a445ecc4b9161, []int{4}
 }
-func (m *QueryCertificates) XXX_Unmarshal(b []byte) error {
+func (m *QueryConsents) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *QueryCertificates) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *QueryConsents) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_QueryCertificates.Marshal(b, m, deterministic)
+		return xxx_messageInfo_QueryConsents.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -245,26 +245,26 @@ func (m *QueryCertificates) XXX_Marshal(b []byte, deterministic bool) ([]byte, e
 		return b[:n], nil
 	}
 }
-func (m *QueryCertificates) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_QueryCertificates.Merge(m, src)
+func (m *QueryConsents) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryConsents.Merge(m, src)
 }
-func (m *QueryCertificates) XXX_Size() int {
+func (m *QueryConsents) XXX_Size() int {
 	return m.Size()
 }
-func (m *QueryCertificates) XXX_DiscardUnknown() {
-	xxx_messageInfo_QueryCertificates.DiscardUnknown(m)
+func (m *QueryConsents) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryConsents.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_QueryCertificates proto.InternalMessageInfo
+var xxx_messageInfo_QueryConsents proto.InternalMessageInfo
 
-func (m *QueryCertificates) GetDealId() uint64 {
+func (m *QueryConsents) GetDealId() uint64 {
 	if m != nil {
 		return m.DealId
 	}
 	return 0
 }
 
-func (m *QueryCertificates) GetPagination() *query.PageRequest {
+func (m *QueryConsents) GetPagination() *query.PageRequest {
 	if m != nil {
 		return m.Pagination
 	}
@@ -272,23 +272,23 @@ func (m *QueryCertificates) GetPagination() *query.PageRequest {
 }
 
 // QueryDealsResponse defines the response type for the Query/Deals RPC method.
-type QueryCertificatesResponse struct {
-	Certificates []*Certificate      `protobuf:"bytes,1,rep,name=certificates,proto3" json:"certificates,omitempty"`
-	Pagination   *query.PageResponse `protobuf:"bytes,2,opt,name=pagination,proto3" json:"pagination,omitempty"`
+type QueryConsentsResponse struct {
+	Consents   []*Consent          `protobuf:"bytes,1,rep,name=consents,proto3" json:"consents,omitempty"`
+	Pagination *query.PageResponse `protobuf:"bytes,2,opt,name=pagination,proto3" json:"pagination,omitempty"`
 }
 
-func (m *QueryCertificatesResponse) Reset()         { *m = QueryCertificatesResponse{} }
-func (m *QueryCertificatesResponse) String() string { return proto.CompactTextString(m) }
-func (*QueryCertificatesResponse) ProtoMessage()    {}
-func (*QueryCertificatesResponse) Descriptor() ([]byte, []int) {
+func (m *QueryConsentsResponse) Reset()         { *m = QueryConsentsResponse{} }
+func (m *QueryConsentsResponse) String() string { return proto.CompactTextString(m) }
+func (*QueryConsentsResponse) ProtoMessage()    {}
+func (*QueryConsentsResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_4c7a445ecc4b9161, []int{5}
 }
-func (m *QueryCertificatesResponse) XXX_Unmarshal(b []byte) error {
+func (m *QueryConsentsResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *QueryCertificatesResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *QueryConsentsResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_QueryCertificatesResponse.Marshal(b, m, deterministic)
+		return xxx_messageInfo_QueryConsentsResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -298,50 +298,50 @@ func (m *QueryCertificatesResponse) XXX_Marshal(b []byte, deterministic bool) ([
 		return b[:n], nil
 	}
 }
-func (m *QueryCertificatesResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_QueryCertificatesResponse.Merge(m, src)
+func (m *QueryConsentsResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryConsentsResponse.Merge(m, src)
 }
-func (m *QueryCertificatesResponse) XXX_Size() int {
+func (m *QueryConsentsResponse) XXX_Size() int {
 	return m.Size()
 }
-func (m *QueryCertificatesResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_QueryCertificatesResponse.DiscardUnknown(m)
+func (m *QueryConsentsResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryConsentsResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_QueryCertificatesResponse proto.InternalMessageInfo
+var xxx_messageInfo_QueryConsentsResponse proto.InternalMessageInfo
 
-func (m *QueryCertificatesResponse) GetCertificates() []*Certificate {
+func (m *QueryConsentsResponse) GetConsents() []*Consent {
 	if m != nil {
-		return m.Certificates
+		return m.Consents
 	}
 	return nil
 }
 
-func (m *QueryCertificatesResponse) GetPagination() *query.PageResponse {
+func (m *QueryConsentsResponse) GetPagination() *query.PageResponse {
 	if m != nil {
 		return m.Pagination
 	}
 	return nil
 }
 
-// QueryCertificate defines the request type for the Query/Certificate RPC method.
-type QueryCertificate struct {
+// QueryConsent defines the request type for the Query/Consent RPC method.
+type QueryConsent struct {
 	DealId   uint64 `protobuf:"varint,1,opt,name=deal_id,json=dealId,proto3" json:"deal_id,omitempty"`
 	DataHash string `protobuf:"bytes,2,opt,name=data_hash,json=dataHash,proto3" json:"data_hash,omitempty"`
 }
 
-func (m *QueryCertificate) Reset()         { *m = QueryCertificate{} }
-func (m *QueryCertificate) String() string { return proto.CompactTextString(m) }
-func (*QueryCertificate) ProtoMessage()    {}
-func (*QueryCertificate) Descriptor() ([]byte, []int) {
+func (m *QueryConsent) Reset()         { *m = QueryConsent{} }
+func (m *QueryConsent) String() string { return proto.CompactTextString(m) }
+func (*QueryConsent) ProtoMessage()    {}
+func (*QueryConsent) Descriptor() ([]byte, []int) {
 	return fileDescriptor_4c7a445ecc4b9161, []int{6}
 }
-func (m *QueryCertificate) XXX_Unmarshal(b []byte) error {
+func (m *QueryConsent) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *QueryCertificate) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *QueryConsent) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_QueryCertificate.Marshal(b, m, deterministic)
+		return xxx_messageInfo_QueryConsent.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -351,49 +351,49 @@ func (m *QueryCertificate) XXX_Marshal(b []byte, deterministic bool) ([]byte, er
 		return b[:n], nil
 	}
 }
-func (m *QueryCertificate) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_QueryCertificate.Merge(m, src)
+func (m *QueryConsent) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryConsent.Merge(m, src)
 }
-func (m *QueryCertificate) XXX_Size() int {
+func (m *QueryConsent) XXX_Size() int {
 	return m.Size()
 }
-func (m *QueryCertificate) XXX_DiscardUnknown() {
-	xxx_messageInfo_QueryCertificate.DiscardUnknown(m)
+func (m *QueryConsent) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryConsent.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_QueryCertificate proto.InternalMessageInfo
+var xxx_messageInfo_QueryConsent proto.InternalMessageInfo
 
-func (m *QueryCertificate) GetDealId() uint64 {
+func (m *QueryConsent) GetDealId() uint64 {
 	if m != nil {
 		return m.DealId
 	}
 	return 0
 }
 
-func (m *QueryCertificate) GetDataHash() string {
+func (m *QueryConsent) GetDataHash() string {
 	if m != nil {
 		return m.DataHash
 	}
 	return ""
 }
 
-// QueryCertificateResponse defines the response type for the Query/Certificate RPC method.
-type QueryCertificateResponse struct {
-	Certificate *Certificate `protobuf:"bytes,1,opt,name=certificate,proto3" json:"certificate,omitempty"`
+// QueryConsentResponse defines the response type for the Query/Consent RPC method.
+type QueryConsentResponse struct {
+	Consent *Consent `protobuf:"bytes,1,opt,name=consent,proto3" json:"consent,omitempty"`
 }
 
-func (m *QueryCertificateResponse) Reset()         { *m = QueryCertificateResponse{} }
-func (m *QueryCertificateResponse) String() string { return proto.CompactTextString(m) }
-func (*QueryCertificateResponse) ProtoMessage()    {}
-func (*QueryCertificateResponse) Descriptor() ([]byte, []int) {
+func (m *QueryConsentResponse) Reset()         { *m = QueryConsentResponse{} }
+func (m *QueryConsentResponse) String() string { return proto.CompactTextString(m) }
+func (*QueryConsentResponse) ProtoMessage()    {}
+func (*QueryConsentResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_4c7a445ecc4b9161, []int{7}
 }
-func (m *QueryCertificateResponse) XXX_Unmarshal(b []byte) error {
+func (m *QueryConsentResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *QueryCertificateResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *QueryConsentResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_QueryCertificateResponse.Marshal(b, m, deterministic)
+		return xxx_messageInfo_QueryConsentResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -403,21 +403,21 @@ func (m *QueryCertificateResponse) XXX_Marshal(b []byte, deterministic bool) ([]
 		return b[:n], nil
 	}
 }
-func (m *QueryCertificateResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_QueryCertificateResponse.Merge(m, src)
+func (m *QueryConsentResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryConsentResponse.Merge(m, src)
 }
-func (m *QueryCertificateResponse) XXX_Size() int {
+func (m *QueryConsentResponse) XXX_Size() int {
 	return m.Size()
 }
-func (m *QueryCertificateResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_QueryCertificateResponse.DiscardUnknown(m)
+func (m *QueryConsentResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryConsentResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_QueryCertificateResponse proto.InternalMessageInfo
+var xxx_messageInfo_QueryConsentResponse proto.InternalMessageInfo
 
-func (m *QueryCertificateResponse) GetCertificate() *Certificate {
+func (m *QueryConsentResponse) GetConsent() *Consent {
 	if m != nil {
-		return m.Certificate
+		return m.Consent
 	}
 	return nil
 }
@@ -427,54 +427,53 @@ func init() {
 	proto.RegisterType((*QueryDealsResponse)(nil), "panacea.datadeal.v2.QueryDealsResponse")
 	proto.RegisterType((*QueryDealRequest)(nil), "panacea.datadeal.v2.QueryDealRequest")
 	proto.RegisterType((*QueryDealResponse)(nil), "panacea.datadeal.v2.QueryDealResponse")
-	proto.RegisterType((*QueryCertificates)(nil), "panacea.datadeal.v2.QueryCertificates")
-	proto.RegisterType((*QueryCertificatesResponse)(nil), "panacea.datadeal.v2.QueryCertificatesResponse")
-	proto.RegisterType((*QueryCertificate)(nil), "panacea.datadeal.v2.QueryCertificate")
-	proto.RegisterType((*QueryCertificateResponse)(nil), "panacea.datadeal.v2.QueryCertificateResponse")
+	proto.RegisterType((*QueryConsents)(nil), "panacea.datadeal.v2.QueryConsents")
+	proto.RegisterType((*QueryConsentsResponse)(nil), "panacea.datadeal.v2.QueryConsentsResponse")
+	proto.RegisterType((*QueryConsent)(nil), "panacea.datadeal.v2.QueryConsent")
+	proto.RegisterType((*QueryConsentResponse)(nil), "panacea.datadeal.v2.QueryConsentResponse")
 }
 
 func init() { proto.RegisterFile("panacea/datadeal/v2/query.proto", fileDescriptor_4c7a445ecc4b9161) }
 
 var fileDescriptor_4c7a445ecc4b9161 = []byte{
-	// 594 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x94, 0x4f, 0x6f, 0x12, 0x4f,
-	0x18, 0xc7, 0x19, 0x7e, 0xd0, 0x9f, 0x1d, 0x7a, 0xd0, 0xd1, 0x44, 0xba, 0x36, 0x2b, 0xd9, 0x08,
-	0x6d, 0x54, 0x66, 0x02, 0x3d, 0x79, 0x30, 0x26, 0x58, 0xb5, 0xc6, 0x8b, 0xee, 0x51, 0x13, 0x9b,
-	0x61, 0x19, 0x97, 0x4d, 0x60, 0x67, 0xcb, 0x0c, 0xc4, 0xa6, 0xf6, 0xa2, 0x77, 0x63, 0xe2, 0x2b,
-	0xf0, 0xda, 0x57, 0xe2, 0xb1, 0x89, 0x17, 0x0f, 0x1e, 0x0c, 0xf8, 0x42, 0xcc, 0xcc, 0x0e, 0xcb,
-	0xd2, 0xf2, 0x4f, 0xe3, 0x0d, 0x78, 0xbe, 0xcf, 0xf3, 0xfd, 0x3c, 0x7f, 0x06, 0x78, 0x33, 0xa2,
-	0x21, 0xf5, 0x18, 0x25, 0x2d, 0x2a, 0x69, 0x8b, 0xd1, 0x0e, 0x19, 0xd4, 0xc9, 0x61, 0x9f, 0xf5,
-	0x8e, 0x70, 0xd4, 0xe3, 0x92, 0xa3, 0xab, 0x46, 0x80, 0xc7, 0x02, 0x3c, 0xa8, 0x5b, 0xd7, 0x7c,
-	0xee, 0x73, 0x1d, 0x27, 0xea, 0x53, 0x2c, 0xb5, 0x6e, 0x7b, 0x5c, 0x74, 0xb9, 0x20, 0x4d, 0x2a,
-	0x58, 0x5c, 0x83, 0x0c, 0x6a, 0x4d, 0x26, 0x69, 0x8d, 0x44, 0xd4, 0x0f, 0x42, 0x2a, 0x03, 0x1e,
-	0x1a, 0xed, 0x96, 0xcf, 0xb9, 0xdf, 0x61, 0x84, 0x46, 0x01, 0xa1, 0x61, 0xc8, 0xa5, 0x0e, 0x0a,
-	0x13, 0xb5, 0x67, 0x51, 0x69, 0xf3, 0x38, 0x5e, 0x9e, 0x15, 0xf7, 0x58, 0x4f, 0x06, 0x6f, 0x02,
-	0x8f, 0x4a, 0x16, 0xcb, 0x9c, 0x57, 0xf0, 0xca, 0x0b, 0x85, 0xb1, 0xc7, 0x68, 0x47, 0xb8, 0xec,
-	0xb0, 0xcf, 0x84, 0x44, 0x8f, 0x21, 0x9c, 0xd0, 0x14, 0x41, 0x09, 0xec, 0x14, 0xea, 0x15, 0x1c,
-	0xa3, 0x63, 0x85, 0x8e, 0xe3, 0xf6, 0x0d, 0x3a, 0x7e, 0x4e, 0x7d, 0x66, 0x72, 0xdd, 0x54, 0xa6,
-	0xf3, 0x11, 0x40, 0x94, 0xae, 0x2e, 0x22, 0x1e, 0x0a, 0x86, 0x08, 0xcc, 0x2b, 0x20, 0x51, 0x04,
-	0xa5, 0xff, 0x76, 0x0a, 0xf5, 0x4d, 0x3c, 0x63, 0x7e, 0x58, 0xa5, 0xb8, 0xb1, 0x0e, 0x3d, 0x99,
-	0xe2, 0xc9, 0x6a, 0x9e, 0xed, 0xa5, 0x3c, 0xb1, 0xdb, 0x14, 0xd0, 0x1d, 0x78, 0x39, 0xe1, 0x19,
-	0x37, 0x7b, 0x1d, 0xfe, 0xaf, 0x5c, 0x0e, 0x82, 0x96, 0xee, 0x34, 0xe7, 0xae, 0xa9, 0xaf, 0x4f,
-	0x5b, 0x4e, 0x23, 0x35, 0x9a, 0x84, 0xbd, 0x0a, 0x73, 0x2a, 0x6c, 0x86, 0xb2, 0x00, 0x5d, 0xcb,
-	0x1c, 0x69, 0x6a, 0x3c, 0x9c, 0x0c, 0x5e, 0xcc, 0x75, 0x3c, 0x37, 0xf7, 0xec, 0x5f, 0xcf, 0xfd,
-	0x14, 0xc0, 0xcd, 0x0b, 0xb6, 0x49, 0x0b, 0x7b, 0x70, 0x23, 0x75, 0x07, 0xe3, 0x2d, 0x94, 0x66,
-	0xb6, 0x92, 0x2a, 0xe0, 0x4e, 0x65, 0xfd, 0xbb, 0x9d, 0xec, 0x9b, 0x9d, 0xa4, 0xac, 0xe6, 0x4f,
-	0xe8, 0x06, 0x5c, 0x57, 0x78, 0x07, 0x6d, 0x2a, 0xda, 0xda, 0x74, 0xdd, 0xbd, 0xa4, 0x7e, 0xd8,
-	0xa7, 0xa2, 0xed, 0xbc, 0x86, 0xc5, 0xf3, 0x95, 0x92, 0xa6, 0x1b, 0xb0, 0x90, 0xc2, 0x37, 0xeb,
-	0x5b, 0xde, 0x73, 0x3a, 0xa9, 0xfe, 0x23, 0x07, 0xf3, 0xda, 0x00, 0xbd, 0x83, 0x79, 0x7d, 0xd2,
-	0xa8, 0x32, 0xb3, 0xc2, 0x85, 0x17, 0x65, 0x6d, 0x2f, 0xd5, 0xc5, 0x9c, 0x8e, 0xf3, 0xfe, 0xdb,
-	0xaf, 0xcf, 0xd9, 0x2d, 0x64, 0x91, 0x79, 0xef, 0x5b, 0xa0, 0x0f, 0x00, 0xe6, 0x54, 0x16, 0x2a,
-	0x2f, 0xae, 0x3a, 0x36, 0xaf, 0x2c, 0x93, 0x19, 0xef, 0xbb, 0xda, 0xbb, 0x82, 0x6e, 0xcd, 0xf7,
-	0x26, 0xc7, 0x66, 0x2f, 0x27, 0xe8, 0x0b, 0x80, 0x1b, 0x53, 0x67, 0xbd, 0xc0, 0x26, 0xad, 0xb3,
-	0xf0, 0x6a, 0xba, 0x04, 0xeb, 0x9e, 0xc6, 0xda, 0x45, 0xb5, 0x55, 0xb0, 0xc8, 0xd4, 0x91, 0x9e,
-	0x02, 0x58, 0x48, 0xdf, 0x55, 0x79, 0x25, 0x6b, 0xab, 0xba, 0x92, 0x2c, 0x01, 0x7c, 0xa4, 0x01,
-	0x1f, 0xa0, 0xfb, 0x7f, 0x0c, 0x48, 0x8e, 0x93, 0x6b, 0x3e, 0x69, 0x3c, 0xfb, 0x3a, 0xb4, 0xc1,
-	0xd9, 0xd0, 0x06, 0x3f, 0x87, 0x36, 0xf8, 0x34, 0xb2, 0x33, 0x67, 0x23, 0x3b, 0xf3, 0x7d, 0x64,
-	0x67, 0x5e, 0xd6, 0xfc, 0x40, 0xb6, 0xfb, 0x4d, 0xec, 0xf1, 0x2e, 0xe9, 0xb2, 0x56, 0xd0, 0xec,
-	0x70, 0x6f, 0xec, 0x55, 0xf5, 0x78, 0x8f, 0x91, 0xb7, 0x13, 0x4b, 0x79, 0x14, 0x31, 0xd1, 0x5c,
-	0xd3, 0x7f, 0xef, 0xbb, 0xbf, 0x03, 0x00, 0x00, 0xff, 0xff, 0x41, 0x61, 0x95, 0x46, 0xbd, 0x06,
-	0x00, 0x00,
+	// 588 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x94, 0xcf, 0x6e, 0xd3, 0x40,
+	0x10, 0xc6, 0xb3, 0x21, 0x69, 0xd2, 0x29, 0x48, 0xb0, 0x14, 0x51, 0x4c, 0x64, 0x5a, 0x0b, 0xd2,
+	0x52, 0x88, 0x57, 0x09, 0x02, 0x81, 0x38, 0x51, 0x2a, 0xfe, 0x08, 0x09, 0x81, 0x8f, 0x70, 0xa8,
+	0x36, 0xce, 0xca, 0xb1, 0x94, 0x78, 0xdd, 0xac, 0x13, 0x51, 0x95, 0x5e, 0xe0, 0x8e, 0x40, 0xdc,
+	0xfa, 0x2c, 0x3c, 0x00, 0xc7, 0x4a, 0x5c, 0x38, 0xa2, 0x84, 0x07, 0x41, 0xbb, 0x5e, 0xbb, 0x09,
+	0x24, 0x31, 0xa0, 0xde, 0x92, 0xcc, 0x37, 0xf3, 0xfd, 0xe6, 0xf3, 0x38, 0x70, 0x25, 0xa4, 0x01,
+	0x75, 0x19, 0x25, 0x2d, 0x1a, 0xd1, 0x16, 0xa3, 0x1d, 0x32, 0x68, 0x90, 0xdd, 0x3e, 0xeb, 0xed,
+	0xd9, 0x61, 0x8f, 0x47, 0x1c, 0x9f, 0xd7, 0x02, 0x3b, 0x11, 0xd8, 0x83, 0x86, 0xb1, 0xec, 0x71,
+	0x8f, 0xab, 0x3a, 0x91, 0x9f, 0x62, 0xa9, 0xb1, 0xe9, 0x72, 0xd1, 0xe5, 0x82, 0x34, 0xa9, 0x60,
+	0xf1, 0x0c, 0x32, 0xa8, 0x37, 0x59, 0x44, 0xeb, 0x24, 0xa4, 0x9e, 0x1f, 0xd0, 0xc8, 0xe7, 0x81,
+	0xd6, 0x56, 0x3c, 0xce, 0xbd, 0x0e, 0x23, 0x34, 0xf4, 0x09, 0x0d, 0x02, 0x1e, 0xa9, 0xa2, 0xd0,
+	0x55, 0x73, 0x1a, 0x95, 0x32, 0x8f, 0xeb, 0x6b, 0xd3, 0xea, 0x2e, 0x0f, 0x04, 0x0b, 0xa2, 0x58,
+	0x62, 0xbd, 0x86, 0x73, 0x2f, 0x25, 0xc2, 0x36, 0xa3, 0x1d, 0xe1, 0xb0, 0xdd, 0x3e, 0x13, 0x11,
+	0x7e, 0x04, 0x70, 0x4c, 0xb2, 0x82, 0x56, 0xd1, 0xc6, 0x52, 0xa3, 0x6a, 0xc7, 0xd8, 0xb6, 0xc4,
+	0xb6, 0xe3, 0xd5, 0x35, 0xb6, 0xfd, 0x82, 0x7a, 0x4c, 0xf7, 0x3a, 0x63, 0x9d, 0xd6, 0x07, 0x04,
+	0x78, 0x7c, 0xba, 0x08, 0xa5, 0x37, 0x26, 0x50, 0x94, 0x30, 0x62, 0x05, 0xad, 0x9e, 0xda, 0x58,
+	0x6a, 0x5c, 0xb2, 0xa7, 0x64, 0x67, 0xcb, 0x16, 0x27, 0xd6, 0xe1, 0xc7, 0x13, 0x3c, 0x79, 0xc5,
+	0xb3, 0x9e, 0xc9, 0x13, 0xbb, 0x4d, 0x00, 0xdd, 0x80, 0xb3, 0x29, 0x4f, 0xb2, 0xec, 0x45, 0x28,
+	0x49, 0x97, 0x1d, 0xbf, 0xa5, 0x36, 0x2d, 0x38, 0x0b, 0xf2, 0xeb, 0xd3, 0x96, 0xb5, 0x35, 0x16,
+	0x4d, 0xca, 0x5e, 0x83, 0x82, 0x2c, 0xeb, 0x50, 0xe6, 0xa0, 0x2b, 0x99, 0x15, 0xc2, 0x19, 0x35,
+	0xe3, 0x61, 0x1c, 0xba, 0x98, 0xe9, 0xf6, 0x5b, 0xe6, 0xf9, 0xff, 0xce, 0xfc, 0x10, 0xc1, 0x85,
+	0x09, 0xcb, 0x14, 0xfd, 0x2e, 0x94, 0xf5, 0xb3, 0x4f, 0x92, 0xaf, 0x4c, 0xc5, 0xd7, 0x8d, 0x4e,
+	0xaa, 0x3e, 0xb9, 0xfc, 0xb7, 0xe1, 0xf4, 0x38, 0xdb, 0xec, 0x34, 0x2e, 0xc3, 0xa2, 0x44, 0xda,
+	0x69, 0x53, 0xd1, 0x56, 0x86, 0x8b, 0x4e, 0x59, 0xfe, 0xf0, 0x84, 0x8a, 0xb6, 0xf5, 0x1c, 0x96,
+	0xc7, 0xa7, 0xa4, 0x0b, 0xde, 0x81, 0x92, 0x46, 0xd6, 0x8f, 0x67, 0xfe, 0x7e, 0x89, 0xb8, 0xf1,
+	0xa5, 0x00, 0x45, 0x35, 0x10, 0xbf, 0x85, 0xa2, 0x3a, 0x55, 0x5c, 0x9d, 0xda, 0xf9, 0xc7, 0x9b,
+	0x62, 0xac, 0x67, 0xea, 0x62, 0x36, 0xcb, 0x7a, 0xf7, 0xed, 0xe7, 0xe7, 0x7c, 0x05, 0x1b, 0x64,
+	0xd6, 0x3b, 0x2b, 0xf0, 0x7b, 0x04, 0x05, 0xd9, 0x85, 0xaf, 0xcd, 0x9f, 0x9a, 0x98, 0x57, 0xb3,
+	0x64, 0xda, 0xfb, 0xa6, 0xf2, 0xae, 0xe2, 0xab, 0xb3, 0xbd, 0xc9, 0xbe, 0x7e, 0x0e, 0x07, 0xf8,
+	0x13, 0x82, 0x72, 0x7a, 0xae, 0xd6, 0x6c, 0x8b, 0x44, 0x63, 0x6c, 0x66, 0x6b, 0x52, 0x94, 0xdb,
+	0x0a, 0x85, 0xe0, 0xda, 0xdf, 0xa0, 0x90, 0xf4, 0x00, 0x0f, 0x11, 0x94, 0x92, 0x9b, 0x59, 0xcb,
+	0xb4, 0x33, 0xae, 0x67, 0x4a, 0x52, 0xa0, 0x07, 0x0a, 0xe8, 0x3e, 0xbe, 0xf7, 0x4f, 0x40, 0x64,
+	0x3f, 0xbd, 0xce, 0x83, 0xad, 0x67, 0x5f, 0x87, 0x26, 0x3a, 0x1a, 0x9a, 0xe8, 0xc7, 0xd0, 0x44,
+	0x1f, 0x47, 0x66, 0xee, 0x68, 0x64, 0xe6, 0xbe, 0x8f, 0xcc, 0xdc, 0xab, 0xba, 0xe7, 0x47, 0xed,
+	0x7e, 0xd3, 0x76, 0x79, 0x97, 0x74, 0x59, 0xcb, 0x6f, 0x76, 0xb8, 0x9b, 0xf8, 0xd4, 0x5c, 0xde,
+	0x63, 0xe4, 0xcd, 0xb1, 0x5d, 0xb4, 0x17, 0x32, 0xd1, 0x5c, 0x50, 0x7f, 0xcb, 0xb7, 0x7e, 0x05,
+	0x00, 0x00, 0xff, 0xff, 0xda, 0x7a, 0x24, 0x37, 0x71, 0x06, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -493,10 +492,10 @@ type QueryClient interface {
 	Deals(ctx context.Context, in *QueryDealsRequest, opts ...grpc.CallOption) (*QueryDealsResponse, error)
 	// Deal returns a Deal.
 	Deal(ctx context.Context, in *QueryDealRequest, opts ...grpc.CallOption) (*QueryDealResponse, error)
-	// Certificates returns a list of Certificate.
-	Certificates(ctx context.Context, in *QueryCertificates, opts ...grpc.CallOption) (*QueryCertificatesResponse, error)
-	// Certificate returns a Certificate
-	Certificate(ctx context.Context, in *QueryCertificate, opts ...grpc.CallOption) (*QueryCertificateResponse, error)
+	// Consents returns a list of Consent.
+	Consents(ctx context.Context, in *QueryConsents, opts ...grpc.CallOption) (*QueryConsentsResponse, error)
+	// Consent returns a Consent
+	Consent(ctx context.Context, in *QueryConsent, opts ...grpc.CallOption) (*QueryConsentResponse, error)
 }
 
 type queryClient struct {
@@ -525,18 +524,18 @@ func (c *queryClient) Deal(ctx context.Context, in *QueryDealRequest, opts ...gr
 	return out, nil
 }
 
-func (c *queryClient) Certificates(ctx context.Context, in *QueryCertificates, opts ...grpc.CallOption) (*QueryCertificatesResponse, error) {
-	out := new(QueryCertificatesResponse)
-	err := c.cc.Invoke(ctx, "/panacea.datadeal.v2.Query/Certificates", in, out, opts...)
+func (c *queryClient) Consents(ctx context.Context, in *QueryConsents, opts ...grpc.CallOption) (*QueryConsentsResponse, error) {
+	out := new(QueryConsentsResponse)
+	err := c.cc.Invoke(ctx, "/panacea.datadeal.v2.Query/Consents", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *queryClient) Certificate(ctx context.Context, in *QueryCertificate, opts ...grpc.CallOption) (*QueryCertificateResponse, error) {
-	out := new(QueryCertificateResponse)
-	err := c.cc.Invoke(ctx, "/panacea.datadeal.v2.Query/Certificate", in, out, opts...)
+func (c *queryClient) Consent(ctx context.Context, in *QueryConsent, opts ...grpc.CallOption) (*QueryConsentResponse, error) {
+	out := new(QueryConsentResponse)
+	err := c.cc.Invoke(ctx, "/panacea.datadeal.v2.Query/Consent", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -549,10 +548,10 @@ type QueryServer interface {
 	Deals(context.Context, *QueryDealsRequest) (*QueryDealsResponse, error)
 	// Deal returns a Deal.
 	Deal(context.Context, *QueryDealRequest) (*QueryDealResponse, error)
-	// Certificates returns a list of Certificate.
-	Certificates(context.Context, *QueryCertificates) (*QueryCertificatesResponse, error)
-	// Certificate returns a Certificate
-	Certificate(context.Context, *QueryCertificate) (*QueryCertificateResponse, error)
+	// Consents returns a list of Consent.
+	Consents(context.Context, *QueryConsents) (*QueryConsentsResponse, error)
+	// Consent returns a Consent
+	Consent(context.Context, *QueryConsent) (*QueryConsentResponse, error)
 }
 
 // UnimplementedQueryServer can be embedded to have forward compatible implementations.
@@ -565,11 +564,11 @@ func (*UnimplementedQueryServer) Deals(ctx context.Context, req *QueryDealsReque
 func (*UnimplementedQueryServer) Deal(ctx context.Context, req *QueryDealRequest) (*QueryDealResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Deal not implemented")
 }
-func (*UnimplementedQueryServer) Certificates(ctx context.Context, req *QueryCertificates) (*QueryCertificatesResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Certificates not implemented")
+func (*UnimplementedQueryServer) Consents(ctx context.Context, req *QueryConsents) (*QueryConsentsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Consents not implemented")
 }
-func (*UnimplementedQueryServer) Certificate(ctx context.Context, req *QueryCertificate) (*QueryCertificateResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Certificate not implemented")
+func (*UnimplementedQueryServer) Consent(ctx context.Context, req *QueryConsent) (*QueryConsentResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Consent not implemented")
 }
 
 func RegisterQueryServer(s grpc1.Server, srv QueryServer) {
@@ -612,38 +611,38 @@ func _Query_Deal_Handler(srv interface{}, ctx context.Context, dec func(interfac
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Query_Certificates_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(QueryCertificates)
+func _Query_Consents_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryConsents)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(QueryServer).Certificates(ctx, in)
+		return srv.(QueryServer).Consents(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/panacea.datadeal.v2.Query/Certificates",
+		FullMethod: "/panacea.datadeal.v2.Query/Consents",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(QueryServer).Certificates(ctx, req.(*QueryCertificates))
+		return srv.(QueryServer).Consents(ctx, req.(*QueryConsents))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Query_Certificate_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(QueryCertificate)
+func _Query_Consent_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryConsent)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(QueryServer).Certificate(ctx, in)
+		return srv.(QueryServer).Consent(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/panacea.datadeal.v2.Query/Certificate",
+		FullMethod: "/panacea.datadeal.v2.Query/Consent",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(QueryServer).Certificate(ctx, req.(*QueryCertificate))
+		return srv.(QueryServer).Consent(ctx, req.(*QueryConsent))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -661,12 +660,12 @@ var _Query_serviceDesc = grpc.ServiceDesc{
 			Handler:    _Query_Deal_Handler,
 		},
 		{
-			MethodName: "Certificates",
-			Handler:    _Query_Certificates_Handler,
+			MethodName: "Consents",
+			Handler:    _Query_Consents_Handler,
 		},
 		{
-			MethodName: "Certificate",
-			Handler:    _Query_Certificate_Handler,
+			MethodName: "Consent",
+			Handler:    _Query_Consent_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
@@ -820,7 +819,7 @@ func (m *QueryDealResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *QueryCertificates) Marshal() (dAtA []byte, err error) {
+func (m *QueryConsents) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -830,12 +829,12 @@ func (m *QueryCertificates) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *QueryCertificates) MarshalTo(dAtA []byte) (int, error) {
+func (m *QueryConsents) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *QueryCertificates) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *QueryConsents) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -860,7 +859,7 @@ func (m *QueryCertificates) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *QueryCertificatesResponse) Marshal() (dAtA []byte, err error) {
+func (m *QueryConsentsResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -870,12 +869,12 @@ func (m *QueryCertificatesResponse) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *QueryCertificatesResponse) MarshalTo(dAtA []byte) (int, error) {
+func (m *QueryConsentsResponse) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *QueryCertificatesResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *QueryConsentsResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -892,10 +891,10 @@ func (m *QueryCertificatesResponse) MarshalToSizedBuffer(dAtA []byte) (int, erro
 		i--
 		dAtA[i] = 0x12
 	}
-	if len(m.Certificates) > 0 {
-		for iNdEx := len(m.Certificates) - 1; iNdEx >= 0; iNdEx-- {
+	if len(m.Consents) > 0 {
+		for iNdEx := len(m.Consents) - 1; iNdEx >= 0; iNdEx-- {
 			{
-				size, err := m.Certificates[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				size, err := m.Consents[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -909,7 +908,7 @@ func (m *QueryCertificatesResponse) MarshalToSizedBuffer(dAtA []byte) (int, erro
 	return len(dAtA) - i, nil
 }
 
-func (m *QueryCertificate) Marshal() (dAtA []byte, err error) {
+func (m *QueryConsent) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -919,12 +918,12 @@ func (m *QueryCertificate) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *QueryCertificate) MarshalTo(dAtA []byte) (int, error) {
+func (m *QueryConsent) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *QueryCertificate) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *QueryConsent) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -944,7 +943,7 @@ func (m *QueryCertificate) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *QueryCertificateResponse) Marshal() (dAtA []byte, err error) {
+func (m *QueryConsentResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -954,19 +953,19 @@ func (m *QueryCertificateResponse) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *QueryCertificateResponse) MarshalTo(dAtA []byte) (int, error) {
+func (m *QueryConsentResponse) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *QueryCertificateResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *QueryConsentResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if m.Certificate != nil {
+	if m.Consent != nil {
 		{
-			size, err := m.Certificate.MarshalToSizedBuffer(dAtA[:i])
+			size, err := m.Consent.MarshalToSizedBuffer(dAtA[:i])
 			if err != nil {
 				return 0, err
 			}
@@ -1047,7 +1046,7 @@ func (m *QueryDealResponse) Size() (n int) {
 	return n
 }
 
-func (m *QueryCertificates) Size() (n int) {
+func (m *QueryConsents) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -1063,14 +1062,14 @@ func (m *QueryCertificates) Size() (n int) {
 	return n
 }
 
-func (m *QueryCertificatesResponse) Size() (n int) {
+func (m *QueryConsentsResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	if len(m.Certificates) > 0 {
-		for _, e := range m.Certificates {
+	if len(m.Consents) > 0 {
+		for _, e := range m.Consents {
 			l = e.Size()
 			n += 1 + l + sovQuery(uint64(l))
 		}
@@ -1082,7 +1081,7 @@ func (m *QueryCertificatesResponse) Size() (n int) {
 	return n
 }
 
-func (m *QueryCertificate) Size() (n int) {
+func (m *QueryConsent) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -1098,14 +1097,14 @@ func (m *QueryCertificate) Size() (n int) {
 	return n
 }
 
-func (m *QueryCertificateResponse) Size() (n int) {
+func (m *QueryConsentResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	if m.Certificate != nil {
-		l = m.Certificate.Size()
+	if m.Consent != nil {
+		l = m.Consent.Size()
 		n += 1 + l + sovQuery(uint64(l))
 	}
 	return n
@@ -1478,7 +1477,7 @@ func (m *QueryDealResponse) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *QueryCertificates) Unmarshal(dAtA []byte) error {
+func (m *QueryConsents) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -1501,10 +1500,10 @@ func (m *QueryCertificates) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: QueryCertificates: wiretype end group for non-group")
+			return fmt.Errorf("proto: QueryConsents: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: QueryCertificates: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: QueryConsents: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -1583,7 +1582,7 @@ func (m *QueryCertificates) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *QueryCertificatesResponse) Unmarshal(dAtA []byte) error {
+func (m *QueryConsentsResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -1606,15 +1605,15 @@ func (m *QueryCertificatesResponse) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: QueryCertificatesResponse: wiretype end group for non-group")
+			return fmt.Errorf("proto: QueryConsentsResponse: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: QueryCertificatesResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: QueryConsentsResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Certificates", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Consents", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -1641,8 +1640,8 @@ func (m *QueryCertificatesResponse) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Certificates = append(m.Certificates, &Certificate{})
-			if err := m.Certificates[len(m.Certificates)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			m.Consents = append(m.Consents, &Consent{})
+			if err := m.Consents[len(m.Consents)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -1703,7 +1702,7 @@ func (m *QueryCertificatesResponse) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *QueryCertificate) Unmarshal(dAtA []byte) error {
+func (m *QueryConsent) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -1726,10 +1725,10 @@ func (m *QueryCertificate) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: QueryCertificate: wiretype end group for non-group")
+			return fmt.Errorf("proto: QueryConsent: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: QueryCertificate: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: QueryConsent: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -1804,7 +1803,7 @@ func (m *QueryCertificate) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *QueryCertificateResponse) Unmarshal(dAtA []byte) error {
+func (m *QueryConsentResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -1827,15 +1826,15 @@ func (m *QueryCertificateResponse) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: QueryCertificateResponse: wiretype end group for non-group")
+			return fmt.Errorf("proto: QueryConsentResponse: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: QueryCertificateResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: QueryConsentResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Certificate", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Consent", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -1862,10 +1861,10 @@ func (m *QueryCertificateResponse) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if m.Certificate == nil {
-				m.Certificate = &Certificate{}
+			if m.Consent == nil {
+				m.Consent = &Consent{}
 			}
-			if err := m.Certificate.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			if err := m.Consent.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex

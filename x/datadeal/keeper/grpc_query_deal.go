@@ -52,12 +52,12 @@ func (k Keeper) Deals(goCtx context.Context, req *types.QueryDealsRequest) (*typ
 	}
 
 	return &types.QueryDealsResponse{
-		Deals:       deals,
+		Deals:      deals,
 		Pagination: pageRes,
 	}, nil
 }
 
-func (k Keeper) Certificates(goCtx context.Context, req *types.QueryCertificates) (*types.QueryCertificatesResponse, error) {
+func (k Keeper) Consents(goCtx context.Context, req *types.QueryConsents) (*types.QueryConsentsResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
@@ -66,39 +66,39 @@ func (k Keeper) Certificates(goCtx context.Context, req *types.QueryCertificates
 
 	store := ctx.KVStore(k.storeKey)
 
-	certsStore := prefix.NewStore(store, append(types.CertificateKey, sdk.Uint64ToBigEndian(req.DealId)...))
+	consentsStore := prefix.NewStore(store, append(types.ConsentKey, sdk.Uint64ToBigEndian(req.DealId)...))
 
-	var certs []*types.Certificate
-	pageRes, err := query.Paginate(certsStore, req.Pagination, func(_ []byte, value []byte) error {
-		var cert types.Certificate
-		err := k.cdc.UnmarshalLengthPrefixed(value, &cert)
+	var consents []*types.Consent
+	pageRes, err := query.Paginate(consentsStore, req.Pagination, func(_ []byte, value []byte) error {
+		var consent types.Consent
+		err := k.cdc.UnmarshalLengthPrefixed(value, &consent)
 		if err != nil {
 			return err
 		}
-		certs = append(certs, &cert)
+		consents = append(consents, &consent)
 		return nil
 	})
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	return &types.QueryCertificatesResponse{
-		Certificates: certs,
-		Pagination:   pageRes,
+	return &types.QueryConsentsResponse{
+		Consents:   consents,
+		Pagination: pageRes,
 	}, nil
 }
 
-func (k Keeper) Certificate(goCtx context.Context, req *types.QueryCertificate) (*types.QueryCertificateResponse, error) {
+func (k Keeper) Consent(goCtx context.Context, req *types.QueryConsent) (*types.QueryConsentResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
 
-	cert, err := k.GetCertificate(sdk.UnwrapSDKContext(goCtx), req.DealId, req.DataHash)
+	consent, err := k.GetConsent(sdk.UnwrapSDKContext(goCtx), req.DealId, req.DataHash)
 	if err != nil {
 		return nil, err
 	}
 
-	return &types.QueryCertificateResponse{
-		Certificate: cert,
+	return &types.QueryConsentResponse{
+		Consent: consent,
 	}, nil
 }

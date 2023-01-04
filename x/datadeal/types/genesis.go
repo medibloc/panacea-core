@@ -5,7 +5,7 @@ func DefaultGenesis() *GenesisState {
 	return &GenesisState{
 		NextDealNumber: uint64(1),
 		Deals:          []Deal{},
-		Certificates:   []Certificate{},
+		Consents:       []Consent{},
 	}
 }
 

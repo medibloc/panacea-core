@@ -49,9 +49,9 @@ func (m *MsgCreateDeal) GetSigners() []sdk.AccAddress {
 
 var _ sdk.Msg = &MsgSubmitConsent{}
 
-func NewMsgSubmitConsent(dataCert *Certificate) *MsgSubmitConsent {
+func NewMsgSubmitConsent(consent *Consent) *MsgSubmitConsent {
 	return &MsgSubmitConsent{
-		Certificate: dataCert,
+		Consent: consent,
 	}
 }
 func (m *MsgSubmitConsent) Route() string {
@@ -63,11 +63,15 @@ func (m *MsgSubmitConsent) Type() string {
 }
 
 func (m *MsgSubmitConsent) ValidateBasic() error {
-	if m.Certificate == nil {
+	if m.Consent == nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "consent is empty")
+	}
+
+	if m.Consent.Certificate == nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "certificate is empty")
 	}
 
-	if err := m.Certificate.ValidateBasic(); err != nil {
+	if err := m.Consent.ValidateBasic(); err != nil {
 		return sdkerrors.Wrapf(err, "failed to validation certificate")
 	}
 
@@ -80,7 +84,7 @@ func (m *MsgSubmitConsent) GetSignBytes() []byte {
 }
 
 func (m *MsgSubmitConsent) GetSigners() []sdk.AccAddress {
-	providerAddress, err := sdk.AccAddressFromBech32(m.Certificate.UnsignedCertificate.ProviderAddress)
+	providerAddress, err := sdk.AccAddressFromBech32(m.Consent.Certificate.UnsignedCertificate.ProviderAddress)
 	if err != nil {
 		panic(err)
 	}

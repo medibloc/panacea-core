@@ -131,9 +131,11 @@ func (suite *certificateTestSuite) TestSubmitConsentSuccess() {
 
 	suite.Require().NoError(err)
 
-	certificate := &types.Certificate{
-		UnsignedCertificate: unsignedCert,
-		Signature:           sign.Serialize(),
+	consent := &types.Consent{
+		Certificate: &types.Certificate{
+			UnsignedCertificate: unsignedCert,
+			Signature:           sign.Serialize(),
+		},
 	}
 
 	providerBalance := suite.BankKeeper.GetBalance(suite.Ctx, suite.providerAccAddr, assets.MicroMedDenom)
@@ -147,7 +149,7 @@ func (suite *certificateTestSuite) TestSubmitConsentSuccess() {
 	dealBalance := suite.BankKeeper.GetBalance(suite.Ctx, dealAccAddr, assets.MicroMedDenom)
 	suite.Require().Equal(sdk.NewIntFromUint64(budgetAmount), dealBalance.Amount)
 
-	err = suite.DataDealKeeper.SubmitConsent(suite.Ctx, certificate)
+	err = suite.DataDealKeeper.SubmitConsent(suite.Ctx, consent)
 	suite.Require().NoError(err)
 
 	providerBalance = suite.BankKeeper.GetBalance(suite.Ctx, suite.providerAccAddr, assets.MicroMedDenom)
@@ -191,9 +193,11 @@ func (suite *certificateTestSuite) TestSubmitConsentChangeStatusComplete() {
 	sign, err := suite.oraclePrivKey.Sign(unsignedCertBz)
 	suite.Require().NoError(err)
 
-	certificate := &types.Certificate{
-		UnsignedCertificate: unsignedCert,
-		Signature:           sign.Serialize(),
+	consent := &types.Consent{
+		Certificate: &types.Certificate{
+			UnsignedCertificate: unsignedCert,
+			Signature:           sign.Serialize(),
+		},
 	}
 
 	providerBalance := suite.BankKeeper.GetBalance(suite.Ctx, suite.providerAccAddr, assets.MicroMedDenom)
@@ -207,7 +211,7 @@ func (suite *certificateTestSuite) TestSubmitConsentChangeStatusComplete() {
 	dealBalance := suite.BankKeeper.GetBalance(suite.Ctx, dealAccAddr, assets.MicroMedDenom)
 	suite.Require().Equal(sdk.NewIntFromUint64(budgetAmount), dealBalance.Amount)
 
-	err = suite.DataDealKeeper.SubmitConsent(suite.Ctx, certificate)
+	err = suite.DataDealKeeper.SubmitConsent(suite.Ctx, consent)
 	suite.Require().NoError(err)
 
 	providerBalance = suite.BankKeeper.GetBalance(suite.Ctx, suite.providerAccAddr, assets.MicroMedDenom)
@@ -246,12 +250,14 @@ func (suite *certificateTestSuite) TestSubmitConsentNotRegisteredOracle() {
 	sign, err := suite.oraclePrivKey.Sign(unsignedCertBz)
 	suite.Require().NoError(err)
 
-	certificate := &types.Certificate{
-		UnsignedCertificate: unsignedCert,
-		Signature:           sign.Serialize(),
+	consent := &types.Consent{
+		Certificate: &types.Certificate{
+			UnsignedCertificate: unsignedCert,
+			Signature:           sign.Serialize(),
+		},
 	}
 
-	err = suite.DataDealKeeper.SubmitConsent(suite.Ctx, certificate)
+	err = suite.DataDealKeeper.SubmitConsent(suite.Ctx, consent)
 	suite.Require().ErrorIs(err, types.ErrSubmitConsent)
 	suite.Require().ErrorContains(err, fmt.Sprintf("failed to oracle validation. address(%s)", suite.providerAccAddr.String()))
 }
@@ -278,12 +284,14 @@ func (suite *certificateTestSuite) TestSubmitConsentNotSameUniqueIDOfOracle() {
 	sign, err := suite.oraclePrivKey.Sign(unsignedCertBz)
 	suite.Require().NoError(err)
 
-	certificate := &types.Certificate{
-		UnsignedCertificate: unsignedCert,
-		Signature:           sign.Serialize(),
+	consent := &types.Consent{
+		Certificate: &types.Certificate{
+			UnsignedCertificate: unsignedCert,
+			Signature:           sign.Serialize(),
+		},
 	}
 
-	err = suite.DataDealKeeper.SubmitConsent(suite.Ctx, certificate)
+	err = suite.DataDealKeeper.SubmitConsent(suite.Ctx, consent)
 	suite.Require().ErrorIs(err, types.ErrSubmitConsent)
 	suite.Require().ErrorContains(err, "is not active an oracle.")
 }
@@ -310,12 +318,14 @@ func (suite *certificateTestSuite) TestSubmitConsentInvalidSignature() {
 	sign, err := suite.invalidOraclePrivKey.Sign(unsignedCertBz)
 	suite.Require().NoError(err)
 
-	certificate := &types.Certificate{
-		UnsignedCertificate: unsignedCert,
-		Signature:           sign.Serialize(),
+	consent := &types.Consent{
+		Certificate: &types.Certificate{
+			UnsignedCertificate: unsignedCert,
+			Signature:           sign.Serialize(),
+		},
 	}
 
-	err = suite.DataDealKeeper.SubmitConsent(suite.Ctx, certificate)
+	err = suite.DataDealKeeper.SubmitConsent(suite.Ctx, consent)
 	suite.Require().ErrorIs(err, types.ErrSubmitConsent)
 	suite.Require().ErrorContains(err, "failed to signature validation")
 }
@@ -339,12 +349,14 @@ func (suite *certificateTestSuite) TestSubmitConsentNotExistDeal() {
 	sign, err := suite.oraclePrivKey.Sign(unsignedCertBz)
 	suite.Require().NoError(err)
 
-	certificate := &types.Certificate{
-		UnsignedCertificate: unsignedCert,
-		Signature:           sign.Serialize(),
+	consent := &types.Consent{
+		Certificate: &types.Certificate{
+			UnsignedCertificate: unsignedCert,
+			Signature:           sign.Serialize(),
+		},
 	}
 
-	err = suite.DataDealKeeper.SubmitConsent(suite.Ctx, certificate)
+	err = suite.DataDealKeeper.SubmitConsent(suite.Ctx, consent)
 	suite.Require().ErrorIs(err, types.ErrSubmitConsent)
 	suite.Require().ErrorContains(err, "failed to get deal.")
 }
@@ -368,11 +380,14 @@ func (suite *certificateTestSuite) TestSubmitConsentAlreadyDealStatusComplete() 
 
 	suite.Require().NoError(err)
 
-	certificate := &types.Certificate{
-		UnsignedCertificate: unsignedCert,
-		Signature:           sign.Serialize(),
+	consent := &types.Consent{
+		Certificate: &types.Certificate{
+			UnsignedCertificate: unsignedCert,
+			Signature:           sign.Serialize(),
+		},
 	}
-	err = suite.DataDealKeeper.SubmitConsent(suite.Ctx, certificate)
+
+	err = suite.DataDealKeeper.SubmitConsent(suite.Ctx, consent)
 	suite.Require().ErrorIs(err, types.ErrSubmitConsent)
 	suite.Require().ErrorContains(err, "deal status is not ACTIVE")
 }
@@ -395,13 +410,16 @@ func (suite *certificateTestSuite) TestSubmitConsentExistSameCertificate() {
 	sign, err := suite.oraclePrivKey.Sign(unsignedCertBz)
 	suite.Require().NoError(err)
 
-	certificate := &types.Certificate{
-		UnsignedCertificate: unsignedCert,
-		Signature:           sign.Serialize(),
+	consent := &types.Consent{
+		Certificate: &types.Certificate{
+			UnsignedCertificate: unsignedCert,
+			Signature:           sign.Serialize(),
+		},
 	}
-	err = suite.DataDealKeeper.SubmitConsent(suite.Ctx, certificate)
+
+	err = suite.DataDealKeeper.SubmitConsent(suite.Ctx, consent)
 	suite.Require().ErrorIs(err, types.ErrSubmitConsent)
-	suite.Require().ErrorContains(err, "already provided certificate: error while submit consent")
+	suite.Require().ErrorContains(err, "already provided consent: error while submit consent")
 }
 
 func (suite *certificateTestSuite) TestSubmitConsentNotSameUniqueIDOfCertificate() {
@@ -427,12 +445,14 @@ func (suite *certificateTestSuite) TestSubmitConsentNotSameUniqueIDOfCertificate
 	sign, err := suite.oraclePrivKey.Sign(unsignedCertBz)
 	suite.Require().NoError(err)
 
-	certificate := &types.Certificate{
-		UnsignedCertificate: unsignedCert,
-		Signature:           sign.Serialize(),
+	consent := &types.Consent{
+		Certificate: &types.Certificate{
+			UnsignedCertificate: unsignedCert,
+			Signature:           sign.Serialize(),
+		},
 	}
 
-	err = suite.DataDealKeeper.SubmitConsent(suite.Ctx, certificate)
+	err = suite.DataDealKeeper.SubmitConsent(suite.Ctx, consent)
 	suite.Require().ErrorIs(err, types.ErrSubmitConsent)
 	suite.Require().ErrorContains(err, fmt.Sprintf("does not match active uniqueID. certificateUniqueID(%s) activeUniqueID(%s)", invalidUniqueID, suite.uniqueID))
 }

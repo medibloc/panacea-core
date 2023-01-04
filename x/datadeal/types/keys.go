@@ -30,8 +30,8 @@ var (
 	// DealKey defines key to store deals
 	DealKey = []byte{0x02}
 
-	// CertificateKey defines key to store certificate
-	CertificateKey = []byte{0x03}
+	// ConsentKey defines key to store consent
+	ConsentKey = []byte{0x03}
 
 	KeyIndexSeparator = []byte{0xFF}
 )
@@ -40,8 +40,8 @@ func GetDealKey(dealID uint64) []byte {
 	return append(DealKey, sdk.Uint64ToBigEndian(dealID)...)
 }
 
-func GetCertificateKey(dealID uint64, dataHash string) []byte {
-	return append(CertificateKey, CombineKeys(sdk.Uint64ToBigEndian(dealID), []byte(dataHash))...)
+func GetConsentKey(dealID uint64, dataHash string) []byte {
+	return append(ConsentKey, CombineKeys(sdk.Uint64ToBigEndian(dealID), []byte(dataHash))...)
 }
 
 // CombineKeys function defines combines deal_id with data_hash.

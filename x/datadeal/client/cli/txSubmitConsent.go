@@ -42,8 +42,8 @@ func CmdSubmitConsent() *cobra.Command {
 	return cmd
 }
 
-func newDataCertificate(file string) (*types.Certificate, error) {
-	var cert *types.Certificate
+func newDataCertificate(file string) (*types.Consent, error) {
+	var cert *types.Consent
 
 	contents, err := os.ReadFile(file)
 	if err != nil {
