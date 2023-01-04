@@ -12,15 +12,15 @@ func NewOracleProposalHandler(k keeper.Keeper) govtypes.Handler {
 	return func(ctx sdk.Context, content govtypes.Content) error {
 		switch c := content.(type) {
 		case *types.OracleUpgradeProposal:
-			return handlerOracleUpgradeProposal(ctx, k, c)
+			return handleOracleUpgradeProposal(ctx, k, c)
 		default:
-			return sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "unrecognized oracle upgrade proposal content type: %T", c)
+			return sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "unrecognized oracle proposal content type: %T", c)
 		}
 
 	}
 }
 
-func handlerOracleUpgradeProposal(ctx sdk.Context, k keeper.Keeper, p *types.OracleUpgradeProposal) error {
+func handleOracleUpgradeProposal(ctx sdk.Context, k keeper.Keeper, p *types.OracleUpgradeProposal) error {
 	if p.Plan.Height < ctx.BlockHeight() {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "oracle upgrade cannot be scheduled in the past")
 	}

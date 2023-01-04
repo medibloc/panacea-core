@@ -9,10 +9,10 @@ import (
 )
 
 func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) {
-	handlerOracleUpgrade(ctx, keeper)
+	handleOracleUpgrade(ctx, keeper)
 }
 
-func handlerOracleUpgrade(ctx sdk.Context, keeper keeper.Keeper) {
+func handleOracleUpgrade(ctx sdk.Context, keeper keeper.Keeper) {
 	upgradeInfo, err := keeper.GetOracleUpgradeInfo(ctx)
 	if err != nil {
 		if errors.Is(err, types.ErrOracleUpgradeInfoNotFound) {
