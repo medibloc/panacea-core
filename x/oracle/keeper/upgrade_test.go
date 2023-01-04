@@ -403,3 +403,76 @@ func (suite *oracleUpgradeTestSuite) TestApproveOracleUpgradeFailAlreadyApproved
 	suite.Require().Error(types.ErrApproveOracleUpgrade)
 	suite.Require().ErrorContains(err, "already approved oracle upgrade")
 }
+
+func (suite *oracleUpgradeTestSuite) TestApproveOracleUpgradeFailInvalidUniqueID() {
+	// requester : suite.oracleAcc
+	// approver : suite.approverAcc
+
+	ctx := suite.Ctx
+
+	// set oracle upgrade info
+	upgradeInfo := &types.OracleUpgradeInfo{
+		UniqueId: suite.upgradeUniqueID,
+		Height:   10,
+	}
+
+	suite.Require().NoError(suite.OracleKeeper.SetOracleUpgradeInfo(ctx, upgradeInfo))
+
+	// set approver oracle
+	approverOracle := &types.Oracle{
+		OracleAddress:                 suite.approverAccAddr.String(),
+		UniqueId:                      suite.currentUniqueID,
+		Endpoint:                      "iam-approver.com",
+		UpdateTime:                    ctx.BlockTime(),
+		OracleCommissionRate:          sdk.NewDecWithPrec(1, 1),
+		OracleCommissionMaxRate:       sdk.NewDecWithPrec(2, 1),
+		OracleCommissionMaxChangeRate: sdk.NewDecWithPrec(1, 2),
+	}
+
+	suite.Require().NoError(suite.OracleKeeper.SetOracle(ctx, approverOracle))
+
+	oracle := &types.Oracle{
+		OracleAddress:                 suite.oracleAccAddr.String(),
+		UniqueId:                      suite.currentUniqueID,
+		Endpoint:                      "test.com",
+		UpdateTime:                    ctx.BlockTime(),
+		OracleCommissionRate:          sdk.NewDecWithPrec(1, 1),
+		OracleCommissionMaxRate:       sdk.NewDecWithPrec(2, 1),
+		OracleCommissionMaxChangeRate: sdk.NewDecWithPrec(1, 2),
+	}
+
+	suite.Require().NoError(suite.OracleKeeper.SetOracle(ctx, oracle))
+
+	msgOracleUpgrade := &types.MsgUpgradeOracle{
+		UniqueId:               suite.upgradeUniqueID,
+		OracleAddress:          suite.oracleAccAddr.String(),
+		NodePubKey:             suite.nodePubKey.SerializeCompressed(),
+		NodePubKeyRemoteReport: suite.nodePubKeyRemoteReport,
+		TrustedBlockHeight:     int64(1),
+		TrustedBlockHash:       []byte("trustedBlockHash"),
+	}
+
+	suite.Require().NoError(suite.OracleKeeper.UpgradeOracle(ctx, msgOracleUpgrade))
+
+	// approve oracle upgrade
+	encryptedOraclePrivKey, err := btcec.Encrypt(suite.nodePubKey, suite.oraclePrivKey.Serialize())
+	suite.Require().NoError(err)
+
+	approveOracleUpgrade := &types.ApprovalSharingOracleKey{
+		ApproverUniqueId:       suite.currentUniqueID,
+		ApproverOracleAddress:  suite.approverAccAddr.String(),
+		TargetUniqueId:         "invalidUniqueID",
+		TargetOracleAddress:    suite.oracleAccAddr.String(),
+		EncryptedOraclePrivKey: encryptedOraclePrivKey,
+	}
+
+	approveOracleRegistrationBz, err := suite.Cdc.Marshaler.Marshal(approveOracleUpgrade)
+	suite.Require().NoError(err)
+	signature, err := suite.oraclePrivKey.Sign(approveOracleRegistrationBz)
+	suite.Require().NoError(err)
+
+	msgApproveOracleUpgrade := types.NewMsgApproveOracleUpgrade(approveOracleUpgrade, signature.Serialize())
+
+	err = suite.OracleKeeper.ApproveOracleUpgrade(ctx, msgApproveOracleUpgrade)
+	suite.Require().ErrorContains(err, types.ErrInvalidUniqueID.Error())
+}
