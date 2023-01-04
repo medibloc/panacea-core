@@ -14,7 +14,7 @@ import (
 
 func CmdSubmitConsent() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "submit-consent [certificate-file]",
+		Use:   "submit-consent [consent-file]",
 		Short: "submit a consent to provide the data",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
