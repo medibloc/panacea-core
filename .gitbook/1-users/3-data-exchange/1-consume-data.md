@@ -76,7 +76,7 @@ curl -v -X GET -H "Authorization: Bearer ${jwt}" \
   "${oracle-url}/v0/data-deal/secret-key?deal-id=${deal-id}&data-hash=${data-hash}"
 ```
 You must specify a JWT issued by yourself in order to prove that you are the data consumer who created the data deal.
-For that authentication, the JWT must be signed by your (data consumer's) chain account private key.
+For this authentication, the JWT must be signed by your (data consumer's) chain account private key.
 
 We highly recommend to set the expiration of JWT as short as possible for security reasons.
 In near future, the protocol will adopt the 'nonce' concept to improve the security of authentications.
