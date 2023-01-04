@@ -1,6 +1,6 @@
 # Consume data
 
-Data consumers can open data deals by specifying what type of data and how much they want, and how much they can pay for it.
+Data consumers can open data deals by specifying the type, the quantity, and the pricing of the data that they are willing to consume. 
 
 Data deals are registered in the Panacea public blockchain, so all data providers can find data deals which match their data.
 
