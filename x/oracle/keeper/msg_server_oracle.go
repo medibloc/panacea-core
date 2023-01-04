@@ -60,7 +60,9 @@ func (m msgServer) UpdateOracleInfo(goCtx context.Context, msg *types.MsgUpdateO
 }
 
 func (m msgServer) UpgradeOracle(goCtx context.Context, msg *types.MsgUpgradeOracle) (*types.MsgUpgradeOracleResponse, error) {
-	// TODO: Implementation
+	if err := m.Keeper.UpgradeOracle(sdk.UnwrapSDKContext(goCtx), msg); err != nil {
+		return nil, err
+	}
 	return &types.MsgUpgradeOracleResponse{}, nil
 }
 

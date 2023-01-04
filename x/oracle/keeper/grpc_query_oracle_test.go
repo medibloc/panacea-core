@@ -279,3 +279,29 @@ func (suite *queryOracleTestSuite) TestOracleUpgradeInfo() {
 	suite.Require().Equal(upgradeInfo.UniqueId, getUpgradeInfo.OracleUpgradeInfo.UniqueId)
 	suite.Require().Equal(upgradeInfo.Height, getUpgradeInfo.OracleUpgradeInfo.Height)
 }
+
+func (suite *queryOracleTestSuite) TestOracleUpgrade() {
+	ctx := suite.Ctx
+	oracleKeeper := suite.OracleKeeper
+
+	oracleUpgrade := &types.OracleUpgrade{
+		UniqueId:               suite.uniqueID,
+		OracleAddress:          suite.oracleAccAddr.String(),
+		NodePubKey:             suite.nodePubKey.SerializeCompressed(),
+		NodePubKeyRemoteReport: []byte("nodePubKeyRemoteReport"),
+		TrustedBlockHeight:     10,
+		TrustedBlockHash:       []byte("hash"),
+		EncryptedOraclePrivKey: nil,
+	}
+
+	suite.Require().NoError(oracleKeeper.SetOracleUpgrade(ctx, oracleUpgrade))
+
+	getOracleUpgrade, err := oracleKeeper.GetOracleUpgrade(ctx, suite.uniqueID, suite.oracleAccAddr.String())
+	suite.Require().NoError(err)
+	suite.Require().Equal(oracleUpgrade.UniqueId, getOracleUpgrade.UniqueId)
+	suite.Require().Equal(oracleUpgrade.OracleAddress, getOracleUpgrade.OracleAddress)
+	suite.Require().Equal(oracleUpgrade.NodePubKey, getOracleUpgrade.NodePubKey)
+	suite.Require().Equal(oracleUpgrade.NodePubKeyRemoteReport, getOracleUpgrade.NodePubKeyRemoteReport)
+	suite.Require().Equal(oracleUpgrade.TrustedBlockHeight, getOracleUpgrade.TrustedBlockHeight)
+	suite.Require().Equal(oracleUpgrade.TrustedBlockHash, getOracleUpgrade.TrustedBlockHash)
+}
