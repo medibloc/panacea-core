@@ -26,6 +26,5 @@ func handlerOracleUpgrade(ctx sdk.Context, keeper keeper.Keeper) {
 		if err := keeper.ApplyUpgrade(ctx, upgradeInfo); err != nil {
 			panic(err)
 		}
-		keeper.RemoveOracleUpgradeInfo(ctx)
 	}
 }
