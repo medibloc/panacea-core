@@ -63,7 +63,7 @@ For more details about data consents, please see the [Data Provider Consent](../
 
 ## Access data
 
-A data validation certificate issued by an oracle contains how the data can be accessed.
+A data validation certificate issued by an oracle contains the methods to access the data.
 For example, if the oracle decides to transmit data via [IPFS](https://ipfs.tech/), the certificate will contain a [CID](https://docs.ipfs.io/concepts/content-addressing/) of data.
 If so, you can access any IPFS node which is connected to the public IPFS network, and can obtain the data.
 
