@@ -63,7 +63,7 @@ func (suite *queryDealTestSuite) TestQueryDeals() {
 	suite.Require().Equal(deal2, res.Deals[1])
 }
 
-func (suite *queryDealTestSuite) TestQueryCert() {
+func (suite *queryDealTestSuite) TestQueryConsent() {
 	consent := &types.Consent{
 		Certificate: &types.Certificate{
 			UnsignedCertificate: &types.UnsignedCertificate{
@@ -90,7 +90,7 @@ func (suite *queryDealTestSuite) TestQueryCert() {
 	suite.Require().Equal(consent, res.Consent)
 }
 
-func (suite *queryDealTestSuite) TestQueryCerts() {
+func (suite *queryDealTestSuite) TestQueryConsents() {
 	consent := &types.Consent{
 		Certificate: &types.Certificate{
 			UnsignedCertificate: &types.UnsignedCertificate{
