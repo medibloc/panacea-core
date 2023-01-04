@@ -205,8 +205,9 @@ func (suite *oracleTestSuite) TestApproveOracleRegistrationSuccess() {
 	suite.Require().NoError(err)
 
 	approvalSharingOracleKey := &types.ApprovalSharingOracleKey{
-		UniqueId:               suite.uniqueID,
+		ApproverUniqueId:       suite.uniqueID,
 		ApproverOracleAddress:  suite.oracleAccAddr.String(),
+		TargetUniqueId:         suite.uniqueID,
 		TargetOracleAddress:    suite.oracleAccAddr.String(),
 		EncryptedOraclePrivKey: encryptedOraclePrivKey,
 	}
@@ -267,8 +268,9 @@ func (suite *oracleTestSuite) TestApproveOracleRegistrationFailedInvalidUniqueID
 	suite.Require().NoError(err)
 
 	approveOracleRegistration := &types.ApprovalSharingOracleKey{
-		UniqueId:               "uniqueID2",
+		ApproverUniqueId:       "uniqueID2",
 		ApproverOracleAddress:  suite.oracleAccAddr.String(),
+		TargetUniqueId:         suite.uniqueID,
 		TargetOracleAddress:    suite.oracleAccAddr.String(),
 		EncryptedOraclePrivKey: encryptedOraclePrivKey,
 	}
@@ -306,8 +308,9 @@ func (suite *oracleTestSuite) TestApproveOracleRegistrationFailedInvalidSignatur
 	suite.Require().NoError(err)
 
 	approveOracleRegistration := &types.ApprovalSharingOracleKey{
-		UniqueId:               "uniqueID",
+		ApproverUniqueId:       "uniqueID",
 		ApproverOracleAddress:  suite.oracleAccAddr.String(),
+		TargetUniqueId:         "uniqueID",
 		TargetOracleAddress:    suite.oracleAccAddr.String(),
 		EncryptedOraclePrivKey: encryptedOraclePrivKey,
 	}
@@ -354,8 +357,9 @@ func (suite *oracleTestSuite) TestApproveOracleRegistrationFailedAlreadyApproved
 	suite.Require().NoError(err)
 
 	approveOracleRegistration := &types.ApprovalSharingOracleKey{
-		UniqueId:               "uniqueID",
+		ApproverUniqueId:       "uniqueID",
 		ApproverOracleAddress:  suite.oracleAccAddr.String(),
+		TargetUniqueId:         "uniqueID",
 		TargetOracleAddress:    suite.oracleAccAddr.String(),
 		EncryptedOraclePrivKey: encryptedOraclePrivKey,
 	}
