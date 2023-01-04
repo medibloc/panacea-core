@@ -55,6 +55,7 @@ func (suite *abciTestSuite) TestOracleUpgradeSuccess() {
 	oracle.EndBlocker(ctx, suite.OracleKeeper)
 
 	suite.Require().Equal(upgradeUniqueID, suite.OracleKeeper.GetParams(ctx).UniqueId)
+
 }
 
 func (suite *abciTestSuite) TestOracleUpgradeFailedBeforeReachUpgradeHeight() {

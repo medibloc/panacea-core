@@ -122,6 +122,16 @@ func (m *Oracle) ValidateOracleCommission(blockTime time.Time, newRate sdk.Dec) 
 	return nil
 }
 
+func (m *OracleUpgradeInfo) ValidateBasic() error {
+	if len(m.UniqueId) == 0 {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "uniqueID is empty")
+	}
+	if m.Height <= 0 {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "upgrade height must be greater than zero")
+	}
+	return nil
+}
+
 func (m *OracleUpgradeInfo) ShouldExecute(ctx sdk.Context) bool {
 	if m.Height > 0 {
 		return m.Height == ctx.BlockHeight()
@@ -139,7 +149,6 @@ func NewUpgradeOracle(msg *MsgUpgradeOracle) *OracleUpgrade {
 		TrustedBlockHash:       msg.TrustedBlockHash,
 	}
 }
-
 func (m *OracleUpgrade) ValidateBasic() error {
 	if len(m.UniqueId) == 0 {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "uniqueID is empty")
@@ -165,5 +174,6 @@ func (m *OracleUpgrade) ValidateBasic() error {
 	if m.TrustedBlockHash == nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "trusted block hash should not be nil")
 	}
+
 	return nil
 }
