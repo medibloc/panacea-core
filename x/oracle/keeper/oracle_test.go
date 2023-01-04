@@ -204,7 +204,7 @@ func (suite *oracleTestSuite) TestApproveOracleRegistrationSuccess() {
 	encryptedOraclePrivKey, err := btcec.Encrypt(suite.nodePubKey, suite.oraclePrivKey.Serialize())
 	suite.Require().NoError(err)
 
-	approveOracleRegistration := &types.ApprovalSharingOracleKey{
+	approvalSharingOracleKey := &types.ApprovalSharingOracleKey{
 		ApproverUniqueId:       suite.uniqueID,
 		ApproverOracleAddress:  suite.oracleAccAddr.String(),
 		TargetUniqueId:         suite.uniqueID,
@@ -212,12 +212,12 @@ func (suite *oracleTestSuite) TestApproveOracleRegistrationSuccess() {
 		EncryptedOraclePrivKey: encryptedOraclePrivKey,
 	}
 
-	approveOracleRegistrationBz, err := suite.Cdc.Marshaler.Marshal(approveOracleRegistration)
+	approveOracleRegistrationBz, err := suite.Cdc.Marshaler.Marshal(approvalSharingOracleKey)
 	suite.Require().NoError(err)
 	signature, err := suite.oraclePrivKey.Sign(approveOracleRegistrationBz)
 	suite.Require().NoError(err)
 
-	msgApproveOracleRegistration := types.NewMsgApproveOracleRegistration(approveOracleRegistration, signature.Serialize())
+	msgApproveOracleRegistration := types.NewMsgApproveOracleRegistration(approvalSharingOracleKey, signature.Serialize())
 
 	err = suite.OracleKeeper.ApproveOracleRegistration(ctx, msgApproveOracleRegistration)
 	suite.Require().NoError(err)
@@ -242,7 +242,7 @@ func (suite *oracleTestSuite) TestApproveOracleRegistrationSuccess() {
 
 	getOracleRegistration, err := suite.OracleKeeper.GetOracleRegistration(suite.Ctx, suite.uniqueID, suite.oracleAccAddr.String())
 	suite.Require().NoError(err)
-	suite.Require().Equal(approveOracleRegistration.EncryptedOraclePrivKey, getOracleRegistration.EncryptedOraclePrivKey)
+	suite.Require().Equal(approvalSharingOracleKey.EncryptedOraclePrivKey, getOracleRegistration.EncryptedOraclePrivKey)
 }
 
 func (suite *oracleTestSuite) TestApproveOracleRegistrationFailedInvalidUniqueID() {

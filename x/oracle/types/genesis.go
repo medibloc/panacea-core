@@ -12,6 +12,8 @@ func DefaultGenesis() *GenesisState {
 	return &GenesisState{
 		Oracles:             []Oracle{},
 		OracleRegistrations: []OracleRegistration{},
+		OracleUpgrades:      []OracleUpgrade{},
+		OracleUpgradeInfo:   nil,
 		Params:              DefaultParams(),
 	}
 }
@@ -37,6 +39,18 @@ func (m *GenesisState) Validate() error {
 	}
 	for _, oracleRegistration := range m.OracleRegistrations {
 		if err := oracleRegistration.ValidateBasic(); err != nil {
+			return err
+		}
+	}
+
+	for _, oracleUpgrade := range m.OracleUpgrades {
+		if err := oracleUpgrade.ValidateBasic(); err != nil {
+			return err
+		}
+	}
+
+	if m.OracleUpgradeInfo != nil {
+		if err := m.OracleUpgradeInfo.ValidateBasic(); err != nil {
 			return err
 		}
 	}
