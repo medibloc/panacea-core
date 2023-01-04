@@ -21,6 +21,18 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 		}
 	}
 
+	for _, oracleUpgrade := range genState.OracleUpgrades {
+		if err := k.SetOracleUpgrade(ctx, &oracleUpgrade); err != nil {
+			panic(err)
+		}
+	}
+
+	if genState.OracleUpgradeInfo != nil {
+		if err := k.SetOracleUpgradeInfo(ctx, genState.OracleUpgradeInfo); err != nil {
+			panic(err)
+		}
+	}
+
 	k.SetParams(ctx, genState.Params)
 }
 
@@ -39,6 +51,18 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 		panic(err)
 	}
 	genesis.OracleRegistrations = oracleRegistrations
+
+	oracleUpgrades, err := k.GetAllOracleUpgradeList(ctx)
+	if err != nil {
+		panic(err)
+	}
+	genesis.OracleUpgrades = oracleUpgrades
+
+	upgradeInfo, err := k.GetOracleUpgradeInfo(ctx)
+	if err != nil {
+		panic(err)
+	}
+	genesis.OracleUpgradeInfo = upgradeInfo
 
 	genesis.Params = k.GetParams(ctx)
 

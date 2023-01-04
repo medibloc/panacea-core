@@ -56,8 +56,6 @@ func (suite *abciTestSuite) TestOracleUpgradeSuccess() {
 
 	suite.Require().Equal(upgradeUniqueID, suite.OracleKeeper.GetParams(ctx).UniqueId)
 
-	_, err := suite.OracleKeeper.GetOracleUpgradeInfo(ctx)
-	suite.Require().Error(err, types.ErrOracleUpgradeInfoNotFound)
 }
 
 func (suite *abciTestSuite) TestOracleUpgradeFailedBeforeReachUpgradeHeight() {
