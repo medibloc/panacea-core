@@ -37,6 +37,11 @@ service Query {
     option (google.api.http).get = "/panacea/oracle/v2/oracle-upgrade-info";
   }
 
+  // OracleUpgrade returns the information related to oracle upgrade
+  rpc OracleUpgrade(QueryOracleUpgradeRequest) returns (QueryOracleUpgradeResponse) {
+    option (google.api.http).get = "/panacea/oracle/v2/oracle-upgrades/{unique_id}/{oracle_address}";
+  }
+
   // Params returns params of oracle module.
   rpc Params(QueryOracleParamsRequest) returns (QueryParamsResponse) {
     option (google.api.http).get = "/panacea/oracle/v2/params";
@@ -93,6 +98,17 @@ message QueryOracleUpgradeInfoRequest {}
 // QueryOracleUpgradeInfoRequest is the response type for the Query/OracleUpgradeInfo RPC method.
 message QueryOracleUpgradeInfoResponse {
   OracleUpgradeInfo oracle_upgrade_info = 1;
+}
+
+// QueryOracleUpgradeRequest is the request type for the Query/OracleUpgrade RPC method.
+message QueryOracleUpgradeRequest {
+  string unique_id = 1;
+  string oracle_address = 2;
+}
+
+// QueryOracleUpgradeResponse is the response type for the Query/OracleUpgrade RPC method.
+message QueryOracleUpgradeResponse {
+  OracleUpgrade oracle_upgrade = 1;
 }
 
 // QueryOracleParamsRequest is the request type for the Query/OracleParams RPC method.
