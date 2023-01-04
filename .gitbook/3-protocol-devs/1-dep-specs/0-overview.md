@@ -1,7 +1,7 @@
 # Data Exchange Protocol Specifications
 
 Prior to diving into the technical specifications of Data Exchange Protocol (hereafter 'DEP'),
-we recommend you to understand what DEP is, its motivation, and goals from the [About DEP](../../1-users/3-data-exchange/0-about-dep.md) documentation.
+we recommend you to understand the definition of DEP, its motivation, and its goals from the [About DEP](../../1-users/3-data-exchange/0-about-dep.md) documentation.
 
 ## Specifications
 
