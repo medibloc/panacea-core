@@ -10,7 +10,7 @@ Data consumers can open data deals by specifying the type, the quantity, and the
 
 Data providers can choose and participate in the deals that match the data that they have when they are willing to provide.
 
-To guarantee data consumers can only consume data in the form they want,
+To guarantee data consumers only consume data in the form they want,
 decentralized oracles verify and issue certificates for all data being shared
 
 Panacea public blockchain manages the status of all data deals and data sharing consents,
