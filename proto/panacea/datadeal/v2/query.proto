@@ -54,13 +54,13 @@ message QueryDealResponse {
   Deal deal = 1;
 }
 
-// QueryDealsRequest defines the request type for the Query/Deals RPC method.
+// QueryConsents defines the request type for the Query/Consents RPC method.
 message QueryConsents {
   uint64 deal_id = 1;
   cosmos.base.query.v1beta1.PageRequest pagination = 2;
 }
 
-// QueryDealsResponse defines the response type for the Query/Deals RPC method.
+// QueryConsentsResponse defines the response type for the Query/Consents RPC method.
 message QueryConsentsResponse {
   repeated Consent consents = 1;
   cosmos.base.query.v1beta1.PageResponse pagination = 2;

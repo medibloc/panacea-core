@@ -218,7 +218,7 @@ func (m *QueryDealResponse) GetDeal() *Deal {
 	return nil
 }
 
-// QueryDealsRequest defines the request type for the Query/Deals RPC method.
+// QueryConsents defines the request type for the Query/Consents RPC method.
 type QueryConsents struct {
 	DealId     uint64             `protobuf:"varint,1,opt,name=deal_id,json=dealId,proto3" json:"deal_id,omitempty"`
 	Pagination *query.PageRequest `protobuf:"bytes,2,opt,name=pagination,proto3" json:"pagination,omitempty"`
@@ -271,7 +271,7 @@ func (m *QueryConsents) GetPagination() *query.PageRequest {
 	return nil
 }
 
-// QueryDealsResponse defines the response type for the Query/Deals RPC method.
+// QueryConsentsResponse defines the response type for the Query/Consents RPC method.
 type QueryConsentsResponse struct {
 	Consents   []*Consent          `protobuf:"bytes,1,rep,name=consents,proto3" json:"consents,omitempty"`
 	Pagination *query.PageResponse `protobuf:"bytes,2,opt,name=pagination,proto3" json:"pagination,omitempty"`
