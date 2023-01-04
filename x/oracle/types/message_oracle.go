@@ -129,8 +129,12 @@ func (m *MsgApproveOracleRegistration) GetSigners() []sdk.AccAddress {
 }
 
 func (m *ApprovalSharingOracleKey) ValidateBasic() error {
-	if len(m.UniqueId) == 0 {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "uniqueID is empty")
+	if len(m.ApproverUniqueId) == 0 {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "approver uniqueID is empty")
+	}
+
+	if len(m.TargetUniqueId) == 0 {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "target uniqueID is empty")
 	}
 
 	if _, err := sdk.AccAddressFromBech32(m.ApproverOracleAddress); err != nil {

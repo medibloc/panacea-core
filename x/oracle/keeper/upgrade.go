@@ -172,6 +172,8 @@ func (k Keeper) GetAllOracleUpgradeList(ctx sdk.Context) ([]types.OracleUpgrade,
 }
 
 func (k Keeper) ApproveOracleUpgrade(ctx sdk.Context, msg *types.MsgApproveOracleUpgrade) error {
+	approval := msg.GetApprovalSharingOracleKey()
+
 	// validate approval for oracle upgrade
 	if err := k.validateApprovalSharingOracleKey(ctx, msg.GetApprovalSharingOracleKey(), msg.GetSignature()); err != nil {
 		return sdkerrors.Wrapf(types.ErrApproveOracleUpgrade, err.Error())
@@ -183,9 +185,14 @@ func (k Keeper) ApproveOracleUpgrade(ctx sdk.Context, msg *types.MsgApproveOracl
 		return sdkerrors.Wrapf(types.ErrApproveOracleUpgrade, err.Error())
 	}
 
-	oracleUpgrade, err := k.GetOracleUpgrade(ctx, upgradeInfo.GetUniqueId(), msg.GetApprovalSharingOracleKey().GetTargetOracleAddress())
+	oracleUpgrade, err := k.GetOracleUpgrade(ctx, upgradeInfo.GetUniqueId(), approval.GetTargetOracleAddress())
 	if err != nil {
 		return sdkerrors.Wrapf(types.ErrApproveOracleUpgrade, err.Error())
+	}
+
+	// check unique ID
+	if approval.TargetUniqueId != upgradeInfo.GetUniqueId() {
+		return sdkerrors.Wrapf(types.ErrApproveOracleUpgrade, types.ErrInvalidUniqueID.Error())
 	}
 
 	// if EncryptedOraclePrivKey is already set, return error
@@ -194,7 +201,7 @@ func (k Keeper) ApproveOracleUpgrade(ctx sdk.Context, msg *types.MsgApproveOracl
 	}
 
 	// update encrypted oracle private key
-	oracleUpgrade.EncryptedOraclePrivKey = msg.GetApprovalSharingOracleKey().EncryptedOraclePrivKey
+	oracleUpgrade.EncryptedOraclePrivKey = approval.EncryptedOraclePrivKey
 
 	// set oracle upgrade
 	if err := k.SetOracleUpgrade(ctx, oracleUpgrade); err != nil {
@@ -205,7 +212,7 @@ func (k Keeper) ApproveOracleUpgrade(ctx sdk.Context, msg *types.MsgApproveOracl
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(
 			types.EventTypeApproveOracleUpgrade,
-			sdk.NewAttribute(types.AttributeKeyOracleAddress, msg.GetApprovalSharingOracleKey().GetTargetOracleAddress()),
+			sdk.NewAttribute(types.AttributeKeyOracleAddress, approval.GetTargetOracleAddress()),
 			sdk.NewAttribute(types.AttributeKeyUniqueID, upgradeInfo.GetUniqueId()),
 		),
 	)

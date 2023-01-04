@@ -41,15 +41,22 @@ func (k Keeper) RegisterOracle(ctx sdk.Context, msg *types.MsgRegisterOracle) er
 }
 
 func (k Keeper) ApproveOracleRegistration(ctx sdk.Context, msg *types.MsgApproveOracleRegistration) error {
+	approval := msg.GetApprovalSharingOracleKey()
+
 	// validate approval for oracle registration
-	if err := k.validateApprovalSharingOracleKey(ctx, msg.GetApprovalSharingOracleKey(), msg.GetSignature()); err != nil {
+	if err := k.validateApprovalSharingOracleKey(ctx, approval, msg.GetSignature()); err != nil {
 		return sdkerrors.Wrapf(types.ErrApproveOracleRegistration, err.Error())
 	}
 
 	// get oracle registration
-	oracleRegistration, err := k.GetOracleRegistration(ctx, msg.ApprovalSharingOracleKey.UniqueId, msg.ApprovalSharingOracleKey.TargetOracleAddress)
+	oracleRegistration, err := k.GetOracleRegistration(ctx, approval.GetTargetUniqueId(), approval.GetTargetOracleAddress())
 	if err != nil {
 		return sdkerrors.Wrapf(types.ErrApproveOracleRegistration, err.Error())
+	}
+
+	params := k.GetParams(ctx)
+	if approval.GetTargetUniqueId() != params.GetUniqueId() {
+		return sdkerrors.Wrapf(types.ErrApproveOracleRegistration, types.ErrInvalidUniqueID.Error())
 	}
 
 	// if EncryptedOraclePrivKey is already set, return error
@@ -57,7 +64,7 @@ func (k Keeper) ApproveOracleRegistration(ctx sdk.Context, msg *types.MsgApprove
 		return sdkerrors.Wrapf(types.ErrApproveOracleRegistration, "already approved oracle registration. if you want to be shared oracle private key again, please register oracle again")
 	}
 
-	oracleRegistration.EncryptedOraclePrivKey = msg.ApprovalSharingOracleKey.EncryptedOraclePrivKey
+	oracleRegistration.EncryptedOraclePrivKey = approval.EncryptedOraclePrivKey
 
 	// add an encrypted oracle private key to oracleRegistration
 	if err := k.SetOracleRegistration(ctx, oracleRegistration); err != nil {
@@ -65,8 +72,8 @@ func (k Keeper) ApproveOracleRegistration(ctx sdk.Context, msg *types.MsgApprove
 	}
 
 	newOracle := types.NewOracle(
-		msg.ApprovalSharingOracleKey.TargetOracleAddress,
-		msg.ApprovalSharingOracleKey.UniqueId,
+		approval.TargetOracleAddress,
+		approval.TargetUniqueId,
 		oracleRegistration.Endpoint,
 		oracleRegistration.OracleCommissionRate,
 		oracleRegistration.OracleCommissionMaxRate,
@@ -82,8 +89,8 @@ func (k Keeper) ApproveOracleRegistration(ctx sdk.Context, msg *types.MsgApprove
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(
 			types.EventTypeApproveOracleRegistration,
-			sdk.NewAttribute(types.AttributeKeyOracleAddress, msg.ApprovalSharingOracleKey.TargetOracleAddress),
-			sdk.NewAttribute(types.AttributeKeyUniqueID, msg.ApprovalSharingOracleKey.UniqueId),
+			sdk.NewAttribute(types.AttributeKeyOracleAddress, approval.GetTargetOracleAddress()),
+			sdk.NewAttribute(types.AttributeKeyUniqueID, approval.GetTargetUniqueId()),
 		),
 	)
 
@@ -96,7 +103,7 @@ func (k Keeper) validateApprovalSharingOracleKey(ctx sdk.Context, approval *type
 	params := k.GetParams(ctx)
 
 	// check unique id
-	if approval.UniqueId != params.UniqueId {
+	if approval.GetApproverUniqueId() != params.UniqueId {
 		return types.ErrInvalidUniqueID
 	}
 
