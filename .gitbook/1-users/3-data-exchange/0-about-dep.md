@@ -4,7 +4,7 @@ Data Exchange Protocol (hereafter 'DEP') is a communication layer for sharing an
 between two parties in decentralized environments.
 
 
-## What is DEP?
+## What can you do with DEP?
 
 Data consumers can open data deals by specifying the type, the quantity, and the pricing of the data that they are willing to consume. 
 
