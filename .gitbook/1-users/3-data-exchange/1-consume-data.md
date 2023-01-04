@@ -70,7 +70,7 @@ If so, you can access any IPFS node which is connected to the public IPFS networ
 For more details about data validation certificates, please see the [Data Validation](../../3-protocol-devs/1-dep-specs/4-data-validation.md) specification.
 
 In general, the data transmitted is encrypted by oracles, so that only a specific data consumer is able to decrypt it.
-Using the following REST API, you can get a secret key of each data from the oracle which issued the data validation certificate.
+Using the following REST API, you can get a secret key of each data from the oracle that issued the data validation certificate.
 ```bash
 curl -v -X GET -H "Authorization: Bearer ${jwt}" \
   "${oracle-url}/v0/data-deal/secret-key?deal-id=${deal-id}&data-hash=${data-hash}"
