@@ -156,3 +156,47 @@ func (k Keeper) GetAllOracleUpgradeList(ctx sdk.Context) ([]types.OracleUpgrade,
 
 	return oracleUpgrades, nil
 }
+
+func (k Keeper) ApproveOracleUpgrade(ctx sdk.Context, msg *types.MsgApproveOracleUpgrade) error {
+	// validate approval for oracle upgrade
+	if err := k.validateApprovalSharingOracleKey(ctx, msg.GetApprovalSharingOracleKey(), msg.GetSignature()); err != nil {
+		return sdkerrors.Wrapf(types.ErrApproveOracleUpgrade, err.Error())
+	}
+
+	// get oracle upgrade and upgrade info
+	upgradeInfo, err := k.GetOracleUpgradeInfo(ctx)
+	if err != nil {
+		return sdkerrors.Wrapf(types.ErrApproveOracleUpgrade, err.Error())
+	}
+
+	oracleUpgrade, err := k.GetOracleUpgrade(ctx, upgradeInfo.GetUniqueId(), msg.GetApprovalSharingOracleKey().GetTargetOracleAddress())
+	if err != nil {
+		return sdkerrors.Wrapf(types.ErrApproveOracleUpgrade, err.Error())
+	}
+
+	// if EncryptedOraclePrivKey is already set, return error
+	if oracleUpgrade.EncryptedOraclePrivKey != nil {
+		return sdkerrors.Wrapf(types.ErrApproveOracleUpgrade, "already approved oracle upgrade. if you want to be shared oracle private key again, please upgrade oracle again")
+	}
+
+	// update encrypted oracle private key
+	oracleUpgrade.EncryptedOraclePrivKey = msg.GetApprovalSharingOracleKey().EncryptedOraclePrivKey
+
+	// set oracle upgrade
+	if err := k.SetOracleUpgrade(ctx, oracleUpgrade); err != nil {
+		return sdkerrors.Wrapf(types.ErrApproveOracleUpgrade, err.Error())
+	}
+
+	// emit event
+	ctx.EventManager().EmitEvent(
+		sdk.NewEvent(
+			types.EventTypeApproveOracleUpgrade,
+			sdk.NewAttribute(types.AttributeKeyOracleAddress, msg.GetApprovalSharingOracleKey().GetTargetOracleAddress()),
+			sdk.NewAttribute(types.AttributeKeyUniqueID, upgradeInfo.GetUniqueId()),
+		),
+	)
+
+	// TODO: add to queue(?) for update unique ID
+
+	return nil
+}

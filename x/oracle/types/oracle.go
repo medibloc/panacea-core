@@ -149,6 +149,7 @@ func NewUpgradeOracle(msg *MsgUpgradeOracle) *OracleUpgrade {
 		TrustedBlockHash:       msg.TrustedBlockHash,
 	}
 }
+
 func (m *OracleUpgrade) ValidateBasic() error {
 	if len(m.UniqueId) == 0 {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "uniqueID is empty")
@@ -174,6 +175,5 @@ func (m *OracleUpgrade) ValidateBasic() error {
 	if m.TrustedBlockHash == nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "trusted block hash should not be nil")
 	}
-
 	return nil
 }

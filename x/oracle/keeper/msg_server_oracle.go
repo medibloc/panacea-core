@@ -67,6 +67,18 @@ func (m msgServer) UpgradeOracle(goCtx context.Context, msg *types.MsgUpgradeOra
 }
 
 func (m msgServer) ApproveOracleUpgrade(goCtx context.Context, msg *types.MsgApproveOracleUpgrade) (*types.MsgApproveOracleUpgradeResponse, error) {
-	// TODO: Implementation
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	if err := m.Keeper.ApproveOracleUpgrade(ctx, msg); err != nil {
+		return nil, err
+	}
+
+	ctx.EventManager().EmitEvent(
+		sdk.NewEvent(
+			sdk.EventTypeMessage,
+			sdk.NewAttribute(sdk.AttributeKeyModule, types.ModuleName),
+		),
+	)
+
 	return &types.MsgApproveOracleUpgradeResponse{}, nil
 }

@@ -48,12 +48,13 @@ message MsgRegisterOracleResponse {
 
 // MsgApproveOracleRegistration defines the Msg/ApproveOracleRegistration
 message MsgApproveOracleRegistration {
-  ApproveOracleRegistration approve_oracle_registration = 1;
+  ApprovalSharingOracleKey approval_sharing_oracle_key = 1;
   bytes signature = 2;
 }
 
-// ApproveOracleRegistration defines for oracle registration approval
-message ApproveOracleRegistration {
+// ApprovalSharingOracleKey defines approval for sharing oracle key encrypted with target oracle's node public key
+message ApprovalSharingOracleKey {
+  // approver's unique ID
   string unique_id = 1;
   string approver_oracle_address = 2;
   string target_oracle_address = 3;
@@ -90,10 +91,8 @@ message MsgUpgradeOracleResponse {}
 
 // MsgApproveOracleUpgrade defines the Msg/ApproveOracleUpgrade
 message MsgApproveOracleUpgrade {
-  string unique_id = 1;
-  string approver_oracle_address = 2;
-  string target_oracle_address = 3;
-  bytes encrypted_oracle_priv_key = 4;
+  ApprovalSharingOracleKey approval_sharing_oracle_key = 1;
+  bytes signature = 2;
 }
 
 // MsgApproveOracleUpgradeResponse defines the response of Msg/ApproveOracleUpgrade
