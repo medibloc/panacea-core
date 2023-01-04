@@ -12,25 +12,21 @@ import (
 func (k Keeper) RegisterOracle(ctx sdk.Context, msg *types.MsgRegisterOracle) error {
 	oracleRegistration := types.NewOracleRegistration(msg)
 
-	if err := oracleRegistration.ValidateBasic(); err != nil {
-		return err
-	}
-
 	params := k.GetParams(ctx)
-	if params.UniqueId != oracleRegistration.UniqueId {
-		return sdkerrors.Wrapf(types.ErrOracleRegistration, "is not match the currently active uniqueID")
+	if params.UniqueId != msg.UniqueId {
+		return sdkerrors.Wrapf(types.ErrRegisterOracle, types.ErrInvalidUniqueID.Error())
 	}
 
-	if oracle, err := k.GetOracle(ctx, oracleRegistration.OracleAddress); !errors.Is(types.ErrOracleNotFound, err) {
-		if oracle != nil {
-			return sdkerrors.Wrapf(types.ErrOracleRegistration, "already registered oracle. address(%s)", oracleRegistration.OracleAddress)
-		} else {
-			return sdkerrors.Wrapf(types.ErrOracleRegistration, err.Error())
-		}
+	existing, err := k.GetOracleRegistration(ctx, msg.GetUniqueId(), msg.GetOracleAddress())
+	if err != nil && !errors.Is(err, types.ErrOracleRegistrationNotFound) {
+		return sdkerrors.Wrapf(types.ErrRegisterOracle, err.Error())
+	}
+	if existing != nil {
+		return sdkerrors.Wrapf(types.ErrRegisterOracle, fmt.Sprintf("already registered oracle. address(%s)", msg.OracleAddress))
 	}
 
 	if err := k.SetOracleRegistration(ctx, oracleRegistration); err != nil {
-		return err
+		return sdkerrors.Wrapf(types.ErrRegisterOracle, err.Error())
 	}
 
 	ctx.EventManager().EmitEvent(
@@ -40,18 +36,25 @@ func (k Keeper) RegisterOracle(ctx sdk.Context, msg *types.MsgRegisterOracle) er
 			sdk.NewAttribute(types.AttributeKeyOracleAddress, oracleRegistration.OracleAddress),
 		),
 	)
+
 	return nil
 }
 
 func (k Keeper) ApproveOracleRegistration(ctx sdk.Context, msg *types.MsgApproveOracleRegistration) error {
-
-	if err := k.validateApproveOracleRegistration(ctx, msg); err != nil {
+	// validate approval for oracle registration
+	if err := k.validateApprovalSharingOracleKey(ctx, msg.GetApprovalSharingOracleKey(), msg.GetSignature()); err != nil {
 		return sdkerrors.Wrapf(types.ErrApproveOracleRegistration, err.Error())
 	}
 
+	// get oracle registration
 	oracleRegistration, err := k.GetOracleRegistration(ctx, msg.ApprovalSharingOracleKey.UniqueId, msg.ApprovalSharingOracleKey.TargetOracleAddress)
 	if err != nil {
 		return sdkerrors.Wrapf(types.ErrApproveOracleRegistration, err.Error())
+	}
+
+	// if EncryptedOraclePrivKey is already set, return error
+	if oracleRegistration.EncryptedOraclePrivKey != nil {
+		return sdkerrors.Wrapf(types.ErrApproveOracleRegistration, "already approved oracle registration. if you want to be shared oracle private key again, please register oracle again")
 	}
 
 	oracleRegistration.EncryptedOraclePrivKey = msg.ApprovalSharingOracleKey.EncryptedOraclePrivKey
@@ -88,33 +91,31 @@ func (k Keeper) ApproveOracleRegistration(ctx sdk.Context, msg *types.MsgApprove
 
 }
 
-// validateApproveOracleRegistration checks signature
-func (k Keeper) validateApproveOracleRegistration(ctx sdk.Context, msg *types.MsgApproveOracleRegistration) error {
-
+// validateApprovalSharingOracleKey validate unique ID of ApprovalSharingOracleKey and its signature
+func (k Keeper) validateApprovalSharingOracleKey(ctx sdk.Context, approval *types.ApprovalSharingOracleKey, signature []byte) error {
 	params := k.GetParams(ctx)
-	targetOracleAddress := msg.ApprovalSharingOracleKey.TargetOracleAddress
 
 	// check unique id
-	if msg.ApprovalSharingOracleKey.UniqueId != params.UniqueId {
+	if approval.UniqueId != params.UniqueId {
 		return types.ErrInvalidUniqueID
 	}
 
-	// verify signature
-	if err := k.VerifyOracleSignature(ctx, msg.ApprovalSharingOracleKey, msg.Signature); err != nil {
-		return err
-	}
-
-	if msg.ApprovalSharingOracleKey.EncryptedOraclePrivKey == nil {
-		return fmt.Errorf("encrypted oracle private key is nil")
-	}
-
-	// check if the oracle has been already registered
-	hasOracle, err := k.HasOracle(ctx, targetOracleAddress)
+	// check if the approver oracle exists
+	isActive, err := k.IsActiveOracle(ctx, approval.ApproverOracleAddress)
 	if err != nil {
+		return fmt.Errorf("error occurs while checking if the oracle(%s) exists: %w", approval.ApproverOracleAddress, err)
+	}
+	if !isActive {
+		return fmt.Errorf("oracle(%s) is not an active oracle", approval.ApproverOracleAddress)
+	}
+
+	// verify signature
+	if err := k.VerifyOracleSignature(ctx, approval, signature); err != nil {
 		return err
 	}
-	if hasOracle {
-		return fmt.Errorf("already registered oracle. address(%s)", targetOracleAddress)
+
+	if approval.EncryptedOraclePrivKey == nil {
+		return fmt.Errorf("encrypted oracle private key is empty")
 	}
 
 	return nil
@@ -189,12 +190,12 @@ func (k Keeper) GetOracleRegistration(ctx sdk.Context, uniqueID, address string)
 	store := ctx.KVStore(k.storeKey)
 	accAddr, err := sdk.AccAddressFromBech32(address)
 	if err != nil {
-		return nil, err
+		return nil, sdkerrors.Wrapf(types.ErrGetOracleRegistration, err.Error())
 	}
 	key := types.GetOracleRegistrationKey(uniqueID, accAddr)
 	bz := store.Get(key)
 	if bz == nil {
-		return nil, sdkerrors.Wrapf(types.ErrGetOracleRegistration, "oracle registration not found")
+		return nil, types.ErrOracleRegistrationNotFound
 	}
 
 	oracleRegistration := &types.OracleRegistration{}
@@ -249,7 +250,7 @@ func (k Keeper) GetOracle(ctx sdk.Context, address string) (*types.Oracle, error
 	store := ctx.KVStore(k.storeKey)
 	accAddr, err := sdk.AccAddressFromBech32(address)
 	if err != nil {
-		return nil, err
+		return nil, sdkerrors.Wrapf(types.ErrGetOracle, err.Error())
 	}
 	key := types.GetOracleKey(accAddr)
 	bz := store.Get(key)
@@ -267,12 +268,17 @@ func (k Keeper) GetOracle(ctx sdk.Context, address string) (*types.Oracle, error
 	return oracle, nil
 }
 
-func (k Keeper) HasOracle(ctx sdk.Context, address string) (bool, error) {
-	store := ctx.KVStore(k.storeKey)
-	accAddr, err := sdk.AccAddressFromBech32(address)
+func (k Keeper) IsActiveOracle(ctx sdk.Context, oracleAddress string) (bool, error) {
+	oracle, err := k.GetOracle(ctx, oracleAddress)
 	if err != nil {
 		return false, err
 	}
 
-	return store.Has(types.GetOracleKey(accAddr)), nil
+	params := k.GetParams(ctx)
+
+	if oracle.GetUniqueId() != params.GetUniqueId() {
+		return false, types.ErrInvalidUniqueID
+	}
+
+	return true, nil
 }

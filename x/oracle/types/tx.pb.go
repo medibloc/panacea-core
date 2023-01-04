@@ -220,6 +220,7 @@ func (m *MsgApproveOracleRegistration) GetSignature() []byte {
 
 // ApprovalSharingOracleKey defines approval for sharing oracle key encrypted with target oracle's node public key
 type ApprovalSharingOracleKey struct {
+	// approver's unique ID
 	UniqueId               string `protobuf:"bytes,1,opt,name=unique_id,json=uniqueId,proto3" json:"unique_id,omitempty"`
 	ApproverOracleAddress  string `protobuf:"bytes,2,opt,name=approver_oracle_address,json=approverOracleAddress,proto3" json:"approver_oracle_address,omitempty"`
 	TargetOracleAddress    string `protobuf:"bytes,3,opt,name=target_oracle_address,json=targetOracleAddress,proto3" json:"target_oracle_address,omitempty"`
