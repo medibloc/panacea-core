@@ -22,23 +22,54 @@ In all of these processes, the data is transmitted with encryption and stored of
 
 ### Motivation
 
-deal에 명시된 
-
-- 올바른 데이터의 제공 (data provision abusing)
-- privacy preserving
-- provider의 제공 동의
-- data provision에 따른 투명한 보상 분배
+Data should be provided by providers based on their data ownership, and the reward should be distributed in transparent and fair manner.
+To do so, providers use digital signature as consent to provide the data.
 
 ### Definitions
 
 - `Data Provider`, `Data Consumer`, and `Oracle` are defined in [User Flow](./1-user-flow.md)
-- `Deal`
-- `confidential computing`
-- `certificate`
+- `Deal` is defined in [Data Deal](./2-data-deal.md)
+- `Certificate`: a certificate that the data is validated to be provided to the deal, which is issued by oracle.
 
 ## Technical Specification
 
+Before provider provides the data to deal, data should be validated by the oracle.
+If the data is successfully validated to be provided, the provider will have a `Certificate` like below (more about [Data Validation](./4-data-validation.md)):
 
+```proto
+message Certificate {
+  UnsignedCertificate unsigned_certificate = 1;
+  bytes signature = 2;
+}
+
+message UnsignedCertificate {
+    string cid = 1;
+    string unique_id = 2;
+    string oracle_address = 3;
+    uint64 deal_id = 4;
+    string provider_address = 5;
+    string data_hash = 6;
+}
+```
+
+Using the `Certificate`, provider can submit consent to provide the data.
+
+```proto
+message MsgSubmitConsent {
+  Consent consent = 1;
+}
+
+message Consent {
+  Certificate certificate = 1;
+}
+```
+
+When this consent is submitted, blockchain will check:
+- if the data is provided by the owner of the data
+- if the data is validated by a registered and active oracle
+- if the data is provided in duplicate
+
+If all checks pass, rewards are distributed to the provider and oracle(more about [incentive](./6-incentives.md)).
 
 ## Backwards Compatibility
 
@@ -46,7 +77,7 @@ Not applicable.
 
 ## Forwards Compatibility
 
-vp
+Not applicable.
 
 ## Example Implementations
 
