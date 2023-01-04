@@ -86,10 +86,10 @@ func (m *MsgRegisterOracle) GetSigners() []sdk.AccAddress {
 
 var _ sdk.Msg = &MsgApproveOracleRegistration{}
 
-func NewMsgApproveOracleRegistration(approve *ApproveOracleRegistration, signature []byte) *MsgApproveOracleRegistration {
+func NewMsgApproveOracleRegistration(approve *ApprovalSharingOracleKey, signature []byte) *MsgApproveOracleRegistration {
 	return &MsgApproveOracleRegistration{
-		ApproveOracleRegistration: approve,
-		Signature:                 signature,
+		ApprovalSharingOracleKey: approve,
+		Signature:                signature,
 	}
 }
 
@@ -102,7 +102,7 @@ func (m *MsgApproveOracleRegistration) Type() string {
 }
 
 func (m *MsgApproveOracleRegistration) ValidateBasic() error {
-	if err := m.ApproveOracleRegistration.ValidateBasic(); err != nil {
+	if err := m.ApprovalSharingOracleKey.ValidateBasic(); err != nil {
 		return err
 	}
 
@@ -119,14 +119,14 @@ func (m *MsgApproveOracleRegistration) GetSignBytes() []byte {
 }
 
 func (m *MsgApproveOracleRegistration) GetSigners() []sdk.AccAddress {
-	oracleAddress, err := sdk.AccAddressFromBech32(m.ApproveOracleRegistration.ApproverOracleAddress)
+	oracleAddress, err := sdk.AccAddressFromBech32(m.ApprovalSharingOracleKey.ApproverOracleAddress)
 	if err != nil {
 		panic(err)
 	}
 	return []sdk.AccAddress{oracleAddress}
 }
 
-func (m *ApproveOracleRegistration) ValidateBasic() error {
+func (m *ApprovalSharingOracleKey) ValidateBasic() error {
 	if len(m.UniqueId) == 0 {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "uniqueID is empty")
 	}
@@ -268,7 +268,7 @@ func (m *MsgApproveOracleUpgrade) GetSignBytes() []byte {
 }
 
 func (m *MsgApproveOracleUpgrade) GetSigners() []sdk.AccAddress {
-	oracleAddress, err := sdk.AccAddressFromBech32(m.ApproverOracleAddress)
+	oracleAddress, err := sdk.AccAddressFromBech32(m.ApprovalSharingOracleKey.ApproverOracleAddress)
 	if err != nil {
 		panic(err)
 	}

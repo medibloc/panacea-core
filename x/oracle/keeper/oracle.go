@@ -49,12 +49,12 @@ func (k Keeper) ApproveOracleRegistration(ctx sdk.Context, msg *types.MsgApprove
 		return sdkerrors.Wrapf(types.ErrApproveOracleRegistration, err.Error())
 	}
 
-	oracleRegistration, err := k.GetOracleRegistration(ctx, msg.ApproveOracleRegistration.UniqueId, msg.ApproveOracleRegistration.TargetOracleAddress)
+	oracleRegistration, err := k.GetOracleRegistration(ctx, msg.ApprovalSharingOracleKey.UniqueId, msg.ApprovalSharingOracleKey.TargetOracleAddress)
 	if err != nil {
 		return sdkerrors.Wrapf(types.ErrApproveOracleRegistration, err.Error())
 	}
 
-	oracleRegistration.EncryptedOraclePrivKey = msg.ApproveOracleRegistration.EncryptedOraclePrivKey
+	oracleRegistration.EncryptedOraclePrivKey = msg.ApprovalSharingOracleKey.EncryptedOraclePrivKey
 
 	// add an encrypted oracle private key to oracleRegistration
 	if err := k.SetOracleRegistration(ctx, oracleRegistration); err != nil {
@@ -62,8 +62,8 @@ func (k Keeper) ApproveOracleRegistration(ctx sdk.Context, msg *types.MsgApprove
 	}
 
 	newOracle := types.NewOracle(
-		msg.ApproveOracleRegistration.TargetOracleAddress,
-		msg.ApproveOracleRegistration.UniqueId,
+		msg.ApprovalSharingOracleKey.TargetOracleAddress,
+		msg.ApprovalSharingOracleKey.UniqueId,
 		oracleRegistration.Endpoint,
 		oracleRegistration.OracleCommissionRate,
 		oracleRegistration.OracleCommissionMaxRate,
@@ -79,8 +79,8 @@ func (k Keeper) ApproveOracleRegistration(ctx sdk.Context, msg *types.MsgApprove
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(
 			types.EventTypeApproveOracleRegistration,
-			sdk.NewAttribute(types.AttributeKeyOracleAddress, msg.ApproveOracleRegistration.TargetOracleAddress),
-			sdk.NewAttribute(types.AttributeKeyUniqueID, msg.ApproveOracleRegistration.UniqueId),
+			sdk.NewAttribute(types.AttributeKeyOracleAddress, msg.ApprovalSharingOracleKey.TargetOracleAddress),
+			sdk.NewAttribute(types.AttributeKeyUniqueID, msg.ApprovalSharingOracleKey.UniqueId),
 		),
 	)
 
@@ -92,19 +92,19 @@ func (k Keeper) ApproveOracleRegistration(ctx sdk.Context, msg *types.MsgApprove
 func (k Keeper) validateApproveOracleRegistration(ctx sdk.Context, msg *types.MsgApproveOracleRegistration) error {
 
 	params := k.GetParams(ctx)
-	targetOracleAddress := msg.ApproveOracleRegistration.TargetOracleAddress
+	targetOracleAddress := msg.ApprovalSharingOracleKey.TargetOracleAddress
 
 	// check unique id
-	if msg.ApproveOracleRegistration.UniqueId != params.UniqueId {
+	if msg.ApprovalSharingOracleKey.UniqueId != params.UniqueId {
 		return types.ErrInvalidUniqueID
 	}
 
 	// verify signature
-	if err := k.VerifyOracleSignature(ctx, msg.ApproveOracleRegistration, msg.Signature); err != nil {
+	if err := k.VerifyOracleSignature(ctx, msg.ApprovalSharingOracleKey, msg.Signature); err != nil {
 		return err
 	}
 
-	if msg.ApproveOracleRegistration.EncryptedOraclePrivKey == nil {
+	if msg.ApprovalSharingOracleKey.EncryptedOraclePrivKey == nil {
 		return fmt.Errorf("encrypted oracle private key is nil")
 	}
 
