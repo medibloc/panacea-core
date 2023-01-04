@@ -8,7 +8,7 @@ between two parties in decentralized environments.
 
 Data consumers can open data deals by specifying the type, the quantity, and the pricing of the data that they are willing to consume. 
 
-Data providers can choose deals that match the data they have and they are willing to provide.
+Data providers can choose and participate in the deals that match the data that they have when they are willing to provide.
 
 To guarantee data consumers can only consume data in the form they want,
 decentralized oracles verify and issue certificates for all data being shared
