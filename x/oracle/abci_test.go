@@ -184,7 +184,7 @@ func (suite *abciTestSuite) TestOracleUpgradeSuccess() {
 
 	// ApplyUpgrade
 	ctx = ctx.WithBlockHeight(10)
-	oracle.EndBlocker(ctx, suite.OracleKeeper)
+	oracle.BeginBlocker(ctx, suite.OracleKeeper)
 
 	// check uniqueID change
 	suite.Require().Equal(suite.upgradeUniqueID, suite.OracleKeeper.GetParams(ctx).UniqueId)
@@ -214,7 +214,7 @@ func (suite *abciTestSuite) TestOracleUpgradeFailedBeforeReachUpgradeHeight() {
 
 	ctx = ctx.WithBlockHeight(9)
 
-	oracle.EndBlocker(ctx, suite.OracleKeeper)
+	oracle.BeginBlocker(ctx, suite.OracleKeeper)
 
 	suite.Require().Equal(suite.currentUniqueID, suite.OracleKeeper.GetParams(ctx).UniqueId)
 }
