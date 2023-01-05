@@ -1,7 +1,7 @@
 # Data Deal
 
 - Status: Draft
-- Crated: 2023-01-03
+- Created: 2023-01-03
 - Modified: 2023-01-03
 - Authors
   - Youngjoon Lee <yjlee@medibloc.org>
