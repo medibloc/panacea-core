@@ -14,9 +14,9 @@
 ## Synopsis
 
 This document defines a data deal which is a contract for data collecting and pay for provision in [DEP](../../1-users/3-data-exchange/0-about-dep.md).
-Data consumers create data deal by specifying what type of data and how much they want, and how much they are willing to pay for it.
+Data consumers create data deals by specifying the type, the quantity, and the pricing of the data that they are willing to consume.
 Data providers can provide their data to the deals that match the type of data they have.
-When a data provider provides data to the deal, the payout is distributed to the provider and oracle that validated the data.
+When a data provider provides data to the deal, the payout is distributed to the provider and the oracle that validated the data.
 Also, data consumers can deactivate their data deal whenever they want and the remained budget would be refunded to the consumer's account.
 
 ### Motivation
@@ -29,6 +29,10 @@ Thus, the data deal was devised so that data consumers can determine the type of
 `Data Provider`, `Data Consumer` and `Oracle` are defined in [User Flow](./1-user-flow.md)
 
 ## Technical Specification
+
+Data consumers should be able to post the information described below publicly, so that any data provider can see it. 
+Also, data providers should be able to be assured that a particular data consumer really posted the information. 
+To meet these requirements, it is recommended to use a public decentralized state machine as a single point of truth, such as Panacea.
 
 ### Data Structure of Deal
 
@@ -47,17 +51,17 @@ message Deal {
 }
 ```
 
-- `id`: auto increment id
-- `address`: an address of deal generated when deal is created
-- `data_schema`: a list of urls of desired type of data schema
-- `budget`: budget for data provision
-- `max_num_data`: maximum number of data the consumer want
-- `cur_num_data`: current number of data of the deal
-- `consumer_address`: consumer's account address (panacea1...)
-- `status`: the status of deal. 3 statuses can be possible
-  - `DEAL_STATUS_ACTIVE`: the status when deal is active (`cur_num_data` < `max_num_data`).  
-  - `DEAL_STATUS_INACTIVE`: the status when deal is deactivated (when consumer deactivated the deal)
-  - `DEAL_STATUS_COMPLETED`: the status when deal is completed (`max_num_data` of data is provided)
+- `id`: Auto increment id
+- `address`: An address of deal generated when deal is created
+- `data_schema`: A list of URLs of desired data schema
+- `budget`: A budget for consuming data
+- `max_num_data`: The maximum number of data the consumer want
+- `cur_num_data`: The current number of data provided
+- `consumer_address`: A consumer's account address of the form `panacea1...`
+- `status`: The status of deal. 3 statuses can be possible
+  - `DEAL_STATUS_ACTIVE`: The status when deal is active (`cur_num_data` < `max_num_data`).  
+  - `DEAL_STATUS_INACTIVE`: The status when deal is deactivated (when consumer deactivated the deal)
+  - `DEAL_STATUS_COMPLETED`: The status when deal is completed (`max_num_data` of data is provided)
 
 ### Create Data Deal
 
