@@ -15,9 +15,9 @@
 
 This document is about providing data through [DEP](../../1-users/3-data-exchange/0-about-dep.md).
 Before providers provide their data to consumers, the data must be validated from oracle whether the data is the correct data specified in the deal.
-Providers can send a request for validation to one of the oracles registered in panacea, and the oracle will validate the data using confidential computing without any exposure of the data.
-For the data that has been validated, oracle will issue a certificate to the provider.
-Providers can consent to provide their data by submitting the certificate to panacea, and will be rewarded by providing the data.
+Providers can send a request for validation to one of the oracles registered in Panacea, and the oracle will validate the data using confidential computing without any exposure of the data.
+As a result of a data validation, oracle will issue a certificate to the provider.
+Providers can consent to provide their data by submitting the certificate to Panacea, and will be rewarded by providing the data.
 In all of these processes, the data is transmitted with encryption and stored off-chain.
 
 ### Motivation
