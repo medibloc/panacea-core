@@ -4,14 +4,14 @@ Data Exchange Protocol (hereafter 'DEP') is a communication layer for sharing an
 between two parties in decentralized environments.
 
 
-## What is DEP?
+## What can you do with DEP?
 
-Data consumers can open data deals by specifying what type of data and how much they want, and how much they can pay for it.
+Data consumers can open data deals by specifying the type, the quantity, and the pricing of the data that they are willing to consume. 
 
-Data providers can choose deals that match the data they have and they are willing to provide.
+Data providers can choose and participate in the deals that match the data that they have when they are willing to provide.
 
-To guarantee data consumers can only consume data in the form they want,
-decentralized oracles verify and issue certificates for all data being shared
+To guarantee data consumers only consume data in the form they want,
+decentralized oracles verify and issue certificates for all data being provided by the data provider.
 
 Panacea public blockchain manages the status of all data deals and data sharing consents,
 ensuring data providers and ecosystem operators are rewarded appropriately.
