@@ -63,87 +63,95 @@ func (suite *queryDealTestSuite) TestQueryDeals() {
 	suite.Require().Equal(deal2, res.Deals[1])
 }
 
-func (suite *queryDealTestSuite) TestQueryCert() {
-	cert := &types.Certificate{
-		UnsignedCertificate: &types.UnsignedCertificate{
-			Cid:             "cid1",
-			OracleAddress:   suite.oracleAccAddr.String(),
-			DealId:          1,
-			ProviderAddress: suite.providerAccAddr.String(),
-			DataHash:        "dataHash",
+func (suite *queryDealTestSuite) TestQueryConsent() {
+	consent := &types.Consent{
+		Certificate: &types.Certificate{
+			UnsignedCertificate: &types.UnsignedCertificate{
+				Cid:             "cid1",
+				OracleAddress:   suite.oracleAccAddr.String(),
+				DealId:          1,
+				ProviderAddress: suite.providerAccAddr.String(),
+				DataHash:        "dataHash",
+			},
+			Signature: []byte("signature"),
 		},
-		Signature: []byte("signature"),
 	}
 
-	err := suite.DataDealKeeper.SetCertificate(suite.Ctx, cert)
+	err := suite.DataDealKeeper.SetConsent(suite.Ctx, consent)
 	suite.Require().NoError(err)
 
-	req := &types.QueryCertificate{
-		DealId:   cert.UnsignedCertificate.DealId,
-		DataHash: cert.UnsignedCertificate.DataHash,
+	req := &types.QueryConsent{
+		DealId:   consent.Certificate.UnsignedCertificate.DealId,
+		DataHash: consent.Certificate.UnsignedCertificate.DataHash,
 	}
-	res, err := suite.DataDealKeeper.Certificate(sdk.WrapSDKContext(suite.Ctx), req)
+	res, err := suite.DataDealKeeper.Consent(sdk.WrapSDKContext(suite.Ctx), req)
 	suite.Require().NoError(err)
 	suite.Require().NotNil(res)
-	suite.Require().Equal(cert, res.Certificate)
+	suite.Require().Equal(consent, res.Consent)
 }
 
-func (suite *queryDealTestSuite) TestQueryCerts() {
-	cert := &types.Certificate{
-		UnsignedCertificate: &types.UnsignedCertificate{
-			Cid:             "cid1",
-			OracleAddress:   suite.oracleAccAddr.String(),
-			DealId:          1,
-			ProviderAddress: suite.providerAccAddr.String(),
-			DataHash:        "dataHash",
+func (suite *queryDealTestSuite) TestQueryConsents() {
+	consent := &types.Consent{
+		Certificate: &types.Certificate{
+			UnsignedCertificate: &types.UnsignedCertificate{
+				Cid:             "cid1",
+				OracleAddress:   suite.oracleAccAddr.String(),
+				DealId:          1,
+				ProviderAddress: suite.providerAccAddr.String(),
+				DataHash:        "dataHash",
+			},
+			Signature: []byte("signature"),
 		},
-		Signature: []byte("signature"),
 	}
 
-	err := suite.DataDealKeeper.SetCertificate(suite.Ctx, cert)
+	err := suite.DataDealKeeper.SetConsent(suite.Ctx, consent)
 	suite.Require().NoError(err)
 
-	cert2 := &types.Certificate{
-		UnsignedCertificate: &types.UnsignedCertificate{
-			Cid:             "cid2",
-			OracleAddress:   suite.oracleAccAddr.String(),
-			DealId:          1,
-			ProviderAddress: suite.providerAccAddr.String(),
-			DataHash:        "dataHash2",
+	consent2 := &types.Consent{
+		Certificate: &types.Certificate{
+			UnsignedCertificate: &types.UnsignedCertificate{
+				Cid:             "cid2",
+				OracleAddress:   suite.oracleAccAddr.String(),
+				DealId:          1,
+				ProviderAddress: suite.providerAccAddr.String(),
+				DataHash:        "dataHash2",
+			},
+			Signature: []byte("signature"),
 		},
-		Signature: []byte("signature"),
 	}
 
-	err = suite.DataDealKeeper.SetCertificate(suite.Ctx, cert2)
+	err = suite.DataDealKeeper.SetConsent(suite.Ctx, consent2)
 	suite.Require().NoError(err)
 
-	cert3 := &types.Certificate{
-		UnsignedCertificate: &types.UnsignedCertificate{
-			Cid:             "cid2",
-			OracleAddress:   suite.oracleAccAddr.String(),
-			DealId:          2,
-			ProviderAddress: suite.providerAccAddr.String(),
-			DataHash:        "dataHash2",
+	consent3 := &types.Consent{
+		Certificate: &types.Certificate{
+			UnsignedCertificate: &types.UnsignedCertificate{
+				Cid:             "cid2",
+				OracleAddress:   suite.oracleAccAddr.String(),
+				DealId:          2,
+				ProviderAddress: suite.providerAccAddr.String(),
+				DataHash:        "dataHash2",
+			},
+			Signature: []byte("signature"),
 		},
-		Signature: []byte("signature"),
 	}
 
-	err = suite.DataDealKeeper.SetCertificate(suite.Ctx, cert3)
+	err = suite.DataDealKeeper.SetConsent(suite.Ctx, consent3)
 	suite.Require().NoError(err)
 
-	req := &types.QueryCertificates{
+	req := &types.QueryConsents{
 		DealId:     1,
 		Pagination: &query.PageRequest{},
 	}
-	res, err := suite.DataDealKeeper.Certificates(sdk.WrapSDKContext(suite.Ctx), req)
+	res, err := suite.DataDealKeeper.Consents(sdk.WrapSDKContext(suite.Ctx), req)
 	suite.Require().NoError(err)
-	suite.Require().Equal(2, len(res.Certificates))
-	suite.Require().Equal(cert, res.Certificates[0])
-	suite.Require().Equal(cert2, res.Certificates[1])
+	suite.Require().Equal(2, len(res.Consents))
+	suite.Require().Equal(consent, res.Consents[0])
+	suite.Require().Equal(consent2, res.Consents[1])
 
 	req.DealId = 2
-	res, err = suite.DataDealKeeper.Certificates(sdk.WrapSDKContext(suite.Ctx), req)
+	res, err = suite.DataDealKeeper.Consents(sdk.WrapSDKContext(suite.Ctx), req)
 	suite.Require().NoError(err)
-	suite.Require().Equal(1, len(res.Certificates))
-	suite.Require().Equal(cert3, res.Certificates[0])
+	suite.Require().Equal(1, len(res.Consents))
+	suite.Require().Equal(consent3, res.Consents[0])
 }

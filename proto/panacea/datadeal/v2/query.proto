@@ -7,7 +7,7 @@ import "gogoproto/gogo.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";
 import "google/api/annotations.proto";
 import "panacea/datadeal/v2/deal.proto";
-import "panacea/datadeal/v2/certificate.proto";
+import "panacea/datadeal/v2/consent.proto";
 
 // Query defines the gRPC querier service.
 service Query {
@@ -21,14 +21,14 @@ service Query {
     option (google.api.http).get = "/panacea/datadeal/v2/deals/{deal_id}";
   }
 
-  // Certificates returns a list of Certificate.
-  rpc Certificates(QueryCertificates) returns (QueryCertificatesResponse) {
-    option (google.api.http).get = "/panacea/datadeal/v2/deals/{deal_id}/certificates";
+  // Consents returns a list of Consent.
+  rpc Consents(QueryConsents) returns (QueryConsentsResponse) {
+    option (google.api.http).get = "/panacea/datadeal/v2/deals/{deal_id}/consents";
   }
 
-  // Certificate returns a Certificate
-  rpc Certificate(QueryCertificate) returns (QueryCertificateResponse) {
-    option (google.api.http).get = "/panacea/datadeal/v2/deals/{deal_id}/certificates/{data_hash}";
+  // Consent returns a Consent
+  rpc Consent(QueryConsent) returns (QueryConsentResponse) {
+    option (google.api.http).get = "/panacea/datadeal/v2/deals/{deal_id}/consents/{data_hash}";
   }
 
 }
@@ -54,26 +54,26 @@ message QueryDealResponse {
   Deal deal = 1;
 }
 
-// QueryDealsRequest defines the request type for the Query/Deals RPC method.
-message QueryCertificates {
+// QueryConsents defines the request type for the Query/Consents RPC method.
+message QueryConsents {
   uint64 deal_id = 1;
   cosmos.base.query.v1beta1.PageRequest pagination = 2;
 }
 
-// QueryDealsResponse defines the response type for the Query/Deals RPC method.
-message QueryCertificatesResponse {
-  repeated Certificate certificates = 1;
+// QueryConsentsResponse defines the response type for the Query/Consents RPC method.
+message QueryConsentsResponse {
+  repeated Consent consents = 1;
   cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 
-// QueryCertificate defines the request type for the Query/Certificate RPC method.
-message QueryCertificate {
+// QueryConsent defines the request type for the Query/Consent RPC method.
+message QueryConsent {
   uint64 deal_id = 1;
   string data_hash = 2;
 }
 
-// QueryCertificateResponse defines the response type for the Query/Certificate RPC method.
-message QueryCertificateResponse {
-  Certificate certificate = 1;
+// QueryConsentResponse defines the response type for the Query/Consent RPC method.
+message QueryConsentResponse {
+  Consent consent = 1;
 }
 

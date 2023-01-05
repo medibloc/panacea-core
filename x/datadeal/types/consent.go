@@ -5,16 +5,16 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-func (m *Certificate) ValidateBasic() error {
-	if m.UnsignedCertificate == nil {
+func (m *Consent) ValidateBasic() error {
+	if m.Certificate.UnsignedCertificate == nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "unsignedCertificate is empty")
 	}
 
-	if err := m.UnsignedCertificate.ValidateBasic(); err != nil {
+	if err := m.Certificate.UnsignedCertificate.ValidateBasic(); err != nil {
 		return sdkerrors.Wrapf(err, "failed to validation unsignedCertificate")
 	}
 
-	if m.Signature == nil {
+	if m.Certificate.Signature == nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "signature is empty")
 	}
 

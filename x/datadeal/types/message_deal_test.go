@@ -70,16 +70,18 @@ func TestMsgSubmitConsentValidateBasic(t *testing.T) {
 	oracleAddress := sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address()).String()
 	providerAddress := sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address()).String()
 	msg := &MsgSubmitConsent{
-		Certificate: &Certificate{
-			UnsignedCertificate: &UnsignedCertificate{
-				Cid:             "cid",
-				UniqueId:        "uniqueID",
-				OracleAddress:   oracleAddress,
-				DealId:          1,
-				ProviderAddress: providerAddress,
-				DataHash:        "dataHash",
+		Consent: &Consent{
+			&Certificate{
+				UnsignedCertificate: &UnsignedCertificate{
+					Cid:             "cid",
+					UniqueId:        "uniqueID",
+					OracleAddress:   oracleAddress,
+					DealId:          1,
+					ProviderAddress: providerAddress,
+					DataHash:        "dataHash",
+				},
+				Signature: []byte("signature"),
 			},
-			Signature: []byte("signature"),
 		},
 	}
 
@@ -95,44 +97,49 @@ func TestMsgSubmitConsentValidateBasicEmptyValue(t *testing.T) {
 
 	err := msg.ValidateBasic()
 	require.ErrorIs(t, err, sdkerrors.ErrInvalidRequest)
+	require.ErrorContains(t, err, "consent is empty")
+
+	msg.Consent = &Consent{}
+	err = msg.ValidateBasic()
+	require.ErrorIs(t, err, sdkerrors.ErrInvalidRequest)
 	require.ErrorContains(t, err, "certificate is empty")
 
-	msg.Certificate = &Certificate{}
+	msg.Consent.Certificate = &Certificate{}
 	err = msg.ValidateBasic()
 	require.ErrorIs(t, err, sdkerrors.ErrInvalidRequest)
 	require.ErrorContains(t, err, "unsignedCertificate is empty")
 
-	msg.Certificate.UnsignedCertificate = &UnsignedCertificate{}
+	msg.Consent.Certificate.UnsignedCertificate = &UnsignedCertificate{}
 	err = msg.ValidateBasic()
 	require.ErrorIs(t, err, sdkerrors.ErrInvalidRequest)
 	require.ErrorContains(t, err, "failed to validation certificate")
 	require.ErrorContains(t, err, "cid is empty")
 
-	msg.Certificate.UnsignedCertificate.Cid = "cid"
+	msg.Consent.Certificate.UnsignedCertificate.Cid = "cid"
 	err = msg.ValidateBasic()
 	require.ErrorIs(t, err, sdkerrors.ErrInvalidRequest)
 	require.ErrorContains(t, err, "failed to validation certificate")
 	require.ErrorContains(t, err, "uniqueId is empty")
 
-	msg.Certificate.UnsignedCertificate.UniqueId = "uniqueID"
+	msg.Consent.Certificate.UnsignedCertificate.UniqueId = "uniqueID"
 	err = msg.ValidateBasic()
 	require.ErrorIs(t, err, sdkerrors.ErrInvalidRequest)
 	require.ErrorContains(t, err, "failed to validation certificate")
 	require.ErrorContains(t, err, "oracleAddress is invalid")
 
-	msg.Certificate.UnsignedCertificate.OracleAddress = oracleAddress
+	msg.Consent.Certificate.UnsignedCertificate.OracleAddress = oracleAddress
 	err = msg.ValidateBasic()
 	require.ErrorIs(t, err, sdkerrors.ErrInvalidRequest)
 	require.ErrorContains(t, err, "failed to validation certificate")
 	require.ErrorContains(t, err, "dealId is greater than 0")
 
-	msg.Certificate.UnsignedCertificate.DealId = 1
+	msg.Consent.Certificate.UnsignedCertificate.DealId = 1
 	err = msg.ValidateBasic()
 	require.ErrorIs(t, err, sdkerrors.ErrInvalidRequest)
 	require.ErrorContains(t, err, "failed to validation certificate")
 	require.ErrorContains(t, err, "providerAddress is invalid")
 
-	msg.Certificate.UnsignedCertificate.ProviderAddress = providerAddress
+	msg.Consent.Certificate.UnsignedCertificate.ProviderAddress = providerAddress
 	err = msg.ValidateBasic()
 	require.ErrorIs(t, err, sdkerrors.ErrInvalidRequest)
 	require.ErrorContains(t, err, "failed to validation certificate")
