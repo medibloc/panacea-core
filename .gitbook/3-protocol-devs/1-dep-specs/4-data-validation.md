@@ -31,7 +31,7 @@ TODO: blahblah with diagrams (e.g. seq diagrams)
 
 #### Request URI
 ```http request
-POST /deals/{dealID}/data
+POST /v0/data-deal/deals/{dealID}/data
 ```
 
 #### Request Headers
