@@ -13,26 +13,27 @@
 
 ## Synopsis
 
-This document describes the API specification and verification process for data verification in Oracle.
+This document describes the API specification, data verification, and process for issuing certificates.
 
 ### Motivation
 
 Oracle can verify whether the data provided by the provider is in the form the consumer wants.
-The Consent created after successful verification contains the oracle information that verified the data.
+The certificate created after successful verification contains the oracle information that verified the data.
 
 ### Definitions
-`Data Provider`, `Data Consumer`, and `Oracle` and [JSON Schema](https://www.w3.org/2019/wot/json-schema)
+`Data Provider`, `Data Consumer`, and `Oracle` and [JSON schema](https://www.w3.org/2019/wot/json-schema)
 
 ## Technical Specification
 
 TODO: blahblah with diagrams (e.g. seq diagrams)
 
-### API Sepc
+### API Specification
 
 #### Request URI
 ```http request
 POST /deals/{dealID}/data
 ```
+
 #### Request Headers
 ```
 # Authorization: Bearer {jwtToken}
@@ -90,7 +91,7 @@ TODO: Guide to JWT generate and verify
 ### Data validation process
 
 #### Data Decryption
-Provider's encrypted data(encrypted_data_base64) can only be decrypted by Oracle.
+Provider's encrypted data(`encrypted_data_base64`) can only be decrypted by Oracle.
 
 TODO: Guide to decrypt data
 ```
@@ -104,37 +105,91 @@ orgin_data = AES256GCM.Decrypt(secret_key, encrypted_data)
 #### Data Validation
 After hashing the original data with SHA256, it is encoded with HEX and compared with `data_hash`.
 ```
-data_hash == HEX.Encode(SHA256(origin_data))
+compare(data_hash, HEX.Encode(SHA256(origin_data))
 ```
 
-Verify that the `provider_address` of the original data matches the JWT Token issuer of the request header.
+Verify that the `provider_address` of the original data matches the JWT auth token issuer of the request header.
 ```
-origin_data.provider_address == jwtToken.issuer
+compare(origin_data.provider_address,jwtToken.issuer)
 ```
 
-Deal is retrieved from the blockchain using the dealID got from the URI path.
+Deal is retrieved from the Panacea using the dealID got from the URI path.
 ```
-deal = getDealFromBlockchain(deal_id)
+deal = getDealFromPanacea(deal_id)
 ```
 
 Before verifying the data, it is checked whether the deal status is valid.
 If the Deal's status is invalid, Oracle does not perform verification work.
 ```
-deal.status == 'DEAL_STATUS_ACTIVE'
+compare(deal.status, 'DEAL_STATUS_ACTIVE')
 ```
 
 Validate original data with `data_schema` extracted from Deal. 
-We currently support JSON Schema.
+We currently support JSON schema.
 ```
 data_schema = deal.data_schema
 
 JSONSchema.Validate(data_schema, orgin_data)
 ```
 
-#### Data re-encryption and store
+#### Data re-encryption and store to IPFS
+
+If data validation is successful, the data must be re-encrypted and stored on IPFS. 
+
+This encrypted data is stored in IPFS to be delivered to the consumer.
+
+The combinedKey used to re-encrypt the data is generated as follows:
+```
+deal_id_bz = convertUint64ToByteArray(deal_id)
+combined_key = SHA256(append(oracle_private_key, deal_id_bz, data_hash))
+```
+
+You need to convert uint64 to byte array type. Below is an example of the go language.
+```go
+func convertUint64ToByteArray(v uint64) []byte {
+    b := make([]byte, 8)
+    b[0] = byte(v >> 56)
+    b[1] = byte(v >> 48)
+    b[2] = byte(v >> 40)
+    b[3] = byte(v >> 32)
+    b[4] = byte(v >> 24)
+    b[5] = byte(v >> 16)
+    b[6] = byte(v >> 8)
+    b[7] = byte(v)
+    return b
+}
+```
+
+After encrypting the data with the generated combinedKey, store it to IPFS.
+
+```
+encrypted_data = AES256GCM.Encrypt(combined_key, orgin_data)
+
+cid = IPFS.add(encrypted_data)
+```
 
 
-#### Consent creation and oracle sign
+#### Issue a certificate signed by Oracle
+If all processes succeed, Oracle responds to the Provider by issuing a certificate.
+
+The certificate includes the following contents.
+```json
+{
+  "unsigned_certificate": {
+    "cid": "QmeSiVLXWagUv9sLEHvbsUJy8rm7r5BoP2pAXrbx4pdbWi",
+    "unique_id": "9a3da3162aa592af3c77f1bba2d5635c7b4c065249bd36094fe3c11c73c90618",
+    "oracle_address": "panacea1ewugvs354xput6xydl5cd5tvkzcuymkejekwk3",
+    "deal_id": 1,
+    "provider_address": "panacea1ewugvs354xput6xydl5cd5tvkzcuymkejekwk3",
+    "data_hash": "13341f91f0da76d2adb67b519e2c9759822ceafd193bd26435ba0d5eee4c3a2b"
+  },
+  "signature": "MEQCIEPyGSe9wVIjrUFuzXtQtEc0siwaHkp4QJCMBvC8ttWQAiAUkntIQldgIkIBFdthaTRWXHisDV2Ys/Ufpc9zejUEuQ=="
+}
+```
+Signature is a value obtained by signing `unsigned_certificate` with `oracle_private_key`.
+```
+signature = sign(oracle_private_key, unsigned_certificate)
+```
 
 
 ## Backwards Compatibility
@@ -143,7 +198,7 @@ Not applicable.
 
 ## Forwards Compatibility
 
-TODO: blahblah
+If the JSON-LD validation specification is applied in the future, Oracle will also be supported.
 
 ## Example Implementations
 
