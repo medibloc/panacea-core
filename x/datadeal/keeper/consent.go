@@ -145,3 +145,24 @@ func (k Keeper) GetConsent(ctx sdk.Context, dealID uint64, dataHash string) (*ty
 
 	return consent, nil
 }
+
+func (k Keeper) GetAllConsents(ctx sdk.Context) ([]types.Consent, error) {
+	store := ctx.KVStore(k.storeKey)
+	iterator := sdk.KVStorePrefixIterator(store, types.ConsentKey)
+	defer iterator.Close()
+
+	consents := make([]types.Consent, 0)
+
+	for ; iterator.Valid(); iterator.Next() {
+		bz := iterator.Value()
+		var consent types.Consent
+
+		if err := k.cdc.UnmarshalLengthPrefixed(bz, &consent); err != nil {
+			return nil, sdkerrors.Wrapf(types.ErrGetConsent, err.Error())
+		}
+
+		consents = append(consents, consent)
+	}
+
+	return consents, nil
+}

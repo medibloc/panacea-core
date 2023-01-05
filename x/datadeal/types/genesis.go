@@ -17,5 +17,12 @@ func (gs GenesisState) Validate() error {
 			return err
 		}
 	}
+
+	for _, consent := range gs.Consents {
+		if err := consent.ValidateBasic(); err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
