@@ -754,7 +754,7 @@ paths:
         x-example: cosmos16xyempempp92x9hyzz9wrgf94r6j9h5f06pxxv
     get:
       deprecated: true
-      summary: Query all 4-validators that a delegator is bonded to
+      summary: Query all validators that a delegator is bonded to
       tags:
         - Staking
       produces:
@@ -803,7 +803,7 @@ paths:
   /staking/validators:
     get:
       deprecated: true
-      summary: Get all validator candidates. By default it returns only the bonded 4-validators.
+      summary: Get all validator candidates. By default it returns only the bonded validators.
       parameters:
         - in: query
           name: status
@@ -968,7 +968,7 @@ paths:
         500:
           description: Internal Server Error
   # TODO: We need to either fix this route when the validator is not found or add a slashed validator in the contract tests
-  #  /slashing/4-validators/{validatorPubKey}/signing_info:
+  #  /slashing/validators/{validatorPubKey}/signing_info:
   #    get:
   #      summary: Get sign info of given validator
   #      description: Get sign info of given validator
@@ -995,8 +995,8 @@ paths:
   /slashing/signing_infos:
     get:
       deprecated: true
-      summary: Get sign info of given all 4-validators
-      description: Get sign info of all 4-validators
+      summary: Get sign info of given all validators
+      description: Get sign info of all validators
       produces:
         - application/json
       tags:
@@ -1022,7 +1022,7 @@ paths:
             items:
               $ref: "#/definitions/SigningInfo"
         400:
-          description: Invalid validator public key for one of the 4-validators
+          description: Invalid validator public key for one of the validators
         500:
           description: Internal Server Error
   /slashing/validators/{validatorAddr}/unjail:
@@ -1195,7 +1195,7 @@ paths:
                 x-example: "Param Change"
               description:
                 type: string
-                x-example: "Update max 4-validators"
+                x-example: "Update max validators"
               proposer:
                 $ref: "#/definitions/Address"
               deposit:

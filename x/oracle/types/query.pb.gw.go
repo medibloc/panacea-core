@@ -538,9 +538,9 @@ func RegisterQueryHandlerClient(ctx context.Context, mux *runtime.ServeMux, clie
 }
 
 var (
-	pattern_Query_Oracles_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"panacea", "oracle", "v2", "5-oracles"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_Oracles_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"panacea", "oracle", "v2", "oracles"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_Oracle_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"panacea", "oracle", "v2", "5-oracles", "oracle_address"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_Oracle_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"panacea", "oracle", "v2", "oracles", "oracle_address"}, "", runtime.AssumeColonVerbOpt(true)))
 
 	pattern_Query_OracleRegistrations_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"panacea", "oracle", "v2", "oracle-registrations", "unique_id"}, "", runtime.AssumeColonVerbOpt(true)))
 
