@@ -19,7 +19,15 @@ panacead tx datadeal create-deal ${deal-file-path} \
 For `deal-file-path`, create a following JSON file.
 ```json
 {
-  
+  "data_schema": [
+    "http://jsonschema.gopanacea.org/vaccination-cert.json"
+  ],
+  "budget": {
+    "denom": "umed",
+    "amount": "1000000"
+  },
+  "max_num_data": 10,
+  "consumer_address": "panacea1..."
 }
 ```
 It is very important to set data schema specifically and correctly, so that data being provided can be validated accurately by oracles.
