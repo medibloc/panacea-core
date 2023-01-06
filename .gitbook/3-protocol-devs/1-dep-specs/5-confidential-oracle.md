@@ -1,8 +1,8 @@
 # Confidential Oracle
 
 - Status: Draft
-- Created: 2023-01-05
-- Modified: 2023-01-05
+- Created: 2023-01-06
+- Modified: 2023-01-06
 - Authors
   - Inchul Song <icsong@medibloc.org>
   - Youngjoon Lee <yjlee@medibloc.org>
