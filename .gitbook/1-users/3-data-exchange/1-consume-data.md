@@ -75,11 +75,18 @@ Using the following REST API, you can get a secret key of each data from the ora
 curl -v -X GET -H "Authorization: Bearer ${jwt}" \
   "${oracle-url}/v0/data-deal/secret-key?deal-id=${deal-id}&data-hash=${data-hash}"
 ```
-You must specify a JWT issued by yourself in order to prove that you are the data consumer who created the data deal.
+You must specify a JWT issued using your account key in order to prove that you are the data consumer who created the data deal.
 For this authentication, the JWT must be signed by your (data consumer's) chain account private key.
 
 We highly recommend to set the expiration of JWT as short as possible for security reasons.
+You can use the `panacead` CLI to issue JWTs easily by the following command.
 In near future, the protocol will adopt the 'nonce' concept to improve the security of authentications.
+```bash
+panacead issue-jwt ${expiration-duration} --from ${your-account-key-name}
+
+# e.g.
+# panacead issue-jwt 10s --from panacea1zqum...
+```
 
 Please note that the returned secret key is also encrypted, so that only the specific data consumers can decrypt the key using his/her chain account private key.
 Nevertheless, we highly recommend you to communicate with oracles who provides an HTTPS endpoint with SSL/TLS encryption.
