@@ -16,16 +16,16 @@
 This document describes the API specification, data verification, and process for issuing certificates.
 
 ### Motivation
-
-Oracle can verify whether the data provided by the provider is in the form the consumer wants.
-The certificate created after successful verification contains the oracle information that verified the data.
+Data consumers can define their requirements.
+This requirement allows them to define the data in any format they want.
+DEP supports a `JSON schema` to define these requirements.
+Oracle can verify the requirements of data consumers according to this JSON schema specification.
+Oracle issues a certificate upon successful verification, which can be verified by Panacea.
 
 ### Definitions
 `Data Provider`, `Data Consumer`, and `Oracle` and [JSON schema](https://www.w3.org/2019/wot/json-schema)
 
 ## Technical Specification
-
-TODO: blahblah with diagrams (e.g. seq diagrams)
 
 ### API Specification
 
@@ -51,10 +51,10 @@ TODO: Guide to JWT generate and verify
 }
 ```
 | Key                   | Type   | Description                                                      |
-|-----------------------|--------|------------------------------------------------------------------|
+| --------------------- | ------ | ---------------------------------------------------------------- |
 | provider_address      | string | Data provider's account address                                  |
 | encrypted_data_base64 | string | Base64-encoded value after encrypt the original data             |
-| data_hash             | string | A hexadecimal string of a SHA256 hash value of the original data  |
+| data_hash             | string | A hexadecimal string of a SHA256 hash value of the original data |
 
 #### Response Headers
 ```
@@ -76,16 +76,16 @@ TODO: Guide to JWT generate and verify
 }
 ```
 
-| Key                                   | Type   | Description                                                      |
-|---------------------------------------|--------|------------------------------------------------------------------|
-| unsigned_certificate                  | Object | Unsigned certificate containing data validation information      |
-| unsigned_certificate.cid              | string | A content identifier of a file in IPFS                                     |
-| unsigned_certificate.unique_id        | string | UniqueID of the oracle that validated the data                   |
-| unsigned_certificate.oracle_address   | string | Account address of the oracle that validated the data            |
-| unsigned_certificate.deal_id          | int    | Deal to whom the provider intends to provide data                |
-| unsigned_certificate.provider_address | string | Data provider's account address                                  |
-| unsigned_certificate.data_hash        | string | A hexadecimal string of a SHA256 hash value of the original data |
-| signature                             | string | Base64-encoded string signed `unsigned_certificate` with Oracle private key.          |
+| Key                                   | Type   | Description                                                                  |
+| ------------------------------------- | ------ | ---------------------------------------------------------------------------- |
+| unsigned_certificate                  | Object | Unsigned certificate containing data validation information                  |
+| unsigned_certificate.cid              | string | A content identifier of a file in IPFS                                       |
+| unsigned_certificate.unique_id        | string | UniqueID of the oracle that validated the data                               |
+| unsigned_certificate.oracle_address   | string | Account address of the oracle that validated the data                        |
+| unsigned_certificate.deal_id          | int    | Deal to whom the provider intends to provide data                            |
+| unsigned_certificate.provider_address | string | Data provider's account address                                              |
+| unsigned_certificate.data_hash        | string | A hexadecimal string of a SHA256 hash value of the original data             |
+| signature                             | string | Base64-encoded string signed `unsigned_certificate` with Oracle private key. |
 
 
 ### Data validation process
