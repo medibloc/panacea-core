@@ -1,11 +1,11 @@
-# User Flow
+# Data validation
 
 - Status: Draft
 - Created: 2023-01-04
 - Modified: 2023-01-04
 - Authors
-    - Youngjoon Lee <yjlee@medibloc.org>
     - Gyuguen Jang <gyuguen.jang@medibloc.org>
+    - Youngjoon Lee <yjlee@medibloc.org>
     - Hansol Lee <hansol@medibloc.org>
     - Myongsik Gong <myongsik_gong@medibloc.org>
     - Inchul Song <icsong@medibloc.org>
@@ -54,7 +54,7 @@ TODO: Guide to JWT generate and verify
 |-----------------------|--------|------------------------------------------------------------------|
 | provider_address      | string | Data provider's account address                                  |
 | encrypted_data_base64 | string | Base64-encoded value after encrypt the original data             |
-| data_hash             | string | The value of hashing the original data with the SHA256 algorithm |
+| data_hash             | string | A hexadecimal string of a SHA256 hash value of the original data  |
 
 #### Response Headers
 ```
@@ -79,47 +79,43 @@ TODO: Guide to JWT generate and verify
 | Key                                   | Type   | Description                                                      |
 |---------------------------------------|--------|------------------------------------------------------------------|
 | unsigned_certificate                  | Object | Unsigned certificate containing data validation information      |
-| unsigned_certificate.cid              | string | A content identifier of IPFS                                     |
+| unsigned_certificate.cid              | string | A content identifier of a file in IPFS                                     |
 | unsigned_certificate.unique_id        | string | UniqueID of the oracle that validated the data                   |
 | unsigned_certificate.oracle_address   | string | Account address of the oracle that validated the data            |
 | unsigned_certificate.deal_id          | int    | Deal to whom the provider intends to provide data                |
 | unsigned_certificate.provider_address | string | Data provider's account address                                  |
-| unsigned_certificate.data_hash        | string | The value of hashing the original data with the SHA256 algorithm |
-| signature                             | string | The value of unsigned_certificate signed with OracleKey          |
+| unsigned_certificate.data_hash        | string | A hexadecimal string of a SHA256 hash value of the original data |
+| signature                             | string | Base64-encoded string signed `unsigned_certificate` with Oracle private key.          |
 
 
 ### Data validation process
 
 #### Data Decryption
-Provider's encrypted data(`encrypted_data_base64`) can only be decrypted by Oracle.
+Provider's encrypted data(`encrypted_data_base64`) can only be decrypted by oracle.
 
-TODO: Guide to decrypt data
 ```
 secret_key = SHA256(ECDH(oracle_private_key, provider_public_key))
 
 encrypted_data = Base64.Decode(encrypted_data_base64)
 
-orgin_data = AES256GCM.Decrypt(secret_key, encrypted_data)
+orginal_data = AES256GCM.Decrypt(secret_key, encrypted_data)
 ```
 
 #### Data Validation
-After hashing the original data with SHA256, it is encoded with HEX and compared with `data_hash`.
+Verify that the original data matches the `data_hash`.
 ```
-compare(data_hash, HEX.Encode(SHA256(origin_data))
+compare(data_hash, HEX.Encode(SHA256(orginal_data))
 ```
 
 Verify that the `provider_address` of the original data matches the JWT auth token issuer of the request header.
 ```
-compare(origin_data.provider_address,jwtToken.issuer)
+compare(original_data.provider_address,jwtToken.issuer)
 ```
 
-Deal is retrieved from the Panacea using the dealID got from the URI path.
-```
-deal = getDealFromPanacea(deal_id)
-```
+The deal information can be retrieved from Panacea using the deal ID
 
 Before verifying the data, it is checked whether the deal status is valid.
-If the Deal's status is invalid, Oracle does not perform verification work.
+If the Deal's status is invalid, oracle does not perform verification work.
 ```
 compare(deal.status, 'DEAL_STATUS_ACTIVE')
 ```
@@ -129,35 +125,17 @@ We currently support JSON schema.
 ```
 data_schema = deal.data_schema
 
-JSONSchema.Validate(data_schema, orgin_data)
+JSONSchema.Validate(data_schema, orginal_data)
 ```
 
-#### Data re-encryption and store to IPFS
+#### Data re-encryption and delivery via IPFS
 
-If data validation is successful, the data must be re-encrypted and stored on IPFS. 
+If data validation is successful, the data must be re-encrypted and stored on IPFS to be delivered to the consumer.
 
-This encrypted data is stored in IPFS to be delivered to the consumer.
-
-The combinedKey used to re-encrypt the data is generated as follows:
+To re-encrypt the data, a symmetric secret key must be used. The symmetric secret key can be derived by the following logic.
 ```
-deal_id_bz = convertUint64ToByteArray(deal_id)
+deal_id_bz = convertUint64ToBigEndian(deal_id)
 combined_key = SHA256(append(oracle_private_key, deal_id_bz, data_hash))
-```
-
-You need to convert uint64 to byte array type. Below is an example of the go language.
-```go
-func convertUint64ToByteArray(v uint64) []byte {
-    b := make([]byte, 8)
-    b[0] = byte(v >> 56)
-    b[1] = byte(v >> 48)
-    b[2] = byte(v >> 40)
-    b[3] = byte(v >> 32)
-    b[4] = byte(v >> 24)
-    b[5] = byte(v >> 16)
-    b[6] = byte(v >> 8)
-    b[7] = byte(v)
-    return b
-}
 ```
 
 After encrypting the data with the generated combinedKey, store it to IPFS.
@@ -169,8 +147,8 @@ cid = IPFS.add(encrypted_data)
 ```
 
 
-#### Issue a certificate signed by Oracle
-If all processes succeed, Oracle responds to the Provider by issuing a certificate.
+#### Certificate issuance with a cryptographic signature
+If all processes succeed, oracle responds to the Provider by issuing a certificate.
 
 The certificate includes the following contents.
 ```json
@@ -186,6 +164,12 @@ The certificate includes the following contents.
   "signature": "MEQCIEPyGSe9wVIjrUFuzXtQtEc0siwaHkp4QJCMBvC8ttWQAiAUkntIQldgIkIBFdthaTRWXHisDV2Ys/Ufpc9zejUEuQ=="
 }
 ```
+
+The certificate requires a signature signed with `oracle_private_key`.
+Because Panacea needs to be able to verify that the certificate was generated by a trusted oracle.
+The `oracle_public_key` registered in Panacea is a pair with the `oracle_private_key` of a trusted oracle. 
+So, Panacea can verify signature of the certificate with `oracle_public_key` to ensure that the certificate is correct.
+
 Signature is a value obtained by signing `unsigned_certificate` with `oracle_private_key`.
 ```
 signature = sign(oracle_private_key, unsigned_certificate)
@@ -198,7 +182,7 @@ Not applicable.
 
 ## Forwards Compatibility
 
-If the JSON-LD validation specification is applied in the future, Oracle will also be supported.
+If the JSON-LD validation specification is applied in the future, oracle will also be supported.
 
 ## Example Implementations
 
