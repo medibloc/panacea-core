@@ -43,7 +43,7 @@ panacead query datadeal deals \
 
 ## Query consents
 
-If some data consumers have data that fit the requirements of your data deal, they will submit consents to the chain.
+If some data providers have data that fit the requirements of your data deal, they will submit consents to the chain.
 The consent means that the data provider has agreed to provide their data to a specific data consumer.
 Also, each consent can contain a data validation certificate issued by an oracle, so that data consumers can trust the validity of data.
 
