@@ -78,7 +78,7 @@ func (m *QueryOraclesRequest) GetPagination() *query.PageRequest {
 
 // QueryOracleResponse is the response type for the Query/Oracles RPC method.
 type QueryOraclesResponse struct {
-	Oracles    []*Oracle           `protobuf:"bytes,1,rep,name=5-oracles,proto3" json:"5-oracles,omitempty"`
+	Oracles    []*Oracle           `protobuf:"bytes,1,rep,name=oracles,proto3" json:"oracles,omitempty"`
 	Pagination *query.PageResponse `protobuf:"bytes,2,opt,name=pagination,proto3" json:"pagination,omitempty"`
 }
 
@@ -579,7 +579,7 @@ const _ = grpc.SupportPackageIsVersion4
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type QueryClient interface {
-	// Oracles returns a list of 5-oracles.
+	// Oracles returns a list of oracles.
 	Oracles(ctx context.Context, in *QueryOraclesRequest, opts ...grpc.CallOption) (*QueryOraclesResponse, error)
 	// Oracle returns a oracle.
 	Oracle(ctx context.Context, in *QueryOracleRequest, opts ...grpc.CallOption) (*QueryOracleResponse, error)
@@ -646,7 +646,7 @@ func (c *queryClient) Params(ctx context.Context, in *QueryOracleParamsRequest, 
 
 // QueryServer is the server API for Query service.
 type QueryServer interface {
-	// Oracles returns a list of 5-oracles.
+	// Oracles returns a list of oracles.
 	Oracles(context.Context, *QueryOraclesRequest) (*QueryOraclesResponse, error)
 	// Oracle returns a oracle.
 	Oracle(context.Context, *QueryOracleRequest) (*QueryOracleResponse, error)

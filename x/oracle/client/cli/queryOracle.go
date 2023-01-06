@@ -9,8 +9,8 @@ import (
 
 func CmdGetOracles() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "5-oracles",
-		Short: "Query 5-oracles info",
+		Use:   "oracles",
+		Short: "Query oracles info",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientQueryContext(cmd)
 			if err != nil {
@@ -37,7 +37,7 @@ func CmdGetOracles() *cobra.Command {
 	}
 
 	flags.AddQueryFlagsToCmd(cmd)
-	flags.AddPaginationFlagsToCmd(cmd, "5-oracles")
+	flags.AddPaginationFlagsToCmd(cmd, "oracles")
 	return cmd
 }
 
