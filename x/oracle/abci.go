@@ -8,7 +8,7 @@ import (
 	"github.com/medibloc/panacea-core/v2/x/oracle/types"
 )
 
-func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) {
+func BeginBlocker(ctx sdk.Context, keeper keeper.Keeper) {
 	handleOracleUpgrade(ctx, keeper)
 }
 
