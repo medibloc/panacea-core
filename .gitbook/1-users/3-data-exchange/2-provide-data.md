@@ -87,7 +87,7 @@ panacead submit-consent ${certificate-file-path} \
 
 After you submit consent, Panacea verifies the certificate and checks the status of the deal. 
 
-When verification is completed, Panacea makes the data accessible to consumers and makes you can get reward.
+When the verification is completed, Panacea makes the data accessible to consumers and makes you can get reward.
 
 ## Query consent
 You can query a consent by the deal ID and data hash you provided.
