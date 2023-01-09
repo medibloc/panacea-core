@@ -8627,7 +8627,7 @@
 
             function d(t) {
                 function n(n, r, o, u, s, c, l) {
-                    (u = u || f, c = c || o, l !== a) && (e && i(!1, "Calling PropTypes 4-validators directly is not supported by the `prop-types` package. Use `PropTypes.checkPropTypes()` to call them. Read more at http://fb.me/use-check-prop-types"));
+                    (u = u || f, c = c || o, l !== a) && (e && i(!1, "Calling PropTypes validators directly is not supported by the `prop-types` package. Use `PropTypes.checkPropTypes()` to call them. Read more at http://fb.me/use-check-prop-types"));
                     return null == r[o] ? n ? null === r[o] ? new h("The " + s + " `" + c + "` is marked as required in `" + u + "`, but its value is `null`.") : new h("The " + s + " `" + c + "` is marked as required in `" + u + "`, but its value is `undefined`.") : null : t(r, o, u, s, c)
                 }
                 var r = n.bind(null, !1);
@@ -8897,7 +8897,7 @@
             o = n(164);
         t.exports = function() {
             function t(t, e, n, r, u, a) {
-                a !== o && i(!1, "Calling PropTypes 4-validators directly is not supported by the `prop-types` package. Use PropTypes.checkPropTypes() to call them. Read more at http://fb.me/use-check-prop-types")
+                a !== o && i(!1, "Calling PropTypes validators directly is not supported by the `prop-types` package. Use PropTypes.checkPropTypes() to call them. Read more at http://fb.me/use-check-prop-types")
             }
 
             function e() {

@@ -22746,7 +22746,7 @@
 
             function h(e) {
                 function n(n, r, i, a, s, l, f) {
-                    (a = a || c, l = l || i, f !== u) && (t && o(!1, "Calling PropTypes 4-validators directly is not supported by the `prop-types` package. Use `PropTypes.checkPropTypes()` to call them. Read more at http://fb.me/use-check-prop-types"));
+                    (a = a || c, l = l || i, f !== u) && (t && o(!1, "Calling PropTypes validators directly is not supported by the `prop-types` package. Use `PropTypes.checkPropTypes()` to call them. Read more at http://fb.me/use-check-prop-types"));
                     return null == r[i] ? n ? null === r[i] ? new d("The " + s + " `" + l + "` is marked as required in `" + a + "`, but its value is `null`.") : new d("The " + s + " `" + l + "` is marked as required in `" + a + "`, but its value is `undefined`.") : null : e(r, i, a, s, l)
                 }
                 var r = n.bind(null, !1);
@@ -31027,7 +31027,7 @@
             i = n(269);
         e.exports = function() {
             function e(e, t, n, r, a, u) {
-                u !== i && o(!1, "Calling PropTypes 4-validators directly is not supported by the `prop-types` package. Use PropTypes.checkPropTypes() to call them. Read more at http://fb.me/use-check-prop-types")
+                u !== i && o(!1, "Calling PropTypes validators directly is not supported by the `prop-types` package. Use PropTypes.checkPropTypes() to call them. Read more at http://fb.me/use-check-prop-types")
             }
 
             function t() {
@@ -36904,18 +36904,18 @@
                         i = t.taggedOperations(),
                         a = o("Collapse");
                     return s.default.createElement("div", null, s.default.createElement("h4", {
-                        className: "0-about-panacea-title"
+                        className: "about-panacea-title"
                     }, "Overview"), i.map(function(e, t) {
                         var o = e.get("operations"),
-                            i = ["0-about-panacea-tags", t],
+                            i = ["about-panacea-tags", t],
                             u = n.isShown(i, !0);
                         return s.default.createElement("div", {
-                            key: "0-about-panacea-" + t
+                            key: "about-panacea-" + t
                         }, s.default.createElement("h4", {
                             onClick: function() {
                                 return r.show(i, !u)
                             },
-                            className: "link 0-about-panacea-tag"
+                            className: "link about-panacea-tag"
                         }, " ", u ? "-" : "+", t), s.default.createElement(a, {
                             isOpened: u,
                             animated: !0
