@@ -15,25 +15,25 @@
 This document explains that why the oracles must use confidential computing.
 
 ## Privacy Vulnerabilities of Oracle
-In DEP, anyone can operate oracle node. However, when validating the sensitive data through the general-purpose oracle, it could be occurred several vulnerabilities.
-The one of vulnerabilities is that the sensitive data could be exposed to oracle operator who uses malicious binary.
+In DEP, anyone can operate the oracle node. However, when verifying the sensitive data through the general-purpose oracle, it could be occurred several privacy vulnerabilities.
+The one of vulnerabilities is that the sensitive data could be exposed to the oracle operator who uses malicious binary.
 The other vulnerabilities is that the data could be stolen from external node or attack.
-So preventing from these vulnerabilities, the oracle must use confidential computing by using Intel SGX Technology in [TEE(Trusted Execution Environment)](https://en.wikipedia.org/wiki/Trusted_execution_environment).
+So preventing from these vulnerabilities, the oracle must use confidential computing which is operated in [TEE(Trusted Execution Environment)](https://en.wikipedia.org/wiki/Trusted_execution_environment) using Intel SGX.
 
 ## Confidential Oracle
 In DEP, anyone can operate oracle nodes but must use confidential computing.
-If the operator runs the confidential oracle, the only oracle software can decrypt a data and validate it. It means that the oracle operator can't decrypt a data and it will be not exposed to the operator.
-Also, when running the confidential oracle, the only genuine binary built in Intel SGX should be used so that it can be prevented from the node who uses malicious binary. It means that all oracles run the same binary.
-Using a genuine binary can preserve a privacy of data.
+If the operator runs the confidential oracle, the only oracle software can decrypt a data and verified it. It means that the oracle operator can't decrypt a data and it will be not exposed to the operator.
+Also, when running the confidential oracle, the only genuine binary built in Intel SGX should be used so that it can be prevented from the node who uses malicious binary. It means that all the oracles run the same binary.
+As a result, using a genuine binary can preserve a privacy of data.
 
 ### Additional Effort
 
-Using a confidential oracle could reinforce a security, but we developed an additional effort for protecting a data leak.
+Using a confidential oracle could reinforce a security, but the oracle was developed with additional efforts for protecting a data leak.
 When running an oracle with the genuine binary, the data encryption and decryption are performed by oracle private key which is sealed by unique ID located in Intel SGX.
 So if the binary is changed or corrupted, the data encryption and decryption would not work.
 
 So how to we set a correct unique ID and how to know it is not malicious binary? The answer is that the unique ID will be determined by Panacea governance.
-We can know the correct unique ID from Panacea as Single Source of Truth(SSOT), and know that what correct genuine binary is.
+We can know the correct unique ID from Panacea as Single Source of Truth(SSOT), and know that what the correct genuine binary is.
 Because of the reason, the oracle operator who wants to steal data could not use malicious binary and it could be prevented from potential data leakage.
 
 
