@@ -15,7 +15,7 @@ The transmission of data and the payment of rewards are managed atomically throu
 Before request to oracle, you should encrypt your data for privacy preserving.
 Encryption can be done using your chain account key and oracle public key which is registered in Panacea public blockchain.
 This makes only oracles can decrypt and verify your original data in secure area.
-For more details about data secure area, please see [Confidential Oracle](../../3-protocol-devs/1-dep-specs/5-confidential-oracle.md)).
+For more details about data secure area, please see [Confidential Oracle](../../3-protocol-devs/1-dep-specs/5-confidential-oracle.md).
 
 You can encrypt data by the following CLI:
 ```bash
