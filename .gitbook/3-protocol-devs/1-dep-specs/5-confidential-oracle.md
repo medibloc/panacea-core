@@ -34,7 +34,7 @@ So if the binary is changed or corrupted, the data encryption and decryption wou
 
 So how to we set a correct unique ID and how to know it is not malicious binary? The answer is that the unique ID will be determined by Panacea governance.
 We can know the correct unique ID from Panacea as Single Source of Truth(SSOT), and know that what the correct genuine binary is.
-Because of the reason, the oracle operator who wants to steal data could not use malicious binary, and it could be prevented from potential data leakage.
+Because of the reason, the oracle operators who are willing to steal data could not use malicious binary, and it could be prevented from potential data leakage.
 
 
 ## Implementation of Confidential Oracle
