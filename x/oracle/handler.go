@@ -29,6 +29,9 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 		case *types.MsgUpgradeOracle:
 			res, err := msgServer.UpgradeOracle(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)
+		case *types.MsgApproveOracleUpgrade:
+			res, err := msgServer.ApproveOracleUpgrade(sdk.WrapSDKContext(ctx), msg)
+			return sdk.WrapServiceResult(ctx, res, err)
 		default:
 			errMsg := fmt.Sprintf("unrecognized %s message type: %T", types.ModuleName, msg)
 			return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, errMsg)
