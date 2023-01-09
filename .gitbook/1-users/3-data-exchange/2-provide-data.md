@@ -78,7 +78,7 @@ Now you can use this certificate in the next step.
 
 Broadcast the following `submit-consent` transaction with certificate from oracle.
 ```bash
-panacead submit-consent ${certifiacte-file-path} \
+panacead submit-consent ${certificate-file-path} \
   --from ${data-provider-addr} \
   --chain-id ${chain-id} \
   --gas auto --gas-adjustment 1.30 --gas-prices 5umed \
