@@ -26,7 +26,7 @@ If the operator runs the confidential oracle, the only oracle software can decry
 Also, when running the confidential oracle, the only genuine binary built in Intel SGX should be used so that it can be prevented from the node who uses malicious binary. It means that all the oracles run the same binary.
 As a result, using a genuine binary can preserve a privacy of data.
 
-### Additional Effort
+### Additional Efforts
 
 Using a confidential oracle could reinforce a security, but the oracle was developed with additional efforts for protecting a data leak.
 When running an oracle with the genuine binary, the data encryption and decryption are performed by oracle private key which is sealed by unique ID located in Intel SGX.
@@ -46,5 +46,5 @@ You can refer to the details of Azure Confidential Computing in this [link](http
 
 - EGo
 
-EGo is an open-source SDK that enable to develop confidential apps written in Go language. The oracle in DEP used a EGo library so that operator needs to install EGo modules.
-You can refer the source code of EGo in this [link](https://github.com/edgelesssys/ego).
+EGo is an open-source SDK that enable to develop confidential apps written in Go language. The oracle in DEP used a EGo so that operator needs to install EGo modules.
+You can refer the source code and details of EGo following in this [link](https://github.com/edgelesssys/ego).
