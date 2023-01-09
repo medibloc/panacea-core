@@ -51,7 +51,7 @@ TODO: Guide to JWT generate and verify
 }
 ```
 | Key                   | Type   | Description                                                      |
-| --------------------- | ------ | ---------------------------------------------------------------- |
+|-----------------------|--------|------------------------------------------------------------------|
 | provider_address      | string | Data provider's account address                                  |
 | encrypted_data_base64 | string | Base64-encoded value after encrypt the original data             |
 | data_hash             | string | A hexadecimal string of a SHA256 hash value of the original data |
@@ -77,12 +77,12 @@ TODO: Guide to JWT generate and verify
 ```
 
 | Key                                   | Type   | Description                                                                  |
-| ------------------------------------- | ------ | ---------------------------------------------------------------------------- |
+|---------------------------------------|--------|------------------------------------------------------------------------------|
 | unsigned_certificate                  | Object | Unsigned certificate containing data validation information                  |
 | unsigned_certificate.cid              | string | A content identifier of a file in IPFS                                       |
 | unsigned_certificate.unique_id        | string | UniqueID of the oracle that validated the data                               |
 | unsigned_certificate.oracle_address   | string | Account address of the oracle that validated the data                        |
-| unsigned_certificate.deal_id          | int    | Deal to whom the provider intends to provide data                            |
+| unsigned_certificate.deal_id          | uint   | Deal to whom the provider intends to provide data                            |
 | unsigned_certificate.provider_address | string | Data provider's account address                                              |
 | unsigned_certificate.data_hash        | string | A hexadecimal string of a SHA256 hash value of the original data             |
 | signature                             | string | Base64-encoded string signed `unsigned_certificate` with Oracle private key. |
@@ -104,12 +104,12 @@ orginal_data = AES256GCM.Decrypt(secret_key, encrypted_data)
 #### Data Validation
 Verify that the original data matches the `data_hash`.
 ```
-compare(data_hash, HEX.Encode(SHA256(orginal_data))
+compare(data_hash, Hex.Encode(SHA256(orginal_data))
 ```
 
 Verify that the `provider_address` of the original data matches the JWT auth token issuer of the request header.
 ```
-compare(original_data.provider_address,jwtToken.issuer)
+compare(provider_address, jwtToken.issuer)
 ```
 
 The deal information can be retrieved from Panacea using the deal ID
@@ -138,10 +138,10 @@ deal_id_bz = convertUint64ToBigEndian(deal_id)
 combined_key = SHA256(append(oracle_private_key, deal_id_bz, data_hash))
 ```
 
-After encrypting the data with the generated combinedKey, store it to IPFS.
+After encrypting the data with the generated `combinedKey`, store it to IPFS.
 
 ```
-encrypted_data = AES256GCM.Encrypt(combined_key, orgin_data)
+encrypted_data = AES256GCM.Encrypt(combined_key, orginal_data)
 
 cid = IPFS.add(encrypted_data)
 ```
@@ -182,7 +182,7 @@ Not applicable.
 
 ## Forwards Compatibility
 
-If the JSON-LD validation specification is applied in the future, oracle will also be supported.
+If the JSON-LD validation specification is applied in the future, oracle will also be support.
 
 ## Example Implementations
 
