@@ -4,16 +4,16 @@ Data providers can provide their data that match the requirements of the data de
 
 Since only the data verified by oracle can be provided to a deal, providers should first request data verification to oracle.
 
-As a result of verification, oracle will issue a certificate, then provider can provide their data by submitting a consent with the certificate to Panacea public blockchain.
+As a result of verification, oracle will issue a certificate, then provider can provide their data by submitting a consent with the certificate to Panacea.
 
 In the whole process of data transmission, the data is encrypted so that no one can access the original data.
 
-The transmission of data and the payment of rewards are managed atomically through the Panacea public blockchain, so consumers can get the data only when the reward payment is completed.
+The transmission of data and the payment of rewards are managed atomically through the Panacea, so consumers can get the data only when the reward payment is completed.
 
 ## Request data verification to oracle
 
 Before request to oracle, you should encrypt your data for privacy preserving.
-Encryption can be done using your chain account key and oracle public key which is registered in Panacea public blockchain.
+Encryption can be done using your chain account key and oracle public key which is registered in Panacea.
 This makes only oracles can decrypt and verify your original data in secure area.
 For more details about data secure area, please see [Confidential Oracle](../../3-protocol-devs/1-dep-specs/5-confidential-oracle.md).
 
@@ -76,7 +76,7 @@ Now you can use this certificate in the next step.
 
 ## Submit consent
 
-Broadcast the following `submit-consent` transaction with certification from oracle.
+Broadcast the following `submit-consent` transaction with certificate from oracle.
 ```bash
 panacead submit-consent ${certifiacte-file-path} \
   --from ${data-provider-addr} \
@@ -85,7 +85,7 @@ panacead submit-consent ${certifiacte-file-path} \
   --node ${chain-node-rpc-addr}
 ```
 
-After you submit consent, Panacea public blockchain verifies the certificate and checks the status of the deal. 
+After you submit consent, Panacea verifies the certificate and checks the status of the deal. 
 
 When verification is completed, Panacea makes the data accessible to consumers and makes you can get reward.
 
