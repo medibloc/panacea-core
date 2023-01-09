@@ -63,4 +63,11 @@
 
 * [About DEP Oracle](5-oracles/0-about-dep-oracle.md)
 * Operate Oracle Nodes
+  * [Overview](5-oracles/1-operate-oracle-nodes/0-overview.md)
+  * [Oracle Installation](5-oracles/1-operate-oracle-nodes/1-oracle-installation.md)
+  * [Oracle Initialization](5-oracles/1-operate-oracle-nodes/2-oracle-intialization.md)
+  * [Genesis Oracle](5-oracles/1-operate-oracle-nodes/3-genesis-oracle.md)
+  * [Oracle Registration](5-oracles/1-operate-oracle-nodes/4-oracle-registration.md)
+  * [Running a Node](5-oracles/1-operate-oracle-nodes/5-running-node.md)
+  * [Upgrading a Node](5-oracles/1-operate-oracle-nodes/6-upgrading-node.md)
 * FAQ
