@@ -49,7 +49,7 @@ For `encrpyred-data-json`, create a following JSON file.
   "encrypted_data_base64" : "{encrypted-data}"
 }
 ```
-You have to get data hash of original data with SHA-256 hash function. For example, you can get hash by following CLI:
+You have to use data hash of original data with SHA-256 hash function. For example, you can get hash by following CLI:
 ```bash
 sha256sum ${original-data-path}
 ```
