@@ -135,13 +135,13 @@ If data validation is successful, the data must be re-encrypted and stored on IP
 To re-encrypt the data, a symmetric secret key must be used. The symmetric secret key can be derived by the following logic.
 ```
 deal_id_bz = convertUint64ToBigEndian(deal_id)
-combined_key = SHA256(append(oracle_private_key, deal_id_bz, data_hash))
+secret_key = SHA256(append(oracle_private_key, deal_id_bz, data_hash))
 ```
 
-After encrypting the data with the generated `combinedKey`, store it to IPFS.
+After encrypting the data with the generated `secretKey`, store it to IPFS.
 
 ```
-encrypted_data = AES256GCM.Encrypt(combined_key, orginal_data)
+encrypted_data = AES256GCM.Encrypt(secret_key, orginal_data)
 
 cid = IPFS.add(encrypted_data)
 ```
