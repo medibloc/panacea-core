@@ -140,5 +140,5 @@ read-timeout = "15"
 
 ##### After initializing the oracle, you can register oracle based on above configuration.
 
-##### f you want to know how to register oracle, please see the [oracle-registration](./4-oracle-registration.md) documentation.
+##### If you want to know how to register oracle, please see the [oracle-registration](./4-oracle-registration.md) documentation.
 
