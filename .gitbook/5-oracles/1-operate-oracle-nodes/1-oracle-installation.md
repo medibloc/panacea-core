@@ -5,8 +5,6 @@
 The oracle only works on [SGX](https://www.intel.com/content/www/us/en/developer/tools/software-guard-extensions/overview.html)-[FLC](https://github.com/intel/linux-sgx/blob/master/psw/ae/ref_le/ref_le.md) environment with a [quote provider](https://docs.edgeless.systems/ego/#/reference/attest) installed.
 You can check if your hardware supports SGX, and it is enabled in the BIOS by following [EGo guide](https://docs.edgeless.systems/ego/#/getting-started/troubleshoot?id=hardware).
 
-[Docker](https://docs.docker.com/get-docker/) is required.
-
 ## Installation: Use Docker
 
 ### Pull an image
