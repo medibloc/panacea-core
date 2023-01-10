@@ -74,9 +74,6 @@ PRs must have a category prefix that is based on the type of changes being made 
 [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) specification.
 Additionally, each PR should only address a single issue.
 
-Pull requests are merged by [code owners](./CODEOWNERS).
-All pull requests must be squashed before being merged, and also be rebased on top of the `main`.
-
 ### Requesting Reviews
 
 [Code owners](./CODEOWNERS) are marked automatically as the reviewers.
