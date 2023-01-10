@@ -543,11 +543,11 @@ For example, given a multisig key comprising the keys `p1`, `p2`, and `p3`, each
 ```text
 panacead keys add \
   p2 \
-  --pubkey=panaceapub1addwnpepqwk3j2j3knuyah89skh8wtn5kr4qx32nhql6hzjadzmre2xlfmvxgy39ln8
+  --pubkey '{"@type":"/cosmos.crypto.secp256k1.PubKey","key":"AhExixh..."}'
 
 panacead keys add \
   p3 \
-  --pubkey=panaceapub1addwnpepqvr594kcrv7y43l5laqtyxzg7s7f5ma9fvm6gjwsf3pp86j3wln676hwndf
+  --pubkey '{"@type":"/cosmos.crypto.secp256k1.PubKey","key":"A3ntuPW..."}'
 
 panacead keys add \
   p1p2p3 \
@@ -570,7 +570,7 @@ panacead keys show p1p2p3 --output json
 The first step to create a multisig transaction is to initiate it on behalf of the multisig address created above:
 
 ```bash
-panacead tx bank send panacea1ynkxl2d9yj9hh5jxt3m9s8nljh507tm5u66swq 10umed \
+panacead tx bank send <multisig_address> <recipient> 10umed \
   --from <multisig_address> \
   --chain-id <chain_id> \
   --generate-only > unsignedTx.json
