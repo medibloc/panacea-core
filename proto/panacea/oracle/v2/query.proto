@@ -37,6 +37,11 @@ service Query {
     option (google.api.http).get = "/panacea/oracle/v2/oracle-upgrade-info";
   }
 
+  // OracleUpgrades returns the information related to oracle upgrade
+  rpc OracleUpgrades(QueryOracleUpgradesRequest) returns (QueryOracleUpgradesResponse) {
+    option (google.api.http).get = "/panacea/oracle/v2/oracle-upgrades/{unique_id}";
+  }
+
   // OracleUpgrade returns the information related to oracle upgrade
   rpc OracleUpgrade(QueryOracleUpgradeRequest) returns (QueryOracleUpgradeResponse) {
     option (google.api.http).get = "/panacea/oracle/v2/oracle-upgrades/{unique_id}/{oracle_address}";
@@ -99,6 +104,19 @@ message QueryOracleUpgradeInfoRequest {}
 message QueryOracleUpgradeInfoResponse {
   OracleUpgradeInfo oracle_upgrade_info = 1;
 }
+
+// QueryOracleUpgradesRequest is the request type for the Query/OracleUpgrades RPC method.
+message QueryOracleUpgradesRequest {
+  string unique_id = 1;
+  cosmos.base.query.v1beta1.PageRequest pagination = 2;
+}
+
+// QueryOracleUpgradesResponse is the response type for the Query/OracleUpgrades RPC method.
+message QueryOracleUpgradesResponse {
+  repeated OracleUpgrade oracle_upgrades = 1;
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
 
 // QueryOracleUpgradeRequest is the request type for the Query/OracleUpgrade RPC method.
 message QueryOracleUpgradeRequest {
