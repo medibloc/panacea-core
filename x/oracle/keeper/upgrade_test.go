@@ -476,3 +476,84 @@ func (suite *oracleUpgradeTestSuite) TestApproveOracleUpgradeFailInvalidUniqueID
 	err = suite.OracleKeeper.ApproveOracleUpgrade(ctx, msgApproveOracleUpgrade)
 	suite.Require().ErrorContains(err, types.ErrInvalidUniqueID.Error())
 }
+
+func (suite *oracleUpgradeTestSuite) TestApproveOracleUpgradeAfterUpgradeHeight() {
+	ctx := suite.Ctx
+
+	// set oracle upgrade info
+	upgradeInfo := &types.OracleUpgradeInfo{
+		UniqueId: suite.upgradeUniqueID,
+		Height:   10,
+	}
+
+	suite.Require().NoError(suite.OracleKeeper.SetOracleUpgradeInfo(ctx, upgradeInfo))
+
+	// set approver oracle
+	approverOracle := &types.Oracle{
+		OracleAddress:                 suite.approverAccAddr.String(),
+		UniqueId:                      suite.upgradeUniqueID,
+		Endpoint:                      "iam-approver.com",
+		UpdateTime:                    ctx.BlockTime(),
+		OracleCommissionRate:          sdk.NewDecWithPrec(1, 1),
+		OracleCommissionMaxRate:       sdk.NewDecWithPrec(2, 1),
+		OracleCommissionMaxChangeRate: sdk.NewDecWithPrec(1, 2),
+	}
+
+	suite.Require().NoError(suite.OracleKeeper.SetOracle(ctx, approverOracle))
+
+	oracle := &types.Oracle{
+		OracleAddress:                 suite.oracleAccAddr.String(),
+		UniqueId:                      suite.currentUniqueID,
+		Endpoint:                      "test.com",
+		UpdateTime:                    ctx.BlockTime(),
+		OracleCommissionRate:          sdk.NewDecWithPrec(1, 1),
+		OracleCommissionMaxRate:       sdk.NewDecWithPrec(2, 1),
+		OracleCommissionMaxChangeRate: sdk.NewDecWithPrec(1, 2),
+	}
+
+	suite.Require().NoError(suite.OracleKeeper.SetOracle(ctx, oracle))
+
+	// reaching upgrade height & apply upgrade
+	ctx = ctx.WithBlockHeight(10)
+	suite.Require().NoError(suite.OracleKeeper.ApplyUpgrade(ctx, upgradeInfo))
+
+	// request upgrade after reaching upgrade height
+	ctx = ctx.WithBlockHeight(11)
+	msgOracleUpgrade := &types.MsgUpgradeOracle{
+		UniqueId:               suite.upgradeUniqueID,
+		OracleAddress:          suite.oracleAccAddr.String(),
+		NodePubKey:             suite.nodePubKey.SerializeCompressed(),
+		NodePubKeyRemoteReport: suite.nodePubKeyRemoteReport,
+		TrustedBlockHeight:     int64(1),
+		TrustedBlockHash:       []byte("trustedBlockHash"),
+	}
+
+	suite.Require().NoError(suite.OracleKeeper.UpgradeOracle(ctx, msgOracleUpgrade))
+
+	// approve oracle upgrade
+	encryptedOraclePrivKey, err := btcec.Encrypt(suite.nodePubKey, suite.oraclePrivKey.Serialize())
+	suite.Require().NoError(err)
+
+	approveOracleUpgrade := &types.ApprovalSharingOracleKey{
+		ApproverUniqueId:       suite.upgradeUniqueID,
+		ApproverOracleAddress:  suite.approverAccAddr.String(),
+		TargetUniqueId:         suite.upgradeUniqueID,
+		TargetOracleAddress:    suite.oracleAccAddr.String(),
+		EncryptedOraclePrivKey: encryptedOraclePrivKey,
+	}
+
+	approveOracleRegistrationBz, err := suite.Cdc.Marshaler.Marshal(approveOracleUpgrade)
+	suite.Require().NoError(err)
+	signature, err := suite.oraclePrivKey.Sign(approveOracleRegistrationBz)
+	suite.Require().NoError(err)
+
+	msgApproveOracleUpgrade := types.NewMsgApproveOracleUpgrade(approveOracleUpgrade, signature.Serialize())
+
+	err = suite.OracleKeeper.ApproveOracleUpgrade(ctx, msgApproveOracleUpgrade)
+	suite.Require().NoError(err)
+
+	getOracle, err := suite.OracleKeeper.GetOracle(ctx, suite.oracleAccAddr.String())
+	suite.Require().NoError(err)
+	suite.Require().Equal(suite.upgradeUniqueID, getOracle.UniqueId)
+
+}
