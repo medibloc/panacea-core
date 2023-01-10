@@ -30,5 +30,14 @@ docker run \
 
 ### How about building from source?
 
+You can build from source by referring to the following [installation-from-source](https://github.com/medibloc/panacea-oracle/blob/main/docs/installation-src.md).
 
+However, we highly recommend installing using docker. 
+This is because the uniqueID in `EGo` is sensitively changes depending on the Go dependency or local debug environment.
+
+Therefore, it is recommended that you check the uniqueID with following CLI when you want to use the binary you built yourself.
+```bash
+ego sign ${enclave-json-path}
+ego uniqueid ${oracle-binary-path}
+```
 
