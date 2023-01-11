@@ -104,3 +104,5 @@ panacead q oracle oracle-registration <unique-id> <oracle-address>
 ```
 
 If at least one oracle approved this registration, there`encrypted_oracle_priv_key` will have some value.
+
+Now, you are ready to running your own oracle. Please refer the [running a node](./5-running-node.md) instructions.
