@@ -88,12 +88,17 @@ You need to launch the Panacea to start generating blocks.
 panacead start
 ```
 
-## Registering oracle keys and remote report
+## Registering Oracle keys and Remote Report
 
 The genesis oracle must create an oracle private key and public key to use for data encryption/decryption.
 It also issues a remote report to prove that it is a valid oracle.
 
-### Generates oracle's private key, public key and remote report in oracle
+### Get trusted block information
+In order to generate oracle keys and remote reports, the oracle need trusted block information first. This block information is used by the light client to validate the data retrieved from Panacea.
+
+In fact, Oracle doesn't need this block information because it doesn't retrieve Panacea's data when generating oracle keys and remote reports. 
+However, when the oracle participates in the verification operation (`oracled start`), the oracle needs to use a light client as it will retrieve data from Panacea.
+Therefore, unless reliable block information is received during the process of generating an oracle key, the genesis oracle has no way to retrieve this block information.
 
 You can get trusted block information by:
 ```shell
@@ -103,7 +108,8 @@ HEIGHT=$(echo $BLOCK | jq -r .block.header.height)
 HASH=$(echo $BLOCK | jq -r .block_id.hash)
 ```
 
-With the above arguments, you can generate the necessary keys and remote report via the CLI below.
+### Generates oracle's private key, public key and remote report in oracle
+You can generate the necessary keys and remote report via the CLI below.
 ```
 docker run \
     --device /dev/sgx_enclave \
