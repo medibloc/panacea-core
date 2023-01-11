@@ -204,7 +204,7 @@ panacead q oracle params
 **Output**
 ```shell
 params:
-  oracle_pub_key_remote_report: "{oracle_remote_report_base64"
+  oracle_pub_key_remote_report: "{oracle_remote_report_base64}"
   oracle_public_key: "{oracle_public_key_base64}"
   unique_id: "{unique_id}"
 ```
