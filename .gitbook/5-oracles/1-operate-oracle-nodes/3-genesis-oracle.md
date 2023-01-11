@@ -209,4 +209,4 @@ params:
   unique_id: "{unique_id}"
 ```
 
-When all these processes are completed, genesis oracle can operate normally.
+When all these processes are completed, the genesis oracle can operate normally.
