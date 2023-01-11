@@ -4,47 +4,54 @@
 - Created: 2023-01-06
 - Modified: 2023-01-06
 - Authors
-  - Inchul Song <icsong@medibloc.org>
-  - Youngjoon Lee <yjlee@medibloc.org>
-  - Gyuguen Jang <gyuguen.jang@medibloc.org>
-  - Hansol Lee <hansol@medibloc.org>
-  - Myongsik Gong <myongsik_gong@medibloc.org>
-
+    - Inchul Song <icsong@medibloc.org>
+    - Youngjoon Lee <yjlee@medibloc.org>
+    - Gyuguen Jang <gyuguen.jang@medibloc.org>
+    - Hansol Lee <hansol@medibloc.org>
+    - Myongsik Gong <myongsik_gong@medibloc.org>
 
 ## Synopsis
+
 This document explains that why the oracles must use confidential computing.
 
-## Privacy Vulnerabilities of Oracle
-In DEP, anyone can operate the oracle node. However, when verifying the sensitive data through the general-purpose oracle, it could be occurred several privacy vulnerabilities.
-The one of vulnerabilities is that the sensitive data could be exposed to the oracle operator who uses malicious binary.
-The other vulnerabilities is that the data could be stolen from external node or attack.
-So preventing from these vulnerabilities, the oracle must use confidential computing which is operated in [TEE(Trusted Execution Environment)](https://en.wikipedia.org/wiki/Trusted_execution_environment) using Intel SGX.
+## Motivation
+
+In DEP, the data must be verified as explained in the [data validation documentation](./4-data-validation.md).
+Since the data is sensitive, we designed the off-chain oracle. Verifying data means that the content of data could be
+shown to the oracle.
+It also means that the oracle operators(human) can see the content of sensitive data. For example, if the oracle
+software stores the important sensitive data to the disk or storage without sealing it,
+it can be read by anyone who can access the disk or storage. Plus, if the malicious oracle operator modified the source
+code of the oracle to print logs of sensitive data or to leak a contents somewhere else,
+it would cause the serious privacy problems.
+To prevent it, we have designed the DEP oracle with confidential computing. Confidential computing guarantees that only
+selected code (binary) can access data in the secure enclave. Also it could protect a sensitive data from being
+leaked by malicious operators while verifying a data correctly in decentralized system.
 
 ## Confidential Oracle
-In DEP, anyone can operate oracle nodes but must use confidential computing.
-If the operator runs the confidential oracle, the only oracle software can decrypt a data and verified it. It means that the oracle operator can't decrypt a data and it will be not exposed to the operator.
-Also, when running the confidential oracle, the only genuine binary built in Intel SGX should be used so that it can be prevented from the node who uses malicious binary. It means that all the oracles run the same binary.
-As a result, using a genuine binary can preserve a privacy of data.
 
-### Additional Efforts
+For running the DEP oracle with confidential computing, we choose an Intel SGX which offers hardware-based memory
+encryption for data security
+using [Microsoft Azure Confidential Computing VM](https://learn.microsoft.com/en-us/azure/confidential-computing/overview).
+Also, we choose an [EGo](https://www.edgeless.systems/products/ego/) SDK which enables to develop confidential apps
+written in Go language.
 
-Using a confidential oracle could reinforce a security, but the oracle was developed with additional efforts for protecting a data leak.
-When running an oracle with the genuine binary, the data encryption and decryption are performed by oracle private key which is sealed by unique ID located in Intel SGX.
-So if the binary is changed or corrupted, the data encryption and decryption would not work.
+The data encryption and decryption are performed by the oracle private key. The oracle private key is sealed by unique
+ID which is for the Intel SGX enclaves. If the oracle operator modified the source code of the oracle, the unique ID
+will be changed.
+It means that the all oracle operators must use the only genuine binary built by selected code. The only genuine binary
+can unseal the data in the SGX secure enclave.
 
-So how to we set a correct unique ID and how to know it is not malicious binary? The answer is that the unique ID will be determined by Panacea governance.
-We can know the correct unique ID from Panacea as Single Source of Truth(SSOT), and know that what the correct genuine binary is.
-Because of the reason, the oracle operators who are willing to steal data could not use malicious binary, and it could be prevented from potential data leakage.
+If the oracle wants to register, it must use remote report composed of the promised security version and unique ID.
+So the one of the oracle approves the registration it the new oracle's remote report is valid.
+If you want a register the oracle, you can verify remote report using below CLI before submitting a registration.
 
+```bash
+ego run oracled verify-report [report-file-path]
+```
 
-## Implementation of Confidential Oracle
+So how to we set a correct unique ID and how to know it is not malicious binary? The correct unique ID will
+be determined by Panacea governance.
+We can know the correct unique ID from Panacea as Single Source of Truth(SSOT), and know that what the correct genuine
+binary is.
 
-- Intel SGX with Microsoft Azure Confidential Computing
-
-The confidential oracle operator must run the nodes in TEE that uses Intel SGX technology with Microsoft Azure Confidential Computing Virtual Machine(VM).
-You can refer to the details of Azure Confidential Computing in this [link](https://learn.microsoft.com/en-us/azure/confidential-computing/overview).
-
-- EGo
-
-EGo is an open-source SDK that enable to develop confidential apps written in Go language. The oracle in DEP used a EGo so that operator needs to install EGo modules.
-You can refer the source code and details of EGo following in this [link](https://github.com/edgelesssys/ego).
