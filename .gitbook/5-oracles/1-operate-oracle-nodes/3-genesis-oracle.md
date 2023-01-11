@@ -56,12 +56,12 @@ panacead add-genesis-oracle \
 
 | Argument                          | Requirement | Description                                                                                          |
 |-----------------------------------|-------------|------------------------------------------------------------------------------------------------------|
-| oracle-unique-id                  | false       | The uniqueID to be set in the params of the oracle module and the genesis oracle                     |
-| oracle-account                    | false       | The address or key name of the account to be registered as an genesis oracle                         |
-| oracle-commission-rate            | false       | The desired initial oracle commission rate                                                           |
-| oracle-commission-max-rate        | false       | The maximum oracle commission rate. The oracle commission rate cannot be greater than this max rate. |
-| oracle-commission-max-change-rate | false       | The maximum rate that an oracle can change once. It will be reset 24 hours after the last change.    |
-| oracle-endpoint                   | false       | The endpoint of oracle to be used                                                                    |
+| oracle-unique-id                  | optional    | The uniqueID to be set in the params of the oracle module and the genesis oracle                     |
+| oracle-account                    | optional    | The address or key name of the account to be registered as an genesis oracle                         |
+| oracle-commission-rate            | optional    | The desired initial oracle commission rate                                                           |
+| oracle-commission-max-rate        | optional    | The maximum oracle commission rate. The oracle commission rate cannot be greater than this max rate. |
+| oracle-commission-max-change-rate | optional    | The maximum rate that an oracle can change once. It will be reset 24 hours after the last change.    |
+| oracle-endpoint                   | optional    | The endpoint of oracle to be used                                                                    |
 
 You can check the oracle registered in `genesis.json`
 ```
@@ -124,8 +124,8 @@ docker run \
 
 | Argument             | Requirement | Description                                                 |
 |----------------------|-------------|-------------------------------------------------------------|
-| trusted-block-height | true        | Trusted block height of Panacea                             |
-| trusted-block-hash   | true        | Block hash corresponding to trusted block height of Panacea |
+| trusted-block-height | required    | Trusted block height of Panacea                             |
+| trusted-block-hash   | required    | Block hash corresponding to trusted block height of Panacea |
 
 
 
