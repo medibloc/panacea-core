@@ -1,8 +1,10 @@
 # Oracle Registration
 
+This document is an instruction to register an oracle to Panacea
+
 ## Get Trusted Block Information
 
-To request oracle registration to Panacea, trusted block information(height and hash), which will be used for light client, is required and need to be verified by other registered oracle.
+To request oracle registration to Panacea, trusted block information (height and hash), which will be used for [light client](), is required and need to be verified by other registered oracle.
 
 You can get trusted block information by:
 ```bash
@@ -31,7 +33,7 @@ With the above arguments, you can now request to register your oracle to Panacea
 docker run \
     --device /dev/sgx_enclave \
     --device /dev/sgx_provision \
-    -v ${ANY_DIR_ON_HOST}:/oracle \
+    -v <directory-you-want>/oracle:/oracle \
     ghcr.io/medibloc/panacea-oracle:latest \
     ego run /usr/bin/oracled register-oracle \ 
     --trusted-block-height ${HEIGHT} \
@@ -94,3 +96,11 @@ docker run \
     ghcr.io/medibloc/panacea-oracle:latest \
     ego run /usr/bin/oracled get-oracle-key
 ```
+
+You can check the status of your registration with the uniqueID and oracle address.
+
+```bash
+panacead q oracle oracle-registration <unique-id> <oracle-address>
+```
+
+If at least one oracle approved this registration, there`encrypted_oracle_priv_key` will have some value.
