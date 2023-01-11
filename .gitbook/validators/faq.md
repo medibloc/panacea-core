@@ -215,11 +215,14 @@ This mechanism aims to incentivize non-empty block proposals, better networking 
 Let's take a concrete example to illustrate the aforementioned concept.
 In this example, there are 10 validators with equal stake.
 Each of them applies a 10% commission rate and has 20% of self-delegated MEDs.
-Now comes a successful block that collects a total of `1005 MEDs` in fees.
+Now comes a successful block that collects a total of 1025.51020408 MED in fees.
 
-First, a community tax is applied, but it is `0%` on the Panacea for now.
+First, a 2% tax is applied. The corresponding MEDs go to the reserved community pool.
+The community pool's funds can be allocated through governance.
 
-So, the full of `1005 MEDs` are distributed to validators and delegators.
+- `2% * 1025.51020408` = 20.51020408 MED go to the community pool
+
+1005 MED now remain to be distributed to validators and delegators.
 Let's assume that the proposer included 100% of the signatures in its block. It thus obtains the full bonus of 5%.
 
 We have to solve this simple equation to find the reward `R` for each validator:
@@ -230,16 +233,16 @@ R = 1005/10.05 = 100
 ```
 
 - For the proposer validator:
-  - The pool obtains `R + R * 5%`: 105 MEDs
-  - Commission: `105 * 80% * 10%` = 8.4 MEDs
-  - Validator's reward: `105 * 20% + Commission` = 29.4 MEDs
-  - Delegators' rewards: `105 * 80% - Commission` = 75.6 MEDs (each delegator will be able to claim its portion of these rewards in proportion to their stake)
+  - The pool obtains `R + R * 5%`: 105 MED
+  - Commission: `105 * 80% * 10%` = 8.4 MED
+  - Validator's reward: `105 * 20% + Commission` = 29.4 MED
+  - Delegators' rewards: `105 * 80% - Commission` = 75.6 MED (each delegator will be able to claim its portion of these rewards in proportion to their stake)
   
 - For each non-proposer validator:
-  - The pool obtains `R`: 100 MEDs
-  - Commission: `100 * 80% * 10%` = 8 MEDs
-  - Validator's reward: `100 * 20% + Commission` = 28 MEDs
-  - Delegators' rewards: `100 * 80% - Commission` = 72 MEDs (each delegator will be able to claim their portion of these rewards in proportion to their stake)
+  - The pool obtains `R`: 100 MED
+  - Commission: `100 * 80% * 10%` = 8 MED
+  - Validator's reward: `100 * 20% + Commission` = 28 MED
+  - Delegators' rewards: `100 * 80% - Commission` = 72 MED (each delegator will be able to claim their portion of these rewards in proportion to their stake)
 
 ### What are the slashing conditions?
 
