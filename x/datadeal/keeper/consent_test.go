@@ -551,3 +551,39 @@ func (suite *consentTestSuite) TestValidateAgreements() {
 	err = suite.DataDealKeeper.ValidateAgreements(terms, []*types.Agreement{{TermId: 1, Agreement: true}, {TermId: 3, Agreement: true}})
 	suite.Require().ErrorContains(err, "cannot find agreement for term 2")
 }
+
+func (suite *consentTestSuite) TestSubmitConsentWithInvalidAgreements() {
+	dealID := suite.createSampleDeal(uint64(10000), 10)
+
+	oracleCommissionRate := sdk.NewDecWithPrec(1, 1) // 10%
+	suite.storeSampleOracle(suite.oracleAccAddr.String(), suite.uniqueID, oracleCommissionRate)
+
+	unsignedCert := &types.UnsignedCertificate{
+		Cid:             "cid",
+		UniqueId:        suite.uniqueID,
+		OracleAddress:   suite.oracleAccAddr.String(),
+		DealId:          dealID,
+		ProviderAddress: suite.providerAccAddr.String(),
+		DataHash:        suite.dataHash,
+	}
+
+	unsignedCertBz, err := unsignedCert.Marshal()
+	suite.Require().NoError(err)
+
+	sign, err := suite.oraclePrivKey.Sign(unsignedCertBz)
+
+	suite.Require().NoError(err)
+
+	consent := &types.Consent{
+		DealId: dealID,
+		Certificate: &types.Certificate{
+			UnsignedCertificate: unsignedCert,
+			Signature:           sign.Serialize(),
+		},
+		Agreements: []*types.Agreement{}, // with no agreement even though the deal requires two agreements
+	}
+
+	err = suite.DataDealKeeper.SubmitConsent(suite.Ctx, consent)
+	suite.Require().ErrorIs(err, types.ErrSubmitConsent)
+	suite.Require().ErrorContains(err, fmt.Sprintf("invalid count(0) of agreements: expected:2"))
+}
