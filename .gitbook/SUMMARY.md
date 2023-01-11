@@ -70,4 +70,5 @@
   * [Oracle Registration](5-oracles/1-operate-oracle-nodes/4-oracle-registration.md)
   * [Running a Node](5-oracles/1-operate-oracle-nodes/5-running-node.md)
   * [Upgrading a Node](5-oracles/1-operate-oracle-nodes/6-upgrading-node.md)
+  * [Verify a Remote Report](5-oracles/1-operate-oracle-nodes/7-verify-remote-report.md)
 * FAQ
