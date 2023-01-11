@@ -35,7 +35,7 @@ This is because the uniqueID in `EGo` is sensitively changes depending on the Go
 
 Therefore, it is recommended that you check the uniqueID with following CLI when you want to use the binary you built yourself.
 ```bash
-ego sign ${enclave-json-path}
+ego sign ${enclave-json-path} # docker image use enclave in <project-dir>/scripts/enclave-prod.json
 ego uniqueid ${oracle-binary-path}
 ```
 
