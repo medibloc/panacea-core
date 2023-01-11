@@ -10,11 +10,7 @@ After install the oracle, create an empty directory on your host, to be mounted 
 enclave.
 
 ```bash
-# If you run oracle on your host
-sudo mkdir /oracle
-
-# If you run oracle using Docker
-mkdir $(pwd)/oracle
+mkdir <directory-you-want>/oracle
 ```
 
 After that, if you want to run the `oracled` with Docker as described in
@@ -22,27 +18,22 @@ the [oracle-installation](./1-oracle-installation.md),
 it is recommended to create an environment variable that you can execute the Docker container easily.
 
 ```bash
-export DOCKER_CMD="docker run --rm \
+export ORACLE_CMD="docker run --rm \
   --device /dev/sgx_enclave \
   --device /dev/sgx_provision \
-  -v $(pwd)/oracle:/oracle ghcr.io/medibloc/panacea-oracle:latest"
-```
-
-If you are not going to run the `oracled` without Docker, you can set an `DOCKER_CMD` environment variable empty string.
-
-```bash
-export DOCKER_CMD=""
+  -v $(pwd)/oracle:/oracle ghcr.io/medibloc/panacea-oracle:latest \
+  ego run /usr/bin/oracled"
 ```
 
 ## Command Line of Initialization
 
 ```bash
-$DOCKER_CMD ego run oracled init --home $HOME/.oracle 
+$DOCKER_CMD init --home $HOME/.oracle 
 ```
 
 When run the above CLI for initializing the oracle, the `config.toml` file will be generated under the `$HOME/.oracle`
 in the enclave.
-The `config.toml` file will be shown like this:
+The default `config.toml` file will be shown like this:
 
 ```toml
 # This is a TOML config file.
@@ -136,7 +127,6 @@ read-timeout = "15"
     - `listen-addr`: The listen address of the oracle
     - `write-timeout`: The maximum duration before timing out writes of the response (default: `60`)
     - `read-timeout`: The maximum duration for reading the entire request, including the body (default: `15`)
-
 
 ##### After initializing the oracle, you can register oracle based on above configuration.
 
