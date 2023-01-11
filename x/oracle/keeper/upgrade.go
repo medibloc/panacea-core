@@ -208,6 +208,19 @@ func (k Keeper) ApproveOracleUpgrade(ctx sdk.Context, msg *types.MsgApproveOracl
 		return sdkerrors.Wrapf(types.ErrApproveOracleUpgrade, err.Error())
 	}
 
+	// approve the oracle-upgrade request immediately if the upgrade height has been already passed
+	// (if the oracle-upgrade request wasn't processed by the BeginBlocker at the upgrade height, because there was no approval at that time.)
+	if ctx.BlockHeight() >= upgradeInfo.Height {
+		oracle, err := k.GetOracle(ctx, oracleUpgrade.OracleAddress)
+		if err != nil {
+			return err
+		}
+		oracle.UniqueId = upgradeInfo.UniqueId
+		if err := k.SetOracle(ctx, oracle); err != nil {
+			return err
+		}
+	}
+
 	// emit event
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(
