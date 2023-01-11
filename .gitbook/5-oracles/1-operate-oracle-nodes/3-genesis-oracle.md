@@ -111,6 +111,14 @@ docker run \
 | trusted-block-height | true        | Trusted block height of Panacea                             |
 | trusted-block-hash   | true        | Block hash corresponding to trusted block height of Panacea |
 
+You can get trusted block information by:
+```shell
+BLOCK=$(panacead q block --node <node-rpc-address>)
+
+HEIGHT=$(echo $BLOCK | jq -r .block.header.height)
+HASH=$(echo $BLOCK | jq -r .block_id.hash)
+```
+
 When the Oracle key and remote report generation is completed, the file is created with the following structure.
 
 ```
