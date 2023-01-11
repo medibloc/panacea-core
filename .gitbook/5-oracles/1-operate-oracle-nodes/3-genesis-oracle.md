@@ -19,7 +19,7 @@ In general, the genesis oracle will already be registered on the testnet or main
 This guide is useful for testing on the localnet.
 
 ## Genesis Oracle Registration
-To register a genesis oracle, you must first complete the [oracle-inialzation](./2-oracle-intialization.md) step.
+To register a genesis oracle, you must first complete the [oracle-initialization](./2-oracle-initialization.md) step.
 Panancea needs to complete the steps before executing `panacead start` in [deploy-localnet](../../4-validators/2-deploy-localnet.md).
 You must first register the genesis oracle in `genesis.json` of Panacea
 
