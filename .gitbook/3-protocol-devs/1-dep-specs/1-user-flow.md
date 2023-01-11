@@ -21,7 +21,7 @@ It is recommended to walk through this document first before diving deeply into 
 ### Motivation
 
 DEP aims to establish a reliable communication layer between two parties who do not have strong trust in each other in decentralized environments.
-To achieve this goal without centralized/authorized mediators, DEP introduces four key players: data consumer, provider, oracle, and chain validator. These key players collaborate to verify all aspects of the data exchange to minimize security/privacy issues.
+To achieve this goal without centralized/authorized mediators, DEP introduces four key players: data consumer, provider, oracle, and chain validator. These key players collaborate to verify all aspects of the data exchange to minimize security/privacy vulnerabilities.
 
 ### Definitions
 
