@@ -1,4 +1,4 @@
-# Genesis oracle
+# Genesis Oracle
 
 - Status: Draft
 - Created: 2023-01-11
@@ -18,7 +18,7 @@ In order for DEP to operate properly, one or more trusted oracles must be regist
 In general, the genesis oracle will already be registered on the testnet or mainnet.
 This guide is useful for testing on the localnet.
 
-## Genesis oracle registration
+## Genesis Oracle Registration
 To register a genesis oracle, you must first complete the [oracle-inialzation](./2-oracle-intialization.md) step.
 Panancea needs to complete the steps before executing `panacead start` in [deploy-localnet](../../4-validators/2-deploy-localnet.md).
 You must first register the genesis oracle in `genesis.json` of Panacea
@@ -39,7 +39,7 @@ EGo v1.0.1 (e1e48c9dbfdfd3cb2f2fda7602729162c9f762cc)
 {A hexadecimal string of unique_id}
 ```
 
-### Genesis oracle registration in Panacea
+### Genesis Oracle Registration in Panacea
 
 After uniqueID extraction is completed, the genesis oracle must be registered in `genesis.json` of Panacea.
 
@@ -88,10 +88,10 @@ You need to launch the Panacea to start generating blocks.
 panacead start
 ```
 
-## Generate oracle key pair and remote reports in Oracle and register them with Panacea
+## Oracle Key Pair and Remote Report
 
 The genesis oracle must create an oracle private key and public key to use for data encryption/decryption.
-The oracle also issues to allow others to prove that the genesis oracle is running inside secure enclave and the oracle key pair is generated inside the enclave.
+The oracle also issues a remote report to allow others to prove that the genesis oracle is running inside secure enclave and the oracle key pair is generated inside the enclave.
 
 ### Generates oracle key pair and remote report in oracle
 The genesis oracle needs to generate an oracle key pair and a remote report.
@@ -210,3 +210,5 @@ params:
 ```
 
 When all these processes are completed, the genesis oracle can operate normally.
+
+Next, see [Running node](./5-running-node.md) where you can run the genesis oracle.
