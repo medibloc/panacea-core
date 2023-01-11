@@ -94,22 +94,6 @@ The genesis oracle must create an oracle private key and public key to use for d
 It also issues a remote report to prove that it is a valid oracle.
 
 ### Generates oracle's private key, public key and remote report in oracle
-You can generate the necessary keys and remote report via the CLI below.
-```
-docker run \
-    --device /dev/sgx_enclave \
-    --device /dev/sgx_provision \
-    -v {ANY_DIR_ON_HOST}:/oracle \
-    ghcr.io/medibloc/panacea-oracle:latest \
-    ego run /usr/bin/oracled gen-oracle-key \
-      --trusted-block-hash {block_hash} \
-      --trusted_block_height {block_height}
-```
-
-| Argument             | Requirement | Description                                                 |
-|----------------------|-------------|-------------------------------------------------------------|
-| trusted-block-height | true        | Trusted block height of Panacea                             |
-| trusted-block-hash   | true        | Block hash corresponding to trusted block height of Panacea |
 
 You can get trusted block information by:
 ```shell
@@ -118,6 +102,26 @@ BLOCK=$(panacead q block --node <node-rpc-address>)
 HEIGHT=$(echo $BLOCK | jq -r .block.header.height)
 HASH=$(echo $BLOCK | jq -r .block_id.hash)
 ```
+
+With the above arguments, you can generate the necessary keys and remote report via the CLI below.
+```
+docker run \
+    --device /dev/sgx_enclave \
+    --device /dev/sgx_provision \
+    -v {ANY_DIR_ON_HOST}:/oracle \
+    ghcr.io/medibloc/panacea-oracle:latest \
+    ego run /usr/bin/oracled gen-oracle-key \
+      --trusted_block_height $HEIGHT \
+      --trusted-block-hash $HASH
+      
+```
+
+| Argument             | Requirement | Description                                                 |
+|----------------------|-------------|-------------------------------------------------------------|
+| trusted-block-height | true        | Trusted block height of Panacea                             |
+| trusted-block-hash   | true        | Block hash corresponding to trusted block height of Panacea |
+
+
 
 When the Oracle key and remote report generation is completed, the file is created with the following structure.
 
