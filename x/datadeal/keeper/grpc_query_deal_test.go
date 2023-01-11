@@ -76,6 +76,7 @@ func (suite *queryDealTestSuite) TestQueryConsent() {
 			},
 			Signature: []byte("signature"),
 		},
+		Agreements: []*types.Agreement{{TermId: 1, Agreement: true}},
 	}
 
 	err := suite.DataDealKeeper.SetConsent(suite.Ctx, consent)
@@ -104,6 +105,7 @@ func (suite *queryDealTestSuite) TestQueryConsents() {
 			},
 			Signature: []byte("signature"),
 		},
+		Agreements: []*types.Agreement{{TermId: 1, Agreement: true}},
 	}
 
 	err := suite.DataDealKeeper.SetConsent(suite.Ctx, consent)

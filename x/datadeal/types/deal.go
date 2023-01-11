@@ -78,15 +78,6 @@ func (m *Deal) IncreaseCurNumData() {
 	m.CurNumData += 1
 }
 
-func (d *Deal) AgreementTerm(termID uint32) *AgreementTerm {
-	for _, term := range d.AgreementTerms {
-		if term.Id == termID {
-			return term
-		}
-	}
-	return nil
-}
-
 func (t *AgreementTerm) ValidateBasic() error {
 	if len(t.Title) == 0 {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "the title of agreement term shouldn't be empty")

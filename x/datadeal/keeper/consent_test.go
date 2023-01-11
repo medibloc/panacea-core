@@ -85,12 +85,37 @@ func (suite *consentTestSuite) createSampleDeal(budgetAmount, maxNumData uint64)
 		Budget:          budget,
 		MaxNumData:      maxNumData,
 		ConsumerAddress: suite.consumerAccAddr.String(),
+		AgreementTerms: []*types.AgreementTerm{
+			{
+				Id:          1,
+				Required:    true,
+				Title:       "term 1",
+				Description: "hello",
+			},
+			{
+				Id:          2,
+				Required:    false,
+				Title:       "term 2",
+				Description: "world",
+			},
+		},
 	}
 
 	dealID, err := suite.DataDealKeeper.CreateDeal(suite.Ctx, msgCreateDeal)
 	suite.Require().NoError(err)
 
 	return dealID
+}
+
+func (suite *consentTestSuite) createSampleAgreements(terms []*types.AgreementTerm) []*types.Agreement {
+	agreements := make([]*types.Agreement, 0)
+
+	for _, term := range terms {
+		agreement := &types.Agreement{TermId: term.Id, Agreement: true}
+		agreements = append(agreements, agreement)
+	}
+
+	return agreements
 }
 
 func (suite *consentTestSuite) storeSampleOracle(address, uniqueID string, commissionRate sdk.Dec) *oracletypes.Oracle {
@@ -132,11 +157,12 @@ func (suite *consentTestSuite) TestSubmitConsentSuccess() {
 	suite.Require().NoError(err)
 
 	consent := &types.Consent{
-		DealId: unsignedCert.DealId,
+		DealId: dealID,
 		Certificate: &types.Certificate{
 			UnsignedCertificate: unsignedCert,
 			Signature:           sign.Serialize(),
 		},
+		Agreements: suite.createSampleAgreements(deal.AgreementTerms),
 	}
 
 	providerBalance := suite.BankKeeper.GetBalance(suite.Ctx, suite.providerAccAddr, assets.MicroMedDenom)
@@ -195,11 +221,12 @@ func (suite *consentTestSuite) TestSubmitConsentChangeStatusComplete() {
 	suite.Require().NoError(err)
 
 	consent := &types.Consent{
-		DealId: unsignedCert.DealId,
+		DealId: dealID,
 		Certificate: &types.Certificate{
 			UnsignedCertificate: unsignedCert,
 			Signature:           sign.Serialize(),
 		},
+		Agreements: suite.createSampleAgreements(deal.AgreementTerms),
 	}
 
 	providerBalance := suite.BankKeeper.GetBalance(suite.Ctx, suite.providerAccAddr, assets.MicroMedDenom)
@@ -236,6 +263,8 @@ func (suite *consentTestSuite) TestSubmitConsentChangeStatusComplete() {
 func (suite *consentTestSuite) TestSubmitConsentNotRegisteredOracle() {
 	budgetAmount := uint64(10000)
 	dealID := suite.createSampleDeal(budgetAmount, 1)
+	deal, err := suite.DataDealKeeper.GetDeal(suite.Ctx, dealID)
+	suite.Require().NoError(err)
 
 	unsignedCert := &types.UnsignedCertificate{
 		Cid:             "cid",
@@ -253,11 +282,12 @@ func (suite *consentTestSuite) TestSubmitConsentNotRegisteredOracle() {
 	suite.Require().NoError(err)
 
 	consent := &types.Consent{
-		DealId: unsignedCert.DealId,
+		DealId: dealID,
 		Certificate: &types.Certificate{
 			UnsignedCertificate: unsignedCert,
 			Signature:           sign.Serialize(),
 		},
+		Agreements: suite.createSampleAgreements(deal.AgreementTerms),
 	}
 
 	err = suite.DataDealKeeper.SubmitConsent(suite.Ctx, consent)
@@ -268,6 +298,8 @@ func (suite *consentTestSuite) TestSubmitConsentNotRegisteredOracle() {
 func (suite *consentTestSuite) TestSubmitConsentNotSameUniqueIDOfOracle() {
 	budgetAmount := uint64(10000)
 	dealID := suite.createSampleDeal(budgetAmount, 1)
+	deal, err := suite.DataDealKeeper.GetDeal(suite.Ctx, dealID)
+	suite.Require().NoError(err)
 
 	oracleCommissionRate := sdk.NewDecWithPrec(1, 1) // 10%
 	suite.storeSampleOracle(suite.oracleAccAddr.String(), "invalidUniqueID", oracleCommissionRate)
@@ -288,11 +320,12 @@ func (suite *consentTestSuite) TestSubmitConsentNotSameUniqueIDOfOracle() {
 	suite.Require().NoError(err)
 
 	consent := &types.Consent{
-		DealId: unsignedCert.DealId,
+		DealId: dealID,
 		Certificate: &types.Certificate{
 			UnsignedCertificate: unsignedCert,
 			Signature:           sign.Serialize(),
 		},
+		Agreements: suite.createSampleAgreements(deal.AgreementTerms),
 	}
 
 	err = suite.DataDealKeeper.SubmitConsent(suite.Ctx, consent)
@@ -303,6 +336,8 @@ func (suite *consentTestSuite) TestSubmitConsentNotSameUniqueIDOfOracle() {
 func (suite *consentTestSuite) TestSubmitConsentInvalidSignature() {
 	budgetAmount := uint64(10000)
 	dealID := suite.createSampleDeal(budgetAmount, 1)
+	deal, err := suite.DataDealKeeper.GetDeal(suite.Ctx, dealID)
+	suite.Require().NoError(err)
 
 	oracleCommissionRate := sdk.NewDecWithPrec(1, 1) // 10%
 	suite.storeSampleOracle(suite.oracleAccAddr.String(), suite.uniqueID, oracleCommissionRate)
@@ -323,11 +358,12 @@ func (suite *consentTestSuite) TestSubmitConsentInvalidSignature() {
 	suite.Require().NoError(err)
 
 	consent := &types.Consent{
-		DealId: unsignedCert.DealId,
+		DealId: dealID,
 		Certificate: &types.Certificate{
 			UnsignedCertificate: unsignedCert,
 			Signature:           sign.Serialize(),
 		},
+		Agreements: suite.createSampleAgreements(deal.AgreementTerms),
 	}
 
 	err = suite.DataDealKeeper.SubmitConsent(suite.Ctx, consent)
@@ -369,12 +405,14 @@ func (suite *consentTestSuite) TestSubmitConsentNotExistDeal() {
 
 func (suite *consentTestSuite) TestSubmitConsentAlreadyDealStatusComplete() {
 	suite.TestSubmitConsentChangeStatusComplete()
+	deal, err := suite.DataDealKeeper.GetDeal(suite.Ctx, 1)
+	suite.Require().NoError(err)
 
 	unsignedCert := &types.UnsignedCertificate{
 		Cid:             "cid",
 		UniqueId:        suite.uniqueID,
 		OracleAddress:   suite.oracleAccAddr.String(),
-		DealId:          1,
+		DealId:          deal.Id,
 		ProviderAddress: suite.providerAccAddr.String(),
 		DataHash:        "dataHash2",
 	}
@@ -387,11 +425,12 @@ func (suite *consentTestSuite) TestSubmitConsentAlreadyDealStatusComplete() {
 	suite.Require().NoError(err)
 
 	consent := &types.Consent{
-		DealId: unsignedCert.DealId,
+		DealId: deal.Id,
 		Certificate: &types.Certificate{
 			UnsignedCertificate: unsignedCert,
 			Signature:           sign.Serialize(),
 		},
+		Agreements: suite.createSampleAgreements(deal.AgreementTerms),
 	}
 
 	err = suite.DataDealKeeper.SubmitConsent(suite.Ctx, consent)
@@ -401,12 +440,14 @@ func (suite *consentTestSuite) TestSubmitConsentAlreadyDealStatusComplete() {
 
 func (suite *consentTestSuite) TestSubmitConsentExistSameCertificate() {
 	suite.TestSubmitConsentSuccess()
+	deal, err := suite.DataDealKeeper.GetDeal(suite.Ctx, 1)
+	suite.Require().NoError(err)
 
 	unsignedCert := &types.UnsignedCertificate{
 		Cid:             "cid",
 		UniqueId:        suite.uniqueID,
 		OracleAddress:   suite.oracleAccAddr.String(),
-		DealId:          1,
+		DealId:          deal.Id,
 		ProviderAddress: suite.providerAccAddr.String(),
 		DataHash:        suite.dataHash,
 	}
@@ -418,11 +459,12 @@ func (suite *consentTestSuite) TestSubmitConsentExistSameCertificate() {
 	suite.Require().NoError(err)
 
 	consent := &types.Consent{
-		DealId: unsignedCert.DealId,
+		DealId: deal.Id,
 		Certificate: &types.Certificate{
 			UnsignedCertificate: unsignedCert,
 			Signature:           sign.Serialize(),
 		},
+		Agreements: suite.createSampleAgreements(deal.AgreementTerms),
 	}
 
 	err = suite.DataDealKeeper.SubmitConsent(suite.Ctx, consent)
@@ -433,6 +475,8 @@ func (suite *consentTestSuite) TestSubmitConsentExistSameCertificate() {
 func (suite *consentTestSuite) TestSubmitConsentNotSameUniqueIDOfCertificate() {
 	budgetAmount := uint64(10000)
 	dealID := suite.createSampleDeal(budgetAmount, 1)
+	deal, err := suite.DataDealKeeper.GetDeal(suite.Ctx, dealID)
+	suite.Require().NoError(err)
 
 	oracleCommissionRate := sdk.NewDecWithPrec(1, 1) // 10%
 	suite.storeSampleOracle(suite.oracleAccAddr.String(), suite.uniqueID, oracleCommissionRate)
@@ -454,14 +498,56 @@ func (suite *consentTestSuite) TestSubmitConsentNotSameUniqueIDOfCertificate() {
 	suite.Require().NoError(err)
 
 	consent := &types.Consent{
-		DealId: unsignedCert.DealId,
+		DealId: dealID,
 		Certificate: &types.Certificate{
 			UnsignedCertificate: unsignedCert,
 			Signature:           sign.Serialize(),
 		},
+		Agreements: suite.createSampleAgreements(deal.AgreementTerms),
 	}
 
 	err = suite.DataDealKeeper.SubmitConsent(suite.Ctx, consent)
 	suite.Require().ErrorIs(err, types.ErrSubmitConsent)
 	suite.Require().ErrorContains(err, fmt.Sprintf("does not match active uniqueID. certificateUniqueID(%s) activeUniqueID(%s)", invalidUniqueID, suite.uniqueID))
+}
+
+func (suite *consentTestSuite) TestValidateAgreements() {
+	terms := []*types.AgreementTerm{
+		{
+			Id:          1,
+			Required:    true,
+			Title:       "term 1",
+			Description: "hello",
+		},
+		{
+			Id:          2,
+			Required:    false,
+			Title:       "term 2",
+			Description: "world",
+		},
+	}
+
+	err := suite.DataDealKeeper.ValidateAgreements(terms, []*types.Agreement{{TermId: 1, Agreement: true}, {TermId: 2, Agreement: false}})
+	suite.Require().NoError(err)
+
+	err = suite.DataDealKeeper.ValidateAgreements(terms, []*types.Agreement{{TermId: 1, Agreement: true}, {TermId: 2, Agreement: true}})
+	suite.Require().NoError(err)
+
+	err = suite.DataDealKeeper.ValidateAgreements(terms, []*types.Agreement{})
+	suite.Require().ErrorContains(err, "invalid count(0) of agreements: expected:2")
+
+	err = suite.DataDealKeeper.ValidateAgreements(terms, []*types.Agreement{{TermId: 1, Agreement: true}})
+	suite.Require().ErrorContains(err, "invalid count(1) of agreements: expected:2")
+
+	err = suite.DataDealKeeper.ValidateAgreements(terms, []*types.Agreement{{TermId: 2, Agreement: true}})
+	suite.Require().ErrorContains(err, "invalid count(1) of agreements: expected:2")
+
+	err = suite.DataDealKeeper.ValidateAgreements(terms, []*types.Agreement{{TermId: 1, Agreement: true}, {TermId: 2, Agreement: true}, {TermId: 3, Agreement: true}})
+	suite.Require().ErrorContains(err, "invalid count(3) of agreements: expected:2")
+
+	err = suite.DataDealKeeper.ValidateAgreements(terms, []*types.Agreement{{TermId: 1, Agreement: false}, {TermId: 2, Agreement: true}})
+	suite.Require().ErrorContains(err, "disagreed to the required agreement term 1")
+
+	err = suite.DataDealKeeper.ValidateAgreements(terms, []*types.Agreement{{TermId: 1, Agreement: true}, {TermId: 3, Agreement: true}})
+	suite.Require().ErrorContains(err, "cannot find agreement for term 2")
 }
