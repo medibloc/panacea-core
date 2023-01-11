@@ -42,8 +42,8 @@ EGo v1.0.1 (e1e48c9dbfdfd3cb2f2fda7602729162c9f762cc)
 ### Genesis oracle registration in Panacea
 
 After uniqueID extraction is completed, the genesis oracle must be registered in `genesis.json` of Panacea.
-We provide a CLI for this process.
 
+We provide a CLI for this process.
 ```
 panacead add-genesis-oracle \
   --oracle-unique-id {unique_id} 
@@ -80,7 +80,7 @@ cat $HOME/.panacea/config/genesis.json | jq .app_state.oracle.oracles
 ```
 
 ### Start block generation in Panacea
-You need to launch the panacea to start generating blocks. 
+You need to launch the Panacea to start generating blocks. 
 ```shell
 panacead start
 ```
