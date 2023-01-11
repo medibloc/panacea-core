@@ -88,17 +88,19 @@ You need to launch the Panacea to start generating blocks.
 panacead start
 ```
 
-## Registering Oracle keys and Remote Report
+## Generate oracle key pair and remote reports in Oracle and register them with Panacea
 
 The genesis oracle must create an oracle private key and public key to use for data encryption/decryption.
-It also issues a remote report to prove that it is a valid oracle.
+The oracle also issues to allow others to prove that the genesis oracle is running inside secure enclave and the oracle key pair is generated inside the enclave.
 
-### Get trusted block information
-In order to generate oracle keys and remote reports, the oracle need trusted block information first. This block information is used by the light client to validate the data retrieved from Panacea.
+### Generates oracle key pair and remote report in oracle
+The genesis oracle needs to generate an oracle key pair and a remote report.
+However, before generating oracle keys and remote reports, you need to know trusted block information from Panacea.
 
-In fact, Oracle doesn't need this block information because it doesn't retrieve Panacea's data when generating oracle keys and remote reports. 
+In fact, the genesis oracle does not need trusted block information for this process.
+The reason is that oracle key pair and remote report generation process do not retrieve data from Panacea. 
 However, when the oracle participates in the verification operation (`oracled start`), the oracle needs to use a light client as it will retrieve data from Panacea.
-Therefore, unless reliable block information is received during the process of generating an oracle key, the genesis oracle has no way to retrieve this block information.
+Therefore, unless trusted block information is received during the process of generating an oracle key, the genesis oracle has no way to retrieve this block information.
 
 You can get trusted block information by:
 ```shell
@@ -108,8 +110,7 @@ HEIGHT=$(echo $BLOCK | jq -r .block.header.height)
 HASH=$(echo $BLOCK | jq -r .block_id.hash)
 ```
 
-### Generates oracle's private key, public key and remote report in oracle
-You can generate the necessary keys and remote report via the CLI below.
+After getting the height and hash of the block, you can generate the necessary keys and remote report via the CLI below.
 ```
 docker run \
     --device /dev/sgx_enclave \
@@ -117,7 +118,7 @@ docker run \
     -v {ANY_DIR_ON_HOST}:/oracle \
     ghcr.io/medibloc/panacea-oracle:latest \
     ego run /usr/bin/oracled gen-oracle-key \
-      --trusted_block_height $HEIGHT \
+      --trusted-block-height $HEIGHT \
       --trusted-block-hash $HASH
       
 ```
@@ -128,8 +129,7 @@ docker run \
 | trusted-block-hash   | required    | Block hash corresponding to trusted block height of Panacea |
 
 
-
-When the Oracle key and remote report generation is completed, the file is created with the following structure.
+When the oracle key and remote report are generated successfully, they are stored as file with the below structure:
 
 ```
 # Oracle home
@@ -158,7 +158,7 @@ When the Oracle key and remote report generation is completed, the file is creat
 ```
 
 ### Submit a parameter change proposal
-In order to register Oracle's public key and remote report with Panacea, a parameter change proposal must be submit.
+The generated oracle public key and its remote report should be set by governance, a proposal for changing module parameter of oracle module.
 
 ```shell
 panacead tx gov submit-proposal param-change proposal.json \
@@ -209,4 +209,4 @@ params:
   unique_id: "{unique_id}"
 ```
 
-When all these processes are completed, Panacea and Oracle can operate DEP normally.
+When all these processes are completed, genesis oracle can operate normally.
