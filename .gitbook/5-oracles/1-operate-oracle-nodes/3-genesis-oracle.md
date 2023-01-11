@@ -53,12 +53,15 @@ panacead add-genesis-oracle \
   --oracle-commission-max-change-rate {oracle_commission_max_change_rate} \
   --oracle-endpoint {oracle_endpoint}
 ```
-- `oracle-unique-id`: The uniqueID to be set in the params of the oracle module and the genesis oracle.
-- `oracle-account`: The address or key name of the account to be registered as an genesis oracle.
-- `oracle-commission-rate`: Fee rate for data validation.
-- `oracle-commission-max-rate`: Maximum commission rate that can be changed.
-- `oracle-commission-max-change`: Maximum commission rate that cat be change per day.
-- `oracle-endpoint`: The endpoint of the oracle to expose to providers and consumers.
+
+| Argument                          | Requirement | Description                                                                                          |
+|-----------------------------------|-------------|------------------------------------------------------------------------------------------------------|
+| oracle-unique-id                  | false       | The uniqueID to be set in the params of the oracle module and the genesis oracle                     |
+| oracle-account                    | false       | The address or key name of the account to be registered as an genesis oracle                         |
+| oracle-commission-rate            | false       | The desired initial oracle commission rate                                                           |
+| oracle-commission-max-rate        | false       | The maximum oracle commission rate. The oracle commission rate cannot be greater than this max rate. |
+| oracle-commission-max-change-rate | false       | The maximum rate that an oracle can change once. It will be reset 24 hours after the last change.    |
+| oracle-endpoint                   | false       | The endpoint of oracle to be used                                                                    |
 
 You can check the oracle registered in `genesis.json`
 ```
@@ -102,8 +105,11 @@ docker run \
       --trusted-block-hash {block_hash} \
       --trusted_block_height {block_height}
 ```
-- `trusted-block-height`: Trusted block height of Panacea.
-- `trusted-block-hash`: Block hash corresponding to trusted block height of Panacea.
+
+| Argument             | Requirement | Description                                                 |
+|----------------------|-------------|-------------------------------------------------------------|
+| trusted-block-height | true        | Trusted block height of Panacea                             |
+| trusted-block-hash   | true        | Block hash corresponding to trusted block height of Panacea |
 
 When the Oracle key and remote report generation is completed, the file is created with the following structure.
 
