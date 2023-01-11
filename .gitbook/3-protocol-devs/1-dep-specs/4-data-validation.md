@@ -61,7 +61,7 @@ TODO: Guide to JWT generate and verify
 # Content-Type: application/json
 ```
 
-#### ResponseBody
+#### Response Body
 ```json
 {
   "unsigned_certificate": {
