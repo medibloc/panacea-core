@@ -112,6 +112,37 @@ func (k Keeper) OracleUpgradeInfo(ctx context.Context, _ *types.QueryOracleUpgra
 	}, nil
 }
 
+func (k Keeper) OracleUpgrades(goCtx context.Context, request *types.QueryOracleUpgradesRequest) (*types.QueryOracleUpgradesResponse, error) {
+	if request == nil {
+		return nil, status.Error(codes.InvalidArgument, "invalid request")
+	}
+
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	store := ctx.KVStore(k.storeKey)
+	oracleUpgradeStore := prefix.NewStore(store, append(types.OracleUpgradeKey, []byte(request.UniqueId)...))
+
+	var oracleUpgrades []*types.OracleUpgrade
+	pageRes, err := query.Paginate(oracleUpgradeStore, request.Pagination, func(_, value []byte) error {
+		var oracleUpgrade types.OracleUpgrade
+		if err := k.cdc.UnmarshalLengthPrefixed(value, &oracleUpgrade); err != nil {
+			return err
+		}
+
+		oracleUpgrades = append(oracleUpgrades, &oracleUpgrade)
+		return nil
+	})
+
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	return &types.QueryOracleUpgradesResponse{
+		OracleUpgrades: oracleUpgrades,
+		Pagination:     pageRes,
+	}, nil
+}
+
 func (k Keeper) OracleUpgrade(goCtx context.Context, request *types.QueryOracleUpgradeRequest) (*types.QueryOracleUpgradeResponse, error) {
 
 	oracleUpgrade, err := k.GetOracleUpgrade(sdk.UnwrapSDKContext(goCtx), request.UniqueId, request.OracleAddress)
