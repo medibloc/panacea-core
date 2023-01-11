@@ -19,7 +19,7 @@ func (k Keeper) SubmitConsent(ctx sdk.Context, consent *types.Consent) error {
 		return sdkerrors.Wrapf(types.ErrSubmitConsent, err.Error())
 	}
 
-	deal, err := k.GetDeal(ctx, unsignedCert.DealId)
+	deal, err := k.GetDeal(ctx, consent.DealId)
 	if err != nil {
 		return sdkerrors.Wrapf(types.ErrSubmitConsent, "failed to get deal. %v", err)
 	} else if deal.Status != types.DEAL_STATUS_ACTIVE {
@@ -27,6 +27,10 @@ func (k Keeper) SubmitConsent(ctx sdk.Context, consent *types.Consent) error {
 	}
 
 	if err := k.verifyUnsignedCertificate(ctx, unsignedCert); err != nil {
+		return sdkerrors.Wrapf(types.ErrSubmitConsent, err.Error())
+	}
+
+	if err := k.validateAgreements(deal, consent.Agreements); err != nil {
 		return sdkerrors.Wrapf(types.ErrSubmitConsent, err.Error())
 	}
 
@@ -54,6 +58,20 @@ func (k Keeper) verifyUnsignedCertificate(ctx sdk.Context, unsignedCert *types.U
 	if k.isProvidedCertificate(ctx, unsignedCert.DealId, unsignedCert.DataHash) {
 		return fmt.Errorf("already provided consent")
 	}
+	return nil
+}
+
+func (k Keeper) validateAgreements(deal *types.Deal, agreements []*types.Agreement) error {
+	for _, agreement := range agreements {
+		agreementTerm := deal.AgreementTerm(agreement.TermId)
+		if agreementTerm == nil {
+			return fmt.Errorf("cannot find agreement term %v from the deal %v", agreement.TermId, deal.Id)
+		}
+		if agreementTerm.Required && !agreement.Agreement {
+			return fmt.Errorf("agreement term %v in the deal %v is required, but disagreed by the consent", agreement.TermId, deal.Id)
+		}
+	}
+
 	return nil
 }
 

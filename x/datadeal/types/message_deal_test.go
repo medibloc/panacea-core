@@ -71,7 +71,8 @@ func TestMsgSubmitConsentValidateBasic(t *testing.T) {
 	providerAddress := sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address()).String()
 	msg := &MsgSubmitConsent{
 		Consent: &Consent{
-			&Certificate{
+			DealId: 1,
+			Certificate: &Certificate{
 				UnsignedCertificate: &UnsignedCertificate{
 					Cid:             "cid",
 					UniqueId:        "uniqueID",

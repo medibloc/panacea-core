@@ -26,6 +26,7 @@ message MsgCreateDeal {
   cosmos.base.v1beta1.Coin budget = 2;
   uint64 max_num_data = 3;
   string consumer_address = 4;
+  repeated AgreementTerm agreement_terms = 5;
 }
 
 // MsgCreateDealResponse defines the Msg/CreateDeal response type.

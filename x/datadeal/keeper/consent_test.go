@@ -132,6 +132,7 @@ func (suite *consentTestSuite) TestSubmitConsentSuccess() {
 	suite.Require().NoError(err)
 
 	consent := &types.Consent{
+		DealId: unsignedCert.DealId,
 		Certificate: &types.Certificate{
 			UnsignedCertificate: unsignedCert,
 			Signature:           sign.Serialize(),
@@ -194,6 +195,7 @@ func (suite *consentTestSuite) TestSubmitConsentChangeStatusComplete() {
 	suite.Require().NoError(err)
 
 	consent := &types.Consent{
+		DealId: unsignedCert.DealId,
 		Certificate: &types.Certificate{
 			UnsignedCertificate: unsignedCert,
 			Signature:           sign.Serialize(),
@@ -251,6 +253,7 @@ func (suite *consentTestSuite) TestSubmitConsentNotRegisteredOracle() {
 	suite.Require().NoError(err)
 
 	consent := &types.Consent{
+		DealId: unsignedCert.DealId,
 		Certificate: &types.Certificate{
 			UnsignedCertificate: unsignedCert,
 			Signature:           sign.Serialize(),
@@ -285,6 +288,7 @@ func (suite *consentTestSuite) TestSubmitConsentNotSameUniqueIDOfOracle() {
 	suite.Require().NoError(err)
 
 	consent := &types.Consent{
+		DealId: unsignedCert.DealId,
 		Certificate: &types.Certificate{
 			UnsignedCertificate: unsignedCert,
 			Signature:           sign.Serialize(),
@@ -319,6 +323,7 @@ func (suite *consentTestSuite) TestSubmitConsentInvalidSignature() {
 	suite.Require().NoError(err)
 
 	consent := &types.Consent{
+		DealId: unsignedCert.DealId,
 		Certificate: &types.Certificate{
 			UnsignedCertificate: unsignedCert,
 			Signature:           sign.Serialize(),
@@ -350,6 +355,7 @@ func (suite *consentTestSuite) TestSubmitConsentNotExistDeal() {
 	suite.Require().NoError(err)
 
 	consent := &types.Consent{
+		DealId: unsignedCert.DealId,
 		Certificate: &types.Certificate{
 			UnsignedCertificate: unsignedCert,
 			Signature:           sign.Serialize(),
@@ -381,6 +387,7 @@ func (suite *consentTestSuite) TestSubmitConsentAlreadyDealStatusComplete() {
 	suite.Require().NoError(err)
 
 	consent := &types.Consent{
+		DealId: unsignedCert.DealId,
 		Certificate: &types.Certificate{
 			UnsignedCertificate: unsignedCert,
 			Signature:           sign.Serialize(),
@@ -411,6 +418,7 @@ func (suite *consentTestSuite) TestSubmitConsentExistSameCertificate() {
 	suite.Require().NoError(err)
 
 	consent := &types.Consent{
+		DealId: unsignedCert.DealId,
 		Certificate: &types.Certificate{
 			UnsignedCertificate: unsignedCert,
 			Signature:           sign.Serialize(),
@@ -446,6 +454,7 @@ func (suite *consentTestSuite) TestSubmitConsentNotSameUniqueIDOfCertificate() {
 	suite.Require().NoError(err)
 
 	consent := &types.Consent{
+		DealId: unsignedCert.DealId,
 		Certificate: &types.Certificate{
 			UnsignedCertificate: unsignedCert,
 			Signature:           sign.Serialize(),

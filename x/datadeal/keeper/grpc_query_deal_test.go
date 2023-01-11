@@ -65,6 +65,7 @@ func (suite *queryDealTestSuite) TestQueryDeals() {
 
 func (suite *queryDealTestSuite) TestQueryConsent() {
 	consent := &types.Consent{
+		DealId: 1,
 		Certificate: &types.Certificate{
 			UnsignedCertificate: &types.UnsignedCertificate{
 				Cid:             "cid1",
@@ -92,6 +93,7 @@ func (suite *queryDealTestSuite) TestQueryConsent() {
 
 func (suite *queryDealTestSuite) TestQueryConsents() {
 	consent := &types.Consent{
+		DealId: 1,
 		Certificate: &types.Certificate{
 			UnsignedCertificate: &types.UnsignedCertificate{
 				Cid:             "cid1",
@@ -108,6 +110,7 @@ func (suite *queryDealTestSuite) TestQueryConsents() {
 	suite.Require().NoError(err)
 
 	consent2 := &types.Consent{
+		DealId: 1,
 		Certificate: &types.Certificate{
 			UnsignedCertificate: &types.UnsignedCertificate{
 				Cid:             "cid2",
@@ -124,6 +127,7 @@ func (suite *queryDealTestSuite) TestQueryConsents() {
 	suite.Require().NoError(err)
 
 	consent3 := &types.Consent{
+		DealId: 1,
 		Certificate: &types.Certificate{
 			UnsignedCertificate: &types.UnsignedCertificate{
 				Cid:             "cid2",
