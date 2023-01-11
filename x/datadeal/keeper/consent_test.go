@@ -585,5 +585,5 @@ func (suite *consentTestSuite) TestSubmitConsentWithInvalidAgreements() {
 
 	err = suite.DataDealKeeper.SubmitConsent(suite.Ctx, consent)
 	suite.Require().ErrorIs(err, types.ErrSubmitConsent)
-	suite.Require().ErrorContains(err, fmt.Sprintf("invalid count(0) of agreements: expected:2"))
+	suite.Require().ErrorContains(err, "invalid count(0) of agreements: expected:2")
 }
