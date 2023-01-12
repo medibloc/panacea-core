@@ -1,4 +1,4 @@
-# Initialization
+# Oracle Initialization
 
 #### Before run the oracle, you should initialize the oracle configuration.
 
@@ -21,29 +21,31 @@ it is recommended to create an environment variable that you can execute the Doc
 export ORACLE_CMD="docker run --rm \
   --device /dev/sgx_enclave \
   --device /dev/sgx_provision \
-  -v $(pwd)/oracle:/oracle ghcr.io/medibloc/panacea-oracle:latest \
+  -v <directory-you-want>/oracle:/oracle ghcr.io/medibloc/panacea-oracle:latest \
   ego run /usr/bin/oracled"
 ```
 
 ## Command Line of Initialization
 
 ```bash
-$DOCKER_CMD init --home $HOME/.oracle 
+$ORACLE_CMD init --home /home_mnt/.oracle 
 ```
 
-When run the above CLI for initializing the oracle, the `config.toml` file will be generated under the `$HOME/.oracle`
+When run the above CLI for initializing the oracle, the `config.toml` file will be generated under
+the `/home_mnt/.oracle`
 in the enclave.
 The default `config.toml` file will be shown like this:
 
 ```toml
 # This is a TOML config file.
 # For more information, see https://github.com/toml-lang/toml
-
+# Write comment later
 ###############################################################################
 ###                           Base Configuration                            ###
 ###############################################################################
 
 log-level = "info"
+oracle-mnemonic = ""
 oracle-acc-num = "0"
 oracle-acc-index = "0"
 data-dir = "data"
@@ -95,40 +97,37 @@ write-timeout = "60"
 read-timeout = "15"
 ```
 
-## The Components of `config.toml`
+## Configuring Some Default Setting
 
-- Base Configuration
-    - `log-level`: The log level you want (default: `info` | `debug`)
-    - `oracle-mnemonic`: The mnemonic of your oracle account registered in Panacea
-    - `oracle-acc-num`: The account number of your oracle account registered in Panacea
-    - `oracle-acc-index`: The account index of your oracle account registered in Panacea
-    - `data-dir`: The path that you want to store data of light client database
-    - `oracle-priv-key-file`: The name of the sealed oracle private key file (default: `oracle_priv_key.sealed`)
-    - `oracle-pub-key-file`: The name of the oracle public key json file (default: `oracle_pub_key.json`)
-    - `node-priv-key-file`: The name of the sealed oracle node private key file (default: `node_priv_key.sealed`)
+#### Base Configuration
 
+In `Base Configuration`, you need to configure a `oracle-mnemonic`, `oracle-acc-num`, and `oracle-acc-index`. Those
+components should be corresponded to account that you registered in the Panacea.
 
-- Panacea Configuration
-    - `chain-id`: The chain ID of Panacea (mainnet: `panacea-3`)
-    - `grpc-addr`: The gRPC address of Panacea (mainnet: `https://grpc.gopanacea.org`)
-    - `rpc-addr`: The RPC address of Panacea (maiinet: `https://rpc.gopanacea.org`)
-    - `default-gas-limit`: The default gas limit when sending transaction (default: `400000`)
-    - `default-fee-amount`: The default fee amount when sending transaction (default: `2000000umed`)
-    - `light-client-primary-add`: A primary RPC address for light client verification
-    - `light-client-witness-addrs`: Witness addresses (comma-separated) for light client verification
-    - `light-client-log-level`: The log information for light client (default: `error` | `warn` | `info`)
+#### Panacea Configuration
 
+In `Panacea Configuration`, you need to configure a chain ID of Panacea. If you want to join the oracle in the Panacea
+mainnet, the chain ID will be configured to `panacea-3`. Or if you want to join in the Panacea testnet, the chain ID
+will be `hygeia-8`.
 
-- IPFS Configuration
-    - `ipfs-node-addr`: Public IPFS node address for store and get data
+The default `grpc-addr` and `rpc-addr` setting is based on localnet. So if you want to connect with the Panacea
+mainnet, the `grpc-addr` will be `https://grpc.gopanacea.org` and the `rpc-addr` will be `https://rpc.gopanacea.org`.
+Also, the `light-client-primary-addr` and `light-client-witness-addrs` are as same as `rpc-addr`, if you want to
+connect with the Panacea mainnet.
 
+The `default-gas-limit` and `default-fee-amount` are set as `400000` and `2000000umed`, since the remote report has a
+large bytes for oracle registration and oracle upgrade. So if you have finished an oracle registration or upgrade, you
+could set a lower gas limit and fee amount than default setting.
 
-- API Configuration
-    - `listen-addr`: The listen address of the oracle
-    - `write-timeout`: The maximum duration before timing out writes of the response (default: `60`)
-    - `read-timeout`: The maximum duration for reading the entire request, including the body (default: `15`)
+#### IPFS Configuration
 
-##### After initializing the oracle, you can register oracle based on above configuration.
+The oracle will use a public IPFS node for now. If you want to run a local IPFS node, the `ipfs-node-addr` is as same as
+default setting. Also, you need to check that the IPFS gateway and the oracle `listen-addr` are at same port. You can
+change the IPFS gateway in `$HOME/.ipfs/config`. If you want to know about RPC API of the IPFS, please refer
+the [IPFS documentation](https://docs.ipfs.tech/reference/kubo/rpc/).
 
-##### If you want to know how to register oracle, please see the [oracle-registration](./4-oracle-registration.md) documentation.
+## Next
+
+If you have done the oracle initialization, you could register oracle based on above configuration. If you want to know
+how to register oracle, please see the [oracle-registration](./4-oracle-registration.md) documentation.
 
