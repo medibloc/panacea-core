@@ -129,5 +129,5 @@ the [IPFS documentation](https://docs.ipfs.tech/reference/kubo/rpc/).
 ## Next
 
 If you have done the oracle initialization, you could register oracle based on above configuration. If you want to know
-how to register oracle, please see the [oracle-registration](./4-oracle-registration.md) documentation.
+how to register oracle, please refer the [oracle-registration](./4-oracle-registration.md) documentation.
 
