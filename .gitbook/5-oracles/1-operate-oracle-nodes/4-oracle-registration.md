@@ -74,15 +74,18 @@ Other oracles already registered will do some verifications of this registration
 - the trusted block information is valid
 
 When the registration is verified successfully, other oracles will send a transaction for approval of the oracle registration.
-The oracle catch the approval transaction, and then the oracle start to retrieve the oracle private key.
+The oracle would detect the approval, and then the oracle start to retrieve the oracle private key.
 As a result of retrieval of oracle private key, a sealed file named `oracle_priv_key.sealed` (default file name) will be generated.
-Using the sealed oracle private key, this oracle is now able to function normally as an oracle.
+Using the sealed oracle private key, this oracle is now ready to perform tasks such as verifying data or other oracles.
+For more information about what oracle does, please refer the [running an oracle node](5-running-node#what-oracle-does.md).
 
 {% hint style="danger" %}
 Like `node_priv_key.sealed`, `oracle_priv_key.sealed` is also very important for working as a valid oracle.
 Thus, we highly recommend to manage the `oracle_priv_key.sealed` file very carefully.
 In case that operator lost the `oracle_priv_key.sealed` file for any reason, it can be retrieved again using `get-oracle-key` CLI with the `node_priv_key.sealed` file, which is generated when request oracle registration above.
 {% endhint %}
+
+## Manually Retrieve Oracle Private Key
 
 For any reasons, the oracle can stop before the oracle private key is retrieved. 
 In this case, you can also retrieve the oracle private key through `get-oracle-key` CLI.
@@ -103,6 +106,6 @@ You can check the status of your registration with the uniqueID and oracle addre
 panacead q oracle oracle-registration <unique-id> <oracle-address>
 ```
 
-If at least one oracle approved this registration, there`encrypted_oracle_priv_key` will have some value.
+If at least one oracle approved this registration, the `encrypted_oracle_priv_key` will have some value.
 
-Now, you are ready to running your own oracle. Please refer the [running a node](./5-running-node.md) instructions.
+Now, you are ready to run your own oracle. Please refer the [running a node](./5-running-node.md) instructions.
