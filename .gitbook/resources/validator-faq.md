@@ -217,7 +217,7 @@ In this example, there are 10 validators with equal stake.
 Each of them applies a 10% commission rate and has 20% of self-delegated MEDs.
 Now comes a successful block that collects a total of 1025.51020408 MED in fees.
 
-First, a 2% tax is applied. The corresponding MEDs go to the reserved community pool.
+First, a 2% tax is applied. The corresponding MED go to the reserved community pool.
 The community pool's funds can be allocated through governance.
 
 - `2% * 1025.51020408` = 20.51020408 MED go to the community pool
