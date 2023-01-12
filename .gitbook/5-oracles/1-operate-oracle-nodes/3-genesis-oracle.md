@@ -36,7 +36,7 @@ docker run \
 **Output**
 ```
 EGo v1.0.1 (e1e48c9dbfdfd3cb2f2fda7602729162c9f762cc)
-{A hexadecimal string of unique_id}
+<a-hexadecimal-string-of-unique-id>
 ```
 
 ### Genesis Oracle Registration in Panacea
@@ -46,11 +46,11 @@ After uniqueID extraction is completed, the genesis oracle must be registered in
 We provide a CLI for this process.
 ```
 panacead add-genesis-oracle \
-  --oracle-unique-id {unique_id} 
-  --oracle-account {address or key_name} \
-  --oracle-commission-rate {oracle_commission_rate} \
-  --oracle-commission-max-rate {oracle_commission_max_rate} \
-  --oracle-commission-max-change-rate {oracle_commission_max_change_rate} \
+  --oracle-unique-id <unique-id>
+  --oracle-account <oracle-address-or-key> \
+  --oracle-commission-rate <oracle-commission-rate> \
+  --oracle-commission-max-rate <oracle-commission-max-rate> \
+  --oracle-commission-max-change-rate <oracle-commission-max-change-rate> \
   --oracle-endpoint {oracle_endpoint}
 ```
 
@@ -71,13 +71,13 @@ cat $HOME/.panacea/config/genesis.json | jq .app_state.oracle.oracles
 ```json
 [
   {
-    "oracle_address": "{oracle_address}",
-    "unique_id": "{unique_id}",
-    "endpoint": "{endpoint}",
-    "update_time": "0001-01-01T00:00:00Z",
-    "oracle_commission_rate": "{commission_rate}",
-    "oracle_commission_max_rate": "{commission_max_rate}",
-    "oracle_commission_max_change_rate": "{commission_max_change_rate}"
+    "oracle_address": "<oracle-address>",
+    "unique_id": "<unique-id>",
+    "endpoint": "<endpoint>",
+    "update_time": "<update-time>",
+    "oracle_commission_rate": "<commission-rate>",
+    "oracle_commission_max_rate": "<commission-max-rate>",
+    "oracle_commission_max_change_rate": "<commission-max-change-rate>"
   }
 ]
 ```
@@ -115,7 +115,7 @@ After getting the height and hash of the block, you can generate the necessary k
 docker run \
     --device /dev/sgx_enclave \
     --device /dev/sgx_provision \
-    -v {ANY_DIR_ON_HOST}:/oracle \
+    -v <directory-you-want>:/oracle \
     ghcr.io/medibloc/panacea-oracle:latest \
     ego run /usr/bin/oracled gen-oracle-key \
       --trusted-block-height $HEIGHT \
@@ -152,8 +152,8 @@ When the oracle key and remote report are generated successfully, they are store
 **oracle_pub_key.json**
 ```json
 {
-  "public_key_base64": "{oracle_public_key_base64}",
-  "remote_report_base64": "{oracle_remote_report_base64}"
+  "public_key_base64": "<oracle-public-key-base64>",
+  "remote_report_base64": "<oracle-remote-report-base64>"
 }
 ```
 
@@ -162,26 +162,28 @@ The generated oracle public key and its remote report should be set by governanc
 
 ```shell
 panacead tx gov submit-proposal param-change proposal.json \
-  --from {key} \
-  --chain-id {chain_id} \
-  --fees 1000000umed \
+  --from <key> \
+  --chain-id <chain-id> \
+  --gas auto \
+  --gas-adjustment 1.3 \
+  --gas-prices 5umed \
   -y
 ```
 **proposal.json**
 ```json
 {
-  "title": "{title}",
-  "description": "{description}",
+  "title": "<title>",
+  "description": "<description>",
   "changes": [
     {
       "subspace": "oracle",
       "key": "OraclePublicKey",
-      "value": "{oracle_pub_key_base64}"
+      "value": "<oracle-pub-key-base64>"
     },
     {
       "subspace": "oracle",
       "key": "OraclePubKeyRemoteReport",
-      "value": "{oracle_remote_report_base64}"
+      "value": "<oracle-remote-report-base64>"
     }
   ],
   "deposit": "100000000000umed"
@@ -191,8 +193,8 @@ panacead tx gov submit-proposal param-change proposal.json \
 After submitting the proposal, vote on the proposal and wait for it to pass.
 ```shell
 panacead tx gov vote {proposal_id} yes \
-  --from {key} \
-  --chain-id {chain_id} \
+  --from <key> \
+  --chain-id <chain_id> \
   --fees 1000000umed \
   -y
 ```
@@ -204,9 +206,9 @@ panacead q oracle params
 **Output**
 ```shell
 params:
-  oracle_pub_key_remote_report: "{oracle_remote_report_base64}"
-  oracle_public_key: "{oracle_public_key_base64}"
-  unique_id: "{unique_id}"
+  oracle_pub_key_remote_report: "<oracle-remote-report-base64>"
+  oracle_public_key: "<oracle-public-key-base64>"
+  unique_id: "<unique-id>"
 ```
 
 When all these processes are completed, the genesis oracle can operate normally.
