@@ -13,10 +13,6 @@ enclave.
 mkdir <directory-you-want>/oracle
 ```
 
-After that, if you want to run the `oracled` with Docker as described in
-the [oracle-installation](./1-oracle-installation.md),
-it is recommended to create an environment variable that you can execute the Docker container easily.
-
 ```bash
 export ORACLE_CMD="docker run --rm \
   --device /dev/sgx_enclave \
@@ -32,8 +28,7 @@ $ORACLE_CMD init --home /home_mnt/.oracle
 ```
 
 When run the above CLI for initializing the oracle, the `config.toml` file will be generated under
-the `/home_mnt/.oracle`
-in the enclave.
+the `<directory-you-want>/.oracle` in the enclave.
 The default `config.toml` file will be shown like this:
 
 ```toml
@@ -106,9 +101,10 @@ components should be corresponded to account that you registered in the Panacea.
 
 #### Panacea Configuration
 
-In `Panacea Configuration`, you need to configure a chain ID of Panacea. If you want to join the oracle in the Panacea
-mainnet, the chain ID will be configured to `panacea-3`. Or if you want to join in the Panacea testnet, the chain ID
-will be `hygeia-8`.
+In `Panacea Configuration`, you need to configure a chain ID of Panacea. If you want to join the oracle to Panacea
+mainnet or testnet, please check the chain IDs
+in [mainnet-repoistory](https://github.com/medibloc/panacea-mainnet#intro)
+or [testnet-repository](https://github.com/medibloc/panacea-testnet#intro), respectively.
 
 The default `grpc-addr` and `rpc-addr` setting is based on localnet. So if you want to connect with the Panacea
 mainnet, the `grpc-addr` will be `https://grpc.gopanacea.org` and the `rpc-addr` will be `https://rpc.gopanacea.org`.
