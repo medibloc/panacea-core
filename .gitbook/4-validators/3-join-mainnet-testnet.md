@@ -9,13 +9,13 @@ This tutorial introduces deploying a new node on [AWS](https://aws.amazon.com/) 
 
 Choose Ubuntu Server 20.04 LTS 64-bit (x86) with SSD Volume Type.
 
-![](../assets/fullnode/ec2-ami.png)
+![](images/ec2-ami.png)
 
 ### Choose the instance type
 
 Choose the `m5.large` instance type (minimum spec).
 
-![](../assets/fullnode/ec2-instance-type.png)
+![](images/ec2-instance-type.png)
 
 ### Configure instance details
 
