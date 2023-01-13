@@ -27,13 +27,20 @@ For `deal-file-path`, create a following JSON file.
     "amount": "1000000"
   },
   "max_num_data": 10,
-  "consumer_address": "panacea1..."
+  "consumer_address": "panacea1...",
+  "agreement_terms": [
+    {
+      "id": 1,
+      "required": true,
+      "title": "Terms of data provision",
+      "description": "The provided data will be used for ..."
+    }
+  ]
 }
 ```
 It is very important to set data schema specifically and correctly, so that data being provided can be validated accurately by oracles.
 
 For more details about data deals, please see the [Data Deal](../../3-protocol-devs/1-dep-specs/2-data-deal.md) specification.
-
 
 ## Query deals
 

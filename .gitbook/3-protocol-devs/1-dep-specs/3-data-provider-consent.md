@@ -53,7 +53,7 @@ message UnsignedCertificate {
 }
 ```
 
-Using the `Certificate`, provider can submit consent to provide the data.
+Using the `Certificate`, provider can submit consent to provide the data with agreement of terms.
 
 ```proto
 message MsgSubmitConsent {
@@ -61,7 +61,14 @@ message MsgSubmitConsent {
 }
 
 message Consent {
-  Certificate certificate = 1;
+  uint64 deal_id = 1;
+  Certificate certificate = 2;
+  repeated Agreement agreements = 3;
+}
+
+message Agreement {
+  uint32 term_id = 1;
+  bool agreement = 2;
 }
 ```
 
@@ -69,6 +76,7 @@ When this consent is submitted, blockchain will check:
 - if the data is provided by the owner of the data
 - if the data is validated by a registered and active oracle
 - if the data is provided in duplicate
+- if the provider agrees to the required terms of agreement
 
 If all checks pass, rewards are distributed to the provider and oracle(more about [incentive](./6-incentives.md)).
 
