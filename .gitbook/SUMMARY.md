@@ -71,4 +71,4 @@
   * [Running a Node](5-oracles/1-operate-oracle-nodes/5-running-node.md)
   * [Updating Oracle Information](5-oracles/1-operate-oracle-nodes/6-update-oracle-info.md)
   * [Oracle Upgrade](5-oracles/1-operate-oracle-nodes/7-oracle-upgrade.md)
-* FAQ
+  * [Verify a Remote Report](5-oracles/1-operate-oracle-nodes/8-verify-remote-report.md)
