@@ -1,4 +1,4 @@
-# Running Node
+# Running a Node
 
 ## Overview
 
@@ -53,11 +53,11 @@ Validation procedure is as follows:
 3. Decrypt provider's encrypted data & check data hash and data schema
 
 If validation passes successfully, oracle issues a certificate as follows:
-1. Generate `secret key` by combining `oracle private key`, deal ID, and data hash
+1. Generate a `secret key` by combining `oracle private key`, deal ID, and data hash
 2. Re-encrypt the data using the `secret key` and put it in `IPFS`
 3. Issue a certificate with `oracle private key` signature
 
-Providers will be able to submit consent to Panacea through the issued certificate.
+Providers will be able to submit consent to Panacea with the issued certificate.
 Panacea ensures that a commission is paid to the oracle operator who issued the certificate when the data delivery is successfully completed.
 
 ### Safely transmit provider data accessibility to consumer
