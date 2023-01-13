@@ -15,7 +15,20 @@ message Deal {
   uint64 max_num_data = 5;
   uint64 cur_num_data = 6;
   string consumer_address = 7;
-  DealStatus status = 8;
+  repeated AgreementTerm agreement_terms = 8;
+  DealStatus status = 9;
+}
+
+// AgreementTerm defines a general format of an agreement term to be specified in a Deal.
+message AgreementTerm {
+  // An unique ID that must be specified manually by the deal creator
+  uint32 id = 1;
+  // If this field is true, only data providers who agree to this term can provide data to the deal.
+  bool required = 2;
+  // A title of the term
+  string title = 3;
+  // A detailed description of the term
+  string description = 4;
 }
 
 // DealStatus enumerates the status of deal.

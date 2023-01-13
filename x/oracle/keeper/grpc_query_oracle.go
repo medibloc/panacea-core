@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"context"
+	"errors"
 
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -96,4 +97,58 @@ func (k Keeper) OracleRegistration(goCtx context.Context, request *types.QueryOr
 func (k Keeper) Params(goCtx context.Context, _ *types.QueryOracleParamsRequest) (*types.QueryParamsResponse, error) {
 	params := k.GetParams(sdk.UnwrapSDKContext(goCtx))
 	return &types.QueryParamsResponse{Params: &params}, nil
+}
+
+func (k Keeper) OracleUpgradeInfo(ctx context.Context, _ *types.QueryOracleUpgradeInfoRequest) (*types.QueryOracleUpgradeInfoResponse, error) {
+	upgradeInfo, err := k.GetOracleUpgradeInfo(sdk.UnwrapSDKContext(ctx))
+	if err != nil {
+		if errors.Is(err, types.ErrOracleUpgradeInfoNotFound) {
+			return &types.QueryOracleUpgradeInfoResponse{}, nil
+		}
+		return nil, err
+	}
+	return &types.QueryOracleUpgradeInfoResponse{
+		OracleUpgradeInfo: upgradeInfo,
+	}, nil
+}
+
+func (k Keeper) OracleUpgrades(goCtx context.Context, request *types.QueryOracleUpgradesRequest) (*types.QueryOracleUpgradesResponse, error) {
+	if request == nil {
+		return nil, status.Error(codes.InvalidArgument, "invalid request")
+	}
+
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	store := ctx.KVStore(k.storeKey)
+	oracleUpgradeStore := prefix.NewStore(store, append(types.OracleUpgradeKey, []byte(request.UniqueId)...))
+
+	var oracleUpgrades []*types.OracleUpgrade
+	pageRes, err := query.Paginate(oracleUpgradeStore, request.Pagination, func(_, value []byte) error {
+		var oracleUpgrade types.OracleUpgrade
+		if err := k.cdc.UnmarshalLengthPrefixed(value, &oracleUpgrade); err != nil {
+			return err
+		}
+
+		oracleUpgrades = append(oracleUpgrades, &oracleUpgrade)
+		return nil
+	})
+
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	return &types.QueryOracleUpgradesResponse{
+		OracleUpgrades: oracleUpgrades,
+		Pagination:     pageRes,
+	}, nil
+}
+
+func (k Keeper) OracleUpgrade(goCtx context.Context, request *types.QueryOracleUpgradeRequest) (*types.QueryOracleUpgradeResponse, error) {
+
+	oracleUpgrade, err := k.GetOracleUpgrade(sdk.UnwrapSDKContext(goCtx), request.UniqueId, request.OracleAddress)
+	if err != nil {
+		return nil, err
+	}
+
+	return &types.QueryOracleUpgradeResponse{OracleUpgrade: oracleUpgrade}, nil
 }

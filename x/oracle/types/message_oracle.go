@@ -33,7 +33,7 @@ func (m *MsgRegisterOracle) Type() string {
 
 func (m *MsgRegisterOracle) ValidateBasic() error {
 	if len(m.UniqueId) == 0 {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "uniqueId is empty")
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "uniqueID is empty")
 	}
 
 	if _, err := sdk.AccAddressFromBech32(m.OracleAddress); err != nil {
@@ -58,12 +58,14 @@ func (m *MsgRegisterOracle) ValidateBasic() error {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "trusted block hash should not be nil")
 	}
 
-	if m.OracleCommissionRate.LT(sdk.ZeroDec()) || m.OracleCommissionRate.GT(sdk.OneDec()) {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "oracleCommissionRate must be between 0 and 1")
-	}
 	if m.OracleCommissionMaxRate.LT(sdk.ZeroDec()) || m.OracleCommissionMaxRate.GT(sdk.OneDec()) {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "OracleCommissionMaxRate must be between 0 and 1")
 	}
+
+	if m.OracleCommissionRate.LT(sdk.ZeroDec()) || m.OracleCommissionRate.GT(m.OracleCommissionMaxRate) {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "oracleCommissionRate must be between 0 and OracleCommissionMaxRate")
+	}
+
 	if m.OracleCommissionMaxChangeRate.LT(sdk.ZeroDec()) || m.OracleCommissionMaxChangeRate.GT(m.OracleCommissionMaxRate) {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "OracleCommissionMaxChangeRate must be between 0 and OracleCommissionMaxRate")
 	}
@@ -86,10 +88,10 @@ func (m *MsgRegisterOracle) GetSigners() []sdk.AccAddress {
 
 var _ sdk.Msg = &MsgApproveOracleRegistration{}
 
-func NewMsgApproveOracleRegistration(approve *ApproveOracleRegistration, signature []byte) *MsgApproveOracleRegistration {
+func NewMsgApproveOracleRegistration(approve *ApprovalSharingOracleKey, signature []byte) *MsgApproveOracleRegistration {
 	return &MsgApproveOracleRegistration{
-		ApproveOracleRegistration: approve,
-		Signature:                 signature,
+		ApprovalSharingOracleKey: approve,
+		Signature:                signature,
 	}
 }
 
@@ -102,7 +104,7 @@ func (m *MsgApproveOracleRegistration) Type() string {
 }
 
 func (m *MsgApproveOracleRegistration) ValidateBasic() error {
-	if err := m.ApproveOracleRegistration.ValidateBasic(); err != nil {
+	if err := m.ApprovalSharingOracleKey.ValidateBasic(); err != nil {
 		return err
 	}
 
@@ -119,16 +121,20 @@ func (m *MsgApproveOracleRegistration) GetSignBytes() []byte {
 }
 
 func (m *MsgApproveOracleRegistration) GetSigners() []sdk.AccAddress {
-	oracleAddress, err := sdk.AccAddressFromBech32(m.ApproveOracleRegistration.ApproverOracleAddress)
+	oracleAddress, err := sdk.AccAddressFromBech32(m.ApprovalSharingOracleKey.ApproverOracleAddress)
 	if err != nil {
 		panic(err)
 	}
 	return []sdk.AccAddress{oracleAddress}
 }
 
-func (m *ApproveOracleRegistration) ValidateBasic() error {
-	if len(m.UniqueId) == 0 {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "uniqueId is empty")
+func (m *ApprovalSharingOracleKey) ValidateBasic() error {
+	if len(m.ApproverUniqueId) == 0 {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "approver uniqueID is empty")
+	}
+
+	if len(m.TargetUniqueId) == 0 {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "target uniqueID is empty")
 	}
 
 	if _, err := sdk.AccAddressFromBech32(m.ApproverOracleAddress); err != nil {
@@ -179,6 +185,110 @@ func (m *MsgUpdateOracleInfo) GetSignBytes() []byte {
 
 func (m *MsgUpdateOracleInfo) GetSigners() []sdk.AccAddress {
 	oracleAddress, err := sdk.AccAddressFromBech32(m.OracleAddress)
+	if err != nil {
+		panic(err)
+	}
+	return []sdk.AccAddress{oracleAddress}
+}
+
+var _ sdk.Msg = &MsgUpgradeOracle{}
+
+func NewMsgUpgradeOracle(uniqueID, oracleAddress string, nodePubKey, nodePubKeyRemoteReport []byte, trustedBlockHeight int64, trustedBlockHash []byte) *MsgUpgradeOracle {
+	return &MsgUpgradeOracle{
+		UniqueId:               uniqueID,
+		OracleAddress:          oracleAddress,
+		NodePubKey:             nodePubKey,
+		NodePubKeyRemoteReport: nodePubKeyRemoteReport,
+		TrustedBlockHeight:     trustedBlockHeight,
+		TrustedBlockHash:       trustedBlockHash,
+	}
+}
+
+func (m *MsgUpgradeOracle) Route() string {
+	return RouterKey
+}
+
+func (m *MsgUpgradeOracle) Type() string {
+	return "UpgradeOracle"
+}
+
+func (m *MsgUpgradeOracle) ValidateBasic() error {
+
+	if len(m.UniqueId) == 0 {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "uniqueID is empty")
+	}
+
+	if _, err := sdk.AccAddressFromBech32(m.OracleAddress); err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "oracleAddress is invalid. address: %s, error: %s", m.OracleAddress, err.Error())
+	}
+
+	if m.NodePubKey == nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "node public key is empty")
+	} else if _, err := btcec.ParsePubKey(m.NodePubKey, btcec.S256()); err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid node public key")
+	}
+
+	if m.NodePubKeyRemoteReport == nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "remote report of node public key is empty")
+	}
+
+	if m.TrustedBlockHeight <= 0 {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "trusted block height must be greater than zero")
+	}
+
+	if m.TrustedBlockHash == nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "trusted block hash should not be nil")
+	}
+	return nil
+}
+
+func (m *MsgUpgradeOracle) GetSignBytes() []byte {
+	bz := ModuleCdc.MustMarshalJSON(m)
+	return sdk.MustSortJSON(bz)
+}
+
+func (m *MsgUpgradeOracle) GetSigners() []sdk.AccAddress {
+	oracleAddress, err := sdk.AccAddressFromBech32(m.OracleAddress)
+	if err != nil {
+		panic(err)
+	}
+	return []sdk.AccAddress{oracleAddress}
+}
+
+func NewMsgApproveOracleUpgrade(approve *ApprovalSharingOracleKey, signature []byte) *MsgApproveOracleUpgrade {
+	return &MsgApproveOracleUpgrade{
+		ApprovalSharingOracleKey: approve,
+		Signature:                signature,
+	}
+}
+
+func (m *MsgApproveOracleUpgrade) Route() string {
+	return RouterKey
+}
+
+func (m *MsgApproveOracleUpgrade) Type() string {
+	return "ApproveOracleUpgrade"
+}
+
+func (m *MsgApproveOracleUpgrade) ValidateBasic() error {
+	if err := m.GetApprovalSharingOracleKey().ValidateBasic(); err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, err.Error())
+	}
+
+	if m.Signature == nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "signature is empty")
+	}
+
+	return nil
+}
+
+func (m *MsgApproveOracleUpgrade) GetSignBytes() []byte {
+	bz := ModuleCdc.MustMarshalJSON(m)
+	return sdk.MustSortJSON(bz)
+}
+
+func (m *MsgApproveOracleUpgrade) GetSigners() []sdk.AccAddress {
+	oracleAddress, err := sdk.AccAddressFromBech32(m.ApprovalSharingOracleKey.ApproverOracleAddress)
 	if err != nil {
 		panic(err)
 	}

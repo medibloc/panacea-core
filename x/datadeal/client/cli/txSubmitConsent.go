@@ -14,7 +14,7 @@ import (
 
 func CmdSubmitConsent() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "submit-consent [certificate-file]",
+		Use:   "submit-consent [consent-file]",
 		Short: "submit a consent to provide the data",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -23,12 +23,12 @@ func CmdSubmitConsent() *cobra.Command {
 				return err
 			}
 
-			cert, err := newDataCertificate(args[0])
+			consent, err := newConsent(args[0])
 			if err != nil {
 				return err
 			}
 
-			msg := types.NewMsgSubmitConsent(cert)
+			msg := types.NewMsgSubmitConsent(consent)
 
 			if err := msg.ValidateBasic(); err != nil {
 				return err
@@ -42,17 +42,17 @@ func CmdSubmitConsent() *cobra.Command {
 	return cmd
 }
 
-func newDataCertificate(file string) (*types.Certificate, error) {
-	var cert *types.Certificate
+func newConsent(file string) (*types.Consent, error) {
+	var consent *types.Consent
 
 	contents, err := os.ReadFile(file)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read file: %w", err)
 	}
 
-	if err := json.Unmarshal(contents, &cert); err != nil {
+	if err := json.Unmarshal(contents, &consent); err != nil {
 		return nil, err
 	}
 
-	return cert, nil
+	return consent, nil
 }

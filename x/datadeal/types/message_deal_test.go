@@ -19,6 +19,14 @@ func TestMsgCreateDealValidateBasic(t *testing.T) {
 		Budget:          &budget,
 		MaxNumData:      10,
 		ConsumerAddress: consumerAddress,
+		AgreementTerms: []*AgreementTerm{
+			{
+				Id:          1,
+				Required:    true,
+				Title:       "title",
+				Description: "description",
+			},
+		},
 	}
 
 	err := msg.ValidateBasic()
@@ -39,14 +47,14 @@ func TestMsgCreateDealValidateBasicEmptyValue(t *testing.T) {
 	err := msg.ValidateBasic()
 	require.ErrorIs(t, err, sdkerrors.ErrInvalidRequest)
 	require.ErrorContains(t, err, "no data schema")
-
 	msg.DataSchema = []string{"https://jsonld.com"}
+
 	msg.MaxNumData = 0
 	err = msg.ValidateBasic()
 	require.ErrorIs(t, err, sdkerrors.ErrInvalidRequest)
 	require.ErrorContains(t, err, "max num of data is negative number")
-
 	msg.MaxNumData = 10
+
 	msg.Budget = nil
 	err = msg.ValidateBasic()
 	require.ErrorIs(t, err, sdkerrors.ErrInvalidRequest)
@@ -58,28 +66,45 @@ func TestMsgCreateDealValidateBasicEmptyValue(t *testing.T) {
 	err = msg.ValidateBasic()
 	require.ErrorIs(t, err, sdkerrors.ErrInvalidRequest)
 	require.ErrorContains(t, err, "budget is not a valid Coin object")
-
 	msg.Budget = &budget
+
 	msg.ConsumerAddress = ""
 	err = msg.ValidateBasic()
 	require.ErrorIs(t, err, sdkerrors.ErrInvalidAddress)
 	require.ErrorContains(t, err, "invalid consumer address")
+	msg.ConsumerAddress = consumerAddress
+
+	msg.AgreementTerms = []*AgreementTerm{{Id: 1, Title: "", Description: "description"}}
+	err = msg.ValidateBasic()
+	require.ErrorIs(t, err, sdkerrors.ErrInvalidRequest)
+	require.ErrorContains(t, err, "invalid agreement term")
+	require.ErrorContains(t, err, "the title of agreement term shouldn't be empty")
+
+	msg.AgreementTerms = []*AgreementTerm{{Id: 1, Title: "title", Description: ""}}
+	err = msg.ValidateBasic()
+	require.ErrorIs(t, err, sdkerrors.ErrInvalidRequest)
+	require.ErrorContains(t, err, "invalid agreement term")
+	require.ErrorContains(t, err, "the description of agreement term shouldn't be empty")
 }
 
 func TestMsgSubmitConsentValidateBasic(t *testing.T) {
 	oracleAddress := sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address()).String()
 	providerAddress := sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address()).String()
 	msg := &MsgSubmitConsent{
-		Certificate: &Certificate{
-			UnsignedCertificate: &UnsignedCertificate{
-				Cid:             "cid",
-				UniqueId:        "uniqueID",
-				OracleAddress:   oracleAddress,
-				DealId:          1,
-				ProviderAddress: providerAddress,
-				DataHash:        "dataHash",
+		Consent: &Consent{
+			DealId: 1,
+			Certificate: &Certificate{
+				UnsignedCertificate: &UnsignedCertificate{
+					Cid:             "cid",
+					UniqueId:        "uniqueID",
+					OracleAddress:   oracleAddress,
+					DealId:          1,
+					ProviderAddress: providerAddress,
+					DataHash:        "dataHash",
+				},
+				Signature: []byte("signature"),
 			},
-			Signature: []byte("signature"),
+			Agreements: []*Agreement{{TermId: 1, Agreement: true}},
 		},
 	}
 
@@ -95,44 +120,49 @@ func TestMsgSubmitConsentValidateBasicEmptyValue(t *testing.T) {
 
 	err := msg.ValidateBasic()
 	require.ErrorIs(t, err, sdkerrors.ErrInvalidRequest)
+	require.ErrorContains(t, err, "consent is empty")
+
+	msg.Consent = &Consent{}
+	err = msg.ValidateBasic()
+	require.ErrorIs(t, err, sdkerrors.ErrInvalidRequest)
 	require.ErrorContains(t, err, "certificate is empty")
 
-	msg.Certificate = &Certificate{}
+	msg.Consent.Certificate = &Certificate{}
 	err = msg.ValidateBasic()
 	require.ErrorIs(t, err, sdkerrors.ErrInvalidRequest)
 	require.ErrorContains(t, err, "unsignedCertificate is empty")
 
-	msg.Certificate.UnsignedCertificate = &UnsignedCertificate{}
+	msg.Consent.Certificate.UnsignedCertificate = &UnsignedCertificate{}
 	err = msg.ValidateBasic()
 	require.ErrorIs(t, err, sdkerrors.ErrInvalidRequest)
 	require.ErrorContains(t, err, "failed to validation certificate")
 	require.ErrorContains(t, err, "cid is empty")
 
-	msg.Certificate.UnsignedCertificate.Cid = "cid"
+	msg.Consent.Certificate.UnsignedCertificate.Cid = "cid"
 	err = msg.ValidateBasic()
 	require.ErrorIs(t, err, sdkerrors.ErrInvalidRequest)
 	require.ErrorContains(t, err, "failed to validation certificate")
 	require.ErrorContains(t, err, "uniqueId is empty")
 
-	msg.Certificate.UnsignedCertificate.UniqueId = "uniqueID"
+	msg.Consent.Certificate.UnsignedCertificate.UniqueId = "uniqueID"
 	err = msg.ValidateBasic()
 	require.ErrorIs(t, err, sdkerrors.ErrInvalidRequest)
 	require.ErrorContains(t, err, "failed to validation certificate")
 	require.ErrorContains(t, err, "oracleAddress is invalid")
 
-	msg.Certificate.UnsignedCertificate.OracleAddress = oracleAddress
+	msg.Consent.Certificate.UnsignedCertificate.OracleAddress = oracleAddress
 	err = msg.ValidateBasic()
 	require.ErrorIs(t, err, sdkerrors.ErrInvalidRequest)
 	require.ErrorContains(t, err, "failed to validation certificate")
 	require.ErrorContains(t, err, "dealId is greater than 0")
 
-	msg.Certificate.UnsignedCertificate.DealId = 1
+	msg.Consent.Certificate.UnsignedCertificate.DealId = 1
 	err = msg.ValidateBasic()
 	require.ErrorIs(t, err, sdkerrors.ErrInvalidRequest)
 	require.ErrorContains(t, err, "failed to validation certificate")
 	require.ErrorContains(t, err, "providerAddress is invalid")
 
-	msg.Certificate.UnsignedCertificate.ProviderAddress = providerAddress
+	msg.Consent.Certificate.UnsignedCertificate.ProviderAddress = providerAddress
 	err = msg.ValidateBasic()
 	require.ErrorIs(t, err, sdkerrors.ErrInvalidRequest)
 	require.ErrorContains(t, err, "failed to validation certificate")

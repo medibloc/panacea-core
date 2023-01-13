@@ -9,9 +9,9 @@ import (
 	"github.com/medibloc/panacea-core/v2/x/datadeal/types"
 )
 
-func (k Keeper) SubmitConsent(ctx sdk.Context, cert *types.Certificate) error {
-	unsignedCert := cert.UnsignedCertificate
-	if err := k.oracleKeeper.VerifyOracleSignature(ctx, unsignedCert, cert.Signature); err != nil {
+func (k Keeper) SubmitConsent(ctx sdk.Context, consent *types.Consent) error {
+	unsignedCert := consent.Certificate.UnsignedCertificate
+	if err := k.oracleKeeper.VerifyOracleSignature(ctx, unsignedCert, consent.Certificate.Signature); err != nil {
 		return sdkerrors.Wrapf(types.ErrSubmitConsent, err.Error())
 	}
 
@@ -19,7 +19,7 @@ func (k Keeper) SubmitConsent(ctx sdk.Context, cert *types.Certificate) error {
 		return sdkerrors.Wrapf(types.ErrSubmitConsent, err.Error())
 	}
 
-	deal, err := k.GetDeal(ctx, unsignedCert.DealId)
+	deal, err := k.GetDeal(ctx, consent.DealId)
 	if err != nil {
 		return sdkerrors.Wrapf(types.ErrSubmitConsent, "failed to get deal. %v", err)
 	} else if deal.Status != types.DEAL_STATUS_ACTIVE {
@@ -30,7 +30,11 @@ func (k Keeper) SubmitConsent(ctx sdk.Context, cert *types.Certificate) error {
 		return sdkerrors.Wrapf(types.ErrSubmitConsent, err.Error())
 	}
 
-	if err := k.SetCertificate(ctx, cert); err != nil {
+	if err := k.ValidateAgreements(deal.AgreementTerms, consent.Agreements); err != nil {
+		return sdkerrors.Wrapf(types.ErrSubmitConsent, err.Error())
+	}
+
+	if err := k.SetConsent(ctx, consent); err != nil {
 		return sdkerrors.Wrapf(types.ErrSubmitConsent, err.Error())
 	}
 
@@ -52,14 +56,41 @@ func (k Keeper) verifyUnsignedCertificate(ctx sdk.Context, unsignedCert *types.U
 	}
 
 	if k.isProvidedCertificate(ctx, unsignedCert.DealId, unsignedCert.DataHash) {
-		return fmt.Errorf("already provided certificate")
+		return fmt.Errorf("already provided consent")
+	}
+	return nil
+}
+
+func (k Keeper) ValidateAgreements(terms []*types.AgreementTerm, agreements []*types.Agreement) error {
+	if len(terms) != len(agreements) {
+		return fmt.Errorf("invalid count(%v) of agreements: expected:%v", len(agreements), len(terms))
+	}
+
+	for _, term := range terms {
+		agreement := findAgreement(agreements, term.Id)
+		if agreement == nil {
+			return fmt.Errorf("cannot find agreement for term %v", term.Id)
+		}
+		if term.Required && !agreement.Agreement {
+			return fmt.Errorf("disagreed to the required agreement term %v", term.Id)
+		}
+	}
+
+	return nil
+}
+
+func findAgreement(agreements []*types.Agreement, termID uint32) *types.Agreement {
+	for _, agreement := range agreements {
+		if agreement.TermId == termID {
+			return agreement
+		}
 	}
 	return nil
 }
 
 func (k Keeper) isProvidedCertificate(ctx sdk.Context, dealID uint64, dataHash string) bool {
 	store := ctx.KVStore(k.storeKey)
-	return store.Has(types.GetCertificateKey(dealID, dataHash))
+	return store.Has(types.GetConsentKey(dealID, dataHash))
 }
 
 func (k Keeper) sendReward(ctx sdk.Context, deal *types.Deal, unsignedCert *types.UnsignedCertificate) error {
@@ -113,11 +144,10 @@ func (k Keeper) postProcessingOfDeal(ctx sdk.Context, deal *types.Deal) error {
 	return nil
 }
 
-func (k Keeper) SetCertificate(ctx sdk.Context, cert *types.Certificate) error {
+func (k Keeper) SetConsent(ctx sdk.Context, consent *types.Consent) error {
 	store := ctx.KVStore(k.storeKey)
-	key := types.GetCertificateKey(cert.UnsignedCertificate.DealId, cert.UnsignedCertificate.DataHash)
-
-	bz, err := k.cdc.MarshalLengthPrefixed(cert)
+	key := types.GetConsentKey(consent.Certificate.UnsignedCertificate.DealId, consent.Certificate.UnsignedCertificate.DataHash)
+	bz, err := k.cdc.MarshalLengthPrefixed(consent)
 
 	if err != nil {
 		return err
@@ -128,21 +158,42 @@ func (k Keeper) SetCertificate(ctx sdk.Context, cert *types.Certificate) error {
 	return nil
 }
 
-func (k Keeper) GetCertificate(ctx sdk.Context, dealID uint64, dataHash string) (*types.Certificate, error) {
+func (k Keeper) GetConsent(ctx sdk.Context, dealID uint64, dataHash string) (*types.Consent, error) {
 	store := ctx.KVStore(k.storeKey)
-	key := types.GetCertificateKey(dealID, dataHash)
+	key := types.GetConsentKey(dealID, dataHash)
 
 	bz := store.Get(key)
 	if bz == nil {
-		return nil, types.ErrCertificateNotFound
+		return nil, types.ErrConsentNotFound
 	}
 
-	certificate := &types.Certificate{}
+	consent := &types.Consent{}
 
-	err := k.cdc.UnmarshalLengthPrefixed(bz, certificate)
+	err := k.cdc.UnmarshalLengthPrefixed(bz, consent)
 	if err != nil {
-		return nil, sdkerrors.Wrapf(types.ErrGetCertificate, err.Error())
+		return nil, sdkerrors.Wrapf(types.ErrGetConsent, err.Error())
 	}
 
-	return certificate, nil
+	return consent, nil
+}
+
+func (k Keeper) GetAllConsents(ctx sdk.Context) ([]types.Consent, error) {
+	store := ctx.KVStore(k.storeKey)
+	iterator := sdk.KVStorePrefixIterator(store, types.ConsentKey)
+	defer iterator.Close()
+
+	consents := make([]types.Consent, 0)
+
+	for ; iterator.Valid(); iterator.Next() {
+		bz := iterator.Value()
+		var consent types.Consent
+
+		if err := k.cdc.UnmarshalLengthPrefixed(bz, &consent); err != nil {
+			return nil, sdkerrors.Wrapf(types.ErrGetConsent, err.Error())
+		}
+
+		consents = append(consents, consent)
+	}
+
+	return consents, nil
 }

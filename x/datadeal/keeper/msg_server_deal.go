@@ -32,7 +32,7 @@ func (m msgServer) DeactivateDeal(goCtx context.Context, msg *types.MsgDeactivat
 func (m msgServer) SubmitConsent(goCtx context.Context, msg *types.MsgSubmitConsent) (*types.MsgSubmitConsentResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	if err := m.Keeper.SubmitConsent(ctx, msg.Certificate); err != nil {
+	if err := m.Keeper.SubmitConsent(ctx, msg.Consent); err != nil {
 		return nil, err
 	}
 

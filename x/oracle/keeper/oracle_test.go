@@ -10,7 +10,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/medibloc/panacea-core/v2/types/testsuite"
 	"github.com/medibloc/panacea-core/v2/x/oracle/types"
 	"github.com/stretchr/testify/suite"
@@ -133,75 +132,8 @@ func (suite *oracleTestSuite) TestRegisterOracleSuccess() {
 	suite.Require().Equal(suite.oracleCommissionMaxChangeRate, oracleFromKeeper.OracleCommissionMaxChangeRate)
 }
 
-func (suite *oracleTestSuite) TestRegisterOracleFailedValidateToMsgOracleRegistration() {
+func (suite *oracleTestSuite) TestRegisterOracleAlreadyExistOracleRegistration() {
 	ctx := suite.Ctx
-
-	msgRegisterOracle := &types.MsgRegisterOracle{
-		OracleAddress:                 suite.oracleAccAddr.String(),
-		NodePubKey:                    suite.nodePubKey.SerializeCompressed(),
-		NodePubKeyRemoteReport:        suite.nodePubKeyRemoteReport,
-		TrustedBlockHeight:            suite.trustedBlockHeight,
-		TrustedBlockHash:              suite.trustedBlockHash,
-		Endpoint:                      suite.endpoint,
-		OracleCommissionRate:          suite.oracleCommissionRate,
-		OracleCommissionMaxRate:       suite.oracleCommissionMaxRate,
-		OracleCommissionMaxChangeRate: suite.oracleCommissionMaxChangeRate,
-	}
-
-	err := suite.OracleKeeper.RegisterOracle(ctx, msgRegisterOracle)
-	suite.Require().Error(err, sdkerrors.ErrInvalidRequest)
-	suite.Require().ErrorContains(err, "uniqueID is empty")
-
-	msgRegisterOracle.UniqueId = suite.uniqueID
-	msgRegisterOracle.NodePubKey = nil
-	err = suite.OracleKeeper.RegisterOracle(ctx, msgRegisterOracle)
-	suite.Require().Error(err, sdkerrors.ErrInvalidRequest)
-	suite.Require().ErrorContains(err, "node public key is empty")
-
-	msgRegisterOracle.NodePubKey = []byte("invalidNodePubKey")
-	err = suite.OracleKeeper.RegisterOracle(ctx, msgRegisterOracle)
-	suite.Require().Error(err, sdkerrors.ErrInvalidRequest)
-	suite.Require().ErrorContains(err, "invalid node public key")
-
-	msgRegisterOracle.NodePubKey = suite.nodePubKey.SerializeCompressed()
-	msgRegisterOracle.NodePubKeyRemoteReport = nil
-	err = suite.OracleKeeper.RegisterOracle(ctx, msgRegisterOracle)
-	suite.Require().Error(err, sdkerrors.ErrInvalidRequest)
-	suite.Require().ErrorContains(err, "remote report of node public key is empty")
-
-	msgRegisterOracle.NodePubKeyRemoteReport = suite.nodePubKeyRemoteReport
-	msgRegisterOracle.TrustedBlockHeight = 0
-	err = suite.OracleKeeper.RegisterOracle(ctx, msgRegisterOracle)
-	suite.Require().Error(err, sdkerrors.ErrInvalidRequest)
-	suite.Require().ErrorContains(err, "trusted block height must be greater than zero")
-
-	msgRegisterOracle.TrustedBlockHeight = suite.trustedBlockHeight
-	msgRegisterOracle.TrustedBlockHash = nil
-	err = suite.OracleKeeper.RegisterOracle(ctx, msgRegisterOracle)
-	suite.Require().Error(err, sdkerrors.ErrInvalidRequest)
-	suite.Require().ErrorContains(err, "trusted block hash should not be nil")
-
-	msgRegisterOracle.TrustedBlockHash = suite.trustedBlockHash
-	msgRegisterOracle.OracleCommissionRate = sdk.NewInt(-1).ToDec()
-	err = suite.OracleKeeper.RegisterOracle(ctx, msgRegisterOracle)
-	suite.Require().Error(err, sdkerrors.ErrInvalidRequest)
-	suite.Require().ErrorContains(err, "oracleCommissionRate must be between 0 and OracleCommissionMaxRate")
-
-	msgRegisterOracle.OracleCommissionRate = sdk.NewInt(2).ToDec()
-	err = suite.OracleKeeper.RegisterOracle(ctx, msgRegisterOracle)
-	suite.Require().Error(err, sdkerrors.ErrInvalidRequest)
-	suite.Require().ErrorContains(err, "oracleCommissionRate must be between 0 and OracleCommissionMaxRate")
-
-	events := suite.Ctx.EventManager().Events()
-	suite.Require().Equal(0, len(events))
-}
-
-func (suite *oracleTestSuite) TestRegisterOracleAlreadyExistOracle() {
-	ctx := suite.Ctx
-
-	oracle := types.NewOracle(suite.oracleAccAddr.String(), suite.uniqueID, suite.endpoint, suite.oracleCommissionRate, suite.oracleCommissionMaxRate, suite.oracleCommissionMaxChangeRate, ctx.BlockTime())
-	err := suite.OracleKeeper.SetOracle(ctx, oracle)
-	suite.Require().NoError(err)
 
 	msgRegisterOracle := &types.MsgRegisterOracle{
 		UniqueId:                      suite.uniqueID,
@@ -216,8 +148,12 @@ func (suite *oracleTestSuite) TestRegisterOracleAlreadyExistOracle() {
 		OracleCommissionMaxChangeRate: suite.oracleCommissionMaxChangeRate,
 	}
 
+	// first registration
+	err := suite.OracleKeeper.RegisterOracle(ctx, msgRegisterOracle)
+	suite.Require().NoError(err)
+
 	err = suite.OracleKeeper.RegisterOracle(ctx, msgRegisterOracle)
-	suite.Require().Error(err, types.ErrOracleRegistration)
+	suite.Require().Error(err, types.ErrRegisterOracle)
 	suite.Require().ErrorContains(err, fmt.Sprintf("already registered oracle. address(%s)", msgRegisterOracle.OracleAddress))
 }
 
@@ -238,12 +174,16 @@ func (suite *oracleTestSuite) TestRegisterOracleNotSameUniqueID() {
 	}
 
 	err := suite.OracleKeeper.RegisterOracle(ctx, msgRegisterOracle)
-	suite.Require().Error(err, types.ErrOracleRegistration)
-	suite.Require().ErrorContains(err, "is not match the currently active uniqueID")
+	suite.Require().Error(err, types.ErrRegisterOracle)
+	suite.Require().ErrorContains(err, types.ErrInvalidUniqueID.Error())
 }
 
 func (suite *oracleTestSuite) TestApproveOracleRegistrationSuccess() {
 	ctx := suite.Ctx
+
+	oracle := types.NewOracle(suite.oracleAccAddr.String(), suite.uniqueID, suite.endpoint, suite.oracleCommissionRate, suite.oracleCommissionMaxRate, suite.oracleCommissionMaxChangeRate, ctx.BlockTime())
+	err := suite.OracleKeeper.SetOracle(ctx, oracle)
+	suite.Require().NoError(err)
 
 	msgRegisterOracle := &types.MsgRegisterOracle{
 		UniqueId:                      suite.uniqueID,
@@ -258,25 +198,26 @@ func (suite *oracleTestSuite) TestApproveOracleRegistrationSuccess() {
 		OracleCommissionMaxChangeRate: suite.oracleCommissionMaxChangeRate,
 	}
 
-	err := suite.OracleKeeper.RegisterOracle(ctx, msgRegisterOracle)
+	err = suite.OracleKeeper.RegisterOracle(ctx, msgRegisterOracle)
 	suite.Require().NoError(err)
 
 	encryptedOraclePrivKey, err := btcec.Encrypt(suite.nodePubKey, suite.oraclePrivKey.Serialize())
 	suite.Require().NoError(err)
 
-	approveOracleRegistration := &types.ApproveOracleRegistration{
-		UniqueId:               suite.uniqueID,
+	approvalSharingOracleKey := &types.ApprovalSharingOracleKey{
+		ApproverUniqueId:       suite.uniqueID,
 		ApproverOracleAddress:  suite.oracleAccAddr.String(),
+		TargetUniqueId:         suite.uniqueID,
 		TargetOracleAddress:    suite.oracleAccAddr.String(),
 		EncryptedOraclePrivKey: encryptedOraclePrivKey,
 	}
 
-	approveOracleRegistrationBz, err := suite.Cdc.Marshaler.Marshal(approveOracleRegistration)
+	approveOracleRegistrationBz, err := suite.Cdc.Marshaler.Marshal(approvalSharingOracleKey)
 	suite.Require().NoError(err)
 	signature, err := suite.oraclePrivKey.Sign(approveOracleRegistrationBz)
 	suite.Require().NoError(err)
 
-	msgApproveOracleRegistration := types.NewMsgApproveOracleRegistration(approveOracleRegistration, signature.Serialize())
+	msgApproveOracleRegistration := types.NewMsgApproveOracleRegistration(approvalSharingOracleKey, signature.Serialize())
 
 	err = suite.OracleKeeper.ApproveOracleRegistration(ctx, msgApproveOracleRegistration)
 	suite.Require().NoError(err)
@@ -301,7 +242,7 @@ func (suite *oracleTestSuite) TestApproveOracleRegistrationSuccess() {
 
 	getOracleRegistration, err := suite.OracleKeeper.GetOracleRegistration(suite.Ctx, suite.uniqueID, suite.oracleAccAddr.String())
 	suite.Require().NoError(err)
-	suite.Require().Equal(approveOracleRegistration.EncryptedOraclePrivKey, getOracleRegistration.EncryptedOraclePrivKey)
+	suite.Require().Equal(approvalSharingOracleKey.EncryptedOraclePrivKey, getOracleRegistration.EncryptedOraclePrivKey)
 }
 
 func (suite *oracleTestSuite) TestApproveOracleRegistrationFailedInvalidUniqueID() {
@@ -326,9 +267,10 @@ func (suite *oracleTestSuite) TestApproveOracleRegistrationFailedInvalidUniqueID
 	encryptedOraclePrivKey, err := btcec.Encrypt(suite.nodePubKey, suite.oraclePrivKey.Serialize())
 	suite.Require().NoError(err)
 
-	approveOracleRegistration := &types.ApproveOracleRegistration{
-		UniqueId:               "uniqueID2",
+	approveOracleRegistration := &types.ApprovalSharingOracleKey{
+		ApproverUniqueId:       "uniqueID2",
 		ApproverOracleAddress:  suite.oracleAccAddr.String(),
+		TargetUniqueId:         suite.uniqueID,
 		TargetOracleAddress:    suite.oracleAccAddr.String(),
 		EncryptedOraclePrivKey: encryptedOraclePrivKey,
 	}
@@ -365,9 +307,10 @@ func (suite *oracleTestSuite) TestApproveOracleRegistrationFailedInvalidSignatur
 	encryptedOraclePrivKey, err := btcec.Encrypt(suite.nodePubKey, suite.oraclePrivKey.Serialize())
 	suite.Require().NoError(err)
 
-	approveOracleRegistration := &types.ApproveOracleRegistration{
-		UniqueId:               "uniqueID",
+	approveOracleRegistration := &types.ApprovalSharingOracleKey{
+		ApproverUniqueId:       "uniqueID",
 		ApproverOracleAddress:  suite.oracleAccAddr.String(),
+		TargetUniqueId:         "uniqueID",
 		TargetOracleAddress:    suite.oracleAccAddr.String(),
 		EncryptedOraclePrivKey: encryptedOraclePrivKey,
 	}
@@ -384,7 +327,7 @@ func (suite *oracleTestSuite) TestApproveOracleRegistrationFailedInvalidSignatur
 	suite.Require().Error(err, "failed to signature validation")
 }
 
-func (suite *oracleTestSuite) TestApproveOracleRegistrationFailedAlreadyExistOracle() {
+func (suite *oracleTestSuite) TestApproveOracleRegistrationFailedAlreadyApprovedOracleRegistration() {
 	ctx := suite.Ctx
 
 	oracle := types.NewOracle(suite.oracleAccAddr.String(), suite.uniqueID, suite.endpoint, suite.oracleCommissionRate, suite.oracleCommissionMaxRate, suite.oracleCommissionMaxChangeRate, ctx.BlockTime())
@@ -405,6 +348,7 @@ func (suite *oracleTestSuite) TestApproveOracleRegistrationFailedAlreadyExistOra
 	}
 
 	oracleRegistration := types.NewOracleRegistration(msgRegisterOracle)
+	oracleRegistration.EncryptedOraclePrivKey = []byte("already registered")
 
 	err = suite.OracleKeeper.SetOracleRegistration(ctx, oracleRegistration)
 	suite.Require().NoError(err)
@@ -412,9 +356,10 @@ func (suite *oracleTestSuite) TestApproveOracleRegistrationFailedAlreadyExistOra
 	encryptedOraclePrivKey, err := btcec.Encrypt(suite.nodePubKey, suite.oraclePrivKey.Serialize())
 	suite.Require().NoError(err)
 
-	approveOracleRegistration := &types.ApproveOracleRegistration{
-		UniqueId:               "uniqueID",
+	approveOracleRegistration := &types.ApprovalSharingOracleKey{
+		ApproverUniqueId:       "uniqueID",
 		ApproverOracleAddress:  suite.oracleAccAddr.String(),
+		TargetUniqueId:         "uniqueID",
 		TargetOracleAddress:    suite.oracleAccAddr.String(),
 		EncryptedOraclePrivKey: encryptedOraclePrivKey,
 	}
@@ -426,8 +371,8 @@ func (suite *oracleTestSuite) TestApproveOracleRegistrationFailedAlreadyExistOra
 	msgApproveOracleRegistration := types.NewMsgApproveOracleRegistration(approveOracleRegistration, signature.Serialize())
 
 	err = suite.OracleKeeper.ApproveOracleRegistration(ctx, msgApproveOracleRegistration)
-	suite.Require().Error(err, types.ErrOracleRegistration)
-	suite.Require().ErrorContains(err, fmt.Sprintf("already registered oracle. address(%s)", msgRegisterOracle.OracleAddress))
+	suite.Require().Error(err, types.ErrRegisterOracle)
+	suite.Require().ErrorContains(err, "already approved oracle registration")
 }
 
 func (suite *oracleTestSuite) TestUpdateOracleInfoSuccess() {

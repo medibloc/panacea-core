@@ -140,7 +140,7 @@ func (suite *queryOracleTestSuite) TestOracleRegistrations() {
 		OracleCommissionRate:          suite.oracleCommissionRate,
 		OracleCommissionMaxRate:       suite.oracleCommissionMaxRate,
 		OracleCommissionMaxChangeRate: suite.oracleCommissionMaxChangeRate,
-		EncryptedOraclePrivKey: nil,
+		EncryptedOraclePrivKey:        nil,
 	}
 
 	oracleRegistration2 := &types.OracleRegistration{
@@ -154,7 +154,7 @@ func (suite *queryOracleTestSuite) TestOracleRegistrations() {
 		OracleCommissionRate:          suite.oracle2CommissionRate,
 		OracleCommissionMaxRate:       suite.oracle2CommissionMaxRate,
 		OracleCommissionMaxChangeRate: suite.oracle2CommissionMaxChangeRate,
-		EncryptedOraclePrivKey: nil,
+		EncryptedOraclePrivKey:        nil,
 	}
 
 	anotherUniqueID := "uniqueID2"
@@ -169,7 +169,7 @@ func (suite *queryOracleTestSuite) TestOracleRegistrations() {
 		OracleCommissionRate:          suite.oracle2CommissionRate,
 		OracleCommissionMaxRate:       suite.oracle2CommissionMaxRate,
 		OracleCommissionMaxChangeRate: suite.oracle2CommissionMaxChangeRate,
-		EncryptedOraclePrivKey: nil,
+		EncryptedOraclePrivKey:        nil,
 	}
 
 	err := oracleKeeper.SetOracleRegistration(ctx, oracleRegistration)
@@ -245,7 +245,7 @@ func (suite *queryOracleTestSuite) TestOracleRegistration() {
 		OracleCommissionRate:          suite.oracleCommissionRate,
 		OracleCommissionMaxRate:       suite.oracleCommissionMaxRate,
 		OracleCommissionMaxChangeRate: suite.oracleCommissionMaxChangeRate,
-		EncryptedOraclePrivKey: nil,
+		EncryptedOraclePrivKey:        nil,
 	}
 	err := oracleKeeper.SetOracleRegistration(ctx, oracleRegistration)
 	suite.Require().NoError(err)
@@ -262,4 +262,130 @@ func (suite *queryOracleTestSuite) TestOracleParams() {
 	suite.Require().NoError(err)
 
 	suite.Require().Equal(types.DefaultParams(), *res.Params)
+}
+
+func (suite *queryOracleTestSuite) TestOracleUpgradeInfo() {
+	ctx := suite.Ctx
+	oracleKeeper := suite.OracleKeeper
+
+	upgradeInfo := &types.OracleUpgradeInfo{
+		UniqueId: "UpgradeUniqueID",
+		Height:   1000000,
+	}
+	suite.Require().NoError(oracleKeeper.SetOracleUpgradeInfo(ctx, upgradeInfo))
+
+	getUpgradeInfo, err := oracleKeeper.OracleUpgradeInfo(sdk.WrapSDKContext(ctx), nil)
+	suite.Require().NoError(err)
+	suite.Require().Equal(upgradeInfo.UniqueId, getUpgradeInfo.OracleUpgradeInfo.UniqueId)
+	suite.Require().Equal(upgradeInfo.Height, getUpgradeInfo.OracleUpgradeInfo.Height)
+}
+
+func (suite *queryOracleTestSuite) TestOracleUpgrades() {
+	ctx := suite.Ctx
+	oracleKeeper := suite.OracleKeeper
+
+	remoteReport := []byte("nodePubKeyRemoteReport")
+	trustedBlockHash := []byte("hash")
+
+	oracleUpgrade := &types.OracleUpgrade{
+		UniqueId:               suite.uniqueID,
+		OracleAddress:          suite.oracleAccAddr.String(),
+		NodePubKey:             suite.nodePubKey.SerializeCompressed(),
+		NodePubKeyRemoteReport: remoteReport,
+		TrustedBlockHeight:     10,
+		TrustedBlockHash:       trustedBlockHash,
+		EncryptedOraclePrivKey: nil,
+	}
+
+	oracleUpgrade2 := &types.OracleUpgrade{
+		UniqueId:               suite.uniqueID,
+		OracleAddress:          suite.oracle2AccAddr.String(),
+		NodePubKey:             suite.nodePubKey.SerializeCompressed(),
+		NodePubKeyRemoteReport: remoteReport,
+		TrustedBlockHeight:     10,
+		TrustedBlockHash:       trustedBlockHash,
+		EncryptedOraclePrivKey: nil,
+	}
+
+	anotherUniqueID := "uniqueID2"
+	oracleUpgrade3 := &types.OracleUpgrade{
+		UniqueId:               anotherUniqueID,
+		OracleAddress:          suite.oracle2AccAddr.String(),
+		NodePubKey:             suite.nodePubKey.SerializeCompressed(),
+		NodePubKeyRemoteReport: remoteReport,
+		TrustedBlockHeight:     10,
+		TrustedBlockHash:       trustedBlockHash,
+		EncryptedOraclePrivKey: nil,
+	}
+
+	err := oracleKeeper.SetOracleUpgrade(ctx, oracleUpgrade)
+	suite.Require().NoError(err)
+	err = oracleKeeper.SetOracleUpgrade(ctx, oracleUpgrade2)
+	suite.Require().NoError(err)
+	err = oracleKeeper.SetOracleUpgrade(ctx, oracleUpgrade3)
+	suite.Require().NoError(err)
+
+	req := types.QueryOracleUpgradesRequest{
+		UniqueId:   suite.uniqueID,
+		Pagination: &query.PageRequest{},
+	}
+	res, err := oracleKeeper.OracleUpgrades(sdk.WrapSDKContext(ctx), &req)
+	suite.Require().NoError(err)
+	suite.Require().Equal(2, len(res.OracleUpgrades))
+	for _, oracleUpgrade := range res.OracleUpgrades {
+		switch oracleUpgrade.OracleAddress {
+		case suite.oracleAccAddr.String():
+			suite.Require().Equal(suite.uniqueID, oracleUpgrade.UniqueId)
+			suite.Require().Equal(suite.nodePubKey.SerializeCompressed(), oracleUpgrade.NodePubKey)
+			suite.Require().Equal(remoteReport, oracleUpgrade.NodePubKeyRemoteReport)
+			suite.Require().Equal(int64(10), oracleUpgrade.TrustedBlockHeight)
+			suite.Require().Equal(trustedBlockHash, oracleUpgrade.TrustedBlockHash)
+		case suite.oracle2AccAddr.String():
+			suite.Require().Equal(suite.uniqueID, oracleUpgrade.UniqueId)
+			suite.Require().Equal(suite.nodePubKey.SerializeCompressed(), oracleUpgrade.NodePubKey)
+			suite.Require().Equal(remoteReport, oracleUpgrade.NodePubKeyRemoteReport)
+			suite.Require().Equal(int64(10), oracleUpgrade.TrustedBlockHeight)
+			suite.Require().Equal(trustedBlockHash, oracleUpgrade.TrustedBlockHash)
+		default:
+			panic("not found oracle address. address: " + oracleUpgrade.OracleAddress)
+		}
+	}
+
+	req.UniqueId = anotherUniqueID
+	res, err = oracleKeeper.OracleUpgrades(sdk.WrapSDKContext(ctx), &req)
+	suite.Require().NoError(err)
+	suite.Require().Equal(1, len(res.OracleUpgrades))
+
+	suite.Require().Equal(suite.oracle2AccAddr.String(), res.OracleUpgrades[0].OracleAddress)
+	suite.Require().Equal(anotherUniqueID, res.OracleUpgrades[0].UniqueId)
+	suite.Require().Equal(suite.nodePubKey.SerializeCompressed(), res.OracleUpgrades[0].NodePubKey)
+	suite.Require().Equal(remoteReport, res.OracleUpgrades[0].NodePubKeyRemoteReport)
+	suite.Require().Equal(int64(10), res.OracleUpgrades[0].TrustedBlockHeight)
+	suite.Require().Equal(trustedBlockHash, res.OracleUpgrades[0].TrustedBlockHash)
+}
+
+func (suite *queryOracleTestSuite) TestOracleUpgrade() {
+	ctx := suite.Ctx
+	oracleKeeper := suite.OracleKeeper
+
+	oracleUpgrade := &types.OracleUpgrade{
+		UniqueId:               suite.uniqueID,
+		OracleAddress:          suite.oracleAccAddr.String(),
+		NodePubKey:             suite.nodePubKey.SerializeCompressed(),
+		NodePubKeyRemoteReport: []byte("nodePubKeyRemoteReport"),
+		TrustedBlockHeight:     10,
+		TrustedBlockHash:       []byte("hash"),
+		EncryptedOraclePrivKey: nil,
+	}
+
+	suite.Require().NoError(oracleKeeper.SetOracleUpgrade(ctx, oracleUpgrade))
+
+	getOracleUpgrade, err := oracleKeeper.GetOracleUpgrade(ctx, suite.uniqueID, suite.oracleAccAddr.String())
+	suite.Require().NoError(err)
+	suite.Require().Equal(oracleUpgrade.UniqueId, getOracleUpgrade.UniqueId)
+	suite.Require().Equal(oracleUpgrade.OracleAddress, getOracleUpgrade.OracleAddress)
+	suite.Require().Equal(oracleUpgrade.NodePubKey, getOracleUpgrade.NodePubKey)
+	suite.Require().Equal(oracleUpgrade.NodePubKeyRemoteReport, getOracleUpgrade.NodePubKeyRemoteReport)
+	suite.Require().Equal(oracleUpgrade.TrustedBlockHeight, getOracleUpgrade.TrustedBlockHeight)
+	suite.Require().Equal(oracleUpgrade.TrustedBlockHash, getOracleUpgrade.TrustedBlockHash)
 }
