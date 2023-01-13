@@ -6,7 +6,7 @@ If you have completed the previous steps, now is the step to actually run oracle
 
 The oracle is responsible for validating the provider's data and ensuring that the data is transmitted securely using the `oracle key`.
 In this process, oracle operators can earn commissions according to the commission rate registered to Panacea.
-The oracle also serves to validate and approve registration requests from other oracles.
+The oracle also serves to validate and approve `registration/upgrade` requests from other oracles.
 
 You can see the details in [What oracle does](#what-oracle-does).
 
@@ -52,7 +52,7 @@ Validation procedure is as follows:
 2. Check the status of related `deal`
 3. Decrypt provider's encrypted data & check data hash and data schema
 
-If validation passes successfully, oracle issue certificate as follows:
+If validation passes successfully, oracle issues a certificate as follows:
 1. Generate `secret key` by combining `oracle private key`, deal ID, and data hash
 2. Re-encrypt the data using the `secret key` and put it in `IPFS`
 3. Issue a certificate with `oracle private key` signature
@@ -67,9 +67,10 @@ Oracle provides a REST API to get data accessibility to consumer.
 After the `submit-consent` transaction succeeds in Panacea, oracle transmits secret key that enables data access to the consumer.
 The detailed process is as follows:
 1. Check the address of the requested consumer with JWT
-2. Check if the `submit-consent` transaction succeeds
-3. Make `encrypted secret key` using `consumer public key`
-4. Response with `encrypted secret key` to consumer
+2. Check if the requested consumer is the owner of the `deal` 
+3. Check if the `submit-consent` transaction succeeds 
+4. Make `encrypted secret key` using `consumer public key`
+5. Response with `encrypted secret key` to consumer
 
 Consumer can obtain the `secret key` through his/her `private key`, and can decrypt data from `IPFS`.
 
