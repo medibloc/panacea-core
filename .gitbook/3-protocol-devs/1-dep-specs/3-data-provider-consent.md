@@ -4,11 +4,12 @@
 - Crated: 2023-01-04
 - Modified: 2023-01-04
 - Authors
-    - Youngjoon Lee <yjlee@medibloc.org>
-    - Gyuguen Jang <gyuguen.jang@medibloc.org>
-    - Hansol Lee <hansol@medibloc.org>
-    - Myongsik Gong <myongsik_gong@medibloc.org>
-    - Inchul Song <icsong@medibloc.org>
+  - Youngjoon Lee <yjlee@medibloc.org>
+  - Gyuguen Jang <gyuguen.jang@medibloc.org>
+  - Hansol Lee <hansol@medibloc.org>
+  - Myongsik Gong <myongsik_gong@medibloc.org>
+  - Inchul Song <icsong@medibloc.org>
+  - Taejin Yoon <tj@medibloc.org>
 
 
 ## Synopsis

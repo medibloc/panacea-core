@@ -9,6 +9,7 @@
   - Hansol Lee <hansol@medibloc.org>
   - Myongsik Gong <myongsik_gong@medibloc.org>
   - Inchul Song <icsong@medibloc.org>
+  - Taejin Yoon <tj@medibloc.org>
 
 
 ## Synopsis
