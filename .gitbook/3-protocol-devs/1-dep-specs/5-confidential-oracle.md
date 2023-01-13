@@ -18,15 +18,17 @@ This document explains that why the oracles must use confidential computing.
 
 In DEP, the data must be verified as explained in the [data validation documentation](./4-data-validation.md).
 Verifying data means that the content of data could be shown to the oracle. However, no one would want their data to be
-exposed to the oracle for data verification. There may also be malicious oracles to exploit the data unfairly.
+exposed to the oracle for data verification. There may also be malicious oracles to exploit the data unfairly. To
+prevent it, we have designed the DEP oracle with confidential computing. Confidential computing guarantees that only
+selected code (binary) can access data in the secure enclave. Also, it could protect a sensitive data from being leaked 
+by malicious operators while verifying a data correctly in decentralized system.
 
 ## Confidential Oracle
 
 The oracle operators(human) can see the content of sensitive data. For example, if the oracle software stores the
 important sensitive data to the disk or storage without sealing it, it can be read by anyone who can access the disk or
-storage. To prevent it, we have designed the DEP oracle with confidential computing. Confidential computing guarantees
-that only selected code (binary) can access data in the secure enclave. Also it could protect a sensitive data from
-being leaked by malicious operators while verifying a data correctly in decentralized system.
+storage. So we developed the confidential oracle for preventing the case from the malicious oracle by using below 
+sections.
 
 ### Technical Specification
 
@@ -53,8 +55,8 @@ The only genuine binary can unseal the data in the SGX secure enclave.
 
 If the oracle wants to register, it must use remote report composed of the promised security version and unique ID.
 So the one of the oracle approves the registration if the new oracle's remote report is valid.
-If you want a register the oracle, you can verify remote report that is valid or not using 
-[CLI](verfiy-remote-report.md). After the oracle registration passed, the new oracle can retrieve the shared oracle 
+If you want a register the oracle, you can verify remote report that is valid or not using
+[CLI](../../5-oracles/7-verfiy-remote-report.md). After the oracle registration passed, the new oracle can retrieve the shared oracle
 private key.
 
 ### Sealing Secrets and States
