@@ -47,7 +47,15 @@ message Deal {
   uint64 max_num_data = 5;
   uint64 cur_num_data = 6;
   string consumer_address = 7;
-  DealStatus status = 8;
+  repeated AgreementTerm agreement_terms = 8;
+  DealStatus status = 9;
+}
+
+message AgreementTerm {
+  uint32 id = 1;
+  bool required = 2;
+  string title = 3;
+  string description = 4;
 }
 ```
 
@@ -58,6 +66,7 @@ message Deal {
 - `max_num_data`: The maximum number of data the consumer want
 - `cur_num_data`: The current number of data provided
 - `consumer_address`: A consumer's account address of the form `panacea1...`
+- `agreement_terms`: Terms of agreement of data provision
 - `status`: The status of deal. 3 statuses can be possible
   - `DEAL_STATUS_ACTIVE`: The status when deal is active (`cur_num_data` < `max_num_data`).  
   - `DEAL_STATUS_INACTIVE`: The status when deal is deactivated (when consumer deactivated the deal)
@@ -73,6 +82,7 @@ message MsgCreateDeal {
   cosmos.base.v1beta1.Coin budget = 2;
   uint64 max_num_data = 3;
   string consumer_address = 4;
+  repeated AgreementTerm agreement_terms = 5;
 }
 ```
 

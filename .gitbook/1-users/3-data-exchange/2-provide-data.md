@@ -65,7 +65,7 @@ The certificate form is like below:
     "cid" : "{ipfs-cid}",
     "unique_id" : "{oracle-unique-id}",
     "oracle_address" : "{oracle-address}",
-    "deal_id": "{deal-id}",
+    "deal_id": <deal-id>,
     "provider_address" : "{your-address}",
     "data_hash" : "{data-hash}"
   },
@@ -76,9 +76,27 @@ Now you can use this certificate in the next step.
 
 ## Submit consent
 
-Broadcast the following `submit-consent` transaction with certificate from oracle.
+Broadcast the following `submit-consent` transaction with the certificate from oracle and agreements of terms for data provision.
+
+**consent.json**
+
+```json
+{
+  "deal_id": <deal-id>,
+  "certificate": {
+    ...
+  },
+  "agreements": [
+    {
+      "id": 1,
+      "agreement": true
+    }
+  ]
+}
+```
+
 ```bash
-panacead submit-consent ${certificate-file-path} \
+panacead submit-consent ${consent-file-path} \
   --from ${data-provider-addr} \
   --chain-id ${chain-id} \
   --gas auto --gas-adjustment 1.30 --gas-prices 5umed \
