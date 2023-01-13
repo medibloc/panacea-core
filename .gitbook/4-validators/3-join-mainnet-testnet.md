@@ -117,7 +117,7 @@ Your node can rapidly sync with the network using state sync without replaying h
 
 To set state sync enabled, RPC servers and trusted block info (height and hash) are required.
 
-You can use the following public RPC endpoints provided by Medibloc team.
+You can use the following public RPC endpoints provided by MediBloc team.
 - 3.35.82.40:26657
 - 13.124.96.254:26657
 - 52.79.108.35:26657
