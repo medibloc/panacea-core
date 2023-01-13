@@ -19,6 +19,7 @@ func NewDeal(dealID uint64, msg *MsgCreateDeal) *Deal {
 		MaxNumData:      msg.MaxNumData,
 		CurNumData:      0,
 		ConsumerAddress: msg.ConsumerAddress,
+		AgreementTerms:  msg.AgreementTerms,
 		Status:          DEAL_STATUS_ACTIVE,
 	}
 }
@@ -58,6 +59,12 @@ func (m *Deal) ValidateBasic() error {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "CurNumData can not be bigger than MaxNumData")
 	}
 
+	for _, agreementTerm := range m.AgreementTerms {
+		if err := agreementTerm.ValidateBasic(); err != nil {
+			return sdkerrors.Wrapf(err, "invalid agreement term")
+		}
+	}
+
 	return nil
 }
 
@@ -69,4 +76,14 @@ func (m *Deal) GetPricePerData() sdk.Dec {
 
 func (m *Deal) IncreaseCurNumData() {
 	m.CurNumData += 1
+}
+
+func (t *AgreementTerm) ValidateBasic() error {
+	if len(t.Title) == 0 {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "the title of agreement term shouldn't be empty")
+	}
+	if len(t.Description) == 0 {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "the description of agreement term shouldn't be empty")
+	}
+	return nil
 }

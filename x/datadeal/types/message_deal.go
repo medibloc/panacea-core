@@ -31,6 +31,11 @@ func (m *MsgCreateDeal) ValidateBasic() error {
 	if _, err := sdk.AccAddressFromBech32(m.ConsumerAddress); err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid consumer address (%s)", err)
 	}
+	for _, agreementTerm := range m.AgreementTerms {
+		if err := agreementTerm.ValidateBasic(); err != nil {
+			return sdkerrors.Wrapf(err, "invalid agreement term")
+		}
+	}
 	return nil
 }
 
@@ -65,10 +70,6 @@ func (m *MsgSubmitConsent) Type() string {
 func (m *MsgSubmitConsent) ValidateBasic() error {
 	if m.Consent == nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "consent is empty")
-	}
-
-	if m.Consent.Certificate == nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "certificate is empty")
 	}
 
 	if err := m.Consent.ValidateBasic(); err != nil {

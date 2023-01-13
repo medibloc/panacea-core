@@ -19,6 +19,14 @@ func TestMsgCreateDealValidateBasic(t *testing.T) {
 		Budget:          &budget,
 		MaxNumData:      10,
 		ConsumerAddress: consumerAddress,
+		AgreementTerms: []*AgreementTerm{
+			{
+				Id:          1,
+				Required:    true,
+				Title:       "title",
+				Description: "description",
+			},
+		},
 	}
 
 	err := msg.ValidateBasic()
@@ -39,14 +47,14 @@ func TestMsgCreateDealValidateBasicEmptyValue(t *testing.T) {
 	err := msg.ValidateBasic()
 	require.ErrorIs(t, err, sdkerrors.ErrInvalidRequest)
 	require.ErrorContains(t, err, "no data schema")
-
 	msg.DataSchema = []string{"https://jsonld.com"}
+
 	msg.MaxNumData = 0
 	err = msg.ValidateBasic()
 	require.ErrorIs(t, err, sdkerrors.ErrInvalidRequest)
 	require.ErrorContains(t, err, "max num of data is negative number")
-
 	msg.MaxNumData = 10
+
 	msg.Budget = nil
 	err = msg.ValidateBasic()
 	require.ErrorIs(t, err, sdkerrors.ErrInvalidRequest)
@@ -58,12 +66,25 @@ func TestMsgCreateDealValidateBasicEmptyValue(t *testing.T) {
 	err = msg.ValidateBasic()
 	require.ErrorIs(t, err, sdkerrors.ErrInvalidRequest)
 	require.ErrorContains(t, err, "budget is not a valid Coin object")
-
 	msg.Budget = &budget
+
 	msg.ConsumerAddress = ""
 	err = msg.ValidateBasic()
 	require.ErrorIs(t, err, sdkerrors.ErrInvalidAddress)
 	require.ErrorContains(t, err, "invalid consumer address")
+	msg.ConsumerAddress = consumerAddress
+
+	msg.AgreementTerms = []*AgreementTerm{{Id: 1, Title: "", Description: "description"}}
+	err = msg.ValidateBasic()
+	require.ErrorIs(t, err, sdkerrors.ErrInvalidRequest)
+	require.ErrorContains(t, err, "invalid agreement term")
+	require.ErrorContains(t, err, "the title of agreement term shouldn't be empty")
+
+	msg.AgreementTerms = []*AgreementTerm{{Id: 1, Title: "title", Description: ""}}
+	err = msg.ValidateBasic()
+	require.ErrorIs(t, err, sdkerrors.ErrInvalidRequest)
+	require.ErrorContains(t, err, "invalid agreement term")
+	require.ErrorContains(t, err, "the description of agreement term shouldn't be empty")
 }
 
 func TestMsgSubmitConsentValidateBasic(t *testing.T) {
@@ -71,7 +92,8 @@ func TestMsgSubmitConsentValidateBasic(t *testing.T) {
 	providerAddress := sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address()).String()
 	msg := &MsgSubmitConsent{
 		Consent: &Consent{
-			&Certificate{
+			DealId: 1,
+			Certificate: &Certificate{
 				UnsignedCertificate: &UnsignedCertificate{
 					Cid:             "cid",
 					UniqueId:        "uniqueID",
@@ -82,6 +104,7 @@ func TestMsgSubmitConsentValidateBasic(t *testing.T) {
 				},
 				Signature: []byte("signature"),
 			},
+			Agreements: []*Agreement{{TermId: 1, Agreement: true}},
 		},
 	}
 

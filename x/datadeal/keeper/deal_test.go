@@ -46,6 +46,14 @@ func (suite *dealTestSuite) TestCreateNewDeal() {
 		Budget:          budget,
 		MaxNumData:      10000,
 		ConsumerAddress: suite.consumerAccAddr.String(),
+		AgreementTerms: []*types.AgreementTerm{
+			{
+				Id:          1,
+				Required:    true,
+				Title:       "title",
+				Description: "description",
+			},
+		},
 	}
 
 	dealID, err := suite.DataDealKeeper.CreateDeal(suite.Ctx, msgCreateDeal)
@@ -61,6 +69,7 @@ func (suite *dealTestSuite) TestCreateNewDeal() {
 	suite.Require().Equal(deal.GetBudget(), msgCreateDeal.GetBudget())
 	suite.Require().Equal(deal.GetMaxNumData(), msgCreateDeal.GetMaxNumData())
 	suite.Require().Equal(deal.GetConsumerAddress(), msgCreateDeal.GetConsumerAddress())
+	suite.Require().Equal(deal.GetAgreementTerms(), msgCreateDeal.GetAgreementTerms())
 	suite.Require().Equal(deal.GetStatus(), types.DEAL_STATUS_ACTIVE)
 }
 

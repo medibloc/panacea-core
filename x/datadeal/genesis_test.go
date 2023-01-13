@@ -86,10 +86,12 @@ func (suite *genesisTestSuite) TestInitGenesis() {
 	suite.Require().NoError(err)
 
 	consent1 := &types.Consent{
+		DealId: deal1.Id,
 		Certificate: &types.Certificate{
 			UnsignedCertificate: unsignedCert1,
 			Signature:           sign1.Serialize(),
 		},
+		Agreements: suite.MakeTestAgreements(deal1),
 	}
 
 	unsignedCert2 := &types.UnsignedCertificate{
@@ -109,10 +111,12 @@ func (suite *genesisTestSuite) TestInitGenesis() {
 	suite.Require().NoError(err)
 
 	consent2 := &types.Consent{
+		DealId: deal2.Id,
 		Certificate: &types.Certificate{
 			UnsignedCertificate: unsignedCert2,
 			Signature:           sign2.Serialize(),
 		},
+		Agreements: suite.MakeTestAgreements(deal2),
 	}
 
 	genesis := types.GenesisState{
@@ -161,10 +165,12 @@ func (suite *genesisTestSuite) TestExportGenesis() {
 	suite.Require().NoError(err)
 
 	consent1 := &types.Consent{
+		DealId: deal1.Id,
 		Certificate: &types.Certificate{
 			UnsignedCertificate: unsignedCert1,
 			Signature:           sign1.Serialize(),
 		},
+		Agreements: suite.MakeTestAgreements(deal1),
 	}
 
 	genesis := types.GenesisState{
@@ -178,6 +184,7 @@ func (suite *genesisTestSuite) TestExportGenesis() {
 		Budget:          deal2.Budget,
 		MaxNumData:      deal2.MaxNumData,
 		ConsumerAddress: deal2.ConsumerAddress,
+		AgreementTerms:  deal2.AgreementTerms,
 	}
 
 	unsignedCert2 := &types.UnsignedCertificate{
@@ -197,10 +204,12 @@ func (suite *genesisTestSuite) TestExportGenesis() {
 	suite.Require().NoError(err)
 
 	consent2 := &types.Consent{
+		DealId: deal2.Id,
 		Certificate: &types.Certificate{
 			UnsignedCertificate: unsignedCert2,
 			Signature:           sign2.Serialize(),
 		},
+		Agreements: suite.MakeTestAgreements(deal2),
 	}
 
 	msgSubmitConsent := &types.MsgSubmitConsent{
