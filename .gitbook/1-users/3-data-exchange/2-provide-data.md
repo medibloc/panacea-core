@@ -1,18 +1,18 @@
 # Provide data
 
-Data providers can provide their data that match the requirements of the data deal and in return earn a reward.
+Data providers can provide their data that match the requirements of the data deal and, in return, earn a reward in MED.
 
 Since only the data verified by oracle can be provided to a deal, providers should first request data verification to oracle.
 
-As a result of verification, oracle will issue a certificate, then provider can provide their data by submitting a consent with the certificate to Panacea.
+As a result of verification, oracle will issue a certificate; then provider can provide their data by submitting a consent with the certificate to Panacea.
 
 In the whole process of data transmission, the data is encrypted so that no one can access the original data.
 
-The transmission of data and the payment of rewards are managed atomically through the Panacea, so consumers can get the data only when the reward payment is completed.
+The transmission of data and the payment of rewards are managed atomically through Panacea, so consumers can get the data only when the reward payment is completed.
 
 ## Request data verification to oracle
 
-Before request to oracle, you should encrypt your data for privacy preserving.
+Before requesting data verification to oracle, you (data provider) should encrypt the data to preserve privacy.
 Encryption can be done using your chain account key and oracle public key which is registered in Panacea.
 This makes only oracles can decrypt and verify your original data in secure area.
 For more details about data secure area, please see [Confidential Oracle](../../3-protocol-devs/1-dep-specs/5-confidential-oracle.md).
@@ -23,7 +23,7 @@ panacead encrypt-data ${input-file-path} ${your-account-key-name}
 ```
 
 You must specify a JWT issued by yourself in order to prove that you are the data provider.
-For that authentication, the JWT must be signed by your (data provider's) chain account private key.
+For that authentication, the JWT must be signed by your chain account private key.
 
 We highly recommend to set the expiration of JWT as short as possible for security reasons.
 In the near future, the protocol will adopt the 'nonce' concept to improve the security of authentications.
@@ -105,7 +105,7 @@ panacead submit-consent ${consent-file-path} \
 
 After you submit consent, Panacea verifies the certificate and checks the status of the deal. 
 
-When the verification is completed, Panacea makes the data accessible to consumers and makes you can get reward.
+When the verification is completed, Panacea makes the data accessible to consumers and transmitts rewards to you.
 
 ## Query consent
 You can query a consent by the deal ID and data hash you provided.
