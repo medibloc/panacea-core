@@ -9,21 +9,21 @@
   - Hansol Lee <hansol@medibloc.org>
   - Myongsik Gong <myongsik_gong@medibloc.org>
   - Inchul Song <icsong@medibloc.org>
-  - Taejin Yoon <tj@medibloc.org>
+  - Tae Jin Yoon <tj@medibloc.org>
 
 
 ## Synopsis
 
-This document defines a data deal which is a contract for data collecting and pay for provision in [DEP](../../1-users/3-data-exchange/0-about-dep.md).
+This document defines a data deal which is a contract for data collecting and payment for data provision in [DEP](../../1-users/3-data-exchange/0-about-dep.md).
 Data consumers create data deals by specifying the type, the quantity, and the pricing of the data that they are willing to consume.
-Data providers can provide their data to the deals that match the type of data they have.
+Data providers can choose and participate in the deals that match the data that they have when they are willing to provide.
 When a data provider provides data to the deal, the payout is distributed to the provider and the oracle that validated the data.
 Also, data consumers can deactivate their data deal whenever they want and the remained budget would be refunded to the consumer's account.
 
 ### Motivation
 
-Data consumers want different types of data, and even for the same type of data, they all differ in how much they want and how much they are willing to pay.
-Thus, the data deal was devised so that data consumers can determine the type of data they want, as much as they want, at a cost they want.
+Data consumers want different types of data, and even for the same type of data, they all differ in the desired quantity and desired cost of the data. 
+Thus, the data deal was devised so that data consumers can determine the type of data they want, the quantity they want, and the cost level they want.
 
 ### Definitions
 
@@ -32,8 +32,8 @@ Thus, the data deal was devised so that data consumers can determine the type of
 ## Technical Specification
 
 Data consumers should be able to post the information described below publicly, so that any data provider can see it. 
-Also, data providers should be able to be assured that a particular data consumer really posted the information. 
-To meet these requirements, it is recommended to use a public decentralized state machine as a single point of truth, such as Panacea.
+Also, data providers should be assured that a particular data consumer really posted the information. 
+To meet these requirements, it is recommended to use a public decentralized state machine as a single source of truth, such as Panacea.
 
 ### Data Structure of Deal
 
@@ -94,7 +94,7 @@ In other words, the balance of consumer's account should be greater or equal tha
 
 The consumer who created the deal can deactivate the deal at any time as long as `max_num_data` of data is not provided.
 
-To deactivate deal, the id of deal should be specified.
+To deactivate a deal, the id of the deal should be specified.
 
 ```proto
 message MsgDeactivateDeal {
@@ -103,8 +103,8 @@ message MsgDeactivateDeal {
 }
 ```
 
-When deal is deactivated, all the remained budget is refunded to the consumer's account.
-After deal is deactivated, no providers can provide their data to this deal, and the status of the deal would be `DEAL_STATUS_INACTIVE`.
+When a deal is deactivated, all ramining budget is refunded to the data consumer's account.
+After the deal is deactivated, data providers cannot provide their data to this deal, and the status of the deal changes to `DEAL_STATUS_INACTIVE`.
 
 ## Backwards Compatibility
 
