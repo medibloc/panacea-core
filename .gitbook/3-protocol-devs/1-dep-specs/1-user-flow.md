@@ -9,12 +9,12 @@
   - Hansol Lee <hansol@medibloc.org>
   - Myongsik Gong <myongsik_gong@medibloc.org>
   - Inchul Song <icsong@medibloc.org>
-  - Taejin Yoon <tj@medibloc.org>
+  - Tae Jin Yoon <tj@medibloc.org>
 
 
 ## Synopsis
 
-This document specified the entire user flow in the Data Exchange Protocol (hereafter 'DEP').
+This document specifies the entire user flow in the Data Exchange Protocol (hereafter 'DEP').
 This document defines the key players essential to operate the DEP, and describes how the players interact to complete the whole data exchange process.
 
 It is recommended to walk through this document first before diving deeply into detailed specifications.
@@ -32,10 +32,10 @@ To achieve this goal without centralized/authorized mediators, DEP introduces fo
 A data consumer is an individual or an organization who wants to consume certain kinds of data for specific purposes, with or without paying.
 
 ##### Data Provider
-A data provider is an individual or an organization that holds data and the permission to provide data to data consumers to obtain benefits, such as incentives or services.
+A data provider is an individual or an organization that holds data and a permission to provide data to data consumers to obtain benefits, such as incentives or services.
 
 ##### Oracle (Oracle operator)
-An oracle is a data validator that guarantees data validity and integrity while data is delivered from data providers to data consumers.
+An oracle is a data validator that guarantees validity and integrity of the data before data is delivered from data providers to data consumers.
 Data verification is essential to ensure the atomicity of data delivery and incentive payments.
 
 ##### Panacea Blockchain Validator
