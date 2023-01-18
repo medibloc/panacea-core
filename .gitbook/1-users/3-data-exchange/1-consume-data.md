@@ -44,12 +44,12 @@ For more details about data deals, please see the [Data Deal](../../3-protocol-d
 
 ## Query deals
 
-You can query a deal with its deal ID.
+One can query a deal with its deal ID.
 ```bash
 panacead query datadeal deal ${deal-id} \
   --node ${chain-node-rpc-addr}
 ```
-You can also query all deals registered in the chain.
+One can also query all deals registered in the chain.
 ```bash
 panacead query datadeal deals \
   --node ${chain-node-rpc-addr}
@@ -58,11 +58,11 @@ panacead query datadeal deals \
 
 ## Query consents
 
-If some data providers have data that fit the requirements of your data deal, they will submit consents to the chain.
+If some data providers have data that fit the requirements of your (data consumers') data deal, they will submit consents to the chain.
 The consent means that the data provider has agreed to provide their data to a specific data consumer.
 Also, each consent should contain a data validation certificate issued by an oracle, so that data consumers can trust the validity of data.
 
-As soon as data providers submit their consents, you can query all consents submitted to a specific data deal.
+As soon as data providers submit their consents, you (data consumer) can query all consents submitted to a specific data deal.
 ```bash
 panacead query datadeal consents ${deal-id} \
   --node ${chain-node-rpc-addr}
