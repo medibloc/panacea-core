@@ -18,3 +18,5 @@ The detailed tech stack of the data exchange protocol is described in the [Panac
 
 There will be more detailed issues that we would have to solve, and we know that all of them cannot be solved in one step. Hence, we will complete this big task step by step. In 2022, MediBloc have released the v0 of data exchange protocol as a proof of concept that includes only essential features on testnet. Based on this proof of concepts, the data exchange protocol will be improved as v1 in 2023 with enhanced security and interoperability. Also, MediBloc will be introducing dApps for data providers using data exchange protocol and keep designing the services that go on top of data exchange protocol. MediBloc has already opened all source codes and progresses publicly on GitHub. We encourage anyone to join the project and share your insights. 
 We are so excited and thrilled to share our vision to achieve our goal to become the world’s best patient centric health data platform. Thank you for your continued support! 
+
+--
