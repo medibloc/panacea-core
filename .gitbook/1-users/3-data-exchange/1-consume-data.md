@@ -7,7 +7,7 @@ Data deals are registered in the Panacea public blockchain, so all data provider
 
 ## Create a data deal
 
-Broadcast the following `create-deal` transaction with specifying data schema, a data count, and a budget in the deal-file in JSON format.
+Broadcast the following `create-deal` transaction with desired data schema and count, and budget specified in the deal-file in JSON format.
 ```bash
 panacead tx datadeal create-deal ${deal-file-path} \
   --from ${data-consumer-addr} \
@@ -38,7 +38,7 @@ For `deal-file-path`, create a following JSON file.
   ]
 }
 ```
-It is very important to set data schema specifically and correctly, so that data being provided can be validated accurately by oracles.
+It is very important to set data schema specifically and correctly, so that data being provided can be validated accurately by the oracles.
 
 For more details about data deals, please see the [Data Deal](../../3-protocol-devs/1-dep-specs/2-data-deal.md) specification.
 
@@ -49,7 +49,7 @@ You can query a deal with its deal ID.
 panacead query datadeal deal ${deal-id} \
   --node ${chain-node-rpc-addr}
 ```
-Also, you can query all deals registered in the chain.
+You can also query all deals registered in the chain.
 ```bash
 panacead query datadeal deals \
   --node ${chain-node-rpc-addr}
@@ -60,7 +60,7 @@ panacead query datadeal deals \
 
 If some data providers have data that fit the requirements of your data deal, they will submit consents to the chain.
 The consent means that the data provider has agreed to provide their data to a specific data consumer.
-Also, each consent can contain a data validation certificate issued by an oracle, so that data consumers can trust the validity of data.
+Also, each consent should contain a data validation certificate issued by an oracle, so that data consumers can trust the validity of data.
 
 As soon as data providers submit their consents, you can query all consents submitted to a specific data deal.
 ```bash
@@ -78,7 +78,7 @@ For more details about data consents, please see the [Data Provider Consent](../
 
 ## Access data
 
-A data validation certificate issued by an oracle contains the methods to access the data.
+A data validation certificate issued by an oracle should contain the methods to access the data.
 For example, if the oracle decides to transmit data via [IPFS](https://ipfs.tech/), the certificate will contain a [CID](https://docs.ipfs.io/concepts/content-addressing/) of data.
 If so, you can access any IPFS node connected to the public IPFS network, and obtain the data.
 
@@ -104,7 +104,7 @@ panacead issue-jwt ${expiration-duration} --from ${your-account-key-name}
 ```
 
 Please note that the returned secret key is also encrypted, so that only the specific data consumers can decrypt the key using his/her chain account private key.
-Nevertheless, we highly recommend you to communicate with oracles who provides an HTTPS endpoint with SSL/TLS encryption.
+Nevertheless, we highly recommend you to communicate with oracles who provide an HTTPS endpoint with SSL/TLS encryption.
 
 Using the encrypted secret key that you obtained from the oracle, you can decrypt data by the following CLI.
 ```bash
