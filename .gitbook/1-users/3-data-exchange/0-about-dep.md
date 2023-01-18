@@ -10,10 +10,10 @@ Data consumers can open data deals by specifying the type, the quantity, and the
 
 Data providers can choose and participate in the deals that match the data that they have when they are willing to provide.
 
-To guarantee data consumers only consume data in the form they want,
+To guarantee data consumers only receive the data that match the criteria specified by them,
 decentralized oracles verify and issue certificates for all data being provided by the data provider.
 
-Panacea public blockchain manages the status of all data deals and data sharing consents,
+Panacea manages the status of all data deals and data sharing consents,
 ensuring data providers and ecosystem operators are rewarded appropriately.
 
 
@@ -25,8 +25,8 @@ The ultimate goal of owning our own data is having a control about how our data 
 
 ### Decentralized off-chain data validation
 
-To ensure data consumers can only consume data that they want, all data being shared must be validated by
-decentralized players who are not malicious.
+o guarantee data consumers only receive the data that match the criteria specified by them,
+decentralized oracles verify and issue certificates for all data being provided by the data provider.
 
 ### Privacy
 
