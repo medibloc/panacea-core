@@ -18,7 +18,7 @@ This document defines a data deal which is a contract for data collecting and pa
 Data consumers create data deals by specifying the type, the quantity, and the pricing of the data that they are willing to consume.
 Data providers can choose and participate in the deals that match the data that they have when they are willing to provide.
 When a data provider provides data to the deal, the payout is distributed to the provider and the oracle that validated the data.
-Also, data consumers can deactivate their data deal whenever they want and the remained budget would be refunded to the consumer's account.
+Also, data consumers can deactivate their data deal whenever they want and the remaining budget would be refunded to the consumer's account.
 
 ### Motivation
 
