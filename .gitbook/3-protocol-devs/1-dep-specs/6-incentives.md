@@ -9,18 +9,18 @@
   - Hansol Lee <hansol@medibloc.org>
   - Myongsik Gong <myongsik_gong@medibloc.org>
   - Inchul Song <icsong@medibloc.org>
-  - Taejin Yoon <tj@medibloc.org>
+  - Tae Jin Yoon <tj@medibloc.org>
 
 
 ## Synopsis
 
-When data deal is created, a budget for data is deposited from data consumer account. 
-And the deposit is distributed to the data providers and the oracles that verified the data.
-Data consumers also can [deactivate the deal](./2-data-deal.md#Deactivate-Data-Deal) they created and refund the remaining budget at any time if the deal is in status `DEAL_STATUS_ACTIVE`.
+When a data deal is created, a budget for the data is deposited from the data consumer account. 
+The deposit, proposed by the data consumer, is distributed to the data providers and the oracles that verified the data when the data provider submits a consent with the certificate to Panacea.  
+Data consumers can [deactivate the deal](./2-data-deal.md#Deactivate-Data-Deal) that they created and retrieve the remaining budget at any time if the deal is in status `DEAL_STATUS_ACTIVE`.
 
 ### Motivation
 
-This is for transparent distribution for the cost of providing data and the cost of verifying data.
+This is for a transparent distribution of the incentives for providing the data and verifying the data.
 
 ### Definitions
 
@@ -30,22 +30,22 @@ This is for transparent distribution for the cost of providing data and the cost
 
 ### Budget Deposit
 
-When data consumers [create a deal](./2-data-deal.md#create-data-deal), they specify the budget for data provision.
-At this time, the amount of the budget is transferred from consumer account to deal account.
+When data consumers [create a deal](./2-data-deal.md#create-data-deal), they specify a budget for data provision.
+At this time, the total amount of the budget is transferred from the data consumer account to the deal account.
 
 ### Reward Distribution
 
 When creating a data deal, data consumers specify the quantity as well as the budget for the data.
-From this, the price per data can be calculated as:
+From these two values, the price per data can be calculated as:
 
 ```
 price_per_data = deposit / max_num_data
 ```
 
-Of the `price_per_data`, as an oracle commission for data verification, the commission rate set by the oracle is transferred to the oracle, and the rest is transferred to the data provider.
+When a data provider submits a consent and a certificate, a portion Of the `price_per_data`, is transferred to the oracle and the rest is transferred to the data provider. 
+This portion is associated with the oracle commision rate that can be set differently for each oracle. 
 
-The oracle commission can be set differently for each oracle.
-you can find out which oracle verified the data by referring to the [certificate](./4-data-validation.md#Response-Body) submitted by the data provider and how much commission fee to be paid.
+The data consumer can find out which oracle verified the data by referring to the [certificate](./4-data-validation.md#Response-Body) submitted by the data provider and how much commission fee was paid.
 
 ```
 oracle_reward = price_per_data * oracle_commission_rate
@@ -54,7 +54,7 @@ provider_reward = price_per_data * (1 - oracle_commission_rate)
 
 ### Budget Refund
 
-If consumers want to stop being provided data and refund for the rest of their budget, they can deactivate the deal they created.
+If consumers want to stop receiving the data and get refund for the rest of their budget, they can deactivate the deal they created.
 However, in order to deactivate the deal, the deal must be in the `DEAL_STATUS_ACTIVE` state.
 
 ## Backwards Compatibility
