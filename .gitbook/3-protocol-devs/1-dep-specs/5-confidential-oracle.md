@@ -54,7 +54,7 @@ If a malicious oracle operator modifies the source code of the oracle to print l
 
 This means that the all oracle operators must only use the genuine binary built by selected code.
 Only the genuine binary can unseal the data in the SGX secure enclave.
-
+"Rewrite this section"
 If the oracle wants to register, it must use remote report composed of the promised security version and unique ID.
 So the one of the oracle approves the registration if the new oracle's remote report is valid.
 If you want a register the oracle, you can verify remote report that is valid or not using
