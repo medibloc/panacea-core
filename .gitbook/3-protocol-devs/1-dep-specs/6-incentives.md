@@ -42,7 +42,7 @@ From these two values, the price per data can be calculated as:
 price_per_data = deposit / max_num_data
 ```
 
-When a data provider submits a consent and a certificate, a portion Of the `price_per_data`, is transferred to the oracle and the rest is transferred to the data provider. 
+When a data provider submits a consent and a certificate, a portion of the `price_per_data`, is transferred to the oracle and the rest is transferred to the data provider. 
 This portion is associated with the oracle commision rate that can be set differently for each oracle. 
 
 The data consumer can find out which oracle verified the data by referring to the [certificate](./4-data-validation.md#Response-Body) submitted by the data provider and how much commission fee was paid.
