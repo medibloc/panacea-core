@@ -1,12 +1,12 @@
 # Oracle Upgrade
 
-This document is about the whole process of oracle upgrade.
+This document is about the entire process of oracle upgrade.
 
 ## Oracle Upgrade Process
 
-All oracles registered in Panacea are forced to run oracle with the same unique ID stored in the oracle module.
-Since the new version (to be upgraded) of oracle will have a unique ID different from the existing one, the new unique ID should be registered in Panacea.
-This process is determined by on-chain governance, thus upgrade can be proposed by an `oracle-upgrade` proposal.
+All oracles registered in Panacea are forced to run the oracle with the same unique ID stored in the oracle module.
+Since the new version (to be upgraded) of oracle will have a unique ID different from the existing one, a new unique ID should be registered in Panacea.
+This process is determined by on-chain governance; thus, an upgrade can be proposed by an `oracle-upgrade` proposal.
 
 ### Submit Proposal for Oracle Upgrade
 
@@ -25,9 +25,9 @@ panacead tx gov submit-proposal oracle-upgrade \
 ```
 
 - title: The title of oracle upgrade proposal
-- description: The description of oracle upgrade proposal
-- upgrade-height: Target height to be upgraded
-- upgrade-unique-id: Unique ID of oracle to be upgraded
+- description: A description of oracle upgrade proposal
+- upgrade-height: A target height to be upgraded
+- upgrade-unique-id: The unique ID of oracle to be upgraded
 - deposit: A deposit for proposal
 
 If the proposal passes, you can check the oracle upgrade information with the below CLI.
@@ -39,8 +39,8 @@ panacead q oracle oracle-upgrade-info
 ### Upgrade Oracle Node
 
 {% hint style="info" %}
-You can upgrade oracle any time after an `oracle-upgrade` proposal has passed (even before the upgrade target height is reached).
-However, since the new version of oracle can be active after the target height, the current version of oracle must be run before the target height.
+You can upgrade your oracle any time after an `oracle-upgrade` proposal has passed (even before the upgrade target height is reached).
+However, since the new version of oracle can be active after the target height, the current version of oracle must be running before the target height.
 
 You do not have to stop the old version of oracle when upgrading to a new version of oracle.
 You can run different versions of oracle at the same time using the `home` flag.
@@ -48,10 +48,11 @@ You can run different versions of oracle at the same time using the `home` flag.
 
 #### Initialization
 
-The `oracle_priv_key.sealed` used in the previous version cannot be used in the new version of oracle.
-(Because it cannot be decrypted in the new version of oracle. For more info, refer to [this](../../3-protocol-devs/1-dep-specs/5-confidential-oracle.md))
-Therefore, the new version of oracle should also be shared the oracle private key.
-This is very similar to the process of registering oracle.
+The `oracle_priv_key.sealed` used in the previous version cannot be used in the new version of oracle because it cannot be decrypted in the new version of oracle. For more info, refer to [this](../../3-protocol-devs/1-dep-specs/5-confidential-oracle.md)
+
+Therefore, the new version of oracle should also know the oracle private key.
+The oracle can retrieve the oracle private key with a similar process to registering an oracle.
+
 Let's start with [initialization](2-oracle-intialization.md) of the new version of oracle.
 
 ```bash
@@ -70,7 +71,7 @@ After initialization, complete the configuration by referring to the [Configurin
 
 #### Request to Upgrade Oracle
 
-The purpose of this request is to securely be shared the oracle private key for a new version of oracle.
+The purpose of this request is to securely receive the oracle private key for a new version of oracle.
 It is similar to sharing the oracle private key in [oracle registration](4-oracle-registration#request-to-register-oracle.md).
 Prior to the request, trusted block information is also required.
 You can get trusted block information with the following command:
@@ -97,8 +98,8 @@ This `node_priv_key.sealed` file is also necessary to retrieve the oracle privat
 
 #### Subscribe Approval of Upgrade
 
-If the transaction for `upgrade-oracle` succeeds, oracle will start subscribing to the `ApproveOracleUpgradeEvent`.
-Upon approval by other oracles, this new version of oracle can be shared the oracle private key.
+If the transaction for `upgrade-oracle` succeeds, the oracle will start subscribing to the `ApproveOracleUpgradeEvent`.
+Upon approval by other oracles, this new version of oracle can retrieve the oracle private key.
 This process is similar to [oracle-registration](4-oracle-registration#subscribe-approval-of-registration.md), so please refer it for details.
 
 #### Running the Upgraded Oracle
