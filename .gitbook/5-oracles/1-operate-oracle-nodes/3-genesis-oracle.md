@@ -9,6 +9,7 @@
     - Hansol Lee <hansol@medibloc.org>
     - Myongsik Gong <myongsik_gong@medibloc.org>
     - Inchul Song <icsong@medibloc.org>
+    - Tae Jin Yoon(tj@medibloc.org)
 
 
 ## Synopsis
@@ -41,7 +42,7 @@ EGo v1.0.1 (e1e48c9dbfdfd3cb2f2fda7602729162c9f762cc)
 
 ### Genesis Oracle Registration in Panacea
 
-After uniqueID extraction is completed, the genesis oracle must be registered in `genesis.json` of Panacea.
+After the uniqueID extraction is completed, the genesis oracle must be registered in `genesis.json` of Panacea.
 
 We provide a CLI for this process.
 ```
@@ -83,7 +84,7 @@ cat $HOME/.panacea/config/genesis.json | jq .app_state.oracle.oracles
 ```
 
 ### Start block generation in Panacea
-You need to launch the Panacea to start generating blocks. 
+You need to launch Panacea to start generating blocks. 
 ```shell
 panacead start
 ```
@@ -91,16 +92,16 @@ panacead start
 ## Oracle Key Pair and Remote Report
 
 The genesis oracle must create an oracle private key and public key to use for data encryption/decryption.
-The oracle also issues a remote report to allow others to prove that the genesis oracle is running inside secure enclave and the oracle key pair is generated inside the enclave.
+This oracle also issues a remote report to allow others to prove that the genesis oracle is running inside secure enclave and the oracle key pair is generated inside the enclave.
 
 ### Generates oracle key pair and remote report in oracle
-The genesis oracle needs to generate an oracle key pair and a remote report.
-However, before generating oracle keys and remote reports, you need to know trusted block information from Panacea.
 
-In fact, the genesis oracle does not need trusted block information for this process.
-The reason is that oracle key pair and remote report generation process do not retrieve data from Panacea. 
-However, when the oracle participates in the verification operation (`oracled start`), the oracle needs to use a light client as it will retrieve data from Panacea.
-Therefore, unless trusted block information is received during the process of generating an oracle key, the genesis oracle has no way to retrieve this block information.
+The genesis oracle needs to generate an oracle key pair and a remote report.
+However, before generating the oracle keys and remote reports, the genesis oracle needs to know the trusted block information from Panacea 
+even though this information is not a necessary component of the oracle key pair generation or the remote report generation.
+This information is not a necessary component because the two generation processes do not retrieve data from Panacea.
+
+When the oracle participates in the verification operation (`oracled start`), the oracle needs to use a light client as it will retrieve data from Panacea. Therefore, unless trusted block information is received during the process of generating an oracle key, the genesis oracle has no way to retrieve this block information; this is why we retrieve the trusted block information during the oracle key pair and remote report generation.
 
 You can get trusted block information by:
 ```shell
