@@ -87,4 +87,4 @@ When another oracle sends a `registration/upgrade`, the running oracle do verifi
 - the trusted block information is valid
 - the oracle is registered (at upgrade requests)
 
-When the `registration/upgrade` is verified successfully, the racle send a transaction for approval of the oracle `registration/upgrade`.
+When the `registration/upgrade` is verified successfully, the oracle send a transaction for approval of the oracle `registration/upgrade`.
