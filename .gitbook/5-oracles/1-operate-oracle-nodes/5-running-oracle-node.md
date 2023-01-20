@@ -1,10 +1,12 @@
-# Running a Node
+# Running an Oracle Node
 
 ## Overview
 
-If you have completed the previous steps, now is the step to actually run oracle.
+If you have completed previous steps, now is the time to actually run oracle.
 
-The oracle is responsible for validating the provider's data and ensuring that the data is transmitted securely using the `oracle key`.
+The oracle is responsible for validating the data provider's data and 
+ensuring that the data is transmitted to the data consumer securely using the `oracle key`.
+
 In this process, oracle operators can earn commissions according to the commission rate registered to Panacea.
 The oracle also serves to validate and approve `registration/upgrade` requests from other oracles.
 
@@ -18,7 +20,7 @@ You can see the details in [What oracle does](#what-oracle-does).
 
 ## Start oracle
 
-You can start oracle with following CLI:
+You can start an oracle with the following CLI:
 ```bash
 docker run \
     --device /dev/sgx_enclave \
@@ -27,7 +29,7 @@ docker run \
     ghcr.io/medibloc/panacea-oracle:latest \
     ego run /usr/bin/oracled start
 ```
-If oracle start is successful, you can see the following log message like example below:
+If the oracle is successful started, you will see the following log message:
 ```
 EGo v1.1.0 (4625a610928f4f4b1ea49262c363376b1e574b6c)
 [erthost] loading enclave ...
@@ -45,44 +47,44 @@ time="2023-01-11T07:40:31Z" level=info msg="HTTP server is started: 127.0.0.1:80
 
 ### Validate provider data & issue certificate
 
-Oracle provides a REST API to validate data from a provider and issue a certificate.
+Oracle provides a REST API to validate data provided by a data provider and issue a certificate.
 
-Validation procedure is as follows:
-1. Check the address of the requested provider with JWT
-2. Check the status of related `deal`
-3. Decrypt provider's encrypted data & check data hash and data schema
+The validation procedure is as follows:
+1. Check the address of the data provider who is requesting data validation with JWT
+2. Check the status of the related `deal`
+3. Decrypt the data provider's encrypted data & check the data hash and the data schema
 
-If validation passes successfully, oracle issues a certificate as follows:
+If the validation passes successfully, the oracle issues a certificate as follows:
 1. Generate a `secret key` by combining `oracle private key`, deal ID, and data hash
 2. Re-encrypt the data using the `secret key` and put it in `IPFS`
 3. Issue a certificate with `oracle private key` signature
 
-Providers will be able to submit consent to Panacea with the issued certificate.
+Data providers will be able to submit a consent to Panacea with the issued certificate.
 Panacea ensures that a commission is paid to the oracle operator who issued the certificate when the data delivery is successfully completed.
 
-### Safely transmit provider data accessibility to consumer
+### Safely transmit the data accessibility to the data consumer
 
-Oracle provides a REST API to get data accessibility to consumer.
+Oracle provides a REST API to get data accessibility to the data consumer.
 
-After the `submit-consent` transaction succeeds in Panacea, oracle transmits secret key that enables data access to the consumer.
+After the `submit-consent` transaction succeeds in Panacea, the oracle transmits a secret key that enables data access to the data consumer.
 The detailed process is as follows:
-1. Check the address of the requested consumer with JWT
-2. Check if the requested consumer is the owner of the `deal` 
-3. Check if the `submit-consent` transaction succeeds 
+1. Check the address of the data consumer who is requesting data access with JWT
+2. Check if the requesting consumer is the owner of the `deal` 
+3. Check if the `submit-consent` transaction is present and successful 
 4. Make `encrypted secret key` using `consumer public key`
-5. Response with `encrypted secret key` to consumer
+5. Respond with `encrypted secret key` to the data consumer
 
-Consumer can obtain the `secret key` through his/her `private key`, and can decrypt data from `IPFS`.
+The data consumer can obtain the `secret key` through his/her `private key`, and can decrypt data from `IPFS`.
 
 ### Validate and approve registration/upgrade requests of other oracles
 
-Oracle subscribes `registration/upgrade` events from Panacea.
+The oracle subscribes to `registration/upgrade` events from Panacea.
 
-When another oracle sends a `registration/upgrade`, the running oracle do some verifications by checking if:
-- correct version of oracle binary is used
+When another oracle sends a `registration/upgrade`, the running oracle do verifications by checking if:
+- a correct version of the oracle binary is used
 - the oracle is running inside an enclave
 - the `Node Key` is generated inside the enclave
 - the trusted block information is valid
 - the oracle is registered (at upgrade requests)
 
-When the `registration/upgrade` is verified successfully, oracle send a transaction for approval of the oracle `registration/upgrade`.
+When the `registration/upgrade` is verified successfully, the racle send a transaction for approval of the oracle `registration/upgrade`.
