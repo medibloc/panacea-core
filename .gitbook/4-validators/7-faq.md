@@ -261,7 +261,7 @@ There are currently two faults that can result in slashing of funds for a valida
 Validators should expect to provision one or more data center locations with redundant power, networking, firewalls, HSMs and servers.
 
 We expect that a modest level of hardware specifications will be needed initially and that they might rise as network use increases.
-For details, please see the [Join the Network](join-mainnet-testnet.md) guide.
+For details, please see the [Join the Network](3-join-mainnet-testnet.md) guide.
 
 ### What are software requirements?
 

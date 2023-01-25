@@ -257,7 +257,7 @@ panacead query slashing params
 ### Create your validator
 
 {% hint style="info" %}
-This guide assumes that you have already set up your full node by following [the guide](join-mainnet-testnet.md).
+This guide assumes that you have already set up your full node by following [the guide](3-join-mainnet-testnet.md).
 {% endhint %}
 
 Your `panaceavalconspub` address (public key) can be used to create a new validator by staking tokens.
@@ -308,7 +308,7 @@ In other words, validators cannot be in the active set, if their total stake (= 
 
 You can confirm that you are in the validator set by the following command:
 ```bash
-panacead query staking validators
+panacead query staking 4-validators
 ```
 
 ### Edit validator description
@@ -351,7 +351,7 @@ You can delegate `umed` to a validator. These delegators can receive part of the
 You can query the list of all validators of a specific chain:
 
 ```bash
-panacead query staking validators
+panacead query staking 4-validators
 ```
 
 If you want to get the information of a single validator you can check it with:
