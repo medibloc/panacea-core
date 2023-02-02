@@ -31,5 +31,5 @@ done
 
 ## move proto files to the right places
 find ./x -type f -name "*.pb*.go" -exec rm {} \;
-cp -rv github.com/medibloc/panacea-core/x/* ./x/
+cp -rv github.com/medibloc/panacea-core/v2/x/* ./x/
 rm -rfv github.com

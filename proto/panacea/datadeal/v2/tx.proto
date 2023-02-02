@@ -1,7 +1,7 @@
 syntax = "proto3";
 package panacea.datadeal.v2;
 
-option go_package = "github.com/medibloc/panacea-core/x/datadeal/types";
+option go_package = "github.com/medibloc/panacea-core/v2/x/datadeal/types";
 
 import "gogoproto/gogo.proto";
 import "cosmos/base/v1beta1/coin.proto";
