@@ -8,8 +8,9 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"time"
 
-	"github.com/gogo/protobuf/jsonpb"
+	ariesdid "github.com/hyperledger/aries-framework-go/pkg/doc/did"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -17,7 +18,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	sdkcodec "github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/go-bip39"
 	"github.com/medibloc/panacea-core/v2/x/did/internal/secp256k1util"
 	"github.com/spf13/cobra"
@@ -31,8 +31,9 @@ import (
 )
 
 const (
-	flagInteractive = "interactive"
-	baseDir         = "did_keystore"
+	flagInteractive     = "interactive"
+	baseDir             = "did_keystore"
+	didDocumentDataType = "aries-framework-go@v0.1.8"
 )
 
 func CmdCreateDID() *cobra.Command {
@@ -155,10 +156,11 @@ func CmdDeactivateDID() *cobra.Command {
 			}
 
 			// For proving that I know the private key. It signs on the DIDDocument.
-			doc := types.DIDDocument{
-				Id: did,
+			document := types.DIDDocument{
+				Document:         nil,
+				DocumentDataType: "",
 			}
-			sig, err := signUsingCurrentSeq(clientCtx, did, privKey, &doc)
+			sig, err := signUsingCurrentSeq(clientCtx, did, privKey, &document)
 			if err != nil {
 				return err
 			}
@@ -256,24 +258,28 @@ func getCheckPassword(reader *bufio.Reader) (string, error) {
 // so that it can be extended by MsgUpdateDID later.
 func newMsgCreateDID(fromAddress sdk.AccAddress, privKey secp256k1.PrivKey) (types.MsgCreateDID, error) {
 	pubKey := secp256k1util.PubKeyBytes(secp256k1util.DerivePubKey(privKey))
-	did := types.NewDID(pubKey)
-	verificationMethodID := types.NewVerificationMethodID(did, "key1")
-	verificationMethod := types.NewVerificationMethod(verificationMethodID, types.ES256K_2019, did, pubKey)
-	verificationMethods := []*types.VerificationMethod{
-		&verificationMethod,
-	}
-	relationship := types.NewVerificationRelationship(verificationMethods[0].Id)
-	authentications := []types.VerificationRelationship{
-		relationship,
-	}
-	doc := types.NewDIDDocument(did, types.WithVerificationMethods(verificationMethods), types.WithAuthentications(authentications))
+	newDid := types.NewDID(pubKey)
+	verificationMethodID := types.NewVerificationMethodID(newDid, "key1")
+	verificationMethod := types.NewVerificationMethod(verificationMethodID, types.ES256K_2019, newDid, pubKey)
+	authentication := types.NewVerification(verificationMethod, ariesdid.Authentication)
+	createdTime := time.Now()
 
-	sig, err := types.Sign(&doc, types.InitialSequence, privKey)
+	document := types.NewDocument(newDid,
+		ariesdid.WithVerificationMethod([]ariesdid.VerificationMethod{verificationMethod}),
+		ariesdid.WithAuthentication([]ariesdid.Verification{authentication}),
+		ariesdid.WithCreatedTime(createdTime))
+
+	didDocument, err := types.NewDIDDocument(document, didDocumentDataType)
 	if err != nil {
 		return types.MsgCreateDID{}, err
 	}
 
-	msg := types.NewMsgCreateDID(did, doc, verificationMethodID, sig, fromAddress.String())
+	sig, err := types.Sign(&didDocument, types.InitialSequence, privKey)
+	if err != nil {
+		return types.MsgCreateDID{}, err
+	}
+
+	msg := types.NewMsgCreateDID(newDid, didDocument, verificationMethodID, sig, fromAddress.String())
 	if err := msg.ValidateBasic(); err != nil {
 		return types.MsgCreateDID{}, err
 	}
@@ -291,15 +297,24 @@ func readDIDDocFrom(path string) (types.DIDDocument, error) {
 	}
 	defer file.Close()
 
-	// Use gogoproto's jsonpb to handle camelCase and custom types as well as snake_case.
-	if err := jsonpb.Unmarshal(file, &doc); err != nil {
-		return doc, fmt.Errorf("fail to decode DIDDocument JSON: %w", err)
-	}
-	if !doc.Valid() {
-		return doc, sdkerrors.Wrapf(types.ErrInvalidDIDDocument, "DIDDocument: %v", doc)
+	fileData, err := os.ReadFile(path)
+	if err != nil {
+		return doc, err
 	}
 
-	return doc, nil
+	document, err := ariesdid.ParseDocument(fileData)
+	if err != nil {
+		return doc, err
+	}
+	ti := time.Now()
+	document.Updated = &ti
+
+	didDocument, err := types.NewDIDDocument(*document, didDocumentDataType)
+	if err != nil {
+		return doc, err
+	}
+
+	return didDocument, nil
 }
 
 // getPrivKeyFromKeyStore loads a privKey using a password which is read from the reader.
@@ -314,7 +329,7 @@ func getPrivKeyFromKeyStore(verificationMethodID string, reader *bufio.Reader) (
 		return secp256k1.PrivKey{}, err
 	}
 
-	privKeyBytes, err := ks.LoadByAddress(string(verificationMethodID), passwd)
+	privKeyBytes, err := ks.LoadByAddress(verificationMethodID, passwd)
 	if err != nil {
 		return secp256k1.PrivKey{}, err
 	}

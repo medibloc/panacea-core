@@ -2,7 +2,9 @@ package keeper_test
 
 import (
 	"testing"
+	"time"
 
+	"github.com/hyperledger/aries-framework-go/pkg/doc/did"
 	"github.com/tendermint/tendermint/crypto"
 	"github.com/tendermint/tendermint/crypto/secp256k1"
 
@@ -44,23 +46,56 @@ func (suite *didTestSuite) TestSetGetDIDDocument() {
 	suite.Require().Equal(did1, resDIDs[1])
 }
 
-func makeTestDIDDocumentWithSeq(did string) (types.DIDDocumentWithSeq, crypto.PrivKey) {
+func makeTestDIDDocumentWithSeq(id string) (types.DIDDocumentWithSeq, crypto.PrivKey) {
 	privKey := secp256k1.GenPrivKey()
 	pubKey := secp256k1util.PubKeyBytes(secp256k1util.DerivePubKey(privKey))
-	verificationMethodID := types.NewVerificationMethodID(did, "key1")
-	es256VerificationMethod := types.NewVerificationMethod(verificationMethodID, types.ES256K_2019, did, pubKey)
-	blsVerificationMethod := types.NewVerificationMethod(verificationMethodID, types.BLS1281G2_2020, did, []byte("dummy BBS+ pub key"))
-	verificationMethods := []*types.VerificationMethod{
-		&es256VerificationMethod,
-		&blsVerificationMethod,
+	verificationMethodID := types.NewVerificationMethodID(id, "key1")
+	verificationMethod := []did.VerificationMethod{
+		{
+			ID:         verificationMethodID,
+			Type:       types.ES256K_2019,
+			Controller: id,
+			Value:      pubKey,
+		},
+		{
+			ID:         verificationMethodID,
+			Type:       types.BLS1281G2_2020,
+			Controller: id,
+			Value:      []byte("dummy BBS+ pub key"),
+		},
 	}
-	verificationRelationship := types.NewVerificationRelationship(verificationMethods[0].Id)
-	authentications := []types.VerificationRelationship{
-		verificationRelationship,
+
+	authentication := []did.Verification{
+		{VerificationMethod: *did.NewVerificationMethodFromBytes(verificationMethodID,
+			types.ES256K_2019,
+			id,
+			pubKey), Relationship: did.Authentication},
+		{VerificationMethod: did.VerificationMethod{
+			ID:         verificationMethodID,
+			Type:       types.ES256K_2019,
+			Controller: id,
+			Value:      pubKey,
+		}},
 	}
-	doc := types.NewDIDDocument(did, types.WithVerificationMethods(verificationMethods), types.WithAuthentications(authentications))
+
+	createdTime := time.Now()
+
+	doc := &did.Doc{
+		Context:            []string{types.ContextDIDV1},
+		ID:                 id,
+		VerificationMethod: verificationMethod,
+		Authentication:     authentication,
+		Created:            &createdTime,
+	}
+	docBz, _ := doc.JSONBytes()
+
+	document := &types.DIDDocument{
+		Document:         docBz,
+		DocumentDataType: "aries-framework-go@v0.1.8",
+	}
+
 	docWithSeq := types.NewDIDDocumentWithSeq(
-		&doc,
+		document,
 		types.InitialSequence,
 	)
 	return docWithSeq, privKey

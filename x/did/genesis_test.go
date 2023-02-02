@@ -3,6 +3,7 @@ package did
 import (
 	"testing"
 
+	ariesdid "github.com/hyperledger/aries-framework-go/pkg/doc/did"
 	"github.com/medibloc/panacea-core/v2/x/did/internal/secp256k1util"
 	"github.com/tendermint/tendermint/crypto"
 	"github.com/tendermint/tendermint/crypto/secp256k1"
@@ -61,17 +62,16 @@ func (suite *genesisTestSuite) newDIDDocumentWithSeq(did string) (types.DIDDocum
 	verificationMethodID := types.NewVerificationMethodID(did, "key1")
 	es256VerificationMethod := types.NewVerificationMethod(verificationMethodID, types.ES256K_2019, did, pubKey)
 	blsVerificationMethod := types.NewVerificationMethod(verificationMethodID, types.BLS1281G2_2020, did, []byte("dummy BBS+ pub key"))
-	verificationMethods := []*types.VerificationMethod{
-		&es256VerificationMethod,
-		&blsVerificationMethod,
-	}
-	verificationRelationship := types.NewVerificationRelationship(verificationMethods[0].Id)
-	authentications := []types.VerificationRelationship{
-		verificationRelationship,
-	}
-	doc := types.NewDIDDocument(did, types.WithVerificationMethods(verificationMethods), types.WithAuthentications(authentications))
+
+	authentication := types.NewVerification(es256VerificationMethod, ariesdid.Authentication)
+	document := types.NewDocument(did,
+		ariesdid.WithVerificationMethod([]ariesdid.VerificationMethod{es256VerificationMethod, blsVerificationMethod}),
+		ariesdid.WithAuthentication([]ariesdid.Verification{authentication}))
+
+	didDocument, _ := types.NewDIDDocument(document, "aries-frame-work@v0.1.8")
+
 	docWithSeq := types.NewDIDDocumentWithSeq(
-		&doc,
+		&didDocument,
 		types.InitialSequence,
 	)
 	return docWithSeq, privKey
