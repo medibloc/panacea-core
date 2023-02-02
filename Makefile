@@ -53,7 +53,7 @@ proto-swagger-gen:
 	$(DOCKER) run --rm -v $(CURDIR):/workspace --workdir /workspace tendermintdev/sdk-proto-gen:v0.7 sh ./scripts/protoc-swagger-gen.sh
 
 proto-lint:
-	$(DOCKER) run --rm -v $(CURDIR):/workspace --workdir /workspace bufbuild/buf lint --error-format=json
+	$(DOCKER) run --rm -v $(CURDIR):/workspace --workdir /workspace/proto bufbuild/buf lint --error-format=json
 
 PROTO_DIR = third_party/proto
 # TODO: use the correct version after releasing medibloc/cosmos-sdk

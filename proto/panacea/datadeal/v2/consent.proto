@@ -3,9 +3,6 @@ package panacea.datadeal.v2;
 
 option go_package = "github.com/medibloc/panacea-core/v2/x/datadeal/types";
 
-import "gogoproto/gogo.proto";
-import "panacea/datadeal/v2/deal.proto";
-
 // Consent contains the data provider's consent to a specific deal
 // and necessary information to complete data provision.
 message Consent {
@@ -22,12 +19,12 @@ message Certificate {
 
 // UnsignedCertificate defines a certificate issued by an oracle as a result of data validation.
 message UnsignedCertificate {
-    string cid = 1;
-    string unique_id = 2;
-    string oracle_address = 3;
-    uint64 deal_id = 4;
-    string provider_address = 5;
-    string data_hash = 6;
+  string cid = 1;
+  string unique_id = 2;
+  string oracle_address = 3;
+  uint64 deal_id = 4;
+  string provider_address = 5;
+  string data_hash = 6;
 }
 
 // Agreement represents whether the data provider, submitting the consent, agrees to a specific agreement term.
