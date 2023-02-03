@@ -288,7 +288,7 @@ func newMsgCreateDID(fromAddress sdk.AccAddress, privKey secp256k1.PrivKey) (typ
 }
 
 // readDIDDocFrom reads a DID document from a JSON file.
-// It returns an error if the JSON file is invalid or the DID document loaded is invalid.
+// It returns an error if the JSON file is invalid or the DID document is invalid.
 func readDIDDocFrom(path string) (types.DIDDocument, error) {
 	var doc types.DIDDocument
 

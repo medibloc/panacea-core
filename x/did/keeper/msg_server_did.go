@@ -98,8 +98,7 @@ func VerifyDIDOwnership(signData *types.DIDDocument, seq uint64, doc *types.DIDD
 		return 0, sdkerrors.Wrapf(types.ErrVerificationMethodKeyTypeNotImplemented, "VerificationMethod: %v", verificationMethod.Type)
 	}
 
-	var key secp256k1.PubKey
-	key = make([]byte, secp256k1.PubKeySize)
+	var key secp256k1.PubKey = make([]byte, secp256k1.PubKeySize)
 	copy(key[:], document.VerificationMethod[0].Value)
 
 	newSeq, ok := types.Verify(sig, signData, seq, key)
