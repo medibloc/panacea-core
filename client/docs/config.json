@@ -146,7 +146,7 @@
       "url": "./tmp-swagger-gen/panacea/burn/v2/query.swagger.json"
     },
     {
-      "url": "./tmp-swagger-gen/panacea/did/v2/query.swagger.json"
+      "url": "./tmp-swagger-gen/panacea/did/v3/query.swagger.json"
     }
   ]
 }
