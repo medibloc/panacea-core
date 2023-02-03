@@ -1,0 +1,55 @@
+syntax = "proto3";
+package panacea.did.v2;
+
+option java_multiple_files = true;
+option go_package = "github.com/medibloc/panacea-core/x/did/types";
+
+import "gogoproto/gogo.proto";
+import "panacea/did/v2/did.proto";
+
+// Msg defines the Msg service.
+service Msg {
+  // CreateDID defines a method for creating a DID.
+  rpc CreateDID(MsgCreateDID) returns (MsgCreateDIDResponse);
+
+  // UpdateDID defines a method for updating a DID.
+  rpc UpdateDID(MsgUpdateDID) returns (MsgUpdateDIDResponse);
+
+  // DeactivateDID defines a method for deactivating a DID.
+  rpc DeactivateDID(MsgDeactivateDID) returns (MsgDeactivateDIDResponse);
+}
+
+// MsgCreateDID defines the Msg/CreateDID request type.
+message MsgCreateDID {
+  string did = 1;
+  DIDDocument document = 2;
+  string verification_method_id = 3;
+  bytes signature = 4;
+  string from_address = 5;
+}
+
+// MsgCreateDIDResponse defines the Msg/CreateDID response type.
+message MsgCreateDIDResponse {}
+
+// MsgUpdateDID defines the Msg/UpdateDID request type.
+message MsgUpdateDID {
+  string did = 1;
+  DIDDocument document = 2;
+  string verification_method_id = 3;
+  bytes signature = 4;
+  string from_address = 5;
+}
+
+// MsgUpdateDIDResponse defines the Msg/UpdateDID response type.
+message MsgUpdateDIDResponse {}
+
+// MsgDeactivateDID defines the Msg/DeactivateDID request type.
+message MsgDeactivateDID {
+  string did = 1;
+  string verification_method_id = 2;
+  bytes signature = 3;
+  string from_address = 4;
+}
+
+// MsgDeactivateDIDResponse defines the Msg/DeactivateDID response type.
+message MsgDeactivateDIDResponse {}

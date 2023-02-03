@@ -1,0 +1,12 @@
+syntax = "proto3";
+package panacea.did.v2;
+
+option java_multiple_files = true;
+option go_package = "github.com/medibloc/panacea-core/x/did/types";
+
+import "panacea/did/v2/did.proto";
+
+// GenesisState defines the did module's genesis state.
+message GenesisState {
+  map<string, DIDDocumentWithSeq> documents = 1;
+}

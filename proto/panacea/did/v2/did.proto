@@ -1,0 +1,66 @@
+syntax = "proto3";
+package panacea.did.v2;
+
+option java_multiple_files = true;
+option go_package = "github.com/medibloc/panacea-core/x/did/types";
+
+import "gogoproto/gogo.proto";
+
+// Strings defines a JSON-LD string array format which is marshalled to a single string if the array length is 1.
+message Strings {
+  repeated string values = 1;
+}
+
+// DIDDocument defines a W3C DID Document
+//
+// NOTE: All 'json_name' and 'gogoproto.customtype' tags are for panacea-core to unmarshal the v1.3 genesis which is in the W3C JSON-LD format.
+//       On the other hand, the panacea-core and cosmos-sdk don't use those tags to marshal result to JSON (via grpc-gateway).
+message DIDDocument {
+  Strings contexts = 1 [json_name = "@context", (gogoproto.customtype) = "JSONStringOrStrings"];
+  string id = 2;
+  Strings controller = 3 [(gogoproto.customtype) = "JSONStringOrStrings"];
+  repeated VerificationMethod verification_methods = 4 [json_name = "verificationMethod"];
+  // TODO: the repeated gogoproto.customtype has an issue: https://github.com/gogo/protobuf/issues/478
+  repeated VerificationRelationship authentications = 5 [json_name = "authentication", (gogoproto.customtype) = "VerificationRelationship"];
+  repeated VerificationRelationship assertion_methods = 6 [json_name = "assertionMethod", (gogoproto.customtype) = "VerificationRelationship"];
+  repeated VerificationRelationship key_agreements = 7 [json_name = "keyAgreement", (gogoproto.customtype) = "VerificationRelationship"];
+  repeated VerificationRelationship capability_invocations = 8 [json_name = "capabilityInvocation", (gogoproto.customtype) = "VerificationRelationship"];
+  repeated VerificationRelationship capability_delegations = 9 [json_name = "capabilityDelegation", (gogoproto.customtype) = "VerificationRelationship"];
+  repeated Service services = 10 [json_name = "service"];
+}
+
+// VerificationMethod defines a W3C verification method
+message VerificationMethod {
+  string id = 1;
+  string type = 2;
+  string controller = 3;
+  string public_key_base58 = 4 [json_name = "publicKeyBase58"];
+}
+
+// VerificationRelationship defines a W3C verification relationship
+message VerificationRelationship {
+  // VerificationRelationship can be one of a single ID or a VerificationMethod.
+  oneof content {
+    string verification_method_id = 1;
+    VerificationMethod verification_method = 2;
+  }
+}
+
+// Service defines a service in the W3C DID Document.
+message Service {
+  string id = 1;
+  string type = 2;
+  string service_endpoint = 3 [json_name = "serviceEndpoint"];
+}
+
+// DIDDocumentWithSeq defines a message for DID Document with a sequence number for preventing replay attacks.
+message DIDDocumentWithSeq {
+  DIDDocument document = 1;
+  uint64 sequence = 2;
+}
+
+// DataWithSeq defines a message for data with a sequence number for preventing replay attacks.
+message DataWithSeq {
+  bytes data = 1;
+  uint64 sequence = 2;
+}
