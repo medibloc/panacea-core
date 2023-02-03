@@ -42,11 +42,8 @@ func (doc DIDDocument) Valid() bool {
 	}
 
 	_, err := ariesdid.ParseDocument(doc.Document)
-	if err != nil {
-		return false
-	}
 
-	return true
+	return err == nil
 }
 
 func (doc DIDDocument) Empty() bool {

@@ -47,8 +47,7 @@ func (suite *txTestSuite) TestNewMsgCreateDID() {
 	verificationMethod := doc.VerificationMethod[0]
 	value := verificationMethod.Value
 
-	var pubKey secp256k1.PubKey
-	pubKey = make([]byte, secp256k1.PubKeySize)
+	var pubKey secp256k1.PubKey = make([]byte, secp256k1.PubKeySize)
 	copy(pubKey[:], value)
 
 	suite.Require().Equal(privKey.PubKey(), pubKey)
@@ -135,6 +134,7 @@ func (suite *txTestSuite) testReadDIDDocOneContext(path string) {
 	doc, err := readDIDDocFrom(path)
 	suite.Require().NoError(err)
 	document, err := ariesdid.ParseDocument(doc.Document)
+	suite.Require().NoError(err)
 	contexts := document.Context
 	suite.Require().Equal(1, len(contexts))
 	suite.Require().Equal(ariesdid.ContextV1, contexts[0])
@@ -160,6 +160,7 @@ func (suite *txTestSuite) testReadDIDDocTwoContexts(path string) {
 	doc, err := readDIDDocFrom(path)
 	suite.Require().NoError(err)
 	document, err := ariesdid.ParseDocument(doc.Document)
+	suite.Require().NoError(err)
 	contexts := document.Context
 	suite.Require().Equal(2, len(contexts))
 	suite.Require().Equal(ariesdid.ContextV1, contexts[0])
@@ -199,6 +200,7 @@ func (suite *txTestSuite) testReadDIDDocMultiRelationship(path string) {
 
 	suite.Require().NoError(err)
 	document, err := ariesdid.ParseDocument(doc.Document)
+	suite.Require().NoError(err)
 	contexts := document.Context
 	suite.Require().Equal(2, len(contexts))
 	suite.Require().Equal(ariesdid.ContextV1, contexts[0])
