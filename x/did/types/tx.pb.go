@@ -363,12 +363,12 @@ func (m *MsgDeactivateDIDResponse) XXX_DiscardUnknown() {
 var xxx_messageInfo_MsgDeactivateDIDResponse proto.InternalMessageInfo
 
 func init() {
-	proto.RegisterType((*MsgCreateDID)(nil), "panacea.did.v2.MsgCreateDID")
-	proto.RegisterType((*MsgCreateDIDResponse)(nil), "panacea.did.v2.MsgCreateDIDResponse")
-	proto.RegisterType((*MsgUpdateDID)(nil), "panacea.did.v2.MsgUpdateDID")
-	proto.RegisterType((*MsgUpdateDIDResponse)(nil), "panacea.did.v2.MsgUpdateDIDResponse")
-	proto.RegisterType((*MsgDeactivateDID)(nil), "panacea.did.v2.MsgDeactivateDID")
-	proto.RegisterType((*MsgDeactivateDIDResponse)(nil), "panacea.did.v2.MsgDeactivateDIDResponse")
+	proto.RegisterType((*MsgCreateDID)(nil), "panacea.did.v3.MsgCreateDID")
+	proto.RegisterType((*MsgCreateDIDResponse)(nil), "panacea.did.v3.MsgCreateDIDResponse")
+	proto.RegisterType((*MsgUpdateDID)(nil), "panacea.did.v3.MsgUpdateDID")
+	proto.RegisterType((*MsgUpdateDIDResponse)(nil), "panacea.did.v3.MsgUpdateDIDResponse")
+	proto.RegisterType((*MsgDeactivateDID)(nil), "panacea.did.v3.MsgDeactivateDID")
+	proto.RegisterType((*MsgDeactivateDIDResponse)(nil), "panacea.did.v3.MsgDeactivateDIDResponse")
 }
 
 func init() { proto.RegisterFile("panacea/did/v3/tx.proto", fileDescriptor_9efc1813fab7c2cd) }
@@ -381,7 +381,7 @@ var fileDescriptor_9efc1813fab7c2cd = []byte{
 	0x77, 0x31, 0x2b, 0xc5, 0x5e, 0xcb, 0xbb, 0x58, 0xa4, 0xbf, 0x1f, 0x70, 0xfd, 0xfd, 0xa1, 0x2b,
 	0x29, 0xaf, 0x3c, 0xc1, 0x1f, 0x39, 0xd9, 0x60, 0xf3, 0x7d, 0x5c, 0x7d, 0xdd, 0x6a, 0xde, 0x9b,
 	0xe7, 0xf7, 0x66, 0x3c, 0xf0, 0x6d, 0x8c, 0x23, 0xec, 0x53, 0x6c, 0x13, 0x46, 0xec, 0x74, 0x60,
-	0xcb, 0xb9, 0x15, 0x27, 0x5c, 0x72, 0xf4, 0x66, 0x03, 0x58, 0x84, 0x11, 0x2b, 0xed, 0x6b, 0xed,
+	0xcb, 0xb9, 0x15, 0x27, 0x5c, 0x72, 0xf4, 0x66, 0x03, 0x58, 0x84, 0x11, 0x2b, 0x1d, 0x68, 0xed,
 	0x80, 0x07, 0x3c, 0x87, 0xec, 0xec, 0xb5, 0x66, 0x69, 0xea, 0x41, 0x7b, 0x46, 0xce, 0x91, 0xde,
 	0x02, 0xc0, 0xa6, 0x2b, 0x82, 0xef, 0x09, 0xc5, 0x92, 0x3a, 0x43, 0x07, 0xb5, 0xa0, 0x42, 0x18,
 	0x51, 0x81, 0x01, 0xcc, 0xba, 0x97, 0x3d, 0xd1, 0x17, 0xf8, 0x8a, 0x70, 0x7f, 0x16, 0xd2, 0x48,
@@ -400,7 +400,7 @@ var fileDescriptor_9efc1813fab7c2cd = []byte{
 	0x62, 0xa9, 0x83, 0xfb, 0xa5, 0x0e, 0xae, 0x57, 0x7a, 0x65, 0xb1, 0xd2, 0x2b, 0x77, 0x2b, 0xbd,
 	0xf2, 0x0b, 0xfc, 0xf9, 0x18, 0x30, 0x39, 0x9d, 0x8d, 0x2d, 0x9f, 0x87, 0x76, 0x48, 0x09, 0x1b,
 	0xff, 0xe3, 0xbe, 0xbd, 0x11, 0xfe, 0xe4, 0xf3, 0x84, 0xda, 0xf3, 0xfc, 0xce, 0xe5, 0xff, 0x98,
-	0x8a, 0xf1, 0xcb, 0xfc, 0xce, 0x07, 0x0f, 0x01, 0x00, 0x00, 0xff, 0xff, 0x59, 0x41, 0x43, 0xed,
+	0x8a, 0xf1, 0xcb, 0xfc, 0xce, 0x07, 0x0f, 0x01, 0x00, 0x00, 0xff, 0xff, 0x95, 0x7c, 0x76, 0xec,
 	0x42, 0x04, 0x00, 0x00,
 }
 
@@ -434,7 +434,7 @@ func NewMsgClient(cc grpc1.ClientConn) MsgClient {
 
 func (c *msgClient) CreateDID(ctx context.Context, in *MsgCreateDID, opts ...grpc.CallOption) (*MsgCreateDIDResponse, error) {
 	out := new(MsgCreateDIDResponse)
-	err := c.cc.Invoke(ctx, "/panacea.did.v2.Msg/CreateDID", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/panacea.did.v3.Msg/CreateDID", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -443,7 +443,7 @@ func (c *msgClient) CreateDID(ctx context.Context, in *MsgCreateDID, opts ...grp
 
 func (c *msgClient) UpdateDID(ctx context.Context, in *MsgUpdateDID, opts ...grpc.CallOption) (*MsgUpdateDIDResponse, error) {
 	out := new(MsgUpdateDIDResponse)
-	err := c.cc.Invoke(ctx, "/panacea.did.v2.Msg/UpdateDID", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/panacea.did.v3.Msg/UpdateDID", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -452,7 +452,7 @@ func (c *msgClient) UpdateDID(ctx context.Context, in *MsgUpdateDID, opts ...grp
 
 func (c *msgClient) DeactivateDID(ctx context.Context, in *MsgDeactivateDID, opts ...grpc.CallOption) (*MsgDeactivateDIDResponse, error) {
 	out := new(MsgDeactivateDIDResponse)
-	err := c.cc.Invoke(ctx, "/panacea.did.v2.Msg/DeactivateDID", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/panacea.did.v3.Msg/DeactivateDID", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -497,7 +497,7 @@ func _Msg_CreateDID_Handler(srv interface{}, ctx context.Context, dec func(inter
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/panacea.did.v2.Msg/CreateDID",
+		FullMethod: "/panacea.did.v3.Msg/CreateDID",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(MsgServer).CreateDID(ctx, req.(*MsgCreateDID))
@@ -515,7 +515,7 @@ func _Msg_UpdateDID_Handler(srv interface{}, ctx context.Context, dec func(inter
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/panacea.did.v2.Msg/UpdateDID",
+		FullMethod: "/panacea.did.v3.Msg/UpdateDID",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(MsgServer).UpdateDID(ctx, req.(*MsgUpdateDID))
@@ -533,7 +533,7 @@ func _Msg_DeactivateDID_Handler(srv interface{}, ctx context.Context, dec func(i
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/panacea.did.v2.Msg/DeactivateDID",
+		FullMethod: "/panacea.did.v3.Msg/DeactivateDID",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(MsgServer).DeactivateDID(ctx, req.(*MsgDeactivateDID))
@@ -542,7 +542,7 @@ func _Msg_DeactivateDID_Handler(srv interface{}, ctx context.Context, dec func(i
 }
 
 var _Msg_serviceDesc = grpc.ServiceDesc{
-	ServiceName: "panacea.did.v2.Msg",
+	ServiceName: "panacea.did.v3.Msg",
 	HandlerType: (*MsgServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
