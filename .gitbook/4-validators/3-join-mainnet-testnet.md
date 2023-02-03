@@ -9,13 +9,13 @@ This tutorial introduces deploying a new node on [AWS](https://aws.amazon.com/) 
 
 Choose Ubuntu Server 20.04 LTS 64-bit (x86) with SSD Volume Type.
 
-![](../assets/fullnode/ec2-ami.png)
+![](images/ec2-ami.png)
 
 ### Choose the instance type
 
 Choose the `m5.large` instance type (minimum spec).
 
-![](../assets/fullnode/ec2-instance-type.png)
+![](images/ec2-instance-type.png)
 
 ### Configure instance details
 
@@ -59,7 +59,7 @@ So, expose them to the network where you perform operational actions.
 ssh ubuntu@<your-ec2-ip> -i <your-key>.pem
 ```
 
-Install prerequisites by following the [Installation](cli-installation.md) guide.
+Install prerequisites by following the [Installation](1-cli-installation.md) guide.
 
 
 ## Setup a New Node
@@ -117,7 +117,7 @@ Your node can rapidly sync with the network using state sync without replaying h
 
 To set state sync enabled, RPC servers and trusted block info (height and hash) are required.
 
-You can use the following public RPC endpoints provided by Medibloc team.
+You can use the following public RPC endpoints provided by MediBloc team.
 - 3.35.82.40:26657
 - 13.124.96.254:26657
 - 52.79.108.35:26657
@@ -206,7 +206,7 @@ Environment="DAEMON_NAME=panacead"
 Environment="DAEMON_ALLOW_DOWNLOAD_BINARIES=false"
 Environment="DAEMON_RESTART_AFTER_UPGRADE=true"
 ```
-For more details about those environment variables, please see the [Cosmovisor guide](cosmovisor.md).
+For more details about those environment variables, please see the [Cosmovisor guide](4-cosmovisor.md).
 
 Then, setup the daemon.
 ```bash
