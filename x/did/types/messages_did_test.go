@@ -39,7 +39,7 @@ func getFromAddress(t *testing.T) sdk.AccAddress {
 }
 
 func newDIDDocument() types.DIDDocument {
-	did, _ := types.ParseDID("did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm")
+	did, _ := types.ValidateDID("did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm")
 	pubKey, _ := secp256k1util.PubKeyFromBase58("qoRmLNBEXoaKDE8dKffMq2DBNxacTEfvbKRuFrccYW1b")
 
 	verificationMethodID := types.NewVerificationMethodID(did, "key1")

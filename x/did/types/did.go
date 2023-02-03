@@ -3,18 +3,19 @@ package types
 import (
 	"crypto/sha256"
 	"fmt"
-	"log"
 	"regexp"
 	"strings"
 
 	"github.com/btcsuite/btcutil/base58"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	ariesdid "github.com/hyperledger/aries-framework-go/pkg/doc/did"
+	log "github.com/sirupsen/logrus"
 )
 
 const (
-	DIDMethod     = "panacea"
-	Base58Charset = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
+	DIDMethod                  = "panacea"
+	Base58Charset              = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
+	MaxVerificationMethodIDLen = 128
 )
 
 func NewDID(pubKey []byte) string {
@@ -27,23 +28,12 @@ func NewDID(pubKey []byte) string {
 	return fmt.Sprintf("did:%s:%s", DIDMethod, idStr)
 }
 
-func ParseDID(str string) (string, error) {
-	_, err := ariesdid.Parse(str)
+func ValidateDID(did string) (string, error) {
+	_, err := ariesdid.Parse(did)
 	if err != nil {
-		return "", sdkerrors.Wrapf(ErrInvalidDID, "did: %v", str)
+		return "", sdkerrors.Wrapf(ErrInvalidDID, "did: %v", did)
 	}
-	return str, nil
-}
-
-func ValidateDID(did string) bool {
-	pattern := fmt.Sprintf("^%s$", didRegex())
-	matched, _ := regexp.MatchString(pattern, did)
-	return matched
-}
-
-func didRegex() string {
-	// https://www.w3.org/TR/did-core/#did-syntax
-	return fmt.Sprintf("did:%s:[%s]{32,44}", DIDMethod, Base58Charset)
+	return did, nil
 }
 
 func (doc DIDDocument) Valid() bool {
@@ -62,10 +52,6 @@ func (doc DIDDocument) Valid() bool {
 func (doc DIDDocument) Empty() bool {
 	return doc.DocumentDataType == ""
 }
-
-const (
-	ContextDIDV1 = "https://www.w3.org/ns/did/v1"
-)
 
 func ValidateDocument(documentBz []byte) error {
 	_, err := ariesdid.ParseDocument(documentBz)
@@ -87,10 +73,6 @@ func ParseVerificationMethodID(id string, did string) (string, error) {
 	}
 	return methodID, nil
 }
-
-const (
-	MaxVerificationMethodIDLen = 128
-)
 
 func ValidateVerificationMethodID(verificationMethodID string, did string) bool {
 	prefix := fmt.Sprintf("%v#", did)

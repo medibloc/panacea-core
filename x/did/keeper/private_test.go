@@ -71,7 +71,7 @@ func newDIDDocumentWithSeq(id string) (types.DIDDocumentWithSeq, crypto.PrivKey)
 	createdTime := time.Now()
 
 	doc := &ariesdid.Doc{
-		Context:            []string{types.ContextDIDV1},
+		Context:            []string{ariesdid.ContextV1},
 		ID:                 id,
 		VerificationMethod: verificationMethod,
 		Authentication:     authentication,

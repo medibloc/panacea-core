@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/hyperledger/aries-framework-go/pkg/doc/did"
+	ariesdid "github.com/hyperledger/aries-framework-go/pkg/doc/did"
 	"github.com/tendermint/tendermint/crypto"
 	"github.com/tendermint/tendermint/crypto/secp256k1"
 
@@ -50,7 +50,7 @@ func makeTestDIDDocumentWithSeq(id string) (types.DIDDocumentWithSeq, crypto.Pri
 	privKey := secp256k1.GenPrivKey()
 	pubKey := secp256k1util.PubKeyBytes(secp256k1util.DerivePubKey(privKey))
 	verificationMethodID := types.NewVerificationMethodID(id, "key1")
-	verificationMethod := []did.VerificationMethod{
+	verificationMethod := []ariesdid.VerificationMethod{
 		{
 			ID:         verificationMethodID,
 			Type:       types.ES256K_2019,
@@ -65,12 +65,12 @@ func makeTestDIDDocumentWithSeq(id string) (types.DIDDocumentWithSeq, crypto.Pri
 		},
 	}
 
-	authentication := []did.Verification{
-		{VerificationMethod: *did.NewVerificationMethodFromBytes(verificationMethodID,
+	authentication := []ariesdid.Verification{
+		{VerificationMethod: *ariesdid.NewVerificationMethodFromBytes(verificationMethodID,
 			types.ES256K_2019,
 			id,
-			pubKey), Relationship: did.Authentication},
-		{VerificationMethod: did.VerificationMethod{
+			pubKey), Relationship: ariesdid.Authentication},
+		{VerificationMethod: ariesdid.VerificationMethod{
 			ID:         verificationMethodID,
 			Type:       types.ES256K_2019,
 			Controller: id,
@@ -80,8 +80,8 @@ func makeTestDIDDocumentWithSeq(id string) (types.DIDDocumentWithSeq, crypto.Pri
 
 	createdTime := time.Now()
 
-	doc := &did.Doc{
-		Context:            []string{types.ContextDIDV1},
+	doc := &ariesdid.Doc{
+		Context:            []string{ariesdid.ContextV1},
 		ID:                 id,
 		VerificationMethod: verificationMethod,
 		Authentication:     authentication,

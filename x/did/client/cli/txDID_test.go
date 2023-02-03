@@ -137,7 +137,7 @@ func (suite *txTestSuite) testReadDIDDocOneContext(path string) {
 	document, err := ariesdid.ParseDocument(doc.Document)
 	contexts := document.Context
 	suite.Require().Equal(1, len(contexts))
-	suite.Require().Equal(types.ContextDIDV1, contexts[0])
+	suite.Require().Equal(ariesdid.ContextV1, contexts[0])
 	suite.Require().Equal("did:panacea:27FnaDeQZApXhsRZZDARhWYs2nKFaw3p7evGd9zUSrBZ", document.ID)
 	suite.Require().Equal(1, len(document.VerificationMethod))
 	suite.Require().Equal("did:panacea:27FnaDeQZApXhsRZZDARhWYs2nKFaw3p7evGd9zUSrBZ", document.VerificationMethod[0].Controller)
@@ -162,7 +162,7 @@ func (suite *txTestSuite) testReadDIDDocTwoContexts(path string) {
 	document, err := ariesdid.ParseDocument(doc.Document)
 	contexts := document.Context
 	suite.Require().Equal(2, len(contexts))
-	suite.Require().Equal(types.ContextDIDV1, contexts[0])
+	suite.Require().Equal(ariesdid.ContextV1, contexts[0])
 	suite.Require().Equal("https://medibloc.org/ko", contexts[1])
 	suite.Require().Equal("did:panacea:27FnaDeQZApXhsRZZDARhWYs2nKFaw3p7evGd9zUSrBZ", document.ID)
 	suite.Require().Equal(1, len(document.VerificationMethod))
@@ -182,6 +182,18 @@ func (suite *txTestSuite) TestReadDIDDocMultiRelationship_W3C() {
 	suite.testReadDIDDocMultiRelationship("./testdata/did_multi_authentication_w3c.json")
 }
 
+func (suite *txTestSuite) TestValidateDocumentInvalidVerificationMethod() {
+	_, err := readDIDDocFrom("./testdata/did_invalid_verification_method.json")
+	suite.Require().Error(err)
+	fmt.Println(err)
+}
+
+func (suite *txTestSuite) TestValidateDocumentInvalidAuthentication() {
+	_, err := readDIDDocFrom("./testdata/did_invalid_authentication.json")
+	suite.Require().Error(err)
+	fmt.Println(err)
+}
+
 func (suite *txTestSuite) testReadDIDDocMultiRelationship(path string) {
 	doc, err := readDIDDocFrom(path)
 
@@ -189,7 +201,7 @@ func (suite *txTestSuite) testReadDIDDocMultiRelationship(path string) {
 	document, err := ariesdid.ParseDocument(doc.Document)
 	contexts := document.Context
 	suite.Require().Equal(2, len(contexts))
-	suite.Require().Equal(types.ContextDIDV1, contexts[0])
+	suite.Require().Equal(ariesdid.ContextV1, contexts[0])
 	suite.Require().Equal("https://medibloc.org/ko", contexts[1])
 	suite.Require().Equal("did:panacea:27FnaDeQZApXhsRZZDARhWYs2nKFaw3p7evGd9zUSrBZ", document.ID)
 	suite.Require().Equal(2, len(document.VerificationMethod))

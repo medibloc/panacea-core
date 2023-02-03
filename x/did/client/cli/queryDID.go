@@ -18,7 +18,7 @@ func CmdGetDID() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 
-			id, err := types.ParseDID(args[0])
+			did, err := types.ValidateDID(args[0])
 			if err != nil {
 				return err
 			}
@@ -26,7 +26,7 @@ func CmdGetDID() *cobra.Command {
 			queryClient := types.NewQueryClient(clientCtx)
 
 			params := &types.QueryDIDRequest{
-				DidBase64: base64.StdEncoding.EncodeToString([]byte(id)),
+				DidBase64: base64.StdEncoding.EncodeToString([]byte(did)),
 			}
 
 			res, err := queryClient.DID(context.Background(), params)

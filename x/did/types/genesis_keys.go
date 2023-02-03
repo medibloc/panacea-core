@@ -12,7 +12,8 @@ func (k GenesisDIDDocumentKey) Marshal() string {
 
 func (k *GenesisDIDDocumentKey) Unmarshal(key string) error {
 	did := key
-	if !ValidateDID(did) {
+	did, err := ValidateDID(did)
+	if err != nil {
 		return sdkerrors.Wrapf(ErrInvalidDID, "DID: %s", key)
 	}
 

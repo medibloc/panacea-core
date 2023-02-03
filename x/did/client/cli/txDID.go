@@ -89,7 +89,7 @@ func CmdUpdateDID() *cobra.Command {
 
 			inBuf := bufio.NewReader(cmd.InOrStdin())
 
-			did, err := types.ParseDID(args[0])
+			did, err := types.ValidateDID(args[0])
 			if err != nil {
 				return err
 			}
@@ -102,6 +102,7 @@ func CmdUpdateDID() *cobra.Command {
 			if err != nil {
 				return err
 			}
+
 			privKey, err := getPrivKeyFromKeyStore(verificationMethodID, inBuf)
 			if err != nil {
 				return err
@@ -142,7 +143,7 @@ func CmdDeactivateDID() *cobra.Command {
 
 			inBuf := bufio.NewReader(cmd.InOrStdin())
 
-			did, err := types.ParseDID(args[0])
+			did, err := types.ValidateDID(args[0])
 			if err != nil {
 				return err
 			}

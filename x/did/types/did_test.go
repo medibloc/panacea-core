@@ -32,14 +32,22 @@ func TestNewDID(t *testing.T) {
 	require.Regexp(t, regex, did)
 }
 
-func TestParseDID(t *testing.T) {
+func TestValidateDID(t *testing.T) {
 	str := "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm"
-	did, err := types.ParseDID(str)
+	did, err := types.ValidateDID(str)
 	require.NoError(t, err)
 	require.EqualValues(t, str, did)
 
 	str = "did:panacea:"
-	_, err = types.ParseDID(str)
+	_, err = types.ValidateDID(str)
+	require.ErrorIs(t, types.ErrInvalidDID, err)
+
+	str = "did:panacea"
+	_, err = types.ValidateDID(str)
+	require.ErrorIs(t, types.ErrInvalidDID, err)
+
+	str = "invalid:panacea:abcdefg123"
+	_, err = types.ValidateDID(str)
 	require.ErrorIs(t, types.ErrInvalidDID, err)
 }
 
