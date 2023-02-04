@@ -5,7 +5,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	govcli "github.com/cosmos/cosmos-sdk/x/gov/client/cli"
-	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
+	govv1beta1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
 	"github.com/medibloc/panacea-core/v2/x/oracle/types"
 	"github.com/spf13/cobra"
 )
@@ -44,7 +44,12 @@ func CmdUpgradeOracleProposal() *cobra.Command {
 				return err
 			}
 
-			msg, err := govtypes.NewMsgSubmitProposal(content, deposit, from)
+			// TODO: govv1 has been introduced in v0.46 but its spec will be updated in v0.47 as below.
+			//       Until then, it is safer to use govv1beta1.
+			//
+			// https://github.com/cosmos/cosmos-sdk/releases/tag/v0.47.0-rc2
+			// > In v0.46 with x/gov v1, these fields were not present (while present in v1beta1). After community feedback, they have been added in x/gov v1.
+			msg, err := govv1beta1.NewMsgSubmitProposal(content, deposit, from)
 			if err != nil {
 				return err
 			}
@@ -70,7 +75,7 @@ func CmdUpgradeOracleProposal() *cobra.Command {
 	return cmd
 }
 
-func makeProposalContent(cmd *cobra.Command) (govtypes.Content, error) {
+func makeProposalContent(cmd *cobra.Command) (govv1beta1.Content, error) {
 	title, err := cmd.Flags().GetString(govcli.FlagTitle)
 	if err != nil {
 		return nil, err
