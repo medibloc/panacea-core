@@ -2,7 +2,7 @@ syntax = "proto3";
 package panacea.burn.v2;
 
 option java_multiple_files = true;
-option go_package = "github.com/medibloc/panacea-core/x/burn/types";
+option go_package = "github.com/medibloc/panacea-core/v2/x/burn/types";
 
 // GenesisState defines the burn module's genesis state.
 message GenesisState {
