@@ -3,7 +3,6 @@ package aries_test
 import (
 	"crypto"
 	"crypto/ecdsa"
-	"crypto/elliptic"
 	"crypto/rand"
 	"crypto/sha256"
 	"encoding/hex"
@@ -25,6 +24,7 @@ import (
 	ldstore "github.com/hyperledger/aries-framework-go/pkg/store/ld"
 	jsld "github.com/piprate/json-gold/ld"
 	"github.com/stretchr/testify/require"
+	"github.com/tendermint/tendermint/crypto/secp256k1"
 )
 
 func TestJsonDoc(t *testing.T) {
@@ -128,14 +128,13 @@ func TestSign(t *testing.T) {
 
 	// make doc sample
 
-	privKey, err := ecdsa.GenerateKey(btcec.S256(), rand.Reader)
-	require.NoError(t, err)
-	pubKey := &privKey.PublicKey
-	pubKeyBytes := elliptic.Marshal(pubKey.Curve, pubKey.X, pubKey.Y)
+	//privKey, err := ecdsa.GenerateKey(btcec.S256(), rand.Reader)
+	//require.NoError(t, err)
+	//pubKey := &privKey.PublicKey
+	//pubKeyBytes := elliptic.Marshal(pubKey.Curve, pubKey.X, pubKey.Y)
 
-	//privKey := secp256k1.GenPrivKey()
-	//pubKey := privKey.PubKey()
-	// pubKeyBytes := pubKey.Bytes()
+	privKey := secp256k1.GenPrivKey()
+	btcecPrivKey, btcecPubKey := btcec.PrivKeyFromBytes(btcec.S256(), privKey.Bytes())
 
 	const (
 		didContext      = "https://w3id.org/did/v1"
@@ -145,7 +144,7 @@ func TestSign(t *testing.T) {
 		ID:         "did:method:abc" + "#key1",
 		Type:       "EcdsaSecp256k1VerificationKey2019",
 		Controller: "did:method:abc",
-		Value:      pubKeyBytes,
+		Value:      btcecPubKey.SerializeUncompressed(),
 	}
 	createdTime := time.Now()
 
@@ -166,7 +165,7 @@ func TestSign(t *testing.T) {
 
 	// sign doc
 	docSigner := signer.New(ecdsasecp256k1signature2019.New(
-		suite.WithSigner(getSigner(privKey))))
+		suite.WithSigner(getSigner(btcecPrivKey.ToECDSA()))))
 
 	signedDoc, err := docSigner.Sign(signerContext, jsonDoc, jsonld.WithDocumentLoader(loader))
 	require.NoError(t, err)
