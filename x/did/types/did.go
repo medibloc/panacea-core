@@ -28,12 +28,12 @@ func NewDID(pubKey []byte) string {
 	return fmt.Sprintf("did:%s:%s", DIDMethod, idStr)
 }
 
-func ValidateDID(did string) (string, error) {
-	_, err := ariesdid.Parse(did)
-	if err != nil {
-		return "", sdkerrors.Wrapf(ErrInvalidDID, "did: %v", did)
+func ValidateDID(did string) error {
+
+	if _, err := ariesdid.Parse(did); err != nil {
+		return sdkerrors.Wrapf(ErrInvalidDID, "did: %v, error: %v", did, err)
 	}
-	return did, nil
+	return nil
 }
 
 func (doc DIDDocument) Valid() bool {
@@ -47,12 +47,11 @@ func (doc DIDDocument) Valid() bool {
 }
 
 func (doc DIDDocument) Empty() bool {
-	return doc.DocumentDataType == ""
+	return doc.DocumentDataType == "" || doc.Document == nil
 }
 
 func ValidateDocument(documentBz []byte) error {
-	_, err := ariesdid.ParseDocument(documentBz)
-	if err != nil {
+	if _, err := ariesdid.ParseDocument(documentBz); err != nil {
 		return err
 	}
 	return nil

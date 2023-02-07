@@ -18,8 +18,8 @@ func CmdGetDID() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 
-			did, err := types.ValidateDID(args[0])
-			if err != nil {
+			did := args[0]
+			if err := types.ValidateDID(did); err != nil {
 				return err
 			}
 

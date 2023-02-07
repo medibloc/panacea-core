@@ -34,20 +34,19 @@ func TestNewDID(t *testing.T) {
 
 func TestValidateDID(t *testing.T) {
 	str := "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm"
-	did, err := types.ValidateDID(str)
+	err := types.ValidateDID(str)
 	require.NoError(t, err)
-	require.EqualValues(t, str, did)
 
 	str = "did:panacea:"
-	_, err = types.ValidateDID(str)
+	err = types.ValidateDID(str)
 	require.ErrorIs(t, types.ErrInvalidDID, err)
 
 	str = "did:panacea"
-	_, err = types.ValidateDID(str)
+	err = types.ValidateDID(str)
 	require.ErrorIs(t, types.ErrInvalidDID, err)
 
 	str = "invalid:panacea:abcdefg123"
-	_, err = types.ValidateDID(str)
+	err = types.ValidateDID(str)
 	require.ErrorIs(t, types.ErrInvalidDID, err)
 }
 

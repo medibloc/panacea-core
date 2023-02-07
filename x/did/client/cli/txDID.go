@@ -33,7 +33,7 @@ import (
 const (
 	flagInteractive     = "interactive"
 	baseDir             = "did_keystore"
-	didDocumentDataType = "aries-framework-go@v0.1.8"
+	didDocumentDataType = "github.com/hyperledger/aries-framework-go/pkg/doc/did.Doc@v0.1.8"
 )
 
 func CmdCreateDID() *cobra.Command {
@@ -89,8 +89,8 @@ func CmdUpdateDID() *cobra.Command {
 
 			inBuf := bufio.NewReader(cmd.InOrStdin())
 
-			did, err := types.ValidateDID(args[0])
-			if err != nil {
+			did := args[0]
+			if err := types.ValidateDID(did); err != nil {
 				return err
 			}
 			verificationMethodID, err := types.ParseVerificationMethodID(args[1], did)
@@ -143,8 +143,8 @@ func CmdDeactivateDID() *cobra.Command {
 
 			inBuf := bufio.NewReader(cmd.InOrStdin())
 
-			did, err := types.ValidateDID(args[0])
-			if err != nil {
+			did := args[0]
+			if err := types.ValidateDID(did); err != nil {
 				return err
 			}
 			verificationMethodID, err := types.ParseVerificationMethodID(args[1], did)
@@ -156,6 +156,7 @@ func CmdDeactivateDID() *cobra.Command {
 				return err
 			}
 
+			// TODO: As the document signing part improves, this part may need to be changed.
 			// For proving that I know the private key. It signs on the DIDDocument.
 			document := types.DIDDocument{
 				Document:         nil,
