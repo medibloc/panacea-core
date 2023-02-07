@@ -6,15 +6,13 @@ option go_package = "github.com/medibloc/panacea-core/x/did/types";
 
 import "gogoproto/gogo.proto";
 
-// DIDDocument defines a W3C DID Document
-//
-// NOTE: All 'json_name' and 'gogoproto.customtype' tags are for panacea-core to unmarshal the v1.3 genesis which is in the W3C JSON-LD format.
-//       On the other hand, the panacea-core and cosmos-sdk don't use those tags to marshal result to JSON (via grpc-gateway).
+// DIDDocument defines a W3C DID Document with document data type to specify the version of document spec.
 message DIDDocument {
   bytes document = 1;
-  string document_data_type=2;
+  string document_data_type = 2;
 }
 
+// TODO: sequence can be replaced with the Challenge field of document proof.
 // DIDDocumentWithSeq defines a message for DID Document with a sequence number for preventing replay attacks.
 message DIDDocumentWithSeq {
   DIDDocument document = 1;

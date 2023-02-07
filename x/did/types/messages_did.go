@@ -38,10 +38,10 @@ func (msg *MsgCreateDID) GetSignBytes() []byte {
 }
 
 func (msg *MsgCreateDID) ValidateBasic() error {
-	_, err := ValidateDID(msg.Did)
-	if err != nil {
+	if err := ValidateDID(msg.Did); err != nil {
 		return sdkerrors.Wrapf(ErrInvalidDID, "did: %v, %v", msg.Did, err)
 	}
+
 	if !msg.Document.Valid() {
 		return sdkerrors.Wrapf(ErrInvalidDIDDocument, "DIDDocument: %v", msg.Document)
 	}
@@ -80,8 +80,7 @@ func (msg MsgUpdateDID) Type() string { return "update_did" }
 
 // ValidateBasic runs stateless checks on the message.
 func (msg MsgUpdateDID) ValidateBasic() error {
-	_, err := ValidateDID(msg.Did)
-	if err != nil {
+	if err := ValidateDID(msg.Did); err != nil {
 		return sdkerrors.Wrapf(ErrInvalidDID, "did: %v, %v", msg.Did, err)
 	}
 	if !msg.Document.Valid() {
@@ -129,8 +128,7 @@ func (msg MsgDeactivateDID) Type() string { return "deactivate_did" }
 
 // VaValidateBasic runs stateless checks on the message.
 func (msg MsgDeactivateDID) ValidateBasic() error {
-	_, err := ValidateDID(msg.Did)
-	if err != nil {
+	if err := ValidateDID(msg.Did); err != nil {
 		return sdkerrors.Wrapf(ErrInvalidDID, "did: %v, %v", msg.Did, err)
 	}
 	if msg.Signature == nil || len(msg.Signature) == 0 {

@@ -19,6 +19,7 @@ service Msg {
   rpc DeactivateDID(MsgDeactivateDID) returns (MsgDeactivateDIDResponse);
 }
 
+// TODO: the signature filed will be deleted as document proof is applied
 // MsgCreateDID defines the Msg/CreateDID request type.
 message MsgCreateDID {
   string did = 1;
