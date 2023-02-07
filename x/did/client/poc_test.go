@@ -4,7 +4,6 @@ import (
 	"crypto"
 	"crypto/ecdsa"
 	"crypto/rand"
-	"crypto/sha256"
 	"encoding/hex"
 	"net/http"
 	"testing"
@@ -169,7 +168,6 @@ func TestSign(t *testing.T) {
 
 	signedDoc, err := docSigner.Sign(signerContext, jsonDoc, jsonld.WithDocumentLoader(loader))
 	require.NoError(t, err)
-	//sigVerifier := ecdsasecp256k1signature2019.New(suite.WithSigner(newSecp256k1Signer(privKey)))
 	sigVerifier := ecdsasecp256k1signature2019.New(suite.WithVerifier(ecdsasecp256k1signature2019.NewPublicKeyVerifier()))
 
 	doc, err := did.ParseDocument(signedDoc)
@@ -229,20 +227,4 @@ func (signer *testSigner) Sign(doc []byte) ([]byte, error) {
 	}
 	return append(copyPadded(r.Bytes(), keyBytes), copyPadded(s.Bytes(), keyBytes)...), nil
 
-}
-
-func getSHA256(bytes []byte) []byte {
-	hasher := sha256.New()
-	hasher.Write(bytes)
-	return hasher.Sum(nil)
-}
-
-func serializeSig(sig *btcec.Signature) []byte {
-	rBytes := sig.R.Bytes()
-	sBytes := sig.S.Bytes()
-	sigBytes := make([]byte, 64)
-	// 0 pad the byte arrays from the left if they aren't big enough.
-	copy(sigBytes[32-len(rBytes):32], rBytes)
-	copy(sigBytes[64-len(sBytes):64], sBytes)
-	return sigBytes
 }
