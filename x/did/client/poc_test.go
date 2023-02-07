@@ -147,16 +147,18 @@ func TestSign(t *testing.T) {
 	}
 	createdTime := time.Now()
 
-	signerContext := &signer.Context{
-		Creator:       "did:method:abc" + "#key1",
-		SignatureType: "EcdsaSecp256k1Signature2019",
-	}
-
 	didDoc := &did.Doc{
 		Context:            []string{didContext, securityContext},
 		ID:                 "did:method:abc",
 		VerificationMethod: []did.VerificationMethod{vm},
 		Created:            &createdTime,
+	}
+
+	// sign with domain 1
+	signerContext := &signer.Context{
+		Creator:       "did:method:abc" + "#key1",
+		SignatureType: "EcdsaSecp256k1Signature2019",
+		Domain:        "1",
 	}
 
 	jsonDoc, err := didDoc.JSONBytes()
@@ -176,9 +178,26 @@ func TestSign(t *testing.T) {
 	err = doc.VerifyProof([]verifier.SignatureSuite{sigVerifier}, jsonld.WithDocumentLoader(loader))
 	require.NoError(t, err)
 
-	doc.Proof[0].ProofValue = []byte("invalid")
+	// change domain value 2
+	doc.Proof[0].Domain = "2"
 	err = doc.VerifyProof([]verifier.SignatureSuite{sigVerifier}, jsonld.WithDocumentLoader(loader))
 	require.NotNil(t, err)
+
+	signerContext2 := &signer.Context{
+		Creator:       "did:method:abc" + "#key1",
+		SignatureType: "EcdsaSecp256k1Signature2019",
+		Domain:        "2",
+	}
+
+	// if set signerContext with domain == 2, verifyProof is passed
+	signedDoc2, err := docSigner.Sign(signerContext2, jsonDoc, jsonld.WithDocumentLoader(loader))
+	require.NoError(t, err)
+	doc2, err := did.ParseDocument(signedDoc2)
+	require.Nil(t, err)
+	require.NotNil(t, doc2)
+	err = doc2.VerifyProof([]verifier.SignatureSuite{sigVerifier}, jsonld.WithDocumentLoader(loader))
+	require.NoError(t, err)
+
 }
 
 func getSigner(privKey *ecdsa.PrivateKey) *testSigner {
