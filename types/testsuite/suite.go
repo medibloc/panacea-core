@@ -162,6 +162,13 @@ func (suite *TestSuite) SetupTest() {
 	)
 	suite.BankKeeper.SetParams(ctx, banktypes.DefaultParams())
 	suite.BurnKeeper = *burnkeeper.NewKeeper(suite.BankKeeper)
+	suite.StakingKeeper = stakingkeeper.NewKeeper(
+		cdc.Marshaler,
+		keyParams[stakingtypes.StoreKey],
+		suite.AccountKeeper,
+		suite.BankKeeper,
+		paramsKeeper.Subspace(stakingtypes.ModuleName),
+	)
 	suite.DistrKeeper = distrkeeper.NewKeeper(
 		cdc.Marshaler, keyParams[distrtypes.StoreKey], paramsKeeper.Subspace(distrtypes.ModuleName), suite.AccountKeeper, suite.BankKeeper, &suite.StakingKeeper, "test_fee_collector", modAccAddrs,
 	)
