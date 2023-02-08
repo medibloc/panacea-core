@@ -269,7 +269,6 @@ type App struct {
 
 	// make scoped keepers public for test purposes
 	ScopedIBCKeeper      capabilitykeeper.ScopedKeeper
-	ScopedIBCFeeKeeper   capabilitykeeper.ScopedKeeper //TODO: need this? not used anywhere
 	ScopedTransferKeeper capabilitykeeper.ScopedKeeper
 	ScopedWasmKeeper     capabilitykeeper.ScopedKeeper
 
@@ -555,7 +554,6 @@ func New(
 		govtypes.ModuleName,
 		paramstypes.ModuleName,
 		ibctransfertypes.ModuleName,
-		ibchost.ModuleName,
 		authtypes.ModuleName,
 		aoltypes.ModuleName,
 		didtypes.ModuleName,
@@ -588,7 +586,6 @@ func New(
 		capabilitytypes.ModuleName,
 		slashingtypes.ModuleName,
 		ibctransfertypes.ModuleName,
-		ibchost.ModuleName,
 		aoltypes.ModuleName,
 		oracletypes.ModuleName,
 		wasm.ModuleName,
@@ -617,7 +614,6 @@ func New(
 		evidencetypes.ModuleName,
 		feegrant.ModuleName,
 		ibctransfertypes.ModuleName,
-		ibchost.ModuleName,
 		aoltypes.ModuleName,
 		didtypes.ModuleName,
 		burntypes.ModuleName,

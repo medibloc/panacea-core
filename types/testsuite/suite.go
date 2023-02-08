@@ -171,7 +171,8 @@ func (suite *TestSuite) SetupTest() {
 	)
 	suite.TransferKeeper = ibctransferkeeper.NewKeeper(
 		cdc.Marshaler, keyParams[ibctransfertypes.StoreKey], paramsKeeper.Subspace(ibctransfertypes.ModuleName),
-		suite.IBCKeeper.ChannelKeeper, suite.IBCKeeper.ChannelKeeper, &suite.IBCKeeper.PortKeeper,
+		suite.IBCKeeper.ChannelKeeper,
+		suite.IBCKeeper.ChannelKeeper, &suite.IBCKeeper.PortKeeper,
 		suite.AccountKeeper, suite.BankKeeper, scopedIBCKeeper,
 	)
 
