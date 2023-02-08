@@ -970,7 +970,7 @@ func (app *App) registerUpgradeHandlers() error {
 
 	if upgradeInfo.Name == "v2.1.0" && !app.UpgradeKeeper.IsSkipHeight(upgradeInfo.Height) {
 		storeUpgrades := storetypes.StoreUpgrades{
-			Added: []string{"datadeal", "oracle"},
+			Added: []string{"datadeal", "oracle"}, //TODO: doesn't need to add ibcfee?
 		}
 
 		app.SetStoreLoader(upgradetypes.UpgradeStoreLoader(upgradeInfo.Height, &storeUpgrades))
