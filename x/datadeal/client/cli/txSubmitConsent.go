@@ -1,13 +1,12 @@
 package cli
 
 import (
-	"encoding/json"
-	"fmt"
 	"os"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
+	"github.com/gogo/protobuf/jsonpb"
 	"github.com/medibloc/panacea-core/v2/x/datadeal/types"
 	"github.com/spf13/cobra"
 )
@@ -42,15 +41,15 @@ func CmdSubmitConsent() *cobra.Command {
 	return cmd
 }
 
-func newConsent(file string) (*types.Consent, error) {
-	var consent *types.Consent
-
-	contents, err := os.ReadFile(file)
+func newConsent(path string) (*types.Consent, error) {
+	contents, err := os.Open(path)
 	if err != nil {
-		return nil, fmt.Errorf("failed to read file: %w", err)
+		return nil, err
 	}
+	defer contents.Close()
 
-	if err := json.Unmarshal(contents, &consent); err != nil {
+	consent := &types.Consent{}
+	if err := jsonpb.Unmarshal(contents, consent); err != nil {
 		return nil, err
 	}
 
