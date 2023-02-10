@@ -2,25 +2,20 @@
 
 set -eo pipefail
 
-# Directories that contain proto files
-PROTO_DIRS="./proto ./third_party/proto"
-
 mkdir -p ./tmp-swagger-gen
 
-proto_dirs=$(find ${PROTO_DIRS} -path -prune -o -name '*.proto' -print0 | xargs -0 -n1 dirname | sort | uniq)
-for dir in $proto_dirs; do
+cd proto
 
+proto_dirs=$(find . -path -prune -o -name '*.proto' -print0 | xargs -0 -n1 dirname | sort | uniq)
+for dir in $proto_dirs; do
   # generate swagger files (filter query files)
   query_file=$(find "${dir}" -maxdepth 1 \( -name 'query.proto' -o -name 'service.proto' \))
   if [[ ! -z "$query_file" ]]; then
-    buf protoc  \
-      -I "proto" \
-      -I "third_party/proto" \
-      "$query_file" \
-      --swagger_out=./tmp-swagger-gen \
-      --swagger_opt=logtostderr=true --swagger_opt=fqn_for_swagger_name=true --swagger_opt=simple_operation_ids=true
+    buf generate --template buf.gen.swagger.yaml $query_file
   fi
 done
+
+cd -
 
 # combine swagger files
 # uses nodejs package `swagger-combine`.

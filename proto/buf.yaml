@@ -1,0 +1,30 @@
+version: v1
+name: buf.build/medibloc/panacea-core
+deps:
+  - buf.build/googleapis/googleapis
+#   Uncomment this as soon as you upgrade cosmos-sdk to v0.46+ that pushes protos to BSR (Buf Schema Registry).
+#   Then, you can delete third-party proto files in this directory.
+#  - buf.build/cosmos/cosmos-sdk
+#  - buf.build/cosmos/cosmos-proto
+#  - buf.build/cosmos/gogo-proto
+breaking:
+  use:
+    - FILE
+lint:
+  use:
+    - DEFAULT
+    - COMMENTS
+    - FILE_LOWER_SNAKE_CASE
+  except:
+    - UNARY_RPC
+    - COMMENT_FIELD
+    - SERVICE_SUFFIX
+    - PACKAGE_VERSION_SUFFIX
+    - RPC_REQUEST_STANDARD_NAME
+  ignore:
+    - confio
+    - cosmos
+    - cosmos_proto
+    - gogoproto
+    - ibc
+    - tendermint

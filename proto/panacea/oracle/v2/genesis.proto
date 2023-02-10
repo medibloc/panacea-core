@@ -4,7 +4,6 @@ package panacea.oracle.v2;
 option go_package = "github.com/medibloc/panacea-core/v2/x/oracle/types";
 
 import "gogoproto/gogo.proto";
-import "google/protobuf/timestamp.proto";
 import "panacea/oracle/v2/oracle.proto";
 
 // GenesisState defines the oracle module's genesis state.

@@ -3,7 +3,6 @@ package panacea.aol.v2;
 
 import "google/api/annotations.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";
-import "panacea/aol/v2/owner.proto";
 import "panacea/aol/v2/record.proto";
 import "panacea/aol/v2/writer.proto";
 import "panacea/aol/v2/topic.proto";
