@@ -27,20 +27,18 @@ func (suite *genesisTestSuite) TestGenesis() {
 
 	// prepare a keeper with some data
 	did1 := "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm"
-	doc1, _ := suite.newDIDDocumentWithSeq(did1)
+	doc1, _ := suite.newDIDDocument(did1)
 	did2 := "did:panacea:6JamVbJgk8azVgUm7Prd74ry1Uct87nZqL3ny7aR7Cg4"
-	doc2, _ := suite.newDIDDocumentWithSeq(did2)
+	doc2, _ := suite.newDIDDocument(did2)
 
 	didKeeper.SetDIDDocument(suite.Ctx, did1, doc1)
 	didKeeper.SetDIDDocument(suite.Ctx, did2, doc2)
-	doc2Deactivated := doc2.Deactivate(doc2.Sequence + 1)
-	didKeeper.SetDIDDocument(suite.Ctx, did2, doc2Deactivated)
 
 	// export a genesis
 	state := ExportGenesis(suite.Ctx, didKeeper)
 	suite.Require().Equal(2, len(state.Documents))
-	suite.Require().Equal(doc1, *state.Documents[suite.newGenesisKey(did1)])
-	suite.Require().Equal(doc2Deactivated, *state.Documents[suite.newGenesisKey(did2)])
+	suite.Require().Equal(doc1, state.Documents[suite.newGenesisKey(did1)])
+	suite.Require().Equal(doc2, state.Documents[suite.newGenesisKey(did2)])
 
 	// check if the exported genesis is valid
 	suite.Require().NoError(state.Validate())
@@ -49,14 +47,14 @@ func (suite *genesisTestSuite) TestGenesis() {
 	InitGenesis(suite.Ctx, didKeeper, *state)
 	suite.Require().Equal(2, len(didKeeper.ListDIDs(suite.Ctx)))
 	suite.Require().Equal(doc1, didKeeper.GetDIDDocument(suite.Ctx, did1))
-	suite.Require().Equal(doc2Deactivated, didKeeper.GetDIDDocument(suite.Ctx, did2))
+	suite.Require().Equal(doc2, didKeeper.GetDIDDocument(suite.Ctx, did2))
 }
 
 func (suite *genesisTestSuite) newGenesisKey(did string) string {
 	return types.GenesisDIDDocumentKey{DID: did}.Marshal()
 }
 
-func (suite *genesisTestSuite) newDIDDocumentWithSeq(did string) (types.DIDDocumentWithSeq, crypto.PrivKey) {
+func (suite *genesisTestSuite) newDIDDocument(did string) (*types.DIDDocument, crypto.PrivKey) {
 	privKey := secp256k1.GenPrivKey()
 	pubKey := secp256k1util.PubKeyBytes(secp256k1util.DerivePubKey(privKey))
 	verificationMethodID := types.NewVerificationMethodID(did, "key1")
@@ -68,11 +66,9 @@ func (suite *genesisTestSuite) newDIDDocumentWithSeq(did string) (types.DIDDocum
 		ariesdid.WithVerificationMethod([]ariesdid.VerificationMethod{es256VerificationMethod, blsVerificationMethod}),
 		ariesdid.WithAuthentication([]ariesdid.Verification{authentication}))
 
-	didDocument, _ := types.NewDIDDocument(document, "aries-frame-work@v0.1.8")
+	documentBz, _ := document.JSONBytes()
 
-	docWithSeq := types.NewDIDDocumentWithSeq(
-		&didDocument,
-		types.InitialSequence,
-	)
-	return docWithSeq, privKey
+	didDocument, _ := types.NewDIDDocument(documentBz, types.DidDocumentDataType)
+
+	return &didDocument, privKey
 }

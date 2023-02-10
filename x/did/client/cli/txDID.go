@@ -8,17 +8,17 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strconv"
 	"time"
 
-	ariesdid "github.com/hyperledger/aries-framework-go/pkg/doc/did"
-
+	"github.com/btcsuite/btcd/btcec"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/input"
 	"github.com/cosmos/cosmos-sdk/client/tx"
-	sdkcodec "github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/go-bip39"
+	ariesdid "github.com/hyperledger/aries-framework-go/pkg/doc/did"
 	"github.com/medibloc/panacea-core/v2/x/did/internal/secp256k1util"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -31,9 +31,8 @@ import (
 )
 
 const (
-	flagInteractive     = "interactive"
-	baseDir             = "did_keystore"
-	didDocumentDataType = "github.com/hyperledger/aries-framework-go/pkg/doc/did.Doc@v0.1.8"
+	flagInteractive = "interactive"
+	baseDir         = "did_keystore"
 )
 
 func CmdCreateDID() *cobra.Command {
@@ -93,22 +92,28 @@ func CmdUpdateDID() *cobra.Command {
 			if err := types.ValidateDID(did); err != nil {
 				return err
 			}
-			verificationMethodID, err := types.ParseVerificationMethodID(args[1], did)
+			verificationMethodID := args[1]
+
+			if err := types.ValidateVerificationMethodID(verificationMethodID, did); err != nil {
+				return err
+			}
 			if err != nil {
 				return err
 			}
+
 			// read an input file of DID document
 			doc, err := readDIDDocFrom(args[2])
 			if err != nil {
 				return err
 			}
 
+			// get private key and sign document with sequence
 			privKey, err := getPrivKeyFromKeyStore(verificationMethodID, inBuf)
 			if err != nil {
 				return err
 			}
-			// For proving that I know the private key. It signs on the DIDDocument.
-			sig, err := signUsingCurrentSeq(clientCtx, did, privKey, &doc)
+
+			signedDocument, err := signUsingCurrentSeq(clientCtx, verificationMethodID, did, privKey, doc)
 			if err != nil {
 				return err
 			}
@@ -118,8 +123,11 @@ func CmdUpdateDID() *cobra.Command {
 			if err != nil {
 				return err
 			}
-
-			msg := types.NewMsgUpdateDID(did, doc, verificationMethodID, sig, fromAddress.String())
+			didDocument, err := types.NewDIDDocument(signedDocument, types.DidDocumentDataType)
+			if err != nil {
+				return err
+			}
+			msg := types.NewMsgUpdateDID(did, didDocument, verificationMethodID, fromAddress.String())
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
@@ -132,43 +140,22 @@ func CmdUpdateDID() *cobra.Command {
 
 func CmdDeactivateDID() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "deactivate-did [did] [key-id]",
+		Use:   "deactivate-did [did]",
 		Short: "Deactivate a DID Document",
-		Args:  cobra.ExactArgs(2),
+		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
 
-			inBuf := bufio.NewReader(cmd.InOrStdin())
-
 			did := args[0]
 			if err := types.ValidateDID(did); err != nil {
 				return err
 			}
-			verificationMethodID, err := types.ParseVerificationMethodID(args[1], did)
-			if err != nil {
-				return err
-			}
-			privKey, err := getPrivKeyFromKeyStore(verificationMethodID, inBuf)
-			if err != nil {
-				return err
-			}
-
-			// TODO: As the document signing part improves, this part may need to be changed.
-			// For proving that I know the private key. It signs on the DIDDocument.
-			document := types.DIDDocument{
-				Document:         nil,
-				DocumentDataType: "",
-			}
-			sig, err := signUsingCurrentSeq(clientCtx, did, privKey, &document)
-			if err != nil {
-				return err
-			}
 
 			fromAddress := clientCtx.GetFromAddress()
-			msg := types.NewMsgDeactivateDID(did, verificationMethodID, sig, fromAddress.String())
+			msg := types.NewMsgDeactivateDID(did, fromAddress.String())
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
@@ -256,32 +243,41 @@ func getCheckPassword(reader *bufio.Reader) (string, error) {
 }
 
 // newMsgCreateDID creates a MsgCreateDID by generating a DID and a DID document from the networkID and privKey.
-// It generates the minimal DID document which contains only one public key information,
+// It generates the minimal DID document which contains only one public key information for did ownership,
 // so that it can be extended by MsgUpdateDID later.
 func newMsgCreateDID(fromAddress sdk.AccAddress, privKey secp256k1.PrivKey) (types.MsgCreateDID, error) {
 	pubKey := secp256k1util.PubKeyBytes(secp256k1util.DerivePubKey(privKey))
+
+	btcecPrivKey, btcecPubKey := btcec.PrivKeyFromBytes(btcec.S256(), privKey.Bytes())
+
 	newDid := types.NewDID(pubKey)
-	verificationMethodID := types.NewVerificationMethodID(newDid, "key1")
-	verificationMethod := types.NewVerificationMethod(verificationMethodID, types.ES256K_2019, newDid, pubKey)
+	verificationMethodID := types.NewVerificationMethodID(newDid, "ownership")
+	verificationMethod := types.NewVerificationMethod(verificationMethodID, types.ES256K_2019, newDid, btcecPubKey.SerializeUncompressed())
 	authentication := types.NewVerification(verificationMethod, ariesdid.Authentication)
 	createdTime := time.Now()
 
 	document := types.NewDocument(newDid,
 		ariesdid.WithVerificationMethod([]ariesdid.VerificationMethod{verificationMethod}),
 		ariesdid.WithAuthentication([]ariesdid.Verification{authentication}),
-		ariesdid.WithCreatedTime(createdTime))
+		ariesdid.WithCreatedTime(createdTime),
+	)
 
-	didDocument, err := types.NewDIDDocument(document, didDocumentDataType)
+	documentBz, err := document.JSONBytes()
 	if err != nil {
 		return types.MsgCreateDID{}, err
 	}
 
-	sig, err := types.Sign(&didDocument, types.InitialSequence, privKey)
+	signedDocument, err := types.SignDocument(documentBz, verificationMethodID, types.InitialSequence, btcecPrivKey)
 	if err != nil {
 		return types.MsgCreateDID{}, err
 	}
 
-	msg := types.NewMsgCreateDID(newDid, didDocument, verificationMethodID, sig, fromAddress.String())
+	didDocument, err := types.NewDIDDocument(signedDocument, types.DidDocumentDataType)
+	if err != nil {
+		return types.MsgCreateDID{}, err
+	}
+
+	msg := types.NewMsgCreateDID(newDid, didDocument, verificationMethodID, fromAddress.String())
 	if err := msg.ValidateBasic(); err != nil {
 		return types.MsgCreateDID{}, err
 	}
@@ -290,33 +286,32 @@ func newMsgCreateDID(fromAddress sdk.AccAddress, privKey secp256k1.PrivKey) (typ
 
 // readDIDDocFrom reads a DID document from a JSON file.
 // It returns an error if the JSON file is invalid or the DID document is invalid.
-func readDIDDocFrom(path string) (types.DIDDocument, error) {
-	var doc types.DIDDocument
+func readDIDDocFrom(path string) ([]byte, error) {
 
 	file, err := os.Open(path)
 	if err != nil {
-		return doc, err
+		return nil, err
 	}
 	defer file.Close()
 
 	fileData, err := os.ReadFile(path)
 	if err != nil {
-		return doc, err
+		return nil, err
 	}
 
 	document, err := ariesdid.ParseDocument(fileData)
 	if err != nil {
-		return doc, err
+		return nil, err
 	}
 	ti := time.Now()
 	document.Updated = &ti
 
-	didDocument, err := types.NewDIDDocument(*document, didDocumentDataType)
+	documentBz, err := document.JSONBytes()
 	if err != nil {
-		return doc, err
+		return nil, err
 	}
 
-	return didDocument, nil
+	return documentBz, nil
 }
 
 // getPrivKeyFromKeyStore loads a privKey using a password which is read from the reader.
@@ -340,7 +335,7 @@ func getPrivKeyFromKeyStore(verificationMethodID string, reader *bufio.Reader) (
 }
 
 // signUsingCurrentSeq generates a signature using the current sequence stored in the blockchain.
-func signUsingCurrentSeq(clientCtx client.Context, did string, privKey crypto.PrivKey, data sdkcodec.ProtoMarshaler) ([]byte, error) {
+func signUsingCurrentSeq(clientCtx client.Context, did, vmID string, privKey crypto.PrivKey, doc []byte) ([]byte, error) {
 	queryClient := types.NewQueryClient(clientCtx)
 
 	params := &types.QueryDIDRequest{
@@ -352,5 +347,16 @@ func signUsingCurrentSeq(clientCtx client.Context, did string, privKey crypto.Pr
 		return []byte{}, err
 	}
 
-	return types.Sign(data, res.DidDocumentWithSeq.Sequence, privKey)
+	btcecPrivKey, _ := btcec.PrivKeyFromBytes(btcec.S256(), privKey.Bytes())
+
+	document, err := ariesdid.ParseDocument(res.DidDocument.Document)
+	if err != nil {
+		return []byte{}, err
+	}
+	sequence, err := strconv.ParseUint(document.Proof[0].Domain, 10, 64)
+	if err != nil {
+		return []byte{}, err
+	}
+
+	return types.SignDocument(doc, vmID, sequence+1, btcecPrivKey)
 }

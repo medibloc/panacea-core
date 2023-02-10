@@ -7,12 +7,11 @@ import (
 
 var _ sdk.Msg = &MsgCreateDID{}
 
-func NewMsgCreateDID(did string, document DIDDocument, VerificationMethodID string, Signature []byte, FromAddress string) MsgCreateDID {
+func NewMsgCreateDID(did string, document DIDDocument, VerificationMethodID string, FromAddress string) MsgCreateDID {
 	return MsgCreateDID{
 		Did:                  did,
 		Document:             &document,
 		VerificationMethodId: VerificationMethodID,
-		Signature:            Signature,
 		FromAddress:          FromAddress,
 	}
 }
@@ -45,9 +44,6 @@ func (msg *MsgCreateDID) ValidateBasic() error {
 	if !msg.Document.Valid() {
 		return sdkerrors.Wrapf(ErrInvalidDIDDocument, "DIDDocument: %v", msg.Document)
 	}
-	if msg.Signature == nil || len(msg.Signature) == 0 {
-		return sdkerrors.Wrapf(ErrInvalidSignature, "Signature: %v", msg.Signature)
-	}
 
 	addr, err := sdk.AccAddressFromBech32(msg.FromAddress)
 	if err != nil {
@@ -62,12 +58,11 @@ func (msg *MsgCreateDID) ValidateBasic() error {
 var _ sdk.Msg = &MsgUpdateDID{}
 
 // NewMsgUpdateDID is a constructor of MsgUpdateDID.
-func NewMsgUpdateDID(did string, doc DIDDocument, verificationMethodID string, sig []byte, fromAddr string) MsgUpdateDID {
+func NewMsgUpdateDID(did string, doc DIDDocument, verificationMethodID string, fromAddr string) MsgUpdateDID {
 	return MsgUpdateDID{
 		Did:                  did,
 		Document:             &doc,
 		VerificationMethodId: verificationMethodID,
-		Signature:            sig,
 		FromAddress:          fromAddr,
 	}
 }
@@ -86,9 +81,7 @@ func (msg MsgUpdateDID) ValidateBasic() error {
 	if !msg.Document.Valid() {
 		return sdkerrors.Wrapf(ErrInvalidDIDDocument, "DIDDocument: %v", msg.Document)
 	}
-	if msg.Signature == nil || len(msg.Signature) == 0 {
-		return sdkerrors.Wrapf(ErrInvalidSignature, "Signature: %v", msg.Signature)
-	}
+
 	addr, err := sdk.AccAddressFromBech32(msg.FromAddress)
 	if err != nil {
 		return err
@@ -116,8 +109,8 @@ func (msg MsgUpdateDID) GetSigners() []sdk.AccAddress {
 var _ sdk.Msg = &MsgDeactivateDID{}
 
 // NewMsgDeactivateDID is a constructor of MsgDeactivateDID.
-func NewMsgDeactivateDID(did string, verificationMethodID string, sig []byte, fromAddr string) MsgDeactivateDID {
-	return MsgDeactivateDID{did, verificationMethodID, sig, fromAddr}
+func NewMsgDeactivateDID(did string, fromAddr string) MsgDeactivateDID {
+	return MsgDeactivateDID{did, fromAddr}
 }
 
 // Route returns the name of the module.
@@ -126,13 +119,10 @@ func (msg MsgDeactivateDID) Route() string { return RouterKey }
 // Type returns the name of the action.
 func (msg MsgDeactivateDID) Type() string { return "deactivate_did" }
 
-// VaValidateBasic runs stateless checks on the message.
+// ValidateBasic runs stateless checks on the message.
 func (msg MsgDeactivateDID) ValidateBasic() error {
 	if err := ValidateDID(msg.Did); err != nil {
 		return sdkerrors.Wrapf(ErrInvalidDID, "did: %v, %v", msg.Did, err)
-	}
-	if msg.Signature == nil || len(msg.Signature) == 0 {
-		return sdkerrors.Wrapf(ErrInvalidSignature, "Signature: %v", msg.Signature)
 	}
 
 	addr, err := sdk.AccAddressFromBech32(msg.FromAddress)

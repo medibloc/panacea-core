@@ -25,8 +25,7 @@ message MsgCreateDID {
   string did = 1;
   DIDDocument document = 2;
   string verification_method_id = 3;
-  bytes signature = 4;
-  string from_address = 5;
+  string from_address = 4;
 }
 
 // MsgCreateDIDResponse defines the Msg/CreateDID response type.
@@ -37,8 +36,7 @@ message MsgUpdateDID {
   string did = 1;
   DIDDocument document = 2;
   string verification_method_id = 3;
-  bytes signature = 4;
-  string from_address = 5;
+  string from_address = 4;
 }
 
 // MsgUpdateDIDResponse defines the Msg/UpdateDID response type.
@@ -47,9 +45,7 @@ message MsgUpdateDIDResponse {}
 // MsgDeactivateDID defines the Msg/DeactivateDID request type.
 message MsgDeactivateDID {
   string did = 1;
-  string verification_method_id = 2;
-  bytes signature = 3;
-  string from_address = 4;
+  string from_address = 2;
 }
 
 // MsgDeactivateDIDResponse defines the Msg/DeactivateDID response type.

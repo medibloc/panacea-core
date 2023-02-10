@@ -133,7 +133,10 @@ func TestSign(t *testing.T) {
 	//pubKeyBytes := elliptic.Marshal(pubKey.Curve, pubKey.X, pubKey.Y)
 
 	privKey := secp256k1.GenPrivKey()
-	btcecPrivKey, btcecPubKey := btcec.PrivKeyFromBytes(btcec.S256(), privKey.Bytes())
+	btcecPrivKey1, btcecPubKey := btcec.PrivKeyFromBytes(btcec.S256(), privKey.Bytes())
+
+	privKey2 := secp256k1.GenPrivKey()
+	_, btcecPubKey2 := btcec.PrivKeyFromBytes(btcec.S256(), privKey2.Bytes())
 
 	const (
 		didContext      = "https://w3id.org/did/v1"
@@ -145,12 +148,21 @@ func TestSign(t *testing.T) {
 		Controller: "did:method:abc",
 		Value:      btcecPubKey.SerializeUncompressed(),
 	}
+
+	vm2 := did.VerificationMethod{
+		ID:         "did:method:abc" + "#key2",
+		Type:       "EcdsaSecp256k1VerificationKey2019",
+		Controller: "did:method:abc",
+		Value:      btcecPubKey2.SerializeUncompressed(),
+	}
+
 	createdTime := time.Now()
 
 	didDoc := &did.Doc{
 		Context:            []string{didContext, securityContext},
 		ID:                 "did:method:abc",
-		VerificationMethod: []did.VerificationMethod{vm},
+		VerificationMethod: []did.VerificationMethod{vm, vm2},
+		AssertionMethod:    []did.Verification{{vm2, did.AssertionMethod, true}},
 		Created:            &createdTime,
 	}
 
@@ -166,7 +178,7 @@ func TestSign(t *testing.T) {
 
 	// sign doc
 	docSigner := signer.New(ecdsasecp256k1signature2019.New(
-		suite.WithSigner(getSigner(btcecPrivKey.ToECDSA()))))
+		suite.WithSigner(getSigner(btcecPrivKey1.ToECDSA()))))
 
 	signedDoc, err := docSigner.Sign(signerContext, jsonDoc, jsonld.WithDocumentLoader(loader))
 	require.NoError(t, err)

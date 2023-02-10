@@ -23,14 +23,11 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
-// DIDDocument defines a W3C DID Document
-//
-// NOTE: All 'json_name' and 'gogoproto.customtype' tags are for panacea-core to unmarshal the v1.3 genesis which is in the W3C JSON-LD format.
-//
-//	On the other hand, the panacea-core and cosmos-sdk don't use those tags to marshal result to JSON (via grpc-gateway).
+// DIDDocument defines a W3C DID Document with document data type to specify the version of document spec.
 type DIDDocument struct {
 	Document         []byte `protobuf:"bytes,1,opt,name=document,proto3" json:"document,omitempty"`
 	DocumentDataType string `protobuf:"bytes,2,opt,name=document_data_type,json=documentDataType,proto3" json:"document_data_type,omitempty"`
+	Deactivated      bool   `protobuf:"varint,3,opt,name=deactivated,proto3" json:"deactivated,omitempty"`
 }
 
 func (m *DIDDocument) Reset()         { *m = DIDDocument{} }
@@ -80,139 +77,36 @@ func (m *DIDDocument) GetDocumentDataType() string {
 	return ""
 }
 
-// DIDDocumentWithSeq defines a message for DID Document with a sequence number for preventing replay attacks.
-type DIDDocumentWithSeq struct {
-	Document *DIDDocument `protobuf:"bytes,1,opt,name=document,proto3" json:"document,omitempty"`
-	Sequence uint64       `protobuf:"varint,2,opt,name=sequence,proto3" json:"sequence,omitempty"`
-}
-
-func (m *DIDDocumentWithSeq) Reset()         { *m = DIDDocumentWithSeq{} }
-func (m *DIDDocumentWithSeq) String() string { return proto.CompactTextString(m) }
-func (*DIDDocumentWithSeq) ProtoMessage()    {}
-func (*DIDDocumentWithSeq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_050d7f513d72eb9a, []int{1}
-}
-func (m *DIDDocumentWithSeq) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *DIDDocumentWithSeq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_DIDDocumentWithSeq.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *DIDDocumentWithSeq) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_DIDDocumentWithSeq.Merge(m, src)
-}
-func (m *DIDDocumentWithSeq) XXX_Size() int {
-	return m.Size()
-}
-func (m *DIDDocumentWithSeq) XXX_DiscardUnknown() {
-	xxx_messageInfo_DIDDocumentWithSeq.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_DIDDocumentWithSeq proto.InternalMessageInfo
-
-func (m *DIDDocumentWithSeq) GetDocument() *DIDDocument {
+func (m *DIDDocument) GetDeactivated() bool {
 	if m != nil {
-		return m.Document
+		return m.Deactivated
 	}
-	return nil
-}
-
-func (m *DIDDocumentWithSeq) GetSequence() uint64 {
-	if m != nil {
-		return m.Sequence
-	}
-	return 0
-}
-
-// DataWithSeq defines a message for data with a sequence number for preventing replay attacks.
-type DataWithSeq struct {
-	Data     []byte `protobuf:"bytes,1,opt,name=data,proto3" json:"data,omitempty"`
-	Sequence uint64 `protobuf:"varint,2,opt,name=sequence,proto3" json:"sequence,omitempty"`
-}
-
-func (m *DataWithSeq) Reset()         { *m = DataWithSeq{} }
-func (m *DataWithSeq) String() string { return proto.CompactTextString(m) }
-func (*DataWithSeq) ProtoMessage()    {}
-func (*DataWithSeq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_050d7f513d72eb9a, []int{2}
-}
-func (m *DataWithSeq) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *DataWithSeq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_DataWithSeq.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *DataWithSeq) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_DataWithSeq.Merge(m, src)
-}
-func (m *DataWithSeq) XXX_Size() int {
-	return m.Size()
-}
-func (m *DataWithSeq) XXX_DiscardUnknown() {
-	xxx_messageInfo_DataWithSeq.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_DataWithSeq proto.InternalMessageInfo
-
-func (m *DataWithSeq) GetData() []byte {
-	if m != nil {
-		return m.Data
-	}
-	return nil
-}
-
-func (m *DataWithSeq) GetSequence() uint64 {
-	if m != nil {
-		return m.Sequence
-	}
-	return 0
+	return false
 }
 
 func init() {
 	proto.RegisterType((*DIDDocument)(nil), "panacea.did.v3.DIDDocument")
-	proto.RegisterType((*DIDDocumentWithSeq)(nil), "panacea.did.v3.DIDDocumentWithSeq")
-	proto.RegisterType((*DataWithSeq)(nil), "panacea.did.v3.DataWithSeq")
 }
 
 func init() { proto.RegisterFile("panacea/did/v3/did.proto", fileDescriptor_050d7f513d72eb9a) }
 
 var fileDescriptor_050d7f513d72eb9a = []byte{
-	// 270 bytes of a gzipped FileDescriptorProto
+	// 229 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0x92, 0x28, 0x48, 0xcc, 0x4b,
 	0x4c, 0x4e, 0x4d, 0xd4, 0x4f, 0xc9, 0x4c, 0xd1, 0x2f, 0x33, 0x06, 0x51, 0x7a, 0x05, 0x45, 0xf9,
 	0x25, 0xf9, 0x42, 0x7c, 0x50, 0x19, 0x3d, 0x90, 0x50, 0x99, 0xb1, 0x94, 0x48, 0x7a, 0x7e, 0x7a,
-	0x3e, 0x58, 0x4a, 0x1f, 0xc4, 0x82, 0xa8, 0x52, 0x0a, 0xe7, 0xe2, 0x76, 0xf1, 0x74, 0x71, 0xc9,
+	0x3e, 0x58, 0x4a, 0x1f, 0xc4, 0x82, 0xa8, 0x52, 0xaa, 0xe4, 0xe2, 0x76, 0xf1, 0x74, 0x71, 0xc9,
 	0x4f, 0x2e, 0xcd, 0x4d, 0xcd, 0x2b, 0x11, 0x92, 0xe2, 0xe2, 0x48, 0x81, 0xb2, 0x25, 0x18, 0x15,
 	0x18, 0x35, 0x78, 0x82, 0xe0, 0x7c, 0x21, 0x1d, 0x2e, 0x21, 0x18, 0x3b, 0x3e, 0x25, 0xb1, 0x24,
 	0x31, 0xbe, 0xa4, 0xb2, 0x20, 0x55, 0x82, 0x49, 0x81, 0x51, 0x83, 0x33, 0x48, 0x00, 0x26, 0xe3,
-	0x92, 0x58, 0x92, 0x18, 0x52, 0x59, 0x90, 0xaa, 0x94, 0xc9, 0x25, 0x84, 0x64, 0x70, 0x78, 0x66,
-	0x49, 0x46, 0x70, 0x6a, 0xa1, 0x90, 0x39, 0x9a, 0xf9, 0xdc, 0x46, 0xd2, 0x7a, 0xa8, 0xee, 0xd4,
-	0x43, 0xd2, 0x85, 0x64, 0xb9, 0x14, 0x17, 0x47, 0x71, 0x6a, 0x61, 0x69, 0x6a, 0x5e, 0x32, 0xc4,
-	0x4a, 0x96, 0x20, 0x38, 0x5f, 0xc9, 0x96, 0x8b, 0x1b, 0x64, 0x2d, 0xcc, 0x0e, 0x21, 0x2e, 0x16,
-	0x90, 0xf3, 0xa0, 0xee, 0x07, 0xb3, 0xf1, 0x69, 0x77, 0xf2, 0x38, 0xf1, 0x48, 0x8e, 0xf1, 0xc2,
-	0x23, 0x39, 0xc6, 0x07, 0x8f, 0xe4, 0x18, 0x27, 0x3c, 0x96, 0x63, 0xb8, 0xf0, 0x58, 0x8e, 0xe1,
-	0xc6, 0x63, 0x39, 0x86, 0x00, 0xc6, 0x28, 0x9d, 0xf4, 0xcc, 0x92, 0x8c, 0xd2, 0x24, 0xbd, 0xe4,
-	0xfc, 0x5c, 0xfd, 0xdc, 0xd4, 0x94, 0xcc, 0xa4, 0x9c, 0xfc, 0x64, 0x7d, 0xa8, 0x83, 0x75, 0x93,
-	0xf3, 0x8b, 0x52, 0xf5, 0x2b, 0xc0, 0x21, 0x0f, 0x0a, 0x8a, 0xe2, 0x24, 0x36, 0x70, 0x98, 0x1a,
-	0x03, 0x02, 0x00, 0x00, 0xff, 0xff, 0xcb, 0xe6, 0x7a, 0x16, 0x95, 0x01, 0x00, 0x00,
+	0x92, 0x58, 0x92, 0x18, 0x52, 0x59, 0x90, 0x2a, 0xa4, 0xc0, 0xc5, 0x9d, 0x92, 0x9a, 0x98, 0x5c,
+	0x92, 0x59, 0x96, 0x58, 0x92, 0x9a, 0x22, 0xc1, 0xac, 0xc0, 0xa8, 0xc1, 0x11, 0x84, 0x2c, 0xe4,
+	0xe4, 0x71, 0xe2, 0x91, 0x1c, 0xe3, 0x85, 0x47, 0x72, 0x8c, 0x0f, 0x1e, 0xc9, 0x31, 0x4e, 0x78,
+	0x2c, 0xc7, 0x70, 0xe1, 0xb1, 0x1c, 0xc3, 0x8d, 0xc7, 0x72, 0x0c, 0x01, 0x8c, 0x51, 0x3a, 0xe9,
+	0x99, 0x25, 0x19, 0xa5, 0x49, 0x7a, 0xc9, 0xf9, 0xb9, 0xfa, 0xb9, 0xa9, 0x29, 0x99, 0x49, 0x39,
+	0xf9, 0xc9, 0xfa, 0x50, 0x0f, 0xe9, 0x26, 0xe7, 0x17, 0xa5, 0xea, 0x57, 0x80, 0x7d, 0x0c, 0x72,
+	0x42, 0x71, 0x12, 0x1b, 0xd8, 0x2f, 0xc6, 0x80, 0x00, 0x00, 0x00, 0xff, 0xff, 0xed, 0x40, 0x57,
+	0x6a, 0x0d, 0x01, 0x00, 0x00,
 }
 
 func (m *DIDDocument) Marshal() (dAtA []byte, err error) {
@@ -235,6 +129,16 @@ func (m *DIDDocument) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
+	if m.Deactivated {
+		i--
+		if m.Deactivated {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x18
+	}
 	if len(m.DocumentDataType) > 0 {
 		i -= len(m.DocumentDataType)
 		copy(dAtA[i:], m.DocumentDataType)
@@ -246,81 +150,6 @@ func (m *DIDDocument) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i -= len(m.Document)
 		copy(dAtA[i:], m.Document)
 		i = encodeVarintDid(dAtA, i, uint64(len(m.Document)))
-		i--
-		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *DIDDocumentWithSeq) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *DIDDocumentWithSeq) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *DIDDocumentWithSeq) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if m.Sequence != 0 {
-		i = encodeVarintDid(dAtA, i, uint64(m.Sequence))
-		i--
-		dAtA[i] = 0x10
-	}
-	if m.Document != nil {
-		{
-			size, err := m.Document.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintDid(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *DataWithSeq) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *DataWithSeq) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *DataWithSeq) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if m.Sequence != 0 {
-		i = encodeVarintDid(dAtA, i, uint64(m.Sequence))
-		i--
-		dAtA[i] = 0x10
-	}
-	if len(m.Data) > 0 {
-		i -= len(m.Data)
-		copy(dAtA[i:], m.Data)
-		i = encodeVarintDid(dAtA, i, uint64(len(m.Data)))
 		i--
 		dAtA[i] = 0xa
 	}
@@ -352,37 +181,8 @@ func (m *DIDDocument) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovDid(uint64(l))
 	}
-	return n
-}
-
-func (m *DIDDocumentWithSeq) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if m.Document != nil {
-		l = m.Document.Size()
-		n += 1 + l + sovDid(uint64(l))
-	}
-	if m.Sequence != 0 {
-		n += 1 + sovDid(uint64(m.Sequence))
-	}
-	return n
-}
-
-func (m *DataWithSeq) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	l = len(m.Data)
-	if l > 0 {
-		n += 1 + l + sovDid(uint64(l))
-	}
-	if m.Sequence != 0 {
-		n += 1 + sovDid(uint64(m.Sequence))
+	if m.Deactivated {
+		n += 2
 	}
 	return n
 }
@@ -488,97 +288,11 @@ func (m *DIDDocument) Unmarshal(dAtA []byte) error {
 			}
 			m.DocumentDataType = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipDid(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthDid
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *DIDDocumentWithSeq) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowDid
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: DIDDocumentWithSeq: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: DIDDocumentWithSeq: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Document", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowDid
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthDid
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthDid
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.Document == nil {
-				m.Document = &DIDDocument{}
-			}
-			if err := m.Document.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 2:
+		case 3:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Sequence", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Deactivated", wireType)
 			}
-			m.Sequence = 0
+			var v int
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowDid
@@ -588,114 +302,12 @@ func (m *DIDDocumentWithSeq) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.Sequence |= uint64(b&0x7F) << shift
+				v |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-		default:
-			iNdEx = preIndex
-			skippy, err := skipDid(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthDid
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *DataWithSeq) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowDid
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: DataWithSeq: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: DataWithSeq: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Data", wireType)
-			}
-			var byteLen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowDid
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				byteLen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if byteLen < 0 {
-				return ErrInvalidLengthDid
-			}
-			postIndex := iNdEx + byteLen
-			if postIndex < 0 {
-				return ErrInvalidLengthDid
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Data = append(m.Data[:0], dAtA[iNdEx:postIndex]...)
-			if m.Data == nil {
-				m.Data = []byte{}
-			}
-			iNdEx = postIndex
-		case 2:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Sequence", wireType)
-			}
-			m.Sequence = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowDid
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.Sequence |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
+			m.Deactivated = bool(v != 0)
 		default:
 			iNdEx = preIndex
 			skippy, err := skipDid(dAtA[iNdEx:])

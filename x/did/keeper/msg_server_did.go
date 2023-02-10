@@ -1,13 +1,14 @@
 package keeper
 
 import (
+	"bytes"
 	"context"
+	"strconv"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	ariesdid "github.com/hyperledger/aries-framework-go/pkg/doc/did"
 	"github.com/medibloc/panacea-core/v2/x/did/types"
-	"github.com/tendermint/tendermint/crypto/secp256k1"
 )
 
 func (m msgServer) CreateDID(goCtx context.Context, msg *types.MsgCreateDID) (*types.MsgCreateDIDResponse, error) {
@@ -16,20 +17,16 @@ func (m msgServer) CreateDID(goCtx context.Context, msg *types.MsgCreateDID) (*t
 
 	cur := keeper.GetDIDDocument(ctx, msg.Did)
 	if !cur.Empty() {
-		if cur.Deactivated() {
+		if cur.Deactivated {
 			return nil, sdkerrors.Wrapf(types.ErrDIDDeactivated, "DID: %s", msg.Did)
 		}
 		return nil, sdkerrors.Wrapf(types.ErrDIDExists, "DID: %s", msg.Did)
 	}
 
-	seq := types.InitialSequence
-	_, err := VerifyDIDOwnership(msg.Document, seq, msg.Document, msg.Signature)
-	if err != nil {
-		return nil, err
+	if !msg.Document.Valid() {
+		return nil, sdkerrors.Wrapf(types.ErrInvalidDIDDocument, "DID: %s", msg.Did)
 	}
 
-	docWithSeq := types.NewDIDDocumentWithSeq(msg.Document, seq)
-	keeper.SetDIDDocument(ctx, msg.Did, docWithSeq)
 	return &types.MsgCreateDIDResponse{}, nil
 }
 
@@ -37,21 +34,19 @@ func (m msgServer) UpdateDID(goCtx context.Context, msg *types.MsgUpdateDID) (*t
 	keeper := m.Keeper
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	docWithSeq := keeper.GetDIDDocument(ctx, msg.Did)
-	if docWithSeq.Empty() {
+	prevDocument := keeper.GetDIDDocument(ctx, msg.Did)
+	if prevDocument.Empty() {
 		return nil, sdkerrors.Wrapf(types.ErrDIDNotFound, "DID: %s", msg.Did)
 	}
-	if docWithSeq.Deactivated() {
+	if prevDocument.Deactivated {
 		return nil, sdkerrors.Wrapf(types.ErrDIDDeactivated, "DID: %s", msg.Did)
 	}
 
-	newSeq, err := VerifyDIDOwnership(msg.Document, docWithSeq.Sequence, docWithSeq.Document, msg.Signature)
-	if err != nil {
-		return nil, err
+	if err := VerifyDIDOwnership(msg.Document.Document, prevDocument.Document); err != nil {
+		return &types.MsgUpdateDIDResponse{}, err
 	}
 
-	newDocWithSeq := types.NewDIDDocumentWithSeq(msg.Document, newSeq)
-	keeper.SetDIDDocument(ctx, msg.Did, newDocWithSeq)
+	keeper.SetDIDDocument(ctx, msg.Did, msg.Document)
 	return &types.MsgUpdateDIDResponse{}, nil
 }
 
@@ -59,51 +54,80 @@ func (m msgServer) DeactivateDID(goCtx context.Context, msg *types.MsgDeactivate
 	keeper := m.Keeper
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	docWithSeq := keeper.GetDIDDocument(ctx, msg.Did)
-	if docWithSeq.Empty() {
+	document := keeper.GetDIDDocument(ctx, msg.Did)
+	if document.Empty() {
 		return nil, sdkerrors.Wrapf(types.ErrDIDNotFound, "DID: %s", msg.Did)
 	}
-	if docWithSeq.Deactivated() {
+	if document.Deactivated {
 		return nil, sdkerrors.Wrapf(types.ErrDIDDeactivated, "DID: %s", msg.Did)
 	}
+	document.Deactivated = true
 
-	doc := types.DIDDocument{}
-
-	newSeq, err := VerifyDIDOwnership(&doc, docWithSeq.Sequence, docWithSeq.Document, msg.Signature)
-	if err != nil {
-		return nil, err
-	}
-
-	keeper.SetDIDDocument(ctx, msg.Did, docWithSeq.Deactivate(newSeq))
+	keeper.SetDIDDocument(ctx, msg.Did, document)
 	return &types.MsgDeactivateDIDResponse{}, nil
 
 }
 
-func VerifyDIDOwnership(signData *types.DIDDocument, seq uint64, doc *types.DIDDocument, sig []byte) (uint64, error) {
+func VerifyDIDOwnership(newDocument, prevDocument []byte) error {
 
-	docBz := doc.Document
-	document, err := ariesdid.ParseDocument(docBz)
+	doc, err := ariesdid.ParseDocument(prevDocument)
 	if err != nil {
-		return 0, sdkerrors.Wrapf(types.ErrInvalidDIDDocument, "failed to parse did document")
+		return sdkerrors.Wrapf(types.ErrInvalidDIDDocument, "failed to parse did document")
 	}
 
-	// TODO: Currently, the public key is stored in the first verificationMethod and make signature using it.
-	//		 We will improve this later by using the document's proof field.
-	verificationMethod := document.VerificationMethod[0]
+	// get previous document signing method
+	proofMehtodID := doc.Proof[0].Creator
+	var verificationMethod ariesdid.VerificationMethod
 
-	// TODO: Currently, only ES256K1 is supported to verify DID ownership.
-	//       It makes sense for now, since a DID is derived from a Secp256k1 public key.
-	//       But, need to support other key types (according to verificationMethod.Type).
-	if verificationMethod.Type != types.ES256K_2019 && verificationMethod.Type != types.ES256K_2018 {
-		return 0, sdkerrors.Wrapf(types.ErrVerificationMethodKeyTypeNotImplemented, "VerificationMethod: %v", verificationMethod.Type)
+	for _, vm := range doc.VerificationMethod {
+		if vm.ID == proofMehtodID {
+			verificationMethod = vm
+		}
 	}
 
-	var key secp256k1.PubKey = make([]byte, secp256k1.PubKeySize)
-	copy(key[:], document.VerificationMethod[0].Value)
-
-	newSeq, ok := types.Verify(sig, signData, seq, key)
-	if !ok {
-		return 0, types.ErrSigVerificationFailed
+	// check
+	newDoc, err := ariesdid.ParseDocument(newDocument)
+	if err != nil {
+		return sdkerrors.Wrapf(types.ErrInvalidDIDDocument, "failed to parse did document")
 	}
-	return newSeq, nil
+
+	check := false
+	for _, vm := range newDoc.VerificationMethod {
+		if vm.ID == proofMehtodID {
+			check = IsEqualVerificationMethod(vm, verificationMethod)
+		}
+	}
+
+	if check == false {
+		return sdkerrors.Wrapf(types.ErrInvalidDIDDocument, "there is no proof verification method in document")
+	}
+
+	// check newDoc proof method id
+	if newDoc.Proof[0].Creator != proofMehtodID {
+		return sdkerrors.Wrapf(types.ErrInvalidDIDDocument, "does not match previous proof method")
+	}
+
+	// check newDoc domain
+	prevSequence, err := strconv.ParseUint(doc.Proof[0].Domain, 10, 64)
+	if err != nil {
+		return sdkerrors.Wrapf(types.ErrInvalidDIDDocument, "invalid sequence")
+	}
+	newSequence, err := strconv.ParseUint(newDoc.Proof[0].Domain, 10, 64)
+	if err != nil {
+		return sdkerrors.Wrapf(types.ErrInvalidDIDDocument, "invalid sequence")
+	}
+	if newSequence != prevSequence+1 {
+		return sdkerrors.Wrapf(types.ErrInvalidDIDDocument, "invalid sequence")
+	}
+
+	// verify proof
+	if err := types.VerifyProof(*newDoc); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func IsEqualVerificationMethod(vm1, vm2 ariesdid.VerificationMethod) bool {
+	return vm1.ID == vm2.ID && vm1.Type == vm2.Type && vm1.Controller == vm2.Controller && bytes.Equal(vm1.Value, vm2.Value)
 }

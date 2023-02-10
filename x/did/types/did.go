@@ -9,11 +9,14 @@ import (
 	"github.com/btcsuite/btcutil/base58"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	ariesdid "github.com/hyperledger/aries-framework-go/pkg/doc/did"
-	log "github.com/sirupsen/logrus"
 )
 
 const (
 	DIDMethod                  = "panacea"
+	DidContext                 = "https://w3id.org/did/v1"
+	SecurityContext            = "https://w3id.org/security/v1"
+	DidDocumentDataType        = "github.com/hyperledger/aries-framework-go/pkg/doc/did.Doc@v0.1.8"
+	InitialSequence            = 0
 	Base58Charset              = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
 	MaxVerificationMethodIDLen = 128
 )
@@ -29,7 +32,6 @@ func NewDID(pubKey []byte) string {
 }
 
 func ValidateDID(did string) error {
-
 	if _, err := ariesdid.Parse(did); err != nil {
 		return sdkerrors.Wrapf(ErrInvalidDID, "did: %v, error: %v", did, err)
 	}
@@ -37,19 +39,29 @@ func ValidateDID(did string) error {
 }
 
 func (doc DIDDocument) Valid() bool {
-	if doc.Empty() { // deactivated
+	if doc.Empty() {
 		return true
 	}
+	document, err := ariesdid.ParseDocument(doc.Document)
+	if err != nil {
+		return false
+	}
 
-	_, err := ariesdid.ParseDocument(doc.Document)
+	// check document is signed or not
+	if document.Proof == nil {
+		return false
+	}
 
-	return err == nil
+	if err := VerifyProof(*document); err != nil {
+		return false
+	}
+
+	return true
 }
 
 func (doc DIDDocument) Empty() bool {
 	return doc.DocumentDataType == "" || doc.Document == nil
 }
-
 func ValidateDocument(documentBz []byte) error {
 	if _, err := ariesdid.ParseDocument(documentBz); err != nil {
 		return err
@@ -59,32 +71,28 @@ func ValidateDocument(documentBz []byte) error {
 
 func NewVerificationMethodID(did string, name string) string {
 	// https://www.w3.org/TR/did-core/#fragment
-	return fmt.Sprintf("%v#%s", did, name)
+	return fmt.Sprintf("%s#%s", did, name)
 }
 
-func ParseVerificationMethodID(id string, did string) (string, error) {
-	methodID := id
-	if !ValidateVerificationMethodID(id, did) {
-		return "", sdkerrors.Wrapf(ErrInvalidVerificationMethodID, "verificationMethodID: %v, did: %v", id, did)
-	}
-	return methodID, nil
-}
-
-func ValidateVerificationMethodID(verificationMethodID string, did string) bool {
+func ValidateVerificationMethodID(verificationMethodID string, did string) error {
 	prefix := fmt.Sprintf("%v#", did)
 	if !strings.HasPrefix(verificationMethodID, prefix) {
-		return false
+		return sdkerrors.Wrapf(ErrInvalidVerificationMethodID, "verificationMethodID: %v, did: %v", verificationMethodID, did)
 	}
 
 	// Limit the length because it can be used for keystore filenames.
 	// Max filename length on Linux is usually 256 bytes.
 	if len(verificationMethodID)-len(prefix) > MaxVerificationMethodIDLen {
-		return false
+		return sdkerrors.Wrapf(ErrInvalidVerificationMethodID, "verificationMethodID: %v, did: %v", verificationMethodID, did)
 	}
 
 	suffix := verificationMethodID[len(prefix):]
-	matched, _ := regexp.MatchString(`^\S+$`, suffix) // no whitespace
-	return matched
+	// no whitespace
+	if _, err := regexp.MatchString(`^\S+$`, suffix); err != nil {
+		return sdkerrors.Wrapf(ErrInvalidVerificationMethodID, "verificationMethodID: %v, did: %v", verificationMethodID, did)
+	}
+
+	return nil
 }
 
 func NewVerificationMethod(verificationMethodID string, keyType string, did string, pubKey []byte) ariesdid.VerificationMethod {
@@ -117,16 +125,13 @@ func NewDocument(did string, opts ...ariesdid.DocOption) ariesdid.Doc {
 
 	doc := ariesdid.BuildDoc(opts...)
 	doc.ID = did
+	doc.Context = []string{DidContext, SecurityContext}
 
 	return *doc
 }
 
-func NewDIDDocument(document ariesdid.Doc, documentDataType string) (DIDDocument, error) {
+func NewDIDDocument(documentBz []byte, documentDataType string) (DIDDocument, error) {
 
-	documentBz, err := document.JSONBytes()
-	if err != nil {
-		return DIDDocument{}, err
-	}
 	if err := ValidateDocument(documentBz); err != nil {
 		return DIDDocument{}, err
 	}
@@ -134,14 +139,17 @@ func NewDIDDocument(document ariesdid.Doc, documentDataType string) (DIDDocument
 	didDocument := DIDDocument{
 		Document:         documentBz,
 		DocumentDataType: documentDataType,
+		Deactivated:      false,
 	}
 
 	return didDocument, nil
 }
 
+// verification key & signature type
 const (
 	JSONWEBKEY_2020 = "JsonWebKey2020"
 	ES256K_2019     = "EcdsaSecp256k1VerificationKey2019"
+	ES256K_2019_SIG = "EcdsaSecp256k1Signature2019"
 	ES256K_2018     = "Secp256k1VerificationKey2018" // deprecated
 	ED25519_2018    = "Ed25519VerificationKey2018"
 	BLS1281G1_2020  = "Bls12381G1Key2020"
@@ -152,54 +160,3 @@ const (
 	SS256K_2019     = "SchnorrSecp256k1VerificationKey2019"
 	ES256K_R_2020   = "EcdsaSecp256k1RecoveryMethod2020"
 )
-
-func ValidateKeyType(keyType string) bool {
-	switch keyType {
-	case JSONWEBKEY_2020,
-		ES256K_2019,
-		ES256K_2018,
-		ED25519_2018,
-		BLS1281G1_2020,
-		BLS1281G2_2020,
-		GPG_2020,
-		RSA_2018,
-		X25519_2019,
-		SS256K_2019,
-		ES256K_R_2020:
-		return true
-	}
-
-	if keyType == "" {
-		return false
-	}
-	log.Printf("[warn] unknown key type: %s\n", keyType) // TODO: Use tendermint logger
-	return true
-}
-
-func NewDIDDocumentWithSeq(doc *DIDDocument, seq uint64) DIDDocumentWithSeq {
-	return DIDDocumentWithSeq{
-		Document: doc,
-		Sequence: seq,
-	}
-}
-
-// Empty returns true if all members in DIDDocumentWithSeq are empty.
-// The empty struct means that the entity doesn't exist.
-func (d DIDDocumentWithSeq) Empty() bool {
-	return d.Document == nil || d.Document.Empty() && d.Sequence == InitialSequence
-}
-
-func (d DIDDocumentWithSeq) Valid() bool {
-	return d.Document.Valid()
-}
-
-// Deactivate creates a new DIDDocumentWithSeq with an empty DIDDocument (tombstone).
-// Note that it requires a new sequence.
-func (d DIDDocumentWithSeq) Deactivate(newSeq uint64) DIDDocumentWithSeq {
-	return NewDIDDocumentWithSeq(&DIDDocument{}, newSeq)
-}
-
-// Deactivated returns true if the DIDDocument has been activated.
-func (d DIDDocumentWithSeq) Deactivated() bool {
-	return d.Document.Empty() && d.Sequence != InitialSequence
-}

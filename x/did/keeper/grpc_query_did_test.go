@@ -22,13 +22,13 @@ func TestQueryDIDTestSuite(t *testing.T) {
 func (suite *queryDIDTestSuite) TestDIDDocumentWithSeq() {
 	didKeeper := suite.DIDKeeper
 	did := "did1:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm"
-	docWithSeq, _ := makeTestDIDDocumentWithSeq(did)
+	didDocument, _, _ := makeTestDIDDocument(did)
 
-	didKeeper.SetDIDDocument(suite.Ctx, did, docWithSeq)
+	didKeeper.SetDIDDocument(suite.Ctx, did, didDocument)
 
 	req := types.QueryDIDRequest{DidBase64: base64.StdEncoding.EncodeToString([]byte(did))}
 	res, err := didKeeper.DID(sdk.WrapSDKContext(suite.Ctx), &req)
 	suite.Require().NoError(err)
 	suite.Require().NotNil(res)
-	suite.Require().Equal(docWithSeq, *res.DidDocumentWithSeq)
+	suite.Require().Equal(didDocument, res.DidDocument)
 }

@@ -11,19 +11,19 @@ option go_package = "github.com/medibloc/panacea-core/x/did/types";
 
 // Query defines the gRPC querier service.
 service Query {
-	// DID returns a DID Document with a sequence number.
+	// DID returns a DID Document.
 	rpc DID(QueryDIDRequest) returns (QueryDIDResponse) {
 		option (google.api.http).get = "/panacea/did/v3/dids/{did_base64}";
 	}
 }
 
-// QueryDIDRequest is the request type for the Query/DIDDocumentWithSeq RPC method.
+// QueryDIDRequest is the request type for the Query/DIDDocument RPC method.
 message QueryDIDRequest {
 	// NOTE: Using base64 due to the URI path cannot contain colons.
 	string did_base64 = 1;
 }
 
-// QueryDIDResponse is the response type for the Query/DIDDocumentWithSeq RPC method.
+// QueryDIDResponse is the response type for the Query/DIDDocument RPC method.
 message QueryDIDResponse {
-	DIDDocumentWithSeq did_document_with_seq = 1;
+	DIDDocument did_document= 1;
 }

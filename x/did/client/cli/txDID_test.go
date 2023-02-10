@@ -7,11 +7,10 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/btcsuite/btcd/btcec"
 	"github.com/btcsuite/btcutil/base58"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	ariesdid "github.com/hyperledger/aries-framework-go/pkg/doc/did"
-	"github.com/tendermint/tendermint/crypto/secp256k1"
-
 	"github.com/stretchr/testify/suite"
 
 	"github.com/medibloc/panacea-core/v2/types/testsuite"
@@ -47,14 +46,13 @@ func (suite *txTestSuite) TestNewMsgCreateDID() {
 	verificationMethod := doc.VerificationMethod[0]
 	value := verificationMethod.Value
 
-	var pubKey secp256k1.PubKey = make([]byte, secp256k1.PubKeySize)
-	copy(pubKey[:], value)
+	_, btcecPubKey := btcec.PrivKeyFromBytes(btcec.S256(), privKey.Bytes())
 
-	suite.Require().Equal(privKey.PubKey(), pubKey)
+	suite.Require().Equal(btcecPubKey.SerializeUncompressed(), value)
 
 	// check if the signature can be verifiable with the initial sequence
-	_, ok := types.Verify(msg.Signature, msg.Document, types.InitialSequence, pubKey)
-	suite.Require().True(ok)
+	err = types.VerifyProof(*doc)
+	suite.Require().NoError(err)
 }
 
 func (suite *txTestSuite) TestReadBIP39ParamsFrom_NotInteractive() {
@@ -133,7 +131,7 @@ func (suite *txTestSuite) TestReadDIDDocOneContext_W3C() {
 func (suite *txTestSuite) testReadDIDDocOneContext(path string) {
 	doc, err := readDIDDocFrom(path)
 	suite.Require().NoError(err)
-	document, err := ariesdid.ParseDocument(doc.Document)
+	document, err := ariesdid.ParseDocument(doc)
 	suite.Require().NoError(err)
 	contexts := document.Context
 	suite.Require().Equal(1, len(contexts))
@@ -159,7 +157,7 @@ func (suite *txTestSuite) TestReadDIDDocTwoContexts_W3C() {
 func (suite *txTestSuite) testReadDIDDocTwoContexts(path string) {
 	doc, err := readDIDDocFrom(path)
 	suite.Require().NoError(err)
-	document, err := ariesdid.ParseDocument(doc.Document)
+	document, err := ariesdid.ParseDocument(doc)
 	suite.Require().NoError(err)
 	contexts := document.Context
 	suite.Require().Equal(2, len(contexts))
@@ -199,7 +197,7 @@ func (suite *txTestSuite) testReadDIDDocMultiRelationship(path string) {
 	doc, err := readDIDDocFrom(path)
 
 	suite.Require().NoError(err)
-	document, err := ariesdid.ParseDocument(doc.Document)
+	document, err := ariesdid.ParseDocument(doc)
 	suite.Require().NoError(err)
 	contexts := document.Context
 	suite.Require().Equal(2, len(contexts))

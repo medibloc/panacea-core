@@ -8,5 +8,5 @@ import "panacea/did/v3/did.proto";
 
 // GenesisState defines the did module's genesis state.
 message GenesisState {
-  map<string, DIDDocumentWithSeq> documents = 1;
+  map<string, DIDDocument> documents = 1;
 }

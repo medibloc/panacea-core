@@ -83,25 +83,17 @@ func TestDIDDocumentEmpty(t *testing.T) {
 
 func TestDIDDocumentEmptyDID(t *testing.T) {
 	document := types.NewDocument("")
+	documentBz, err := document.JSONBytes()
+	require.NoError(t, err)
 
-	_, err := types.NewDIDDocument(document, "test")
+	err = types.ValidateDocument(documentBz)
 	require.Error(t, err)
-	require.Contains(t, err.Error(), "id is required")
 }
 
 func TestDIDDocumentWithSeqEmpty(t *testing.T) {
 	document := getValidDIDDocument()
-	require.False(t, types.NewDIDDocumentWithSeq(&document, types.InitialSequence).Empty())
-	require.True(t, types.DIDDocumentWithSeq{}.Empty())
-}
-
-func TestDIDDocumentWithSeqDeactivate(t *testing.T) {
-	document := getValidDIDDocument()
-	docWithSeq := types.NewDIDDocumentWithSeq(&document, types.InitialSequence)
-	deactivated := docWithSeq.Deactivate(types.InitialSequence + 1)
-	require.True(t, deactivated.Deactivated())
-	require.False(t, deactivated.Empty())
-	require.True(t, deactivated.Valid())
+	require.False(t, document.Empty())
+	require.True(t, types.DIDDocument{}.Empty())
 }
 
 func getValidDIDDocument() types.DIDDocument {
@@ -115,6 +107,8 @@ func getValidDIDDocument() types.DIDDocument {
 		ariesdid.WithVerificationMethod([]ariesdid.VerificationMethod{verificationMethod}),
 		ariesdid.WithAuthentication([]ariesdid.Verification{authentication}))
 
-	didDocument, _ := types.NewDIDDocument(document, "aries-framework-go@v0.1.8")
+	docmentBz, _ := document.JSONBytes()
+
+	didDocument, _ := types.NewDIDDocument(docmentBz, types.DidDocumentDataType)
 	return didDocument
 }

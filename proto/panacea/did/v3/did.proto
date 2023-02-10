@@ -10,17 +10,5 @@ import "gogoproto/gogo.proto";
 message DIDDocument {
   bytes document = 1;
   string document_data_type = 2;
-}
-
-// TODO: sequence can be replaced with the Challenge field of document proof.
-// DIDDocumentWithSeq defines a message for DID Document with a sequence number for preventing replay attacks.
-message DIDDocumentWithSeq {
-  DIDDocument document = 1;
-  uint64 sequence = 2;
-}
-
-// DataWithSeq defines a message for data with a sequence number for preventing replay attacks.
-message DataWithSeq {
-  bytes data = 1;
-  uint64 sequence = 2;
+  bool deactivated = 3;
 }

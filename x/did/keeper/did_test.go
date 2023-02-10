@@ -4,14 +4,13 @@ import (
 	"testing"
 	"time"
 
+	"github.com/btcsuite/btcd/btcec"
 	ariesdid "github.com/hyperledger/aries-framework-go/pkg/doc/did"
-	"github.com/tendermint/tendermint/crypto"
 	"github.com/tendermint/tendermint/crypto/secp256k1"
 
 	"github.com/stretchr/testify/suite"
 
 	"github.com/medibloc/panacea-core/v2/types/testsuite"
-	"github.com/medibloc/panacea-core/v2/x/did/internal/secp256k1util"
 	"github.com/medibloc/panacea-core/v2/x/did/types"
 )
 
@@ -28,16 +27,16 @@ func (suite *didTestSuite) TestSetGetDIDDocument() {
 
 	// Input two DIDDocument
 	did1 := "did1:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm"
-	docWithSeq1, _ := makeTestDIDDocumentWithSeq(did1)
-	didKeeper.SetDIDDocument(suite.Ctx, did1, docWithSeq1)
+	didDocument1, _, _ := makeTestDIDDocument(did1)
+	didKeeper.SetDIDDocument(suite.Ctx, did1, didDocument1)
 	did2 := "did1:panacea:1Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgap"
-	docWithSeq2, _ := makeTestDIDDocumentWithSeq(did1)
-	didKeeper.SetDIDDocument(suite.Ctx, did2, docWithSeq2)
+	didDocument2, _, _ := makeTestDIDDocument(did2)
+	didKeeper.SetDIDDocument(suite.Ctx, did2, didDocument2)
 
 	// Test one DIDDocument
-	resDocWithSeq := didKeeper.GetDIDDocument(suite.Ctx, did1)
-	suite.Require().NotNil(resDocWithSeq)
-	suite.Require().Equal(docWithSeq1, resDocWithSeq)
+	resDocument := didKeeper.GetDIDDocument(suite.Ctx, did1)
+	suite.Require().NotNil(resDocument)
+	suite.Require().Equal(didDocument1, resDocument)
 
 	// Test all DIDs
 	resDIDs := didKeeper.ListDIDs(suite.Ctx)
@@ -46,57 +45,30 @@ func (suite *didTestSuite) TestSetGetDIDDocument() {
 	suite.Require().Equal(did1, resDIDs[1])
 }
 
-func makeTestDIDDocumentWithSeq(id string) (types.DIDDocumentWithSeq, crypto.PrivKey) {
+func makeTestDIDDocument(id string) (*types.DIDDocument, *btcec.PrivateKey, string) {
 	privKey := secp256k1.GenPrivKey()
-	pubKey := secp256k1util.PubKeyBytes(secp256k1util.DerivePubKey(privKey))
-	verificationMethodID := types.NewVerificationMethodID(id, "key1")
-	verificationMethod := []ariesdid.VerificationMethod{
-		{
-			ID:         verificationMethodID,
-			Type:       types.ES256K_2019,
-			Controller: id,
-			Value:      pubKey,
-		},
-		{
-			ID:         verificationMethodID,
-			Type:       types.BLS1281G2_2020,
-			Controller: id,
-			Value:      []byte("dummy BBS+ pub key"),
-		},
-	}
+	btcecPrivKey, btcecPubKey := btcec.PrivKeyFromBytes(btcec.S256(), privKey.Bytes())
 
-	authentication := []ariesdid.Verification{
-		{VerificationMethod: *ariesdid.NewVerificationMethodFromBytes(verificationMethodID,
-			types.ES256K_2019,
-			id,
-			pubKey), Relationship: ariesdid.Authentication},
-		{VerificationMethod: ariesdid.VerificationMethod{
-			ID:         verificationMethodID,
-			Type:       types.ES256K_2019,
-			Controller: id,
-			Value:      pubKey,
-		}},
-	}
+	verificationMethodID := types.NewVerificationMethodID(id, "key1")
+	verificationMethod := types.NewVerificationMethod(verificationMethodID, types.ES256K_2019, id, btcecPubKey.SerializeUncompressed())
+
+	authentication := types.NewVerification(verificationMethod, ariesdid.Authentication)
 
 	createdTime := time.Now()
 
-	doc := &ariesdid.Doc{
-		Context:            []string{ariesdid.ContextV1},
-		ID:                 id,
-		VerificationMethod: verificationMethod,
-		Authentication:     authentication,
-		Created:            &createdTime,
-	}
+	doc := types.NewDocument(id,
+		ariesdid.WithVerificationMethod([]ariesdid.VerificationMethod{verificationMethod}),
+		ariesdid.WithAuthentication([]ariesdid.Verification{authentication}),
+		ariesdid.WithCreatedTime(createdTime),
+	)
+
 	docBz, _ := doc.JSONBytes()
 
 	document := &types.DIDDocument{
 		Document:         docBz,
-		DocumentDataType: "aries-framework-go@v0.1.8",
+		DocumentDataType: types.DidDocumentDataType,
+		Deactivated:      false,
 	}
 
-	docWithSeq := types.NewDIDDocumentWithSeq(
-		document,
-		types.InitialSequence,
-	)
-	return docWithSeq, privKey
+	return document, btcecPrivKey, verificationMethodID
 }
