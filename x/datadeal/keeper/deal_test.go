@@ -1,7 +1,10 @@
 package keeper_test
 
 import (
+	"encoding/json"
 	"testing"
+
+	"github.com/hyperledger/aries-framework-go/pkg/doc/presexch"
 
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -11,12 +14,18 @@ import (
 	"github.com/stretchr/testify/suite"
 )
 
+var (
+	intFilterType = "integer"
+)
+
 type dealTestSuite struct {
 	testutil.DataDealBaseTestSuite
 
 	defaultFunds    sdk.Coins
 	consumerAccAddr sdk.AccAddress
 	providerAccAddr sdk.AccAddress
+
+	pdBz []byte
 }
 
 func TestDealTestSuite(t *testing.T) {
@@ -32,6 +41,42 @@ func (suite *dealTestSuite) BeforeTest(_, _ string) {
 	err := suite.DataDealKeeper.SetNextDealNumber(suite.Ctx, 2)
 	suite.Require().NoError(err)
 	err = suite.DataDealKeeper.SetDeal(suite.Ctx, testDeal)
+	suite.Require().NoError(err)
+
+	required := presexch.Required
+	pd := &presexch.PresentationDefinition{
+		ID:      "c1b88ce1-8460-4baf-8f16-4759a2f055fd",
+		Purpose: "To sell you a drink we need to know that you are an adult.",
+		InputDescriptors: []*presexch.InputDescriptor{{
+			ID:      "age_descriptor",
+			Purpose: "Your age should be greater or equal to 18.",
+			// required temporarily in v0.1.8 for schema verification.
+			// schema will be optional by supporting presentation exchange v2
+			// https://github.com/hyperledger/aries-framework-go/commit/66d9bf30de2f5cd6116adaac27f277b45077f26f
+			Schema: []*presexch.Schema{{
+				URI:      "https://www.w3.org/2018/credentials#VerifiableCredential",
+				Required: false,
+			}, {
+				URI:      "https://w3id.org/security/bbs/v1",
+				Required: false,
+			}},
+			Constraints: &presexch.Constraints{
+				LimitDisclosure: &required,
+				Fields: []*presexch.Field{
+					{
+						Path: []string{"$.credentialSubject.age"},
+						Filter: &presexch.Filter{
+							Type:    &intFilterType,
+							Minimum: 18,
+							Maximum: 30,
+						},
+					},
+				},
+			},
+		}},
+	}
+
+	suite.pdBz, err = json.Marshal(pd)
 	suite.Require().NoError(err)
 }
 
@@ -54,6 +99,7 @@ func (suite *dealTestSuite) TestCreateNewDeal() {
 				Description: "description",
 			},
 		},
+		PresentationDefinition: suite.pdBz,
 	}
 
 	dealID, err := suite.DataDealKeeper.CreateDeal(suite.Ctx, msgCreateDeal)
@@ -71,6 +117,48 @@ func (suite *dealTestSuite) TestCreateNewDeal() {
 	suite.Require().Equal(deal.GetConsumerAddress(), msgCreateDeal.GetConsumerAddress())
 	suite.Require().Equal(deal.GetAgreementTerms(), msgCreateDeal.GetAgreementTerms())
 	suite.Require().Equal(deal.GetStatus(), types.DEAL_STATUS_ACTIVE)
+}
+
+func (suite *dealTestSuite) TestCreateDealInvalidPD() {
+	err := suite.FundAccount(suite.Ctx, suite.consumerAccAddr, suite.defaultFunds)
+	suite.Require().NoError(err)
+
+	budget := &sdk.Coin{Denom: assets.MicroMedDenom, Amount: sdk.NewInt(10000000)}
+
+	invalidPD := &presexch.PresentationDefinition{
+		ID:      "c1b88ce1-8460-4baf-8f16-4759a2f055fd",
+		Purpose: "To sell you a drink we need to know that you are an adult.",
+		InputDescriptors: []*presexch.InputDescriptor{{
+			Schema: []*presexch.Schema{{
+				URI:      "https://www.w3.org/2018/credentials#VerifiableCredential",
+				Required: false,
+			}, {
+				URI:      "https://w3id.org/security/bbs/v1",
+				Required: false,
+			}},
+		}},
+	}
+	invalidPDBz, err := json.Marshal(invalidPD)
+	suite.Require().NoError(err)
+
+	msgCreateDeal := &types.MsgCreateDeal{
+		DataSchema:      []string{"http://jsonld.com"},
+		Budget:          budget,
+		MaxNumData:      10000,
+		ConsumerAddress: suite.consumerAccAddr.String(),
+		AgreementTerms: []*types.AgreementTerm{
+			{
+				Id:          1,
+				Required:    true,
+				Title:       "title",
+				Description: "description",
+			},
+		},
+		PresentationDefinition: invalidPDBz,
+	}
+
+	err = msgCreateDeal.ValidateBasic()
+	suite.Require().ErrorContains(err, "invalid presentation definition")
 }
 
 func (suite *dealTestSuite) TestCheckDealCurNumDataAndIncrement() {

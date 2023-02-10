@@ -36,6 +36,11 @@ func (m *MsgCreateDeal) ValidateBasic() error {
 			return sdkerrors.Wrapf(err, "invalid agreement term")
 		}
 	}
+	if len(m.PresentationDefinition) > 0 {
+		if err := ValidatePD(m.PresentationDefinition); err != nil {
+			return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid presentation definition")
+		}
+	}
 	return nil
 }
 

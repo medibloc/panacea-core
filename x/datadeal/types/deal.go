@@ -1,7 +1,11 @@
 package types
 
 import (
+	"encoding/json"
+	"fmt"
 	"strconv"
+
+	"github.com/hyperledger/aries-framework-go/pkg/doc/presexch"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -12,15 +16,16 @@ func NewDeal(dealID uint64, msg *MsgCreateDeal) *Deal {
 	dealAddress := NewDealAddress(dealID)
 
 	return &Deal{
-		Id:              dealID,
-		Address:         dealAddress.String(),
-		DataSchema:      msg.DataSchema,
-		Budget:          msg.Budget,
-		MaxNumData:      msg.MaxNumData,
-		CurNumData:      0,
-		ConsumerAddress: msg.ConsumerAddress,
-		AgreementTerms:  msg.AgreementTerms,
-		Status:          DEAL_STATUS_ACTIVE,
+		Id:                     dealID,
+		Address:                dealAddress.String(),
+		DataSchema:             msg.DataSchema,
+		Budget:                 msg.Budget,
+		MaxNumData:             msg.MaxNumData,
+		CurNumData:             0,
+		ConsumerAddress:        msg.ConsumerAddress,
+		AgreementTerms:         msg.AgreementTerms,
+		Status:                 DEAL_STATUS_ACTIVE,
+		PresentationDefinition: msg.PresentationDefinition,
 	}
 }
 
@@ -85,5 +90,19 @@ func (t *AgreementTerm) ValidateBasic() error {
 	if len(t.Description) == 0 {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "the description of agreement term shouldn't be empty")
 	}
+	return nil
+}
+
+func ValidatePD(pdBz []byte) error {
+	var pd *presexch.PresentationDefinition
+
+	if err := json.Unmarshal(pdBz, &pd); err != nil {
+		return fmt.Errorf("failed to unmarshal presentation definition: %w", err)
+	}
+
+	if err := pd.ValidateSchema(); err != nil {
+		return fmt.Errorf("invalid presentation definition: %w", err)
+	}
+
 	return nil
 }

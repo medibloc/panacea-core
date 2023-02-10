@@ -17,6 +17,7 @@ message Deal {
   string consumer_address = 7;
   repeated AgreementTerm agreement_terms = 8;
   DealStatus status = 9;
+  bytes presentation_definition = 10;
 }
 
 // AgreementTerm defines a general format of an agreement term to be specified in a Deal.
