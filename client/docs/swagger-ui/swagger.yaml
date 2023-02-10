@@ -1,7 +1,7 @@
 swagger: '2.0'
 info:
   title: Cosmos SDK - Legacy REST and gRPC Gateway docs
-  description: 'A REST interface for state queries, legacy transactions'
+  description: A REST interface for state queries, legacy transactions
   version: 1.0.0
 paths:
   /node_info:
@@ -59,7 +59,7 @@ paths:
                     type: string
                   listen_addr:
                     type: string
-                    example: '192.168.56.1:26656'
+                    example: 192.168.56.1:26656
                   version:
                     description: Tendermint version
                     type: string
@@ -73,7 +73,7 @@ paths:
                         example: 'on'
                       rpc_address:
                         type: string
-                        example: 'tcp://0.0.0.0:26657'
+                        example: tcp://0.0.0.0:26657
         '500':
           description: Failed to query node status
   /syncing:
@@ -337,7 +337,7 @@ paths:
                                 7uTC74QlknqYWEwg7Vn6M8Om7FuZ0EO4bjvuj6rwH1mTUJrRuMMZvAAqT9VjNgP0RA/TDp6u/92AqrZfXJSpBQ==
         '500':
           description: Server internal error
-  '/blocks/{height}':
+  /blocks/{height}:
     get:
       summary: Get a block at a certain height
       tags:
@@ -627,7 +627,7 @@ paths:
                       example: '1000'
         '500':
           description: Server internal error
-  '/validatorsets/{height}':
+  /validatorsets/{height}:
     get:
       summary: Get a validator set a certain height
       tags:
@@ -674,7 +674,7 @@ paths:
           description: Block at height not available
         '500':
           description: Server internal error
-  '/txs/{hash}':
+  /txs/{hash}:
     get:
       deprecated: true
       summary: Get a Tx by hash
@@ -1233,7 +1233,7 @@ paths:
           description: The tx was malformated
         '500':
           description: Server internal error
-  '/bank/balances/{address}':
+  /bank/balances/{address}:
     get:
       deprecated: true
       summary: Get the account balances
@@ -1264,7 +1264,7 @@ paths:
                   example: '50'
         '500':
           description: Server internal error
-  '/bank/accounts/{address}/transfers':
+  /bank/accounts/{address}/transfers:
     post:
       deprecated: true
       summary: Send coins from one account to another
@@ -1297,7 +1297,7 @@ paths:
                     description: Sender address or Keybase name to generate a transaction
                   memo:
                     type: string
-                    example: "Sent via Cosmos Voyager \U0001F680"
+                    example: Sent via Cosmos Voyager 🚀
                   chain_id:
                     type: string
                     example: Cosmos-Hub
@@ -1395,7 +1395,7 @@ paths:
           description: Invalid request
         '500':
           description: Server internal error
-  '/auth/accounts/{address}':
+  /auth/accounts/{address}:
     get:
       deprecated: true
       summary: Get the account information on blockchain
@@ -1447,7 +1447,7 @@ paths:
                     type: string
         '500':
           description: Server internel error
-  '/staking/delegators/{delegatorAddr}/delegations':
+  /staking/delegators/{delegatorAddr}/delegations:
     parameters:
       - in: path
         name: delegatorAddr
@@ -1507,7 +1507,7 @@ paths:
                     description: Sender address or Keybase name to generate a transaction
                   memo:
                     type: string
-                    example: "Sent via Cosmos Voyager \U0001F680"
+                    example: Sent via Cosmos Voyager 🚀
                   chain_id:
                     type: string
                     example: Cosmos-Hub
@@ -1619,7 +1619,7 @@ paths:
           description: Key password is wrong
         '500':
           description: Internal Server Error
-  '/staking/delegators/{delegatorAddr}/delegations/{validatorAddr}':
+  /staking/delegators/{delegatorAddr}/delegations/{validatorAddr}:
     parameters:
       - in: path
         name: delegatorAddr
@@ -1665,7 +1665,7 @@ paths:
           description: Invalid delegator address or validator address
         '500':
           description: Internal Server Error
-  '/staking/delegators/{delegatorAddr}/unbonding_delegations':
+  /staking/delegators/{delegatorAddr}/unbonding_delegations:
     parameters:
       - in: path
         name: delegatorAddr
@@ -1722,7 +1722,7 @@ paths:
                     description: Sender address or Keybase name to generate a transaction
                   memo:
                     type: string
-                    example: "Sent via Cosmos Voyager \U0001F680"
+                    example: Sent via Cosmos Voyager 🚀
                   chain_id:
                     type: string
                     example: Cosmos-Hub
@@ -1828,7 +1828,7 @@ paths:
           description: Key password is wrong
         '500':
           description: Internal Server Error
-  '/staking/delegators/{delegatorAddr}/unbonding_delegations/{validatorAddr}':
+  /staking/delegators/{delegatorAddr}/unbonding_delegations/{validatorAddr}:
     parameters:
       - in: path
         name: delegatorAddr
@@ -1909,7 +1909,7 @@ paths:
               $ref: '#/definitions/Redelegation'
         '500':
           description: Internal Server Error
-  '/staking/delegators/{delegatorAddr}/redelegations':
+  /staking/delegators/{delegatorAddr}/redelegations:
     parameters:
       - in: path
         name: delegatorAddr
@@ -1936,7 +1936,7 @@ paths:
                     description: Sender address or Keybase name to generate a transaction
                   memo:
                     type: string
-                    example: "Sent via Cosmos Voyager \U0001F680"
+                    example: Sent via Cosmos Voyager 🚀
                   chain_id:
                     type: string
                     example: Cosmos-Hub
@@ -2044,7 +2044,7 @@ paths:
           description: Invalid delegator address or redelegation request body
         '500':
           description: Internal Server Error
-  '/staking/delegators/{delegatorAddr}/validators':
+  /staking/delegators/{delegatorAddr}/validators:
     parameters:
       - in: path
         name: delegatorAddr
@@ -2127,7 +2127,7 @@ paths:
           description: Invalid delegator address
         '500':
           description: Internal Server Error
-  '/staking/delegators/{delegatorAddr}/validators/{validatorAddr}':
+  /staking/delegators/{delegatorAddr}/validators/{validatorAddr}:
     parameters:
       - in: path
         name: delegatorAddr
@@ -2308,7 +2308,7 @@ paths:
                       example: '1970-01-01T00:00:00Z'
         '500':
           description: Internal Server Error
-  '/staking/validators/{validatorAddr}':
+  /staking/validators/{validatorAddr}:
     parameters:
       - in: path
         name: validatorAddr
@@ -2389,7 +2389,7 @@ paths:
           description: Invalid validator address
         '500':
           description: Internal Server Error
-  '/staking/validators/{validatorAddr}/delegations':
+  /staking/validators/{validatorAddr}/delegations:
     parameters:
       - in: path
         name: validatorAddr
@@ -2431,7 +2431,7 @@ paths:
           description: Invalid validator address
         '500':
           description: Internal Server Error
-  '/staking/validators/{validatorAddr}/unbonding_delegations':
+  /staking/validators/{validatorAddr}/unbonding_delegations:
     parameters:
       - in: path
         name: validatorAddr
@@ -2570,7 +2570,7 @@ paths:
           description: Invalid validator public key for one of the validators
         '500':
           description: Internal Server Error
-  '/slashing/validators/{validatorAddr}/unjail':
+  /slashing/validators/{validatorAddr}/unjail:
     post:
       deprecated: true
       summary: Unjail a jailed validator
@@ -2756,7 +2756,7 @@ paths:
                     description: Sender address or Keybase name to generate a transaction
                   memo:
                     type: string
-                    example: "Sent via Cosmos Voyager \U0001F680"
+                    example: Sent via Cosmos Voyager 🚀
                   chain_id:
                     type: string
                     example: Cosmos-Hub
@@ -2973,7 +2973,7 @@ paths:
                     description: Sender address or Keybase name to generate a transaction
                   memo:
                     type: string
-                    example: "Sent via Cosmos Voyager \U0001F680"
+                    example: Sent via Cosmos Voyager 🚀
                   chain_id:
                     type: string
                     example: Cosmos-Hub
@@ -3097,7 +3097,7 @@ paths:
           description: Invalid proposal body
         '500':
           description: Internal Server Error
-  '/gov/proposals/{proposalId}':
+  /gov/proposals/{proposalId}:
     get:
       deprecated: true
       summary: Query a proposal
@@ -3162,7 +3162,7 @@ paths:
           description: Invalid proposal id
         '500':
           description: Internal Server Error
-  '/gov/proposals/{proposalId}/proposer':
+  /gov/proposals/{proposalId}/proposer:
     get:
       deprecated: true
       summary: Query proposer
@@ -3191,7 +3191,7 @@ paths:
           description: Invalid proposal ID
         '500':
           description: Internal Server Error
-  '/gov/proposals/{proposalId}/deposits':
+  /gov/proposals/{proposalId}/deposits:
     get:
       deprecated: true
       summary: Query deposits
@@ -3268,7 +3268,7 @@ paths:
                     description: Sender address or Keybase name to generate a transaction
                   memo:
                     type: string
-                    example: "Sent via Cosmos Voyager \U0001F680"
+                    example: Sent via Cosmos Voyager 🚀
                   chain_id:
                     type: string
                     example: Cosmos-Hub
@@ -3372,7 +3372,7 @@ paths:
           description: Key password is wrong
         '500':
           description: Internal Server Error
-  '/gov/proposals/{proposalId}/deposits/{depositor}':
+  /gov/proposals/{proposalId}/deposits/{depositor}:
     get:
       deprecated: true
       summary: Query deposit
@@ -3423,7 +3423,7 @@ paths:
           description: Found no deposit
         '500':
           description: Internal Server Error
-  '/gov/proposals/{proposalId}/votes':
+  /gov/proposals/{proposalId}/votes:
     get:
       deprecated: true
       summary: Query voters
@@ -3492,7 +3492,7 @@ paths:
                     description: Sender address or Keybase name to generate a transaction
                   memo:
                     type: string
-                    example: "Sent via Cosmos Voyager \U0001F680"
+                    example: Sent via Cosmos Voyager 🚀
                   chain_id:
                     type: string
                     example: Cosmos-Hub
@@ -3588,7 +3588,7 @@ paths:
           description: Key password is wrong
         '500':
           description: Internal Server Error
-  '/gov/proposals/{proposalId}/votes/{voter}':
+  /gov/proposals/{proposalId}/votes/{voter}:
     get:
       deprecated: true
       summary: Query vote
@@ -3628,7 +3628,7 @@ paths:
           description: Found no vote
         '500':
           description: Internal Server Error
-  '/gov/proposals/{proposalId}/tally':
+  /gov/proposals/{proposalId}/tally:
     get:
       deprecated: true
       summary: Get a proposal's tally result at the current time
@@ -3760,7 +3760,7 @@ paths:
           description: Found no voting parameters
         '500':
           description: Internal Server Error
-  '/distribution/delegators/{delegatorAddr}/rewards':
+  /distribution/delegators/{delegatorAddr}/rewards:
     parameters:
       - in: path
         name: delegatorAddr
@@ -3843,7 +3843,7 @@ paths:
                     description: Sender address or Keybase name to generate a transaction
                   memo:
                     type: string
-                    example: "Sent via Cosmos Voyager \U0001F680"
+                    example: Sent via Cosmos Voyager 🚀
                   chain_id:
                     type: string
                     example: Cosmos-Hub
@@ -3932,7 +3932,7 @@ paths:
           description: Key password is wrong
         '500':
           description: Internal Server Error
-  '/distribution/delegators/{delegatorAddr}/rewards/{validatorAddr}':
+  /distribution/delegators/{delegatorAddr}/rewards/{validatorAddr}:
     parameters:
       - in: path
         name: delegatorAddr
@@ -3996,7 +3996,7 @@ paths:
                     description: Sender address or Keybase name to generate a transaction
                   memo:
                     type: string
-                    example: "Sent via Cosmos Voyager \U0001F680"
+                    example: Sent via Cosmos Voyager 🚀
                   chain_id:
                     type: string
                     example: Cosmos-Hub
@@ -4085,7 +4085,7 @@ paths:
           description: Key password is wrong
         '500':
           description: Internal Server Error
-  '/distribution/delegators/{delegatorAddr}/withdraw_address':
+  /distribution/delegators/{delegatorAddr}/withdraw_address:
     parameters:
       - in: path
         name: delegatorAddr
@@ -4138,7 +4138,7 @@ paths:
                     description: Sender address or Keybase name to generate a transaction
                   memo:
                     type: string
-                    example: "Sent via Cosmos Voyager \U0001F680"
+                    example: Sent via Cosmos Voyager 🚀
                   chain_id:
                     type: string
                     example: Cosmos-Hub
@@ -4231,7 +4231,7 @@ paths:
           description: Key password is wrong
         '500':
           description: Internal Server Error
-  '/distribution/validators/{validatorAddr}':
+  /distribution/validators/{validatorAddr}:
     parameters:
       - in: path
         name: validatorAddr
@@ -4283,7 +4283,7 @@ paths:
           description: Invalid validator address
         '500':
           description: Internal Server Error
-  '/distribution/validators/{validatorAddr}/outstanding_rewards':
+  /distribution/validators/{validatorAddr}/outstanding_rewards:
     parameters:
       - in: path
         name: validatorAddr
@@ -4314,7 +4314,7 @@ paths:
                   example: '50'
         '500':
           description: Internal Server Error
-  '/distribution/validators/{validatorAddr}/rewards':
+  /distribution/validators/{validatorAddr}/rewards:
     parameters:
       - in: path
         name: validatorAddr
@@ -4372,7 +4372,7 @@ paths:
                     description: Sender address or Keybase name to generate a transaction
                   memo:
                     type: string
-                    example: "Sent via Cosmos Voyager \U0001F680"
+                    example: Sent via Cosmos Voyager 🚀
                   chain_id:
                     type: string
                     example: Cosmos-Hub
@@ -4590,7 +4590,7 @@ paths:
                       example: '50'
         '500':
           description: Internal Server Error
-  '/supply/total/{denomination}':
+  /supply/total/{denomination}:
     parameters:
       - in: path
         name: denomination
@@ -4614,7 +4614,7 @@ paths:
           description: Invalid coin denomination
         '500':
           description: Internal Server Error
-  '/cosmos/auth/v1beta1/accounts/{address}':
+  /cosmos/auth/v1beta1/accounts/{address}:
     get:
       summary: Account returns account details based on address.
       operationId: Account
@@ -4695,7 +4695,7 @@ paths:
               QueryAccountResponse is the response type for the Query/Account
               RPC method.
         default:
-          description: An unexpected error response
+          description: An unexpected error response.
           schema:
             type: object
             properties:
@@ -4821,10 +4821,13 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := ptypes.MarshalAny(foo)
+                         any, err := anypb.New(foo)
+                         if err != nil {
+                           ...
+                         }
                          ...
                          foo := &pb.Foo{}
-                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                         if err := any.UnmarshalTo(foo); err != nil {
                            ...
                          }
 
@@ -4924,7 +4927,7 @@ paths:
               QueryParamsResponse is the response type for the Query/Params RPC
               method.
         default:
-          description: An unexpected error response
+          description: An unexpected error response.
           schema:
             type: object
             properties:
@@ -5050,10 +5053,13 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := ptypes.MarshalAny(foo)
+                         any, err := anypb.New(foo)
+                         if err != nil {
+                           ...
+                         }
                          ...
                          foo := &pb.Foo{}
-                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                         if err := any.UnmarshalTo(foo); err != nil {
                            ...
                          }
 
@@ -5114,7 +5120,7 @@ paths:
                         }
       tags:
         - Query
-  '/cosmos/bank/v1beta1/balances/{address}':
+  /cosmos/bank/v1beta1/balances/{address}:
     get:
       summary: AllBalances queries the balance of all coins for a single account.
       operationId: AllBalances
@@ -5166,7 +5172,7 @@ paths:
 
               method.
         default:
-          description: An unexpected error response
+          description: An unexpected error response.
           schema:
             type: object
             properties:
@@ -5239,10 +5245,9 @@ paths:
           in: query
           required: false
           type: boolean
-          format: boolean
       tags:
         - Query
-  '/cosmos/bank/v1beta1/balances/{address}/by_denom':
+  /cosmos/bank/v1beta1/balances/{address}/by_denom:
     get:
       summary: Balance queries the balance of a single coin for a single account.
       operationId: Balance
@@ -5271,7 +5276,7 @@ paths:
               QueryBalanceResponse is the response type for the Query/Balance
               RPC method.
         default:
-          description: An unexpected error response
+          description: An unexpected error response.
           schema:
             type: object
             properties:
@@ -5403,7 +5408,7 @@ paths:
 
               method.
         default:
-          description: An unexpected error response
+          description: An unexpected error response.
           schema:
             type: object
             properties:
@@ -5471,10 +5476,9 @@ paths:
           in: query
           required: false
           type: boolean
-          format: boolean
       tags:
         - Query
-  '/cosmos/bank/v1beta1/denoms_metadata/{denom}':
+  /cosmos/bank/v1beta1/denoms_metadata/{denom}:
     get:
       summary: DenomsMetadata queries the client metadata of a given coin denomination.
       operationId: DenomMetadata
@@ -5547,7 +5551,7 @@ paths:
 
               method.
         default:
-          description: An unexpected error response
+          description: An unexpected error response.
           schema:
             type: object
             properties:
@@ -5598,7 +5602,6 @@ paths:
                           type: string
                         enabled:
                           type: boolean
-                          format: boolean
                       description: >-
                         SendEnabled maps coin denom to a send_enabled status
                         (whether a denom is
@@ -5606,13 +5609,12 @@ paths:
                         sendable).
                   default_send_enabled:
                     type: boolean
-                    format: boolean
                 description: Params defines the parameters for the bank module.
             description: >-
               QueryParamsResponse defines the response type for querying x/bank
               parameters.
         default:
-          description: An unexpected error response
+          description: An unexpected error response.
           schema:
             type: object
             properties:
@@ -5669,7 +5671,7 @@ paths:
 
               method
         default:
-          description: An unexpected error response
+          description: An unexpected error response.
           schema:
             type: object
             properties:
@@ -5692,7 +5694,7 @@ paths:
                       format: byte
       tags:
         - Query
-  '/cosmos/bank/v1beta1/supply/{denom}':
+  /cosmos/bank/v1beta1/supply/{denom}:
     get:
       summary: SupplyOf queries the supply of a single coin.
       operationId: SupplyOf
@@ -5721,7 +5723,7 @@ paths:
               QuerySupplyOfResponse is the response type for the Query/SupplyOf
               RPC method.
         default:
-          description: An unexpected error response
+          description: An unexpected error response.
           schema:
             type: object
             properties:
@@ -6318,7 +6320,7 @@ paths:
               GetLatestBlockResponse is the response type for the
               Query/GetLatestBlock RPC method.
         default:
-          description: An unexpected error response
+          description: An unexpected error response.
           schema:
             type: object
             properties:
@@ -6444,10 +6446,13 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := ptypes.MarshalAny(foo)
+                         any, err := anypb.New(foo)
+                         if err != nil {
+                           ...
+                         }
                          ...
                          foo := &pb.Foo{}
-                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                         if err := any.UnmarshalTo(foo); err != nil {
                            ...
                          }
 
@@ -6508,7 +6513,7 @@ paths:
                         }
       tags:
         - Service
-  '/cosmos/base/tendermint/v1beta1/blocks/{height}':
+  /cosmos/base/tendermint/v1beta1/blocks/{height}:
     get:
       summary: GetBlockByHeight queries block for given height.
       operationId: GetBlockByHeight
@@ -7076,7 +7081,7 @@ paths:
               GetBlockByHeightResponse is the response type for the
               Query/GetBlockByHeight RPC method.
         default:
-          description: An unexpected error response
+          description: An unexpected error response.
           schema:
             type: object
             properties:
@@ -7202,10 +7207,13 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := ptypes.MarshalAny(foo)
+                         any, err := anypb.New(foo)
+                         if err != nil {
+                           ...
+                         }
                          ...
                          foo := &pb.Foo{}
-                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                         if err := any.UnmarshalTo(foo); err != nil {
                            ...
                          }
 
@@ -7354,7 +7362,7 @@ paths:
               GetNodeInfoResponse is the request type for the Query/GetNodeInfo
               RPC method.
         default:
-          description: An unexpected error response
+          description: An unexpected error response.
           schema:
             type: object
             properties:
@@ -7480,10 +7488,13 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := ptypes.MarshalAny(foo)
+                         any, err := anypb.New(foo)
+                         if err != nil {
+                           ...
+                         }
                          ...
                          foo := &pb.Foo{}
-                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                         if err := any.UnmarshalTo(foo); err != nil {
                            ...
                          }
 
@@ -7556,12 +7567,11 @@ paths:
             properties:
               syncing:
                 type: boolean
-                format: boolean
             description: >-
               GetSyncingResponse is the response type for the Query/GetSyncing
               RPC method.
         default:
-          description: An unexpected error response
+          description: An unexpected error response.
           schema:
             type: object
             properties:
@@ -7687,10 +7697,13 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := ptypes.MarshalAny(foo)
+                         any, err := anypb.New(foo)
+                         if err != nil {
+                           ...
+                         }
                          ...
                          foo := &pb.Foo{}
-                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                         if err := any.UnmarshalTo(foo); err != nil {
                            ...
                          }
 
@@ -7884,10 +7897,13 @@ paths:
                          Example 4: Pack and unpack a message in Go
 
                              foo := &pb.Foo{...}
-                             any, err := ptypes.MarshalAny(foo)
+                             any, err := anypb.New(foo)
+                             if err != nil {
+                               ...
+                             }
                              ...
                              foo := &pb.Foo{}
-                             if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                             if err := any.UnmarshalTo(foo); err != nil {
                                ...
                              }
 
@@ -7977,7 +7993,7 @@ paths:
               GetLatestValidatorSetResponse is the response type for the
               Query/GetValidatorSetByHeight RPC method.
         default:
-          description: An unexpected error response
+          description: An unexpected error response.
           schema:
             type: object
             properties:
@@ -8103,10 +8119,13 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := ptypes.MarshalAny(foo)
+                         any, err := anypb.New(foo)
+                         if err != nil {
+                           ...
+                         }
                          ...
                          foo := &pb.Foo{}
-                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                         if err := any.UnmarshalTo(foo); err != nil {
                            ...
                          }
 
@@ -8212,10 +8231,9 @@ paths:
           in: query
           required: false
           type: boolean
-          format: boolean
       tags:
         - Service
-  '/cosmos/base/tendermint/v1beta1/validatorsets/{height}':
+  /cosmos/base/tendermint/v1beta1/validatorsets/{height}:
     get:
       summary: GetValidatorSetByHeight queries validator-set at a given height.
       operationId: GetValidatorSetByHeight
@@ -8348,10 +8366,13 @@ paths:
                          Example 4: Pack and unpack a message in Go
 
                              foo := &pb.Foo{...}
-                             any, err := ptypes.MarshalAny(foo)
+                             any, err := anypb.New(foo)
+                             if err != nil {
+                               ...
+                             }
                              ...
                              foo := &pb.Foo{}
-                             if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                             if err := any.UnmarshalTo(foo); err != nil {
                                ...
                              }
 
@@ -8441,7 +8462,7 @@ paths:
               GetValidatorSetByHeightResponse is the response type for the
               Query/GetValidatorSetByHeight RPC method.
         default:
-          description: An unexpected error response
+          description: An unexpected error response.
           schema:
             type: object
             properties:
@@ -8567,10 +8588,13 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := ptypes.MarshalAny(foo)
+                         any, err := anypb.New(foo)
+                         if err != nil {
+                           ...
+                         }
                          ...
                          foo := &pb.Foo{}
-                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                         if err := any.UnmarshalTo(foo); err != nil {
                            ...
                          }
 
@@ -8681,7 +8705,6 @@ paths:
           in: query
           required: false
           type: boolean
-          format: boolean
       tags:
         - Service
   /cosmos/distribution/v1beta1/community_pool:
@@ -8719,7 +8742,7 @@ paths:
 
               RPC method.
         default:
-          description: An unexpected error response
+          description: An unexpected error response.
           schema:
             type: object
             properties:
@@ -8742,7 +8765,7 @@ paths:
                       format: byte
       tags:
         - Query
-  '/cosmos/distribution/v1beta1/delegators/{delegator_address}/rewards':
+  /cosmos/distribution/v1beta1/delegators/{delegator_address}/rewards:
     get:
       summary: |-
         DelegationTotalRewards queries the total rewards accrued by a each
@@ -8806,7 +8829,7 @@ paths:
               QueryDelegationTotalRewardsResponse is the response type for the
               Query/DelegationTotalRewards RPC method.
         default:
-          description: An unexpected error response
+          description: An unexpected error response.
           schema:
             type: object
             properties:
@@ -8835,7 +8858,7 @@ paths:
           type: string
       tags:
         - Query
-  '/cosmos/distribution/v1beta1/delegators/{delegator_address}/rewards/{validator_address}':
+  /cosmos/distribution/v1beta1/delegators/{delegator_address}/rewards/{validator_address}:
     get:
       summary: DelegationRewards queries the total rewards accrued by a delegation.
       operationId: DelegationRewards
@@ -8868,7 +8891,7 @@ paths:
               QueryDelegationRewardsResponse is the response type for the
               Query/DelegationRewards RPC method.
         default:
-          description: An unexpected error response
+          description: An unexpected error response.
           schema:
             type: object
             properties:
@@ -8902,7 +8925,7 @@ paths:
           type: string
       tags:
         - Query
-  '/cosmos/distribution/v1beta1/delegators/{delegator_address}/validators':
+  /cosmos/distribution/v1beta1/delegators/{delegator_address}/validators:
     get:
       summary: DelegatorValidators queries the validators of a delegator.
       operationId: DelegatorValidators
@@ -8923,7 +8946,7 @@ paths:
               QueryDelegatorValidatorsResponse is the response type for the
               Query/DelegatorValidators RPC method.
         default:
-          description: An unexpected error response
+          description: An unexpected error response.
           schema:
             type: object
             properties:
@@ -8952,7 +8975,7 @@ paths:
           type: string
       tags:
         - Query
-  '/cosmos/distribution/v1beta1/delegators/{delegator_address}/withdraw_address':
+  /cosmos/distribution/v1beta1/delegators/{delegator_address}/withdraw_address:
     get:
       summary: DelegatorWithdrawAddress queries withdraw address of a delegator.
       operationId: DelegatorWithdrawAddress
@@ -8969,7 +8992,7 @@ paths:
               QueryDelegatorWithdrawAddressResponse is the response type for the
               Query/DelegatorWithdrawAddress RPC method.
         default:
-          description: An unexpected error response
+          description: An unexpected error response.
           schema:
             type: object
             properties:
@@ -9020,12 +9043,11 @@ paths:
                     type: string
                   withdraw_addr_enabled:
                     type: boolean
-                    format: boolean
             description: >-
               QueryParamsResponse is the response type for the Query/Params RPC
               method.
         default:
-          description: An unexpected error response
+          description: An unexpected error response.
           schema:
             type: object
             properties:
@@ -9048,7 +9070,7 @@ paths:
                       format: byte
       tags:
         - Query
-  '/cosmos/distribution/v1beta1/validators/{validator_address}/commission':
+  /cosmos/distribution/v1beta1/validators/{validator_address}/commission:
     get:
       summary: ValidatorCommission queries accumulated commission for a validator.
       operationId: ValidatorCommission
@@ -9084,7 +9106,7 @@ paths:
               QueryValidatorCommissionResponse is the response type for the
               Query/ValidatorCommission RPC method
         default:
-          description: An unexpected error response
+          description: An unexpected error response.
           schema:
             type: object
             properties:
@@ -9113,7 +9135,7 @@ paths:
           type: string
       tags:
         - Query
-  '/cosmos/distribution/v1beta1/validators/{validator_address}/outstanding_rewards':
+  /cosmos/distribution/v1beta1/validators/{validator_address}/outstanding_rewards:
     get:
       summary: ValidatorOutstandingRewards queries rewards of a validator address.
       operationId: ValidatorOutstandingRewards
@@ -9156,7 +9178,7 @@ paths:
 
               Query/ValidatorOutstandingRewards RPC method.
         default:
-          description: An unexpected error response
+          description: An unexpected error response.
           schema:
             type: object
             properties:
@@ -9185,7 +9207,7 @@ paths:
           type: string
       tags:
         - Query
-  '/cosmos/distribution/v1beta1/validators/{validator_address}/slashes':
+  /cosmos/distribution/v1beta1/validators/{validator_address}/slashes:
     get:
       summary: ValidatorSlashes queries slash events of a validator.
       operationId: ValidatorSlashes
@@ -9238,7 +9260,7 @@ paths:
               QueryValidatorSlashesResponse is the response type for the
               Query/ValidatorSlashes RPC method.
         default:
-          description: An unexpected error response
+          description: An unexpected error response.
           schema:
             type: object
             properties:
@@ -9327,7 +9349,6 @@ paths:
           in: query
           required: false
           type: boolean
-          format: boolean
       tags:
         - Query
   /cosmos/evidence/v1beta1/evidence:
@@ -9455,10 +9476,13 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := ptypes.MarshalAny(foo)
+                         any, err := anypb.New(foo)
+                         if err != nil {
+                           ...
+                         }
                          ...
                          foo := &pb.Foo{}
-                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                         if err := any.UnmarshalTo(foo); err != nil {
                            ...
                          }
 
@@ -9542,7 +9566,7 @@ paths:
 
               method.
         default:
-          description: An unexpected error response
+          description: An unexpected error response.
           schema:
             type: object
             properties:
@@ -9668,10 +9692,13 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := ptypes.MarshalAny(foo)
+                         any, err := anypb.New(foo)
+                         if err != nil {
+                           ...
+                         }
                          ...
                          foo := &pb.Foo{}
-                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                         if err := any.UnmarshalTo(foo); err != nil {
                            ...
                          }
 
@@ -9777,10 +9804,9 @@ paths:
           in: query
           required: false
           type: boolean
-          format: boolean
       tags:
         - Query
-  '/cosmos/evidence/v1beta1/evidence/{evidence_hash}':
+  /cosmos/evidence/v1beta1/evidence/{evidence_hash}:
     get:
       summary: Evidence queries evidence based on evidence hash.
       operationId: Evidence
@@ -9902,10 +9928,13 @@ paths:
                    Example 4: Pack and unpack a message in Go
 
                        foo := &pb.Foo{...}
-                       any, err := ptypes.MarshalAny(foo)
+                       any, err := anypb.New(foo)
+                       if err != nil {
+                         ...
+                       }
                        ...
                        foo := &pb.Foo{}
-                       if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                       if err := any.UnmarshalTo(foo); err != nil {
                          ...
                        }
 
@@ -9965,7 +9994,7 @@ paths:
               QueryEvidenceResponse is the response type for the Query/Evidence
               RPC method.
         default:
-          description: An unexpected error response
+          description: An unexpected error response.
           schema:
             type: object
             properties:
@@ -10091,10 +10120,13 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := ptypes.MarshalAny(foo)
+                         any, err := anypb.New(foo)
+                         if err != nil {
+                           ...
+                         }
                          ...
                          foo := &pb.Foo{}
-                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                         if err := any.UnmarshalTo(foo); err != nil {
                            ...
                          }
 
@@ -10162,7 +10194,7 @@ paths:
           format: byte
       tags:
         - Query
-  '/cosmos/gov/v1beta1/params/{params_type}':
+  /cosmos/gov/v1beta1/params/{params_type}:
     get:
       summary: Params queries all parameters of the gov module.
       operationId: GovParams
@@ -10235,7 +10267,7 @@ paths:
               QueryParamsResponse is the response type for the Query/Params RPC
               method.
         default:
-          description: An unexpected error response
+          description: An unexpected error response.
           schema:
             type: object
             properties:
@@ -10361,10 +10393,13 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := ptypes.MarshalAny(foo)
+                         any, err := anypb.New(foo)
+                         if err != nil {
+                           ...
+                         }
                          ...
                          foo := &pb.Foo{}
-                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                         if err := any.UnmarshalTo(foo); err != nil {
                            ...
                          }
 
@@ -10566,10 +10601,13 @@ paths:
                          Example 4: Pack and unpack a message in Go
 
                              foo := &pb.Foo{...}
-                             any, err := ptypes.MarshalAny(foo)
+                             any, err := anypb.New(foo)
+                             if err != nil {
+                               ...
+                             }
                              ...
                              foo := &pb.Foo{}
-                             if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                             if err := any.UnmarshalTo(foo); err != nil {
                                ...
                              }
 
@@ -10726,7 +10764,7 @@ paths:
 
               method.
         default:
-          description: An unexpected error response
+          description: An unexpected error response.
           schema:
             type: object
             properties:
@@ -10852,10 +10890,13 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := ptypes.MarshalAny(foo)
+                         any, err := anypb.New(foo)
+                         if err != nil {
+                           ...
+                         }
                          ...
                          foo := &pb.Foo{}
-                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                         if err := any.UnmarshalTo(foo); err != nil {
                            ...
                          }
 
@@ -10997,10 +11038,9 @@ paths:
           in: query
           required: false
           type: boolean
-          format: boolean
       tags:
         - Query
-  '/cosmos/gov/v1beta1/proposals/{proposal_id}':
+  /cosmos/gov/v1beta1/proposals/{proposal_id}:
     get:
       summary: Proposal queries proposal details based on ProposalID.
       operationId: Proposal
@@ -11129,10 +11169,13 @@ paths:
                        Example 4: Pack and unpack a message in Go
 
                            foo := &pb.Foo{...}
-                           any, err := ptypes.MarshalAny(foo)
+                           any, err := anypb.New(foo)
+                           if err != nil {
+                             ...
+                           }
                            ...
                            foo := &pb.Foo{}
-                           if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                           if err := any.UnmarshalTo(foo); err != nil {
                              ...
                            }
 
@@ -11266,7 +11309,7 @@ paths:
               QueryProposalResponse is the response type for the Query/Proposal
               RPC method.
         default:
-          description: An unexpected error response
+          description: An unexpected error response.
           schema:
             type: object
             properties:
@@ -11392,10 +11435,13 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := ptypes.MarshalAny(foo)
+                         any, err := anypb.New(foo)
+                         if err != nil {
+                           ...
+                         }
                          ...
                          foo := &pb.Foo{}
-                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                         if err := any.UnmarshalTo(foo); err != nil {
                            ...
                          }
 
@@ -11463,7 +11509,7 @@ paths:
           format: uint64
       tags:
         - Query
-  '/cosmos/gov/v1beta1/proposals/{proposal_id}/deposits':
+  /cosmos/gov/v1beta1/proposals/{proposal_id}/deposits:
     get:
       summary: Deposits queries all deposits of a single proposal.
       operationId: Deposits
@@ -11528,7 +11574,7 @@ paths:
               QueryDepositsResponse is the response type for the Query/Deposits
               RPC method.
         default:
-          description: An unexpected error response
+          description: An unexpected error response.
           schema:
             type: object
             properties:
@@ -11654,10 +11700,13 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := ptypes.MarshalAny(foo)
+                         any, err := anypb.New(foo)
+                         if err != nil {
+                           ...
+                         }
                          ...
                          foo := &pb.Foo{}
-                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                         if err := any.UnmarshalTo(foo); err != nil {
                            ...
                          }
 
@@ -11769,10 +11818,9 @@ paths:
           in: query
           required: false
           type: boolean
-          format: boolean
       tags:
         - Query
-  '/cosmos/gov/v1beta1/proposals/{proposal_id}/deposits/{depositor}':
+  /cosmos/gov/v1beta1/proposals/{proposal_id}/deposits/{depositor}:
     get:
       summary: >-
         Deposit queries single deposit information based proposalID,
@@ -11818,7 +11866,7 @@ paths:
               QueryDepositResponse is the response type for the Query/Deposit
               RPC method.
         default:
-          description: An unexpected error response
+          description: An unexpected error response.
           schema:
             type: object
             properties:
@@ -11944,10 +11992,13 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := ptypes.MarshalAny(foo)
+                         any, err := anypb.New(foo)
+                         if err != nil {
+                           ...
+                         }
                          ...
                          foo := &pb.Foo{}
-                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                         if err := any.UnmarshalTo(foo); err != nil {
                            ...
                          }
 
@@ -12020,7 +12071,7 @@ paths:
           type: string
       tags:
         - Query
-  '/cosmos/gov/v1beta1/proposals/{proposal_id}/tally':
+  /cosmos/gov/v1beta1/proposals/{proposal_id}/tally:
     get:
       summary: TallyResult queries the tally of a proposal vote.
       operationId: TallyResult
@@ -12048,7 +12099,7 @@ paths:
               QueryTallyResultResponse is the response type for the Query/Tally
               RPC method.
         default:
-          description: An unexpected error response
+          description: An unexpected error response.
           schema:
             type: object
             properties:
@@ -12174,10 +12225,13 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := ptypes.MarshalAny(foo)
+                         any, err := anypb.New(foo)
+                         if err != nil {
+                           ...
+                         }
                          ...
                          foo := &pb.Foo{}
-                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                         if err := any.UnmarshalTo(foo); err != nil {
                            ...
                          }
 
@@ -12245,7 +12299,7 @@ paths:
           format: uint64
       tags:
         - Query
-  '/cosmos/gov/v1beta1/proposals/{proposal_id}/votes':
+  /cosmos/gov/v1beta1/proposals/{proposal_id}/votes:
     get:
       summary: Votes queries votes of a given proposal.
       operationId: Votes
@@ -12311,7 +12365,7 @@ paths:
               QueryVotesResponse is the response type for the Query/Votes RPC
               method.
         default:
-          description: An unexpected error response
+          description: An unexpected error response.
           schema:
             type: object
             properties:
@@ -12437,10 +12491,13 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := ptypes.MarshalAny(foo)
+                         any, err := anypb.New(foo)
+                         if err != nil {
+                           ...
+                         }
                          ...
                          foo := &pb.Foo{}
-                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                         if err := any.UnmarshalTo(foo); err != nil {
                            ...
                          }
 
@@ -12552,12 +12609,11 @@ paths:
           in: query
           required: false
           type: boolean
-          format: boolean
       tags:
         - Query
-  '/cosmos/gov/v1beta1/proposals/{proposal_id}/votes/{voter}':
+  /cosmos/gov/v1beta1/proposals/{proposal_id}/votes/{voter}:
     get:
-      summary: 'Vote queries voted information based on proposalID, voterAddr.'
+      summary: Vote queries voted information based on proposalID, voterAddr.
       operationId: Vote
       responses:
         '200':
@@ -12600,7 +12656,7 @@ paths:
               QueryVoteResponse is the response type for the Query/Vote RPC
               method.
         default:
-          description: An unexpected error response
+          description: An unexpected error response.
           schema:
             type: object
             properties:
@@ -12726,10 +12782,13 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := ptypes.MarshalAny(foo)
+                         any, err := anypb.New(foo)
+                         if err != nil {
+                           ...
+                         }
                          ...
                          foo := &pb.Foo{}
-                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                         if err := any.UnmarshalTo(foo); err != nil {
                            ...
                          }
 
@@ -12822,7 +12881,7 @@ paths:
               QueryAnnualProvisionsResponse is the response type for the
               Query/AnnualProvisions RPC method.
         default:
-          description: An unexpected error response
+          description: An unexpected error response.
           schema:
             type: object
             properties:
@@ -12865,7 +12924,7 @@ paths:
 
               method.
         default:
-          description: An unexpected error response
+          description: An unexpected error response.
           schema:
             type: object
             properties:
@@ -12925,7 +12984,7 @@ paths:
               QueryParamsResponse is the response type for the Query/Params RPC
               method.
         default:
-          description: An unexpected error response
+          description: An unexpected error response.
           schema:
             type: object
             properties:
@@ -12974,7 +13033,7 @@ paths:
               QueryParamsResponse is response type for the Query/Params RPC
               method.
         default:
-          description: An unexpected error response
+          description: An unexpected error response.
           schema:
             type: object
             properties:
@@ -13042,7 +13101,7 @@ paths:
               QueryParamsResponse is the response type for the Query/Params RPC
               method
         default:
-          description: An unexpected error response
+          description: An unexpected error response.
           schema:
             type: object
             properties:
@@ -13098,7 +13157,6 @@ paths:
                       title: timestamp validator cannot be unjailed until
                     tombstoned:
                       type: boolean
-                      format: boolean
                       title: >-
                         whether or not a validator has been tombstoned (killed
                         out of validator
@@ -13149,7 +13207,7 @@ paths:
 
               method
         default:
-          description: An unexpected error response
+          description: An unexpected error response.
           schema:
             type: object
             properties:
@@ -13217,10 +13275,9 @@ paths:
           in: query
           required: false
           type: boolean
-          format: boolean
       tags:
         - Query
-  '/cosmos/slashing/v1beta1/signing_infos/{cons_address}':
+  /cosmos/slashing/v1beta1/signing_infos/{cons_address}:
     get:
       summary: SigningInfo queries the signing info of given cons address
       operationId: SigningInfo
@@ -13251,7 +13308,6 @@ paths:
                     title: timestamp validator cannot be unjailed until
                   tombstoned:
                     type: boolean
-                    format: boolean
                     title: >-
                       whether or not a validator has been tombstoned (killed out
                       of validator
@@ -13277,7 +13333,7 @@ paths:
 
               method
         default:
-          description: An unexpected error response
+          description: An unexpected error response.
           schema:
             type: object
             properties:
@@ -13306,7 +13362,7 @@ paths:
           type: string
       tags:
         - Query
-  '/cosmos/staking/v1beta1/delegations/{delegator_addr}':
+  /cosmos/staking/v1beta1/delegations/{delegator_addr}:
     get:
       summary: >-
         DelegatorDelegations queries all delegations of a given delegator
@@ -13393,7 +13449,7 @@ paths:
               QueryDelegatorDelegationsResponse is response type for the
               Query/DelegatorDelegations RPC method.
         default:
-          description: An unexpected error response
+          description: An unexpected error response.
           schema:
             type: object
             properties:
@@ -13519,10 +13575,13 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := ptypes.MarshalAny(foo)
+                         any, err := anypb.New(foo)
+                         if err != nil {
+                           ...
+                         }
                          ...
                          foo := &pb.Foo{}
-                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                         if err := any.UnmarshalTo(foo); err != nil {
                            ...
                          }
 
@@ -13633,10 +13692,9 @@ paths:
           in: query
           required: false
           type: boolean
-          format: boolean
       tags:
         - Query
-  '/cosmos/staking/v1beta1/delegators/{delegator_addr}/redelegations':
+  /cosmos/staking/v1beta1/delegators/{delegator_addr}/redelegations:
     get:
       summary: Redelegations queries redelegations of given address.
       operationId: Redelegations
@@ -13783,7 +13841,7 @@ paths:
 
               method.
         default:
-          description: An unexpected error response
+          description: An unexpected error response.
           schema:
             type: object
             properties:
@@ -13909,10 +13967,13 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := ptypes.MarshalAny(foo)
+                         any, err := anypb.New(foo)
+                         if err != nil {
+                           ...
+                         }
                          ...
                          foo := &pb.Foo{}
-                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                         if err := any.UnmarshalTo(foo); err != nil {
                            ...
                          }
 
@@ -14033,10 +14094,9 @@ paths:
           in: query
           required: false
           type: boolean
-          format: boolean
       tags:
         - Query
-  '/cosmos/staking/v1beta1/delegators/{delegator_addr}/unbonding_delegations':
+  /cosmos/staking/v1beta1/delegators/{delegator_addr}/unbonding_delegations:
     get:
       summary: >-
         DelegatorUnbondingDelegations queries all unbonding delegations of a
@@ -14125,7 +14185,7 @@ paths:
 
               Query/UnbondingDelegatorDelegations RPC method.
         default:
-          description: An unexpected error response
+          description: An unexpected error response.
           schema:
             type: object
             properties:
@@ -14251,10 +14311,13 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := ptypes.MarshalAny(foo)
+                         any, err := anypb.New(foo)
+                         if err != nil {
+                           ...
+                         }
                          ...
                          foo := &pb.Foo{}
-                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                         if err := any.UnmarshalTo(foo); err != nil {
                            ...
                          }
 
@@ -14365,10 +14428,9 @@ paths:
           in: query
           required: false
           type: boolean
-          format: boolean
       tags:
         - Query
-  '/cosmos/staking/v1beta1/delegators/{delegator_addr}/validators':
+  /cosmos/staking/v1beta1/delegators/{delegator_addr}/validators:
     get:
       summary: |-
         DelegatorValidators queries all validators info for given delegator
@@ -14503,10 +14565,13 @@ paths:
                          Example 4: Pack and unpack a message in Go
 
                              foo := &pb.Foo{...}
-                             any, err := ptypes.MarshalAny(foo)
+                             any, err := anypb.New(foo)
+                             if err != nil {
+                               ...
+                             }
                              ...
                              foo := &pb.Foo{}
-                             if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                             if err := any.UnmarshalTo(foo); err != nil {
                                ...
                              }
 
@@ -14569,7 +14634,6 @@ paths:
                             }
                     jailed:
                       type: boolean
-                      format: boolean
                       description: >-
                         jailed defined whether the validator has been jailed
                         from bonded status or not.
@@ -14716,7 +14780,7 @@ paths:
               QueryDelegatorValidatorsResponse is response type for the
               Query/DelegatorValidators RPC method.
         default:
-          description: An unexpected error response
+          description: An unexpected error response.
           schema:
             type: object
             properties:
@@ -14842,10 +14906,13 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := ptypes.MarshalAny(foo)
+                         any, err := anypb.New(foo)
+                         if err != nil {
+                           ...
+                         }
                          ...
                          foo := &pb.Foo{}
-                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                         if err := any.UnmarshalTo(foo); err != nil {
                            ...
                          }
 
@@ -14956,10 +15023,9 @@ paths:
           in: query
           required: false
           type: boolean
-          format: boolean
       tags:
         - Query
-  '/cosmos/staking/v1beta1/delegators/{delegator_addr}/validators/{validator_addr}':
+  /cosmos/staking/v1beta1/delegators/{delegator_addr}/validators/{validator_addr}:
     get:
       summary: |-
         DelegatorValidator queries validator info for given delegator validator
@@ -15092,10 +15158,13 @@ paths:
                        Example 4: Pack and unpack a message in Go
 
                            foo := &pb.Foo{...}
-                           any, err := ptypes.MarshalAny(foo)
+                           any, err := anypb.New(foo)
+                           if err != nil {
+                             ...
+                           }
                            ...
                            foo := &pb.Foo{}
-                           if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                           if err := any.UnmarshalTo(foo); err != nil {
                              ...
                            }
 
@@ -15156,7 +15225,6 @@ paths:
                           }
                   jailed:
                     type: boolean
-                    format: boolean
                     description: >-
                       jailed defined whether the validator has been jailed from
                       bonded status or not.
@@ -15283,7 +15351,7 @@ paths:
               QueryDelegatorValidatorResponse response type for the
               Query/DelegatorValidator RPC method.
         default:
-          description: An unexpected error response
+          description: An unexpected error response.
           schema:
             type: object
             properties:
@@ -15409,10 +15477,13 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := ptypes.MarshalAny(foo)
+                         any, err := anypb.New(foo)
+                         if err != nil {
+                           ...
+                         }
                          ...
                          foo := &pb.Foo{}
-                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                         if err := any.UnmarshalTo(foo); err != nil {
                            ...
                          }
 
@@ -15484,7 +15555,7 @@ paths:
           type: string
       tags:
         - Query
-  '/cosmos/staking/v1beta1/historical_info/{height}':
+  /cosmos/staking/v1beta1/historical_info/{height}:
     get:
       summary: HistoricalInfo queries the historical info for given height.
       operationId: HistoricalInfo
@@ -15699,10 +15770,13 @@ paths:
                              Example 4: Pack and unpack a message in Go
 
                                  foo := &pb.Foo{...}
-                                 any, err := ptypes.MarshalAny(foo)
+                                 any, err := anypb.New(foo)
+                                 if err != nil {
+                                   ...
+                                 }
                                  ...
                                  foo := &pb.Foo{}
-                                 if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                                 if err := any.UnmarshalTo(foo); err != nil {
                                    ...
                                  }
 
@@ -15765,7 +15839,6 @@ paths:
                                 }
                         jailed:
                           type: boolean
-                          format: boolean
                           description: >-
                             jailed defined whether the validator has been jailed
                             from bonded status or not.
@@ -15896,7 +15969,7 @@ paths:
 
               method.
         default:
-          description: An unexpected error response
+          description: An unexpected error response.
           schema:
             type: object
             properties:
@@ -16022,10 +16095,13 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := ptypes.MarshalAny(foo)
+                         any, err := anypb.New(foo)
+                         if err != nil {
+                           ...
+                         }
                          ...
                          foo := &pb.Foo{}
-                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                         if err := any.UnmarshalTo(foo); err != nil {
                            ...
                          }
 
@@ -16138,7 +16214,7 @@ paths:
               QueryParamsResponse is response type for the Query/Params RPC
               method.
         default:
-          description: An unexpected error response
+          description: An unexpected error response.
           schema:
             type: object
             properties:
@@ -16264,10 +16340,13 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := ptypes.MarshalAny(foo)
+                         any, err := anypb.New(foo)
+                         if err != nil {
+                           ...
+                         }
                          ...
                          foo := &pb.Foo{}
-                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                         if err := any.UnmarshalTo(foo); err != nil {
                            ...
                          }
 
@@ -16348,7 +16427,7 @@ paths:
                     type: string
             description: QueryPoolResponse is response type for the Query/Pool RPC method.
         default:
-          description: An unexpected error response
+          description: An unexpected error response.
           schema:
             type: object
             properties:
@@ -16474,10 +16553,13 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := ptypes.MarshalAny(foo)
+                         any, err := anypb.New(foo)
+                         if err != nil {
+                           ...
+                         }
                          ...
                          foo := &pb.Foo{}
-                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                         if err := any.UnmarshalTo(foo); err != nil {
                            ...
                          }
 
@@ -16671,10 +16753,13 @@ paths:
                          Example 4: Pack and unpack a message in Go
 
                              foo := &pb.Foo{...}
-                             any, err := ptypes.MarshalAny(foo)
+                             any, err := anypb.New(foo)
+                             if err != nil {
+                               ...
+                             }
                              ...
                              foo := &pb.Foo{}
-                             if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                             if err := any.UnmarshalTo(foo); err != nil {
                                ...
                              }
 
@@ -16737,7 +16822,6 @@ paths:
                             }
                     jailed:
                       type: boolean
-                      format: boolean
                       description: >-
                         jailed defined whether the validator has been jailed
                         from bonded status or not.
@@ -16884,7 +16968,7 @@ paths:
               QueryValidatorsResponse is response type for the Query/Validators
               RPC method
         default:
-          description: An unexpected error response
+          description: An unexpected error response.
           schema:
             type: object
             properties:
@@ -17010,10 +17094,13 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := ptypes.MarshalAny(foo)
+                         any, err := anypb.New(foo)
+                         if err != nil {
+                           ...
+                         }
                          ...
                          foo := &pb.Foo{}
-                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                         if err := any.UnmarshalTo(foo); err != nil {
                            ...
                          }
 
@@ -17124,10 +17211,9 @@ paths:
           in: query
           required: false
           type: boolean
-          format: boolean
       tags:
         - Query
-  '/cosmos/staking/v1beta1/validators/{validator_addr}':
+  /cosmos/staking/v1beta1/validators/{validator_addr}:
     get:
       summary: Validator queries validator info for given validator address.
       operationId: Validator
@@ -17258,10 +17344,13 @@ paths:
                        Example 4: Pack and unpack a message in Go
 
                            foo := &pb.Foo{...}
-                           any, err := ptypes.MarshalAny(foo)
+                           any, err := anypb.New(foo)
+                           if err != nil {
+                             ...
+                           }
                            ...
                            foo := &pb.Foo{}
-                           if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                           if err := any.UnmarshalTo(foo); err != nil {
                              ...
                            }
 
@@ -17322,7 +17411,6 @@ paths:
                           }
                   jailed:
                     type: boolean
-                    format: boolean
                     description: >-
                       jailed defined whether the validator has been jailed from
                       bonded status or not.
@@ -17449,7 +17537,7 @@ paths:
               QueryValidatorResponse is response type for the Query/Validator
               RPC method
         default:
-          description: An unexpected error response
+          description: An unexpected error response.
           schema:
             type: object
             properties:
@@ -17575,10 +17663,13 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := ptypes.MarshalAny(foo)
+                         any, err := anypb.New(foo)
+                         if err != nil {
+                           ...
+                         }
                          ...
                          foo := &pb.Foo{}
-                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                         if err := any.UnmarshalTo(foo); err != nil {
                            ...
                          }
 
@@ -17645,7 +17736,7 @@ paths:
           type: string
       tags:
         - Query
-  '/cosmos/staking/v1beta1/validators/{validator_addr}/delegations':
+  /cosmos/staking/v1beta1/validators/{validator_addr}/delegations:
     get:
       summary: ValidatorDelegations queries delegate info for given validator.
       operationId: ValidatorDelegations
@@ -17727,7 +17818,7 @@ paths:
               QueryValidatorDelegationsResponse is response type for the
               Query/ValidatorDelegations RPC method
         default:
-          description: An unexpected error response
+          description: An unexpected error response.
           schema:
             type: object
             properties:
@@ -17853,10 +17944,13 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := ptypes.MarshalAny(foo)
+                         any, err := anypb.New(foo)
+                         if err != nil {
+                           ...
+                         }
                          ...
                          foo := &pb.Foo{}
-                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                         if err := any.UnmarshalTo(foo); err != nil {
                            ...
                          }
 
@@ -17967,10 +18061,9 @@ paths:
           in: query
           required: false
           type: boolean
-          format: boolean
       tags:
         - Query
-  '/cosmos/staking/v1beta1/validators/{validator_addr}/delegations/{delegator_addr}':
+  /cosmos/staking/v1beta1/validators/{validator_addr}/delegations/{delegator_addr}:
     get:
       summary: Delegation queries delegate info for given validator delegator pair.
       operationId: Delegation
@@ -18032,7 +18125,7 @@ paths:
               QueryDelegationResponse is response type for the Query/Delegation
               RPC method.
         default:
-          description: An unexpected error response
+          description: An unexpected error response.
           schema:
             type: object
             properties:
@@ -18158,10 +18251,13 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := ptypes.MarshalAny(foo)
+                         any, err := anypb.New(foo)
+                         if err != nil {
+                           ...
+                         }
                          ...
                          foo := &pb.Foo{}
-                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                         if err := any.UnmarshalTo(foo); err != nil {
                            ...
                          }
 
@@ -18233,7 +18329,7 @@ paths:
           type: string
       tags:
         - Query
-  '/cosmos/staking/v1beta1/validators/{validator_addr}/delegations/{delegator_addr}/unbonding_delegation':
+  /cosmos/staking/v1beta1/validators/{validator_addr}/delegations/{delegator_addr}/unbonding_delegation:
     get:
       summary: |-
         UnbondingDelegation queries unbonding info for given validator delegator
@@ -18298,7 +18394,7 @@ paths:
 
               RPC method.
         default:
-          description: An unexpected error response
+          description: An unexpected error response.
           schema:
             type: object
             properties:
@@ -18424,10 +18520,13 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := ptypes.MarshalAny(foo)
+                         any, err := anypb.New(foo)
+                         if err != nil {
+                           ...
+                         }
                          ...
                          foo := &pb.Foo{}
-                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                         if err := any.UnmarshalTo(foo); err != nil {
                            ...
                          }
 
@@ -18499,7 +18598,7 @@ paths:
           type: string
       tags:
         - Query
-  '/cosmos/staking/v1beta1/validators/{validator_addr}/unbonding_delegations':
+  /cosmos/staking/v1beta1/validators/{validator_addr}/unbonding_delegations:
     get:
       summary: >-
         ValidatorUnbondingDelegations queries unbonding delegations of a
@@ -18586,7 +18685,7 @@ paths:
 
               Query/ValidatorUnbondingDelegations RPC method.
         default:
-          description: An unexpected error response
+          description: An unexpected error response.
           schema:
             type: object
             properties:
@@ -18712,10 +18811,13 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := ptypes.MarshalAny(foo)
+                         any, err := anypb.New(foo)
+                         if err != nil {
+                           ...
+                         }
                          ...
                          foo := &pb.Foo{}
-                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                         if err := any.UnmarshalTo(foo); err != nil {
                            ...
                          }
 
@@ -18826,7 +18928,6 @@ paths:
           in: query
           required: false
           type: boolean
-          format: boolean
       tags:
         - Query
   /cosmos/tx/v1beta1/simulate:
@@ -18891,7 +18992,6 @@ paths:
                                 format: byte
                               index:
                                 type: boolean
-                                format: boolean
                             description: >-
                               EventAttribute is a single key-value pair,
                               associated with an event.
@@ -18912,7 +19012,7 @@ paths:
               SimulateResponse is the response type for the
               Service.SimulateRPC method.
         default:
-          description: An unexpected error response
+          description: An unexpected error response.
           schema:
             type: object
             properties:
@@ -19038,10 +19138,13 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := ptypes.MarshalAny(foo)
+                         any, err := anypb.New(foo)
+                         if err != nil {
+                           ...
+                         }
                          ...
                          foo := &pb.Foo{}
-                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                         if err := any.UnmarshalTo(foo); err != nil {
                            ...
                          }
 
@@ -19118,7 +19221,7 @@ paths:
           schema:
             $ref: '#/definitions/cosmos.tx.v1beta1.GetTxsEventResponse'
         default:
-          description: An unexpected error response
+          description: An unexpected error response.
           schema:
             type: object
             properties:
@@ -19244,10 +19347,13 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := ptypes.MarshalAny(foo)
+                         any, err := anypb.New(foo)
+                         if err != nil {
+                           ...
+                         }
                          ...
                          foo := &pb.Foo{}
-                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                         if err := any.UnmarshalTo(foo); err != nil {
                            ...
                          }
 
@@ -19361,7 +19467,6 @@ paths:
           in: query
           required: false
           type: boolean
-          format: boolean
         - name: order_by
           description: |2-
              - ORDER_BY_UNSPECIFIED: ORDER_BY_UNSPECIFIED specifies an unknown sorting order. OrderBy defaults to ASC in this case.
@@ -19405,7 +19510,7 @@ paths:
                     description: Response code.
                   data:
                     type: string
-                    description: 'Result bytes, if any.'
+                    description: Result bytes, if any.
                   raw_log:
                     type: string
                     description: >-
@@ -19585,10 +19690,13 @@ paths:
                        Example 4: Pack and unpack a message in Go
 
                            foo := &pb.Foo{...}
-                           any, err := ptypes.MarshalAny(foo)
+                           any, err := anypb.New(foo)
+                           if err != nil {
+                             ...
+                           }
                            ...
                            foo := &pb.Foo{}
-                           if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                           if err := any.UnmarshalTo(foo); err != nil {
                              ...
                            }
 
@@ -19677,7 +19785,6 @@ paths:
                                 format: byte
                               index:
                                 type: boolean
-                                format: boolean
                             description: >-
                               EventAttribute is a single key-value pair,
                               associated with an event.
@@ -19713,7 +19820,7 @@ paths:
               BroadcastTxResponse is the response type for the
               Service.BroadcastTx method.
         default:
-          description: An unexpected error response
+          description: An unexpected error response.
           schema:
             type: object
             properties:
@@ -19839,10 +19946,13 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := ptypes.MarshalAny(foo)
+                         any, err := anypb.New(foo)
+                         if err != nil {
+                           ...
+                         }
                          ...
                          foo := &pb.Foo{}
-                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                         if err := any.UnmarshalTo(foo); err != nil {
                            ...
                          }
 
@@ -19938,7 +20048,7 @@ paths:
               RPC method.
       tags:
         - Service
-  '/cosmos/tx/v1beta1/txs/{hash}':
+  /cosmos/tx/v1beta1/txs/{hash}:
     get:
       summary: GetTx fetches a tx by hash.
       operationId: GetTx
@@ -19948,7 +20058,7 @@ paths:
           schema:
             $ref: '#/definitions/cosmos.tx.v1beta1.GetTxResponse'
         default:
-          description: An unexpected error response
+          description: An unexpected error response.
           schema:
             type: object
             properties:
@@ -20074,10 +20184,13 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := ptypes.MarshalAny(foo)
+                         any, err := anypb.New(foo)
+                         if err != nil {
+                           ...
+                         }
                          ...
                          foo := &pb.Foo{}
-                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                         if err := any.UnmarshalTo(foo); err != nil {
                            ...
                          }
 
@@ -20138,13 +20251,13 @@ paths:
                         }
       parameters:
         - name: hash
-          description: 'hash is the tx hash to query, encoded as a hex string.'
+          description: hash is the tx hash to query, encoded as a hex string.
           in: path
           required: true
           type: string
       tags:
         - Service
-  '/cosmos/upgrade/v1beta1/applied_plan/{name}':
+  /cosmos/upgrade/v1beta1/applied_plan/{name}:
     get:
       summary: AppliedPlan queries a previously applied upgrade plan by its name.
       operationId: AppliedPlan
@@ -20164,7 +20277,7 @@ paths:
 
               method.
         default:
-          description: An unexpected error response
+          description: An unexpected error response.
           schema:
             type: object
             properties:
@@ -20290,10 +20403,13 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := ptypes.MarshalAny(foo)
+                         any, err := anypb.New(foo)
+                         if err != nil {
+                           ...
+                         }
                          ...
                          foo := &pb.Foo{}
-                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                         if err := any.UnmarshalTo(foo); err != nil {
                            ...
                          }
 
@@ -20531,10 +20647,13 @@ paths:
                        Example 4: Pack and unpack a message in Go
 
                            foo := &pb.Foo{...}
-                           any, err := ptypes.MarshalAny(foo)
+                           any, err := anypb.New(foo)
+                           if err != nil {
+                             ...
+                           }
                            ...
                            foo := &pb.Foo{}
-                           if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                           if err := any.UnmarshalTo(foo); err != nil {
                              ...
                            }
 
@@ -20613,7 +20732,7 @@ paths:
 
               method.
         default:
-          description: An unexpected error response
+          description: An unexpected error response.
           schema:
             type: object
             properties:
@@ -20739,10 +20858,13 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := ptypes.MarshalAny(foo)
+                         any, err := anypb.New(foo)
+                         if err != nil {
+                           ...
+                         }
                          ...
                          foo := &pb.Foo{}
-                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                         if err := any.UnmarshalTo(foo); err != nil {
                            ...
                          }
 
@@ -20803,7 +20925,7 @@ paths:
                         }
       tags:
         - Query
-  '/cosmos/upgrade/v1beta1/upgraded_consensus_state/{last_height}':
+  /cosmos/upgrade/v1beta1/upgraded_consensus_state/{last_height}:
     get:
       summary: |-
         UpgradedConsensusState queries the consensus state that will serve
@@ -20929,10 +21051,13 @@ paths:
                    Example 4: Pack and unpack a message in Go
 
                        foo := &pb.Foo{...}
-                       any, err := ptypes.MarshalAny(foo)
+                       any, err := anypb.New(foo)
+                       if err != nil {
+                         ...
+                       }
                        ...
                        foo := &pb.Foo{}
-                       if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                       if err := any.UnmarshalTo(foo); err != nil {
                          ...
                        }
 
@@ -20994,7 +21119,7 @@ paths:
 
               RPC method.
         default:
-          description: An unexpected error response
+          description: An unexpected error response.
           schema:
             type: object
             properties:
@@ -21120,10 +21245,13 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := ptypes.MarshalAny(foo)
+                         any, err := anypb.New(foo)
+                         if err != nil {
+                           ...
+                         }
                          ...
                          foo := &pb.Foo{}
-                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                         if err := any.UnmarshalTo(foo); err != nil {
                            ...
                          }
 
@@ -21342,7 +21470,7 @@ paths:
               QueryChannelsResponse is the response type for the Query/Channels
               RPC method.
         default:
-          description: An unexpected error response
+          description: An unexpected error response.
           schema:
             type: object
             properties:
@@ -21468,10 +21596,13 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := ptypes.MarshalAny(foo)
+                         any, err := anypb.New(foo)
+                         if err != nil {
+                           ...
+                         }
                          ...
                          foo := &pb.Foo{}
-                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                         if err := any.UnmarshalTo(foo); err != nil {
                            ...
                          }
 
@@ -21577,10 +21708,9 @@ paths:
           in: query
           required: false
           type: boolean
-          format: boolean
       tags:
         - Query
-  '/ibc/core/channel/v1beta1/channels/{channel_id}/ports/{port_id}':
+  /ibc/core/channel/v1beta1/channels/{channel_id}/ports/{port_id}:
     get:
       summary: Channel queries an IBC Channel.
       operationId: Channel
@@ -21704,7 +21834,7 @@ paths:
 
               proof was retrieved.
         default:
-          description: An unexpected error response
+          description: An unexpected error response.
           schema:
             type: object
             properties:
@@ -21830,10 +21960,13 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := ptypes.MarshalAny(foo)
+                         any, err := anypb.New(foo)
+                         if err != nil {
+                           ...
+                         }
                          ...
                          foo := &pb.Foo{}
-                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                         if err := any.UnmarshalTo(foo); err != nil {
                            ...
                          }
 
@@ -21905,7 +22038,7 @@ paths:
           type: string
       tags:
         - Query
-  '/ibc/core/channel/v1beta1/channels/{channel_id}/ports/{port_id}/client_state':
+  /ibc/core/channel/v1beta1/channels/{channel_id}/ports/{port_id}/client_state:
     get:
       summary: >-
         ChannelClientState queries for the client state for the channel
@@ -22039,10 +22172,13 @@ paths:
                        Example 4: Pack and unpack a message in Go
 
                            foo := &pb.Foo{...}
-                           any, err := ptypes.MarshalAny(foo)
+                           any, err := anypb.New(foo)
+                           if err != nil {
+                             ...
+                           }
                            ...
                            foo := &pb.Foo{}
-                           if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                           if err := any.UnmarshalTo(foo); err != nil {
                              ...
                            }
 
@@ -22142,7 +22278,7 @@ paths:
               QueryChannelClientStateResponse is the Response type for the
               Query/QueryChannelClientState RPC method
         default:
-          description: An unexpected error response
+          description: An unexpected error response.
           schema:
             type: object
             properties:
@@ -22268,10 +22404,13 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := ptypes.MarshalAny(foo)
+                         any, err := anypb.New(foo)
+                         if err != nil {
+                           ...
+                         }
                          ...
                          foo := &pb.Foo{}
-                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                         if err := any.UnmarshalTo(foo); err != nil {
                            ...
                          }
 
@@ -22343,7 +22482,7 @@ paths:
           type: string
       tags:
         - Query
-  '/ibc/core/channel/v1beta1/channels/{channel_id}/ports/{port_id}/consensus_state/revision/{revision_number}/height/{revision_height}':
+  /ibc/core/channel/v1beta1/channels/{channel_id}/ports/{port_id}/consensus_state/revision/{revision_number}/height/{revision_height}:
     get:
       summary: |-
         ChannelConsensusState queries for the consensus state for the channel
@@ -22467,10 +22606,13 @@ paths:
                    Example 4: Pack and unpack a message in Go
 
                        foo := &pb.Foo{...}
-                       any, err := ptypes.MarshalAny(foo)
+                       any, err := anypb.New(foo)
+                       if err != nil {
+                         ...
+                       }
                        ...
                        foo := &pb.Foo{}
-                       if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                       if err := any.UnmarshalTo(foo); err != nil {
                          ...
                        }
 
@@ -22565,7 +22707,7 @@ paths:
               QueryChannelClientStateResponse is the Response type for the
               Query/QueryChannelClientState RPC method
         default:
-          description: An unexpected error response
+          description: An unexpected error response.
           schema:
             type: object
             properties:
@@ -22691,10 +22833,13 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := ptypes.MarshalAny(foo)
+                         any, err := anypb.New(foo)
+                         if err != nil {
+                           ...
+                         }
                          ...
                          foo := &pb.Foo{}
-                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                         if err := any.UnmarshalTo(foo); err != nil {
                            ...
                          }
 
@@ -22778,7 +22923,7 @@ paths:
           format: uint64
       tags:
         - Query
-  '/ibc/core/channel/v1beta1/channels/{channel_id}/ports/{port_id}/next_sequence':
+  /ibc/core/channel/v1beta1/channels/{channel_id}/ports/{port_id}/next_sequence:
     get:
       summary: >-
         NextSequenceReceive returns the next receive sequence for a given
@@ -22829,7 +22974,7 @@ paths:
               QuerySequenceResponse is the request type for the
               Query/QueryNextSequenceReceiveResponse RPC method
         default:
-          description: An unexpected error response
+          description: An unexpected error response.
           schema:
             type: object
             properties:
@@ -22955,10 +23100,13 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := ptypes.MarshalAny(foo)
+                         any, err := anypb.New(foo)
+                         if err != nil {
+                           ...
+                         }
                          ...
                          foo := &pb.Foo{}
-                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                         if err := any.UnmarshalTo(foo); err != nil {
                            ...
                          }
 
@@ -23030,7 +23178,7 @@ paths:
           type: string
       tags:
         - Query
-  '/ibc/core/channel/v1beta1/channels/{channel_id}/ports/{port_id}/packet_acknowledgements':
+  /ibc/core/channel/v1beta1/channels/{channel_id}/ports/{port_id}/packet_acknowledgements:
     get:
       summary: >-
         PacketAcknowledgements returns all the packet acknowledgements
@@ -23132,7 +23280,7 @@ paths:
               QueryPacketAcknowledgemetsResponse is the request type for the
               Query/QueryPacketAcknowledgements RPC method
         default:
-          description: An unexpected error response
+          description: An unexpected error response.
           schema:
             type: object
             properties:
@@ -23258,10 +23406,13 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := ptypes.MarshalAny(foo)
+                         any, err := anypb.New(foo)
+                         if err != nil {
+                           ...
+                         }
                          ...
                          foo := &pb.Foo{}
-                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                         if err := any.UnmarshalTo(foo); err != nil {
                            ...
                          }
 
@@ -23377,10 +23528,9 @@ paths:
           in: query
           required: false
           type: boolean
-          format: boolean
       tags:
         - Query
-  '/ibc/core/channel/v1beta1/channels/{channel_id}/ports/{port_id}/packet_acks/{sequence}':
+  /ibc/core/channel/v1beta1/channels/{channel_id}/ports/{port_id}/packet_acks/{sequence}:
     get:
       summary: PacketAcknowledgement queries a stored packet acknowledgement hash.
       operationId: PacketAcknowledgement
@@ -23433,7 +23583,7 @@ paths:
 
               proof was retrieved
         default:
-          description: An unexpected error response
+          description: An unexpected error response.
           schema:
             type: object
             properties:
@@ -23559,10 +23709,13 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := ptypes.MarshalAny(foo)
+                         any, err := anypb.New(foo)
+                         if err != nil {
+                           ...
+                         }
                          ...
                          foo := &pb.Foo{}
-                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                         if err := any.UnmarshalTo(foo); err != nil {
                            ...
                          }
 
@@ -23640,7 +23793,7 @@ paths:
           format: uint64
       tags:
         - Query
-  '/ibc/core/channel/v1beta1/channels/{channel_id}/ports/{port_id}/packet_commitments':
+  /ibc/core/channel/v1beta1/channels/{channel_id}/ports/{port_id}/packet_commitments:
     get:
       summary: |-
         PacketCommitments returns all the packet commitments hashes associated
@@ -23740,7 +23893,7 @@ paths:
               QueryPacketCommitmentsResponse is the request type for the
               Query/QueryPacketCommitments RPC method
         default:
-          description: An unexpected error response
+          description: An unexpected error response.
           schema:
             type: object
             properties:
@@ -23866,10 +24019,13 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := ptypes.MarshalAny(foo)
+                         any, err := anypb.New(foo)
+                         if err != nil {
+                           ...
+                         }
                          ...
                          foo := &pb.Foo{}
-                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                         if err := any.UnmarshalTo(foo); err != nil {
                            ...
                          }
 
@@ -23985,10 +24141,9 @@ paths:
           in: query
           required: false
           type: boolean
-          format: boolean
       tags:
         - Query
-  '/ibc/core/channel/v1beta1/channels/{channel_id}/ports/{port_id}/packet_commitments/{packet_ack_sequences}/unreceived_acks':
+  /ibc/core/channel/v1beta1/channels/{channel_id}/ports/{port_id}/packet_commitments/{packet_ack_sequences}/unreceived_acks:
     get:
       summary: >-
         UnreceivedAcks returns all the unreceived IBC acknowledgements
@@ -24039,7 +24194,7 @@ paths:
               QueryUnreceivedAcksResponse is the response type for the
               Query/UnreceivedAcks RPC method
         default:
-          description: An unexpected error response
+          description: An unexpected error response.
           schema:
             type: object
             properties:
@@ -24165,10 +24320,13 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := ptypes.MarshalAny(foo)
+                         any, err := anypb.New(foo)
+                         if err != nil {
+                           ...
+                         }
                          ...
                          foo := &pb.Foo{}
-                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                         if err := any.UnmarshalTo(foo); err != nil {
                            ...
                          }
 
@@ -24250,7 +24408,7 @@ paths:
           minItems: 1
       tags:
         - Query
-  '/ibc/core/channel/v1beta1/channels/{channel_id}/ports/{port_id}/packet_commitments/{packet_commitment_sequences}/unreceived_packets':
+  /ibc/core/channel/v1beta1/channels/{channel_id}/ports/{port_id}/packet_commitments/{packet_commitment_sequences}/unreceived_packets:
     get:
       summary: >-
         UnreceivedPackets returns all the unreceived IBC packets associated with
@@ -24301,7 +24459,7 @@ paths:
               QueryUnreceivedPacketsResponse is the response type for the
               Query/UnreceivedPacketCommitments RPC method
         default:
-          description: An unexpected error response
+          description: An unexpected error response.
           schema:
             type: object
             properties:
@@ -24427,10 +24585,13 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := ptypes.MarshalAny(foo)
+                         any, err := anypb.New(foo)
+                         if err != nil {
+                           ...
+                         }
                          ...
                          foo := &pb.Foo{}
-                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                         if err := any.UnmarshalTo(foo); err != nil {
                            ...
                          }
 
@@ -24512,7 +24673,7 @@ paths:
           minItems: 1
       tags:
         - Query
-  '/ibc/core/channel/v1beta1/channels/{channel_id}/ports/{port_id}/packet_commitments/{sequence}':
+  /ibc/core/channel/v1beta1/channels/{channel_id}/ports/{port_id}/packet_commitments/{sequence}:
     get:
       summary: PacketCommitment queries a stored packet commitment hash.
       operationId: PacketCommitment
@@ -24566,7 +24727,7 @@ paths:
 
               retrieved
         default:
-          description: An unexpected error response
+          description: An unexpected error response.
           schema:
             type: object
             properties:
@@ -24692,10 +24853,13 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := ptypes.MarshalAny(foo)
+                         any, err := anypb.New(foo)
+                         if err != nil {
+                           ...
+                         }
                          ...
                          foo := &pb.Foo{}
-                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                         if err := any.UnmarshalTo(foo); err != nil {
                            ...
                          }
 
@@ -24773,7 +24937,7 @@ paths:
           format: uint64
       tags:
         - Query
-  '/ibc/core/channel/v1beta1/channels/{channel_id}/ports/{port_id}/packet_receipts/{sequence}':
+  /ibc/core/channel/v1beta1/channels/{channel_id}/ports/{port_id}/packet_receipts/{sequence}:
     get:
       summary: >-
         PacketReceipt queries if a given packet sequence has been received on
@@ -24787,7 +24951,6 @@ paths:
             properties:
               received:
                 type: boolean
-                format: boolean
                 title: success flag for if receipt exists
               proof:
                 type: string
@@ -24829,7 +24992,7 @@ paths:
 
               retrieved
         default:
-          description: An unexpected error response
+          description: An unexpected error response.
           schema:
             type: object
             properties:
@@ -24955,10 +25118,13 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := ptypes.MarshalAny(foo)
+                         any, err := anypb.New(foo)
+                         if err != nil {
+                           ...
+                         }
                          ...
                          foo := &pb.Foo{}
-                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                         if err := any.UnmarshalTo(foo); err != nil {
                            ...
                          }
 
@@ -25036,7 +25202,7 @@ paths:
           format: uint64
       tags:
         - Query
-  '/ibc/core/channel/v1beta1/connections/{connection}/channels':
+  /ibc/core/channel/v1beta1/connections/{connection}/channels:
     get:
       summary: |-
         ConnectionChannels queries all the channels associated with a connection
@@ -25187,7 +25353,7 @@ paths:
               QueryConnectionChannelsResponse is the Response type for the
               Query/QueryConnectionChannels RPC method
         default:
-          description: An unexpected error response
+          description: An unexpected error response.
           schema:
             type: object
             properties:
@@ -25313,10 +25479,13 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := ptypes.MarshalAny(foo)
+                         any, err := anypb.New(foo)
+                         if err != nil {
+                           ...
+                         }
                          ...
                          foo := &pb.Foo{}
-                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                         if err := any.UnmarshalTo(foo); err != nil {
                            ...
                          }
 
@@ -25427,7 +25596,6 @@ paths:
           in: query
           required: false
           type: boolean
-          format: boolean
       tags:
         - Query
   /ibc/client/v1beta1/params:
@@ -25455,7 +25623,7 @@ paths:
               QueryClientParamsResponse is the response type for the
               Query/ClientParams RPC method.
         default:
-          description: An unexpected error response
+          description: An unexpected error response.
           schema:
             type: object
             properties:
@@ -25581,10 +25749,13 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := ptypes.MarshalAny(foo)
+                         any, err := anypb.New(foo)
+                         if err != nil {
+                           ...
+                         }
                          ...
                          foo := &pb.Foo{}
-                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                         if err := any.UnmarshalTo(foo); err != nil {
                            ...
                          }
 
@@ -25776,10 +25947,13 @@ paths:
                          Example 4: Pack and unpack a message in Go
 
                              foo := &pb.Foo{...}
-                             any, err := ptypes.MarshalAny(foo)
+                             any, err := anypb.New(foo)
+                             if err != nil {
+                               ...
+                             }
                              ...
                              foo := &pb.Foo{}
-                             if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                             if err := any.UnmarshalTo(foo); err != nil {
                                ...
                              }
 
@@ -25881,7 +26055,7 @@ paths:
 
               method.
         default:
-          description: An unexpected error response
+          description: An unexpected error response.
           schema:
             type: object
             properties:
@@ -26007,10 +26181,13 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := ptypes.MarshalAny(foo)
+                         any, err := anypb.New(foo)
+                         if err != nil {
+                           ...
+                         }
                          ...
                          foo := &pb.Foo{}
-                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                         if err := any.UnmarshalTo(foo); err != nil {
                            ...
                          }
 
@@ -26116,10 +26293,9 @@ paths:
           in: query
           required: false
           type: boolean
-          format: boolean
       tags:
         - Query
-  '/ibc/core/client/v1beta1/client_states/{client_id}':
+  /ibc/core/client/v1beta1/client_states/{client_id}:
     get:
       summary: ClientState queries an IBC light client.
       operationId: ClientState
@@ -26241,10 +26417,13 @@ paths:
                    Example 4: Pack and unpack a message in Go
 
                        foo := &pb.Foo{...}
-                       any, err := ptypes.MarshalAny(foo)
+                       any, err := anypb.New(foo)
+                       if err != nil {
+                         ...
+                       }
                        ...
                        foo := &pb.Foo{}
-                       if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                       if err := any.UnmarshalTo(foo); err != nil {
                          ...
                        }
 
@@ -26341,7 +26520,7 @@ paths:
 
               which the proof was retrieved.
         default:
-          description: An unexpected error response
+          description: An unexpected error response.
           schema:
             type: object
             properties:
@@ -26467,10 +26646,13 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := ptypes.MarshalAny(foo)
+                         any, err := anypb.New(foo)
+                         if err != nil {
+                           ...
+                         }
                          ...
                          foo := &pb.Foo{}
-                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                         if err := any.UnmarshalTo(foo); err != nil {
                            ...
                          }
 
@@ -26537,7 +26719,7 @@ paths:
           type: string
       tags:
         - Query
-  '/ibc/core/client/v1beta1/consensus_states/{client_id}':
+  /ibc/core/client/v1beta1/consensus_states/{client_id}:
     get:
       summary: |-
         ConsensusStates queries all the consensus state associated with a given
@@ -26694,10 +26876,13 @@ paths:
                          Example 4: Pack and unpack a message in Go
 
                              foo := &pb.Foo{...}
-                             any, err := ptypes.MarshalAny(foo)
+                             any, err := anypb.New(foo)
+                             if err != nil {
+                               ...
+                             }
                              ...
                              foo := &pb.Foo{}
-                             if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                             if err := any.UnmarshalTo(foo); err != nil {
                                ...
                              }
 
@@ -26795,7 +26980,7 @@ paths:
               QueryConsensusStatesResponse is the response type for the
               Query/ConsensusStates RPC method
         default:
-          description: An unexpected error response
+          description: An unexpected error response.
           schema:
             type: object
             properties:
@@ -26921,10 +27106,13 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := ptypes.MarshalAny(foo)
+                         any, err := anypb.New(foo)
+                         if err != nil {
+                           ...
+                         }
                          ...
                          foo := &pb.Foo{}
-                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                         if err := any.UnmarshalTo(foo); err != nil {
                            ...
                          }
 
@@ -27035,10 +27223,9 @@ paths:
           in: query
           required: false
           type: boolean
-          format: boolean
       tags:
         - Query
-  '/ibc/core/client/v1beta1/consensus_states/{client_id}/revision/{revision_number}/height/{revision_height}':
+  /ibc/core/client/v1beta1/consensus_states/{client_id}/revision/{revision_number}/height/{revision_height}:
     get:
       summary: >-
         ConsensusState queries a consensus state associated with a client state
@@ -27164,10 +27351,13 @@ paths:
                    Example 4: Pack and unpack a message in Go
 
                        foo := &pb.Foo{...}
-                       any, err := ptypes.MarshalAny(foo)
+                       any, err := anypb.New(foo)
+                       if err != nil {
+                         ...
+                       }
                        ...
                        foo := &pb.Foo{}
-                       if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                       if err := any.UnmarshalTo(foo); err != nil {
                          ...
                        }
 
@@ -27263,7 +27453,7 @@ paths:
 
               RPC method
         default:
-          description: An unexpected error response
+          description: An unexpected error response.
           schema:
             type: object
             properties:
@@ -27389,10 +27579,13 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := ptypes.MarshalAny(foo)
+                         any, err := anypb.New(foo)
+                         if err != nil {
+                           ...
+                         }
                          ...
                          foo := &pb.Foo{}
-                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                         if err := any.UnmarshalTo(foo); err != nil {
                            ...
                          }
 
@@ -27478,10 +27671,9 @@ paths:
           in: query
           required: false
           type: boolean
-          format: boolean
       tags:
         - Query
-  '/ibc/core/connection/v1beta1/client_connections/{client_id}':
+  /ibc/core/connection/v1beta1/client_connections/{client_id}:
     get:
       summary: |-
         ClientConnections queries the connection paths associated with a client
@@ -27533,7 +27725,7 @@ paths:
               QueryClientConnectionsResponse is the response type for the
               Query/ClientConnections RPC method
         default:
-          description: An unexpected error response
+          description: An unexpected error response.
           schema:
             type: object
             properties:
@@ -27659,10 +27851,13 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := ptypes.MarshalAny(foo)
+                         any, err := anypb.New(foo)
+                         if err != nil {
+                           ...
+                         }
                          ...
                          foo := &pb.Foo{}
-                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                         if err := any.UnmarshalTo(foo); err != nil {
                            ...
                          }
 
@@ -27887,7 +28082,7 @@ paths:
 
               method.
         default:
-          description: An unexpected error response
+          description: An unexpected error response.
           schema:
             type: object
             properties:
@@ -28013,10 +28208,13 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := ptypes.MarshalAny(foo)
+                         any, err := anypb.New(foo)
+                         if err != nil {
+                           ...
+                         }
                          ...
                          foo := &pb.Foo{}
-                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                         if err := any.UnmarshalTo(foo); err != nil {
                            ...
                          }
 
@@ -28122,10 +28320,9 @@ paths:
           in: query
           required: false
           type: boolean
-          format: boolean
       tags:
         - Query
-  '/ibc/core/connection/v1beta1/connections/{connection_id}':
+  /ibc/core/connection/v1beta1/connections/{connection_id}:
     get:
       summary: Connection queries an IBC connection end.
       operationId: Connection
@@ -28266,7 +28463,7 @@ paths:
 
               which the proof was retrieved.
         default:
-          description: An unexpected error response
+          description: An unexpected error response.
           schema:
             type: object
             properties:
@@ -28392,10 +28589,13 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := ptypes.MarshalAny(foo)
+                         any, err := anypb.New(foo)
+                         if err != nil {
+                           ...
+                         }
                          ...
                          foo := &pb.Foo{}
-                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                         if err := any.UnmarshalTo(foo); err != nil {
                            ...
                          }
 
@@ -28462,7 +28662,7 @@ paths:
           type: string
       tags:
         - Query
-  '/ibc/core/connection/v1beta1/connections/{connection_id}/client_state':
+  /ibc/core/connection/v1beta1/connections/{connection_id}/client_state:
     get:
       summary: |-
         ConnectionClientState queries the client state associated with the
@@ -28594,10 +28794,13 @@ paths:
                        Example 4: Pack and unpack a message in Go
 
                            foo := &pb.Foo{...}
-                           any, err := ptypes.MarshalAny(foo)
+                           any, err := anypb.New(foo)
+                           if err != nil {
+                             ...
+                           }
                            ...
                            foo := &pb.Foo{}
-                           if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                           if err := any.UnmarshalTo(foo); err != nil {
                              ...
                            }
 
@@ -28697,7 +28900,7 @@ paths:
               QueryConnectionClientStateResponse is the response type for the
               Query/ConnectionClientState RPC method
         default:
-          description: An unexpected error response
+          description: An unexpected error response.
           schema:
             type: object
             properties:
@@ -28823,10 +29026,13 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := ptypes.MarshalAny(foo)
+                         any, err := anypb.New(foo)
+                         if err != nil {
+                           ...
+                         }
                          ...
                          foo := &pb.Foo{}
-                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                         if err := any.UnmarshalTo(foo); err != nil {
                            ...
                          }
 
@@ -28893,7 +29099,7 @@ paths:
           type: string
       tags:
         - Query
-  '/ibc/core/connection/v1beta1/connections/{connection_id}/consensus_state/revision/{revision_number}/height/{revision_height}':
+  /ibc/core/connection/v1beta1/connections/{connection_id}/consensus_state/revision/{revision_number}/height/{revision_height}:
     get:
       summary: |-
         ConnectionConsensusState queries the consensus state associated with the
@@ -29017,10 +29223,13 @@ paths:
                    Example 4: Pack and unpack a message in Go
 
                        foo := &pb.Foo{...}
-                       any, err := ptypes.MarshalAny(foo)
+                       any, err := anypb.New(foo)
+                       if err != nil {
+                         ...
+                       }
                        ...
                        foo := &pb.Foo{}
-                       if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                       if err := any.UnmarshalTo(foo); err != nil {
                          ...
                        }
 
@@ -29115,7 +29324,7 @@ paths:
               QueryConnectionConsensusStateResponse is the response type for the
               Query/ConnectionConsensusState RPC method
         default:
-          description: An unexpected error response
+          description: An unexpected error response.
           schema:
             type: object
             properties:
@@ -29241,10 +29450,13 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := ptypes.MarshalAny(foo)
+                         any, err := anypb.New(foo)
+                         if err != nil {
+                           ...
+                         }
                          ...
                          foo := &pb.Foo{}
-                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                         if err := any.UnmarshalTo(foo); err != nil {
                            ...
                          }
 
@@ -29376,7 +29588,7 @@ paths:
 
               method.
         default:
-          description: An unexpected error response
+          description: An unexpected error response.
           schema:
             type: object
             properties:
@@ -29444,10 +29656,9 @@ paths:
           in: query
           required: false
           type: boolean
-          format: boolean
       tags:
         - Query
-  '/ibc/applications/transfer/v1beta1/denom_traces/{hash}':
+  /ibc/applications/transfer/v1beta1/denom_traces/{hash}:
     get:
       summary: DenomTrace queries a denomination trace information.
       operationId: DenomTrace
@@ -29481,7 +29692,7 @@ paths:
 
               method.
         default:
-          description: An unexpected error response
+          description: An unexpected error response.
           schema:
             type: object
             properties:
@@ -29526,7 +29737,6 @@ paths:
                 properties:
                   send_enabled:
                     type: boolean
-                    format: boolean
                     description: >-
                       send_enabled enables or disables all cross-chain token
                       transfers from this
@@ -29534,7 +29744,6 @@ paths:
                       chain.
                   receive_enabled:
                     type: boolean
-                    format: boolean
                     description: >-
                       receive_enabled enables or disables all cross-chain token
                       transfers to this
@@ -29544,7 +29753,7 @@ paths:
               QueryParamsResponse is the response type for the Query/Params RPC
               method.
         default:
-          description: An unexpected error response
+          description: An unexpected error response.
           schema:
             type: object
             properties:
@@ -29567,7 +29776,7 @@ paths:
                       format: byte
       tags:
         - Query
-  '/panacea/aol/v2/owners/{owner_address}/topics':
+  /panacea/aol/v2/owners/{owner_address}/topics:
     get:
       summary: Topics returns topic names.
       operationId: Topics
@@ -29612,7 +29821,7 @@ paths:
               QueryTopicsResponse is the response type for the Query/Topics RPC
               method.
         default:
-          description: An unexpected error response
+          description: An unexpected error response.
           schema:
             type: object
             properties:
@@ -29684,10 +29893,9 @@ paths:
           in: query
           required: false
           type: boolean
-          format: boolean
       tags:
         - Query
-  '/panacea/aol/v2/owners/{owner_address}/topics/{topic_name}':
+  /panacea/aol/v2/owners/{owner_address}/topics/{topic_name}:
     get:
       summary: Topic returns topic details.
       operationId: Topic
@@ -29713,7 +29921,7 @@ paths:
               QueryTopicResponse is the response type for the Query/Topic RPC
               method.
         default:
-          description: An unexpected error response
+          description: An unexpected error response.
           schema:
             type: object
             properties:
@@ -29745,7 +29953,7 @@ paths:
           type: string
       tags:
         - Query
-  '/panacea/aol/v2/owners/{owner_address}/topics/{topic_name}/records/{offset}':
+  /panacea/aol/v2/owners/{owner_address}/topics/{topic_name}/records/{offset}:
     get:
       summary: Record returns record details.
       operationId: Record
@@ -29774,7 +29982,7 @@ paths:
               QueryRecordResponse is the response type for the Query/Record RPC
               method.
         default:
-          description: An unexpected error response
+          description: An unexpected error response.
           schema:
             type: object
             properties:
@@ -29811,7 +30019,7 @@ paths:
           format: uint64
       tags:
         - Query
-  '/panacea/aol/v2/owners/{owner_address}/topics/{topic_name}/writers':
+  /panacea/aol/v2/owners/{owner_address}/topics/{topic_name}/writers:
     get:
       summary: Writers returns writer addresses.
       operationId: Writers
@@ -29856,7 +30064,7 @@ paths:
               QueryWritersResponse is the response type for the Query/Writers
               RPC method.
         default:
-          description: An unexpected error response
+          description: An unexpected error response.
           schema:
             type: object
             properties:
@@ -29932,10 +30140,9 @@ paths:
           in: query
           required: false
           type: boolean
-          format: boolean
       tags:
         - Query
-  '/panacea/aol/v2/owners/{owner_address}/topics/{topic_name}/writers/{writer_address}':
+  /panacea/aol/v2/owners/{owner_address}/topics/{topic_name}/writers/{writer_address}:
     get:
       summary: Writer returns writer details.
       operationId: Writer
@@ -29960,7 +30167,7 @@ paths:
               QueryWriterResponse is the response type for the Query/Writer RPC
               method.
         default:
-          description: An unexpected error response
+          description: An unexpected error response.
           schema:
             type: object
             properties:
@@ -29996,7 +30203,7 @@ paths:
           type: string
       tags:
         - Query
-  '/panacea/did/v2/dids/{did_base64}':
+  /panacea/did/v2/dids/{did_base64}:
     get:
       summary: DID returns a DID Document with a sequence number.
       operationId: DID
@@ -30201,7 +30408,7 @@ paths:
               QueryDIDResponse is the response type for the
               Query/DIDDocumentWithSeq RPC method.
         default:
-          description: An unexpected error response
+          description: An unexpected error response.
           schema:
             type: object
             properties:
@@ -31143,7 +31350,7 @@ definitions:
         description: Sender address or Keybase name to generate a transaction
       memo:
         type: string
-        example: "Sent via Cosmos Voyager \U0001F680"
+        example: Sent via Cosmos Voyager 🚀
       chain_id:
         type: string
         example: Cosmos-Hub
@@ -31723,10 +31930,13 @@ definitions:
        Example 4: Pack and unpack a message in Go
 
            foo := &pb.Foo{...}
-           any, err := ptypes.MarshalAny(foo)
+           any, err := anypb.New(foo)
+           if err != nil {
+             ...
+           }
            ...
            foo := &pb.Foo{}
-           if err := ptypes.UnmarshalAny(any, foo); err != nil {
+           if err := any.UnmarshalTo(foo); err != nil {
              ...
            }
 
@@ -31897,10 +32107,13 @@ definitions:
              Example 4: Pack and unpack a message in Go
 
                  foo := &pb.Foo{...}
-                 any, err := ptypes.MarshalAny(foo)
+                 any, err := anypb.New(foo)
+                 if err != nil {
+                   ...
+                 }
                  ...
                  foo := &pb.Foo{}
-                 if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                 if err := any.UnmarshalTo(foo); err != nil {
                    ...
                  }
 
@@ -32042,7 +32255,6 @@ definitions:
               type: string
             enabled:
               type: boolean
-              format: boolean
           description: >-
             SendEnabled maps coin denom to a send_enabled status (whether a
             denom is
@@ -32050,7 +32262,6 @@ definitions:
             sendable).
       default_send_enabled:
         type: boolean
-        format: boolean
     description: Params defines the parameters for the bank module.
   cosmos.bank.v1beta1.QueryAllBalancesResponse:
     type: object
@@ -32269,7 +32480,6 @@ definitions:
                   type: string
                 enabled:
                   type: boolean
-                  format: boolean
               description: >-
                 SendEnabled maps coin denom to a send_enabled status (whether a
                 denom is
@@ -32277,7 +32487,6 @@ definitions:
                 sendable).
           default_send_enabled:
             type: boolean
-            format: boolean
         description: Params defines the parameters for the bank module.
     description: >-
       QueryParamsResponse defines the response type for querying x/bank
@@ -32330,7 +32539,6 @@ definitions:
         type: string
       enabled:
         type: boolean
-        format: boolean
     description: |-
       SendEnabled maps coin denom to a send_enabled status (whether a denom is
       sendable).
@@ -32361,7 +32569,6 @@ definitions:
           If left empty it will default to a value to be set by each app.
       count_total:
         type: boolean
-        format: boolean
         description: >-
           count_total is set to true  to indicate that the result set should
           include
@@ -33642,10 +33849,13 @@ definitions:
                  Example 4: Pack and unpack a message in Go
 
                      foo := &pb.Foo{...}
-                     any, err := ptypes.MarshalAny(foo)
+                     any, err := anypb.New(foo)
+                     if err != nil {
+                       ...
+                     }
                      ...
                      foo := &pb.Foo{}
-                     if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                     if err := any.UnmarshalTo(foo); err != nil {
                        ...
                      }
 
@@ -33806,7 +34016,6 @@ definitions:
     properties:
       syncing:
         type: boolean
-        format: boolean
     description: >-
       GetSyncingResponse is the response type for the Query/GetSyncing RPC
       method.
@@ -33935,10 +34144,13 @@ definitions:
                  Example 4: Pack and unpack a message in Go
 
                      foo := &pb.Foo{...}
-                     any, err := ptypes.MarshalAny(foo)
+                     any, err := anypb.New(foo)
+                     if err != nil {
+                       ...
+                     }
                      ...
                      foo := &pb.Foo{}
-                     if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                     if err := any.UnmarshalTo(foo); err != nil {
                        ...
                      }
 
@@ -34144,10 +34356,13 @@ definitions:
            Example 4: Pack and unpack a message in Go
 
                foo := &pb.Foo{...}
-               any, err := ptypes.MarshalAny(foo)
+               any, err := anypb.New(foo)
+               if err != nil {
+                 ...
+               }
                ...
                foo := &pb.Foo{}
-               if err := ptypes.UnmarshalAny(any, foo); err != nil {
+               if err := any.UnmarshalTo(foo); err != nil {
                  ...
                }
 
@@ -36671,7 +36886,6 @@ definitions:
         type: string
       withdraw_addr_enabled:
         type: boolean
-        format: boolean
     description: Params defines the set of params for the distribution module.
   cosmos.distribution.v1beta1.QueryCommunityPoolResponse:
     type: object
@@ -36802,7 +37016,6 @@ definitions:
             type: string
           withdraw_addr_enabled:
             type: boolean
-            format: boolean
     description: QueryParamsResponse is the response type for the Query/Params RPC method.
   cosmos.distribution.v1beta1.QueryValidatorCommissionResponse:
     type: object
@@ -37071,10 +37284,13 @@ definitions:
              Example 4: Pack and unpack a message in Go
 
                  foo := &pb.Foo{...}
-                 any, err := ptypes.MarshalAny(foo)
+                 any, err := anypb.New(foo)
+                 if err != nil {
+                   ...
+                 }
                  ...
                  foo := &pb.Foo{}
-                 if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                 if err := any.UnmarshalTo(foo); err != nil {
                    ...
                  }
 
@@ -37257,10 +37473,13 @@ definitions:
            Example 4: Pack and unpack a message in Go
 
                foo := &pb.Foo{...}
-               any, err := ptypes.MarshalAny(foo)
+               any, err := anypb.New(foo)
+               if err != nil {
+                 ...
+               }
                ...
                foo := &pb.Foo{}
-               if err := ptypes.UnmarshalAny(any, foo); err != nil {
+               if err := any.UnmarshalTo(foo); err != nil {
                  ...
                }
 
@@ -37475,10 +37694,13 @@ definitions:
            Example 4: Pack and unpack a message in Go
 
                foo := &pb.Foo{...}
-               any, err := ptypes.MarshalAny(foo)
+               any, err := anypb.New(foo)
+               if err != nil {
+                 ...
+               }
                ...
                foo := &pb.Foo{}
-               if err := ptypes.UnmarshalAny(any, foo); err != nil {
+               if err := any.UnmarshalTo(foo); err != nil {
                  ...
                }
 
@@ -37887,10 +38109,13 @@ definitions:
                Example 4: Pack and unpack a message in Go
 
                    foo := &pb.Foo{...}
-                   any, err := ptypes.MarshalAny(foo)
+                   any, err := anypb.New(foo)
+                   if err != nil {
+                     ...
+                   }
                    ...
                    foo := &pb.Foo{}
-                   if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                   if err := any.UnmarshalTo(foo); err != nil {
                      ...
                    }
 
@@ -38134,10 +38359,13 @@ definitions:
                  Example 4: Pack and unpack a message in Go
 
                      foo := &pb.Foo{...}
-                     any, err := ptypes.MarshalAny(foo)
+                     any, err := anypb.New(foo)
+                     if err != nil {
+                       ...
+                     }
                      ...
                      foo := &pb.Foo{}
-                     if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                     if err := any.UnmarshalTo(foo); err != nil {
                        ...
                      }
 
@@ -38629,7 +38857,6 @@ definitions:
             title: timestamp validator cannot be unjailed until
           tombstoned:
             type: boolean
-            format: boolean
             title: >-
               whether or not a validator has been tombstoned (killed out of
               validator
@@ -38674,7 +38901,6 @@ definitions:
               title: timestamp validator cannot be unjailed until
             tombstoned:
               type: boolean
-              format: boolean
               title: >-
                 whether or not a validator has been tombstoned (killed out of
                 validator
@@ -38739,7 +38965,6 @@ definitions:
         title: timestamp validator cannot be unjailed until
       tombstoned:
         type: boolean
-        format: boolean
         title: >-
           whether or not a validator has been tombstoned (killed out of
           validator
@@ -38780,7 +39005,7 @@ definitions:
         properties:
           rate:
             type: string
-            description: 'rate is the commission rate charged to delegators, as a fraction.'
+            description: rate is the commission rate charged to delegators, as a fraction.
           max_rate:
             type: string
             description: >-
@@ -38801,7 +39026,7 @@ definitions:
     properties:
       rate:
         type: string
-        description: 'rate is the commission rate charged to delegators, as a fraction.'
+        description: rate is the commission rate charged to delegators, as a fraction.
       max_rate:
         type: string
         description: >-
@@ -39090,10 +39315,13 @@ definitions:
                  Example 4: Pack and unpack a message in Go
 
                      foo := &pb.Foo{...}
-                     any, err := ptypes.MarshalAny(foo)
+                     any, err := anypb.New(foo)
+                     if err != nil {
+                       ...
+                     }
                      ...
                      foo := &pb.Foo{}
-                     if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                     if err := any.UnmarshalTo(foo); err != nil {
                        ...
                      }
 
@@ -39149,7 +39377,6 @@ definitions:
                     }
             jailed:
               type: boolean
-              format: boolean
               description: >-
                 jailed defined whether the validator has been jailed from bonded
                 status or not.
@@ -39632,10 +39859,13 @@ definitions:
                Example 4: Pack and unpack a message in Go
 
                    foo := &pb.Foo{...}
-                   any, err := ptypes.MarshalAny(foo)
+                   any, err := anypb.New(foo)
+                   if err != nil {
+                     ...
+                   }
                    ...
                    foo := &pb.Foo{}
-                   if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                   if err := any.UnmarshalTo(foo); err != nil {
                      ...
                    }
 
@@ -39689,7 +39919,6 @@ definitions:
                   }
           jailed:
             type: boolean
-            format: boolean
             description: >-
               jailed defined whether the validator has been jailed from bonded
               status or not.
@@ -39928,10 +40157,13 @@ definitions:
                  Example 4: Pack and unpack a message in Go
 
                      foo := &pb.Foo{...}
-                     any, err := ptypes.MarshalAny(foo)
+                     any, err := anypb.New(foo)
+                     if err != nil {
+                       ...
+                     }
                      ...
                      foo := &pb.Foo{}
-                     if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                     if err := any.UnmarshalTo(foo); err != nil {
                        ...
                      }
 
@@ -39987,7 +40219,6 @@ definitions:
                     }
             jailed:
               type: boolean
-              format: boolean
               description: >-
                 jailed defined whether the validator has been jailed from bonded
                 status or not.
@@ -40329,10 +40560,13 @@ definitions:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := ptypes.MarshalAny(foo)
+                         any, err := anypb.New(foo)
+                         if err != nil {
+                           ...
+                         }
                          ...
                          foo := &pb.Foo{}
-                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                         if err := any.UnmarshalTo(foo); err != nil {
                            ...
                          }
 
@@ -40393,7 +40627,6 @@ definitions:
                         }
                 jailed:
                   type: boolean
-                  format: boolean
                   description: >-
                     jailed defined whether the validator has been jailed from
                     bonded status or not.
@@ -40935,10 +41168,13 @@ definitions:
                Example 4: Pack and unpack a message in Go
 
                    foo := &pb.Foo{...}
-                   any, err := ptypes.MarshalAny(foo)
+                   any, err := anypb.New(foo)
+                   if err != nil {
+                     ...
+                   }
                    ...
                    foo := &pb.Foo{}
-                   if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                   if err := any.UnmarshalTo(foo); err != nil {
                      ...
                    }
 
@@ -40992,7 +41228,6 @@ definitions:
                   }
           jailed:
             type: boolean
-            format: boolean
             description: >-
               jailed defined whether the validator has been jailed from bonded
               status or not.
@@ -41300,10 +41535,13 @@ definitions:
                  Example 4: Pack and unpack a message in Go
 
                      foo := &pb.Foo{...}
-                     any, err := ptypes.MarshalAny(foo)
+                     any, err := anypb.New(foo)
+                     if err != nil {
+                       ...
+                     }
                      ...
                      foo := &pb.Foo{}
-                     if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                     if err := any.UnmarshalTo(foo); err != nil {
                        ...
                      }
 
@@ -41359,7 +41597,6 @@ definitions:
                     }
             jailed:
               type: boolean
-              format: boolean
               description: >-
                 jailed defined whether the validator has been jailed from bonded
                 status or not.
@@ -41883,10 +42120,13 @@ definitions:
            Example 4: Pack and unpack a message in Go
 
                foo := &pb.Foo{...}
-               any, err := ptypes.MarshalAny(foo)
+               any, err := anypb.New(foo)
+               if err != nil {
+                 ...
+               }
                ...
                foo := &pb.Foo{}
-               if err := ptypes.UnmarshalAny(any, foo); err != nil {
+               if err := any.UnmarshalTo(foo); err != nil {
                  ...
                }
 
@@ -41938,7 +42178,6 @@ definitions:
               }
       jailed:
         type: boolean
-        format: boolean
         description: >-
           jailed defined whether the validator has been jailed from bonded
           status or not.
@@ -42141,7 +42380,6 @@ definitions:
                     format: byte
                   index:
                     type: boolean
-                    format: boolean
                 description: >-
                   EventAttribute is a single key-value pair, associated with an
                   event.
@@ -42198,7 +42436,7 @@ definitions:
         description: Response code.
       data:
         type: string
-        description: 'Result bytes, if any.'
+        description: Result bytes, if any.
       raw_log:
         type: string
         description: |-
@@ -42368,10 +42606,13 @@ definitions:
            Example 4: Pack and unpack a message in Go
 
                foo := &pb.Foo{...}
-               any, err := ptypes.MarshalAny(foo)
+               any, err := anypb.New(foo)
+               if err != nil {
+                 ...
+               }
                ...
                foo := &pb.Foo{}
-               if err := ptypes.UnmarshalAny(any, foo); err != nil {
+               if err := any.UnmarshalTo(foo); err != nil {
                  ...
                }
 
@@ -42451,7 +42692,6 @@ definitions:
                     format: byte
                   index:
                     type: boolean
-                    format: boolean
                 description: >-
                   EventAttribute is a single key-value pair, associated with an
                   event.
@@ -42666,7 +42906,7 @@ definitions:
             description: Response code.
           data:
             type: string
-            description: 'Result bytes, if any.'
+            description: Result bytes, if any.
           raw_log:
             type: string
             description: |-
@@ -42841,10 +43081,13 @@ definitions:
                Example 4: Pack and unpack a message in Go
 
                    foo := &pb.Foo{...}
-                   any, err := ptypes.MarshalAny(foo)
+                   any, err := anypb.New(foo)
+                   if err != nil {
+                     ...
+                   }
                    ...
                    foo := &pb.Foo{}
-                   if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                   if err := any.UnmarshalTo(foo); err != nil {
                      ...
                    }
 
@@ -42926,7 +43169,6 @@ definitions:
                         format: byte
                       index:
                         type: boolean
-                        format: boolean
                     description: >-
                       EventAttribute is a single key-value pair, associated with
                       an event.
@@ -43039,7 +43281,7 @@ definitions:
             description: Response code.
           data:
             type: string
-            description: 'Result bytes, if any.'
+            description: Result bytes, if any.
           raw_log:
             type: string
             description: |-
@@ -43214,10 +43456,13 @@ definitions:
                Example 4: Pack and unpack a message in Go
 
                    foo := &pb.Foo{...}
-                   any, err := ptypes.MarshalAny(foo)
+                   any, err := anypb.New(foo)
+                   if err != nil {
+                     ...
+                   }
                    ...
                    foo := &pb.Foo{}
-                   if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                   if err := any.UnmarshalTo(foo); err != nil {
                      ...
                    }
 
@@ -43299,7 +43544,6 @@ definitions:
                         format: byte
                       index:
                         type: boolean
-                        format: boolean
                     description: >-
                       EventAttribute is a single key-value pair, associated with
                       an event.
@@ -43360,7 +43604,7 @@ definitions:
               description: Response code.
             data:
               type: string
-              description: 'Result bytes, if any.'
+              description: Result bytes, if any.
             raw_log:
               type: string
               description: |-
@@ -43537,10 +43781,13 @@ definitions:
                  Example 4: Pack and unpack a message in Go
 
                      foo := &pb.Foo{...}
-                     any, err := ptypes.MarshalAny(foo)
+                     any, err := anypb.New(foo)
+                     if err != nil {
+                       ...
+                     }
                      ...
                      foo := &pb.Foo{}
-                     if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                     if err := any.UnmarshalTo(foo); err != nil {
                        ...
                      }
 
@@ -43624,7 +43871,6 @@ definitions:
                           format: byte
                         index:
                           type: boolean
-                          format: boolean
                       description: >-
                         EventAttribute is a single key-value pair, associated
                         with an event.
@@ -43894,10 +44140,13 @@ definitions:
            Example 4: Pack and unpack a message in Go
 
                foo := &pb.Foo{...}
-               any, err := ptypes.MarshalAny(foo)
+               any, err := anypb.New(foo)
+               if err != nil {
+                 ...
+               }
                ...
                foo := &pb.Foo{}
-               if err := ptypes.UnmarshalAny(any, foo); err != nil {
+               if err := any.UnmarshalTo(foo); err != nil {
                  ...
                }
 
@@ -44029,7 +44278,6 @@ definitions:
                         format: byte
                       index:
                         type: boolean
-                        format: boolean
                     description: >-
                       EventAttribute is a single key-value pair, associated with
                       an event.
@@ -44170,10 +44418,13 @@ definitions:
                  Example 4: Pack and unpack a message in Go
 
                      foo := &pb.Foo{...}
-                     any, err := ptypes.MarshalAny(foo)
+                     any, err := anypb.New(foo)
+                     if err != nil {
+                       ...
+                     }
                      ...
                      foo := &pb.Foo{}
-                     if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                     if err := any.UnmarshalTo(foo); err != nil {
                        ...
                      }
 
@@ -44369,10 +44620,13 @@ definitions:
                  Example 4: Pack and unpack a message in Go
 
                      foo := &pb.Foo{...}
-                     any, err := ptypes.MarshalAny(foo)
+                     any, err := anypb.New(foo)
+                     if err != nil {
+                       ...
+                     }
                      ...
                      foo := &pb.Foo{}
-                     if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                     if err := any.UnmarshalTo(foo); err != nil {
                        ...
                      }
 
@@ -44548,10 +44802,13 @@ definitions:
                  Example 4: Pack and unpack a message in Go
 
                      foo := &pb.Foo{...}
-                     any, err := ptypes.MarshalAny(foo)
+                     any, err := anypb.New(foo)
+                     if err != nil {
+                       ...
+                     }
                      ...
                      foo := &pb.Foo{}
-                     if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                     if err := any.UnmarshalTo(foo); err != nil {
                        ...
                      }
 
@@ -44747,10 +45004,13 @@ definitions:
              Example 4: Pack and unpack a message in Go
 
                  foo := &pb.Foo{...}
-                 any, err := ptypes.MarshalAny(foo)
+                 any, err := anypb.New(foo)
+                 if err != nil {
+                   ...
+                 }
                  ...
                  foo := &pb.Foo{}
-                 if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                 if err := any.UnmarshalTo(foo); err != nil {
                    ...
                  }
 
@@ -44936,10 +45196,13 @@ definitions:
              Example 4: Pack and unpack a message in Go
 
                  foo := &pb.Foo{...}
-                 any, err := ptypes.MarshalAny(foo)
+                 any, err := anypb.New(foo)
+                 if err != nil {
+                   ...
+                 }
                  ...
                  foo := &pb.Foo{}
-                 if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                 if err := any.UnmarshalTo(foo); err != nil {
                    ...
                  }
 
@@ -45107,10 +45370,13 @@ definitions:
              Example 4: Pack and unpack a message in Go
 
                  foo := &pb.Foo{...}
-                 any, err := ptypes.MarshalAny(foo)
+                 any, err := anypb.New(foo)
+                 if err != nil {
+                   ...
+                 }
                  ...
                  foo := &pb.Foo{}
-                 if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                 if err := any.UnmarshalTo(foo); err != nil {
                    ...
                  }
 
@@ -45186,8 +45452,7 @@ definitions:
               format: byte
             index:
               type: boolean
-              format: boolean
-          description: 'EventAttribute is a single key-value pair, associated with an event.'
+          description: EventAttribute is a single key-value pair, associated with an event.
     description: >-
       Event allows application developers to attach additional information to
 
@@ -45206,8 +45471,7 @@ definitions:
         format: byte
       index:
         type: boolean
-        format: boolean
-    description: 'EventAttribute is a single key-value pair, associated with an event.'
+    description: EventAttribute is a single key-value pair, associated with an event.
   cosmos.upgrade.v1beta1.Plan:
     type: object
     properties:
@@ -45354,10 +45618,13 @@ definitions:
            Example 4: Pack and unpack a message in Go
 
                foo := &pb.Foo{...}
-               any, err := ptypes.MarshalAny(foo)
+               any, err := anypb.New(foo)
+               if err != nil {
+                 ...
+               }
                ...
                foo := &pb.Foo{}
-               if err := ptypes.UnmarshalAny(any, foo); err != nil {
+               if err := any.UnmarshalTo(foo); err != nil {
                  ...
                }
 
@@ -45594,10 +45861,13 @@ definitions:
                Example 4: Pack and unpack a message in Go
 
                    foo := &pb.Foo{...}
-                   any, err := ptypes.MarshalAny(foo)
+                   any, err := anypb.New(foo)
+                   if err != nil {
+                     ...
+                   }
                    ...
                    foo := &pb.Foo{}
-                   if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                   if err := any.UnmarshalTo(foo); err != nil {
                      ...
                    }
 
@@ -45777,10 +46047,13 @@ definitions:
            Example 4: Pack and unpack a message in Go
 
                foo := &pb.Foo{...}
-               any, err := ptypes.MarshalAny(foo)
+               any, err := anypb.New(foo)
+               if err != nil {
+                 ...
+               }
                ...
                foo := &pb.Foo{}
-               if err := ptypes.UnmarshalAny(any, foo); err != nil {
+               if err := any.UnmarshalTo(foo); err != nil {
                  ...
                }
 
@@ -45893,7 +46166,7 @@ definitions:
           this channel will travel
       version:
         type: string
-        title: 'opaque channel version, which is agreed upon during the handshake'
+        title: opaque channel version, which is agreed upon during the handshake
     description: |-
       Channel defines pipeline for exactly-once packet delivery between specific
       modules on separate blockchains, which has at least one end capable of
@@ -45968,7 +46241,7 @@ definitions:
           this channel will travel
       version:
         type: string
-        title: 'opaque channel version, which is agreed upon during the handshake'
+        title: opaque channel version, which is agreed upon during the handshake
       port_id:
         type: string
         title: port identifier
@@ -46133,10 +46406,13 @@ definitions:
                Example 4: Pack and unpack a message in Go
 
                    foo := &pb.Foo{...}
-                   any, err := ptypes.MarshalAny(foo)
+                   any, err := anypb.New(foo)
+                   if err != nil {
+                     ...
+                   }
                    ...
                    foo := &pb.Foo{}
-                   if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                   if err := any.UnmarshalTo(foo); err != nil {
                      ...
                    }
 
@@ -46333,10 +46609,13 @@ definitions:
            Example 4: Pack and unpack a message in Go
 
                foo := &pb.Foo{...}
-               any, err := ptypes.MarshalAny(foo)
+               any, err := anypb.New(foo)
+               if err != nil {
+                 ...
+               }
                ...
                foo := &pb.Foo{}
-               if err := ptypes.UnmarshalAny(any, foo); err != nil {
+               if err := any.UnmarshalTo(foo); err != nil {
                  ...
                }
 
@@ -46486,7 +46765,7 @@ definitions:
               this channel will travel
           version:
             type: string
-            title: 'opaque channel version, which is agreed upon during the handshake'
+            title: opaque channel version, which is agreed upon during the handshake
         description: >-
           Channel defines pipeline for exactly-once packet delivery between
           specific
@@ -47091,7 +47370,6 @@ definitions:
     properties:
       received:
         type: boolean
-        format: boolean
         title: success flag for if receipt exists
       proof:
         type: string
@@ -47366,10 +47644,13 @@ definitions:
            Example 4: Pack and unpack a message in Go
 
                foo := &pb.Foo{...}
-               any, err := ptypes.MarshalAny(foo)
+               any, err := anypb.New(foo)
+               if err != nil {
+                 ...
+               }
                ...
                foo := &pb.Foo{}
-               if err := ptypes.UnmarshalAny(any, foo); err != nil {
+               if err := any.UnmarshalTo(foo); err != nil {
                  ...
                }
 
@@ -47557,10 +47838,13 @@ definitions:
            Example 4: Pack and unpack a message in Go
 
                foo := &pb.Foo{...}
-               any, err := ptypes.MarshalAny(foo)
+               any, err := anypb.New(foo)
+               if err != nil {
+                 ...
+               }
                ...
                foo := &pb.Foo{}
-               if err := ptypes.UnmarshalAny(any, foo); err != nil {
+               if err := any.UnmarshalTo(foo); err != nil {
                  ...
                }
 
@@ -47747,10 +48031,13 @@ definitions:
            Example 4: Pack and unpack a message in Go
 
                foo := &pb.Foo{...}
-               any, err := ptypes.MarshalAny(foo)
+               any, err := anypb.New(foo)
+               if err != nil {
+                 ...
+               }
                ...
                foo := &pb.Foo{}
-               if err := ptypes.UnmarshalAny(any, foo); err != nil {
+               if err := any.UnmarshalTo(foo); err != nil {
                  ...
                }
 
@@ -47960,10 +48247,13 @@ definitions:
                  Example 4: Pack and unpack a message in Go
 
                      foo := &pb.Foo{...}
-                     any, err := ptypes.MarshalAny(foo)
+                     any, err := anypb.New(foo)
+                     if err != nil {
+                       ...
+                     }
                      ...
                      foo := &pb.Foo{}
-                     if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                     if err := any.UnmarshalTo(foo); err != nil {
                        ...
                      }
 
@@ -48164,10 +48454,13 @@ definitions:
            Example 4: Pack and unpack a message in Go
 
                foo := &pb.Foo{...}
-               any, err := ptypes.MarshalAny(foo)
+               any, err := anypb.New(foo)
+               if err != nil {
+                 ...
+               }
                ...
                foo := &pb.Foo{}
-               if err := ptypes.UnmarshalAny(any, foo); err != nil {
+               if err := any.UnmarshalTo(foo); err != nil {
                  ...
                }
 
@@ -48401,10 +48694,13 @@ definitions:
                  Example 4: Pack and unpack a message in Go
 
                      foo := &pb.Foo{...}
-                     any, err := ptypes.MarshalAny(foo)
+                     any, err := anypb.New(foo)
+                     if err != nil {
+                       ...
+                     }
                      ...
                      foo := &pb.Foo{}
-                     if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                     if err := any.UnmarshalTo(foo); err != nil {
                        ...
                      }
 
@@ -48859,10 +49155,13 @@ definitions:
                Example 4: Pack and unpack a message in Go
 
                    foo := &pb.Foo{...}
-                   any, err := ptypes.MarshalAny(foo)
+                   any, err := anypb.New(foo)
+                   if err != nil {
+                     ...
+                   }
                    ...
                    foo := &pb.Foo{}
-                   if err := ptypes.UnmarshalAny(any, foo); err != nil {
+                   if err := any.UnmarshalTo(foo); err != nil {
                      ...
                    }
 
@@ -49059,10 +49358,13 @@ definitions:
            Example 4: Pack and unpack a message in Go
 
                foo := &pb.Foo{...}
-               any, err := ptypes.MarshalAny(foo)
+               any, err := anypb.New(foo)
+               if err != nil {
+                 ...
+               }
                ...
                foo := &pb.Foo{}
-               if err := ptypes.UnmarshalAny(any, foo); err != nil {
+               if err := any.UnmarshalTo(foo); err != nil {
                  ...
                }
 
@@ -49471,7 +49773,6 @@ definitions:
     properties:
       send_enabled:
         type: boolean
-        format: boolean
         description: >-
           send_enabled enables or disables all cross-chain token transfers from
           this
@@ -49479,7 +49780,6 @@ definitions:
           chain.
       receive_enabled:
         type: boolean
-        format: boolean
         description: >-
           receive_enabled enables or disables all cross-chain token transfers to
           this
@@ -49574,7 +49874,6 @@ definitions:
         properties:
           send_enabled:
             type: boolean
-            format: boolean
             description: >-
               send_enabled enables or disables all cross-chain token transfers
               from this
@@ -49582,7 +49881,6 @@ definitions:
               chain.
           receive_enabled:
             type: boolean
-            format: boolean
             description: >-
               receive_enabled enables or disables all cross-chain token
               transfers to this

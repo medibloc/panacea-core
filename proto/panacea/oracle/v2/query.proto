@@ -3,8 +3,6 @@ package panacea.oracle.v2;
 
 option go_package = "github.com/medibloc/panacea-core/v2/x/oracle/types";
 
-import "gogoproto/gogo.proto";
-import "google/protobuf/timestamp.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";
 import "google/api/annotations.proto";
 import "panacea/oracle/v2/oracle.proto";
