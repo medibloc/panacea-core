@@ -4,6 +4,7 @@ import (
 	"crypto"
 	"crypto/ecdsa"
 	"crypto/rand"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -27,12 +28,12 @@ func SignDocument(doc []byte, verificationID string, sequence uint64, privKey *b
 	documentSigner := GetECDSASigner(privKey)
 	loader, err := GetDocumentLoader()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error to get document loader: %v", err)
 	}
 
 	signedDocument, err := documentSigner.Sign(signerContext, doc, jsonld.WithDocumentLoader(loader))
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error to sign document: %v", err)
 	}
 
 	return signedDocument, nil

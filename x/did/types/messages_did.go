@@ -82,7 +82,7 @@ func (msg MsgUpdateDID) ValidateBasic() error {
 
 	addr, err := sdk.AccAddressFromBech32(msg.FromAddress)
 	if err != nil {
-		return err
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "Address: %v", addr.String())
 	}
 	if addr.Empty() {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "Address: %v", addr.String())

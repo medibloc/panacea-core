@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"strconv"
 	"strings"
 	"testing"
 
@@ -53,6 +54,60 @@ func (suite *txTestSuite) TestNewMsgCreateDID() {
 	// check if the signature can be verifiable with the initial sequence
 	err = types.VerifyProof(*doc)
 	suite.Require().NoError(err)
+}
+
+func (suite *txTestSuite) TestUpdateDID() {
+	privKey, _ := crypto.GenSecp256k1PrivKey("", "")
+	fromAddr, err := sdk.AccAddressFromBech32("panacea154p6kyu9kqgvcmq63w3vpn893ssy6anpu8ykfq")
+	suite.Require().NoError(err)
+
+	// create DID document
+	msg, vmID, err := newMsgCreateDID(fromAddr, privKey)
+	suite.Require().NoError(err)
+	did := msg.Did
+
+	_, err = suite.DIDMsgServer.CreateDID(sdk.WrapSDKContext(suite.Ctx), &msg)
+	suite.Require().NoError(err)
+
+	// get DID document
+	storedDIDDocument := suite.DIDKeeper.GetDIDDocument(suite.Ctx, did)
+
+	document, err := ariesdid.ParseDocument(storedDIDDocument.Document)
+	suite.Require().NoError(err)
+
+	sequence, err := strconv.ParseUint(document.Proof[0].Domain, 10, 64)
+	suite.Require().NoError(err)
+	btcecPrivKey, _ := btcec.PrivKeyFromBytes(btcec.S256(), privKey.Bytes())
+
+	// sign document with next sequence
+	newDocument := document
+	newDocument.CapabilityDelegation = append(newDocument.CapabilityDelegation, types.NewVerification(newDocument.VerificationMethod[0], ariesdid.CapabilityDelegation))
+	newDocument.Proof = nil
+	newDocumentBz, err := newDocument.JSONBytes()
+	suite.Require().NoError(err)
+
+	signedDocument, err := types.SignDocument(newDocumentBz, vmID, sequence+1, btcecPrivKey)
+	suite.Require().NoError(err)
+
+	didDocument := types.NewDIDDocument(signedDocument, types.DidDocumentDataType)
+
+	updateMsg := types.NewMsgUpdateDID(did, didDocument, fromAddr.String())
+
+	err = updateMsg.ValidateBasic()
+	suite.Require().NoError(err)
+
+	_, err = suite.DIDMsgServer.UpdateDID(sdk.WrapSDKContext(suite.Ctx), &updateMsg)
+	suite.Require().NoError(err)
+	updatedDIDDocument := suite.DIDKeeper.GetDIDDocument(suite.Ctx, did)
+
+	resultDoc, err := ariesdid.ParseDocument(updatedDIDDocument.Document)
+	suite.Require().NoError(err)
+	suite.Equal(resultDoc.ID, newDocument.ID)
+	suite.Equal(1, len(resultDoc.VerificationMethod))
+	suite.Equal(resultDoc.Authentication, newDocument.Authentication)
+	suite.Equal(resultDoc.CapabilityDelegation, newDocument.CapabilityDelegation)
+	suite.Equal("1", resultDoc.Proof[0].Domain)
+
 }
 
 func (suite *txTestSuite) TestReadBIP39ParamsFrom_NotInteractive() {

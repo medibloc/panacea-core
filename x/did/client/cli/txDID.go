@@ -114,7 +114,7 @@ func CmdUpdateDID() *cobra.Command {
 				return err
 			}
 
-			signedDocument, err := signUsingCurrentSeq(clientCtx, did, verificationMethodID, privKey, doc)
+			signedDocument, err := SignUsingCurrentSeq(clientCtx, did, verificationMethodID, privKey, doc)
 			if err != nil {
 				return err
 			}
@@ -330,8 +330,8 @@ func getPrivKeyFromKeyStore(verificationMethodID string, reader *bufio.Reader) (
 	return secp256k1util.PrivKeyFromBytes(privKeyBytes)
 }
 
-// signUsingCurrentSeq generates a signature using the current sequence stored in the blockchain.
-func signUsingCurrentSeq(clientCtx client.Context, did, vmID string, privKey crypto.PrivKey, doc []byte) ([]byte, error) {
+// SignUsingCurrentSeq generates a signature using the current sequence stored in the blockchain.
+func SignUsingCurrentSeq(clientCtx client.Context, did, vmID string, privKey crypto.PrivKey, doc []byte) ([]byte, error) {
 
 	// get stored did document sequence
 	queryClient := types.NewQueryClient(clientCtx)
