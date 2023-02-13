@@ -17,6 +17,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/input"
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/go-bip39"
 	ariesdid "github.com/hyperledger/aries-framework-go/pkg/doc/did"
 	"github.com/medibloc/panacea-core/v2/x/did/internal/secp256k1util"
@@ -331,27 +332,28 @@ func getPrivKeyFromKeyStore(verificationMethodID string, reader *bufio.Reader) (
 
 // signUsingCurrentSeq generates a signature using the current sequence stored in the blockchain.
 func signUsingCurrentSeq(clientCtx client.Context, did, vmID string, privKey crypto.PrivKey, doc []byte) ([]byte, error) {
-	queryClient := types.NewQueryClient(clientCtx)
 
+	// get stored did document sequence
+	queryClient := types.NewQueryClient(clientCtx)
 	params := &types.QueryDIDRequest{
 		DidBase64: base64.StdEncoding.EncodeToString([]byte(did)),
 	}
-
 	res, err := queryClient.DID(context.Background(), params)
 	if err != nil {
-		return []byte{}, err
+		return nil, err
 	}
 
-	btcecPrivKey, _ := btcec.PrivKeyFromBytes(btcec.S256(), privKey.Bytes())
-
-	document, err := ariesdid.ParseDocument(res.DidDocument.Document)
+	storedDIDDocument := res.DidDocument
+	document, err := ariesdid.ParseDocument(storedDIDDocument.Document)
 	if err != nil {
-		return []byte{}, err
+		return nil, sdkerrors.Wrapf(types.ErrParseDocument, "failed to parse stored did document. error: %v", err)
 	}
 	sequence, err := strconv.ParseUint(document.Proof[0].Domain, 10, 64)
 	if err != nil {
-		return []byte{}, err
+		return nil, sdkerrors.Wrapf(types.ErrInvalidSequence, "error: %v", err)
 	}
+
+	btcecPrivKey, _ := btcec.PrivKeyFromBytes(btcec.S256(), privKey.Bytes())
 
 	return types.SignDocument(doc, vmID, sequence+1, btcecPrivKey)
 }
