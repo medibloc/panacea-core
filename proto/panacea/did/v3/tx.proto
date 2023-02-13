@@ -27,7 +27,9 @@ message MsgCreateDID {
 }
 
 // MsgCreateDIDResponse defines the Msg/CreateDID response type.
-message MsgCreateDIDResponse {}
+message MsgCreateDIDResponse {
+  string did = 1;
+}
 
 // MsgUpdateDID defines the Msg/UpdateDID request type.
 message MsgUpdateDID {

@@ -117,6 +117,7 @@ func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
 		EncryptDataCmd(app.DefaultNodeHome),
 		DecryptDataCmd(app.DefaultNodeHome),
 		JwtCmd(app.DefaultNodeHome),
+		ParseDocumentCmd(app.DefaultNodeHome),
 	)
 
 	a := appCreator{encodingConfig}

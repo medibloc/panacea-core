@@ -28,7 +28,7 @@ func (m msgServer) CreateDID(goCtx context.Context, msg *types.MsgCreateDID) (*t
 	}
 
 	keeper.SetDIDDocument(ctx, msg.Did, msg.Document)
-	return &types.MsgCreateDIDResponse{}, nil
+	return &types.MsgCreateDIDResponse{Did: msg.Did}, nil
 }
 
 func (m msgServer) UpdateDID(goCtx context.Context, msg *types.MsgUpdateDID) (*types.MsgUpdateDIDResponse, error) {
