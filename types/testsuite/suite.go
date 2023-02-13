@@ -26,10 +26,10 @@ import (
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	upgradekeeper "github.com/cosmos/cosmos-sdk/x/upgrade/keeper"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
-	ibctransferkeeper "github.com/cosmos/ibc-go/v2/modules/apps/transfer/keeper"
-	ibctransfertypes "github.com/cosmos/ibc-go/v2/modules/apps/transfer/types"
-	ibchost "github.com/cosmos/ibc-go/v2/modules/core/24-host"
-	ibckeeper "github.com/cosmos/ibc-go/v2/modules/core/keeper"
+	ibctransferkeeper "github.com/cosmos/ibc-go/v4/modules/apps/transfer/keeper"
+	ibctransfertypes "github.com/cosmos/ibc-go/v4/modules/apps/transfer/types"
+	ibchost "github.com/cosmos/ibc-go/v4/modules/core/24-host"
+	ibckeeper "github.com/cosmos/ibc-go/v4/modules/core/keeper"
 	aolkeeper "github.com/medibloc/panacea-core/v2/x/aol/keeper"
 	aoltypes "github.com/medibloc/panacea-core/v2/x/aol/types"
 	burnkeeper "github.com/medibloc/panacea-core/v2/x/burn/keeper"
@@ -162,6 +162,13 @@ func (suite *TestSuite) SetupTest() {
 	)
 	suite.BankKeeper.SetParams(ctx, banktypes.DefaultParams())
 	suite.BurnKeeper = *burnkeeper.NewKeeper(suite.BankKeeper)
+	suite.StakingKeeper = stakingkeeper.NewKeeper(
+		cdc.Marshaler,
+		keyParams[stakingtypes.StoreKey],
+		suite.AccountKeeper,
+		suite.BankKeeper,
+		paramsKeeper.Subspace(stakingtypes.ModuleName),
+	)
 	suite.DistrKeeper = distrkeeper.NewKeeper(
 		cdc.Marshaler, keyParams[distrtypes.StoreKey], paramsKeeper.Subspace(distrtypes.ModuleName), suite.AccountKeeper, suite.BankKeeper, &suite.StakingKeeper, "test_fee_collector", modAccAddrs,
 	)
@@ -171,6 +178,7 @@ func (suite *TestSuite) SetupTest() {
 	)
 	suite.TransferKeeper = ibctransferkeeper.NewKeeper(
 		cdc.Marshaler, keyParams[ibctransfertypes.StoreKey], paramsKeeper.Subspace(ibctransfertypes.ModuleName),
+		suite.IBCKeeper.ChannelKeeper,
 		suite.IBCKeeper.ChannelKeeper, &suite.IBCKeeper.PortKeeper,
 		suite.AccountKeeper, suite.BankKeeper, scopedIBCKeeper,
 	)
