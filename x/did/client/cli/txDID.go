@@ -113,7 +113,7 @@ func CmdUpdateDID() *cobra.Command {
 				return err
 			}
 
-			signedDocument, err := signUsingCurrentSeq(clientCtx, verificationMethodID, did, privKey, doc)
+			signedDocument, err := signUsingCurrentSeq(clientCtx, did, verificationMethodID, privKey, doc)
 			if err != nil {
 				return err
 			}
