@@ -59,11 +59,11 @@ func CmdCreateDID() *cobra.Command {
 
 			fromAddress := clientCtx.GetFromAddress()
 
-			msg, err := newMsgCreateDID(fromAddress, privKey)
+			msg, verificationMethodID, err := newMsgCreateDID(fromAddress, privKey)
 			if err != nil {
 				return err
 			}
-			if err := savePrivKeyToKeyStore(msg.VerificationMethodId, privKey, inBuf); err != nil {
+			if err := savePrivKeyToKeyStore(verificationMethodID, privKey, inBuf); err != nil {
 				return err
 			}
 
@@ -127,7 +127,7 @@ func CmdUpdateDID() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			msg := types.NewMsgUpdateDID(did, didDocument, verificationMethodID, fromAddress.String())
+			msg := types.NewMsgUpdateDID(did, didDocument, fromAddress.String())
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
@@ -245,7 +245,7 @@ func getCheckPassword(reader *bufio.Reader) (string, error) {
 // newMsgCreateDID creates a MsgCreateDID by generating a DID and a DID document from the networkID and privKey.
 // It generates the minimal DID document which contains only one public key information for did ownership,
 // so that it can be extended by MsgUpdateDID later.
-func newMsgCreateDID(fromAddress sdk.AccAddress, privKey secp256k1.PrivKey) (types.MsgCreateDID, error) {
+func newMsgCreateDID(fromAddress sdk.AccAddress, privKey secp256k1.PrivKey) (types.MsgCreateDID, string, error) {
 	pubKey := secp256k1util.PubKeyBytes(secp256k1util.DerivePubKey(privKey))
 
 	btcecPrivKey, btcecPubKey := btcec.PrivKeyFromBytes(btcec.S256(), privKey.Bytes())
@@ -264,24 +264,24 @@ func newMsgCreateDID(fromAddress sdk.AccAddress, privKey secp256k1.PrivKey) (typ
 
 	documentBz, err := document.JSONBytes()
 	if err != nil {
-		return types.MsgCreateDID{}, err
+		return types.MsgCreateDID{}, "", err
 	}
 
 	signedDocument, err := types.SignDocument(documentBz, verificationMethodID, types.InitialSequence, btcecPrivKey)
 	if err != nil {
-		return types.MsgCreateDID{}, err
+		return types.MsgCreateDID{}, "", err
 	}
 
 	didDocument, err := types.NewDIDDocument(signedDocument, types.DidDocumentDataType)
 	if err != nil {
-		return types.MsgCreateDID{}, err
+		return types.MsgCreateDID{}, "", err
 	}
 
-	msg := types.NewMsgCreateDID(newDid, didDocument, verificationMethodID, fromAddress.String())
+	msg := types.NewMsgCreateDID(newDid, didDocument, fromAddress.String())
 	if err := msg.ValidateBasic(); err != nil {
-		return types.MsgCreateDID{}, err
+		return types.MsgCreateDID{}, "", err
 	}
-	return msg, nil
+	return msg, verificationMethodID, nil
 }
 
 // readDIDDocFrom reads a DID document from a JSON file.

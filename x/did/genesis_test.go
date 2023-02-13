@@ -3,8 +3,8 @@ package did
 import (
 	"testing"
 
+	"github.com/btcsuite/btcd/btcec"
 	ariesdid "github.com/hyperledger/aries-framework-go/pkg/doc/did"
-	"github.com/medibloc/panacea-core/v2/x/did/internal/secp256k1util"
 	"github.com/tendermint/tendermint/crypto"
 	"github.com/tendermint/tendermint/crypto/secp256k1"
 
@@ -56,19 +56,20 @@ func (suite *genesisTestSuite) newGenesisKey(did string) string {
 
 func (suite *genesisTestSuite) newDIDDocument(did string) (*types.DIDDocument, crypto.PrivKey) {
 	privKey := secp256k1.GenPrivKey()
-	pubKey := secp256k1util.PubKeyBytes(secp256k1util.DerivePubKey(privKey))
+	btcecPrivKey, btcecPubKey := btcec.PrivKeyFromBytes(btcec.S256(), privKey.Bytes())
 	verificationMethodID := types.NewVerificationMethodID(did, "key1")
-	es256VerificationMethod := types.NewVerificationMethod(verificationMethodID, types.ES256K_2019, did, pubKey)
-	blsVerificationMethod := types.NewVerificationMethod(verificationMethodID, types.BLS1281G2_2020, did, []byte("dummy BBS+ pub key"))
+	es256VerificationMethod := types.NewVerificationMethod(verificationMethodID, types.ES256K_2019, did, btcecPubKey.SerializeUncompressed())
 
 	authentication := types.NewVerification(es256VerificationMethod, ariesdid.Authentication)
 	document := types.NewDocument(did,
-		ariesdid.WithVerificationMethod([]ariesdid.VerificationMethod{es256VerificationMethod, blsVerificationMethod}),
+		ariesdid.WithVerificationMethod([]ariesdid.VerificationMethod{es256VerificationMethod}),
 		ariesdid.WithAuthentication([]ariesdid.Verification{authentication}))
 
 	documentBz, _ := document.JSONBytes()
 
-	didDocument, _ := types.NewDIDDocument(documentBz, types.DidDocumentDataType)
+	signedDocument, _ := types.SignDocument(documentBz, verificationMethodID, types.InitialSequence, btcecPrivKey)
+
+	didDocument, _ := types.NewDIDDocument(signedDocument, types.DidDocumentDataType)
 
 	return &didDocument, privKey
 }

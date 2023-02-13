@@ -37,7 +37,7 @@ func (suite *txTestSuite) TestNewMsgCreateDID() {
 	suite.Require().NoError(err)
 
 	// create a message
-	msg, err := newMsgCreateDID(fromAddr, privKey)
+	msg, _, err := newMsgCreateDID(fromAddr, privKey)
 	suite.Require().NoError(err)
 
 	// check if verificationMethod is correct

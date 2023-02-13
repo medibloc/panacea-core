@@ -7,12 +7,11 @@ import (
 
 var _ sdk.Msg = &MsgCreateDID{}
 
-func NewMsgCreateDID(did string, document DIDDocument, VerificationMethodID string, FromAddress string) MsgCreateDID {
+func NewMsgCreateDID(did string, document DIDDocument, FromAddress string) MsgCreateDID {
 	return MsgCreateDID{
-		Did:                  did,
-		Document:             &document,
-		VerificationMethodId: VerificationMethodID,
-		FromAddress:          FromAddress,
+		Did:         did,
+		Document:    &document,
+		FromAddress: FromAddress,
 	}
 }
 
@@ -58,12 +57,11 @@ func (msg *MsgCreateDID) ValidateBasic() error {
 var _ sdk.Msg = &MsgUpdateDID{}
 
 // NewMsgUpdateDID is a constructor of MsgUpdateDID.
-func NewMsgUpdateDID(did string, doc DIDDocument, verificationMethodID string, fromAddr string) MsgUpdateDID {
+func NewMsgUpdateDID(did string, doc DIDDocument, fromAddr string) MsgUpdateDID {
 	return MsgUpdateDID{
-		Did:                  did,
-		Document:             &doc,
-		VerificationMethodId: verificationMethodID,
-		FromAddress:          fromAddr,
+		Did:         did,
+		Document:    &doc,
+		FromAddress: fromAddr,
 	}
 }
 

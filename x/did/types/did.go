@@ -47,11 +47,10 @@ func (doc DIDDocument) Valid() bool {
 		return false
 	}
 
-	// check document is signed or not
+	// validation for document signing
 	if document.Proof == nil {
 		return false
 	}
-
 	if err := VerifyProof(*document); err != nil {
 		return false
 	}

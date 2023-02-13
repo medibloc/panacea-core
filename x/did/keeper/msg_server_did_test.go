@@ -84,23 +84,6 @@ func (suite *msgServerTestSuite) TestHandleMsgCreateDID_Deactivated() {
 	suite.Require().Nil(res)
 }
 
-//todo: add signature verification at createDID
-//func (suite *msgServerTestSuite) TestHandleMsgCreateDID_SigVerificationFailed() {
-//	didMsgServer := suite.DIDMsgServer
-//	goContext := sdk.WrapSDKContext(suite.Ctx)
-//
-//	did := "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm"
-//
-//	didDocument, privKey, verificationMethodID := makeTestDIDDocument(did)
-//	btcecPrivKey, _ := btcec.PrivKeyFromBytes(btcec.S256(), privKey.Bytes())
-//	signedDoc, err := types.SignDocument(didDocument.Document, verificationMethodID, types.InitialSequence, btcecPrivKey)
-//	suite.Require().NoError(err)
-//
-//	res, err := didMsgServer.CreateDID(goContext, &msg)
-//	suite.Require().ErrorIs(types.ErrSigVerificationFailed, err)
-//	suite.Require().Nil(res)
-//}
-
 func (suite *msgServerTestSuite) TestHandleMsgUpdateDID() {
 	didKeeper := suite.DIDKeeper
 	didMsgServer := suite.DIDMsgServer
@@ -261,7 +244,7 @@ func newMsgCreateDID(suite *msgServerTestSuite, did string, didDocument types.DI
 
 	didDocument.Document = signedDoc
 
-	return didDocument, types.NewMsgCreateDID(did, didDocument, verificationMethodID, sdk.AccAddress{}.String())
+	return didDocument, types.NewMsgCreateDID(did, didDocument, sdk.AccAddress{}.String())
 }
 
 func newMsgUpdateDID(suite *msgServerTestSuite, did string, didDocument types.DIDDocument, verificationMethodID string, sequence uint64, privKey *btcec.PrivateKey) (types.DIDDocument, types.MsgUpdateDID) {
@@ -271,7 +254,7 @@ func newMsgUpdateDID(suite *msgServerTestSuite, did string, didDocument types.DI
 
 	didDocument.Document = signedDoc
 
-	return didDocument, types.NewMsgUpdateDID(did, didDocument, verificationMethodID, sdk.AccAddress{}.String())
+	return didDocument, types.NewMsgUpdateDID(did, didDocument, sdk.AccAddress{}.String())
 }
 
 func newMsgDeactivateDID(did string) types.MsgDeactivateDID {

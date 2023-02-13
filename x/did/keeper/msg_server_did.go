@@ -27,6 +27,7 @@ func (m msgServer) CreateDID(goCtx context.Context, msg *types.MsgCreateDID) (*t
 		return nil, sdkerrors.Wrapf(types.ErrInvalidDIDDocument, "DID: %s", msg.Did)
 	}
 
+	keeper.SetDIDDocument(ctx, msg.Did, msg.Document)
 	return &types.MsgCreateDIDResponse{}, nil
 }
 
@@ -75,7 +76,7 @@ func VerifyDIDOwnership(newDocument, prevDocument []byte) error {
 		return sdkerrors.Wrapf(types.ErrInvalidDIDDocument, "failed to parse did document")
 	}
 
-	// get previous document signing method
+	// get previous document proof verification method
 	proofMehtodID := doc.Proof[0].Creator
 	var verificationMethod ariesdid.VerificationMethod
 
@@ -85,7 +86,7 @@ func VerifyDIDOwnership(newDocument, prevDocument []byte) error {
 		}
 	}
 
-	// check
+	// check if the proof was created with the verification method used in the previous document
 	newDoc, err := ariesdid.ParseDocument(newDocument)
 	if err != nil {
 		return sdkerrors.Wrapf(types.ErrInvalidDIDDocument, "failed to parse did document")
@@ -97,7 +98,6 @@ func VerifyDIDOwnership(newDocument, prevDocument []byte) error {
 			check = IsEqualVerificationMethod(vm, verificationMethod)
 		}
 	}
-
 	if check == false {
 		return sdkerrors.Wrapf(types.ErrInvalidDIDDocument, "there is no proof verification method in document")
 	}
