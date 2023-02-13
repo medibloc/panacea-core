@@ -23,8 +23,8 @@ func (m msgServer) CreateDID(goCtx context.Context, msg *types.MsgCreateDID) (*t
 		return nil, sdkerrors.Wrapf(types.ErrDIDExists, "DID: %s", msg.Did)
 	}
 
-	if !msg.Document.Valid() {
-		return nil, sdkerrors.Wrapf(types.ErrInvalidDIDDocument, "DID: %s", msg.Did)
+	if err := types.ValidateDIDDocument(msg.Did, msg.Document); err != nil {
+		return nil, sdkerrors.Wrapf(types.ErrInvalidDIDDocument, "error: %v", err)
 	}
 
 	keeper.SetDIDDocument(ctx, msg.Did, msg.Document)
@@ -35,6 +35,10 @@ func (m msgServer) UpdateDID(goCtx context.Context, msg *types.MsgUpdateDID) (*t
 	keeper := m.Keeper
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
+	if err := types.ValidateDIDDocument(msg.Did, msg.Document); err != nil {
+		return nil, sdkerrors.Wrapf(types.ErrInvalidDIDDocument, "error: %v", err)
+	}
+
 	prevDocument := keeper.GetDIDDocument(ctx, msg.Did)
 	if prevDocument.Empty() {
 		return nil, sdkerrors.Wrapf(types.ErrDIDNotFound, "DID: %s", msg.Did)
@@ -44,10 +48,11 @@ func (m msgServer) UpdateDID(goCtx context.Context, msg *types.MsgUpdateDID) (*t
 	}
 
 	if err := VerifyDIDOwnership(msg.Document.Document, prevDocument.Document); err != nil {
-		return &types.MsgUpdateDIDResponse{}, err
+		return nil, sdkerrors.Wrapf(types.ErrVerifyOwnershipFailed, "error: %v", err)
 	}
 
 	keeper.SetDIDDocument(ctx, msg.Did, msg.Document)
+
 	return &types.MsgUpdateDIDResponse{}, nil
 }
 
@@ -73,56 +78,58 @@ func VerifyDIDOwnership(newDocument, prevDocument []byte) error {
 
 	doc, err := ariesdid.ParseDocument(prevDocument)
 	if err != nil {
-		return sdkerrors.Wrapf(types.ErrInvalidDIDDocument, "failed to parse did document")
+		return sdkerrors.Wrapf(types.ErrParseDocument, "failed to parse did document")
+	}
+	newDoc, err := ariesdid.ParseDocument(newDocument)
+	if err != nil {
+		return sdkerrors.Wrapf(types.ErrParseDocument, "failed to parse did document")
 	}
 
+	// todo: Currently, only the key used in CreateDID is used for ownership verification.
+	//       Since the aries framework can create proof array based on multiple keys, this part can be extended.
+
 	// get previous document proof verification method
-	proofMehtodID := doc.Proof[0].Creator
+	proofMethodID := doc.Proof[0].Creator
 	var verificationMethod ariesdid.VerificationMethod
 
 	for _, vm := range doc.VerificationMethod {
-		if vm.ID == proofMehtodID {
+		if vm.ID == proofMethodID {
 			verificationMethod = vm
 		}
 	}
 
 	// check if the proof was created with the verification method used in the previous document
-	newDoc, err := ariesdid.ParseDocument(newDocument)
-	if err != nil {
-		return sdkerrors.Wrapf(types.ErrInvalidDIDDocument, "failed to parse did document")
-	}
-
 	check := false
 	for _, vm := range newDoc.VerificationMethod {
-		if vm.ID == proofMehtodID {
+		if vm.ID == proofMethodID {
 			check = IsEqualVerificationMethod(vm, verificationMethod)
 		}
 	}
 	if check == false {
-		return sdkerrors.Wrapf(types.ErrInvalidDIDDocument, "there is no proof verification method in document")
+		return sdkerrors.Wrapf(types.ErrInvalidProof, "there is no proof verification method in document")
 	}
 
-	// check newDoc proof method id
-	if newDoc.Proof[0].Creator != proofMehtodID {
-		return sdkerrors.Wrapf(types.ErrInvalidDIDDocument, "does not match previous proof method")
+	// Check if newDoc proof method matches previous document proof method
+	if newDoc.Proof[0].Creator != proofMethodID {
+		return sdkerrors.Wrapf(types.ErrInvalidProof, "does not match previous proof method")
 	}
 
-	// check newDoc domain
+	// check newDoc sequence
 	prevSequence, err := strconv.ParseUint(doc.Proof[0].Domain, 10, 64)
 	if err != nil {
-		return sdkerrors.Wrapf(types.ErrInvalidDIDDocument, "invalid sequence")
+		return sdkerrors.Wrapf(types.ErrInvalidSequence, "can not parse previous document sequence")
 	}
 	newSequence, err := strconv.ParseUint(newDoc.Proof[0].Domain, 10, 64)
 	if err != nil {
-		return sdkerrors.Wrapf(types.ErrInvalidDIDDocument, "invalid sequence")
+		return sdkerrors.Wrapf(types.ErrInvalidSequence, "can not parse new document sequence")
 	}
 	if newSequence != prevSequence+1 {
-		return sdkerrors.Wrapf(types.ErrInvalidDIDDocument, "invalid sequence")
+		return sdkerrors.Wrapf(types.ErrInvalidSequence, "invalid sequence")
 	}
 
-	// verify proof
+	// verify proof itself
 	if err := types.VerifyProof(*newDoc); err != nil {
-		return err
+		return sdkerrors.Wrapf(types.ErrInvalidProof, "error: %v", err)
 	}
 
 	return nil

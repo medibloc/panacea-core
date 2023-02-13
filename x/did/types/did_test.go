@@ -82,12 +82,15 @@ func TestDIDDocumentEmpty(t *testing.T) {
 }
 
 func TestDIDDocumentEmptyDID(t *testing.T) {
-	document := types.NewDocument("")
+	did := ""
+	document := types.NewDocument(did)
 	documentBz, err := document.JSONBytes()
 	require.NoError(t, err)
 
-	err = types.ValidateDocument(documentBz)
+	didDocument := types.NewDIDDocument(documentBz, types.DidDocumentDataType)
+	err = types.ValidateDIDDocument(did, &didDocument)
 	require.Error(t, err)
+	require.ErrorContains(t, err, types.ErrParseDocument.Error())
 }
 
 func TestDIDDocumentWithSeqEmpty(t *testing.T) {
@@ -109,6 +112,6 @@ func getValidDIDDocument() types.DIDDocument {
 
 	docmentBz, _ := document.JSONBytes()
 
-	didDocument, _ := types.NewDIDDocument(docmentBz, types.DidDocumentDataType)
+	didDocument := types.NewDIDDocument(docmentBz, types.DidDocumentDataType)
 	return didDocument
 }

@@ -38,34 +38,33 @@ func ValidateDID(did string) error {
 	return nil
 }
 
-func (doc DIDDocument) Valid() bool {
+func ValidateDIDDocument(did string, doc *DIDDocument) error {
 	if doc.Empty() {
-		return true
+		return sdkerrors.Wrapf(ErrEmptyDocument, "did: %v", did)
 	}
+
 	document, err := ariesdid.ParseDocument(doc.Document)
 	if err != nil {
-		return false
+		return sdkerrors.Wrapf(ErrParseDocument, "did: %v, error: %v", did, err)
 	}
 
-	// validation for document signing
+	if did != document.ID {
+		return sdkerrors.Wrapf(ErrDIDNotMatched, "did: %v, document ID : %v", did, document.ID)
+	}
+
+	// verify with document proof
 	if document.Proof == nil {
-		return false
+		return sdkerrors.Wrapf(ErrEmptyProof, "did: %v", did)
 	}
 	if err := VerifyProof(*document); err != nil {
-		return false
+		return sdkerrors.Wrapf(ErrInvalidProof, "did: %v, error: %v", did, err)
 	}
 
-	return true
+	return nil
 }
 
 func (doc DIDDocument) Empty() bool {
 	return doc.DocumentDataType == "" || doc.Document == nil
-}
-func ValidateDocument(documentBz []byte) error {
-	if _, err := ariesdid.ParseDocument(documentBz); err != nil {
-		return err
-	}
-	return nil
 }
 
 func NewVerificationMethodID(did string, name string) string {
@@ -129,11 +128,7 @@ func NewDocument(did string, opts ...ariesdid.DocOption) ariesdid.Doc {
 	return *doc
 }
 
-func NewDIDDocument(documentBz []byte, documentDataType string) (DIDDocument, error) {
-
-	if err := ValidateDocument(documentBz); err != nil {
-		return DIDDocument{}, err
-	}
+func NewDIDDocument(documentBz []byte, documentDataType string) DIDDocument {
 
 	didDocument := DIDDocument{
 		Document:         documentBz,
@@ -141,7 +136,7 @@ func NewDIDDocument(documentBz []byte, documentDataType string) (DIDDocument, er
 		Deactivated:      false,
 	}
 
-	return didDocument, nil
+	return didDocument
 }
 
 // verification key & signature type

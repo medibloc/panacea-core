@@ -92,8 +92,8 @@ func CmdUpdateDID() *cobra.Command {
 			if err := types.ValidateDID(did); err != nil {
 				return err
 			}
-			verificationMethodID := args[1]
 
+			verificationMethodID := args[1]
 			if err := types.ValidateVerificationMethodID(verificationMethodID, did); err != nil {
 				return err
 			}
@@ -123,10 +123,8 @@ func CmdUpdateDID() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			didDocument, err := types.NewDIDDocument(signedDocument, types.DidDocumentDataType)
-			if err != nil {
-				return err
-			}
+			didDocument := types.NewDIDDocument(signedDocument, types.DidDocumentDataType)
+
 			msg := types.NewMsgUpdateDID(did, didDocument, fromAddress.String())
 			if err := msg.ValidateBasic(); err != nil {
 				return err
@@ -272,10 +270,7 @@ func newMsgCreateDID(fromAddress sdk.AccAddress, privKey secp256k1.PrivKey) (typ
 		return types.MsgCreateDID{}, "", err
 	}
 
-	didDocument, err := types.NewDIDDocument(signedDocument, types.DidDocumentDataType)
-	if err != nil {
-		return types.MsgCreateDID{}, "", err
-	}
+	didDocument := types.NewDIDDocument(signedDocument, types.DidDocumentDataType)
 
 	msg := types.NewMsgCreateDID(newDid, didDocument, fromAddress.String())
 	if err := msg.ValidateBasic(); err != nil {

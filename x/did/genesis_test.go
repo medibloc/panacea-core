@@ -69,7 +69,7 @@ func (suite *genesisTestSuite) newDIDDocument(did string) (*types.DIDDocument, c
 
 	signedDocument, _ := types.SignDocument(documentBz, verificationMethodID, types.InitialSequence, btcecPrivKey)
 
-	didDocument, _ := types.NewDIDDocument(signedDocument, types.DidDocumentDataType)
+	didDocument := types.NewDIDDocument(signedDocument, types.DidDocumentDataType)
 
 	return &didDocument, privKey
 }

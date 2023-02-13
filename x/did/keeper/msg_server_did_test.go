@@ -127,7 +127,7 @@ func (suite *msgServerTestSuite) TestHandleMsgUpdateDID() {
 
 	// call again with the same signature (replay-attack! should be failed!)
 	updateRes, err = didMsgServer.UpdateDID(goContext, &updateMsg)
-	suite.Require().ErrorIs(types.ErrInvalidDIDDocument, err)
+	suite.Require().ErrorContains(err, types.ErrInvalidSequence.Error())
 }
 
 func (suite *msgServerTestSuite) TestHandleMsgUpdateDID_DIDNotFound() {

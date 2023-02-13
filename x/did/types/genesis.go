@@ -19,8 +19,8 @@ func (data GenesisState) Validate() error {
 			return err
 		}
 
-		if !doc.Valid() {
-			return sdkerrors.Wrapf(ErrInvalidDIDDocument, "DIDDocument: %v", doc)
+		if err := ValidateDIDDocument(bz, doc); err != nil {
+			return sdkerrors.Wrapf(ErrInvalidDIDDocument, "error: %v", err)
 		}
 	}
 	return nil

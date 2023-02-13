@@ -40,8 +40,8 @@ func (msg *MsgCreateDID) ValidateBasic() error {
 		return sdkerrors.Wrapf(ErrInvalidDID, "did: %v, %v", msg.Did, err)
 	}
 
-	if !msg.Document.Valid() {
-		return sdkerrors.Wrapf(ErrInvalidDIDDocument, "DIDDocument: %v", msg.Document)
+	if err := ValidateDIDDocument(msg.Did, msg.Document); err != nil {
+		return sdkerrors.Wrapf(ErrInvalidDIDDocument, "error: %v", err)
 	}
 
 	addr, err := sdk.AccAddressFromBech32(msg.FromAddress)
@@ -76,8 +76,8 @@ func (msg MsgUpdateDID) ValidateBasic() error {
 	if err := ValidateDID(msg.Did); err != nil {
 		return sdkerrors.Wrapf(ErrInvalidDID, "did: %v, %v", msg.Did, err)
 	}
-	if !msg.Document.Valid() {
-		return sdkerrors.Wrapf(ErrInvalidDIDDocument, "DIDDocument: %v", msg.Document)
+	if err := ValidateDIDDocument(msg.Did, msg.Document); err != nil {
+		return sdkerrors.Wrapf(ErrInvalidDIDDocument, "error: %v", err)
 	}
 
 	addr, err := sdk.AccAddressFromBech32(msg.FromAddress)
