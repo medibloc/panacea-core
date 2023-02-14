@@ -127,7 +127,7 @@ func (suite *msgServerTestSuite) TestHandleMsgUpdateDID() {
 	suite.Require().Equal(signedNewDidDocument, *didKeeper.GetDIDDocument(suite.Ctx, did))
 
 	// call again with the same signature (replay-attack! should be failed!)
-	updateRes, err = didMsgServer.UpdateDID(goContext, &updateMsg)
+	_, err = didMsgServer.UpdateDID(goContext, &updateMsg)
 	suite.Require().ErrorContains(err, types.ErrInvalidSequence.Error())
 }
 
