@@ -56,7 +56,7 @@ func (suite *txTestSuite) TestNewMsgCreateDID() {
 	suite.Require().NoError(err)
 }
 
-func (suite *txTestSuite) TestUpdateDID() {
+func (suite *txTestSuite) TestMsgUpdateDID() {
 	privKey, _ := crypto.GenSecp256k1PrivKey("", "")
 	fromAddr, err := sdk.AccAddressFromBech32("panacea154p6kyu9kqgvcmq63w3vpn893ssy6anpu8ykfq")
 	suite.Require().NoError(err)

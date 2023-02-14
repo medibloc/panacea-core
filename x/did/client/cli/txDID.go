@@ -331,7 +331,7 @@ func getPrivKeyFromKeyStore(verificationMethodID string, reader *bufio.Reader) (
 }
 
 // SignUsingCurrentSeq generates a signature using the current sequence stored in the blockchain.
-func SignUsingCurrentSeq(clientCtx client.Context, did, vmID string, privKey crypto.PrivKey, doc []byte) ([]byte, error) {
+func SignUsingCurrentSeq(clientCtx client.Context, did, vmID string, privKey crypto.PrivKey, newDoc []byte) ([]byte, error) {
 
 	// get stored did document sequence
 	queryClient := types.NewQueryClient(clientCtx)
@@ -353,7 +353,19 @@ func SignUsingCurrentSeq(clientCtx client.Context, did, vmID string, privKey cry
 		return nil, sdkerrors.Wrapf(types.ErrInvalidSequence, "error: %v", err)
 	}
 
+	// make new document proof value to nil
+	newDocument, err := ariesdid.ParseDocument(newDoc)
+	if err != nil {
+		return nil, sdkerrors.Wrapf(types.ErrParseDocument, "failed to parse new did document. error: %v", err)
+	}
+	newDocument.Proof = nil
+	newDocumentBz, err := newDocument.JSONBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	// get ecdsa private key from secp256k1 key
 	btcecPrivKey, _ := btcec.PrivKeyFromBytes(btcec.S256(), privKey.Bytes())
 
-	return types.SignDocument(doc, vmID, sequence+1, btcecPrivKey)
+	return types.SignDocument(newDocumentBz, vmID, sequence+1, btcecPrivKey)
 }

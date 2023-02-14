@@ -3,6 +3,7 @@ package cli
 import (
 	"context"
 	"encoding/base64"
+	"encoding/json"
 	"fmt"
 
 	"github.com/cosmos/cosmos-sdk/client"
@@ -10,11 +11,6 @@ import (
 	ariesdid "github.com/hyperledger/aries-framework-go/pkg/doc/did"
 	"github.com/medibloc/panacea-core/v2/x/did/types"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
-)
-
-const (
-	flagDetail = "detail"
 )
 
 func CmdGetDID() *cobra.Command {
@@ -41,21 +37,27 @@ func CmdGetDID() *cobra.Command {
 				return err
 			}
 
-			if viper.GetBool(flagDetail) {
-				documentBz := res.DidDocument.Document
-				document, err := ariesdid.ParseDocument(documentBz)
-				if err != nil {
-					return err
-				}
-				fmt.Printf("%+v\n", document)
+			documentBz := res.DidDocument.Document
+			document, err := ariesdid.ParseDocument(documentBz)
+			if err != nil {
+				return err
 			}
 
-			return clientCtx.PrintProto(res)
+			jsonDocument, err := json.Marshal(document)
+			if err != nil {
+				return err
+			}
+
+			_, err = fmt.Fprintf(cmd.OutOrStdout(), string(jsonDocument))
+			if err != nil {
+				return err
+			}
+
+			return nil
 		},
 	}
 
 	flags.AddQueryFlagsToCmd(cmd)
-	cmd.Flags().Bool(flagDetail, false, "Print detail document value")
 
 	return cmd
 }
