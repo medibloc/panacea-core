@@ -110,6 +110,53 @@ func (suite *txTestSuite) TestMsgUpdateDID() {
 
 }
 
+func (suite *txTestSuite) TestMsgDeactivateDID() {
+	privKey, _ := crypto.GenSecp256k1PrivKey("", "")
+	fromAddr, err := sdk.AccAddressFromBech32("panacea154p6kyu9kqgvcmq63w3vpn893ssy6anpu8ykfq")
+	suite.Require().NoError(err)
+
+	// create DID document
+	msg, vmID, err := newMsgCreateDID(fromAddr, privKey)
+	suite.Require().NoError(err)
+	did := msg.Did
+
+	_, err = suite.DIDMsgServer.CreateDID(sdk.WrapSDKContext(suite.Ctx), &msg)
+	suite.Require().NoError(err)
+
+	// get DID document
+	storedDIDDocument := suite.DIDKeeper.GetDIDDocument(suite.Ctx, did)
+
+	document, err := ariesdid.ParseDocument(storedDIDDocument.Document)
+	suite.Require().NoError(err)
+
+	sequence, err := strconv.ParseUint(document.Proof[0].Domain, 10, 64)
+	suite.Require().NoError(err)
+	btcecPrivKey, _ := btcec.PrivKeyFromBytes(btcec.S256(), privKey.Bytes())
+
+	// sign document with next sequence
+	newDocument := document
+	newDocument.Proof = nil
+	newDocumentBz, err := newDocument.JSONBytes()
+	suite.Require().NoError(err)
+
+	signedDocument, err := types.SignDocument(newDocumentBz, vmID, sequence+1, btcecPrivKey)
+	suite.Require().NoError(err)
+
+	didDocument := types.NewDIDDocument(signedDocument, types.DidDocumentDataType)
+
+	deactivateMsg := types.NewMsgDeactivateDID(did, didDocument, fromAddr.String())
+
+	err = deactivateMsg.ValidateBasic()
+	suite.Require().NoError(err)
+
+	_, err = suite.DIDMsgServer.DeactivateDID(sdk.WrapSDKContext(suite.Ctx), &deactivateMsg)
+	suite.Require().NoError(err)
+	deactivatedDIDDocument := suite.DIDKeeper.GetDIDDocument(suite.Ctx, did)
+	suite.Require().Equal(deactivatedDIDDocument.Deactivated, true)
+	suite.Require().Nil(deactivatedDIDDocument.Document)
+	suite.Require().Equal(deactivatedDIDDocument.DocumentDataType, "")
+}
+
 func (suite *txTestSuite) TestReadBIP39ParamsFrom_NotInteractive() {
 	mnemonic, passphrase, err := readBIP39ParamsFrom(false, nil)
 	suite.Require().NoError(err)

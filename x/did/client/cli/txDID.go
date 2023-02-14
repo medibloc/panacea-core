@@ -139,22 +139,52 @@ func CmdUpdateDID() *cobra.Command {
 
 func CmdDeactivateDID() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "deactivate-did [did]",
+		Use:   "deactivate-did [did] [key-id] [did-doc-path]",
 		Short: "Deactivate a DID Document",
-		Args:  cobra.ExactArgs(1),
+		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
 
+			inBuf := bufio.NewReader(cmd.InOrStdin())
+
 			did := args[0]
 			if err := types.ValidateDID(did); err != nil {
 				return err
 			}
 
+			verificationMethodID := args[1]
+			if err := types.ValidateVerificationMethodID(verificationMethodID, did); err != nil {
+				return err
+			}
+			if err != nil {
+				return err
+			}
+
+			// read an input file of DID document
+			doc, err := readDIDDocFrom(args[2])
+			if err != nil {
+				return err
+			}
+
+			// get private key and sign document with sequence
+			privKey, err := getPrivKeyFromKeyStore(verificationMethodID, inBuf)
+			if err != nil {
+				return err
+			}
+
+			signedDocument, err := signUsingNextSequence(clientCtx, did, verificationMethodID, privKey, doc)
+			if err != nil {
+				return err
+			}
+
 			fromAddress := clientCtx.GetFromAddress()
-			msg := types.NewMsgDeactivateDID(did, fromAddress.String())
+
+			didDocument := types.NewDIDDocument(signedDocument, types.DidDocumentDataType)
+
+			msg := types.NewMsgDeactivateDID(did, didDocument, fromAddress.String())
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}

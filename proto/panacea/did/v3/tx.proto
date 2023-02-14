@@ -44,7 +44,8 @@ message MsgUpdateDIDResponse {}
 // MsgDeactivateDID defines the Msg/DeactivateDID request type.
 message MsgDeactivateDID {
   string did = 1;
-  string from_address = 2;
+  DIDDocument document = 2;
+  string from_address = 3;
 }
 
 // MsgDeactivateDIDResponse defines the Msg/DeactivateDID response type.

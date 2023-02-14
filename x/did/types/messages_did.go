@@ -107,8 +107,8 @@ func (msg MsgUpdateDID) GetSigners() []sdk.AccAddress {
 var _ sdk.Msg = &MsgDeactivateDID{}
 
 // NewMsgDeactivateDID is a constructor of MsgDeactivateDID.
-func NewMsgDeactivateDID(did string, fromAddr string) MsgDeactivateDID {
-	return MsgDeactivateDID{did, fromAddr}
+func NewMsgDeactivateDID(did string, doc DIDDocument, fromAddr string) MsgDeactivateDID {
+	return MsgDeactivateDID{did, &doc, fromAddr}
 }
 
 // Route returns the name of the module.
@@ -121,6 +121,9 @@ func (msg MsgDeactivateDID) Type() string { return "deactivate_did" }
 func (msg MsgDeactivateDID) ValidateBasic() error {
 	if err := ValidateDID(msg.Did); err != nil {
 		return sdkerrors.Wrapf(ErrInvalidDID, "did: %v, %v", msg.Did, err)
+	}
+	if err := ValidateDIDDocument(msg.Did, msg.Document); err != nil {
+		return sdkerrors.Wrapf(ErrInvalidDIDDocument, "error: %v", err)
 	}
 
 	addr, err := sdk.AccAddressFromBech32(msg.FromAddress)

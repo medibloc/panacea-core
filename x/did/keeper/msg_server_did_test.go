@@ -74,7 +74,7 @@ func (suite *msgServerTestSuite) TestHandleMsgCreateDID_Deactivated() {
 	suite.Require().Equal(1, len(didKeeper.ListDIDs(suite.Ctx)))
 	suite.Require().Equal(signedDidDocument, *didKeeper.GetDIDDocument(suite.Ctx, did))
 
-	deactivateMsg := newMsgDeactivateDID(did)
+	deactivateMsg := newMsgDeactivateDID(suite, did, *didDocument, verificationMethodID, 1, privKey)
 	deactivateRes, err := didMsgServer.DeactivateDID(goContext, &deactivateMsg)
 	suite.Require().NoError(err)
 	suite.Require().NotNil(deactivateRes)
@@ -161,7 +161,7 @@ func (suite *msgServerTestSuite) TestHandleMsgUpdateDID_DIDDeactivated() {
 	suite.Require().Equal(signedDidDocument, *didKeeper.GetDIDDocument(suite.Ctx, did))
 
 	// deactivate
-	deactivateMsg := newMsgDeactivateDID(did)
+	deactivateMsg := newMsgDeactivateDID(suite, did, *didDocument, verificationMethodID, 1, privKey)
 	deactivateRes, err := didMsgServer.DeactivateDID(goContext, &deactivateMsg)
 	suite.Require().NoError(err)
 	suite.Require().NotNil(deactivateRes)
@@ -187,7 +187,7 @@ func (suite *msgServerTestSuite) TestHandleMsgDeactivateDID() {
 	suite.Require().Equal(1, len(didKeeper.ListDIDs(suite.Ctx)))
 	suite.Require().Equal(signedDidDocument, *didKeeper.GetDIDDocument(suite.Ctx, did))
 	// deactivate
-	deactivateMsg := newMsgDeactivateDID(did)
+	deactivateMsg := newMsgDeactivateDID(suite, did, *didDocument, verificationMethodID, 1, privKey)
 	deactivateRes, err := didMsgServer.DeactivateDID(goContext, &deactivateMsg)
 
 	suite.Require().NoError(err)
@@ -204,8 +204,10 @@ func (suite *msgServerTestSuite) TestHandleMsgDeactivateDID_DIDNotFound() {
 	goContext := sdk.WrapSDKContext(suite.Ctx)
 	did := "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm"
 
+	didDocument, privKey, verificationMethodID := makeTestDIDDocument(did)
+
 	// deactivate without creation
-	deactivateMsg := newMsgDeactivateDID(did)
+	deactivateMsg := newMsgDeactivateDID(suite, did, *didDocument, verificationMethodID, 0, privKey)
 	deactivateRes, err := didMsgServer.DeactivateDID(goContext, &deactivateMsg)
 	suite.Require().ErrorIs(types.ErrDIDNotFound, err)
 	suite.Require().Nil(deactivateRes)
@@ -227,7 +229,7 @@ func (suite *msgServerTestSuite) TestHandleMsgDeactivateDID_DIDDeactivated() {
 	suite.Require().Equal(signedDidDocument, *didKeeper.GetDIDDocument(suite.Ctx, did))
 
 	// deactivate
-	deactivateMsg := newMsgDeactivateDID(did)
+	deactivateMsg := newMsgDeactivateDID(suite, did, *didDocument, verificationMethodID, 1, privKey)
 	deactivateRes, err := didMsgServer.DeactivateDID(goContext, &deactivateMsg)
 	suite.Require().NotNil(deactivateRes)
 	suite.Require().NoError(err)
@@ -258,7 +260,12 @@ func newMsgUpdateDID(suite *msgServerTestSuite, did string, didDocument types.DI
 	return didDocument, types.NewMsgUpdateDID(did, didDocument, sdk.AccAddress{}.String())
 }
 
-func newMsgDeactivateDID(did string) types.MsgDeactivateDID {
+func newMsgDeactivateDID(suite *msgServerTestSuite, did string, didDocument types.DIDDocument, verificationMethodID string, sequence uint64, privKey *btcec.PrivateKey) types.MsgDeactivateDID {
 
-	return types.NewMsgDeactivateDID(did, sdk.AccAddress{}.String())
+	signedDoc, err := types.SignDocument(didDocument.Document, verificationMethodID, sequence, privKey)
+	suite.Require().NoError(err)
+
+	didDocument.Document = signedDoc
+
+	return types.NewMsgDeactivateDID(did, didDocument, sdk.AccAddress{}.String())
 }

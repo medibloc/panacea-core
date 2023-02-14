@@ -60,16 +60,25 @@ func (m msgServer) DeactivateDID(goCtx context.Context, msg *types.MsgDeactivate
 	keeper := m.Keeper
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	document := keeper.GetDIDDocument(ctx, msg.Did)
-	if document.Empty() {
+	prevDocument := keeper.GetDIDDocument(ctx, msg.Did)
+	if prevDocument.Empty() {
 		return nil, sdkerrors.Wrapf(types.ErrDIDNotFound, "DID: %s", msg.Did)
 	}
-	if document.Deactivated {
+	if prevDocument.Deactivated {
 		return nil, sdkerrors.Wrapf(types.ErrDIDDeactivated, "DID: %s", msg.Did)
 	}
-	document.Deactivated = true
 
-	keeper.SetDIDDocument(ctx, msg.Did, document)
+	if err := VerifyDIDOwnership(msg.Document.Document, prevDocument.Document); err != nil {
+		return nil, sdkerrors.Wrapf(types.ErrVerifyOwnershipFailed, "error: %v", err)
+	}
+
+	deactivatedDIDDocument := &types.DIDDocument{
+		Document:         nil,
+		DocumentDataType: "",
+		Deactivated:      true,
+	}
+
+	keeper.SetDIDDocument(ctx, msg.Did, deactivatedDIDDocument)
 	return &types.MsgDeactivateDIDResponse{}, nil
 
 }
