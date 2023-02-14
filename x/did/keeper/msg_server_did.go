@@ -85,8 +85,7 @@ func VerifyDIDOwnership(newDocument, prevDocument []byte) error {
 		return sdkerrors.Wrapf(types.ErrParseDocument, "failed to parse did document")
 	}
 
-	// todo: Currently, only the key used in CreateDID is used for ownership verification.
-	//       Since the aries framework can create proof array based on multiple keys, this part can be extended.
+	// todo: Currently, proof is assumed to have only one element. It can be changed to have multiple proofs.
 
 	// get previous document proof verification method
 	proofMethodID := doc.Proof[0].Creator
