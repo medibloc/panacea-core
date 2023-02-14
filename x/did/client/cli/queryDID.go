@@ -48,7 +48,7 @@ func CmdGetDID() *cobra.Command {
 				return err
 			}
 
-			_, err = fmt.Fprintf(cmd.OutOrStdout(), string(jsonDocument))
+			_, err = fmt.Fprintln(cmd.OutOrStdout(), string(jsonDocument))
 			if err != nil {
 				return err
 			}

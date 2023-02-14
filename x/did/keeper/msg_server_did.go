@@ -104,7 +104,7 @@ func VerifyDIDOwnership(newDocument, prevDocument []byte) error {
 			check = IsEqualVerificationMethod(vm, verificationMethod)
 		}
 	}
-	if check == false {
+	if !check {
 		return sdkerrors.Wrapf(types.ErrInvalidProof, "there is no proof verification method in document")
 	}
 

@@ -52,6 +52,7 @@ func TestVerifyDIDOwnershipInvalidSequence(t *testing.T) {
 
 	// sign same document with invalid sequence
 	updatedSignedDoc, err := types.SignDocument(docBz, vmID, 2, btcecPrivKey)
+	require.NoError(t, err)
 	err = keeper.VerifyDIDOwnership(updatedSignedDoc, signedDoc)
 	require.Error(t, err)
 }
