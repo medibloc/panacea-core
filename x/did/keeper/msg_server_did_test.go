@@ -31,6 +31,7 @@ func (suite *msgServerTestSuite) TestHandleMsgCreateDID() {
 	res, err := didMsgServer.CreateDID(sdk.WrapSDKContext(suite.Ctx), &msg)
 	suite.Require().NoError(err)
 	suite.Require().NotNil(res)
+	suite.Require().Equal(res.Did, did)
 	suite.Require().Equal(1, len(didKeeper.ListDIDs(suite.Ctx)))
 	suite.Require().Equal(signedDidDocument, *didKeeper.GetDIDDocument(suite.Ctx, did))
 }
