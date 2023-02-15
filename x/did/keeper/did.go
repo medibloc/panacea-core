@@ -18,7 +18,7 @@ func (k Keeper) GetDIDDocument(ctx sdk.Context, did string) *types.DIDDocument {
 	key := []byte(did)
 	bz := store.Get(key)
 	if bz == nil {
-		return &types.DIDDocument{}
+		return nil
 	}
 
 	var doc types.DIDDocument

@@ -25,5 +25,5 @@ message QueryDIDRequest {
 
 // QueryDIDResponse is the response type for the Query/DIDDocument RPC method.
 message QueryDIDResponse {
-	DIDDocument did_document= 1;
+	DIDDocument did_document = 1;
 }
