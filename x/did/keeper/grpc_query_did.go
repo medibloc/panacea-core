@@ -31,5 +31,5 @@ func (k Keeper) DID(c context.Context, req *types.QueryDIDRequest) (*types.Query
 		return nil, status.Error(codes.NotFound, "DID deactivated")
 	}
 
-	return &types.QueryDIDResponse{DidDocument: document}, nil
+	return &types.QueryDIDResponse{DidDocument: &document}, nil
 }

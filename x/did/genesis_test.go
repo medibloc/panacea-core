@@ -46,8 +46,8 @@ func (suite *genesisTestSuite) TestGenesis() {
 	// import it to a new keeper
 	InitGenesis(suite.Ctx, didKeeper, *state)
 	suite.Require().Equal(2, len(didKeeper.ListDIDs(suite.Ctx)))
-	suite.Require().Equal(doc1, didKeeper.GetDIDDocument(suite.Ctx, did1))
-	suite.Require().Equal(doc2, didKeeper.GetDIDDocument(suite.Ctx, did2))
+	suite.Require().Equal(*doc1, didKeeper.GetDIDDocument(suite.Ctx, did1))
+	suite.Require().Equal(*doc2, didKeeper.GetDIDDocument(suite.Ctx, did2))
 }
 
 func (suite *genesisTestSuite) newGenesisKey(did string) string {

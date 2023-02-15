@@ -36,7 +36,7 @@ func (suite *didTestSuite) TestSetGetDIDDocument() {
 	// Test one DIDDocument
 	resDocument := didKeeper.GetDIDDocument(suite.Ctx, did1)
 	suite.Require().NotNil(resDocument)
-	suite.Require().Equal(didDocument1, resDocument)
+	suite.Require().Equal(didDocument1, &resDocument)
 
 	// Test all DIDs
 	resDIDs := didKeeper.ListDIDs(suite.Ctx)

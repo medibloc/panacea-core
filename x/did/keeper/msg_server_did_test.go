@@ -33,7 +33,7 @@ func (suite *msgServerTestSuite) TestHandleMsgCreateDID() {
 	suite.Require().NotNil(res)
 	suite.Require().Equal(res.Did, did)
 	suite.Require().Equal(1, len(didKeeper.ListDIDs(suite.Ctx)))
-	suite.Require().Equal(signedDidDocument, *didKeeper.GetDIDDocument(suite.Ctx, did))
+	suite.Require().Equal(signedDidDocument, didKeeper.GetDIDDocument(suite.Ctx, did))
 }
 
 func (suite *msgServerTestSuite) TestHandleMsgCreateDID_Exists() {
@@ -49,7 +49,7 @@ func (suite *msgServerTestSuite) TestHandleMsgCreateDID_Exists() {
 	suite.Require().NoError(err)
 	suite.Require().NotNil(res)
 	suite.Require().Equal(1, len(didKeeper.ListDIDs(suite.Ctx)))
-	suite.Require().Equal(signedDidDocument, *didKeeper.GetDIDDocument(suite.Ctx, did))
+	suite.Require().Equal(signedDidDocument, didKeeper.GetDIDDocument(suite.Ctx, did))
 
 	// one more time
 	res, err = didMsgServer.CreateDID(sdk.WrapSDKContext(suite.Ctx), &msg)
@@ -72,7 +72,7 @@ func (suite *msgServerTestSuite) TestHandleMsgCreateDID_Deactivated() {
 	suite.Require().NoError(err)
 	suite.Require().NotNil(res)
 	suite.Require().Equal(1, len(didKeeper.ListDIDs(suite.Ctx)))
-	suite.Require().Equal(signedDidDocument, *didKeeper.GetDIDDocument(suite.Ctx, did))
+	suite.Require().Equal(signedDidDocument, didKeeper.GetDIDDocument(suite.Ctx, did))
 
 	deactivateMsg := newMsgDeactivateDID(suite, did, *didDocument, verificationMethodID, 1, privKey)
 	deactivateRes, err := didMsgServer.DeactivateDID(goContext, &deactivateMsg)
@@ -99,7 +99,7 @@ func (suite *msgServerTestSuite) TestHandleMsgUpdateDID() {
 	suite.Require().NoError(err)
 	suite.Require().NotNil(res)
 	suite.Require().Equal(1, len(didKeeper.ListDIDs(suite.Ctx)))
-	suite.Require().Equal(signedDidDocument, *didKeeper.GetDIDDocument(suite.Ctx, did))
+	suite.Require().Equal(signedDidDocument, didKeeper.GetDIDDocument(suite.Ctx, did))
 
 	// prepare a new doc
 
@@ -124,7 +124,7 @@ func (suite *msgServerTestSuite) TestHandleMsgUpdateDID() {
 	suite.Require().NotNil(updateRes)
 	suite.Require().Equal(1, len(didKeeper.ListDIDs(suite.Ctx)))
 
-	suite.Require().Equal(signedNewDidDocument, *didKeeper.GetDIDDocument(suite.Ctx, did))
+	suite.Require().Equal(signedNewDidDocument, didKeeper.GetDIDDocument(suite.Ctx, did))
 
 	// call again with the same signature (replay-attack! should be failed!)
 	_, err = didMsgServer.UpdateDID(goContext, &updateMsg)
@@ -158,7 +158,7 @@ func (suite *msgServerTestSuite) TestHandleMsgUpdateDID_DIDDeactivated() {
 	suite.Require().NoError(err)
 	suite.Require().NotNil(res)
 	suite.Require().Equal(1, len(didKeeper.ListDIDs(suite.Ctx)))
-	suite.Require().Equal(signedDidDocument, *didKeeper.GetDIDDocument(suite.Ctx, did))
+	suite.Require().Equal(signedDidDocument, didKeeper.GetDIDDocument(suite.Ctx, did))
 
 	// deactivate
 	deactivateMsg := newMsgDeactivateDID(suite, did, *didDocument, verificationMethodID, 1, privKey)
@@ -185,7 +185,7 @@ func (suite *msgServerTestSuite) TestHandleMsgDeactivateDID() {
 	suite.Require().NoError(err)
 	suite.Require().NotNil(createRes)
 	suite.Require().Equal(1, len(didKeeper.ListDIDs(suite.Ctx)))
-	suite.Require().Equal(signedDidDocument, *didKeeper.GetDIDDocument(suite.Ctx, did))
+	suite.Require().Equal(signedDidDocument, didKeeper.GetDIDDocument(suite.Ctx, did))
 	// deactivate
 	deactivateMsg := newMsgDeactivateDID(suite, did, *didDocument, verificationMethodID, 1, privKey)
 	deactivateRes, err := didMsgServer.DeactivateDID(goContext, &deactivateMsg)
@@ -226,7 +226,7 @@ func (suite *msgServerTestSuite) TestHandleMsgDeactivateDID_DIDDeactivated() {
 	suite.Require().NoError(err)
 	suite.Require().NotNil(createRes)
 	suite.Require().Equal(1, len(didKeeper.ListDIDs(suite.Ctx)))
-	suite.Require().Equal(signedDidDocument, *didKeeper.GetDIDDocument(suite.Ctx, did))
+	suite.Require().Equal(signedDidDocument, didKeeper.GetDIDDocument(suite.Ctx, did))
 
 	// deactivate
 	deactivateMsg := newMsgDeactivateDID(suite, did, *didDocument, verificationMethodID, 1, privKey)

@@ -21,7 +21,7 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	for _, did := range k.ListDIDs(ctx) {
 		key := types.GenesisDIDDocumentKey{DID: did}.Marshal()
 		document := k.GetDIDDocument(ctx, did)
-		documentsMap[key] = document
+		documentsMap[key] = &document
 	}
 
 	return &types.GenesisState{

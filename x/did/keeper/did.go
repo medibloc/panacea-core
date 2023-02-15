@@ -13,17 +13,17 @@ func (k Keeper) SetDIDDocument(ctx sdk.Context, did string, doc *types.DIDDocume
 	store.Set(key, bz)
 }
 
-func (k Keeper) GetDIDDocument(ctx sdk.Context, did string) *types.DIDDocument {
+func (k Keeper) GetDIDDocument(ctx sdk.Context, did string) types.DIDDocument {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.DIDKeyPrefix)
 	key := []byte(did)
 	bz := store.Get(key)
 	if bz == nil {
-		return nil
+		return types.DIDDocument{}
 	}
 
 	var doc types.DIDDocument
 	k.cdc.MustUnmarshalLengthPrefixed(bz, &doc)
-	return &doc
+	return doc
 }
 
 func (k Keeper) ListDIDs(ctx sdk.Context) []string {
