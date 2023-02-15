@@ -85,7 +85,7 @@ func (m msgServer) DeactivateDID(goCtx context.Context, msg *types.MsgDeactivate
 
 func VerifyDIDOwnership(newDocument, prevDocument []byte) error {
 
-	doc, err := ariesdid.ParseDocument(prevDocument)
+	prevDoc, err := ariesdid.ParseDocument(prevDocument)
 	if err != nil {
 		return sdkerrors.Wrapf(types.ErrParseDocument, "failed to parse did document")
 	}
@@ -97,33 +97,23 @@ func VerifyDIDOwnership(newDocument, prevDocument []byte) error {
 	// todo: Currently, proof is assumed to have only one element. It can be changed to have multiple proofs.
 
 	// get previous document proof verification method
-	proofMethodID := doc.Proof[0].Creator
-	var verificationMethod ariesdid.VerificationMethod
+	proofMethodID := newDoc.Proof[0].Creator
 
-	for _, vm := range doc.VerificationMethod {
-		if vm.ID == proofMethodID {
-			verificationMethod = vm
-		}
+	prevVM, err := GetVerificationMethodByID(prevDoc, proofMethodID)
+	if err != nil {
+		return err
+	}
+	newVM, err := GetVerificationMethodByID(newDoc, proofMethodID)
+	if err != nil {
+		return err
 	}
 
-	// check if the proof was created with the verification method used in the previous document
-	check := false
-	for _, vm := range newDoc.VerificationMethod {
-		if vm.ID == proofMethodID {
-			check = IsEqualVerificationMethod(vm, verificationMethod)
-		}
-	}
-	if !check {
-		return sdkerrors.Wrapf(types.ErrInvalidProof, "there is no proof verification method in document")
-	}
-
-	// Check if newDoc proof method matches previous document proof method
-	if newDoc.Proof[0].Creator != proofMethodID {
-		return sdkerrors.Wrapf(types.ErrInvalidProof, "does not match previous proof method")
+	if !IsEqualVerificationMethod(prevVM, newVM) {
+		return sdkerrors.Wrapf(types.ErrInvalidProof, "verification method does not match.")
 	}
 
 	// check newDoc sequence
-	prevSequence, err := strconv.ParseUint(doc.Proof[0].Domain, 10, 64)
+	prevSequence, err := strconv.ParseUint(prevDoc.Proof[0].Domain, 10, 64)
 	if err != nil {
 		return sdkerrors.Wrapf(types.ErrInvalidSequence, "can not parse previous document sequence")
 	}
@@ -143,6 +133,15 @@ func VerifyDIDOwnership(newDocument, prevDocument []byte) error {
 	return nil
 }
 
-func IsEqualVerificationMethod(vm1, vm2 ariesdid.VerificationMethod) bool {
+func IsEqualVerificationMethod(vm1, vm2 *ariesdid.VerificationMethod) bool {
 	return vm1.ID == vm2.ID && vm1.Type == vm2.Type && vm1.Controller == vm2.Controller && bytes.Equal(vm1.Value, vm2.Value)
+}
+
+func GetVerificationMethodByID(doc *ariesdid.Doc, vmID string) (*ariesdid.VerificationMethod, error) {
+	for _, vm := range doc.VerificationMethod {
+		if vm.ID == vmID {
+			return &vm, nil
+		}
+	}
+	return nil, sdkerrors.Wrapf(types.ErrInvalidProof, "can not get VerificationMethod. ID: %v", vmID)
 }

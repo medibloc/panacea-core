@@ -55,6 +55,7 @@ func TestVerifyDIDOwnershipInvalidSequence(t *testing.T) {
 	require.NoError(t, err)
 	err = keeper.VerifyDIDOwnership(updatedSignedDoc, signedDoc)
 	require.Error(t, err)
+	require.ErrorIs(t, err, types.ErrInvalidSequence)
 }
 
 func TestVerifyDIDOwnershipDeleteVerificationMethod(t *testing.T) {
@@ -87,4 +88,5 @@ func TestVerifyDIDOwnershipDeleteVerificationMethod(t *testing.T) {
 
 	err = keeper.VerifyDIDOwnership(updatedSignedDoc, signedDoc)
 	require.Error(t, err)
+	require.ErrorIs(t, err, types.ErrInvalidProof)
 }
