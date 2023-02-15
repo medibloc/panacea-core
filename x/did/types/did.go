@@ -64,7 +64,7 @@ func ValidateDIDDocument(did string, doc *DIDDocument) error {
 }
 
 func (doc DIDDocument) Empty() bool {
-	return doc.DocumentDataType == "" || doc.Document == nil
+	return (doc.DocumentDataType == "" || doc.Document == nil) && !doc.Deactivated
 }
 
 func NewVerificationMethodID(did string, name string) string {
