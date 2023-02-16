@@ -144,5 +144,4 @@ replace (
 	// The latest gRPC doesn't work with with a modified proto compiler of Cosmos,
 	// so we need to enforce the following version across all dependencies.
 	google.golang.org/grpc => google.golang.org/grpc v1.33.2
-
 )
