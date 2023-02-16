@@ -4,7 +4,7 @@
 
 ### Improvements
 
-- \#TBD feat: upgrade ibc-go from v2 to v4.3.0 (with cosmos-sdk v0.45.12 and informalsystems/tendermint v0.34.24)
+- [\#635](https://github.com/medibloc/panacea-core/pull/635) feat: upgrade ibc-go from v2 to v4.3.0 (with cosmos-sdk v0.45.12 and informalsystems/tendermint v0.34.24)
 
 
 ## [v2.0.5](https://github.com/medibloc/panacea-core/releases/tag/v2.0.5) - 2022-10-19
