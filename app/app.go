@@ -917,6 +917,9 @@ func (app *App) registerUpgradeHandlers() error {
 
 		oracle.InitGenesis(ctx, app.oracleKeeper, *genesisState)
 
+		// Regardless of the new oracle module, we need this upgrade handler
+		// because ibctransfer module consensus version has been bumped to 2
+		// https://ibc.cosmos.network/main/migrations/v3-to-v4.html#migration-to-fix-support-for-base-denoms-with-slashes
 		return app.mm.RunMigrations(ctx, app.configurator, fromVM)
 	})
 
