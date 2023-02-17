@@ -161,7 +161,17 @@ require (
 )
 
 replace (
+	// For a min-commission-rate param in x/staking
 	github.com/cosmos/cosmos-sdk => github.com/medibloc/cosmos-sdk v0.45.12-panacea.1
+
+	// use Cosmos style protobufs
 	github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
+
+	// Use Informal Systems fork of Tendermint
+	github.com/tendermint/tendermint => github.com/informalsystems/tendermint v0.34.24
+
+	// The latest gRPC doesn't work with with a modified proto compiler of Cosmos,
+	// so we need to enforce the following version across all dependencies.
 	google.golang.org/grpc => google.golang.org/grpc v1.33.2
+
 )
