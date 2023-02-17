@@ -26,6 +26,7 @@ message MsgCreateDeal {
   uint64 max_num_data = 3;
   string consumer_address = 4;
   repeated AgreementTerm agreement_terms = 5;
+  bytes presentation_definition = 6;
 }
 
 // MsgCreateDealResponse defines the Msg/CreateDeal response type.

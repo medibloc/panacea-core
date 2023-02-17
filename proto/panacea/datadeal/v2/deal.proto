@@ -11,12 +11,13 @@ message Deal {
   uint64 id = 1;
   string address = 2;
   repeated string data_schema = 3;
-  cosmos.base.v1beta1.Coin budget = 4;
-  uint64 max_num_data = 5;
-  uint64 cur_num_data = 6;
-  string consumer_address = 7;
-  repeated AgreementTerm agreement_terms = 8;
-  DealStatus status = 9;
+  bytes presentation_definition = 4;
+  cosmos.base.v1beta1.Coin budget = 5;
+  uint64 max_num_data = 6;
+  uint64 cur_num_data = 7;
+  string consumer_address = 8;
+  repeated AgreementTerm agreement_terms = 9;
+  DealStatus status = 10;
 }
 
 // AgreementTerm defines a general format of an agreement term to be specified in a Deal.

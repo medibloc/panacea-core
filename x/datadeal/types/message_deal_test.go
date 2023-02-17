@@ -46,7 +46,7 @@ func TestMsgCreateDealValidateBasicEmptyValue(t *testing.T) {
 
 	err := msg.ValidateBasic()
 	require.ErrorIs(t, err, sdkerrors.ErrInvalidRequest)
-	require.ErrorContains(t, err, "no data schema")
+	require.ErrorContains(t, err, "one of data schema and presentation definition can be provided")
 	msg.DataSchema = []string{"https://jsonld.com"}
 
 	msg.MaxNumData = 0

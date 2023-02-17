@@ -16,8 +16,13 @@ func (m *MsgCreateDeal) Type() string {
 }
 
 func (m *MsgCreateDeal) ValidateBasic() error {
-	if len(m.DataSchema) == 0 {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "no data schema")
+	if m.HasDataSchema() == m.HasPresentationDefinition() {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "one of data schema and presentation definition can be provided")
+	}
+	if m.HasPresentationDefinition() {
+		if err := ValidatePD(m.PresentationDefinition); err != nil {
+			return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid presentation definition")
+		}
 	}
 	if m.MaxNumData <= 0 {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "max num of data is negative number")
@@ -50,6 +55,14 @@ func (m *MsgCreateDeal) GetSigners() []sdk.AccAddress {
 		panic(err)
 	}
 	return []sdk.AccAddress{consumerAddress}
+}
+
+func (m *MsgCreateDeal) HasDataSchema() bool {
+	return len(m.DataSchema) > 0
+}
+
+func (m *MsgCreateDeal) HasPresentationDefinition() bool {
+	return len(m.PresentationDefinition) > 0
 }
 
 var _ sdk.Msg = &MsgSubmitConsent{}
