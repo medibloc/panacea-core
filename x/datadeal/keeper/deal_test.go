@@ -142,7 +142,6 @@ func (suite *dealTestSuite) TestCreateDealInvalidPD() {
 	suite.Require().NoError(err)
 
 	msgCreateDeal := &types.MsgCreateDeal{
-		DataSchema:      []string{"http://jsonld.com"},
 		Budget:          budget,
 		MaxNumData:      10000,
 		ConsumerAddress: suite.consumerAccAddr.String(),
