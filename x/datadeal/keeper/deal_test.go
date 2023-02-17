@@ -99,7 +99,6 @@ func (suite *dealTestSuite) TestCreateNewDeal() {
 				Description: "description",
 			},
 		},
-		PresentationDefinition: suite.pdBz,
 	}
 
 	dealID, err := suite.DataDealKeeper.CreateDeal(suite.Ctx, msgCreateDeal)
@@ -158,6 +157,32 @@ func (suite *dealTestSuite) TestCreateDealInvalidPD() {
 
 	err = msgCreateDeal.ValidateBasic()
 	suite.Require().ErrorContains(err, "invalid presentation definition")
+}
+
+func (suite *dealTestSuite) TestCreateDealBothSchemaAndPD() {
+	err := suite.FundAccount(suite.Ctx, suite.consumerAccAddr, suite.defaultFunds)
+	suite.Require().NoError(err)
+
+	budget := &sdk.Coin{Denom: assets.MicroMedDenom, Amount: sdk.NewInt(10000000)}
+
+	msgCreateDeal := &types.MsgCreateDeal{
+		DataSchema:      []string{"http://jsonld.com"},
+		Budget:          budget,
+		MaxNumData:      10000,
+		ConsumerAddress: suite.consumerAccAddr.String(),
+		AgreementTerms: []*types.AgreementTerm{
+			{
+				Id:          1,
+				Required:    true,
+				Title:       "title",
+				Description: "description",
+			},
+		},
+		PresentationDefinition: suite.pdBz,
+	}
+
+	err = msgCreateDeal.ValidateBasic()
+	suite.Require().ErrorContains(err, "one of data schema and presentation definition can be provided")
 }
 
 func (suite *dealTestSuite) TestCheckDealCurNumDataAndIncrement() {
