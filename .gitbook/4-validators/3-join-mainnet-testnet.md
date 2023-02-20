@@ -160,6 +160,18 @@ panacead tendermint unsafe-reset-all
 
 ## Run a Full Node
 
+### Before Running a Node
+Before running full node, it is highly recommended to use [state sync](#state-sync).
+
+It is possible to start from scratch but will take a significant amount of time and effort to catch up.
+To sync full node from scratch, it is important to note that you must start with v2.0.1 and proceed through several upgrades at proper block heights.
+
+Another way is to use a snapshot to recover up to the latest block. 
+We do not currently have an official snapshot download service, so please request a snapshot from the Panacea team or another full node operator.
+
+For bootstrapping full node, state sync would be sufficient.
+
+### Launch Node
 Start the full node with this command:
 
 ```bash
