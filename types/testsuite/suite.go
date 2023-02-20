@@ -1,10 +1,6 @@
 package testsuite
 
 import (
-	"github.com/CosmWasm/wasmd/x/wasm"
-	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
-	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
-	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/cosmos-sdk/store"
@@ -65,7 +61,6 @@ type TestSuite struct {
 	TransferKeeper   ibctransferkeeper.Keeper
 	DIDMsgServer     didtypes.MsgServer
 	DIDKeeper        didkeeper.Keeper
-	WasmKeeper       wasm.Keeper
 	UpgradeKeeper    upgradekeeper.Keeper
 }
 
@@ -76,7 +71,6 @@ func (suite *TestSuite) SetupTest() {
 		banktypes.StoreKey,
 		paramstypes.StoreKey,
 		didtypes.StoreKey,
-		wasm.StoreKey,
 		ibchost.StoreKey,
 		capabilitytypes.StoreKey,
 		ibctransfertypes.StoreKey,
@@ -107,7 +101,6 @@ func (suite *TestSuite) SetupTest() {
 		stakingtypes.NotBondedPoolName: {authtypes.Burner, authtypes.Staking},
 		govtypes.ModuleName:            {authtypes.Burner},
 		ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
-		wasm.ModuleName:                {authtypes.Burner},
 		burntypes.ModuleName:           {authtypes.Burner},
 	}
 
@@ -170,39 +163,6 @@ func (suite *TestSuite) SetupTest() {
 		suite.IBCKeeper.ChannelKeeper, &suite.IBCKeeper.PortKeeper,
 		suite.AccountKeeper, suite.BankKeeper, scopedIBCKeeper,
 	)
-
-	msgRouter := baseapp.NewMsgServiceRouter()
-
-	querier := baseapp.NewGRPCQueryRouter()
-
-	supportedFeatures := "iterator,staking,stargate"
-	suite.WasmKeeper = wasmkeeper.NewKeeper(
-		cdc.Marshaler,
-		keyParams[wasm.StoreKey],
-		paramsKeeper.Subspace(wasm.ModuleName),
-		suite.AccountKeeper,
-		suite.BankKeeper,
-		suite.StakingKeeper,
-		suite.DistrKeeper,
-		suite.IBCKeeper.ChannelKeeper,
-		&suite.IBCKeeper.PortKeeper,
-		scopedIBCKeeper,
-		suite.TransferKeeper,
-		msgRouter,
-		querier,
-		suite.T().TempDir(),
-		wasmtypes.DefaultWasmConfig(),
-		supportedFeatures,
-		[]wasm.Option{}...,
-	)
-
-	wasmGenState := wasmtypes.GenesisState{
-		Codes:     []wasmtypes.Code{},
-		Sequences: []wasmtypes.Sequence{},
-		Params:    wasmtypes.DefaultParams(),
-	}
-	_, err := wasmkeeper.InitGenesis(suite.Ctx, &suite.WasmKeeper, wasmGenState, suite.StakingKeeper, wasmkeeper.TestHandler(wasmkeeper.NewDefaultPermissionKeeper(suite.WasmKeeper)))
-	suite.Require().NoError(err)
 
 	suite.DIDKeeper = *didkeeper.NewKeeper(
 		cdc.Marshaler,
