@@ -763,6 +763,8 @@ func (app *App) registerUpgradeHandlers() error {
 
 	app.UpgradeKeeper.SetUpgradeHandler("v2.0.6", func(ctx sdk.Context, plan upgradetypes.Plan, _ module.VersionMap) (module.VersionMap, error) {
 
+		// 1st-time running in-store migrations, using 1 as fromVersion to
+		// avoid running InitGenesis.
 		fromVM := map[string]uint64{
 			"auth":         1,
 			"bank":         1,
@@ -783,7 +785,10 @@ func (app *App) registerUpgradeHandlers() error {
 			"aol":          1,
 			"did":          1,
 			"burn":         1,
+			"wasm":         1,
 		}
+
+		app.IBCKeeper.ConnectionKeeper.SetParams(ctx, ibcconnectiontypes.DefaultParams())
 
 		// transfer module consensus version has been bumped to 2
 		// https://ibc.cosmos.network/main/migrations/v3-to-v4.html#migration-to-fix-support-for-base-denoms-with-slashes
