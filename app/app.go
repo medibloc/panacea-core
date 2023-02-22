@@ -762,30 +762,7 @@ func (app *App) registerUpgradeHandlers() error {
 		return app.mm.RunMigrations(ctx, app.configurator, fromVM)
 	})
 
-	app.UpgradeKeeper.SetUpgradeHandler("v2.0.6", func(ctx sdk.Context, plan upgradetypes.Plan, _ module.VersionMap) (module.VersionMap, error) {
-
-		fromVM := map[string]uint64{
-			"auth":         1,
-			"bank":         1,
-			"capability":   1,
-			"crisis":       1,
-			"distribution": 1,
-			"evidence":     1,
-			"gov":          1,
-			"mint":         1,
-			"params":       1,
-			"slashing":     1,
-			"staking":      1,
-			"upgrade":      1,
-			"vesting":      1,
-			"ibc":          1,
-			"genutil":      1,
-			"transfer":     1,
-			"aol":          1,
-			"did":          1,
-			"burn":         1,
-			"wasm":         1,
-		}
+	app.UpgradeKeeper.SetUpgradeHandler("v2.0.6", func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
 
 		app.IBCKeeper.ConnectionKeeper.SetParams(ctx, ibcconnectiontypes.DefaultParams())
 
@@ -819,5 +796,4 @@ func (app *App) registerUpgradeHandlers() error {
 	}
 
 	return nil
-
 }
