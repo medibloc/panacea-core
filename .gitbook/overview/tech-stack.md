@@ -41,15 +41,6 @@ Also, data holders can reveal only data that they really want to share using the
 This mechanism is so essential for the health data ecosystem because patients can keep the ownership of their health data
 and choose the level of privacy by themselves.
 
-
-## Smart Contract
-
-Panacea provides the Smart Contract framework powered by CosmWasm.
-Any developers can implement their own smart contracts using the Rust programming language and deploy them on Panacea.
-It means that any fancy ideas such as DeFi and NFT can be implemented on Panacea,
-and they can be used for boosting the liquidity of health data flow of medical systems built on Panacea.
-
-
 ## IBC (Inter-Blockchain Communication)
 
 Since Panacea is a Cosmos-based blockchain, it can be connected with other Cosmos-based blockchains through the IBC protocol.
