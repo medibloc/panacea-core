@@ -12,7 +12,7 @@ please clone the `panacea-core` project and build it.
 
 ```bash
 # Make sure to checkout the correct branch.
-git clone -b v2.0.5 https://github.com/medibloc/panacea-core
+git clone -b v2.0.6 https://github.com/medibloc/panacea-core
 cd panacea-core
 make install  # All binaries are installed in $GOPATH/bin
 ```
@@ -20,7 +20,7 @@ make install  # All binaries are installed in $GOPATH/bin
 Verify that the `panacead` binary is installed successfully.
 ```bash
 $ panacead version
-2.0.5
+2.0.6
 ```
 
 ## Import `panacea-core` as a Go dependency
@@ -36,10 +36,9 @@ module your.com/yours
 go 1.19
 
 replace (
-	github.com/confio/ics23/go => github.com/cosmos/cosmos-sdk/ics23/go v0.8.0
-	github.com/cosmos/cosmos-sdk => github.com/medibloc/cosmos-sdk v0.45.9-panacea.1
-	github.com/cosmos/ledger-go => github.com/cosmos/ledger-go v0.9.3
+	github.com/cosmos/cosmos-sdk => github.com/medibloc/cosmos-sdk v0.45.12-panacea.1
 	github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
+	github.com/tendermint/tendermint => github.com/informalsystems/tendermint v0.34.24
 	google.golang.org/grpc => google.golang.org/grpc v1.33.2
 )
 ```
