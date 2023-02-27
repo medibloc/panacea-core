@@ -2,9 +2,15 @@
 
 ## Unreleased
 
+TDB
+
+
+## [v2.0.6](https://github.com/medibloc/panacea-core/releases/tag/v2.0.6) - 2023-02-27
+
 ### Improvements
 
 - [\#635](https://github.com/medibloc/panacea-core/pull/635) feat: upgrade ibc-go from v2 to v4.3.0 (with cosmos-sdk v0.45.12 and informalsystems/tendermint v0.34.24)
+- [\#640](https://github.com/medibloc/panacea-core/pull/640) feat: remove CosmWasm
 
 
 ## [v2.0.5](https://github.com/medibloc/panacea-core/releases/tag/v2.0.5) - 2022-10-19
