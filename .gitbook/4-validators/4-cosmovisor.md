@@ -104,7 +104,7 @@ You need to create a path in cosmovisor's home path to store the binary to be up
 mkdir -p $DAEMON_HOME/cosmovisor/upgrades/[upgrade-version]/bin
 ```
 
-Generate a new binary and navigate to the path you created above.
+Generate a new binary and navigate to the directory you created above.
 ```
 git clone -b tags/[upgrade-version] https://github.com/medibloc/panacea-core.git
 cd panacea-core
