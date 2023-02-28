@@ -66,7 +66,7 @@ export DAEMON_RESTART_AFTER_UPGRADE=true
 export DAEMON_ALLOW_DOWNLOAD_BINARIES=false
 ```
 
-Create a directory for the genesis binary. This path should contain the panacead currently running on the mainnet.
+Create a directory for the genesis binary. The current version of binary should be under the directory.
 
 ```shell
 mkdir -p $DAEMON_HOME/cosmovisor/genesis/bin
