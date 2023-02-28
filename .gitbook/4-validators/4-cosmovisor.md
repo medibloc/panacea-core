@@ -97,7 +97,7 @@ cosmovisor start
 
 cosmovisor supports chain upgrades automatically. This requires some preliminary work.
 
-You need to create a path in cosmovisor's home path to store the binary to be upgraded.
+You need to create a directory for the binary to be upgraded.
 
 ```shell
 # Generally, [upgrade-version] refers to the 'Name' value set in the SoftwareUpgradeProposal.
