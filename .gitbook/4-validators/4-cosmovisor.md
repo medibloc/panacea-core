@@ -112,4 +112,4 @@ make clean && make build
 cp ./build/panacead $DAEMON_HOME/cosmovisor/upgrades/[upgrade-version]/bin
 ```
 
-The upgrade is complete when the chain is stopped by SoftwareUpgradeProposal, the binaries are replaced by cosmovisor, and the chain is started.s
+The upgrade is complete when the chain reaches the target height of upgrade. The binary is replaced by cosmovisor automatically, and the chain is started.
