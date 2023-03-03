@@ -41,6 +41,10 @@ func (m *MsgCreateDeal) ValidateBasic() error {
 			return sdkerrors.Wrapf(err, "invalid agreement term")
 		}
 	}
+	if len(m.ConsumerServiceEndpoint) == 0 {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "consumer service endpoint is empty")
+	}
+
 	return nil
 }
 

@@ -34,7 +34,8 @@ func (suite *DataDealBaseTestSuite) MakeTestDeal(dealID uint64, consumerAddress 
 				Description: "This is not mandatory.",
 			},
 		},
-		Status: types.DEAL_STATUS_ACTIVE,
+		Status:                  types.DEAL_STATUS_ACTIVE,
+		ConsumerServiceEndpoint: "http://127.0.0.1/v1/data",
 	}
 }
 

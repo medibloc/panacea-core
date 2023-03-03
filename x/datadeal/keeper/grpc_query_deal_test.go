@@ -68,7 +68,7 @@ func (suite *queryDealTestSuite) TestQueryConsent() {
 		DealId: 1,
 		Certificate: &types.Certificate{
 			UnsignedCertificate: &types.UnsignedCertificate{
-				Cid:             "cid1",
+				DataEndpoint:    "http://127.0.0.1/v1/data/dataHash",
 				OracleAddress:   suite.oracleAccAddr.String(),
 				DealId:          1,
 				ProviderAddress: suite.providerAccAddr.String(),
@@ -97,7 +97,7 @@ func (suite *queryDealTestSuite) TestQueryConsents() {
 		DealId: 1,
 		Certificate: &types.Certificate{
 			UnsignedCertificate: &types.UnsignedCertificate{
-				Cid:             "cid1",
+				DataEndpoint:    "http://127.0.0.1/v1/data/dataHash",
 				OracleAddress:   suite.oracleAccAddr.String(),
 				DealId:          1,
 				ProviderAddress: suite.providerAccAddr.String(),
@@ -115,7 +115,7 @@ func (suite *queryDealTestSuite) TestQueryConsents() {
 		DealId: 1,
 		Certificate: &types.Certificate{
 			UnsignedCertificate: &types.UnsignedCertificate{
-				Cid:             "cid2",
+				DataEndpoint:    "http://127.0.0.1/v1/data/dataHash2",
 				OracleAddress:   suite.oracleAccAddr.String(),
 				DealId:          1,
 				ProviderAddress: suite.providerAccAddr.String(),
@@ -132,7 +132,7 @@ func (suite *queryDealTestSuite) TestQueryConsents() {
 		DealId: 1,
 		Certificate: &types.Certificate{
 			UnsignedCertificate: &types.UnsignedCertificate{
-				Cid:             "cid2",
+				DataEndpoint:    "http://127.0.0.1/v1/data/dataHash2",
 				OracleAddress:   suite.oracleAccAddr.String(),
 				DealId:          2,
 				ProviderAddress: suite.providerAccAddr.String(),

@@ -19,7 +19,7 @@ message Certificate {
 
 // UnsignedCertificate defines a certificate issued by an oracle as a result of data validation.
 message UnsignedCertificate {
-  string cid = 1;
+  string data_endpoint = 1;
   string unique_id = 2;
   string oracle_address = 3;
   uint64 deal_id = 4;
