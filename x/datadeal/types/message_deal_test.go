@@ -96,7 +96,6 @@ func TestMsgSubmitConsentValidateBasic(t *testing.T) {
 			DealId: 1,
 			Certificate: &Certificate{
 				UnsignedCertificate: &UnsignedCertificate{
-					DataEndpoint:    "http://127.0.0.1/v1/data/dataHash",
 					UniqueId:        "uniqueID",
 					OracleAddress:   oracleAddress,
 					DealId:          1,
@@ -134,12 +133,6 @@ func TestMsgSubmitConsentValidateBasicEmptyValue(t *testing.T) {
 	require.ErrorContains(t, err, "unsignedCertificate is empty")
 
 	msg.Consent.Certificate.UnsignedCertificate = &UnsignedCertificate{}
-	err = msg.ValidateBasic()
-	require.ErrorIs(t, err, sdkerrors.ErrInvalidRequest)
-	require.ErrorContains(t, err, "failed to validation certificate")
-	require.ErrorContains(t, err, "dataEndpoint is empty")
-
-	msg.Consent.Certificate.UnsignedCertificate.DataEndpoint = "http://127.0.0.1/v1/data/dataHash"
 	err = msg.ValidateBasic()
 	require.ErrorIs(t, err, sdkerrors.ErrInvalidRequest)
 	require.ErrorContains(t, err, "failed to validation certificate")

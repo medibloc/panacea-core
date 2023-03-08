@@ -19,12 +19,11 @@ message Certificate {
 
 // UnsignedCertificate defines a certificate issued by an oracle as a result of data validation.
 message UnsignedCertificate {
-  string data_endpoint = 1;
-  string unique_id = 2;
-  string oracle_address = 3;
-  uint64 deal_id = 4;
-  string provider_address = 5;
-  string data_hash = 6;
+  string unique_id = 1;
+  string oracle_address = 2;
+  uint64 deal_id = 3;
+  string provider_address = 4;
+  string data_hash = 5;
 }
 
 // Agreement represents whether the data provider, submitting the consent, agrees to a specific agreement term.

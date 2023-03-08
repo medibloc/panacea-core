@@ -70,7 +70,6 @@ func (suite *genesisTestSuite) TestInitGenesis() {
 	deal2 := suite.MakeTestDeal(2, suite.consumerAccAddr, 100)
 
 	unsignedCert1 := &types.UnsignedCertificate{
-		DataEndpoint:    "http://127.0.0.1/v1/data/dataHash",
 		UniqueId:        "uniqueID",
 		OracleAddress:   suite.oracleAccAddr.String(),
 		DealId:          1,
@@ -95,7 +94,6 @@ func (suite *genesisTestSuite) TestInitGenesis() {
 	}
 
 	unsignedCert2 := &types.UnsignedCertificate{
-		DataEndpoint:    "http://127.0.0.1/v1/data/dataHash",
 		UniqueId:        "uniqueID",
 		OracleAddress:   suite.oracleAccAddr.String(),
 		DealId:          2,
@@ -149,7 +147,6 @@ func (suite *genesisTestSuite) TestExportGenesis() {
 	deal2 := suite.MakeTestDeal(2, suite.consumerAccAddr, 100)
 
 	unsignedCert1 := &types.UnsignedCertificate{
-		DataEndpoint:    "http://127.0.0.1/v1/data/dataHash",
 		UniqueId:        "uniqueID",
 		OracleAddress:   suite.oracleAccAddr.String(),
 		DealId:          1,
@@ -188,7 +185,6 @@ func (suite *genesisTestSuite) TestExportGenesis() {
 	}
 
 	unsignedCert2 := &types.UnsignedCertificate{
-		DataEndpoint:    "http://127.0.0.1/v1/data/dataHash",
 		UniqueId:        "uniqueID",
 		OracleAddress:   suite.oracleAccAddr.String(),
 		DealId:          2,
