@@ -55,7 +55,7 @@ Data consumers can publish deals publicly, specifying 1) which data they want to
 Data providers (holders) who agree to provide their data with the data consumers can provide their data securely and earn MED as rewards.
 
 This on-chain data exchange coordination must work with some off-chain components to verify data validity/integrity and to deliver data securely.
-For example, some malicious data providers ccould try to sell data that the data consumers don't want or that was forged by themselves (not by trusted issuers).
+For example, some malicious data providers could try to sell data that the data consumers don't want or that was forged by themselves (not by trusted issuers).
 Therefore, data should be validated by off-chain data validators before being delivered to data consumers, as described in the [Data Exchange Validation](#data-exchange-validation-with-confidential-computing) section.
 
 
