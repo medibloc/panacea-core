@@ -6,9 +6,6 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/CosmWasm/wasmd/x/wasm"
-	"github.com/prometheus/client_golang/prometheus"
-
 	"github.com/cosmos/cosmos-sdk/snapshots"
 	"github.com/medibloc/panacea-core/v2/app/params"
 
@@ -37,8 +34,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/crisis"
 	genutilcli "github.com/cosmos/cosmos-sdk/x/genutil/client/cli"
 	"github.com/medibloc/panacea-core/v2/app"
-
-	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
 )
 
 var ChainID string
@@ -112,7 +107,6 @@ func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
 		tmcli.NewCompletionCmd(rootCmd, true),
 		debug.Cmd(),
 		// this line is used by starport scaffolding # stargate/root/commands
-		AddGenesisWasmMsgCmd(app.DefaultNodeHome),
 		AddGenesisOracleCmd(app.DefaultNodeHome),
 		EncryptDataCmd(app.DefaultNodeHome),
 		DecryptDataCmd(app.DefaultNodeHome),
@@ -133,7 +127,6 @@ func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
 
 func addModuleInitFlags(startCmd *cobra.Command) {
 	crisis.AddModuleInitFlags(startCmd)
-	wasm.AddModuleInitFlags(startCmd)
 }
 
 func queryCommand() *cobra.Command {
@@ -220,11 +213,6 @@ func (a appCreator) newApp(logger log.Logger, db dbm.DB, traceStore io.Writer, a
 		panic(err)
 	}
 
-	var wasmOpts []wasm.Option
-	if cast.ToBool(appOpts.Get("telemetry.enabled")) {
-		wasmOpts = append(wasmOpts, wasmkeeper.WithVMCacheMetrics(prometheus.DefaultRegisterer))
-	}
-
 	return app.New(
 		logger, db, traceStore, true, skipUpgradeHeights,
 		cast.ToString(appOpts.Get(flags.FlagHome)),
@@ -232,8 +220,6 @@ func (a appCreator) newApp(logger log.Logger, db dbm.DB, traceStore io.Writer, a
 		a.encCfg,
 		// this line is used by starport scaffolding # stargate/root/appArgument
 		appOpts,
-		wasmOpts,
-		app.GetEnabledWasmProposals(),
 		baseapp.SetPruning(pruningOpts),
 		baseapp.SetMinGasPrices(cast.ToString(appOpts.Get(server.FlagMinGasPrices))),
 		baseapp.SetMinRetainBlocks(cast.ToUint64(appOpts.Get(server.FlagMinRetainBlocks))),
@@ -260,8 +246,6 @@ func (a appCreator) appExport(
 		return servertypes.ExportedApp{}, errors.New("application home not set")
 	}
 
-	var emptyWasmOpts []wasm.Option
-
 	if height != -1 {
 		anApp = app.New(
 			logger,
@@ -274,8 +258,6 @@ func (a appCreator) appExport(
 			a.encCfg,
 			// this line is used by starport scaffolding # stargate/root/exportArgument
 			appOpts,
-			emptyWasmOpts,
-			app.GetEnabledWasmProposals(),
 		)
 
 		if err := anApp.LoadHeight(height); err != nil {
@@ -293,8 +275,6 @@ func (a appCreator) appExport(
 			a.encCfg,
 			// this line is used by starport scaffolding # stargate/root/noHeightExportArgument
 			appOpts,
-			emptyWasmOpts,
-			app.GetEnabledWasmProposals(),
 		)
 	}
 

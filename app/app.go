@@ -6,16 +6,12 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-	"strings"
 
 	"github.com/cosmos/cosmos-sdk/x/authz"
 	"github.com/medibloc/panacea-core/v2/x/oracle"
 	oracleclient "github.com/medibloc/panacea-core/v2/x/oracle/client"
 	oraclekeeper "github.com/medibloc/panacea-core/v2/x/oracle/keeper"
 	oracletypes "github.com/medibloc/panacea-core/v2/x/oracle/types"
-
-	"github.com/CosmWasm/wasmd/x/wasm"
-	wasmclient "github.com/CosmWasm/wasmd/x/wasm/client"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec/types"
@@ -103,10 +99,8 @@ import (
 	ibchost "github.com/cosmos/ibc-go/v4/modules/core/24-host"
 	ibckeeper "github.com/cosmos/ibc-go/v4/modules/core/keeper"
 	appparams "github.com/medibloc/panacea-core/v2/app/params"
-	tmjson "github.com/tendermint/tendermint/libs/json"
-	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
-
 	_ "github.com/medibloc/panacea-core/v2/client/docs/statik"
+	tmjson "github.com/tendermint/tendermint/libs/json"
 
 	"github.com/medibloc/panacea-core/v2/x/aol"
 	aolkeeper "github.com/medibloc/panacea-core/v2/x/aol/keeper"
@@ -125,34 +119,6 @@ import (
 
 const Name = "panacea"
 
-// We pull these out so we can set them with LDFLAGS in the Makefile
-var (
-	// If EnabledSpecificWasmProposals is "", and this is "true", then enable all x/wasm proposals.
-	// If EnabledSpecificWasmProposals is "", and this is not "true", then disable all x/wasm proposals.
-	WasmProposalsEnabled = "false"
-	// If set to non-empty string it must be comma-separated list of values that are all a subset
-	// of "wasm.EnableAllProposals" (takes precedence over WasmProposalsEnabled)
-	// https://github.com/CosmWasm/wasmd/blob/02a54d33ff2c064f3539ae12d75d027d9c665f05/x/wasm/internal/types/proposal.go#L28-L34
-	EnableSpecificWasmProposals = ""
-)
-
-// GetEnabledWasmProposals parses the WasmProposalsEnabled / EnableSpecificWasmProposals values to
-// produce a list of enabled proposals to pass into panacead app.
-func GetEnabledWasmProposals() []wasm.ProposalType {
-	if EnableSpecificWasmProposals == "" {
-		if WasmProposalsEnabled == "true" {
-			return wasm.EnableAllProposals
-		}
-		return wasm.DisableAllProposals
-	}
-	chunks := strings.Split(EnableSpecificWasmProposals, ",")
-	proposals, err := wasm.ConvertToProposals(chunks)
-	if err != nil {
-		panic(err)
-	}
-	return proposals
-}
-
 func getGovProposalHandlers() []govclient.ProposalHandler {
 	var govProposalHandlers []govclient.ProposalHandler
 	// this line is used by starport scaffolding # stargate/app/govProposalHandlers
@@ -165,7 +131,6 @@ func getGovProposalHandlers() []govclient.ProposalHandler {
 		// this line is used by starport scaffolding # stargate/app/govProposalHandler
 		oracleclient.ProposalHandler,
 	)
-	govProposalHandlers = append(govProposalHandlers, wasmclient.ProposalHandlers...)
 
 	return govProposalHandlers
 }
@@ -198,7 +163,6 @@ var (
 		did.AppModuleBasic{},
 		burn.AppModuleBasic{},
 		oracle.AppModuleBasic{},
-		wasm.AppModuleBasic{},
 		feegrantmodule.AppModuleBasic{},
 		authzmodule.AppModuleBasic{},
 		datadeal.AppModuleBasic{},
@@ -213,7 +177,6 @@ var (
 		stakingtypes.NotBondedPoolName: {authtypes.Burner, authtypes.Staking},
 		govtypes.ModuleName:            {authtypes.Burner},
 		ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
-		wasm.ModuleName:                {authtypes.Burner},
 		burntypes.ModuleName:           {authtypes.Burner},
 	}
 )
@@ -270,12 +233,10 @@ type App struct {
 	// make scoped keepers public for test purposes
 	ScopedIBCKeeper      capabilitykeeper.ScopedKeeper
 	ScopedTransferKeeper capabilitykeeper.ScopedKeeper
-	ScopedWasmKeeper     capabilitykeeper.ScopedKeeper
 
 	aolKeeper      aolkeeper.Keeper
 	didKeeper      didkeeper.Keeper
 	burnKeeper     burnkeeper.Keeper
-	wasmKeeper     wasm.Keeper
 	oracleKeeper   oraclekeeper.Keeper
 	datadealKeeper datadealkeeper.Keeper
 
@@ -290,7 +251,7 @@ type App struct {
 func New(
 	logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bool, skipUpgradeHeights map[int64]bool,
 	homePath string, invCheckPeriod uint, encodingConfig appparams.EncodingConfig,
-	appOpts servertypes.AppOptions, wasmOpts []wasm.Option, enabledWasmProposals []wasm.ProposalType, baseAppOptions ...func(*baseapp.BaseApp),
+	appOpts servertypes.AppOptions, baseAppOptions ...func(*baseapp.BaseApp),
 ) *App {
 
 	appCodec := encodingConfig.Marshaler
@@ -321,7 +282,6 @@ func New(
 		didtypes.StoreKey,
 		burntypes.StoreKey,
 		oracletypes.StoreKey,
-		wasm.StoreKey,
 		feegrant.StoreKey,
 		datadealtypes.StoreKey,
 	)
@@ -350,7 +310,6 @@ func New(
 	// grant capabilities for the ibc and ibc-transfer modules
 	scopedIBCKeeper := app.CapabilityKeeper.ScopeToModule(ibchost.ModuleName)
 	scopedTransferKeeper := app.CapabilityKeeper.ScopeToModule(ibctransfertypes.ModuleName)
-	scopedWasmKeeper := app.CapabilityKeeper.ScopeToModule(wasm.ModuleName)
 
 	// add keepers
 	app.AccountKeeper = authkeeper.NewAccountKeeper(
@@ -453,38 +412,6 @@ func New(
 		app.oracleKeeper,
 	)
 
-	wasmDir := filepath.Join(homePath, wasm.ModuleName)
-	wasmConfig, err := wasm.ReadWasmConfig(appOpts)
-	if err != nil {
-		panic("failed to read wasm config: " + err.Error())
-	}
-
-	supportedFeatures := "staking,stargate"
-	app.wasmKeeper = wasm.NewKeeper(
-		appCodec,
-		keys[wasm.StoreKey],
-		app.GetSubspace(wasm.ModuleName),
-		app.AccountKeeper,
-		app.BankKeeper,
-		app.StakingKeeper,
-		app.DistrKeeper,
-		app.IBCKeeper.ChannelKeeper,
-		&app.IBCKeeper.PortKeeper,
-		scopedWasmKeeper,
-		app.TransferKeeper,
-		app.MsgServiceRouter(),
-		app.GRPCQueryRouter(),
-		wasmDir,
-		wasmConfig,
-		supportedFeatures,
-		wasmOpts...,
-	)
-
-	// The gov proposal types can be individually enabled
-	if len(enabledWasmProposals) != 0 {
-		govRouter.AddRoute(wasm.RouterKey, wasm.NewWasmProposalHandler(app.wasmKeeper, enabledWasmProposals))
-	}
-
 	app.GovKeeper = govkeeper.NewKeeper(
 		appCodec, keys[govtypes.StoreKey], app.GetSubspace(govtypes.ModuleName), app.AccountKeeper, app.BankKeeper,
 		&stakingKeeper, govRouter,
@@ -493,7 +420,7 @@ func New(
 	// Create static IBC router, add transfer route, then set and seal it
 	ibcRouter := porttypes.NewRouter()
 	ibcRouter.AddRoute(ibctransfertypes.ModuleName, transfer.NewIBCModule(app.TransferKeeper))
-	ibcRouter.AddRoute(wasm.ModuleName, wasm.NewIBCHandler(app.wasmKeeper, app.IBCKeeper.ChannelKeeper, app.IBCKeeper.ChannelKeeper))
+
 	// this line is used by starport scaffolding # ibc/app/router
 	app.IBCKeeper.SetRouter(ibcRouter)
 
@@ -532,7 +459,6 @@ func New(
 		did.NewAppModule(appCodec, app.didKeeper),
 		burn.NewAppModule(appCodec, app.burnKeeper),
 		oracle.NewAppModule(appCodec, app.oracleKeeper),
-		wasm.NewAppModule(appCodec, &app.wasmKeeper, app.StakingKeeper, app.AccountKeeper, app.BankKeeper),
 		datadeal.NewAppModule(appCodec, app.datadealKeeper),
 	)
 
@@ -558,7 +484,6 @@ func New(
 		aoltypes.ModuleName,
 		didtypes.ModuleName,
 		oracletypes.ModuleName,
-		wasm.ModuleName,
 		banktypes.ModuleName,
 		crisistypes.ModuleName,
 		burntypes.ModuleName,
@@ -588,7 +513,6 @@ func New(
 		ibctransfertypes.ModuleName,
 		aoltypes.ModuleName,
 		oracletypes.ModuleName,
-		wasm.ModuleName,
 		paramstypes.ModuleName,
 		authz.ModuleName,
 		datadealtypes.ModuleName,
@@ -618,7 +542,6 @@ func New(
 		didtypes.ModuleName,
 		burntypes.ModuleName,
 		oracletypes.ModuleName,
-		wasm.ModuleName,
 		paramstypes.ModuleName,
 		upgradetypes.ModuleName,
 		vestingtypes.ModuleName,
@@ -648,9 +571,7 @@ func New(
 				SignModeHandler: encodingConfig.TxConfig.SignModeHandler(),
 				SigGasConsumer:  ante.DefaultSigVerificationGasConsumer,
 			},
-			IBCKeeper:         app.IBCKeeper,
-			WasmConfig:        &wasmConfig,
-			TXCounterStoreKey: keys[wasm.StoreKey],
+			IBCKeeper: app.IBCKeeper,
 		},
 	)
 	if err != nil {
@@ -675,18 +596,12 @@ func New(
 		// that in-memory capabilities get regenerated on app restart.
 		// Note that since this reads from the store, we can only perform it when
 		// `loadLatest` is set to true.
-		ctx := app.BaseApp.NewUncachedContext(true, tmproto.Header{})
 		app.CapabilityKeeper.Seal()
 
-		// Initialize pinned codes in wasmvm as they are not persisted there
-		if err := app.wasmKeeper.InitializePinnedCodes(ctx); err != nil {
-			panic(err)
-		}
 	}
 
 	app.ScopedIBCKeeper = scopedIBCKeeper
 	app.ScopedTransferKeeper = scopedTransferKeeper
-	app.ScopedWasmKeeper = scopedWasmKeeper
 
 	return app
 }
@@ -852,7 +767,6 @@ func initParamsKeeper(appCodec codec.Codec, legacyAmino *codec.LegacyAmino, key,
 	paramsKeeper.Subspace(didtypes.ModuleName)
 	paramsKeeper.Subspace(burntypes.ModuleName)
 	paramsKeeper.Subspace(oracletypes.ModuleName)
-	paramsKeeper.Subspace(wasm.ModuleName)
 	paramsKeeper.Subspace(datadealtypes.ModuleName)
 
 	return paramsKeeper
@@ -890,6 +804,13 @@ func (app *App) registerUpgradeHandlers() error {
 
 		app.IBCKeeper.ConnectionKeeper.SetParams(ctx, ibcconnectiontypes.DefaultParams())
 
+		return app.mm.RunMigrations(ctx, app.configurator, fromVM)
+	})
+
+	app.UpgradeKeeper.SetUpgradeHandler("v2.0.6", func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
+
+		// transfer module consensus version has been bumped to 2
+		// https://ibc.cosmos.network/main/migrations/v3-to-v4.html#migration-to-fix-support-for-base-denoms-with-slashes
 		return app.mm.RunMigrations(ctx, app.configurator, fromVM)
 	})
 
@@ -932,6 +853,15 @@ func (app *App) registerUpgradeHandlers() error {
 		storeUpgrades := storetypes.StoreUpgrades{
 			Added:   []string{"authz", "feegrant"},
 			Deleted: []string{"token"},
+		}
+
+		// configure store loader that checks if version == upgradeHeight and applies store upgrades
+		app.SetStoreLoader(upgradetypes.UpgradeStoreLoader(upgradeInfo.Height, &storeUpgrades))
+	}
+
+	if upgradeInfo.Name == "v2.0.6" && !app.UpgradeKeeper.IsSkipHeight(upgradeInfo.Height) {
+		storeUpgrades := storetypes.StoreUpgrades{
+			Deleted: []string{"wasm"},
 		}
 
 		// configure store loader that checks if version == upgradeHeight and applies store upgrades
