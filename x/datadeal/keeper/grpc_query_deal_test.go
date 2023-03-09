@@ -68,7 +68,6 @@ func (suite *queryDealTestSuite) TestQueryConsent() {
 		DealId: 1,
 		Certificate: &types.Certificate{
 			UnsignedCertificate: &types.UnsignedCertificate{
-				Cid:             "cid1",
 				OracleAddress:   suite.oracleAccAddr.String(),
 				DealId:          1,
 				ProviderAddress: suite.providerAccAddr.String(),
@@ -97,7 +96,6 @@ func (suite *queryDealTestSuite) TestQueryConsents() {
 		DealId: 1,
 		Certificate: &types.Certificate{
 			UnsignedCertificate: &types.UnsignedCertificate{
-				Cid:             "cid1",
 				OracleAddress:   suite.oracleAccAddr.String(),
 				DealId:          1,
 				ProviderAddress: suite.providerAccAddr.String(),
@@ -115,7 +113,6 @@ func (suite *queryDealTestSuite) TestQueryConsents() {
 		DealId: 1,
 		Certificate: &types.Certificate{
 			UnsignedCertificate: &types.UnsignedCertificate{
-				Cid:             "cid2",
 				OracleAddress:   suite.oracleAccAddr.String(),
 				DealId:          1,
 				ProviderAddress: suite.providerAccAddr.String(),
@@ -132,7 +129,6 @@ func (suite *queryDealTestSuite) TestQueryConsents() {
 		DealId: 1,
 		Certificate: &types.Certificate{
 			UnsignedCertificate: &types.UnsignedCertificate{
-				Cid:             "cid2",
 				OracleAddress:   suite.oracleAccAddr.String(),
 				DealId:          2,
 				ProviderAddress: suite.providerAccAddr.String(),

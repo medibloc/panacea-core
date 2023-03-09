@@ -141,7 +141,6 @@ func (suite *consentTestSuite) TestSubmitConsentSuccess() {
 	suite.storeSampleOracle(suite.oracleAccAddr.String(), suite.uniqueID, oracleCommissionRate)
 
 	unsignedCert := &types.UnsignedCertificate{
-		Cid:             "cid",
 		UniqueId:        suite.uniqueID,
 		OracleAddress:   suite.oracleAccAddr.String(),
 		DealId:          dealID,
@@ -206,7 +205,6 @@ func (suite *consentTestSuite) TestSubmitConsentChangeStatusComplete() {
 	suite.storeSampleOracle(suite.oracleAccAddr.String(), suite.uniqueID, oracleCommissionRate)
 
 	unsignedCert := &types.UnsignedCertificate{
-		Cid:             "cid",
 		UniqueId:        suite.uniqueID,
 		OracleAddress:   suite.oracleAccAddr.String(),
 		DealId:          dealID,
@@ -267,7 +265,6 @@ func (suite *consentTestSuite) TestSubmitConsentNotRegisteredOracle() {
 	suite.Require().NoError(err)
 
 	unsignedCert := &types.UnsignedCertificate{
-		Cid:             "cid",
 		UniqueId:        suite.uniqueID,
 		OracleAddress:   suite.providerAccAddr.String(),
 		DealId:          dealID,
@@ -305,7 +302,6 @@ func (suite *consentTestSuite) TestSubmitConsentNotSameUniqueIDOfOracle() {
 	suite.storeSampleOracle(suite.oracleAccAddr.String(), "invalidUniqueID", oracleCommissionRate)
 
 	unsignedCert := &types.UnsignedCertificate{
-		Cid:             "cid",
 		UniqueId:        suite.uniqueID,
 		OracleAddress:   suite.oracleAccAddr.String(),
 		DealId:          dealID,
@@ -343,7 +339,6 @@ func (suite *consentTestSuite) TestSubmitConsentInvalidSignature() {
 	suite.storeSampleOracle(suite.oracleAccAddr.String(), suite.uniqueID, oracleCommissionRate)
 
 	unsignedCert := &types.UnsignedCertificate{
-		Cid:             "cid",
 		UniqueId:        suite.uniqueID,
 		OracleAddress:   suite.oracleAccAddr.String(),
 		DealId:          dealID,
@@ -376,7 +371,6 @@ func (suite *consentTestSuite) TestSubmitConsentNotExistDeal() {
 	suite.storeSampleOracle(suite.oracleAccAddr.String(), suite.uniqueID, oracleCommissionRate)
 
 	unsignedCert := &types.UnsignedCertificate{
-		Cid:             "cid",
 		UniqueId:        suite.uniqueID,
 		OracleAddress:   suite.oracleAccAddr.String(),
 		DealId:          1,
@@ -409,7 +403,6 @@ func (suite *consentTestSuite) TestSubmitConsentAlreadyDealStatusComplete() {
 	suite.Require().NoError(err)
 
 	unsignedCert := &types.UnsignedCertificate{
-		Cid:             "cid",
 		UniqueId:        suite.uniqueID,
 		OracleAddress:   suite.oracleAccAddr.String(),
 		DealId:          deal.Id,
@@ -444,7 +437,6 @@ func (suite *consentTestSuite) TestSubmitConsentExistSameCertificate() {
 	suite.Require().NoError(err)
 
 	unsignedCert := &types.UnsignedCertificate{
-		Cid:             "cid",
 		UniqueId:        suite.uniqueID,
 		OracleAddress:   suite.oracleAccAddr.String(),
 		DealId:          deal.Id,
@@ -483,7 +475,6 @@ func (suite *consentTestSuite) TestSubmitConsentNotSameUniqueIDOfCertificate() {
 
 	invalidUniqueID := "invalidUniqueID"
 	unsignedCert := &types.UnsignedCertificate{
-		Cid:             "cid",
 		UniqueId:        invalidUniqueID,
 		OracleAddress:   suite.oracleAccAddr.String(),
 		DealId:          dealID,
@@ -559,7 +550,6 @@ func (suite *consentTestSuite) TestSubmitConsentWithInvalidAgreements() {
 	suite.storeSampleOracle(suite.oracleAccAddr.String(), suite.uniqueID, oracleCommissionRate)
 
 	unsignedCert := &types.UnsignedCertificate{
-		Cid:             "cid",
 		UniqueId:        suite.uniqueID,
 		OracleAddress:   suite.oracleAccAddr.String(),
 		DealId:          dealID,

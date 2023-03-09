@@ -16,16 +16,17 @@ func NewDeal(dealID uint64, msg *MsgCreateDeal) *Deal {
 	dealAddress := NewDealAddress(dealID)
 
 	return &Deal{
-		Id:                     dealID,
-		Address:                dealAddress.String(),
-		DataSchema:             msg.DataSchema,
-		Budget:                 msg.Budget,
-		MaxNumData:             msg.MaxNumData,
-		CurNumData:             0,
-		ConsumerAddress:        msg.ConsumerAddress,
-		AgreementTerms:         msg.AgreementTerms,
-		Status:                 DEAL_STATUS_ACTIVE,
-		PresentationDefinition: msg.PresentationDefinition,
+		Id:                      dealID,
+		Address:                 dealAddress.String(),
+		DataSchema:              msg.DataSchema,
+		Budget:                  msg.Budget,
+		MaxNumData:              msg.MaxNumData,
+		CurNumData:              0,
+		ConsumerAddress:         msg.ConsumerAddress,
+		AgreementTerms:          msg.AgreementTerms,
+		Status:                  DEAL_STATUS_ACTIVE,
+		PresentationDefinition:  msg.PresentationDefinition,
+		ConsumerServiceEndpoint: msg.ConsumerServiceEndpoint,
 	}
 }
 
@@ -68,6 +69,10 @@ func (m *Deal) ValidateBasic() error {
 		if err := agreementTerm.ValidateBasic(); err != nil {
 			return sdkerrors.Wrapf(err, "invalid agreement term")
 		}
+	}
+
+	if len(m.ConsumerServiceEndpoint) == 0 {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "consumer service endpoint is empty")
 	}
 
 	return nil

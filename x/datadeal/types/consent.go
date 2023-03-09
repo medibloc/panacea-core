@@ -30,9 +30,6 @@ func (m *Consent) ValidateBasic() error {
 }
 
 func (m *UnsignedCertificate) ValidateBasic() error {
-	if len(m.Cid) == 0 {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "cid is empty")
-	}
 
 	if len(m.UniqueId) == 0 {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "uniqueId is empty")

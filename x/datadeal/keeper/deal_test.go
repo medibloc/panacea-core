@@ -99,6 +99,7 @@ func (suite *dealTestSuite) TestCreateNewDeal() {
 				Description: "description",
 			},
 		},
+		ConsumerServiceEndpoint: "http://127.0.0.1/v1/data",
 	}
 
 	dealID, err := suite.DataDealKeeper.CreateDeal(suite.Ctx, msgCreateDeal)
@@ -152,7 +153,8 @@ func (suite *dealTestSuite) TestCreateDealInvalidPD() {
 				Description: "description",
 			},
 		},
-		PresentationDefinition: invalidPDBz,
+		PresentationDefinition:  invalidPDBz,
+		ConsumerServiceEndpoint: "http://127.0.0.1/v1/data",
 	}
 
 	err = msgCreateDeal.ValidateBasic()
@@ -178,7 +180,8 @@ func (suite *dealTestSuite) TestCreateDealBothSchemaAndPD() {
 				Description: "description",
 			},
 		},
-		PresentationDefinition: suite.pdBz,
+		PresentationDefinition:  suite.pdBz,
+		ConsumerServiceEndpoint: "http://127.0.0.1/v1/data",
 	}
 
 	err = msgCreateDeal.ValidateBasic()
