@@ -27,6 +27,7 @@ message MsgCreateDeal {
   string consumer_address = 4;
   repeated AgreementTerm agreement_terms = 5;
   bytes presentation_definition = 6;
+  string consumer_service_endpoint =7;
 }
 
 // MsgCreateDealResponse defines the Msg/CreateDeal response type.
