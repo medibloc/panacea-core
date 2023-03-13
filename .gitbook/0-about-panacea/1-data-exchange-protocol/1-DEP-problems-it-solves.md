@@ -2,36 +2,50 @@
 
 DEP seeks to address the problems of decentralized data delivery that allows for data validation while ensuring data privacy:
 
-- Data privacy
-- Data validation
-- Incentive
-- Decentralization
-- Scalability
+- [Data privacy](#data-privacy)
+- [Data validation](#data-validation)
+- [Incentive](#incentive)
+- [Decentralization](#decentralization)
+- [Scalability](#scalability)
 
 ## Data privacy
+
+Since DEP is targeting sensitive data, the privacy of the data must be ensured throughout all data transfers. 
+It is essential that no data is exposed in the process of data delivery.
 
 DEP uses data encryption in all data delivery processes to ensure the privacy of sensitive data. 
 Symmetric and asymmetric key encryption is utilized to ensure that the privacy of data during all data delivery processes.
 
-## Data Validation
+## Data validation
 
-As a data consumer, it is essential to verify that the data you receive is the right data.
-DEP provides a way to verify data by utilizing oracle running in an enclave environment, did-based verifiable credentials, and verifiable presentation.
+As a data consumer, it is important to validate that the data you receive is the right data.
+The data must be truthful, uncorrupted, and conform to the requirements the consumer propose.
+
+DEP provides a way to verify data by utilizing oracle running in an enclave environment, did-based verifiable presentation.
 
 ## Incentive
 
-By providing data, the data provider can be rewarded with an incentive offered by the data consumer. 
-In this case, the delivery of data and the incentive must be processed atomically and simultaneously. 
-DEP ensures this through the panacea blockchain Tx.
+By providing data, the data provider can be guaranteed with an incentive offered by the data consumer. 
+In this case, the delivery of data and the paying incentive must be processed atomically and simultaneously. 
+
+DEP ensures this through the panacea blockchain Tx and data encryption.
 
 ## Decentralization
 
+DEP aims to be a decentralized protocol with no centralized data validator and deliverer.
+
 The DEP components, panacea blockchain and oracle, are open decentralized ecosystem where everyone can participate.
-Oracle, which plays a central role in data verification, can be run in the enclave environment by anyone and can participate through the oracle registration process.
-As a data verifier in the ecosystem, oracle can also get a certain percentage of incentives, so a healthy ecosystem can be organized.
 
 ## Scalability
 
-The DEP has a scalable structure that allows the validation process to be divided among the oracles as the number of operating oracles increases.
-Since oracles play a direct role in data validation and are not involved in blockchain consensus, the number of oracles can improve overall DEP performance.
+The DEP aims to have a scalable structure for oracle, which plays a key role in data validation.
+Since oracle plays a role in data validation, if the oracle structure is not scalable, it can be fatal to the overall DEP performance.
 
+The DEP has designed the ecosystem in such a way that as the number of oracles increases, data validation request can be divided into multiple oracles.
+This ensures that as the number of oracles increases, the overall performance of the DEP increases.
+
+## Further Reading
+
+- To learn more about how DEP works, see [How DEP works](2-How-DEP-works.md).
+- For more detailed specification of DEP, see [DEP specifications](../../3-protocol-devs/1-dep-specs/0-overview.md).
+- For more information about Oracle, see the [Operate Oracle Nodes](../../5-oracles/1-operate-oracle-nodes/0-overview.md).
