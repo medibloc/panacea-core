@@ -18,7 +18,7 @@ Symmetric and asymmetric key encryption is utilized to ensure that the privacy o
 
 ## Data validation
 
-As a data consumer, it is important to validate that the data you receive is the right data.
+As data consumers, it is crucial to validate that the data they receive is correct.
 The data must be truthful, uncorrupted, and conform to the requirements the consumer propose.
 
 DEP provides a way to verify data by utilizing oracle running in an enclave environment, did-based verifiable presentation.
