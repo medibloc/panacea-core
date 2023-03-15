@@ -52,11 +52,11 @@ You(data consumer) must run a `consumer service` to receive and store encrypted 
 The `consumer service` must be able to handle HTTP POST request like below:
 ```bash
 curl -v -X POST -H "Authorization: Bearer ${jwt}" \
-  "${consumer-service-endpoint}v0/deals/${dealId}/data/${dataHash}
+  "${consumer-service-endpoint}/v0/deals/${dealId}/data/${dataHash}
 ```
 After completing the incentive payment, you can get the encrypted data from the `consumer service` and proceed with the [Access data](#access-data) process.
 
-For more details about `consumer service`, please see the [Data Delivery](../../3-protocol-devs/1-dep-specs/5-data-delivery.md) specification.
+For more details about `consumer service`, please see the [Consumer Service](../../3-protocol-devs/1-dep-specs/5-consumer-service.md) specification.
 
 ## Query deals
 
