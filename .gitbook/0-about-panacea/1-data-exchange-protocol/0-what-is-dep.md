@@ -4,21 +4,21 @@
 
 DEP is a protocol for delivering sensitive data in a decentralized way while considering the privacy of the data.
 In order to deliver sensitive data (e.g., medical data) in a decentralized environment, 
-encryption of the data becomes essential, and as a trade-off, it makes difficult to verify the data is valid or not.
+data encryption is essential, and as a trade-off, it makes difficult to verify whether the data is valid or not.
 DEP goes beyond these limitations and aims for a protocol that allows sensitive data to be delivered securely and validation of the data.
 
 With DEP, data consumers can specify the type of data they want in a deal, 
-and data providers can be guaranteed that their data delivered securely with data privacy. 
-With DEP, data providers can take ownership of their data and receive the right compensation,
+and data providers can be guaranteed that their data is delivered securely with data privacy. 
+With DEP, data providers can take ownership of their data and receive the proper compensation,
 while data consumers can gain access to sensitive data that would otherwise be difficult to collect 
 and utilize for various research or business purposes.
 
 ## DEP Component
-The DEP ecosystem consists of consumer, provider, panacea blockchain, and oracle as components.
+The DEP ecosystem consists of consumer, provider, Panacea blockchain, and oracle as components.
 
 ### Data Consumer
 A data consumer is an individual or an organization who wants to consume certain kinds of data for specific purposes, with or without paying.
-The consumer creates a deal that specifies the terms of the data they want to get and reward the provider who delivers the data they want.
+The consumer creates a deal that specifies the terms of the data they want to get and rewards the provider who delivers the data they want.
 
 ### Data Provider
 A data provider is an individual or an organization that holds data and a permission to provide data to data consumers to obtain benefits, such as incentives or services.

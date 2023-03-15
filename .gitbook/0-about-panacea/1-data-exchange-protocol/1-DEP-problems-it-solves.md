@@ -1,7 +1,8 @@
 # DEP and the problems it solves
 
-DEP seeks to address the problems of decentralized data delivery that allows for data validation while ensuring data privacy:
+DEP seeks to address the problems of decentralized data delivery that allows for data validation while ensuring data privacy.
 
+DEP aims to stay true to the five principles below:
 - [Data privacy](#data-privacy)
 - [Data validation](#data-validation)
 - [Incentive](#incentive)
@@ -11,30 +12,31 @@ DEP seeks to address the problems of decentralized data delivery that allows for
 ## Data privacy
 
 Since DEP is targeting sensitive data, the privacy of the data must be ensured throughout all data transfers. 
-It is essential that no data is exposed in the process of data delivery.
+No data must be exposed to anyone except promised data consumers during the data delivery.
 
-DEP uses data encryption in all data delivery processes to ensure the privacy of sensitive data. 
-Symmetric and asymmetric key encryption is utilized to ensure that the privacy of data during all data delivery processes.
+DEP uses data encryption in the whole data delivery process to ensure the privacy of sensitive data.
+[ECIES hybrid encryption](https://cryptobook.nakov.com/asymmetric-key-ciphers/ecies-public-key-encryption) is used to ensure data privacy during the entire data delivery process.
 
 ## Data validation
 
-As a data consumer, it is important to validate that the data you receive is the right data.
-The data must be truthful, uncorrupted, and conform to the requirements the consumer propose.
+As data consumers, it is crucial to validate that the data they receive is correct.
+The data must be truthful, untampered, and conform to the requirements the consumer specified.
 
-DEP provides a way to verify data by utilizing oracle running in an enclave environment, did-based verifiable presentation.
+DEP provides a way to verify data by utilizing oracle running in an secure enclave environment and DID-based verifiable presentation.
 
 ## Incentive
 
-By providing data, the data provider can be guaranteed with an incentive offered by the data consumer. 
-In this case, the delivery of data and the paying incentive must be processed atomically and simultaneously. 
+By providing data, the data provider can be guaranteed an incentive paid by the data consumer. 
+In this case, data delivery and payment must be processed atomically and simultaneously.
 
-DEP ensures this through the panacea blockchain Tx and data encryption.
+DEP ensures this through Panacea blockchain transactions and data encryption.
 
 ## Decentralization
 
-DEP aims to be a decentralized protocol with no centralized data validator and deliverer.
+DEP aims to be a decentralized protocol with no centralized mediator for data validation and delivery.
 
-The DEP components, panacea blockchain and oracle, are open decentralized ecosystem where everyone can participate.
+Anyone can participate in operating DEP components, such as Panacea blockchain and oracle. By the nature of the proof-of-stake blockchain, any party with less than 2/3 voting power cannot change the behavior of DEP, and anyone with less than 1/3 voting power cannot stop the protocol. Also, anyone can operate oracle nodes to improve the performance of DEP and earn incentives if they have appropriate hardware environments.
+The entire source code, protocol specifications, and discussions are open-sourced, so anyone can dive into details and participate in developments. Any protocol changes must go through governments to be deployed in production. 
 
 ## Scalability
 

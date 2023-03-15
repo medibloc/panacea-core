@@ -4,9 +4,9 @@
 
 * [Panacea Ecosystem](0-about-panacea/0-panacea-ecosystem.md)
 * Data Exchange Protocol
-  * What is DEP
-  * DEP and the problems it solves
-  * How DEP Works
+  * [What is DEP](0-about-panacea/1-data-exchange-protocol/0-what-is-dep.md)
+  * [DEP and the problems it solves](0-about-panacea/1-data-exchange-protocol/1-DEP-problems-it-solves.md)
+  * [How DEP Works](0-about-panacea/1-data-exchange-protocol/2-How-DEP-works.md)
 * [Roadmap](0-about-panacea/2-roadmap.md)
 
 ## For Users
