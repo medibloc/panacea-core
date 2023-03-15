@@ -14,7 +14,7 @@ while data consumers can gain access to sensitive data that would otherwise be d
 and utilize for various research or business purposes.
 
 ## DEP Component
-The DEP ecosystem consists of consumer, provider, panacea blockchain, and oracle as components.
+The DEP ecosystem consists of consumer, provider, Panacea blockchain, and oracle as components.
 
 ### Data Consumer
 A data consumer is an individual or an organization who wants to consume certain kinds of data for specific purposes, with or without paying.
