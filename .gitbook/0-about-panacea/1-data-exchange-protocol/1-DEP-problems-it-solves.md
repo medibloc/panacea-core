@@ -25,8 +25,8 @@ DEP provides a way to verify data by utilizing oracle running in an secure encla
 
 ## Incentive
 
-By providing data, the data provider can be guaranteed with an incentive offered by the data consumer. 
-In this case, the delivery of data and the paying incentive must be processed atomically and simultaneously. 
+By providing data, the data provider can be guaranteed an incentive paid by the data consumer. 
+In this case, data delivery and payment must be processed atomically and simultaneously.
 
 DEP ensures this through Panacea blockchain transactions and data encryption.
 
