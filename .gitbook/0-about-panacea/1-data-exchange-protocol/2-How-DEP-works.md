@@ -28,8 +28,8 @@ Therefore, it is impossible to leak the original data and data privacy is contin
 ### Data privacy between provider & consumer
 
 After completing the [Data Validation](../../3-protocol-devs/1-dep-specs/4-data-validation.md), oracle encrypts the data and provides this encrypted to the consumer.
-t this time, a symmetric key based on the oracle private key is generated, so the data cannot be decrypted until the consumer also receives this symmetric key.
-After the [Incentive Distribution](../../3-protocol-devs/1-dep-specs/6-incentives.md) process is completed, the consumer can request the symmetric key from the oracle.
+At this time, a symmetric key based on the oracle private key is generated, so the data cannot be decrypted until the consumer also receives this symmetric key.
+After the [Submit Consent](../../3-protocol-devs/1-dep-specs/3-data-provider-consent.md) and [Incentive Distribution](../../3-protocol-devs/1-dep-specs/6-incentives.md) process is completed, the consumer can request the symmetric key from the oracle.
 The oracle checks whether the incentive distribution process is completed from the panacea blockchain, and provides the secret key encrypted based on the consumer's public key.
 As a result, it is impossible for the provider to obtain the original data before the incentive is paid, and the secret key cannot be obtained except by the consumer.
 
@@ -37,7 +37,7 @@ As a result, it is impossible for the provider to obtain the original data befor
 
 Oracle validates the data after receiving encrypted data from the provider.
 After the basic deal status, data hash validation, oracle checks whether the data satisfies the requirements specified in the deal.
-here are two types of data requirements that can be specified in the deal (json schema validation, presentation definition validation).
+Here are two types of data requirements that can be specified in the deal (json schema validation, presentation definition validation).
 
 [Json schema](https://json-schema.org) validation checks whether the data satisfies the conditions for the schema definition.
 [Presentation definition](https://identity.foundation/presentation-exchange/#presentation-definition) validation checks that the data is in the form of a did-based verifiable presentation and satisfies the presentation definition.
@@ -45,8 +45,8 @@ This validation can additionally verify that the data was created from a verifia
 
 ## Atomic incentive distribution
 
-After receiving the certificate from oracle, the provider can get the incentive through [Incentive Distribution](../../3-protocol-devs/1-dep-specs/6-incentives.md) process.
-In this process, panacea blockchain checks the certificate information and immediately completes the incentive payment to the provider, and at the same time enables the consumer to obtain the secret key to decrypt the provided data.
+After submitting consent to Panacea, the provider can get the incentive through [Incentive Distribution](../../3-protocol-devs/1-dep-specs/6-incentives.md) process.
+In this process, panacea blockchain checks the consent information and immediately completes the incentive payment to the provider, and at the same time enables the consumer to obtain the secret key to decrypt the provided data.
 Thus, the provider is guaranteed to be rewarded for providing the data, and the consumer is guaranteed to access the data after completing the payment.
 
 ## Decentralization & Scalability
@@ -58,8 +58,8 @@ In addition, oracle can also participate through the oracle registration process
 Panacea blockchain validators can get block generation rewards by participating in the consensus, and oracle can get commissions as incentives are paid out.
 This reward system can make a healthy decentralized ecosystem.
 
-A provider or consumer can request to any registered oracle and receive the same result.
-Therefore, consumers and providers can choose one of several registered oracles to perform [Data Validation](../../3-protocol-devs/1-dep-specs/4-data-validation.md) and [Data Delivery](../../3-protocol-devs/1-dep-specs/5-data-delivery.md).
+Providers or consumers can be guaranteed to get the same response no matter which oracle they request.
+Therefore, consumers and providers can choose one of several registered oracles to perform [Data Validation](../../3-protocol-devs/1-dep-specs/4-data-validation.md).
 This DEP structure that allows the validation process to be divided into the oracles.
 As a result, data validation in oracle can be processed in parallel by multiple oracles and the overall performance of DEP improves as the number of oracles increases.
 
