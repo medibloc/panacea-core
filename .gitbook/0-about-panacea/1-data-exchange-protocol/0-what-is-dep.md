@@ -18,7 +18,7 @@ The DEP ecosystem consists of consumer, provider, Panacea blockchain, and oracle
 
 ### Data Consumer
 A data consumer is an individual or an organization who wants to consume certain kinds of data for specific purposes, with or without paying.
-The consumer creates a deal that specifies the terms of the data they want to get and reward the provider who delivers the data they want.
+The consumer creates a deal that specifies the terms of the data they want to get and rewards the provider who delivers the data they want.
 
 ### Data Provider
 A data provider is an individual or an organization that holds data and a permission to provide data to data consumers to obtain benefits, such as incentives or services.
