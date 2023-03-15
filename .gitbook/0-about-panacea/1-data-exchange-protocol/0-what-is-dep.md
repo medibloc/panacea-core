@@ -4,7 +4,7 @@
 
 DEP is a protocol for delivering sensitive data in a decentralized way while considering the privacy of the data.
 In order to deliver sensitive data (e.g., medical data) in a decentralized environment, 
-encryption of the data becomes essential, and as a trade-off, it makes difficult to verify the data is valid or not.
+data encryption is essential, and as a trade-off, it makes difficult to verify whether the data is valid or not.
 DEP goes beyond these limitations and aims for a protocol that allows sensitive data to be delivered securely and validation of the data.
 
 With DEP, data consumers can specify the type of data they want in a deal, 
