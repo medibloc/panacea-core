@@ -13,7 +13,7 @@ DEP seeks to address the problems of decentralized data delivery that allows for
 Since DEP is targeting sensitive data, the privacy of the data must be ensured throughout all data transfers. 
 No data must be exposed to anyone except promised data consumers during the data delivery.
 
-DEP uses data encryption in all data delivery processes to ensure the privacy of sensitive data. 
+DEP uses data encryption in the whole data delivery process to ensure the privacy of sensitive data. 
 Symmetric and asymmetric key encryption is utilized to ensure that the privacy of data during all data delivery processes.
 
 ## Data validation
