@@ -2,7 +2,7 @@
 
 - Status: Draft
 - Created: 2023-01-03
-- Modified: 2023-01-03
+- Modified: 2023-03-14
 - Authors
   - Youngjoon Lee <yjlee@medibloc.org>
   - Gyuguen Jang <gyuguen.jang@medibloc.org>
@@ -44,12 +44,14 @@ message Deal {
   uint64 id = 1;
   string address = 2;
   repeated string data_schema = 3;
-  cosmos.base.v1beta1.Coin budget = 4;
-  uint64 max_num_data = 5;
-  uint64 cur_num_data = 6;
-  string consumer_address = 7;
-  repeated AgreementTerm agreement_terms = 8;
-  DealStatus status = 9;
+  bytes presentation_definition = 4;
+  cosmos.base.v1beta1.Coin budget = 5;
+  uint64 max_num_data = 6;
+  uint64 cur_num_data = 7;
+  string consumer_address = 8;
+  repeated AgreementTerm agreement_terms = 9;
+  DealStatus status = 10;
+  string consumer_service_endpoint = 11;
 }
 
 message AgreementTerm {
@@ -63,6 +65,7 @@ message AgreementTerm {
 - `id`: Auto increment id
 - `address`: An address of deal generated when deal is created
 - `data_schema`: A list of URLs of desired data schema
+- `presentation_definition`: Objects that specify the conditions required for verifiable presentation
 - `budget`: A budget for consuming data
 - `max_num_data`: The maximum number of data the consumer want
 - `cur_num_data`: The current number of data provided
@@ -72,6 +75,7 @@ message AgreementTerm {
   - `DEAL_STATUS_ACTIVE`: The status when deal is active (`cur_num_data` < `max_num_data`).  
   - `DEAL_STATUS_INACTIVE`: The status when deal is deactivated (when consumer deactivated the deal)
   - `DEAL_STATUS_COMPLETED`: The status when deal is completed (`max_num_data` of data is provided)
+- `consumer_service_endpoint`: The URL of a consumer service that can serve as consumer data storage.
 
 ### Create Data Deal
 
@@ -84,6 +88,8 @@ message MsgCreateDeal {
   uint64 max_num_data = 3;
   string consumer_address = 4;
   repeated AgreementTerm agreement_terms = 5;
+  bytes presentation_definition = 6;
+  string consumer_service_endpoint =7;
 }
 ```
 
@@ -103,7 +109,7 @@ message MsgDeactivateDeal {
 }
 ```
 
-When a deal is deactivated, all ramining budget is refunded to the data consumer's account.
+When a deal is deactivated, all remaining budget is refunded to the data consumer's account.
 After the deal is deactivated, data providers cannot provide their data to this deal, and the status of the deal changes to `DEAL_STATUS_INACTIVE`.
 
 ## Backwards Compatibility
@@ -126,6 +132,7 @@ None at present.
 ## History
 
 - 2023-01-03: Initial draft finished
+- 2023-03-14: Add `presentation definition` and `consumer service endpoint` to deal
 
 ## Copyright
 

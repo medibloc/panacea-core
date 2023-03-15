@@ -2,7 +2,7 @@
 
 - Status: Draft
 - Crated: 2023-01-04
-- Modified: 2023-01-04
+- Modified: 2023-03-14
 - Authors
   - Youngjoon Lee <yjlee@medibloc.org>
   - Gyuguen Jang <gyuguen.jang@medibloc.org>
@@ -45,12 +45,11 @@ message Certificate {
 }
 
 message UnsignedCertificate {
-    string cid = 1;
-    string unique_id = 2;
-    string oracle_address = 3;
-    uint64 deal_id = 4;
-    string provider_address = 5;
-    string data_hash = 6;
+    string unique_id = 1;
+    string oracle_address = 2;
+    uint64 deal_id = 3;
+    string provider_address = 4;
+    string data_hash = 5;
 }
 ```
 
@@ -81,6 +80,8 @@ When this consent is submitted, blockchain will check:
 
 If all checks pass, rewards are distributed to the data provider and the oracle(more about [incentive](./6-incentives.md)).
 
+At the end of the process, certificate is stored in `Consent`, then the data consumer can gt the data decryption key from the oracle.
+
 ## Backwards Compatibility
 
 Not applicable.
@@ -100,6 +101,7 @@ None at present.
 ## History
 
 - 2023-01-04: Initial draft finished
+- 2023-03-14: Delete cid from UnsignedCertificate
 
 ## Copyright
 
