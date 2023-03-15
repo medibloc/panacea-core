@@ -28,7 +28,7 @@ DEP provides a way to verify data by utilizing oracle running in an secure encla
 By providing data, the data provider can be guaranteed with an incentive offered by the data consumer. 
 In this case, the delivery of data and the paying incentive must be processed atomically and simultaneously. 
 
-DEP ensures this through the panacea blockchain Tx and data encryption.
+DEP ensures this through Panacea blockchain transactions and data encryption.
 
 ## Decentralization
 
