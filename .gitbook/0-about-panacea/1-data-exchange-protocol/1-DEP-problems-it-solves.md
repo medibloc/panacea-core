@@ -32,7 +32,7 @@ DEP ensures this through Panacea blockchain transactions and data encryption.
 
 ## Decentralization
 
-DEP aims to be a decentralized protocol with no centralized data validator and deliverer.
+DEP aims to be a decentralized protocol with no centralized mediator for data validation and delivery.
 
 Anyone can participate in operating DEP components, such as Panacea blockchain and oracle. By the nature of the proof-of-stake blockchain, any party with less than 2/3 voting power cannot change the behavior of DEP, and anyone with less than 1/3 voting power cannot stop the protocol. Also, anyone can operate oracle nodes to improve the performance of DEP and earn incentives if they have appropriate hardware environments.
 The entire source code, protocol specifications, and discussions are open-sourced, so anyone can dive into details and participate in developments. Any protocol changes must go through governments to be deployed in production. 
