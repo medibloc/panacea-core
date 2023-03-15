@@ -9,7 +9,7 @@ DEP goes beyond these limitations and aims for a protocol that allows sensitive 
 
 With DEP, data consumers can specify the type of data they want in a deal, 
 and data providers can be guaranteed that their data is delivered securely with data privacy. 
-With DEP, data providers can take ownership of their data and receive the right compensation,
+With DEP, data providers can take ownership of their data and receive the proper compensation,
 while data consumers can gain access to sensitive data that would otherwise be difficult to collect 
 and utilize for various research or business purposes.
 
