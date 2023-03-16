@@ -19,8 +19,8 @@ This document describes the API specification, data verification, and certificat
 ### Motivation
 Data consumers can define their requirements.
 This requirement allows them to define the format of the data they want.
-DEP supports `JSON schema` and `Presentation Definition` to define these requirements.
-Oracle can verify the requirements of data consumers according to this specification.
+DEP supports `JSON schema` and `Presentation Definition` for data consumers to define these requirements.
+Oracle can verify data submitted by providers according to the requirements that data consumers defined.
 Oracle issues a certificate upon successful verification, which can be verified by Panacea.
 
 ### Definitions
