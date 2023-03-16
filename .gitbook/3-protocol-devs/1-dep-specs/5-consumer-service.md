@@ -44,7 +44,7 @@ POST /v0/deals/${dealId}/data/${dataHash}
 ```
 
 The JWT is signed by oracle using the oracle private key.
-The `consumer service` can use this JWT to authenticate that oracle sent the post request.
+The `consumer service` can use this JWT to authenticate that oracle sent the POST request.
 
 ## Backwards Compatibility
 
