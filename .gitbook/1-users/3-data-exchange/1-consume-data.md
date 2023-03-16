@@ -54,7 +54,7 @@ The `consumer service` must be able to handle HTTP POST request like below:
 curl -v -X POST -H "Authorization: Bearer ${jwt}" \
   "${consumer-service-endpoint}/v0/deals/${dealId}/data/${dataHash}
 ```
-After completing the incentive payment, you can get the encrypted data from the `consumer service` and proceed with the [Access data](#access-data) process.
+You can receive encrypted data from oracle via your consumer service, but the decryption key (so called `secret key`) can obtained from oracle only after the data provider submits consents to the Panacea blockchain and the incentive is paid to the provider completely.
 
 For more details about `consumer service`, please see the [Consumer Service](../../3-protocol-devs/1-dep-specs/5-consumer-service.md) specification.
 
