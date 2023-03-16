@@ -146,12 +146,15 @@ deal_id_bz = convertUint64ToBigEndian(deal_id)
 secret_key = SHA256(append(oracle_private_key, deal_id_bz, data_hash))
 ```
 
-After encrypting the data with the generated `secretKey`, store it to `consumer service`.
+After encrypting the data with the generated `secretKey`, send it to `consumer service` as HTTP POST request.
 
 ```
 encrypted_data = AES256GCM.Encrypt(secret_key, orginal_data)
-
-cid = IPFS.add(encrypted_data)
+```
+```bash
+curl -v -X POST -H "Authorization: Bearer ${jwt}" \
+  -d "@<encrypted-data-path>" \
+  "${consumer-service-endpoint}/v0/deals/${dealId}/data/${dataHash}
 ```
 
 
