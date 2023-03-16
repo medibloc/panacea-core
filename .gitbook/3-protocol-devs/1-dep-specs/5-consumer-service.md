@@ -20,8 +20,7 @@ This document describes consumer service.
 Data consumers should run an HTTP server to receive the encrypted data from oracle.
 When creating deals, data consumers must specify the endpoint of their server in the `consumer-service-endpoint` field.
 
-When the incentive payment to the data provider is completed, the data consumer can get the `secret key` to decrypt the stored data from the oracle. 
-Finally, the data consumer can get the original data with the data from the `consumer service` and the `secret key`.
+When the incentive is paid to the data provider completely, the data consumer can get the `secret key` to decrypt data received from the oracle.
 
 ### Definitions
 - `Data Provider`, `Data Consumer`, and `Oracle` are defined in [User Flow](./1-user-flow.md)
