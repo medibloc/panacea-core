@@ -119,7 +119,7 @@ If the Deal's status is invalid, oracle does not perform verification work.
 compare(deal.status, 'DEAL_STATUS_ACTIVE')
 ```
 
-Validate original data with `data_schema` or `presentation_definition` extracted from Deal.
+Validate original data with `data_schema` or `presentation_definition` specified in the deal.
 
 If the deal has `data_schema` information, then validate json schema as shown below.
 ```
