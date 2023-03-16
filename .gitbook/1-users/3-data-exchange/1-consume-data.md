@@ -52,6 +52,7 @@ You(data consumer) must run a `consumer service` to receive and store encrypted 
 The `consumer service` must be able to handle HTTP POST request like below:
 ```bash
 curl -v -X POST -H "Authorization: Bearer ${jwt}" \
+  -d "@<encrypted-data-path>" \
   "${consumer-service-endpoint}/v0/deals/${dealId}/data/${dataHash}
 ```
 You can receive encrypted data from oracle via your consumer service, but the decryption key (so called `secret key`) can obtained from oracle only after the data provider submits consents to the Panacea blockchain and the incentive is paid to the provider completely.
