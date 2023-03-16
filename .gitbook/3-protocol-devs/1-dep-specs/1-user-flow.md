@@ -57,7 +57,7 @@ A data consumer creates a data deal, specifying data schema, a budget in MED, th
 A data provider willing to provide data that meet the requirements desired by a data consumer should request a data validation to one of the verified oracles in the network.
 The oracle validates the validity and integrity of data based on the requirements specified by the data consumer in the data deal. 
 As a result of the data validation, the oracle issues a data validation certificate with a cryptographic signature. 
-Also, the oracle uploads the data to the storage accessible by the data consumer. For more details of the data storage, please see the [Consumer Service](5-consumer-service.md).
+Also, the oracle uploads the data to the storage operated by the data consumer. For more details of the data storage, please see the [Consumer Service](5-consumer-service.md).
 The data is encrypted securely for each communication. For more details on the data validation and encryption, please see the [Data Validation](4-data-validation.md) and the [Confidential Oracle](6-confidential-oracle.md) specifications.
 
 ### Consent Submission
