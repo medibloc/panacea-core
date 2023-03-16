@@ -111,7 +111,7 @@ Data consumer need to create a json schema, upload it to a specific URI, and put
 
 `presentation_definition` is a way to specify data in the form of a verifiable presentation.
 
-When `presentation_definition` is set, o ORACLE checks that the provider's data is generated from a VC issued by a Certificate Authority and satisfies the requirements in the presentation definition.
+When `presentation_definition` is set, oracle checks that the provider's data is generated from a VC issued by a Certificate Authority and satisfies the requirements in the presentation definition.
 
 Data consumer can define a `presentation definition` in the following [this](https://identity.foundation/presentation-exchange/#presentation-definition).
 Data Consumer need to convert the defined json form of `presentation defintion` to byte array form and put it into the deal.
