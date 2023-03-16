@@ -66,4 +66,6 @@ As a result, data validation in oracle can be processed in parallel by multiple 
 ## Further Reading
 
 - For more detailed specification of DEP, see [DEP specifications](../../3-protocol-devs/1-dep-specs/0-overview.md).
+- For more detailed information of data privacy, see [Data Validation](../../3-protocol-devs/1-dep-specs/4-data-validation.md).
+- For more detailed information of deal requirements, see [Data Deal](../../3-protocol-devs/1-dep-specs/2-data-deal.md).
 - For more information about Oracle, see the [Operate Oracle Nodes](../../5-oracles/1-operate-oracle-nodes/0-overview.md).
