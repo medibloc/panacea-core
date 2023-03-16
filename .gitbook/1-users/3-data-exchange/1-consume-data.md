@@ -45,7 +45,7 @@ For `deal-file-path`, create a following JSON file.
 When `data_schema` is set, oracle performs [JSON schema](https://json-schema.org/) validation, and when `presentation_definition` is set, oracle performs [verifiable presentation](https://www.w3.org/TR/vc-data-model/#presentations-0) based validation.
 For more details about data deals, please see the [Data Deal](../../3-protocol-devs/1-dep-specs/2-data-deal.md) specification.
 
-**consumer service**
+**Consumer Service**
 
 You(data consumer) must run a `consumer service` to receive and store encrypted data from oracle.
 
