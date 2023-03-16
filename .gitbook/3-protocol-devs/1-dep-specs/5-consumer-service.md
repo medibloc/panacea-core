@@ -17,8 +17,8 @@
 This document describes consumer service.
 
 ### Motivation
-The data consumer needs to run an HTTP server to store the provider's encrypted data.
-When creating a `deal`, the data consumer must specify the endpoint of its server in the `consumer-service-endpoint`.
+Data consumers should run an HTTP server to receive the encrypted data from oracle.
+When creating deals, data consumers must specify the endpoint of their server in the `consumer-service-endpoint` field.
 
 When the incentive payment to the data provider is completed, the data consumer can get the `secret key` to decrypt the stored data from the oracle. 
 Finally, the data consumer can get the original data with the data from the `consumer service` and the `secret key`.
