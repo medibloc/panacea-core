@@ -44,8 +44,9 @@
   * [Data Deal](3-protocol-devs/1-dep-specs/2-data-deal.md)
   * [Data Provider Consent](3-protocol-devs/1-dep-specs/3-data-provider-consent.md)
   * [Data Validation](3-protocol-devs/1-dep-specs/4-data-validation.md)
-  * [Confidential Oracle](3-protocol-devs/1-dep-specs/5-confidential-oracle.md)
-  * [Incentives](3-protocol-devs/1-dep-specs/6-incentives.md)
+  * [Consumer Service](3-protocol-devs/1-dep-specs/5-consumer-service.md)
+  * [Confidential Oracle](3-protocol-devs/1-dep-specs/6-confidential-oracle.md)
+  * [Incentives](3-protocol-devs/1-dep-specs/7-incentives.md)
 * Modules
 * Dev Guides
 
@@ -72,7 +73,7 @@
   * [Oracle Initialization](5-oracles/1-operate-oracle-nodes/2-oracle-intialization.md)
   * [Genesis Oracle](5-oracles/1-operate-oracle-nodes/3-genesis-oracle.md)
   * [Oracle Registration](5-oracles/1-operate-oracle-nodes/4-oracle-registration.md)
-  * [Running a Node](5-oracles/1-operate-oracle-nodes/5-running-node.md)
+  * [Running a Node](5-oracles/1-operate-oracle-nodes/5-running-oracle-node.md)
   * [Updating Oracle Information](5-oracles/1-operate-oracle-nodes/6-update-oracle-info.md)
   * [Oracle Upgrade](5-oracles/1-operate-oracle-nodes/7-oracle-upgrade.md)
   * [Verify a Remote Report](5-oracles/1-operate-oracle-nodes/8-verify-remote-report.md)

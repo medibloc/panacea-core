@@ -15,5 +15,6 @@ based on various programming languages and infrastructure.
 2. [Data Deal](2-data-deal.md)
 3. [Data Provider Consent](3-data-provider-consent.md)
 4. [Data Validation](4-data-validation.md)
-5. [Confidential Oracle](5-confidential-oracle.md)
-6. [Incentives](6-incentives.md)
+5. [Consumer Service](5-consumer-service.md)
+5. [Confidential Oracle](6-confidential-oracle.md)
+6. [Incentives](7-incentives.md)
