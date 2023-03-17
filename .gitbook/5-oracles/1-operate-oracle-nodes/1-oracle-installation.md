@@ -25,8 +25,7 @@ docker run \
     ghcr.io/medibloc/panacea-oracle:latest \
     ego run /usr/bin/oracled --help
 ```
-After a successful installation, go to the process of [initializing oracle](5-oracles/1-operate-oracle-nodes/2-oracle-intialization.md).
-
+After a successful installation, go to the process of [initializing oracle](./2-oracle-intialization.md).
 
 ### How about building from source?
 
