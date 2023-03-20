@@ -55,8 +55,10 @@ A data consumer creates a data deal, specifying data schema, a budget in MED, th
 ### Data Validation
 
 A data provider willing to provide data that meet the requirements desired by a data consumer should request a data validation to one of the verified oracles in the network.
-The oracle validates the validity and integrity of data based on the requirements specified by the data consumer in the data deal. As a result of the data validation, the oracle issues a data validation certificate with a cryptographic signature. Also, the oracle uploads the data to the storage accessible by the data consumer.
-The data is encrypted securely for each communication. For more details on the data validation and encryption, please see the [Data Validation](4-data-validation.md) and the [Confidential Oracle](5-confidential-oracle.md) specifications.
+The oracle validates the validity and integrity of data based on the requirements specified by the data consumer in the data deal. 
+As a result of the data validation, the oracle issues a data validation certificate with a cryptographic signature. 
+Also, the oracle uploads the data to the storage operated by the data consumer. For more details of the data storage, please see the [Consumer Service](5-consumer-service.md).
+The data is encrypted securely for each communication. For more details on the data validation and encryption, please see the [Data Validation](4-data-validation.md) and the [Confidential Oracle](6-confidential-oracle.md) specifications.
 
 ### Consent Submission
 
@@ -69,7 +71,7 @@ For more details on the consent and the data validation, please see the [Data Pr
 As soon as the consent is accepted by the Panacea blockchain, the proper amount of MED coins are automatically distributed to the data provider and the oracle that issued the data validation certificate.
 It is safe to distribute incentives right after the consent submission is accepted because the data consumer can immediately access the provided data.
 The amount of incentives for each data provision is calculated by the total budget and the maximum number of data to consume specified by the data consumer in the data deal. The distribution ratio between the data provider and the oracle is determined by the commission rate promised by the oracle in the Panacea blockchain.
-For more details, please see the [Incentives](6-incentives.md) specification.
+For more details, please see the [Incentives](7-incentives.md) specification.
 
 ### Data Delivery
 

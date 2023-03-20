@@ -2,7 +2,7 @@
 
 - Status: Draft
 - Created: 2023-01-04
-- Modified: 2023-01-04
+- Modified: 2023-03-14
 - Authors
   - Gyuguen Jang <gyuguen.jang@medibloc.org>
   - Youngjoon Lee <yjlee@medibloc.org>
@@ -19,8 +19,8 @@ This document describes the API specification, data verification, and certificat
 ### Motivation
 Data consumers can define their requirements.
 This requirement allows them to define the format of the data they want.
-DEP supports `JSON schema` to define these requirements.
-Oracle can verify the requirements of data consumers according to this JSON schema specification.
+DEP supports `JSON schema` and `Presentation Definition` for data consumers to define these requirements.
+Oracle can verify data submitted by providers according to the requirements that data consumers defined.
 Oracle issues a certificate upon successful verification, which can be verified by Panacea.
 
 ### Definitions
@@ -66,7 +66,6 @@ TODO: Guide to JWT generate and verify
 ```json
 {
   "unsigned_certificate": {
-    "cid": "QmeSiVLXWagUv9sLEHvbsUJy8rm7r5BoP2pAXrbx4pdbWi",
     "unique_id": "9a3da3162aa592af3c77f1bba2d5635c7b4c065249bd36094fe3c11c73c90618",
     "oracle_address": "panacea1ewugvs354xput6xydl5cd5tvkzcuymkejekwk3",
     "deal_id": 1,
@@ -80,7 +79,6 @@ TODO: Guide to JWT generate and verify
 | Key                                   | Type   | Description                                                                  |
 |---------------------------------------|--------|------------------------------------------------------------------------------|
 | unsigned_certificate                  | Object | Unsigned certificate containing data validation information                  |
-| unsigned_certificate.cid              | string | A content identifier of a file in IPFS                                       |
 | unsigned_certificate.unique_id        | string | UniqueID of the oracle that validated the data                               |
 | unsigned_certificate.oracle_address   | string | Account address of the oracle that validated the data                        |
 | unsigned_certificate.deal_id          | uint   | Deal to whom the provider intends to provide data                            |
@@ -121,17 +119,26 @@ If the Deal's status is invalid, oracle does not perform verification work.
 compare(deal.status, 'DEAL_STATUS_ACTIVE')
 ```
 
-Validate original data with `data_schema` extracted from Deal. 
-We currently support JSON schema.
+Validate original data with `data_schema` or `presentation_definition` specified in the deal.
+
+If the deal has `data_schema` information, then validate json schema as shown below.
 ```
 data_schema = deal.data_schema
 
-JSONSchema.Validate(data_schema, orginal_data)
+JSONSchema.Validate(data_schema, original_data)
 ```
 
-#### Data re-encryption and delivery via IPFS
+If the deal has `presentation_definition`, then validate verifiable presentation with presentation definition.
+In this case, the `original_data` must be in a verifiable presentation to pass validation.
+```
+presentation_definition = deal.presentation_definition
 
-If data validation is successful, the data must be re-encrypted and stored on IPFS to be delivered to the consumer.
+ValidateVP(original_data, presentation_definition)
+```
+
+#### Data re-encryption and delivery via Consumer Service
+
+If data validation is successful, the data must be re-encrypted and stored on the `consumer service`.
 
 To re-encrypt the data, a symmetric secret key must be used. The symmetric secret key can be derived from the following logic.
 ```
@@ -139,12 +146,15 @@ deal_id_bz = convertUint64ToBigEndian(deal_id)
 secret_key = SHA256(append(oracle_private_key, deal_id_bz, data_hash))
 ```
 
-After encrypting the data with the generated `secretKey`, store it to IPFS.
+After encrypting the data with the generated `secretKey`, send it to `consumer service` as HTTP POST request.
 
 ```
 encrypted_data = AES256GCM.Encrypt(secret_key, orginal_data)
-
-cid = IPFS.add(encrypted_data)
+```
+```bash
+curl -v -X POST -H "Authorization: Bearer ${jwt}" \
+  -d "@<encrypted-data-path>" \
+  "${consumer-service-endpoint}/v0/deals/${dealId}/data/${dataHash}
 ```
 
 
@@ -155,7 +165,6 @@ The certificate includes the following contents.
 ```json
 {
   "unsigned_certificate": {
-    "cid": "QmeSiVLXWagUv9sLEHvbsUJy8rm7r5BoP2pAXrbx4pdbWi",
     "unique_id": "9a3da3162aa592af3c77f1bba2d5635c7b4c065249bd36094fe3c11c73c90618",
     "oracle_address": "panacea1ewugvs354xput6xydl5cd5tvkzcuymkejekwk3",
     "deal_id": 1,
@@ -195,6 +204,7 @@ None at present.
 ## History
 
 - 2023-01-04: Initial draft finished
+- 2023-03-14: add presentation definition validation
 
 ## Copyright
 
