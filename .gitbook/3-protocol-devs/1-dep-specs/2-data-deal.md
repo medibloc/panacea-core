@@ -96,6 +96,66 @@ message MsgCreateDeal {
 When deal is created, the amount of budget is sent from consumer's account to deal's account.
 In other words, the balance of consumer's account should be greater or equal than the budget.
 
+#### Data Requirements
+There are two ways for a data consumer to specify the requirements of the data they want to consume: `data_schema` and `presentation_definition`
+
+**Data Schema**
+
+`data_shcema` is a way to specify a data with [JSON Schema](https://json-schema.org/).
+
+When `data_schema` is set, oracle checks to see if the provider's data satisfies the JSON schema.
+Data consumer need to create a json schema, upload it to a specific URI, and put it into the deal.
+[Here](http://jsonschema.gopanacea.org/vaccination-cert.json) is the example of json schema.
+
+**Presentation Definition**
+
+`presentation_definition` is a way to specify data in the form of a verifiable presentation.
+
+When `presentation_definition` is set, oracle checks that the provider's data is generated from a VC issued by a Certificate Authority and satisfies the requirements in the presentation definition.
+
+Data consumer can define a `presentation definition` in the following [this](https://identity.foundation/presentation-exchange/#presentation-definition).
+Data Consumer need to convert the defined json form of `presentation defintion` to byte array form and put it into the deal.
+
+Below is an example of a `presentation definition`:
+```json
+{
+  "id": "c1b88ce1-8460-4baf-8f16-4759a2f055fd",
+  "purpose": "To get data on Korean people aged 18-30",
+  "input_descriptors": [
+    {
+      "id": "age_descriptor",
+      "purpose": "Your age should be greater or equal to 18.",
+      "constraints": {
+        "limit_disclosure": "required",
+        "fields": [
+          {
+            "path": [
+              "$.credentialSubject.age"
+            ],
+            "filter": {
+              "type": "integer",
+              "minimum": 18,
+              "maximum": 30
+            }
+          },
+          {
+            "path": [
+              "$.credentialSubject.nationality"
+            ],
+            "filter": {
+              "type": "string",
+              "enum": [
+                "Korea"
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
+```
+
 ### Deactivate Data Deal
 
 The consumer who created the deal can deactivate the deal at any time as long as `max_num_data` of data is not provided.
