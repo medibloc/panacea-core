@@ -59,6 +59,8 @@ Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
 	cmd.PersistentFlags().String(flags.FlagKeyringBackend, flags.DefaultKeyringBackend, "Select keyring's backend (os|file|test)")
 	cmd.PersistentFlags().String(cli.OutputFlag, "text", "Output format (text|json)")
 
+	flags.AddTxFlagsToCmd(cmd)
+
 	return cmd
 }
 

@@ -72,6 +72,8 @@ panacead keys add ...
 	cmd.PersistentFlags().String(flags.FlagKeyringBackend, flags.DefaultKeyringBackend, "Select keyring's backend (os|file|test)")
 	cmd.PersistentFlags().String(cli.OutputFlag, "text", "Output format (text|json)")
 
+	flags.AddQueryFlagsToCmd(cmd)
+
 	return cmd
 }
 
