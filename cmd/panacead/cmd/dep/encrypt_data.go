@@ -1,4 +1,4 @@
-package cmd
+package dep
 
 import (
 	"encoding/base64"
@@ -21,10 +21,10 @@ func EncryptDataCmd(defaultNodeHome string) *cobra.Command {
 		Use:   "encrypt-data [input-file-path] [key-name]",
 		Short: "Encrypt data with shared key which consists of oracle public key and provider's private key",
 		Long: `
-			This command can encrypt data with shared key which consists of oracle public key and provider's private key.
-			The key to be used for encryption should be stored in the localStore.
-			If not stored, please add the key first via the following command.
-			panacead keys add ...
+This command can encrypt data with shared key which consists of oracle public key and provider's private key.
+The key to be used for encryption should be stored in the localStore.
+If not stored, please add the key first via the following command.
+panacead keys add ...
 		`,
 		Args: cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -66,9 +66,6 @@ func EncryptDataCmd(defaultNodeHome string) *cobra.Command {
 	cmd.PersistentFlags().String(flags.FlagKeyringDir, "", "The client Keyring directory; if omitted, the default 'home' directory will be used")
 	cmd.PersistentFlags().String(flags.FlagKeyringBackend, flags.DefaultKeyringBackend, "Select keyring's backend (os|file|test)")
 	cmd.PersistentFlags().String(cli.OutputFlag, "text", "Output format (text|json)")
-	cmd.PersistentFlags().String(flags.FlagChainID, "", "The network chain ID")
-
-	flags.AddQueryFlagsToCmd(cmd)
 
 	return cmd
 }

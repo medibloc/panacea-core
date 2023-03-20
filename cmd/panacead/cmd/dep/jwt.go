@@ -1,4 +1,4 @@
-package cmd
+package dep
 
 import (
 	"encoding/hex"
@@ -58,9 +58,6 @@ Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
 	cmd.PersistentFlags().String(flags.FlagKeyringDir, "", "The client Keyring directory; if omitted, the default 'home' directory will be used")
 	cmd.PersistentFlags().String(flags.FlagKeyringBackend, flags.DefaultKeyringBackend, "Select keyring's backend (os|file|test)")
 	cmd.PersistentFlags().String(cli.OutputFlag, "text", "Output format (text|json)")
-	cmd.PersistentFlags().String(flags.FlagChainID, "", "The network chain ID")
-
-	flags.AddTxFlagsToCmd(cmd)
 
 	return cmd
 }
