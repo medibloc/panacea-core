@@ -10,12 +10,12 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func HashDataCmd() *cobra.Command {
+func HashJSONCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "hash-data [data-file-path]",
-		Short: "Hash a data by sha256 algorithm",
+		Use:   "hash-json [json-file-path]",
+		Short: "Hash a JSON data by sha256 algorithm",
 		Long: `
-This command can hash a data by sha256 algorithm. The data will be encoded to canonical JSON format and printed as a hash value.`,
+This command can hash a JSON data by sha256 algorithm. The data will be encoded to canonical JSON format and printed as a hash value.`,
 		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			origData, err := os.ReadFile(args[0])
