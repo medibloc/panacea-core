@@ -193,6 +193,7 @@ func depCommand(defaultNodeHome string) *cobra.Command {
 		dep.EncryptDataCmd(defaultNodeHome),
 		dep.DecryptDataCmd(defaultNodeHome),
 		dep.JwtCmd(defaultNodeHome),
+		dep.HashJSONCmd(),
 	)
 
 	cmd.PersistentFlags().String(flags.FlagChainID, "", "The network chain ID")
