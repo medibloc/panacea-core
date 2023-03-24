@@ -13,7 +13,7 @@ Oracle is a validator that validates data as it transmits from provider to consu
 
 Since data encryption is required for data privacy, `Panacea`, a public blockchain, cannot act as a validator.
 Instead, the oracle decrypts and validates the provider's data and provides the result in the form of a `certificate`.
-Then, data consumer and `Panacea blockchain` can check the `certificate` to determine the validity of the data.
+Then, data consumer and `Panacea` can check the `certificate` to determine the validity of the data.
 
 For a detailed process, see [Data Validation](../3-protocol-devs/1-dep-specs/4-data-validation.md#data-validation).
 
