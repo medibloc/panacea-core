@@ -18,7 +18,7 @@ Then, data consumer and `Panacea blockchain` can check the `certificate` to dete
 For a detailed process, see [Data Validation](../3-protocol-devs/1-dep-specs/4-data-validation.md#data-validation).
 
 
-### Mediator of Data Delivery
+### Mediator for Data Delivery
 
 Oracle also works as a data deliverer.
 The oracle is responsible for delivering the verified data to the appropriate consumer.
