@@ -27,7 +27,7 @@ The consumer can get `secret key` through the oracle after the provider get ince
 
 For a detailed process, see [Data Validation](../3-protocol-devs/1-dep-specs/4-data-validation.md#data-re-encryption-and-delivery-via-consumer-service).
 
-## Oracle using SGX
+## Oracle based on SGX
 
 The oracle only works on [SGX](https://www.intel.com/content/www/us/en/developer/tools/software-guard-extensions/overview.html) environment. 
 
