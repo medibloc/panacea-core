@@ -74,12 +74,22 @@ light-client-witness-addrs = "tcp://127.0.0.1:26657"
 light-client-log-level = "error"
 
 ###############################################################################
-###                         IPFS Configuration                           ###
+###                         GRPC Configuration                           ###
 ###############################################################################
+[grpc]
 
-[ipfs]
-
-ipfs-node-addr = "127.0.0.1:5001"
+listen-addr = "127.0.0.1:9090"
+connection-timeout = 120000000000 #2m0s
+max-connections = 50
+max-concurrent-streams = 0
+max-recv-msg-size = 0
+keepalive-max-connection-idle = 1048576 #1MB
+keepalive-max-connection-age = 0
+keepalive-max-connection-age-grace = 0
+keepalive-time = 7200000000000 # 2h
+keepalive-timeout = 20000000000 # 2s
+rate-limits = 100
+rate-limit-wait-timeout = 50000000000 # 5s
 
 ###############################################################################
 ###                         API Configuration                           ###
@@ -87,9 +97,21 @@ ipfs-node-addr = "127.0.0.1:5001"
 
 [api]
 
+enabled = true
 listen-addr = "127.0.0.1:8080"
-write-timeout = "60"
-read-timeout = "15"
+grpc-connect-timeout = 100000000000 # 10s
+write-timeout = 600000000000 # 60s
+read-timeout = 50000000000 # 5s
+max-connections = 50
+max-request-body-size = 1048576 #1MB
+
+###############################################################################
+###                          Consumer Configuration                         ###
+###############################################################################
+
+[consumer]
+
+timeout = 50000000000 # 5s
 ```
 
 ## Configuring Some Default Setting
@@ -115,12 +137,14 @@ The `default-gas-limit` and `default-fee-amount` are set as `400000` and `200000
 large bytes for oracle registration and oracle upgrade. Once you finish an oracle registration or an upgrade, you
 could set a lower gas limit and fee amount than the default setting.
 
-#### IPFS Configuration
+#### GRPC & API Configuration
 
-The oracle will use a public IPFS node for now. If you want to run a local IPFS node, the `ipfs-node-addr` is same as
-default setting. Also, you need to check that the IPFS gateway and the oracle `listen-addr` are at the same port. You can
-change the IPFS gateway in `$HOME/.ipfs/config`. If you want to know more about RPC API of the IPFS, please refer
-the [IPFS documentation](https://docs.ipfs.tech/reference/kubo/rpc/).
+In `GRPC Configuration` and `API Configuration`, you can set detailed settings for grpc and gprc gateway.
+It contains settings that affect the speed and latency of data processing in oracle.
+
+#### Consumer Configuration
+
+In `Consumer Configuration`, you can set timeout for sending data to `consumer service` as a POST request.
 
 ## Next
 
