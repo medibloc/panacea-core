@@ -8,6 +8,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/snapshots"
 	"github.com/medibloc/panacea-core/v2/app/params"
+	"github.com/medibloc/panacea-core/v2/cmd/panacead/cmd/dep"
 
 	"github.com/spf13/cast"
 	"github.com/spf13/cobra"
@@ -108,9 +109,6 @@ func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
 		debug.Cmd(),
 		// this line is used by starport scaffolding # stargate/root/commands
 		AddGenesisOracleCmd(app.DefaultNodeHome),
-		EncryptDataCmd(app.DefaultNodeHome),
-		DecryptDataCmd(app.DefaultNodeHome),
-		JwtCmd(app.DefaultNodeHome),
 	)
 
 	a := appCreator{encodingConfig}
@@ -121,6 +119,7 @@ func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
 		rpc.StatusCommand(),
 		queryCommand(),
 		txCommand(),
+		depCommand(app.DefaultNodeHome),
 		keys.Commands(app.DefaultNodeHome),
 	)
 }
@@ -178,6 +177,26 @@ func txCommand() *cobra.Command {
 	app.ModuleBasics.AddTxCommands(cmd)
 	cmd.PersistentFlags().String(flags.FlagChainID, "", "The network chain ID")
 
+	return cmd
+}
+
+func depCommand(defaultNodeHome string) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:                        "dep",
+		Short:                      "Data Exchange Protocol subcommands",
+		DisableFlagParsing:         true,
+		SuggestionsMinimumDistance: 2,
+		RunE:                       client.ValidateCmd,
+	}
+
+	cmd.AddCommand(
+		dep.EncryptDataCmd(defaultNodeHome),
+		dep.DecryptDataCmd(defaultNodeHome),
+		dep.JwtCmd(defaultNodeHome),
+		dep.HashJSONCmd(),
+	)
+
+	cmd.PersistentFlags().String(flags.FlagChainID, "", "The network chain ID")
 	return cmd
 }
 
