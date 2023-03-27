@@ -1,10 +1,10 @@
 # Provide data
 
-Data providers can provide their data that match the requirements of the data deal and, in return, earn a reward in MED.
+Data providers can provide their data that match the requirements of the data `deal` and, in return, earn a reward in MED.
 
-Since only the data verified by oracle can be provided to a deal, providers should first request data verification to oracle.
+Since only the data verified by oracle can be provided to a `deal`, providers should first request data verification to oracle.
 
-As a result of verification, oracle will issue a certificate; then provider can provide their data by submitting a consent with the certificate to Panacea.
+As a result of verification, oracle will issue a `certificate`; then provider can provide their data by submitting a consent with the `certificate` to `Panacea`.
 
 In the whole process of data transmission, the data is encrypted so that no one can access the original data.
 
@@ -15,7 +15,7 @@ The transmission of data and the payment of rewards are managed atomically throu
 Before requesting data verification to oracle, you (data provider) should encrypt the data to preserve privacy.
 Encryption can be done using your chain account key and oracle public key which is registered in Panacea.
 This makes only oracles can decrypt and verify your original data in secure area.
-For more details about data secure area, please see [Confidential Oracle](../../3-protocol-devs/1-dep-specs/5-confidential-oracle.md).
+For more details about data secure area, please see [Confidential Oracle](../../3-protocol-devs/1-dep-specs/6-confidential-oracle.md).
 
 You can encrypt data by the following CLI:
 ```bash
@@ -62,30 +62,35 @@ The certificate form is like below:
 ```json
 {
   "unsigned_certificate" : {
-    "cid" : "{ipfs-cid}",
     "unique_id" : "{oracle-unique-id}",
     "oracle_address" : "{oracle-address}",
-    "deal_id": <deal-id>,
+    "deal_id": "{deal-id}",
     "provider_address" : "{your-address}",
     "data_hash" : "{data-hash}"
   },
   "signature" : "{oracle-signature}"
 }
 ```
-Now you can use this certificate in the next step.
+Now you can use this `certificate` in the next step.
 
 ## Submit consent
 
-Broadcast the following `submit-consent` transaction with the certificate from oracle and agreements of terms for data provision.
+Broadcast the following `submit-consent` transaction with the certificate from oracle and agreements of terms by the following CLI:
+
+```bash
+panacead submit-consent ${consent-file} \
+  --from ${data-provider-addr} \
+  --chain-id ${chain-id} \
+  --gas auto --gas-adjustment 1.30 --gas-prices 5umed \
+  --node ${chain-node-rpc-addr}
+```
 
 **consent.json**
 
 ```json
 {
-  "deal_id": <deal-id>,
-  "certificate": {
-    ...
-  },
+  "deal_id": "{deal-id}",
+  "certificate": "{certificate}",
   "agreements": [
     {
       "id": 1,
@@ -95,17 +100,9 @@ Broadcast the following `submit-consent` transaction with the certificate from o
 }
 ```
 
-```bash
-panacead submit-consent ${consent-file-path} \
-  --from ${data-provider-addr} \
-  --chain-id ${chain-id} \
-  --gas auto --gas-adjustment 1.30 --gas-prices 5umed \
-  --node ${chain-node-rpc-addr}
-```
+After you submit consent, `Panacea` verifies the certificate and checks the status of the deal. 
 
-After you submit consent, Panacea verifies the certificate and checks the status of the deal. 
-
-When the verification is completed, Panacea makes the data accessible to consumers and transmitts rewards to you.
+When the verification is completed, `Panacea` makes the data accessible to consumers and transmits rewards to you.
 
 ## Query consent
 You can query a consent by the deal ID and data hash you provided.

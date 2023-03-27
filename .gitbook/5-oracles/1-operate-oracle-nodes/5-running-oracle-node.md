@@ -13,8 +13,8 @@ The oracle also serves to validate and approve `registration/upgrade` requests f
 You can see the details in [What oracle does](#what-oracle-does).
 
 ## Prerequisites
-- [Hardware Requirement](5-oracles/1-operate-oracle-nodes/1-oracle-installation.md)
-- Complete [Oracle Registration](5-oracles/1-operate-oracle-nodes/4-oracle-registration.md) or [Genesis Oracle](5-oracles/1-operate-oracle-nodes/3-genesis-oracle.md)
+- [Hardware Requirement](./1-oracle-installation.md)
+- Complete [Oracle Registration](./4-oracle-registration.md) or [Genesis Oracle](./3-genesis-oracle.md)
     - Your oracle have to be registered in Panacea
     - The `oracle_priv_key.sealed` must be in the oracle home path
 
@@ -29,7 +29,7 @@ docker run \
     ghcr.io/medibloc/panacea-oracle:latest \
     ego run /usr/bin/oracled start
 ```
-If the oracle is successful started, you will see the following log message:
+If the oracle is successfully started, you will see the following log message:
 ```
 EGo v1.1.0 (4625a610928f4f4b1ea49262c363376b1e574b6c)
 [erthost] loading enclave ...
@@ -56,7 +56,7 @@ The validation procedure is as follows:
 
 If the validation passes successfully, the oracle issues a certificate as follows:
 1. Generate a `secret key` by combining `oracle private key`, deal ID, and data hash
-2. Re-encrypt the data using the `secret key` and put it in `IPFS`
+2. Re-encrypt the data using the `secret key` and put it in `consumer service`
 3. Issue a certificate with `oracle private key` signature
 
 Data providers will be able to submit a consent to Panacea with the issued certificate.
@@ -74,7 +74,7 @@ The detailed process is as follows:
 4. Make `encrypted secret key` using `consumer public key`
 5. Respond with `encrypted secret key` to the data consumer
 
-The data consumer can obtain the `secret key` through his/her `private key`, and can decrypt data from `IPFS`.
+The data consumer can obtain the `secret key` through his/her `private key`, and can decrypt data from `consumer service`.
 
 ### Validate and approve registration/upgrade requests of other oracles
 
