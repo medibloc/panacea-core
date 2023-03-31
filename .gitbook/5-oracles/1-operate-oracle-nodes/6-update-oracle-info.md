@@ -11,7 +11,7 @@ docker run \
     --device /dev/sgx_enclave \
     --device /dev/sgx_provision \
     -v <directory-you-want>/oracle:/oracle \
-    ghcr.io/medibloc/panacea-oracle:latest \
+    ghcr.io/medibloc/panacea-oracle:main \
     ego run /usr/bin/oracled update-oracle-info \ 
     --oracle-endpoint "<your-new-endpoint>" \ 
     --oracle-commission-rate <your-new-commission-rate>

@@ -34,7 +34,7 @@ docker run \
     --device /dev/sgx_enclave \
     --device /dev/sgx_provision \
     -v <directory-you-want>/oracle:/oracle \
-    ghcr.io/medibloc/panacea-oracle:latest \
+    ghcr.io/medibloc/panacea-oracle:main \
     ego run /usr/bin/oracled register-oracle \ 
     --trusted-block-height ${HEIGHT} \
     --trusted-block-hash ${HASH} \
@@ -97,7 +97,7 @@ docker run \
     --device /dev/sgx_enclave \
     --device /dev/sgx_provision \
     -v ${ANY_DIR_ON_HOST}:/oracle \
-    ghcr.io/medibloc/panacea-oracle:latest \
+    ghcr.io/medibloc/panacea-oracle:main \
     ego run /usr/bin/oracled get-oracle-key
 ```
 

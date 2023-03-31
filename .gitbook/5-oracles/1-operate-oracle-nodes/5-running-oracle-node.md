@@ -26,7 +26,7 @@ docker run \
     --device /dev/sgx_enclave \
     --device /dev/sgx_provision \
     -v ${ANY_DIR_ON_HOST}:/oracle \
-    ghcr.io/medibloc/panacea-oracle:latest \
+    ghcr.io/medibloc/panacea-oracle:main \
     ego run /usr/bin/oracled start
 ```
 If the oracle is successfully started, you will see the following log message:

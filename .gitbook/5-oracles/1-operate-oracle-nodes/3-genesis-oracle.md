@@ -31,7 +31,7 @@ Execute the command in oracle as follows:
 docker run \
     --device /dev/sgx_enclave \
     --device /dev/sgx_provision \
-    ghcr.io/medibloc/panacea-oracle:latest \
+    ghcr.io/medibloc/panacea-oracle:main \
     ego uniqueid /usr/bin/oracled
 ```
 **Output**
@@ -117,7 +117,7 @@ docker run \
     --device /dev/sgx_enclave \
     --device /dev/sgx_provision \
     -v <directory-you-want>:/oracle \
-    ghcr.io/medibloc/panacea-oracle:latest \
+    ghcr.io/medibloc/panacea-oracle:main \
     ego run /usr/bin/oracled gen-oracle-key \
       --trusted-block-height $HEIGHT \
       --trusted-block-hash $HASH

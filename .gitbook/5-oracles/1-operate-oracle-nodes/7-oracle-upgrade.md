@@ -59,7 +59,7 @@ Let's start with [initialization](2-oracle-intialization.md) of the new version 
 export ORACLE_CMD="docker run --rm \
   --device /dev/sgx_enclave \
   --device /dev/sgx_provision \
-  -v <directory-you-want>/oracle:/oracle ghcr.io/medibloc/panacea-oracle:latest \
+  -v <directory-you-want>/oracle:/oracle ghcr.io/medibloc/panacea-oracle:main \
   ego run /usr/bin/oracled"
   
   $ORACLE_CMD init --home /home_mnt/.oracle-new

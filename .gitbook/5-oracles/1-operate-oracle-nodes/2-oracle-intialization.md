@@ -17,7 +17,7 @@ mkdir <directory-you-want>/oracle
 export ORACLE_CMD="docker run --rm \
   --device /dev/sgx_enclave \
   --device /dev/sgx_provision \
-  -v <directory-you-want>/oracle:/oracle ghcr.io/medibloc/panacea-oracle:latest \
+  -v <directory-you-want>/oracle:/oracle ghcr.io/medibloc/panacea-oracle:main \
   ego run /usr/bin/oracled"
 ```
 
