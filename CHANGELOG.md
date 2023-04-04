@@ -4,6 +4,12 @@
 
 TDB
 
+## [v2.0.7](https://github.com/medibloc/panacea-core/releases/tag/v2.0.7) - 2023-04-04
+
+### Bug fixes
+
+- [\#367](https://github.com/medibloc/panacea-core/pull/659) Add missing ibc route and ibc client settings
+
 
 ## [v2.0.6](https://github.com/medibloc/panacea-core/releases/tag/v2.0.6) - 2023-02-27
 
