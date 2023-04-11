@@ -12,7 +12,7 @@ please clone the `panacea-core` project and build it.
 
 ```bash
 # Make sure to checkout the correct branch.
-git clone -b v2.0.6 https://github.com/medibloc/panacea-core
+git clone -b v2.0.7-1 https://github.com/medibloc/panacea-core
 cd panacea-core
 make install  # All binaries are installed in $GOPATH/bin
 ```
