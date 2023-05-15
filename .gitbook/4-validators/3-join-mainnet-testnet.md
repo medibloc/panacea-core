@@ -118,14 +118,13 @@ Your node can rapidly sync with the network using state sync without replaying h
 To set state sync enabled, RPC servers and trusted block info (height and hash) are required.
 
 You can use the following public RPC endpoints provided by MediBloc team.
-- 3.35.82.40:26657
-- 13.124.96.254:26657
-- 52.79.108.35:26657
+- 15.165.191.68:26657
+- 54.254.66.59:26657
 
 trusted block info can be obtained via RPC.
 
 ```shell
-curl -s 13.124.96.254:26657/block | jq -r '.result.block.header.height + "\n" + .result.block_id.hash'
+curl -s 15.165.191.68:26657/block | jq -r '.result.block.header.height + "\n" + .result.block_id.hash'
 # 7700000 (height)
 # 0D3E53F02ABCDDA8AAC1520342D37A290DDABE4C28190EE6E2C6B0C819F74D4A (hash)
 ```
@@ -133,11 +132,14 @@ curl -s 13.124.96.254:26657/block | jq -r '.result.block.header.height + "\n" + 
 Then, you need to edit several things in `~/.panacea/config/config.toml` file.
 
 ```toml
+# The nodes that are providing statesync must be registered as persistent_peers.
+persistent_peers = "28ca0dffec0b97655c711c09889929e7c3a839a7@15.165.191.68:26656,c455619f4ffe67a9578e208f0b9121748e36d504@54.254.66.59:26656"
+
 [statesync]
 
 enable = true
 
-rpc_servers = "3.35.82.40:26657,13.124.96.254:26657,52.79.108.35:26657" # rpc addresses
+rpc_servers = "15.165.191.68:26657,54.254.66.59:26657" # rpc addresses
 trust_height = <trusted-block-height>
 trust_hash = "<trusted-block-hash>"
 trust_period = "336h0m0s" # 2/3 of 21 days (unbonding period)
