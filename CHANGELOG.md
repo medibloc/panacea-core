@@ -4,6 +4,13 @@
 
 TDB
 
+## [v2.0.7-2](https://github.com/medibloc/panacea-core/releases/tag/v2.0.7-2) - 2023-05-25
+
+### Improvements
+- 
+- [\#663](https://github.com/medibloc/panacea-core/pull/663) feat: apply huckleberry security
+
+
 ## [v2.0.7-1](https://github.com/medibloc/panacea-core/releases/tag/v2.0.7-1) - 2023-04-11
 
 ### Bug fixes
