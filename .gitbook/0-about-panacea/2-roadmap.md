@@ -1,22 +1,37 @@
 # Roadmap
 
-![](images/roadmap.png)
+## About DEP Prototype
 
-Until 2021, MediBloc focused on upgrading Panacea to be more secure and interconnectable with other chains in Cosmos ecosystem. Inter Blockchain Communication (IBC) was enabled after the chain was upgraded with Cosmos SDK Stargate, and MED became tradable on one of the biggest decentralized exchange, Osmosis. On top of this, many professional validators and delegators have joined Panacea to enhance the security of the chain.
+After successfully launching the DEP (Data Exchange Protocol) prototype on the testnet in early 2023, the MediBloc team confirmed the potential and technical capabilities of this technology through various projects. Additionally, we have considered the marketability of DEP and related Data Exchange Services and have prepared the service by closely communicating with potential customers.
 
-Now, MediBloc would like to shift its focus to boosting the potential of Panacea ecosystem and we believe that fruitful and meaningful data exchange will achieve that goal. Hence, MediBloc Panacea Team has been designing the Data Exchange Protocol based on Panacea. As you know, MediBloc believes that healthcare data should be owned by patients and those patients can take high-quality services by providing their healthcare data securely. Based on this philosophy, Data Exchange Protocol has been designed for anyone who holds data (even the sensitive data) to provide/sell their data to someone who is really willing to pay for it.
+However, we concluded that to make our service viable and scalable in the rapidly changing crypto industry, we need to embrace not only a small number of users familiar with WEB3 but also the majority of general users familiar with WEB2. Therefore, to promote the growth of our project, blockchain technology needs to be more seamlessly integrated with Dapps like MediPass and Dr.palette, which adopt Panacea technology, to embrace a broader user base.
 
-Nowadays, many businesses and technologies are data-driven. Many companies are already familiar with handling large dataset and deriving new values by analyzing sets of data. But, secure data exchange is still the one of the hardest area for data-driven industries. Data requesters want well-refined data or fine-grained raw data for successful data analysis. But, data owners (individuals) don’t want their privacy exposed and abused. Additionally, Web3 users are already aware that proper rewards should be guaranteed for their data and actions transparently on Web3. Traditional systems in Web2 have solved this issue in various ways, but MediBloc believes that we all can build more transparent and reliable systems for secure data exchange in Web3 ecosystem. 
+## New Strategy for Expanding Data Pools
 
-Our data exchange protocol has the concept of data Pool, so that anyone can specify the type and the quantity of the data they want. Also, they can specify how much cryptocurrency they are willing to pay for the data. All of these data pools are recorded in Panacea and everyone who wants to sell their data can see all data pools. Data providers can choose data pools by checking how many parts of their data to be shared to data consumers. Then, they sign the consents for data exchange. Verified off-chain data validators validate whether data provided by data providers conforms to criteria that data pool creator has specified. If all the requirements are met, the data is provided to data consumers via secure connections and the promised amount of cryptocurrency is transferred to data providers. In this entire protocol, data is not recorded on any blockchain such as Panacea. All data transmissions are performed off-chain and Panacea guarantees all agreements for data exchanges and transparent payments.
+Thus, we have revised our plans from expanding the data pool through personal health data access and third-party service coverage to quickly expanding the accessible data pool through cooperation with institutions. We plan to expand personal health data accessibility in forms that can be realized in the future by closely monitoring the rapidly changing regulatory environment in the virtual asset industry.
 
-This data exchange protocol is being developed to be as general as possible, so that not only the healthcare data but also all the other types of data can be handled by the protocol. Since Panacea and data exchange protocol is publicly opened, any service providers can build their own services on the top of the data exchange protocol, so that their users can exchange their data securely and get proper rewards. As the first use case, MediBloc is going to build a healthcare data marketplace service based on this protocol.
-Well, it sounds like the protocol should work well, right? However, there are many issues that we have to resolve. For privacy and security, data providers should be able to expose only a small part of their data that is really desired by data consumers. Also, data transmission must be secure, so that no one can steal or intercept the data. In order to guarantee the right of data consumers, all criteria that data consumers specified has to be validated clearly before the payment is finalized. Last but not least, the ecosystem should be attractive enough for many data providers and consumers to join. 
+The main participants expected by MediBloc are individuals and companies or institutions interested in or related to the healthcare industry. Therefore, MediBloc will focus on securing healthcare institutions and patients through cooperation with various third parties. We are also cooperating with various parties to establish identity and data authentication infrastructure (e.g., cooperation with existing identity authentication service providers), which will provide real value to our services and make them necessary technologies.
 
-In order to resolve these challenges, the team is developing this data exchange protocol with several latest technologies.
-The detailed tech stack of the data exchange protocol is described in the [Panacea Ecosystem](./0-panacea-ecosystem.md) document.
+Therefore, MediBloc focuses on advancing blockchain technology to be actively used in Dapps like MediPass and Dr.palette, which already have secured over 700,000 users. We will continue to advance our technology and consider ways to apply it more actively to ensure that our services are most effectively utilized for healthcare data in line with the regulatory environment. Suppose we can implement services that connect healthcare institutions and patients more closely using medical records generated during the treatment process at healthcare institutions with personal health data. In that case, the potential for the development of the medical industry will be limitless.
 
-There will be more detailed issues that we would have to solve, and we know that all of them cannot be solved in one step. Hence, we will complete this big task step by step. In 2022, MediBloc have released the v0 of data exchange protocol as a proof of concept that includes only essential features on testnet. Based on this proof of concepts, the data exchange protocol will be improved as v1 in 2023 with enhanced security and interoperability. Also, MediBloc will be introducing dApps for data providers using data exchange protocol and keep designing the services that go on top of data exchange protocol. MediBloc has already opened all source codes and progresses publicly on GitHub. We encourage anyone to join the project and share your insights. 
-We are so excited and thrilled to share our vision to achieve our goal to become the world’s best patient centric health data platform. Thank you for your continued support! 
+## New Roadmap for Expanding the Data Pool
 
---
+![](./images/roadmap.png)
+
+- 2021: The Road to Interchain
+    - Open validator participation publicly
+    - Enable IBC (Inter-blockchain Communication)
+    - List MED on DEX (Osmosis)
+- 2022: Enhancing Panacea Ecosystem
+    - Ensuring the long-term sustainability of the validator ecosystem
+    - Involving professional validators and corporate validators from various fields
+- 2023: Expansion of Promising Service Providers
+    - Support expansion of 3rd party services using Panacea (EHR, PHR, authentication solutions, etc.)
+- 2024+: Advanced Healthcare Services Using Panacea
+    - Further enhance EHR integration to provide a service experience based on Panacea for medical institutions and medical practitioners
+    - Provide PHR service that can obtain a better medical institution usage experience by utilizing personal health records
+    - Apply Panacea to communication services that effectively connect medical service users and providers
+
+MediBloc believes in the potential and infinite possibilities of blockchain technology. To realize it, we will make efforts to improve blockchain technology based on our experience launching the DEP prototype, so that it can be stably operated in various healthcare data-related services, including MediPass and Dr.palette.
+
+To meet the needs of our customers, MediBloc aims to provide innovative services using blockchain technology to the fullest. We will continue our research and development of blockchain-related technologies and trends, and make efforts to promote blockchain technology to more people.
