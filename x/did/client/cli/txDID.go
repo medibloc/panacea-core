@@ -11,6 +11,9 @@ import (
 
 	"github.com/gogo/protobuf/jsonpb"
 
+	"github.com/cometbft/cometbft/crypto"
+	"github.com/cometbft/cometbft/crypto/secp256k1"
+	"github.com/cometbft/cometbft/libs/cli"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/input"
@@ -22,9 +25,6 @@ import (
 	"github.com/medibloc/panacea-core/v2/x/did/internal/secp256k1util"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/tendermint/tendermint/crypto"
-	"github.com/tendermint/tendermint/crypto/secp256k1"
-	"github.com/tendermint/tendermint/libs/cli"
 
 	didcrypto "github.com/medibloc/panacea-core/v2/x/did/client/crypto"
 	"github.com/medibloc/panacea-core/v2/x/did/types"

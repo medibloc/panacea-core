@@ -1,9 +1,15 @@
 package testsuite
 
 import (
+	dbm "github.com/cometbft/cometbft-db"
+	"github.com/cometbft/cometbft/crypto/secp256k1"
+	"github.com/cometbft/cometbft/libs/log"
+	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
+	"github.com/cometbft/cometbft/types/time"
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/cosmos-sdk/store"
+	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	"github.com/cosmos/cosmos-sdk/x/auth/tx"
@@ -22,20 +28,15 @@ import (
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	upgradekeeper "github.com/cosmos/cosmos-sdk/x/upgrade/keeper"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
-	ibctransferkeeper "github.com/cosmos/ibc-go/v4/modules/apps/transfer/keeper"
-	ibctransfertypes "github.com/cosmos/ibc-go/v4/modules/apps/transfer/types"
-	ibchost "github.com/cosmos/ibc-go/v4/modules/core/24-host"
-	ibckeeper "github.com/cosmos/ibc-go/v4/modules/core/keeper"
+	ibctransferkeeper "github.com/cosmos/ibc-go/v7/modules/apps/transfer/keeper"
+	ibctransfertypes "github.com/cosmos/ibc-go/v7/modules/apps/transfer/types"
+	ibcexported "github.com/cosmos/ibc-go/v7/modules/core/exported"
+	ibckeeper "github.com/cosmos/ibc-go/v7/modules/core/keeper"
 	aolkeeper "github.com/medibloc/panacea-core/v2/x/aol/keeper"
 	aoltypes "github.com/medibloc/panacea-core/v2/x/aol/types"
 	burnkeeper "github.com/medibloc/panacea-core/v2/x/burn/keeper"
 	burntypes "github.com/medibloc/panacea-core/v2/x/burn/types"
 	"github.com/stretchr/testify/suite"
-	"github.com/tendermint/tendermint/crypto/secp256k1"
-	"github.com/tendermint/tendermint/libs/log"
-	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
-	"github.com/tendermint/tendermint/types/time"
-	dbm "github.com/tendermint/tm-db"
 
 	"github.com/medibloc/panacea-core/v2/app/params"
 	didkeeper "github.com/medibloc/panacea-core/v2/x/did/keeper"
@@ -50,7 +51,7 @@ type TestSuite struct {
 	Ctx sdk.Context
 
 	AccountKeeper    authkeeper.AccountKeeper
-	StakingKeeper    stakingkeeper.Keeper
+	StakingKeeper    *stakingkeeper.Keeper
 	AolKeeper        aolkeeper.Keeper
 	AolMsgServer     aoltypes.MsgServer
 	BankKeeper       bankkeeper.Keeper
@@ -61,7 +62,7 @@ type TestSuite struct {
 	TransferKeeper   ibctransferkeeper.Keeper
 	DIDMsgServer     didtypes.MsgServer
 	DIDKeeper        didkeeper.Keeper
-	UpgradeKeeper    upgradekeeper.Keeper
+	UpgradeKeeper    *upgradekeeper.Keeper
 }
 
 func (suite *TestSuite) SetupTest() {
@@ -71,7 +72,7 @@ func (suite *TestSuite) SetupTest() {
 		banktypes.StoreKey,
 		paramstypes.StoreKey,
 		didtypes.StoreKey,
-		ibchost.StoreKey,
+		ibcexported.StoreKey,
 		capabilitytypes.StoreKey,
 		ibctransfertypes.StoreKey,
 		upgradetypes.StoreKey,
@@ -79,14 +80,14 @@ func (suite *TestSuite) SetupTest() {
 	tKeyParams := sdk.NewTransientStoreKey(paramstypes.TStoreKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
 
-	cdc := newTestCodec()
+	encodingConfig := newTestCodec()
 	db := dbm.NewMemDB()
 	ms := store.NewCommitMultiStore(db)
 	ctx := sdk.NewContext(ms, tmproto.Header{Time: time.Now()}, false, log.NewNopLogger())
 
-	ms.MountStoreWithDB(tKeyParams, sdk.StoreTypeTransient, db)
+	ms.MountStoreWithDB(tKeyParams, storetypes.StoreTypeTransient, db)
 	for _, v := range keyParams {
-		ms.MountStoreWithDB(v, sdk.StoreTypeIAVL, db)
+		ms.MountStoreWithDB(v, storetypes.StoreTypeIAVL, db)
 	}
 
 	sdk.GetConfig().SetBech32PrefixForAccount("panacea", "panaceapub")
@@ -109,63 +110,70 @@ func (suite *TestSuite) SetupTest() {
 		modAccAddrs[authtypes.NewModuleAddress(acc).String()] = true
 	}
 
+	appCodec := encodingConfig.Codec
+	legacyAmino := encodingConfig.Amino
 	paramsKeeper := paramskeeper.NewKeeper(
-		cdc.Marshaler,
-		cdc.Amino,
+		appCodec,
+		legacyAmino,
 		keyParams[paramstypes.StoreKey],
 		tKeyParams)
 
-	suite.CapabilityKeeper = capabilitykeeper.NewKeeper(cdc.Marshaler, keyParams[capabilitytypes.StoreKey], memKeys[capabilitytypes.MemStoreKey])
+	suite.CapabilityKeeper = capabilitykeeper.NewKeeper(appCodec, keyParams[capabilitytypes.StoreKey], memKeys[capabilitytypes.MemStoreKey])
 
-	scopedIBCKeeper := suite.CapabilityKeeper.ScopeToModule(ibchost.ModuleName)
+	scopedIBCKeeper := suite.CapabilityKeeper.ScopeToModule(ibcexported.ModuleName)
 
 	suite.Ctx = ctx
 	suite.AccountKeeper = authkeeper.NewAccountKeeper(
-		cdc.Marshaler,
+		appCodec,
 		keyParams[authtypes.StoreKey],
-		paramsKeeper.Subspace(authtypes.ModuleName),
 		authtypes.ProtoBaseAccount,
 		maccPerms,
+		"panacea",
+		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
 	suite.AccountKeeper.SetParams(ctx, authtypes.DefaultParams())
 	suite.AolKeeper = *aolkeeper.NewKeeper(
-		cdc.Marshaler,
+		appCodec,
 		keyParams[aoltypes.StoreKey],
 		memKeys[aoltypes.MemStoreKey],
 	)
 	suite.AolMsgServer = aolkeeper.NewMsgServerImpl(suite.AolKeeper)
 	suite.BankKeeper = bankkeeper.NewBaseKeeper(
-		cdc.Marshaler,
+		appCodec,
 		keyParams[banktypes.StoreKey],
 		suite.AccountKeeper,
-		paramsKeeper.Subspace(banktypes.ModuleName),
-		modAccAddrs,
+		BlockedAddresses(maccPerms),
+		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
 	suite.BankKeeper.SetParams(ctx, banktypes.DefaultParams())
 	suite.BurnKeeper = *burnkeeper.NewKeeper(suite.BankKeeper)
 	suite.StakingKeeper = stakingkeeper.NewKeeper(
-		cdc.Marshaler,
+		appCodec,
 		keyParams[stakingtypes.StoreKey],
 		suite.AccountKeeper,
 		suite.BankKeeper,
-		paramsKeeper.Subspace(stakingtypes.ModuleName),
+		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
 	suite.DistrKeeper = distrkeeper.NewKeeper(
-		cdc.Marshaler, keyParams[distrtypes.StoreKey], paramsKeeper.Subspace(distrtypes.ModuleName), suite.AccountKeeper, suite.BankKeeper, &suite.StakingKeeper, "test_fee_collector", modAccAddrs,
+		appCodec, keyParams[distrtypes.StoreKey], suite.AccountKeeper, suite.BankKeeper,
+		suite.StakingKeeper, "test_fee_collector",
+		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
-	suite.UpgradeKeeper = upgradekeeper.NewKeeper(map[int64]bool{}, keyParams[upgradetypes.StoreKey], cdc.Marshaler, suite.T().TempDir(), NewTestProtocolVersionSetter())
+	skipUpgradeHeights := map[int64]bool{}
+	homePath := suite.T().TempDir()
+	suite.UpgradeKeeper = upgradekeeper.NewKeeper(skipUpgradeHeights, keyParams[upgradetypes.StoreKey], appCodec, homePath, NewTestProtocolVersionSetter(), authtypes.NewModuleAddress(govtypes.ModuleName).String())
 	suite.IBCKeeper = ibckeeper.NewKeeper(
-		cdc.Marshaler, keyParams[ibchost.StoreKey], paramsKeeper.Subspace(ibchost.ModuleName), suite.StakingKeeper, suite.UpgradeKeeper, scopedIBCKeeper,
+		appCodec, keyParams[ibcexported.StoreKey], paramsKeeper.Subspace(ibcexported.ModuleName), suite.StakingKeeper, suite.UpgradeKeeper, scopedIBCKeeper,
 	)
 	suite.TransferKeeper = ibctransferkeeper.NewKeeper(
-		cdc.Marshaler, keyParams[ibctransfertypes.StoreKey], paramsKeeper.Subspace(ibctransfertypes.ModuleName),
+		appCodec, keyParams[ibctransfertypes.StoreKey], paramsKeeper.Subspace(ibctransfertypes.ModuleName),
 		suite.IBCKeeper.ChannelKeeper,
 		suite.IBCKeeper.ChannelKeeper, &suite.IBCKeeper.PortKeeper,
 		suite.AccountKeeper, suite.BankKeeper, scopedIBCKeeper,
 	)
 
 	suite.DIDKeeper = *didkeeper.NewKeeper(
-		cdc.Marshaler,
+		appCodec,
 		keyParams[didtypes.StoreKey],
 		memKeys[didtypes.MemStoreKey],
 	)
@@ -190,7 +198,7 @@ func newTestCodec() params.EncodingConfig {
 
 	return params.EncodingConfig{
 		InterfaceRegistry: interfaceRegistry,
-		Marshaler:         marshaler,
+		Codec:             marshaler,
 		TxConfig:          tx.NewTxConfig(marshaler, tx.DefaultSignModes),
 		Amino:             cdc,
 	}
@@ -214,3 +222,15 @@ func NewTestProtocolVersionSetter() TestProtocolVersionSetter {
 }
 
 func (vs TestProtocolVersionSetter) SetProtocolVersion(v uint64) {}
+
+func BlockedAddresses(maccPerms map[string][]string) map[string]bool {
+	modAccAddrs := make(map[string]bool)
+	for acc := range maccPerms {
+		modAccAddrs[authtypes.NewModuleAddress(acc).String()] = true
+	}
+
+	// allow the following addresses to receive funds
+	delete(modAccAddrs, authtypes.NewModuleAddress(govtypes.ModuleName).String())
+
+	return modAccAddrs
+}

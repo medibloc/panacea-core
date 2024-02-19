@@ -6,8 +6,8 @@ package types
 import (
 	context "context"
 	fmt "fmt"
-	grpc1 "github.com/gogo/protobuf/grpc"
-	proto "github.com/gogo/protobuf/proto"
+	grpc1 "github.com/cosmos/gogoproto/grpc"
+	proto "github.com/cosmos/gogoproto/proto"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -550,7 +550,8 @@ type MsgClient interface {
 	AddWriter(ctx context.Context, in *MsgAddWriter, opts ...grpc.CallOption) (*MsgAddWriterResponse, error)
 	// DeleteWriter defines a method for deleting a writer to the topic.
 	DeleteWriter(ctx context.Context, in *MsgDeleteWriter, opts ...grpc.CallOption) (*MsgDeleteWriterResponse, error)
-	// AddRecord defines a method for adding a record to the topic with the writer.
+	// AddRecord defines a method for adding a record to the topic with the
+	// writer.
 	AddRecord(ctx context.Context, in *MsgAddRecord, opts ...grpc.CallOption) (*MsgAddRecordResponse, error)
 }
 
@@ -606,7 +607,8 @@ type MsgServer interface {
 	AddWriter(context.Context, *MsgAddWriter) (*MsgAddWriterResponse, error)
 	// DeleteWriter defines a method for deleting a writer to the topic.
 	DeleteWriter(context.Context, *MsgDeleteWriter) (*MsgDeleteWriterResponse, error)
-	// AddRecord defines a method for adding a record to the topic with the writer.
+	// AddRecord defines a method for adding a record to the topic with the
+	// writer.
 	AddRecord(context.Context, *MsgAddRecord) (*MsgAddRecordResponse, error)
 }
 

@@ -3,8 +3,8 @@ package keeper_test
 import (
 	"testing"
 
-	"github.com/tendermint/tendermint/crypto"
-	"github.com/tendermint/tendermint/crypto/secp256k1"
+	"github.com/cometbft/cometbft/crypto"
+	"github.com/cometbft/cometbft/crypto/secp256k1"
 
 	"github.com/stretchr/testify/suite"
 

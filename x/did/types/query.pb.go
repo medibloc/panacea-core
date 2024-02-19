@@ -7,8 +7,8 @@ import (
 	context "context"
 	fmt "fmt"
 	_ "github.com/cosmos/cosmos-sdk/types/query"
-	grpc1 "github.com/gogo/protobuf/grpc"
-	proto "github.com/gogo/protobuf/proto"
+	grpc1 "github.com/cosmos/gogoproto/grpc"
+	proto "github.com/cosmos/gogoproto/proto"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
@@ -29,7 +29,8 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
-// QueryDIDRequest is the request type for the Query/DIDDocumentWithSeq RPC method.
+// QueryDIDRequest is the request type for the Query/DIDDocumentWithSeq RPC
+// method.
 type QueryDIDRequest struct {
 	// NOTE: Using base64 due to the URI path cannot contain colons.
 	DidBase64 string `protobuf:"bytes,1,opt,name=did_base64,json=didBase64,proto3" json:"did_base64,omitempty"`
@@ -75,7 +76,8 @@ func (m *QueryDIDRequest) GetDidBase64() string {
 	return ""
 }
 
-// QueryDIDResponse is the response type for the Query/DIDDocumentWithSeq RPC method.
+// QueryDIDResponse is the response type for the Query/DIDDocumentWithSeq RPC
+// method.
 type QueryDIDResponse struct {
 	DidDocumentWithSeq *DIDDocumentWithSeq `protobuf:"bytes,1,opt,name=did_document_with_seq,json=didDocumentWithSeq,proto3" json:"did_document_with_seq,omitempty"`
 }

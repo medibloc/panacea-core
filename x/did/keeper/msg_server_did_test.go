@@ -3,14 +3,14 @@ package keeper_test
 import (
 	"testing"
 
+	"github.com/cometbft/cometbft/crypto"
+	"github.com/cometbft/cometbft/crypto/secp256k1"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/medibloc/panacea-core/v2/types/testsuite"
 	"github.com/medibloc/panacea-core/v2/x/did/internal/secp256k1util"
 	didkeeper "github.com/medibloc/panacea-core/v2/x/did/keeper"
 	"github.com/medibloc/panacea-core/v2/x/did/types"
 	"github.com/stretchr/testify/suite"
-	"github.com/tendermint/tendermint/crypto"
-	"github.com/tendermint/tendermint/crypto/secp256k1"
 )
 
 type msgServerTestSuite struct {

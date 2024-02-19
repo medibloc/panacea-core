@@ -5,8 +5,8 @@ package types
 
 import (
 	fmt "fmt"
-	_ "github.com/gogo/protobuf/gogoproto"
-	proto "github.com/gogo/protobuf/proto"
+	_ "github.com/cosmos/gogoproto/gogoproto"
+	proto "github.com/cosmos/gogoproto/proto"
 	io "io"
 	math "math"
 	math_bits "math/bits"
@@ -23,7 +23,8 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
-// Strings defines a JSON-LD string array format which is marshalled to a single string if the array length is 1.
+// Strings defines a JSON-LD string array format which is marshalled to a single
+// string if the array length is 1.
 type Strings struct {
 	Values []string `protobuf:"bytes,1,rep,name=values,proto3" json:"values,omitempty"`
 }
@@ -70,14 +71,18 @@ func (m *Strings) GetValues() []string {
 
 // DIDDocument defines a W3C DID Document
 //
-// NOTE: All 'json_name' and 'gogoproto.customtype' tags are for panacea-core to unmarshal the v1.3 genesis which is in the W3C JSON-LD format.
-//       On the other hand, the panacea-core and cosmos-sdk don't use those tags to marshal result to JSON (via grpc-gateway).
+// NOTE: All 'json_name' and 'gogoproto.customtype' tags are for panacea-core to
+// unmarshal the v1.3 genesis which is in the W3C JSON-LD format.
+//
+//	On the other hand, the panacea-core and cosmos-sdk don't use those tags
+//	to marshal result to JSON (via grpc-gateway).
 type DIDDocument struct {
 	Contexts            *JSONStringOrStrings  `protobuf:"bytes,1,opt,name=contexts,json=@context,proto3,customtype=JSONStringOrStrings" json:"contexts,omitempty"`
 	Id                  string                `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`
 	Controller          *JSONStringOrStrings  `protobuf:"bytes,3,opt,name=controller,proto3,customtype=JSONStringOrStrings" json:"controller,omitempty"`
 	VerificationMethods []*VerificationMethod `protobuf:"bytes,4,rep,name=verification_methods,json=verificationMethod,proto3" json:"verification_methods,omitempty"`
-	// TODO: the repeated gogoproto.customtype has an issue: https://github.com/gogo/protobuf/issues/478
+	// TODO: the repeated gogoproto.customtype has an issue:
+	// https://github.com/gogo/protobuf/issues/478
 	Authentications       []VerificationRelationship `protobuf:"bytes,5,rep,name=authentications,json=authentication,proto3,customtype=VerificationRelationship" json:"authentications,omitempty"`
 	AssertionMethods      []VerificationRelationship `protobuf:"bytes,6,rep,name=assertion_methods,json=assertionMethod,proto3,customtype=VerificationRelationship" json:"assertion_methods,omitempty"`
 	KeyAgreements         []VerificationRelationship `protobuf:"bytes,7,rep,name=key_agreements,json=keyAgreement,proto3,customtype=VerificationRelationship" json:"key_agreements,omitempty"`
@@ -214,6 +219,7 @@ type VerificationRelationship struct {
 	// VerificationRelationship can be one of a single ID or a VerificationMethod.
 	//
 	// Types that are valid to be assigned to Content:
+	//
 	//	*VerificationRelationship_VerificationMethodId
 	//	*VerificationRelationship_VerificationMethod
 	Content isVerificationRelationship_Content `protobuf_oneof:"content"`
@@ -358,7 +364,8 @@ func (m *Service) GetServiceEndpoint() string {
 	return ""
 }
 
-// DIDDocumentWithSeq defines a message for DID Document with a sequence number for preventing replay attacks.
+// DIDDocumentWithSeq defines a message for DID Document with a sequence number
+// for preventing replay attacks.
 type DIDDocumentWithSeq struct {
 	Document *DIDDocument `protobuf:"bytes,1,opt,name=document,proto3" json:"document,omitempty"`
 	Sequence uint64       `protobuf:"varint,2,opt,name=sequence,proto3" json:"sequence,omitempty"`
@@ -411,7 +418,8 @@ func (m *DIDDocumentWithSeq) GetSequence() uint64 {
 	return 0
 }
 
-// DataWithSeq defines a message for data with a sequence number for preventing replay attacks.
+// DataWithSeq defines a message for data with a sequence number for preventing
+// replay attacks.
 type DataWithSeq struct {
 	Data     []byte `protobuf:"bytes,1,opt,name=data,proto3" json:"data,omitempty"`
 	Sequence uint64 `protobuf:"varint,2,opt,name=sequence,proto3" json:"sequence,omitempty"`

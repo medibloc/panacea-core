@@ -13,88 +13,88 @@ option go_package = "github.com/medibloc/panacea-core/x/aol/types";
 
 // Query defines the gRPC querier service.
 service Query {
-	// Topic returns topic details.
-	rpc Topic(QueryTopicRequest) returns (QueryTopicResponse) {
-		option (google.api.http).get = "/panacea/aol/v2/owners/{owner_address}/topics/{topic_name}";
-	}
+  // Topic returns topic details.
+  rpc Topic(QueryTopicRequest) returns (QueryTopicResponse) {
+    option (google.api.http).get =
+        "/panacea/aol/v2/owners/{owner_address}/topics/{topic_name}";
+  }
 
-	// Topics returns topic names.
-	rpc Topics(QueryTopicsRequest) returns (QueryTopicsResponse) {
-		option (google.api.http).get = "/panacea/aol/v2/owners/{owner_address}/topics";
-	}
+  // Topics returns topic names.
+  rpc Topics(QueryTopicsRequest) returns (QueryTopicsResponse) {
+    option (google.api.http).get =
+        "/panacea/aol/v2/owners/{owner_address}/topics";
+  }
 
-	// Writer returns writer details.
-	rpc Writer(QueryWriterRequest) returns (QueryWriterResponse) {
-		option (google.api.http).get = "/panacea/aol/v2/owners/{owner_address}/topics/{topic_name}/writers/{writer_address}";
-	}
+  // Writer returns writer details.
+  rpc Writer(QueryWriterRequest) returns (QueryWriterResponse) {
+    option (google.api.http).get =
+        "/panacea/aol/v2/owners/{owner_address}/topics/{topic_name}/writers/"
+        "{writer_address}";
+  }
 
-	// Writers returns writer addresses.
-	rpc Writers(QueryWritersRequest) returns (QueryWritersResponse) {
-		option (google.api.http).get = "/panacea/aol/v2/owners/{owner_address}/topics/{topic_name}/writers";
-	}
+  // Writers returns writer addresses.
+  rpc Writers(QueryWritersRequest) returns (QueryWritersResponse) {
+    option (google.api.http).get =
+        "/panacea/aol/v2/owners/{owner_address}/topics/{topic_name}/writers";
+  }
 
-	// Record returns record details.
-	rpc Record(QueryRecordRequest) returns (QueryRecordResponse) {
-		option (google.api.http).get = "/panacea/aol/v2/owners/{owner_address}/topics/{topic_name}/records/{offset}";
-	}
+  // Record returns record details.
+  rpc Record(QueryRecordRequest) returns (QueryRecordResponse) {
+    option (google.api.http).get = "/panacea/aol/v2/owners/{owner_address}/"
+                                   "topics/{topic_name}/records/{offset}";
+  }
 }
 
 // QueryTopicRequest is the request type for the Query/Topic RPC method.
 message QueryTopicRequest {
-	string owner_address = 1;
-	string topic_name = 2;
+  string owner_address = 1;
+  string topic_name = 2;
 }
 
 // QueryTopicResponse is the response type for the Query/Topic RPC method.
-message QueryTopicResponse {
-	Topic topic = 1;
-}
+message QueryTopicResponse { Topic topic = 1; }
 
 // QueryTopicsRequest is the request type for the Query/Topics RPC method.
 message QueryTopicsRequest {
-	string owner_address = 1;
-	cosmos.base.query.v1beta1.PageRequest pagination = 2;
+  string owner_address = 1;
+  cosmos.base.query.v1beta1.PageRequest pagination = 2;
 }
 
 // QueryTopicsResponse is the response type for the Query/Topics RPC method.
 message QueryTopicsResponse {
-	repeated string topic_names = 1;
-	cosmos.base.query.v1beta1.PageResponse pagination = 2;
+  repeated string topic_names = 1;
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 
 // QueryWriterRequest is the request type for the Query/Writer RPC method.
 message QueryWriterRequest {
-	string owner_address = 1;
-	string topic_name = 2;
-	string writer_address = 3;
+  string owner_address = 1;
+  string topic_name = 2;
+  string writer_address = 3;
 }
 
 // QueryWriterResponse is the response type for the Query/Writer RPC method.
-message QueryWriterResponse {
-	Writer writer = 1;
-}
+message QueryWriterResponse { Writer writer = 1; }
 
 // QueryWritersRequest is the request type for the Query/Writers RPC method.
 message QueryWritersRequest {
-	string owner_address = 1;
-	string topic_name = 2;
-	cosmos.base.query.v1beta1.PageRequest pagination = 3;
+  string owner_address = 1;
+  string topic_name = 2;
+  cosmos.base.query.v1beta1.PageRequest pagination = 3;
 }
 
 // QueryWritersResponse is the response type for the Query/Writers RPC method.
 message QueryWritersResponse {
-	repeated string writer_addresses = 1;
-	cosmos.base.query.v1beta1.PageResponse pagination = 2;
+  repeated string writer_addresses = 1;
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 
 // QueryRecordRequest is the request type for the Query/Record RPC method.
 message QueryRecordRequest {
-	string owner_address = 1;
-	string topic_name = 2;
-	uint64 offset = 3;
+  string owner_address = 1;
+  string topic_name = 2;
+  uint64 offset = 3;
 }
 
 // QueryRecordResponse is the response type for the Query/Record RPC method.
-message QueryRecordResponse {
-	Record record = 1;
-}
+message QueryRecordResponse { Record record = 1; }

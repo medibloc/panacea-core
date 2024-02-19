@@ -56,13 +56,16 @@ func CmdAddRecord() *cobra.Command {
 
 // generateOrBroadcastTxWithMultiSigners is a fork of tx.GenerateOrBroadcastTxCLI, but with multi signers.
 func generateOrBroadcastTxWithMultiSigners(clientCtx client.Context, flagSet *pflag.FlagSet, signerAddrs []sdk.AccAddress, msgs ...sdk.Msg) error {
-	txf := tx.NewFactoryCLI(clientCtx, flagSet)
+	txf, err := tx.NewFactoryCLI(clientCtx, flagSet)
+	if err != nil {
+		return err
+	}
 	if txf.SignMode() == signing.SignMode_SIGN_MODE_UNSPECIFIED {
 		txf = txf.WithSignMode(signing.SignMode_SIGN_MODE_DIRECT)
 	}
 
 	if clientCtx.GenerateOnly {
-		return tx.GenerateTx(clientCtx, txf, msgs...)
+		return tx.GenerateOrBroadcastTxWithFactory(clientCtx, txf, msgs...)
 	}
 	return broadcastTxWithMultiSigners(clientCtx, txf, signerAddrs, msgs...)
 }
@@ -83,7 +86,7 @@ func broadcastTxWithMultiSigners(clientCtx client.Context, txf tx.Factory, signe
 		return nil
 	}
 
-	txBuilder, err := tx.BuildUnsignedTx(txf, msgs...)
+	txBuilder, err := txf.BuildUnsignedTx(msgs...)
 	if err != nil {
 		return err
 	}
@@ -132,7 +135,7 @@ func broadcastTxWithMultiSigners(clientCtx client.Context, txf tx.Factory, signe
 }
 
 type accountInKeyring struct {
-	keyInfo       keyring.Info
+	keyInfo       *keyring.Record
 	accountNumber uint64
 	sequence      uint64
 }
@@ -170,8 +173,12 @@ func gatherAllSignerInfos(txBuilder client.TxBuilder, signMode signing.SignMode,
 	var sigsV2 []signing.SignatureV2
 
 	for _, account := range accounts {
+		pub, err := account.keyInfo.GetPubKey()
+		if err != nil {
+			return err
+		}
 		sigV2 := signing.SignatureV2{
-			PubKey: account.keyInfo.GetPubKey(),
+			PubKey: pub,
 			Data: &signing.SingleSignatureData{
 				SignMode:  signMode,
 				Signature: nil,
@@ -197,7 +204,7 @@ func signWithMultiSigners(clientCtx client.Context, txBuilder client.TxBuilder, 
 		if err != nil {
 			return err
 		}
-		signature, pubKey, err := clientCtx.Keyring.Sign(account.keyInfo.GetName(), signBytes)
+		signature, pubKey, err := clientCtx.Keyring.Sign(account.keyInfo.Name, signBytes)
 		if err != nil {
 			return err
 		}

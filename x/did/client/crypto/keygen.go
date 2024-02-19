@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/cometbft/cometbft/crypto/secp256k1"
 	"github.com/cosmos/cosmos-sdk/crypto/hd"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/go-bip39"
-	"github.com/tendermint/tendermint/crypto/secp256k1"
 )
 
 const (

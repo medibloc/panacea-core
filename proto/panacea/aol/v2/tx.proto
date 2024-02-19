@@ -15,7 +15,8 @@ service Msg {
   // DeleteWriter defines a method for deleting a writer to the topic.
   rpc DeleteWriter(MsgDeleteWriter) returns (MsgDeleteWriterResponse);
 
-  // AddRecord defines a method for adding a record to the topic with the writer.
+  // AddRecord defines a method for adding a record to the topic with the
+  // writer.
   rpc AddRecord(MsgAddRecord) returns (MsgAddRecordResponse);
 }
 
@@ -27,7 +28,7 @@ message MsgCreateTopic {
 }
 
 // MsgCreateTopicResponse defines the Msg/CreateTopic response type.
-message MsgCreateTopicResponse { }
+message MsgCreateTopicResponse {}
 
 // MsgAddWriter defines the Msg/AddWriter request type.
 message MsgAddWriter {
@@ -39,7 +40,7 @@ message MsgAddWriter {
 }
 
 // MsgAddWriter defines the Msg/AddWriter response type.
-message MsgAddWriterResponse { }
+message MsgAddWriterResponse {}
 
 // MsgDeleteWriter defines the Msg/DeleteWriter request type.
 message MsgDeleteWriter {
@@ -49,7 +50,7 @@ message MsgDeleteWriter {
 }
 
 // MsgDeleteWriter defines the Msg/DeleteWriter response type.
-message MsgDeleteWriterResponse { }
+message MsgDeleteWriterResponse {}
 
 // MsgAddRecord defines the Msg/AddRecord request type.
 message MsgAddRecord {

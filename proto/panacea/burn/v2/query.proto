@@ -8,5 +8,4 @@ option java_multiple_files = true;
 option go_package = "github.com/medibloc/panacea-core/x/burn/types";
 
 // Query defines the gRPC querier service.
-service Query {
-}
+service Query {}
