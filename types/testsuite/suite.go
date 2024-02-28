@@ -131,7 +131,9 @@ func (suite *TestSuite) SetupTest() {
 		"panacea",
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
-	suite.AccountKeeper.SetParams(ctx, authtypes.DefaultParams())
+	if err := suite.AccountKeeper.SetParams(ctx, authtypes.DefaultParams()); err != nil {
+		panic(err)
+	}
 	suite.AolKeeper = *aolkeeper.NewKeeper(
 		appCodec,
 		keyParams[aoltypes.StoreKey],
@@ -145,7 +147,9 @@ func (suite *TestSuite) SetupTest() {
 		BlockedAddresses(maccPerms),
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
-	suite.BankKeeper.SetParams(ctx, banktypes.DefaultParams())
+	if err := suite.BankKeeper.SetParams(ctx, banktypes.DefaultParams()); err != nil {
+		panic(err)
+	}
 	suite.BurnKeeper = *burnkeeper.NewKeeper(suite.BankKeeper)
 	suite.StakingKeeper = stakingkeeper.NewKeeper(
 		appCodec,
