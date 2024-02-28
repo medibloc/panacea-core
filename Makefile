@@ -55,6 +55,8 @@ ldflags = -X github.com/cosmos/cosmos-sdk/version.Name=panacea-core \
 		  -X "github.com/cosmos/cosmos-sdk/version.BuildTags=$(build_tags_comma_sep)" \
 		  -X github.com/tendermint/tendermint/version.TMCoreSemVer=$(TMVERSION)
 
+ARTIFACT_DIR := artifacts
+
 # DB backend selection
 ifeq (cleveldb,$(findstring cleveldb,$(COSMOS_BUILD_OPTIONS)))
   build_tags += gcc
@@ -102,6 +104,11 @@ BUILD_TARGETS := build install
 build: BUILD_ARGS=-o $(BUILDDIR)/
 build-linux:
 	GOOS=linux GOARCH=$(if $(findstring aarch64,$(shell uname -m)) || $(findstring arm64,$(shell uname -m)),arm64,amd64) LEDGER_ENABLED=false $(MAKE) build
+
+test:
+	mkdir -p $(ARTIFACT_DIR)
+	go test -covermode=count -coverprofile=$(ARTIFACT_DIR)/coverage.out ./...
+	go tool cover -html=$(ARTIFACT_DIR)/coverage.out -o $(ARTIFACT_DIR)/coverage.html
 
 $(BUILD_TARGETS): go.sum $(BUILDDIR)/
 	go $@ -mod=readonly $(BUILD_FLAGS) $(BUILD_ARGS) ./...
