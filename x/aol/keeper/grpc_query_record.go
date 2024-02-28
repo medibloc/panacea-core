@@ -9,7 +9,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (k Keeper) Record(c context.Context, req *types.QueryRecordRequest) (*types.QueryRecordResponse, error) {
+func (k Keeper) Record(c context.Context, req *types.QueryServiceRecordRequest) (*types.QueryServiceRecordResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
@@ -27,5 +27,5 @@ func (k Keeper) Record(c context.Context, req *types.QueryRecordRequest) (*types
 	}
 
 	record := k.GetRecord(ctx, recordKey)
-	return &types.QueryRecordResponse{Record: &record}, nil
+	return &types.QueryServiceRecordResponse{Record: &record}, nil
 }

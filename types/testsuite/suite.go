@@ -53,14 +53,14 @@ type TestSuite struct {
 	AccountKeeper    authkeeper.AccountKeeper
 	StakingKeeper    *stakingkeeper.Keeper
 	AolKeeper        aolkeeper.Keeper
-	AolMsgServer     aoltypes.MsgServer
+	AolMsgServer     aoltypes.MsgServiceServer
 	BankKeeper       bankkeeper.Keeper
 	BurnKeeper       burnkeeper.Keeper
 	CapabilityKeeper *capabilitykeeper.Keeper
 	DistrKeeper      distrkeeper.Keeper
 	IBCKeeper        *ibckeeper.Keeper
 	TransferKeeper   ibctransferkeeper.Keeper
-	DIDMsgServer     didtypes.MsgServer
+	DIDMsgServer     didtypes.MsgServiceServer
 	DIDKeeper        didkeeper.Keeper
 	UpgradeKeeper    *upgradekeeper.Keeper
 }

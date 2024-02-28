@@ -23,9 +23,9 @@ func CmdGetDID() *cobra.Command {
 				return err
 			}
 
-			queryClient := types.NewQueryClient(clientCtx)
+			queryClient := types.NewQueryServiceClient(clientCtx)
 
-			params := &types.QueryDIDRequest{
+			params := &types.QueryServiceDIDRequest{
 				DidBase64: base64.StdEncoding.EncodeToString([]byte(id)),
 			}
 

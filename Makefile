@@ -75,7 +75,7 @@ endif
 ifeq (,$(findstring nostrip,$(COSMOS_BUILD_OPTIONS)))
   ldflags += -w -s
 endif
-ldflags += $(LDFLAGS)
+#ldflags += $(LDFLAGS)
 ldflags := $(strip $(ldflags))
 
 build_tags += $(BUILD_TAGS)
@@ -92,8 +92,8 @@ ifeq (debug,$(findstring debug,$(COSMOS_BUILD_OPTIONS)))
   BUILD_FLAGS += -gcflags "all=-N -l"
 endif
 
-all: tools build lint test
-
+all: build lint test
+build-all: proto-lint proto-gen proto-swagger-gen build
 ###############################################################################
 ###                                  Build                                  ###
 ###############################################################################
@@ -130,7 +130,6 @@ go.sum: go.mod
 	echo "Ensure dependencies have not been modified ..." >&2
 	go mod verify
 	go mod tidy
-
 
 ###############################################################################
 ###                                Linting                                  ###

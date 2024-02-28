@@ -15,7 +15,7 @@ func TestMsgCreateDID(t *testing.T) {
 	sig := []byte("my-sig")
 	fromAddr := getFromAddress(t)
 
-	msg := types.NewMsgCreateDID(doc.Id, doc, doc.VerificationMethods[0].Id, sig, fromAddr.String())
+	msg := types.NewMsgServiceCreateDIDResponse(doc.Id, doc, doc.VerificationMethods[0].Id, sig, fromAddr.String())
 	require.Equal(t, doc.Id, msg.Did)
 	require.Equal(t, doc, *msg.Document)
 	require.Equal(t, doc.VerificationMethods[0].Id, msg.VerificationMethodId)

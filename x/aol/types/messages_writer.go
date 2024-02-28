@@ -1,14 +1,15 @@
 package types
 
 import (
+	"cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-var _ sdk.Msg = &MsgAddWriter{}
+var _ sdk.Msg = &MsgServiceAddWriterRequest{}
 
-func NewMsgAddWriter(topicName, moniker, description, writerAddress, ownerAddress string) *MsgAddWriter {
-	return &MsgAddWriter{
+func NewMsgAddWriter(topicName, moniker, description, writerAddress, ownerAddress string) *MsgServiceAddWriterRequest {
+	return &MsgServiceAddWriterRequest{
 		TopicName:     topicName,
 		Moniker:       moniker,
 		Description:   description,
@@ -17,15 +18,15 @@ func NewMsgAddWriter(topicName, moniker, description, writerAddress, ownerAddres
 	}
 }
 
-func (msg *MsgAddWriter) Route() string {
+func (msg *MsgServiceAddWriterRequest) Route() string {
 	return RouterKey
 }
 
-func (msg *MsgAddWriter) Type() string {
+func (msg *MsgServiceAddWriterRequest) Type() string {
 	return "AddWriter"
 }
 
-func (msg *MsgAddWriter) GetSigners() []sdk.AccAddress {
+func (msg *MsgServiceAddWriterRequest) GetSigners() []sdk.AccAddress {
 	ownerAddress, err := sdk.AccAddressFromBech32(msg.OwnerAddress)
 	if err != nil {
 		panic(err)
@@ -33,12 +34,12 @@ func (msg *MsgAddWriter) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{ownerAddress}
 }
 
-func (msg *MsgAddWriter) GetSignBytes() []byte {
+func (msg *MsgServiceAddWriterRequest) GetSignBytes() []byte {
 	bz := ModuleCdc.MustMarshalJSON(msg)
 	return sdk.MustSortJSON(bz)
 }
 
-func (msg *MsgAddWriter) ValidateBasic() error {
+func (msg *MsgServiceAddWriterRequest) ValidateBasic() error {
 	if err := validateTopicName(msg.TopicName); err != nil {
 		return err
 	}
@@ -49,32 +50,32 @@ func (msg *MsgAddWriter) ValidateBasic() error {
 		return err
 	}
 	if _, err := sdk.AccAddressFromBech32(msg.WriterAddress); err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid writer address (%s)", err)
+		return errors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid writer address (%s)", err)
 	}
 	if _, err := sdk.AccAddressFromBech32(msg.OwnerAddress); err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid owner address (%s)", err)
+		return errors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid owner address (%s)", err)
 	}
 	return nil
 }
 
-var _ sdk.Msg = &MsgDeleteWriter{}
+var _ sdk.Msg = &MsgServiceDeleteWriterRequest{}
 
-func NewMsgDeleteWriter(topicName, writerAddress, ownerAddress string) *MsgDeleteWriter {
-	return &MsgDeleteWriter{
+func NewMsgDeleteWriter(topicName, writerAddress, ownerAddress string) *MsgServiceDeleteWriterRequest {
+	return &MsgServiceDeleteWriterRequest{
 		TopicName:     topicName,
 		WriterAddress: writerAddress,
 		OwnerAddress:  ownerAddress,
 	}
 }
-func (msg *MsgDeleteWriter) Route() string {
+func (msg *MsgServiceDeleteWriterRequest) Route() string {
 	return RouterKey
 }
 
-func (msg *MsgDeleteWriter) Type() string {
+func (msg *MsgServiceDeleteWriterRequest) Type() string {
 	return "DeleteWriter"
 }
 
-func (msg *MsgDeleteWriter) GetSigners() []sdk.AccAddress {
+func (msg *MsgServiceDeleteWriterRequest) GetSigners() []sdk.AccAddress {
 	ownerAddress, err := sdk.AccAddressFromBech32(msg.OwnerAddress)
 	if err != nil {
 		panic(err)
@@ -82,20 +83,20 @@ func (msg *MsgDeleteWriter) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{ownerAddress}
 }
 
-func (msg *MsgDeleteWriter) GetSignBytes() []byte {
+func (msg *MsgServiceDeleteWriterRequest) GetSignBytes() []byte {
 	bz := ModuleCdc.MustMarshalJSON(msg)
 	return sdk.MustSortJSON(bz)
 }
 
-func (msg *MsgDeleteWriter) ValidateBasic() error {
+func (msg *MsgServiceDeleteWriterRequest) ValidateBasic() error {
 	if err := validateTopicName(msg.TopicName); err != nil {
 		return err
 	}
 	if _, err := sdk.AccAddressFromBech32(msg.WriterAddress); err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid writer address (%s)", err)
+		return errors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid writer address (%s)", err)
 	}
 	if _, err := sdk.AccAddressFromBech32(msg.OwnerAddress); err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid owner address (%s)", err)
+		return errors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid owner address (%s)", err)
 	}
 	return nil
 }

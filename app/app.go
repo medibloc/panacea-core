@@ -89,7 +89,7 @@ import (
 	appparams "github.com/medibloc/panacea-core/v2/app/params"
 
 	// unnamed import of statik for swagger UI support
-	_ "github.com/medibloc/panacea-core/v2/client/docs/statik"
+	_ "github.com/cosmos/cosmos-sdk/client/docs/statik"
 
 	"github.com/medibloc/panacea-core/v2/x/aol"
 	aoltypes "github.com/medibloc/panacea-core/v2/x/aol/types"

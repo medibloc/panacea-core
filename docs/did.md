@@ -13,15 +13,15 @@ This specification describes how DIDs are managed on the Panacea.
 
 * [DID Method Name](#did-method-name)
 * [DID Method Specific Identifier](#did-method-specific-identifier)
-    * [Relationship between DIDs and Panacea accounts](#relationship-between-dids-and-panacea-accounts)
+  * [Relationship between DIDs and Panacea accounts](#relationship-between-dids-and-panacea-accounts)
 * [DID Document Format (JSON-LD)](#did-document-format-json-ld)
 * [CRUD Operations](#crud-operations)
-    * [Create (Register)](#create-register)
-    * [Read](#read)
-    * [Update](#update)
-    * [Deactivate](#deactivate)
+  * [Create (Register)](#create-register)
+  * [Read](#read)
+  * [Update](#update)
+  * [Deactivate](#deactivate)
 * [Security Considerations](#security-considerations)
-    * [Replay Attack](#replay-attack)
+  * [Replay Attack](#replay-attack)
 * [Privacy Considerations](#privacy-considerations)
 * [Reference Implementations](#reference-implementations)
 * [References](#references)
@@ -65,7 +65,7 @@ to create/update/deactivate the DIDs.
 It means that Panacea accounts are not used to verify the DID ownership.
 To prove the DID ownership, users must include a signature to the transaction.
 The signature must be generated with the private key which corresponds to one of the public keys registered in the DID document.
-The signature is different from the Panacea transaction signature generated with the private key of the Panacea account. 
+The signature is different from the Panacea transaction signature generated with the private key of the Panacea account.
 The details are described below.
 
 
@@ -73,19 +73,19 @@ The details are described below.
 
 ```json
 {
-    "@context": "https://www.w3.org/ns/did/v1",
-    "id": "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm",
-    "verificationMethod": [
-        {
-            "id": "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm#key1",
-            "type": "Secp256k1VerificationKey2018",
-            "controller": "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm",
-            "publicKeyBase58": "dBuN4i7dqwCLzSX7GHBLsfUoXw5RmWQ3DwQ9Ee4bfh5Y"
-        }
-    ],
-    "authentication": [
-        "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm#key1"
-    ]
+  "@context": "https://www.w3.org/ns/did/v1",
+  "id": "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm",
+  "verificationMethod": [
+    {
+      "id": "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm#key1",
+      "type": "Secp256k1VerificationKey2018",
+      "controller": "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm",
+      "publicKeyBase58": "dBuN4i7dqwCLzSX7GHBLsfUoXw5RmWQ3DwQ9Ee4bfh5Y"
+    }
+  ],
+  "authentication": [
+    "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm#key1"
+  ]
 }
 ```
 
@@ -105,28 +105,28 @@ The Panacea DID Document doesn't contain the `service` field currently. It would
 To create a DID Document in Panacea, the following transaction should be submitted.
 ```json
 {
-    "type": "did/MsgCreateDID",
-    "value": {
-        "did": "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm",
-        "document": {
-            "@context": "https://www.w3.org/ns/did/v1",
-            "id": "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm",
-            "verificationMethod": [
-                {
-                    "id": "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm#key1",
-                    "type": "Secp256k1VerificationKey2018",
-                    "controller": "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm",
-                    "publicKeyBase58": "dBuN4i7dqwCLzSX7GHBLsfUoXw5RmWQ3DwQ9Ee4bfh5Y"
-                }
-            ],
-            "authentication": [
-                "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm#key1"
-            ]
-        },
-        "signature": "FLOgUBcMEjKs/o1lgu4Y5Ump/2xee0D0tLsrY9+YVMUD/G/qbSHo3lOJ4Jv2zsDn1grcbIYSQsOvoBTbYXXg3g==",
-        "verification_method_id": "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm#key1",
-        "from_address": "panacea1d58s72gu0mjkw0lkgyvr0eqzz3mv74awfsjslz"
-    }
+  "type": "did/MsgCreateDID",
+  "value": {
+    "did": "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm",
+    "document": {
+      "@context": "https://www.w3.org/ns/did/v1",
+      "id": "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm",
+      "verificationMethod": [
+        {
+          "id": "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm#key1",
+          "type": "Secp256k1VerificationKey2018",
+          "controller": "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm",
+          "publicKeyBase58": "dBuN4i7dqwCLzSX7GHBLsfUoXw5RmWQ3DwQ9Ee4bfh5Y"
+        }
+      ],
+      "authentication": [
+        "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm#key1"
+      ]
+    },
+    "signature": "FLOgUBcMEjKs/o1lgu4Y5Ump/2xee0D0tLsrY9+YVMUD/G/qbSHo3lOJ4Jv2zsDn1grcbIYSQsOvoBTbYXXg3g==",
+    "verification_method_id": "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm#key1",
+    "from_address": "panacea1d58s72gu0mjkw0lkgyvr0eqzz3mv74awfsjslz"
+  }
 }
 ```
 The transaction must have a `did` and a `document` which will be stored in the Panacea.
@@ -139,12 +139,12 @@ The `verification_method_id` must be one of the key IDs specified in the `authen
 The source of the `signature` should look like (encoded with Amino):
 ```json
 {
-    "data": {
-        "@context": ...,
-        "id": "did:panacea:...",
-        ...
-    },
-    "sequence": "0"
+  "data": {
+    "@context": ...,
+    "id": "did:panacea:...",
+    ...
+  },
+  "sequence": "0"
 }
 ```
 
@@ -158,29 +158,29 @@ The transaction fails if the same DID exists or if it has been already deactivat
 A Panacea DID Document can be looked up by the following query.
 ```json
 {
-    "did": "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm"
+  "did": "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm"
 }
 ```
 
 If the DID exists (not deactivated yet), the result is:
 ```json
 {
-    "document": {
-        "@context": "https://www.w3.org/ns/did/v1",
-        "id": "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm",
-        "verificationMethod": [
-            {
-                "id": "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm#key1",
-                "type": "Secp256k1VerificationKey2018",
-                "controller": "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm",
-                "publicKeyBase58": "dBuN4i7dqwCLzSX7GHBLsfUoXw5RmWQ3DwQ9Ee4bfh5Y"
-            }
-        ],
-        "authentication": [
-            "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm#key1"
-        ]
-    },
-    "sequence": "0"
+  "document": {
+    "@context": "https://www.w3.org/ns/did/v1",
+    "id": "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm",
+    "verificationMethod": [
+      {
+        "id": "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm#key1",
+        "type": "Secp256k1VerificationKey2018",
+        "controller": "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm",
+        "publicKeyBase58": "dBuN4i7dqwCLzSX7GHBLsfUoXw5RmWQ3DwQ9Ee4bfh5Y"
+      }
+    ],
+    "authentication": [
+      "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm#key1"
+    ]
+  },
+  "sequence": "0"
 }
 ```
 
@@ -194,40 +194,40 @@ Only the DID owner can replace the DID Document using the following transaction.
 This example is for adding a new public key to the `verificationMethod` and adding a dedicated public key to the `authentication`.
 ```json
 {
-    "type": "did/MsgUpdateDID",
-    "value": {
-        "did": "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm",
-        "document": {
-            "@context": "https://www.w3.org/ns/did/v1",
-            "id": "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm",
-            "verificationMethod": [
-                {
-                    "id": "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm#key1",
-                    "type": "Secp256k1VerificationKey2018",
-                    "controller": "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm",
-                    "publicKeyBase58": "dBuN4i7dqwCLzSX7GHBLsfUoXw5RmWQ3DwQ9Ee4bfh5Y"
-                },
-                {
-                    "id": "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm#key2",
-                    "type": "Secp256k1VerificationKey2018",
-                    "controller": "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm",
-                    "publicKeyBase58": "2BjcxuwijyE1om4991ANiFrwZJ3Ev5YYX9KiPKgaHmGsi"
-                }
-            ],
-            "authentication": [
-                "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm#key1",
-                {
-                    "id": "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm#key3",
-                    "type": "Secp256k1VerificationKey2018",
-                    "controller": "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm",
-                    "publicKeyBase58": "yE1om4991ANiFrwZJ3Ev5YYX9KiPKgaHmGsi2Bjcxuwij"
-                }
-            ]
+  "type": "did/MsgUpdateDID",
+  "value": {
+    "did": "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm",
+    "document": {
+      "@context": "https://www.w3.org/ns/did/v1",
+      "id": "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm",
+      "verificationMethod": [
+        {
+          "id": "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm#key1",
+          "type": "Secp256k1VerificationKey2018",
+          "controller": "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm",
+          "publicKeyBase58": "dBuN4i7dqwCLzSX7GHBLsfUoXw5RmWQ3DwQ9Ee4bfh5Y"
         },
-        "signature": "xtsQH3D5naHe9IXmhCnohlChwHiD0dx9PI4aPkaJPGoEznYMHmg0aBerg85ai7T2WNxxlc39uFzAxKbI4sbJCA==",
-        "verification_method_id": "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm#key1",
-        "from_address": "panacea1d58s72gu0mjkw0lkgyvr0eqzz3mv74awfsjslz"
-    }
+        {
+          "id": "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm#key2",
+          "type": "Secp256k1VerificationKey2018",
+          "controller": "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm",
+          "publicKeyBase58": "2BjcxuwijyE1om4991ANiFrwZJ3Ev5YYX9KiPKgaHmGsi"
+        }
+      ],
+      "authentication": [
+        "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm#key1",
+        {
+          "id": "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm#key3",
+          "type": "Secp256k1VerificationKey2018",
+          "controller": "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm",
+          "publicKeyBase58": "yE1om4991ANiFrwZJ3Ev5YYX9KiPKgaHmGsi2Bjcxuwij"
+        }
+      ]
+    },
+    "signature": "xtsQH3D5naHe9IXmhCnohlChwHiD0dx9PI4aPkaJPGoEznYMHmg0aBerg85ai7T2WNxxlc39uFzAxKbI4sbJCA==",
+    "verification_method_id": "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm#key1",
+    "from_address": "panacea1d58s72gu0mjkw0lkgyvr0eqzz3mv74awfsjslz"
+  }
 }
 ```
 
@@ -241,12 +241,12 @@ Whenever submitting this transaction, the user must query the current `sequence`
 The source of the `signature` should look like (encoded with Amino):
 ```json
 {
-    "data": {
-        "@context": ...,
-        "id": "did:panacea:...",
-        ...
-    },
-    "sequence": "50"
+  "data": {
+    "@context": ...,
+    "id": "did:panacea:...",
+    ...
+  },
+  "sequence": "50"
 }
 ```
 
@@ -261,13 +261,13 @@ This strategy guarantees that malicious users cannot recreate the DID,
 because the DID deactivation may be appropriate when a person dies or a business is terminated.
 ```json
 {
-    "type": "did/MsgDeactivateDID",
-    "value": {
-        "did": "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm",
-        "signature": "xtsQH3D5naHe9IXmhCnohlChwHiD0dx9PI4aPkaJPGoEznYMHmg0aBerg85ai7T2WNxxlc39uFzAxKbI4sbJCA==",
-        "verification_method_id": "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm#key1",
-        "from_address": "panacea1d58s72gu0mjkw0lkgyvr0eqzz3mv74awfsjslz"
-    }
+  "type": "did/MsgDeactivateDID",
+  "value": {
+    "did": "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm",
+    "signature": "xtsQH3D5naHe9IXmhCnohlChwHiD0dx9PI4aPkaJPGoEznYMHmg0aBerg85ai7T2WNxxlc39uFzAxKbI4sbJCA==",
+    "verification_method_id": "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm#key1",
+    "from_address": "panacea1d58s72gu0mjkw0lkgyvr0eqzz3mv74awfsjslz"
+  }
 }
 ```
 
@@ -278,8 +278,8 @@ The `verification_method_id` must be one of the key IDs specified in the `authen
 The source of the `signature` should look like (encoded with Amino):
 ```json
 {
-    "data": "did:panacea:...",
-    "sequence": "50"
+  "data": "did:panacea:...",
+  "sequence": "50"
 }
 ```
 

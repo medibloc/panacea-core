@@ -9,7 +9,7 @@ import (
 	"github.com/medibloc/panacea-core/v2/x/aol/types"
 )
 
-func (k msgServer) AddRecord(goCtx context.Context, msg *types.MsgAddRecord) (*types.MsgAddRecordResponse, error) {
+func (k msgServer) AddRecord(goCtx context.Context, msg *types.MsgServiceAddRecordRequest) (*types.MsgServiceAddRecordResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	ownerAddr, err := sdk.AccAddressFromBech32(msg.OwnerAddress)
@@ -43,7 +43,7 @@ func (k msgServer) AddRecord(goCtx context.Context, msg *types.MsgAddRecord) (*t
 	}
 	k.SetRecord(ctx, recordKey, record)
 
-	return &types.MsgAddRecordResponse{
+	return &types.MsgServiceAddRecordResponse{
 		OwnerAddress: msg.OwnerAddress,
 		TopicName:    msg.TopicName,
 		Offset:       offset,

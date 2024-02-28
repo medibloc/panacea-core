@@ -4,8 +4,6 @@ package panacea.aol.v2;
 option java_multiple_files = true;
 option go_package = "github.com/medibloc/panacea-core/x/aol/types";
 
-import "gogoproto/gogo.proto";
-
 // Topic defines a topic type.
 message Topic {
   string description = 1;

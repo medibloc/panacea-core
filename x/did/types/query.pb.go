@@ -6,7 +6,6 @@ package types
 import (
 	context "context"
 	fmt "fmt"
-	_ "github.com/cosmos/cosmos-sdk/types/query"
 	grpc1 "github.com/cosmos/gogoproto/grpc"
 	proto "github.com/cosmos/gogoproto/proto"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
@@ -31,23 +30,23 @@ const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 // QueryDIDRequest is the request type for the Query/DIDDocumentWithSeq RPC
 // method.
-type QueryDIDRequest struct {
+type QueryServiceDIDRequest struct {
 	// NOTE: Using base64 due to the URI path cannot contain colons.
 	DidBase64 string `protobuf:"bytes,1,opt,name=did_base64,json=didBase64,proto3" json:"did_base64,omitempty"`
 }
 
-func (m *QueryDIDRequest) Reset()         { *m = QueryDIDRequest{} }
-func (m *QueryDIDRequest) String() string { return proto.CompactTextString(m) }
-func (*QueryDIDRequest) ProtoMessage()    {}
-func (*QueryDIDRequest) Descriptor() ([]byte, []int) {
+func (m *QueryServiceDIDRequest) Reset()         { *m = QueryServiceDIDRequest{} }
+func (m *QueryServiceDIDRequest) String() string { return proto.CompactTextString(m) }
+func (*QueryServiceDIDRequest) ProtoMessage()    {}
+func (*QueryServiceDIDRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_77f797fe21802469, []int{0}
 }
-func (m *QueryDIDRequest) XXX_Unmarshal(b []byte) error {
+func (m *QueryServiceDIDRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *QueryDIDRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *QueryServiceDIDRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_QueryDIDRequest.Marshal(b, m, deterministic)
+		return xxx_messageInfo_QueryServiceDIDRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -57,19 +56,19 @@ func (m *QueryDIDRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, err
 		return b[:n], nil
 	}
 }
-func (m *QueryDIDRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_QueryDIDRequest.Merge(m, src)
+func (m *QueryServiceDIDRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryServiceDIDRequest.Merge(m, src)
 }
-func (m *QueryDIDRequest) XXX_Size() int {
+func (m *QueryServiceDIDRequest) XXX_Size() int {
 	return m.Size()
 }
-func (m *QueryDIDRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_QueryDIDRequest.DiscardUnknown(m)
+func (m *QueryServiceDIDRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryServiceDIDRequest.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_QueryDIDRequest proto.InternalMessageInfo
+var xxx_messageInfo_QueryServiceDIDRequest proto.InternalMessageInfo
 
-func (m *QueryDIDRequest) GetDidBase64() string {
+func (m *QueryServiceDIDRequest) GetDidBase64() string {
 	if m != nil {
 		return m.DidBase64
 	}
@@ -78,22 +77,22 @@ func (m *QueryDIDRequest) GetDidBase64() string {
 
 // QueryDIDResponse is the response type for the Query/DIDDocumentWithSeq RPC
 // method.
-type QueryDIDResponse struct {
+type QueryServiceDIDResponse struct {
 	DidDocumentWithSeq *DIDDocumentWithSeq `protobuf:"bytes,1,opt,name=did_document_with_seq,json=didDocumentWithSeq,proto3" json:"did_document_with_seq,omitempty"`
 }
 
-func (m *QueryDIDResponse) Reset()         { *m = QueryDIDResponse{} }
-func (m *QueryDIDResponse) String() string { return proto.CompactTextString(m) }
-func (*QueryDIDResponse) ProtoMessage()    {}
-func (*QueryDIDResponse) Descriptor() ([]byte, []int) {
+func (m *QueryServiceDIDResponse) Reset()         { *m = QueryServiceDIDResponse{} }
+func (m *QueryServiceDIDResponse) String() string { return proto.CompactTextString(m) }
+func (*QueryServiceDIDResponse) ProtoMessage()    {}
+func (*QueryServiceDIDResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_77f797fe21802469, []int{1}
 }
-func (m *QueryDIDResponse) XXX_Unmarshal(b []byte) error {
+func (m *QueryServiceDIDResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *QueryDIDResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *QueryServiceDIDResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_QueryDIDResponse.Marshal(b, m, deterministic)
+		return xxx_messageInfo_QueryServiceDIDResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -103,19 +102,19 @@ func (m *QueryDIDResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, er
 		return b[:n], nil
 	}
 }
-func (m *QueryDIDResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_QueryDIDResponse.Merge(m, src)
+func (m *QueryServiceDIDResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryServiceDIDResponse.Merge(m, src)
 }
-func (m *QueryDIDResponse) XXX_Size() int {
+func (m *QueryServiceDIDResponse) XXX_Size() int {
 	return m.Size()
 }
-func (m *QueryDIDResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_QueryDIDResponse.DiscardUnknown(m)
+func (m *QueryServiceDIDResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryServiceDIDResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_QueryDIDResponse proto.InternalMessageInfo
+var xxx_messageInfo_QueryServiceDIDResponse proto.InternalMessageInfo
 
-func (m *QueryDIDResponse) GetDidDocumentWithSeq() *DIDDocumentWithSeq {
+func (m *QueryServiceDIDResponse) GetDidDocumentWithSeq() *DIDDocumentWithSeq {
 	if m != nil {
 		return m.DidDocumentWithSeq
 	}
@@ -123,36 +122,35 @@ func (m *QueryDIDResponse) GetDidDocumentWithSeq() *DIDDocumentWithSeq {
 }
 
 func init() {
-	proto.RegisterType((*QueryDIDRequest)(nil), "panacea.did.v2.QueryDIDRequest")
-	proto.RegisterType((*QueryDIDResponse)(nil), "panacea.did.v2.QueryDIDResponse")
+	proto.RegisterType((*QueryServiceDIDRequest)(nil), "panacea.did.v2.QueryServiceDIDRequest")
+	proto.RegisterType((*QueryServiceDIDResponse)(nil), "panacea.did.v2.QueryServiceDIDResponse")
 }
 
 func init() { proto.RegisterFile("panacea/did/v2/query.proto", fileDescriptor_77f797fe21802469) }
 
 var fileDescriptor_77f797fe21802469 = []byte{
-	// 343 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x74, 0x90, 0x4f, 0x4a, 0xc3, 0x40,
-	0x14, 0x87, 0x1b, 0x45, 0xa1, 0x23, 0xa8, 0x04, 0x84, 0x12, 0x34, 0xd6, 0xb8, 0x51, 0xd1, 0x8c,
-	0x8d, 0xe2, 0x01, 0xca, 0x2c, 0xec, 0x4e, 0x2b, 0x22, 0xb8, 0x29, 0x93, 0xcc, 0x23, 0x1d, 0x68,
-	0x66, 0x92, 0xce, 0xa4, 0x5a, 0xd4, 0x8d, 0x27, 0x10, 0xbc, 0x94, 0xcb, 0x82, 0x1b, 0x97, 0xd2,
-	0x7a, 0x10, 0xc9, 0xb4, 0x52, 0x8c, 0xb8, 0x7d, 0xef, 0xfb, 0x7d, 0xef, 0x0f, 0x72, 0x52, 0x2a,
-	0x68, 0x04, 0x14, 0x33, 0xce, 0xf0, 0x20, 0xc0, 0x59, 0x0e, 0xfd, 0xa1, 0x9f, 0xf6, 0xa5, 0x96,
-	0xf6, 0xea, 0xac, 0xe7, 0x33, 0xce, 0xfc, 0x41, 0xe0, 0x6c, 0xc6, 0x52, 0xc6, 0x3d, 0xc0, 0x34,
-	0xe5, 0x98, 0x0a, 0x21, 0x35, 0xd5, 0x5c, 0x0a, 0x35, 0xa5, 0x9d, 0x83, 0x48, 0xaa, 0x44, 0x2a,
-	0x1c, 0x52, 0x05, 0x53, 0x0d, 0x1e, 0x34, 0x42, 0xd0, 0xb4, 0x81, 0x53, 0x1a, 0x73, 0x61, 0xe0,
-	0x19, 0x5b, 0x2b, 0x4d, 0x2d, 0x06, 0x98, 0x8e, 0x77, 0x8c, 0xd6, 0x2e, 0x8b, 0x2c, 0x69, 0x91,
-	0x36, 0x64, 0x39, 0x28, 0x6d, 0x6f, 0x21, 0xc4, 0x38, 0xeb, 0x14, 0xde, 0xb3, 0xd3, 0x9a, 0x55,
-	0xb7, 0xf6, 0xaa, 0xed, 0x2a, 0xe3, 0xac, 0x69, 0x0a, 0x1e, 0x47, 0xeb, 0xf3, 0x84, 0x4a, 0xa5,
-	0x50, 0x60, 0x5f, 0xa3, 0x8d, 0x22, 0xc2, 0x64, 0x94, 0x27, 0x20, 0x74, 0xe7, 0x8e, 0xeb, 0x6e,
-	0x47, 0x41, 0x66, 0xd2, 0x2b, 0x81, 0xe7, 0xff, 0xbe, 0xcc, 0x27, 0x2d, 0x42, 0x66, 0xec, 0x0d,
-	0xd7, 0xdd, 0x2b, 0xc8, 0xda, 0x36, 0xe3, 0xac, 0x54, 0x0b, 0x1e, 0xd1, 0x92, 0x19, 0x65, 0x2b,
-	0xb4, 0x48, 0x5a, 0xc4, 0xde, 0x2e, 0x7b, 0x4a, 0xab, 0x3b, 0xf5, 0xff, 0x81, 0xe9, 0xa6, 0xde,
-	0xfe, 0xf3, 0xfb, 0xd7, 0xeb, 0xc2, 0xae, 0xbd, 0x83, 0xff, 0xbe, 0x44, 0xe1, 0x87, 0xf9, 0xe1,
-	0x4f, 0xcd, 0xf3, 0xb7, 0xb1, 0x6b, 0x8d, 0xc6, 0xae, 0xf5, 0x39, 0x76, 0xad, 0x97, 0x89, 0x5b,
-	0x19, 0x4d, 0xdc, 0xca, 0xc7, 0xc4, 0xad, 0x5c, 0x58, 0xb7, 0x87, 0x31, 0xd7, 0xdd, 0x3c, 0xf4,
-	0x23, 0x99, 0xe0, 0x04, 0x18, 0x0f, 0x7b, 0x32, 0xfa, 0x31, 0x1e, 0x45, 0xb2, 0x0f, 0xf8, 0xde,
-	0x88, 0xf5, 0x30, 0x05, 0x15, 0x2e, 0x9b, 0x5f, 0x9f, 0x7c, 0x07, 0x00, 0x00, 0xff, 0xff, 0xae,
-	0x8a, 0xe9, 0x40, 0xfd, 0x01, 0x00, 0x00,
+	// 332 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x84, 0x91, 0xcf, 0x4a, 0x33, 0x31,
+	0x14, 0xc5, 0x9b, 0xef, 0x03, 0xa1, 0x51, 0x5c, 0x04, 0xd4, 0x32, 0xe8, 0xa0, 0x23, 0xf8, 0x07,
+	0x74, 0x02, 0xa3, 0xe8, 0xbe, 0x64, 0x61, 0x77, 0xda, 0x22, 0x82, 0x9b, 0x92, 0x99, 0x5c, 0xda,
+	0x40, 0x3b, 0xc9, 0x4c, 0x32, 0xd5, 0x22, 0x2e, 0xf4, 0x09, 0x44, 0x5f, 0xca, 0x65, 0xc1, 0x8d,
+	0x4b, 0x69, 0x7d, 0x10, 0xe9, 0xb4, 0xa2, 0x4e, 0x05, 0xb7, 0xf7, 0x9e, 0xf3, 0x4b, 0xce, 0xb9,
+	0xd8, 0xd1, 0x3c, 0xe6, 0x11, 0x70, 0x2a, 0xa4, 0xa0, 0xbd, 0x80, 0x26, 0x19, 0xa4, 0x7d, 0x5f,
+	0xa7, 0xca, 0x2a, 0xb2, 0x38, 0xdd, 0xf9, 0x42, 0x0a, 0xbf, 0x17, 0x38, 0xab, 0x2d, 0xa5, 0x5a,
+	0x1d, 0xa0, 0x5c, 0x4b, 0xca, 0xe3, 0x58, 0x59, 0x6e, 0xa5, 0x8a, 0xcd, 0x44, 0xed, 0x54, 0x0a,
+	0xa4, 0xb1, 0x29, 0xdf, 0x78, 0xc7, 0x78, 0xf9, 0x6c, 0x8c, 0x6d, 0x40, 0xda, 0x93, 0x11, 0xb0,
+	0x1a, 0xab, 0x43, 0x92, 0x81, 0xb1, 0x64, 0x0d, 0x63, 0x21, 0x45, 0x33, 0xe4, 0x06, 0x8e, 0x0e,
+	0x2b, 0x68, 0x1d, 0xed, 0x94, 0xeb, 0x65, 0x21, 0x45, 0x35, 0x1f, 0x78, 0x1a, 0xaf, 0xcc, 0x18,
+	0x8d, 0x56, 0xb1, 0x01, 0x72, 0x8e, 0x97, 0xc6, 0x4e, 0xa1, 0xa2, 0xac, 0x0b, 0xb1, 0x6d, 0x5e,
+	0x49, 0xdb, 0x6e, 0x1a, 0x48, 0x72, 0xc8, 0x7c, 0xe0, 0xf9, 0x3f, 0xff, 0xee, 0xb3, 0x1a, 0x63,
+	0x53, 0xed, 0x85, 0xb4, 0xed, 0x06, 0x24, 0x75, 0x22, 0xa4, 0x28, 0xcc, 0x82, 0x47, 0x84, 0x17,
+	0xbe, 0x3f, 0x49, 0xee, 0x10, 0xfe, 0xcf, 0x6a, 0x8c, 0x6c, 0x15, 0x81, 0xbf, 0x27, 0x72, 0xb6,
+	0xff, 0xd4, 0x4d, 0x02, 0x78, 0xbb, 0xf7, 0x2f, 0xef, 0x4f, 0xff, 0x36, 0xc9, 0x06, 0x9d, 0xed,
+	0xcd, 0xd0, 0x9b, 0xaf, 0x5a, 0x6e, 0xab, 0x27, 0xcf, 0x43, 0x17, 0x0d, 0x86, 0x2e, 0x7a, 0x1b,
+	0xba, 0xe8, 0x61, 0xe4, 0x96, 0x06, 0x23, 0xb7, 0xf4, 0x3a, 0x72, 0x4b, 0xa7, 0xe8, 0x72, 0xaf,
+	0x25, 0x6d, 0x3b, 0x0b, 0xfd, 0x48, 0x75, 0x69, 0x17, 0x84, 0x0c, 0x3b, 0x2a, 0xfa, 0x24, 0xee,
+	0x47, 0x2a, 0x05, 0x7a, 0x9d, 0x83, 0x6d, 0x5f, 0x83, 0x09, 0xe7, 0xf2, 0x83, 0x1c, 0x7c, 0x04,
+	0x00, 0x00, 0xff, 0xff, 0xe6, 0xed, 0x42, 0x8f, 0xf6, 0x01, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -163,81 +161,81 @@ var _ grpc.ClientConn
 // is compatible with the grpc package it is being compiled against.
 const _ = grpc.SupportPackageIsVersion4
 
-// QueryClient is the client API for Query service.
+// QueryServiceClient is the client API for QueryService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
-type QueryClient interface {
+type QueryServiceClient interface {
 	// DID returns a DID Document with a sequence number.
-	DID(ctx context.Context, in *QueryDIDRequest, opts ...grpc.CallOption) (*QueryDIDResponse, error)
+	DID(ctx context.Context, in *QueryServiceDIDRequest, opts ...grpc.CallOption) (*QueryServiceDIDResponse, error)
 }
 
-type queryClient struct {
+type queryServiceClient struct {
 	cc grpc1.ClientConn
 }
 
-func NewQueryClient(cc grpc1.ClientConn) QueryClient {
-	return &queryClient{cc}
+func NewQueryServiceClient(cc grpc1.ClientConn) QueryServiceClient {
+	return &queryServiceClient{cc}
 }
 
-func (c *queryClient) DID(ctx context.Context, in *QueryDIDRequest, opts ...grpc.CallOption) (*QueryDIDResponse, error) {
-	out := new(QueryDIDResponse)
-	err := c.cc.Invoke(ctx, "/panacea.did.v2.Query/DID", in, out, opts...)
+func (c *queryServiceClient) DID(ctx context.Context, in *QueryServiceDIDRequest, opts ...grpc.CallOption) (*QueryServiceDIDResponse, error) {
+	out := new(QueryServiceDIDResponse)
+	err := c.cc.Invoke(ctx, "/panacea.did.v2.QueryService/DID", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// QueryServer is the server API for Query service.
-type QueryServer interface {
+// QueryServiceServer is the server API for QueryService service.
+type QueryServiceServer interface {
 	// DID returns a DID Document with a sequence number.
-	DID(context.Context, *QueryDIDRequest) (*QueryDIDResponse, error)
+	DID(context.Context, *QueryServiceDIDRequest) (*QueryServiceDIDResponse, error)
 }
 
-// UnimplementedQueryServer can be embedded to have forward compatible implementations.
-type UnimplementedQueryServer struct {
+// UnimplementedQueryServiceServer can be embedded to have forward compatible implementations.
+type UnimplementedQueryServiceServer struct {
 }
 
-func (*UnimplementedQueryServer) DID(ctx context.Context, req *QueryDIDRequest) (*QueryDIDResponse, error) {
+func (*UnimplementedQueryServiceServer) DID(ctx context.Context, req *QueryServiceDIDRequest) (*QueryServiceDIDResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DID not implemented")
 }
 
-func RegisterQueryServer(s grpc1.Server, srv QueryServer) {
-	s.RegisterService(&_Query_serviceDesc, srv)
+func RegisterQueryServiceServer(s grpc1.Server, srv QueryServiceServer) {
+	s.RegisterService(&_QueryService_serviceDesc, srv)
 }
 
-func _Query_DID_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(QueryDIDRequest)
+func _QueryService_DID_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryServiceDIDRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(QueryServer).DID(ctx, in)
+		return srv.(QueryServiceServer).DID(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/panacea.did.v2.Query/DID",
+		FullMethod: "/panacea.did.v2.QueryService/DID",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(QueryServer).DID(ctx, req.(*QueryDIDRequest))
+		return srv.(QueryServiceServer).DID(ctx, req.(*QueryServiceDIDRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-var _Query_serviceDesc = grpc.ServiceDesc{
-	ServiceName: "panacea.did.v2.Query",
-	HandlerType: (*QueryServer)(nil),
+var _QueryService_serviceDesc = grpc.ServiceDesc{
+	ServiceName: "panacea.did.v2.QueryService",
+	HandlerType: (*QueryServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "DID",
-			Handler:    _Query_DID_Handler,
+			Handler:    _QueryService_DID_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
 	Metadata: "panacea/did/v2/query.proto",
 }
 
-func (m *QueryDIDRequest) Marshal() (dAtA []byte, err error) {
+func (m *QueryServiceDIDRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -247,12 +245,12 @@ func (m *QueryDIDRequest) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *QueryDIDRequest) MarshalTo(dAtA []byte) (int, error) {
+func (m *QueryServiceDIDRequest) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *QueryDIDRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *QueryServiceDIDRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -267,7 +265,7 @@ func (m *QueryDIDRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *QueryDIDResponse) Marshal() (dAtA []byte, err error) {
+func (m *QueryServiceDIDResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -277,12 +275,12 @@ func (m *QueryDIDResponse) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *QueryDIDResponse) MarshalTo(dAtA []byte) (int, error) {
+func (m *QueryServiceDIDResponse) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *QueryDIDResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *QueryServiceDIDResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -313,7 +311,7 @@ func encodeVarintQuery(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	return base
 }
-func (m *QueryDIDRequest) Size() (n int) {
+func (m *QueryServiceDIDRequest) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -326,7 +324,7 @@ func (m *QueryDIDRequest) Size() (n int) {
 	return n
 }
 
-func (m *QueryDIDResponse) Size() (n int) {
+func (m *QueryServiceDIDResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -345,7 +343,7 @@ func sovQuery(x uint64) (n int) {
 func sozQuery(x uint64) (n int) {
 	return sovQuery(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
-func (m *QueryDIDRequest) Unmarshal(dAtA []byte) error {
+func (m *QueryServiceDIDRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -368,10 +366,10 @@ func (m *QueryDIDRequest) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: QueryDIDRequest: wiretype end group for non-group")
+			return fmt.Errorf("proto: QueryServiceDIDRequest: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: QueryDIDRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: QueryServiceDIDRequest: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -427,7 +425,7 @@ func (m *QueryDIDRequest) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *QueryDIDResponse) Unmarshal(dAtA []byte) error {
+func (m *QueryServiceDIDResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -450,10 +448,10 @@ func (m *QueryDIDResponse) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: QueryDIDResponse: wiretype end group for non-group")
+			return fmt.Errorf("proto: QueryServiceDIDResponse: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: QueryDIDResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: QueryServiceDIDResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
