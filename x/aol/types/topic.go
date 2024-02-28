@@ -1,9 +1,8 @@
 package types
 
 import (
+	"cosmossdk.io/errors"
 	"regexp"
-
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 const (
@@ -23,7 +22,7 @@ func (t Topic) IncreaseTotalRecords() Topic {
 	return Topic{
 		TotalRecords: t.TotalRecords + 1,
 		TotalWriters: t.TotalWriters,
-		Description: t.Description,
+		Description:  t.Description,
 	}
 }
 
@@ -31,7 +30,7 @@ func (t Topic) IncreaseTotalWriters() Topic {
 	return Topic{
 		TotalRecords: t.TotalRecords,
 		TotalWriters: t.TotalWriters + 1,
-		Description: t.Description,
+		Description:  t.Description,
 	}
 }
 
@@ -39,18 +38,18 @@ func (t Topic) DecreaseTotalWriters() Topic {
 	return Topic{
 		TotalRecords: t.TotalRecords,
 		TotalWriters: t.TotalWriters - 1,
-		Description: t.Description,
+		Description:  t.Description,
 	}
 }
 
 func validateTopicName(topicName string) error {
 	if len(topicName) > maxTopicLength {
-		return sdkerrors.Wrapf(ErrMessageTooLarge, "topicName (%d > %d)", len(topicName), maxTopicLength)
+		return errors.Wrapf(ErrMessageTooLarge, "topicName (%d > %d)", len(topicName), maxTopicLength)
 	}
 
 	// cannot be an empty string
 	if !regexp.MustCompile("^[A-Za-z0-9._-]+$").MatchString(topicName) {
-		return sdkerrors.Wrapf(ErrInvalidTopic, "topic %s", topicName)
+		return errors.Wrapf(ErrInvalidTopic, "topic %s", topicName)
 	}
 
 	return nil
@@ -58,7 +57,7 @@ func validateTopicName(topicName string) error {
 
 func validateDescription(description string) error {
 	if len(description) > maxDescriptionLength {
-		return sdkerrors.Wrapf(ErrMessageTooLarge, "description (%d > %d)", len(description), maxDescriptionLength)
+		return errors.Wrapf(ErrMessageTooLarge, "description (%d > %d)", len(description), maxDescriptionLength)
 	}
 	return nil
 }

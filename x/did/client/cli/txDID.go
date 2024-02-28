@@ -3,6 +3,7 @@ package cli
 import (
 	"bufio"
 	"context"
+	sdkerrors "cosmossdk.io/errors"
 	"encoding/base64"
 	"errors"
 	"fmt"
@@ -20,7 +21,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	sdkcodec "github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/go-bip39"
 	"github.com/medibloc/panacea-core/v2/x/did/internal/secp256k1util"
 	"github.com/spf13/cobra"

@@ -2,6 +2,7 @@ package types
 
 import (
 	"bytes"
+	"cosmossdk.io/errors"
 	"crypto/sha256"
 	"encoding/json"
 	"fmt"
@@ -10,8 +11,6 @@ import (
 	"strings"
 
 	"github.com/gogo/protobuf/jsonpb"
-
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
 	"github.com/btcsuite/btcutil/base58"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -124,7 +123,7 @@ func NewDID(pubKey []byte) string {
 func ParseDID(str string) (string, error) {
 	did := str
 	if !ValidateDID(did) {
-		return "", sdkerrors.Wrapf(ErrInvalidDID, "did: %v", str)
+		return "", errors.Wrapf(ErrInvalidDID, "did: %v", str)
 	}
 	return did, nil
 }
@@ -344,7 +343,7 @@ func NewVerificationMethodID(did string, name string) string {
 func ParseVerificationMethodID(id string, did string) (string, error) {
 	methodID := id
 	if !ValidateVerificationMethodID(id, did) {
-		return "", sdkerrors.Wrapf(ErrInvalidVerificationMethodID, "verificationMethodID: %v, did: %v", id, did)
+		return "", errors.Wrapf(ErrInvalidVerificationMethodID, "verificationMethodID: %v, did: %v", id, did)
 	}
 	return methodID, nil
 }

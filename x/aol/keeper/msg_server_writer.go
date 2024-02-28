@@ -58,7 +58,7 @@ func (k msgServer) DeleteWriter(goCtx context.Context, msg *types.MsgServiceDele
 	topicKey := types.TopicCompositeKey{OwnerAddress: ownerAddr, TopicName: msg.TopicName}
 	writerKey := types.WriterCompositeKey{OwnerAddress: ownerAddr, TopicName: msg.TopicName, WriterAddress: writerAddr}
 	if !k.HasWriter(ctx, writerKey) {
-		return nil, sdkerrors.Wrapf(types.ErrWriterNotFound, "writer <%s, %s, %s>", msg.OwnerAddress, msg.TopicName, msg.WriterAddress)
+		return nil, errors.Wrapf(types.ErrWriterNotFound, "writer <%s, %s, %s>", msg.OwnerAddress, msg.TopicName, msg.WriterAddress)
 	}
 
 	topic := k.GetTopic(ctx, topicKey).DecreaseTotalWriters()
