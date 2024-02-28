@@ -32,7 +32,7 @@ jobs:
     - name: Lint
       uses: golangci/golangci-lint-action@v3
       with:
-        version: latest
+        version: v1.49.0
 
     - name: Publish coverage.html as an artifact
       uses: actions/upload-artifact@master
