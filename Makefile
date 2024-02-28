@@ -93,7 +93,6 @@ ifeq (debug,$(findstring debug,$(COSMOS_BUILD_OPTIONS)))
 endif
 
 all: build lint test
-build-all: proto-lint proto-gen proto-swagger-gen build
 ###############################################################################
 ###                                  Build                                  ###
 ###############################################################################

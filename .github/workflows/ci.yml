@@ -24,7 +24,7 @@ jobs:
       uses: actions/checkout@v3
 
     - name: Build (+ generating proto and docs)
-      run: make build-all
+      run: make all
 
     - name: Test
       run: make test
