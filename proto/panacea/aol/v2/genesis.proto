@@ -11,8 +11,8 @@ option go_package = "github.com/medibloc/panacea-core/x/aol/types";
 
 // GenesisState defines the aol module's genesis state.
 message GenesisState {
-    map<string, Owner> owners = 1;
-    map<string, Topic> topics = 2;
-    map<string, Writer> writers = 3;
-    map<string, Record> records = 4;
+  map<string, Owner> owners = 1;
+  map<string, Topic> topics = 2;
+  map<string, Writer> writers = 3;
+  map<string, Record> records = 4;
 }

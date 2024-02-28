@@ -5,9 +5,9 @@ import (
 
 	"github.com/stretchr/testify/suite"
 
+	"github.com/cometbft/cometbft/crypto/secp256k1"
 	"github.com/medibloc/panacea-core/v2/types/testsuite"
 	"github.com/medibloc/panacea-core/v2/x/did/client/crypto"
-	"github.com/tendermint/tendermint/crypto/secp256k1"
 )
 
 type keygenTestSuite struct {

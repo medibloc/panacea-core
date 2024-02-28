@@ -5,5 +5,4 @@ option java_multiple_files = true;
 option go_package = "github.com/medibloc/panacea-core/x/burn/types";
 
 // GenesisState defines the burn module's genesis state.
-message GenesisState {
-}
+message GenesisState {}

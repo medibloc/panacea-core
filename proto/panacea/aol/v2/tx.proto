@@ -5,32 +5,33 @@ option java_multiple_files = true;
 option go_package = "github.com/medibloc/panacea-core/x/aol/types";
 
 // Msg defines the Msg service.
-service Msg {
+service MsgService {
   // CreateTopic defines a method for creating a topic.
-  rpc CreateTopic(MsgCreateTopic) returns (MsgCreateTopicResponse);
+  rpc CreateTopic(MsgServiceCreateTopicRequest) returns (MsgServiceCreateTopicResponse);
 
   // AddWriter defines a method for adding a writer to the topic.
-  rpc AddWriter(MsgAddWriter) returns (MsgAddWriterResponse);
+  rpc AddWriter(MsgServiceAddWriterRequest) returns (MsgServiceAddWriterResponse);
 
   // DeleteWriter defines a method for deleting a writer to the topic.
-  rpc DeleteWriter(MsgDeleteWriter) returns (MsgDeleteWriterResponse);
+  rpc DeleteWriter(MsgServiceDeleteWriterRequest) returns (MsgServiceDeleteWriterResponse);
 
-  // AddRecord defines a method for adding a record to the topic with the writer.
-  rpc AddRecord(MsgAddRecord) returns (MsgAddRecordResponse);
+  // AddRecord defines a method for adding a record to the topic with the
+  // writer.
+  rpc AddRecord(MsgServiceAddRecordRequest) returns (MsgServiceAddRecordResponse);
 }
 
 // MsgCreateTopic defines the Msg/CreateTopic request type.
-message MsgCreateTopic {
+message MsgServiceCreateTopicRequest {
   string topic_name = 1;
   string description = 2;
   string owner_address = 3;
 }
 
 // MsgCreateTopicResponse defines the Msg/CreateTopic response type.
-message MsgCreateTopicResponse { }
+message MsgServiceCreateTopicResponse {}
 
 // MsgAddWriter defines the Msg/AddWriter request type.
-message MsgAddWriter {
+message MsgServiceAddWriterRequest {
   string topic_name = 1;
   string moniker = 2;
   string description = 3;
@@ -39,20 +40,20 @@ message MsgAddWriter {
 }
 
 // MsgAddWriter defines the Msg/AddWriter response type.
-message MsgAddWriterResponse { }
+message MsgServiceAddWriterResponse {}
 
 // MsgDeleteWriter defines the Msg/DeleteWriter request type.
-message MsgDeleteWriter {
+message MsgServiceDeleteWriterRequest {
   string topic_name = 1;
   string writer_address = 2;
   string owner_address = 3;
 }
 
 // MsgDeleteWriter defines the Msg/DeleteWriter response type.
-message MsgDeleteWriterResponse { }
+message MsgServiceDeleteWriterResponse {}
 
 // MsgAddRecord defines the Msg/AddRecord request type.
-message MsgAddRecord {
+message MsgServiceAddRecordRequest {
   string topic_name = 1;
   bytes key = 2;
   bytes value = 3;
@@ -62,7 +63,7 @@ message MsgAddRecord {
 }
 
 // MsgAddRecordResponse defines the Msg/AddRecordResponse response type.
-message MsgAddRecordResponse {
+message MsgServiceAddRecordResponse {
   string owner_address = 1;
   string topic_name = 2;
   uint64 offset = 3;

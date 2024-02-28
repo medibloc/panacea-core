@@ -5,8 +5,8 @@ import (
 	"os"
 	"testing"
 
+	"github.com/cometbft/cometbft/crypto/secp256k1"
 	"github.com/stretchr/testify/suite"
-	"github.com/tendermint/tendermint/crypto/secp256k1"
 
 	"github.com/medibloc/panacea-core/v2/types/testsuite"
 	"github.com/medibloc/panacea-core/v2/x/did/client/crypto"

@@ -3,6 +3,7 @@ package cli
 import (
 	"bufio"
 	"context"
+	sdkerrors "cosmossdk.io/errors"
 	"encoding/base64"
 	"errors"
 	"fmt"
@@ -11,20 +12,19 @@ import (
 
 	"github.com/gogo/protobuf/jsonpb"
 
+	"github.com/cometbft/cometbft/crypto"
+	"github.com/cometbft/cometbft/crypto/secp256k1"
+	"github.com/cometbft/cometbft/libs/cli"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/input"
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	sdkcodec "github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/go-bip39"
 	"github.com/medibloc/panacea-core/v2/x/did/internal/secp256k1util"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/tendermint/tendermint/crypto"
-	"github.com/tendermint/tendermint/crypto/secp256k1"
-	"github.com/tendermint/tendermint/libs/cli"
 
 	didcrypto "github.com/medibloc/panacea-core/v2/x/did/client/crypto"
 	"github.com/medibloc/panacea-core/v2/x/did/types"
@@ -121,7 +121,7 @@ func CmdUpdateDID() *cobra.Command {
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
-			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), &msg)
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
 	}
 	flags.AddTxFlagsToCmd(cmd)
@@ -164,11 +164,11 @@ func CmdDeactivateDID() *cobra.Command {
 			}
 
 			fromAddress := clientCtx.GetFromAddress()
-			msg := types.NewMsgDeactivateDID(did, verificationMethodID, sig, fromAddress.String())
+			msg := types.NewMsgServiceDeactivateDIDRequest(did, verificationMethodID, sig, fromAddress.String())
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
-			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), &msg)
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
 	}
 	flags.AddTxFlagsToCmd(cmd)
@@ -254,7 +254,7 @@ func getCheckPassword(reader *bufio.Reader) (string, error) {
 // newMsgCreateDID creates a MsgCreateDID by generating a DID and a DID document from the networkID and privKey.
 // It generates the minimal DID document which contains only one public key information,
 // so that it can be extended by MsgUpdateDID later.
-func newMsgCreateDID(fromAddress sdk.AccAddress, privKey secp256k1.PrivKey) (types.MsgCreateDID, error) {
+func newMsgCreateDID(fromAddress sdk.AccAddress, privKey secp256k1.PrivKey) (types.MsgServiceCreateDIDRequest, error) {
 	pubKey := secp256k1util.PubKeyBytes(secp256k1util.DerivePubKey(privKey))
 	did := types.NewDID(pubKey)
 	verificationMethodID := types.NewVerificationMethodID(did, "key1")
@@ -270,12 +270,12 @@ func newMsgCreateDID(fromAddress sdk.AccAddress, privKey secp256k1.PrivKey) (typ
 
 	sig, err := types.Sign(&doc, types.InitialSequence, privKey)
 	if err != nil {
-		return types.MsgCreateDID{}, err
+		return types.MsgServiceCreateDIDRequest{}, err
 	}
 
-	msg := types.NewMsgCreateDID(did, doc, verificationMethodID, sig, fromAddress.String())
+	msg := types.NewMsgServiceCreateDIDResponse(did, doc, verificationMethodID, sig, fromAddress.String())
 	if err := msg.ValidateBasic(); err != nil {
-		return types.MsgCreateDID{}, err
+		return types.MsgServiceCreateDIDRequest{}, err
 	}
 	return msg, nil
 }
@@ -324,9 +324,9 @@ func getPrivKeyFromKeyStore(verificationMethodID string, reader *bufio.Reader) (
 
 // signUsingCurrentSeq generates a signature using the current sequence stored in the blockchain.
 func signUsingCurrentSeq(clientCtx client.Context, did string, privKey crypto.PrivKey, data sdkcodec.ProtoMarshaler) ([]byte, error) {
-	queryClient := types.NewQueryClient(clientCtx)
+	queryClient := types.NewQueryServiceClient(clientCtx)
 
-	params := &types.QueryDIDRequest{
+	params := &types.QueryServiceDIDRequest{
 		DidBase64: base64.StdEncoding.EncodeToString([]byte(did)),
 	}
 

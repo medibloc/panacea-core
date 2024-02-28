@@ -1,8 +1,8 @@
 package types
 
 import (
+	"cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 const (
@@ -25,14 +25,14 @@ func (r Record) Validate() error {
 
 func validateRecordKey(key []byte) error {
 	if len(key) > maxRecordKeyLength {
-		return sdkerrors.Wrapf(ErrMessageTooLarge, "key (%d > %d)", len(key), maxRecordKeyLength)
+		return errors.Wrapf(ErrMessageTooLarge, "key (%d > %d)", len(key), maxRecordKeyLength)
 	}
 	return nil
 }
 
 func validateRecordValue(value []byte) error {
 	if len(value) > maxRecordValueLength {
-		return sdkerrors.Wrapf(ErrMessageTooLarge, "value (%d > %d)", len(value), maxRecordValueLength)
+		return errors.Wrapf(ErrMessageTooLarge, "value (%d > %d)", len(value), maxRecordValueLength)
 	}
 	return nil
 }

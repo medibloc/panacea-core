@@ -6,9 +6,8 @@ package types
 import (
 	context "context"
 	fmt "fmt"
-	_ "github.com/gogo/protobuf/gogoproto"
-	grpc1 "github.com/gogo/protobuf/grpc"
-	proto "github.com/gogo/protobuf/proto"
+	grpc1 "github.com/cosmos/gogoproto/grpc"
+	proto "github.com/cosmos/gogoproto/proto"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -29,7 +28,7 @@ var _ = math.Inf
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 // MsgCreateDID defines the Msg/CreateDID request type.
-type MsgCreateDID struct {
+type MsgServiceCreateDIDRequest struct {
 	Did                  string       `protobuf:"bytes,1,opt,name=did,proto3" json:"did,omitempty"`
 	Document             *DIDDocument `protobuf:"bytes,2,opt,name=document,proto3" json:"document,omitempty"`
 	VerificationMethodId string       `protobuf:"bytes,3,opt,name=verification_method_id,json=verificationMethodId,proto3" json:"verification_method_id,omitempty"`
@@ -37,18 +36,18 @@ type MsgCreateDID struct {
 	FromAddress          string       `protobuf:"bytes,5,opt,name=from_address,json=fromAddress,proto3" json:"from_address,omitempty"`
 }
 
-func (m *MsgCreateDID) Reset()         { *m = MsgCreateDID{} }
-func (m *MsgCreateDID) String() string { return proto.CompactTextString(m) }
-func (*MsgCreateDID) ProtoMessage()    {}
-func (*MsgCreateDID) Descriptor() ([]byte, []int) {
+func (m *MsgServiceCreateDIDRequest) Reset()         { *m = MsgServiceCreateDIDRequest{} }
+func (m *MsgServiceCreateDIDRequest) String() string { return proto.CompactTextString(m) }
+func (*MsgServiceCreateDIDRequest) ProtoMessage()    {}
+func (*MsgServiceCreateDIDRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_c90e89c02ae9a760, []int{0}
 }
-func (m *MsgCreateDID) XXX_Unmarshal(b []byte) error {
+func (m *MsgServiceCreateDIDRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *MsgCreateDID) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *MsgServiceCreateDIDRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_MsgCreateDID.Marshal(b, m, deterministic)
+		return xxx_messageInfo_MsgServiceCreateDIDRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -58,47 +57,47 @@ func (m *MsgCreateDID) XXX_Marshal(b []byte, deterministic bool) ([]byte, error)
 		return b[:n], nil
 	}
 }
-func (m *MsgCreateDID) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgCreateDID.Merge(m, src)
+func (m *MsgServiceCreateDIDRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgServiceCreateDIDRequest.Merge(m, src)
 }
-func (m *MsgCreateDID) XXX_Size() int {
+func (m *MsgServiceCreateDIDRequest) XXX_Size() int {
 	return m.Size()
 }
-func (m *MsgCreateDID) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgCreateDID.DiscardUnknown(m)
+func (m *MsgServiceCreateDIDRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgServiceCreateDIDRequest.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_MsgCreateDID proto.InternalMessageInfo
+var xxx_messageInfo_MsgServiceCreateDIDRequest proto.InternalMessageInfo
 
-func (m *MsgCreateDID) GetDid() string {
+func (m *MsgServiceCreateDIDRequest) GetDid() string {
 	if m != nil {
 		return m.Did
 	}
 	return ""
 }
 
-func (m *MsgCreateDID) GetDocument() *DIDDocument {
+func (m *MsgServiceCreateDIDRequest) GetDocument() *DIDDocument {
 	if m != nil {
 		return m.Document
 	}
 	return nil
 }
 
-func (m *MsgCreateDID) GetVerificationMethodId() string {
+func (m *MsgServiceCreateDIDRequest) GetVerificationMethodId() string {
 	if m != nil {
 		return m.VerificationMethodId
 	}
 	return ""
 }
 
-func (m *MsgCreateDID) GetSignature() []byte {
+func (m *MsgServiceCreateDIDRequest) GetSignature() []byte {
 	if m != nil {
 		return m.Signature
 	}
 	return nil
 }
 
-func (m *MsgCreateDID) GetFromAddress() string {
+func (m *MsgServiceCreateDIDRequest) GetFromAddress() string {
 	if m != nil {
 		return m.FromAddress
 	}
@@ -106,21 +105,21 @@ func (m *MsgCreateDID) GetFromAddress() string {
 }
 
 // MsgCreateDIDResponse defines the Msg/CreateDID response type.
-type MsgCreateDIDResponse struct {
+type MsgServiceCreateDIDResponse struct {
 }
 
-func (m *MsgCreateDIDResponse) Reset()         { *m = MsgCreateDIDResponse{} }
-func (m *MsgCreateDIDResponse) String() string { return proto.CompactTextString(m) }
-func (*MsgCreateDIDResponse) ProtoMessage()    {}
-func (*MsgCreateDIDResponse) Descriptor() ([]byte, []int) {
+func (m *MsgServiceCreateDIDResponse) Reset()         { *m = MsgServiceCreateDIDResponse{} }
+func (m *MsgServiceCreateDIDResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgServiceCreateDIDResponse) ProtoMessage()    {}
+func (*MsgServiceCreateDIDResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_c90e89c02ae9a760, []int{1}
 }
-func (m *MsgCreateDIDResponse) XXX_Unmarshal(b []byte) error {
+func (m *MsgServiceCreateDIDResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *MsgCreateDIDResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *MsgServiceCreateDIDResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_MsgCreateDIDResponse.Marshal(b, m, deterministic)
+		return xxx_messageInfo_MsgServiceCreateDIDResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -130,20 +129,20 @@ func (m *MsgCreateDIDResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte
 		return b[:n], nil
 	}
 }
-func (m *MsgCreateDIDResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgCreateDIDResponse.Merge(m, src)
+func (m *MsgServiceCreateDIDResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgServiceCreateDIDResponse.Merge(m, src)
 }
-func (m *MsgCreateDIDResponse) XXX_Size() int {
+func (m *MsgServiceCreateDIDResponse) XXX_Size() int {
 	return m.Size()
 }
-func (m *MsgCreateDIDResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgCreateDIDResponse.DiscardUnknown(m)
+func (m *MsgServiceCreateDIDResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgServiceCreateDIDResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_MsgCreateDIDResponse proto.InternalMessageInfo
+var xxx_messageInfo_MsgServiceCreateDIDResponse proto.InternalMessageInfo
 
 // MsgUpdateDID defines the Msg/UpdateDID request type.
-type MsgUpdateDID struct {
+type MsgServiceUpdateDIDRequest struct {
 	Did                  string       `protobuf:"bytes,1,opt,name=did,proto3" json:"did,omitempty"`
 	Document             *DIDDocument `protobuf:"bytes,2,opt,name=document,proto3" json:"document,omitempty"`
 	VerificationMethodId string       `protobuf:"bytes,3,opt,name=verification_method_id,json=verificationMethodId,proto3" json:"verification_method_id,omitempty"`
@@ -151,18 +150,18 @@ type MsgUpdateDID struct {
 	FromAddress          string       `protobuf:"bytes,5,opt,name=from_address,json=fromAddress,proto3" json:"from_address,omitempty"`
 }
 
-func (m *MsgUpdateDID) Reset()         { *m = MsgUpdateDID{} }
-func (m *MsgUpdateDID) String() string { return proto.CompactTextString(m) }
-func (*MsgUpdateDID) ProtoMessage()    {}
-func (*MsgUpdateDID) Descriptor() ([]byte, []int) {
+func (m *MsgServiceUpdateDIDRequest) Reset()         { *m = MsgServiceUpdateDIDRequest{} }
+func (m *MsgServiceUpdateDIDRequest) String() string { return proto.CompactTextString(m) }
+func (*MsgServiceUpdateDIDRequest) ProtoMessage()    {}
+func (*MsgServiceUpdateDIDRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_c90e89c02ae9a760, []int{2}
 }
-func (m *MsgUpdateDID) XXX_Unmarshal(b []byte) error {
+func (m *MsgServiceUpdateDIDRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *MsgUpdateDID) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *MsgServiceUpdateDIDRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_MsgUpdateDID.Marshal(b, m, deterministic)
+		return xxx_messageInfo_MsgServiceUpdateDIDRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -172,47 +171,47 @@ func (m *MsgUpdateDID) XXX_Marshal(b []byte, deterministic bool) ([]byte, error)
 		return b[:n], nil
 	}
 }
-func (m *MsgUpdateDID) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgUpdateDID.Merge(m, src)
+func (m *MsgServiceUpdateDIDRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgServiceUpdateDIDRequest.Merge(m, src)
 }
-func (m *MsgUpdateDID) XXX_Size() int {
+func (m *MsgServiceUpdateDIDRequest) XXX_Size() int {
 	return m.Size()
 }
-func (m *MsgUpdateDID) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgUpdateDID.DiscardUnknown(m)
+func (m *MsgServiceUpdateDIDRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgServiceUpdateDIDRequest.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_MsgUpdateDID proto.InternalMessageInfo
+var xxx_messageInfo_MsgServiceUpdateDIDRequest proto.InternalMessageInfo
 
-func (m *MsgUpdateDID) GetDid() string {
+func (m *MsgServiceUpdateDIDRequest) GetDid() string {
 	if m != nil {
 		return m.Did
 	}
 	return ""
 }
 
-func (m *MsgUpdateDID) GetDocument() *DIDDocument {
+func (m *MsgServiceUpdateDIDRequest) GetDocument() *DIDDocument {
 	if m != nil {
 		return m.Document
 	}
 	return nil
 }
 
-func (m *MsgUpdateDID) GetVerificationMethodId() string {
+func (m *MsgServiceUpdateDIDRequest) GetVerificationMethodId() string {
 	if m != nil {
 		return m.VerificationMethodId
 	}
 	return ""
 }
 
-func (m *MsgUpdateDID) GetSignature() []byte {
+func (m *MsgServiceUpdateDIDRequest) GetSignature() []byte {
 	if m != nil {
 		return m.Signature
 	}
 	return nil
 }
 
-func (m *MsgUpdateDID) GetFromAddress() string {
+func (m *MsgServiceUpdateDIDRequest) GetFromAddress() string {
 	if m != nil {
 		return m.FromAddress
 	}
@@ -220,21 +219,21 @@ func (m *MsgUpdateDID) GetFromAddress() string {
 }
 
 // MsgUpdateDIDResponse defines the Msg/UpdateDID response type.
-type MsgUpdateDIDResponse struct {
+type MsgServiceUpdateDIDResponse struct {
 }
 
-func (m *MsgUpdateDIDResponse) Reset()         { *m = MsgUpdateDIDResponse{} }
-func (m *MsgUpdateDIDResponse) String() string { return proto.CompactTextString(m) }
-func (*MsgUpdateDIDResponse) ProtoMessage()    {}
-func (*MsgUpdateDIDResponse) Descriptor() ([]byte, []int) {
+func (m *MsgServiceUpdateDIDResponse) Reset()         { *m = MsgServiceUpdateDIDResponse{} }
+func (m *MsgServiceUpdateDIDResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgServiceUpdateDIDResponse) ProtoMessage()    {}
+func (*MsgServiceUpdateDIDResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_c90e89c02ae9a760, []int{3}
 }
-func (m *MsgUpdateDIDResponse) XXX_Unmarshal(b []byte) error {
+func (m *MsgServiceUpdateDIDResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *MsgUpdateDIDResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *MsgServiceUpdateDIDResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_MsgUpdateDIDResponse.Marshal(b, m, deterministic)
+		return xxx_messageInfo_MsgServiceUpdateDIDResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -244,38 +243,38 @@ func (m *MsgUpdateDIDResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte
 		return b[:n], nil
 	}
 }
-func (m *MsgUpdateDIDResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgUpdateDIDResponse.Merge(m, src)
+func (m *MsgServiceUpdateDIDResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgServiceUpdateDIDResponse.Merge(m, src)
 }
-func (m *MsgUpdateDIDResponse) XXX_Size() int {
+func (m *MsgServiceUpdateDIDResponse) XXX_Size() int {
 	return m.Size()
 }
-func (m *MsgUpdateDIDResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgUpdateDIDResponse.DiscardUnknown(m)
+func (m *MsgServiceUpdateDIDResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgServiceUpdateDIDResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_MsgUpdateDIDResponse proto.InternalMessageInfo
+var xxx_messageInfo_MsgServiceUpdateDIDResponse proto.InternalMessageInfo
 
 // MsgDeactivateDID defines the Msg/DeactivateDID request type.
-type MsgDeactivateDID struct {
+type MsgServiceDeactivateDIDRequest struct {
 	Did                  string `protobuf:"bytes,1,opt,name=did,proto3" json:"did,omitempty"`
 	VerificationMethodId string `protobuf:"bytes,2,opt,name=verification_method_id,json=verificationMethodId,proto3" json:"verification_method_id,omitempty"`
 	Signature            []byte `protobuf:"bytes,3,opt,name=signature,proto3" json:"signature,omitempty"`
 	FromAddress          string `protobuf:"bytes,4,opt,name=from_address,json=fromAddress,proto3" json:"from_address,omitempty"`
 }
 
-func (m *MsgDeactivateDID) Reset()         { *m = MsgDeactivateDID{} }
-func (m *MsgDeactivateDID) String() string { return proto.CompactTextString(m) }
-func (*MsgDeactivateDID) ProtoMessage()    {}
-func (*MsgDeactivateDID) Descriptor() ([]byte, []int) {
+func (m *MsgServiceDeactivateDIDRequest) Reset()         { *m = MsgServiceDeactivateDIDRequest{} }
+func (m *MsgServiceDeactivateDIDRequest) String() string { return proto.CompactTextString(m) }
+func (*MsgServiceDeactivateDIDRequest) ProtoMessage()    {}
+func (*MsgServiceDeactivateDIDRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_c90e89c02ae9a760, []int{4}
 }
-func (m *MsgDeactivateDID) XXX_Unmarshal(b []byte) error {
+func (m *MsgServiceDeactivateDIDRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *MsgDeactivateDID) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *MsgServiceDeactivateDIDRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_MsgDeactivateDID.Marshal(b, m, deterministic)
+		return xxx_messageInfo_MsgServiceDeactivateDIDRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -285,40 +284,40 @@ func (m *MsgDeactivateDID) XXX_Marshal(b []byte, deterministic bool) ([]byte, er
 		return b[:n], nil
 	}
 }
-func (m *MsgDeactivateDID) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgDeactivateDID.Merge(m, src)
+func (m *MsgServiceDeactivateDIDRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgServiceDeactivateDIDRequest.Merge(m, src)
 }
-func (m *MsgDeactivateDID) XXX_Size() int {
+func (m *MsgServiceDeactivateDIDRequest) XXX_Size() int {
 	return m.Size()
 }
-func (m *MsgDeactivateDID) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgDeactivateDID.DiscardUnknown(m)
+func (m *MsgServiceDeactivateDIDRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgServiceDeactivateDIDRequest.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_MsgDeactivateDID proto.InternalMessageInfo
+var xxx_messageInfo_MsgServiceDeactivateDIDRequest proto.InternalMessageInfo
 
-func (m *MsgDeactivateDID) GetDid() string {
+func (m *MsgServiceDeactivateDIDRequest) GetDid() string {
 	if m != nil {
 		return m.Did
 	}
 	return ""
 }
 
-func (m *MsgDeactivateDID) GetVerificationMethodId() string {
+func (m *MsgServiceDeactivateDIDRequest) GetVerificationMethodId() string {
 	if m != nil {
 		return m.VerificationMethodId
 	}
 	return ""
 }
 
-func (m *MsgDeactivateDID) GetSignature() []byte {
+func (m *MsgServiceDeactivateDIDRequest) GetSignature() []byte {
 	if m != nil {
 		return m.Signature
 	}
 	return nil
 }
 
-func (m *MsgDeactivateDID) GetFromAddress() string {
+func (m *MsgServiceDeactivateDIDRequest) GetFromAddress() string {
 	if m != nil {
 		return m.FromAddress
 	}
@@ -326,21 +325,21 @@ func (m *MsgDeactivateDID) GetFromAddress() string {
 }
 
 // MsgDeactivateDIDResponse defines the Msg/DeactivateDID response type.
-type MsgDeactivateDIDResponse struct {
+type MsgServiceDeactivateDIDResponse struct {
 }
 
-func (m *MsgDeactivateDIDResponse) Reset()         { *m = MsgDeactivateDIDResponse{} }
-func (m *MsgDeactivateDIDResponse) String() string { return proto.CompactTextString(m) }
-func (*MsgDeactivateDIDResponse) ProtoMessage()    {}
-func (*MsgDeactivateDIDResponse) Descriptor() ([]byte, []int) {
+func (m *MsgServiceDeactivateDIDResponse) Reset()         { *m = MsgServiceDeactivateDIDResponse{} }
+func (m *MsgServiceDeactivateDIDResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgServiceDeactivateDIDResponse) ProtoMessage()    {}
+func (*MsgServiceDeactivateDIDResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_c90e89c02ae9a760, []int{5}
 }
-func (m *MsgDeactivateDIDResponse) XXX_Unmarshal(b []byte) error {
+func (m *MsgServiceDeactivateDIDResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *MsgDeactivateDIDResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *MsgServiceDeactivateDIDResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_MsgDeactivateDIDResponse.Marshal(b, m, deterministic)
+		return xxx_messageInfo_MsgServiceDeactivateDIDResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -350,58 +349,58 @@ func (m *MsgDeactivateDIDResponse) XXX_Marshal(b []byte, deterministic bool) ([]
 		return b[:n], nil
 	}
 }
-func (m *MsgDeactivateDIDResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgDeactivateDIDResponse.Merge(m, src)
+func (m *MsgServiceDeactivateDIDResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgServiceDeactivateDIDResponse.Merge(m, src)
 }
-func (m *MsgDeactivateDIDResponse) XXX_Size() int {
+func (m *MsgServiceDeactivateDIDResponse) XXX_Size() int {
 	return m.Size()
 }
-func (m *MsgDeactivateDIDResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgDeactivateDIDResponse.DiscardUnknown(m)
+func (m *MsgServiceDeactivateDIDResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgServiceDeactivateDIDResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_MsgDeactivateDIDResponse proto.InternalMessageInfo
+var xxx_messageInfo_MsgServiceDeactivateDIDResponse proto.InternalMessageInfo
 
 func init() {
-	proto.RegisterType((*MsgCreateDID)(nil), "panacea.did.v2.MsgCreateDID")
-	proto.RegisterType((*MsgCreateDIDResponse)(nil), "panacea.did.v2.MsgCreateDIDResponse")
-	proto.RegisterType((*MsgUpdateDID)(nil), "panacea.did.v2.MsgUpdateDID")
-	proto.RegisterType((*MsgUpdateDIDResponse)(nil), "panacea.did.v2.MsgUpdateDIDResponse")
-	proto.RegisterType((*MsgDeactivateDID)(nil), "panacea.did.v2.MsgDeactivateDID")
-	proto.RegisterType((*MsgDeactivateDIDResponse)(nil), "panacea.did.v2.MsgDeactivateDIDResponse")
+	proto.RegisterType((*MsgServiceCreateDIDRequest)(nil), "panacea.did.v2.MsgServiceCreateDIDRequest")
+	proto.RegisterType((*MsgServiceCreateDIDResponse)(nil), "panacea.did.v2.MsgServiceCreateDIDResponse")
+	proto.RegisterType((*MsgServiceUpdateDIDRequest)(nil), "panacea.did.v2.MsgServiceUpdateDIDRequest")
+	proto.RegisterType((*MsgServiceUpdateDIDResponse)(nil), "panacea.did.v2.MsgServiceUpdateDIDResponse")
+	proto.RegisterType((*MsgServiceDeactivateDIDRequest)(nil), "panacea.did.v2.MsgServiceDeactivateDIDRequest")
+	proto.RegisterType((*MsgServiceDeactivateDIDResponse)(nil), "panacea.did.v2.MsgServiceDeactivateDIDResponse")
 }
 
 func init() { proto.RegisterFile("panacea/did/v2/tx.proto", fileDescriptor_c90e89c02ae9a760) }
 
 var fileDescriptor_c90e89c02ae9a760 = []byte{
-	// 420 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xdc, 0x53, 0x3d, 0x8f, 0xd3, 0x40,
-	0x10, 0xcd, 0xc6, 0x01, 0x91, 0x4d, 0x40, 0xd1, 0x2a, 0x0a, 0x96, 0x89, 0x2c, 0x13, 0x51, 0xb8,
-	0x00, 0x5b, 0x32, 0x48, 0xd4, 0x80, 0x0b, 0x52, 0x58, 0x20, 0x4b, 0x34, 0x50, 0x44, 0x1b, 0xef,
-	0xc6, 0x59, 0x09, 0x7b, 0x2d, 0xef, 0xc6, 0x0a, 0x3d, 0x3f, 0xe0, 0xfa, 0xfb, 0x43, 0x57, 0xa6,
-	0xbc, 0xf2, 0x94, 0xfc, 0x91, 0x93, 0x9d, 0xd8, 0xf9, 0xbe, 0x5c, 0x7d, 0xdd, 0x6a, 0xde, 0x9b,
-	0xe7, 0xf7, 0x66, 0x3c, 0xf0, 0x75, 0x82, 0x63, 0x1c, 0x50, 0x6c, 0x13, 0x46, 0xec, 0xcc, 0xb1,
-	0xe5, 0xdc, 0x4a, 0x52, 0x2e, 0x39, 0x7a, 0xb5, 0x01, 0x2c, 0xc2, 0x88, 0x95, 0x39, 0x5a, 0x37,
-	0xe4, 0x21, 0x2f, 0x20, 0x3b, 0x7f, 0xad, 0x59, 0x9a, 0x7a, 0xd0, 0x9e, 0x93, 0x0b, 0x64, 0xb0,
-	0x00, 0xb0, 0xed, 0x89, 0xf0, 0x5b, 0x4a, 0xb1, 0xa4, 0xee, 0xd0, 0x45, 0x1d, 0xa8, 0x10, 0x46,
-	0x54, 0x60, 0x00, 0xb3, 0xe9, 0xe7, 0x4f, 0xf4, 0x19, 0xbe, 0x20, 0x3c, 0x98, 0x45, 0x34, 0x96,
-	0x6a, 0xdd, 0x00, 0x66, 0xcb, 0x79, 0x63, 0xed, 0x7f, 0xd5, 0x72, 0x87, 0xae, 0xbb, 0xa1, 0xf8,
-	0x15, 0x19, 0x7d, 0x82, 0xbd, 0x8c, 0xa6, 0x6c, 0xc2, 0x02, 0x2c, 0x19, 0x8f, 0x47, 0x11, 0x95,
-	0x53, 0x4e, 0x46, 0x8c, 0xa8, 0x4a, 0xa1, 0xde, 0xdd, 0x45, 0xbd, 0x02, 0x1c, 0x12, 0xd4, 0x87,
-	0x4d, 0xc1, 0xc2, 0x18, 0xcb, 0x59, 0x4a, 0xd5, 0x86, 0x01, 0xcc, 0xb6, 0xbf, 0x2d, 0xa0, 0xb7,
-	0xb0, 0x3d, 0x49, 0x79, 0x34, 0xc2, 0x84, 0xa4, 0x54, 0x08, 0xf5, 0x59, 0xa1, 0xd4, 0xca, 0x6b,
-	0x5f, 0xd6, 0xa5, 0x41, 0x0f, 0x76, 0x77, 0x13, 0xf9, 0x54, 0x24, 0x3c, 0x16, 0xb4, 0x8c, 0xfa,
-	0x2b, 0x21, 0x4f, 0x2c, 0x6a, 0x95, 0xa8, 0x8a, 0x7a, 0x0d, 0x60, 0xc7, 0x13, 0xa1, 0x4b, 0x71,
-	0x20, 0x59, 0x76, 0x36, 0xee, 0x79, 0xd7, 0xf5, 0xc7, 0xba, 0x56, 0x2e, 0xb9, 0x6e, 0x1c, 0xbb,
-	0xd6, 0xa0, 0x7a, 0x68, 0xae, 0x74, 0xee, 0xfc, 0xaf, 0x43, 0xc5, 0x13, 0x21, 0xfa, 0x01, 0x9b,
-	0xdb, 0x7f, 0xb2, 0x7f, 0xb8, 0x84, 0xdd, 0xfd, 0x6a, 0xef, 0x1e, 0x42, 0x4b, 0xe1, 0x5c, 0x70,
-	0xbb, 0xf9, 0x53, 0x82, 0x15, 0x7a, 0x52, 0xf0, 0x68, 0xc6, 0xe8, 0x0f, 0x7c, 0xb9, 0x3f, 0x5f,
-	0xe3, 0x44, 0xdb, 0x1e, 0x43, 0x33, 0x2f, 0x31, 0x4a, 0xf1, 0xaf, 0xdf, 0x6f, 0x96, 0x3a, 0x58,
-	0x2c, 0x75, 0x70, 0xb7, 0xd4, 0xc1, 0xd5, 0x4a, 0xaf, 0x2d, 0x56, 0x7a, 0xed, 0x76, 0xa5, 0xd7,
-	0x7e, 0x82, 0xdf, 0xef, 0x43, 0x26, 0xa7, 0xb3, 0xb1, 0x15, 0xf0, 0xc8, 0x8e, 0x28, 0x61, 0xe3,
-	0xbf, 0x3c, 0xb0, 0x37, 0xc2, 0x1f, 0x02, 0x9e, 0x52, 0x7b, 0x5e, 0xdc, 0xb9, 0xfc, 0x97, 0x50,
-	0x31, 0x7e, 0x5e, 0xdc, 0xf9, 0xc7, 0xfb, 0x00, 0x00, 0x00, 0xff, 0xff, 0x48, 0x26, 0x49, 0x8f,
-	0x42, 0x04, 0x00, 0x00,
+	// 422 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xdc, 0x94, 0xcb, 0x8e, 0xd3, 0x30,
+	0x14, 0x86, 0xeb, 0x76, 0x40, 0xd4, 0x33, 0x20, 0x64, 0x21, 0x88, 0x32, 0x10, 0x3a, 0xb3, 0xaa,
+	0xb8, 0x24, 0x52, 0x40, 0x62, 0x0d, 0x64, 0x41, 0x17, 0x23, 0xa1, 0x20, 0x36, 0x6c, 0x2a, 0xd7,
+	0x3e, 0xd3, 0x5a, 0x22, 0x71, 0xb0, 0x9d, 0xa8, 0xbc, 0x05, 0xaf, 0xc1, 0x9b, 0x20, 0x56, 0x5d,
+	0xb2, 0x42, 0xa8, 0x7d, 0x11, 0x94, 0x8b, 0x7a, 0x49, 0x9b, 0xb6, 0xeb, 0xd9, 0x45, 0xe7, 0xfc,
+	0x39, 0xbf, 0x3f, 0xff, 0xd6, 0xc1, 0x8f, 0x12, 0x1a, 0x53, 0x06, 0xd4, 0xe3, 0x82, 0x7b, 0x99,
+	0xef, 0x99, 0xa9, 0x9b, 0x28, 0x69, 0x24, 0xb9, 0x57, 0x35, 0x5c, 0x2e, 0xb8, 0x9b, 0xf9, 0xb6,
+	0x55, 0x13, 0xe6, 0xe5, 0x42, 0x79, 0xf9, 0x17, 0x61, 0xfb, 0x4a, 0x8f, 0x3f, 0x81, 0xca, 0x04,
+	0x83, 0xf7, 0x0a, 0xa8, 0x81, 0x60, 0x10, 0x84, 0xf0, 0x2d, 0x05, 0x6d, 0xc8, 0x7d, 0xdc, 0xe1,
+	0x82, 0x5b, 0xa8, 0x87, 0xfa, 0xdd, 0x30, 0xff, 0x24, 0x6f, 0xf0, 0x1d, 0x2e, 0x59, 0x1a, 0x41,
+	0x6c, 0xac, 0x76, 0x0f, 0xf5, 0x4f, 0xfd, 0x73, 0x77, 0xd3, 0xcd, 0x0d, 0x06, 0x41, 0x50, 0x49,
+	0xc2, 0xa5, 0x98, 0xbc, 0xc6, 0x0f, 0x33, 0x50, 0xe2, 0x5a, 0x30, 0x6a, 0x84, 0x8c, 0x87, 0x11,
+	0x98, 0x89, 0xe4, 0x43, 0xc1, 0xad, 0x4e, 0x31, 0xfd, 0xc1, 0x7a, 0xf7, 0xaa, 0x68, 0x0e, 0x38,
+	0x79, 0x8c, 0xbb, 0x5a, 0x8c, 0x63, 0x6a, 0x52, 0x05, 0xd6, 0x49, 0x0f, 0xf5, 0xcf, 0xc2, 0x55,
+	0x81, 0x5c, 0xe0, 0xb3, 0x6b, 0x25, 0xa3, 0x21, 0xe5, 0x5c, 0x81, 0xd6, 0xd6, 0xad, 0x62, 0xd2,
+	0x69, 0x5e, 0x7b, 0x5b, 0x96, 0x2e, 0x9f, 0xe0, 0xf3, 0x9d, 0x7c, 0x3a, 0x91, 0xb1, 0x86, 0x1a,
+	0xff, 0xe7, 0x84, 0xdf, 0x68, 0xfe, 0x35, 0xbe, 0x8a, 0xff, 0x27, 0xc2, 0xce, 0xaa, 0x1f, 0x00,
+	0x65, 0x46, 0x64, 0x87, 0xee, 0xa0, 0x19, 0xa5, 0x7d, 0x2c, 0x4a, 0xe7, 0x10, 0xca, 0xc9, 0x36,
+	0xca, 0x05, 0x7e, 0xda, 0x78, 0xd4, 0x12, 0xc7, 0xff, 0xdd, 0xc6, 0x78, 0xa5, 0x21, 0x1c, 0x77,
+	0x97, 0x91, 0x93, 0x67, 0xf5, 0x9c, 0x9a, 0xdf, 0xbd, 0xfd, 0xfc, 0x28, 0x6d, 0x69, 0x9a, 0xbb,
+	0x2c, 0x2f, 0x76, 0x9f, 0x4b, 0xfd, 0x75, 0xed, 0x73, 0xd9, 0x4a, 0x8a, 0x24, 0xf8, 0xee, 0x06,
+	0x33, 0x71, 0x9b, 0xff, 0xde, 0x95, 0xa3, 0xed, 0x1d, 0xad, 0x2f, 0x1d, 0xdf, 0x7d, 0xf8, 0x35,
+	0x77, 0xd0, 0x6c, 0xee, 0xa0, 0x7f, 0x73, 0x07, 0xfd, 0x58, 0x38, 0xad, 0xd9, 0xc2, 0x69, 0xfd,
+	0x59, 0x38, 0xad, 0x8f, 0xe8, 0xcb, 0x8b, 0xb1, 0x30, 0x93, 0x74, 0xe4, 0x32, 0x19, 0x79, 0x11,
+	0x70, 0x31, 0xfa, 0x2a, 0x99, 0x57, 0xcd, 0x7f, 0xc9, 0xa4, 0x02, 0x6f, 0x5a, 0x2c, 0x1b, 0xf3,
+	0x3d, 0x01, 0x3d, 0xba, 0x5d, 0x2c, 0x9b, 0x57, 0xff, 0x03, 0x00, 0x00, 0xff, 0xff, 0xa1, 0x61,
+	0x1b, 0x60, 0xb1, 0x04, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -412,157 +411,157 @@ var _ grpc.ClientConn
 // is compatible with the grpc package it is being compiled against.
 const _ = grpc.SupportPackageIsVersion4
 
-// MsgClient is the client API for Msg service.
+// MsgServiceClient is the client API for MsgService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
-type MsgClient interface {
+type MsgServiceClient interface {
 	// CreateDID defines a method for creating a DID.
-	CreateDID(ctx context.Context, in *MsgCreateDID, opts ...grpc.CallOption) (*MsgCreateDIDResponse, error)
+	CreateDID(ctx context.Context, in *MsgServiceCreateDIDRequest, opts ...grpc.CallOption) (*MsgServiceCreateDIDResponse, error)
 	// UpdateDID defines a method for updating a DID.
-	UpdateDID(ctx context.Context, in *MsgUpdateDID, opts ...grpc.CallOption) (*MsgUpdateDIDResponse, error)
+	UpdateDID(ctx context.Context, in *MsgServiceUpdateDIDRequest, opts ...grpc.CallOption) (*MsgServiceUpdateDIDResponse, error)
 	// DeactivateDID defines a method for deactivating a DID.
-	DeactivateDID(ctx context.Context, in *MsgDeactivateDID, opts ...grpc.CallOption) (*MsgDeactivateDIDResponse, error)
+	DeactivateDID(ctx context.Context, in *MsgServiceDeactivateDIDRequest, opts ...grpc.CallOption) (*MsgServiceDeactivateDIDResponse, error)
 }
 
-type msgClient struct {
+type msgServiceClient struct {
 	cc grpc1.ClientConn
 }
 
-func NewMsgClient(cc grpc1.ClientConn) MsgClient {
-	return &msgClient{cc}
+func NewMsgServiceClient(cc grpc1.ClientConn) MsgServiceClient {
+	return &msgServiceClient{cc}
 }
 
-func (c *msgClient) CreateDID(ctx context.Context, in *MsgCreateDID, opts ...grpc.CallOption) (*MsgCreateDIDResponse, error) {
-	out := new(MsgCreateDIDResponse)
-	err := c.cc.Invoke(ctx, "/panacea.did.v2.Msg/CreateDID", in, out, opts...)
+func (c *msgServiceClient) CreateDID(ctx context.Context, in *MsgServiceCreateDIDRequest, opts ...grpc.CallOption) (*MsgServiceCreateDIDResponse, error) {
+	out := new(MsgServiceCreateDIDResponse)
+	err := c.cc.Invoke(ctx, "/panacea.did.v2.MsgService/CreateDID", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *msgClient) UpdateDID(ctx context.Context, in *MsgUpdateDID, opts ...grpc.CallOption) (*MsgUpdateDIDResponse, error) {
-	out := new(MsgUpdateDIDResponse)
-	err := c.cc.Invoke(ctx, "/panacea.did.v2.Msg/UpdateDID", in, out, opts...)
+func (c *msgServiceClient) UpdateDID(ctx context.Context, in *MsgServiceUpdateDIDRequest, opts ...grpc.CallOption) (*MsgServiceUpdateDIDResponse, error) {
+	out := new(MsgServiceUpdateDIDResponse)
+	err := c.cc.Invoke(ctx, "/panacea.did.v2.MsgService/UpdateDID", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *msgClient) DeactivateDID(ctx context.Context, in *MsgDeactivateDID, opts ...grpc.CallOption) (*MsgDeactivateDIDResponse, error) {
-	out := new(MsgDeactivateDIDResponse)
-	err := c.cc.Invoke(ctx, "/panacea.did.v2.Msg/DeactivateDID", in, out, opts...)
+func (c *msgServiceClient) DeactivateDID(ctx context.Context, in *MsgServiceDeactivateDIDRequest, opts ...grpc.CallOption) (*MsgServiceDeactivateDIDResponse, error) {
+	out := new(MsgServiceDeactivateDIDResponse)
+	err := c.cc.Invoke(ctx, "/panacea.did.v2.MsgService/DeactivateDID", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// MsgServer is the server API for Msg service.
-type MsgServer interface {
+// MsgServiceServer is the server API for MsgService service.
+type MsgServiceServer interface {
 	// CreateDID defines a method for creating a DID.
-	CreateDID(context.Context, *MsgCreateDID) (*MsgCreateDIDResponse, error)
+	CreateDID(context.Context, *MsgServiceCreateDIDRequest) (*MsgServiceCreateDIDResponse, error)
 	// UpdateDID defines a method for updating a DID.
-	UpdateDID(context.Context, *MsgUpdateDID) (*MsgUpdateDIDResponse, error)
+	UpdateDID(context.Context, *MsgServiceUpdateDIDRequest) (*MsgServiceUpdateDIDResponse, error)
 	// DeactivateDID defines a method for deactivating a DID.
-	DeactivateDID(context.Context, *MsgDeactivateDID) (*MsgDeactivateDIDResponse, error)
+	DeactivateDID(context.Context, *MsgServiceDeactivateDIDRequest) (*MsgServiceDeactivateDIDResponse, error)
 }
 
-// UnimplementedMsgServer can be embedded to have forward compatible implementations.
-type UnimplementedMsgServer struct {
+// UnimplementedMsgServiceServer can be embedded to have forward compatible implementations.
+type UnimplementedMsgServiceServer struct {
 }
 
-func (*UnimplementedMsgServer) CreateDID(ctx context.Context, req *MsgCreateDID) (*MsgCreateDIDResponse, error) {
+func (*UnimplementedMsgServiceServer) CreateDID(ctx context.Context, req *MsgServiceCreateDIDRequest) (*MsgServiceCreateDIDResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateDID not implemented")
 }
-func (*UnimplementedMsgServer) UpdateDID(ctx context.Context, req *MsgUpdateDID) (*MsgUpdateDIDResponse, error) {
+func (*UnimplementedMsgServiceServer) UpdateDID(ctx context.Context, req *MsgServiceUpdateDIDRequest) (*MsgServiceUpdateDIDResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateDID not implemented")
 }
-func (*UnimplementedMsgServer) DeactivateDID(ctx context.Context, req *MsgDeactivateDID) (*MsgDeactivateDIDResponse, error) {
+func (*UnimplementedMsgServiceServer) DeactivateDID(ctx context.Context, req *MsgServiceDeactivateDIDRequest) (*MsgServiceDeactivateDIDResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeactivateDID not implemented")
 }
 
-func RegisterMsgServer(s grpc1.Server, srv MsgServer) {
-	s.RegisterService(&_Msg_serviceDesc, srv)
+func RegisterMsgServiceServer(s grpc1.Server, srv MsgServiceServer) {
+	s.RegisterService(&_MsgService_serviceDesc, srv)
 }
 
-func _Msg_CreateDID_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(MsgCreateDID)
+func _MsgService_CreateDID_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgServiceCreateDIDRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MsgServer).CreateDID(ctx, in)
+		return srv.(MsgServiceServer).CreateDID(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/panacea.did.v2.Msg/CreateDID",
+		FullMethod: "/panacea.did.v2.MsgService/CreateDID",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MsgServer).CreateDID(ctx, req.(*MsgCreateDID))
+		return srv.(MsgServiceServer).CreateDID(ctx, req.(*MsgServiceCreateDIDRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Msg_UpdateDID_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(MsgUpdateDID)
+func _MsgService_UpdateDID_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgServiceUpdateDIDRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MsgServer).UpdateDID(ctx, in)
+		return srv.(MsgServiceServer).UpdateDID(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/panacea.did.v2.Msg/UpdateDID",
+		FullMethod: "/panacea.did.v2.MsgService/UpdateDID",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MsgServer).UpdateDID(ctx, req.(*MsgUpdateDID))
+		return srv.(MsgServiceServer).UpdateDID(ctx, req.(*MsgServiceUpdateDIDRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Msg_DeactivateDID_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(MsgDeactivateDID)
+func _MsgService_DeactivateDID_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgServiceDeactivateDIDRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MsgServer).DeactivateDID(ctx, in)
+		return srv.(MsgServiceServer).DeactivateDID(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/panacea.did.v2.Msg/DeactivateDID",
+		FullMethod: "/panacea.did.v2.MsgService/DeactivateDID",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MsgServer).DeactivateDID(ctx, req.(*MsgDeactivateDID))
+		return srv.(MsgServiceServer).DeactivateDID(ctx, req.(*MsgServiceDeactivateDIDRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-var _Msg_serviceDesc = grpc.ServiceDesc{
-	ServiceName: "panacea.did.v2.Msg",
-	HandlerType: (*MsgServer)(nil),
+var _MsgService_serviceDesc = grpc.ServiceDesc{
+	ServiceName: "panacea.did.v2.MsgService",
+	HandlerType: (*MsgServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "CreateDID",
-			Handler:    _Msg_CreateDID_Handler,
+			Handler:    _MsgService_CreateDID_Handler,
 		},
 		{
 			MethodName: "UpdateDID",
-			Handler:    _Msg_UpdateDID_Handler,
+			Handler:    _MsgService_UpdateDID_Handler,
 		},
 		{
 			MethodName: "DeactivateDID",
-			Handler:    _Msg_DeactivateDID_Handler,
+			Handler:    _MsgService_DeactivateDID_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
 	Metadata: "panacea/did/v2/tx.proto",
 }
 
-func (m *MsgCreateDID) Marshal() (dAtA []byte, err error) {
+func (m *MsgServiceCreateDIDRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -572,12 +571,12 @@ func (m *MsgCreateDID) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *MsgCreateDID) MarshalTo(dAtA []byte) (int, error) {
+func (m *MsgServiceCreateDIDRequest) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *MsgCreateDID) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MsgServiceCreateDIDRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -625,7 +624,7 @@ func (m *MsgCreateDID) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *MsgCreateDIDResponse) Marshal() (dAtA []byte, err error) {
+func (m *MsgServiceCreateDIDResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -635,12 +634,12 @@ func (m *MsgCreateDIDResponse) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *MsgCreateDIDResponse) MarshalTo(dAtA []byte) (int, error) {
+func (m *MsgServiceCreateDIDResponse) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *MsgCreateDIDResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MsgServiceCreateDIDResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -648,7 +647,7 @@ func (m *MsgCreateDIDResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *MsgUpdateDID) Marshal() (dAtA []byte, err error) {
+func (m *MsgServiceUpdateDIDRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -658,12 +657,12 @@ func (m *MsgUpdateDID) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *MsgUpdateDID) MarshalTo(dAtA []byte) (int, error) {
+func (m *MsgServiceUpdateDIDRequest) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *MsgUpdateDID) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MsgServiceUpdateDIDRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -711,7 +710,7 @@ func (m *MsgUpdateDID) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *MsgUpdateDIDResponse) Marshal() (dAtA []byte, err error) {
+func (m *MsgServiceUpdateDIDResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -721,12 +720,12 @@ func (m *MsgUpdateDIDResponse) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *MsgUpdateDIDResponse) MarshalTo(dAtA []byte) (int, error) {
+func (m *MsgServiceUpdateDIDResponse) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *MsgUpdateDIDResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MsgServiceUpdateDIDResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -734,7 +733,7 @@ func (m *MsgUpdateDIDResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *MsgDeactivateDID) Marshal() (dAtA []byte, err error) {
+func (m *MsgServiceDeactivateDIDRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -744,12 +743,12 @@ func (m *MsgDeactivateDID) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *MsgDeactivateDID) MarshalTo(dAtA []byte) (int, error) {
+func (m *MsgServiceDeactivateDIDRequest) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *MsgDeactivateDID) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MsgServiceDeactivateDIDRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -785,7 +784,7 @@ func (m *MsgDeactivateDID) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *MsgDeactivateDIDResponse) Marshal() (dAtA []byte, err error) {
+func (m *MsgServiceDeactivateDIDResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -795,12 +794,12 @@ func (m *MsgDeactivateDIDResponse) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *MsgDeactivateDIDResponse) MarshalTo(dAtA []byte) (int, error) {
+func (m *MsgServiceDeactivateDIDResponse) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *MsgDeactivateDIDResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MsgServiceDeactivateDIDResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -819,7 +818,7 @@ func encodeVarintTx(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	return base
 }
-func (m *MsgCreateDID) Size() (n int) {
+func (m *MsgServiceCreateDIDRequest) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -848,7 +847,7 @@ func (m *MsgCreateDID) Size() (n int) {
 	return n
 }
 
-func (m *MsgCreateDIDResponse) Size() (n int) {
+func (m *MsgServiceCreateDIDResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -857,7 +856,7 @@ func (m *MsgCreateDIDResponse) Size() (n int) {
 	return n
 }
 
-func (m *MsgUpdateDID) Size() (n int) {
+func (m *MsgServiceUpdateDIDRequest) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -886,7 +885,7 @@ func (m *MsgUpdateDID) Size() (n int) {
 	return n
 }
 
-func (m *MsgUpdateDIDResponse) Size() (n int) {
+func (m *MsgServiceUpdateDIDResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -895,7 +894,7 @@ func (m *MsgUpdateDIDResponse) Size() (n int) {
 	return n
 }
 
-func (m *MsgDeactivateDID) Size() (n int) {
+func (m *MsgServiceDeactivateDIDRequest) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -920,7 +919,7 @@ func (m *MsgDeactivateDID) Size() (n int) {
 	return n
 }
 
-func (m *MsgDeactivateDIDResponse) Size() (n int) {
+func (m *MsgServiceDeactivateDIDResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -935,7 +934,7 @@ func sovTx(x uint64) (n int) {
 func sozTx(x uint64) (n int) {
 	return sovTx(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
-func (m *MsgCreateDID) Unmarshal(dAtA []byte) error {
+func (m *MsgServiceCreateDIDRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -958,10 +957,10 @@ func (m *MsgCreateDID) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: MsgCreateDID: wiretype end group for non-group")
+			return fmt.Errorf("proto: MsgServiceCreateDIDRequest: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgCreateDID: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MsgServiceCreateDIDRequest: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -1151,7 +1150,7 @@ func (m *MsgCreateDID) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *MsgCreateDIDResponse) Unmarshal(dAtA []byte) error {
+func (m *MsgServiceCreateDIDResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -1174,10 +1173,10 @@ func (m *MsgCreateDIDResponse) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: MsgCreateDIDResponse: wiretype end group for non-group")
+			return fmt.Errorf("proto: MsgServiceCreateDIDResponse: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgCreateDIDResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MsgServiceCreateDIDResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		default:
@@ -1201,7 +1200,7 @@ func (m *MsgCreateDIDResponse) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *MsgUpdateDID) Unmarshal(dAtA []byte) error {
+func (m *MsgServiceUpdateDIDRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -1224,10 +1223,10 @@ func (m *MsgUpdateDID) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: MsgUpdateDID: wiretype end group for non-group")
+			return fmt.Errorf("proto: MsgServiceUpdateDIDRequest: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgUpdateDID: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MsgServiceUpdateDIDRequest: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -1417,7 +1416,7 @@ func (m *MsgUpdateDID) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *MsgUpdateDIDResponse) Unmarshal(dAtA []byte) error {
+func (m *MsgServiceUpdateDIDResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -1440,10 +1439,10 @@ func (m *MsgUpdateDIDResponse) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: MsgUpdateDIDResponse: wiretype end group for non-group")
+			return fmt.Errorf("proto: MsgServiceUpdateDIDResponse: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgUpdateDIDResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MsgServiceUpdateDIDResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		default:
@@ -1467,7 +1466,7 @@ func (m *MsgUpdateDIDResponse) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *MsgDeactivateDID) Unmarshal(dAtA []byte) error {
+func (m *MsgServiceDeactivateDIDRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -1490,10 +1489,10 @@ func (m *MsgDeactivateDID) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: MsgDeactivateDID: wiretype end group for non-group")
+			return fmt.Errorf("proto: MsgServiceDeactivateDIDRequest: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgDeactivateDID: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MsgServiceDeactivateDIDRequest: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -1647,7 +1646,7 @@ func (m *MsgDeactivateDID) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *MsgDeactivateDIDResponse) Unmarshal(dAtA []byte) error {
+func (m *MsgServiceDeactivateDIDResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -1670,10 +1669,10 @@ func (m *MsgDeactivateDIDResponse) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: MsgDeactivateDIDResponse: wiretype end group for non-group")
+			return fmt.Errorf("proto: MsgServiceDeactivateDIDResponse: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgDeactivateDIDResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MsgServiceDeactivateDIDResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		default:

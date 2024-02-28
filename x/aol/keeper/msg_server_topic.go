@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"context"
+	"cosmossdk.io/errors"
 
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
@@ -9,17 +10,17 @@ import (
 	"github.com/medibloc/panacea-core/v2/x/aol/types"
 )
 
-func (k msgServer) CreateTopic(goCtx context.Context, msg *types.MsgCreateTopic) (*types.MsgCreateTopicResponse, error) {
+func (k msgServer) CreateTopic(goCtx context.Context, msg *types.MsgServiceCreateTopicRequest) (*types.MsgServiceCreateTopicResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	ownerAddr, err := sdk.AccAddressFromBech32(msg.OwnerAddress)
 	if err != nil {
-		return nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid owner address: %v", err)
+		return nil, errors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid owner address: %v", err)
 	}
 
 	topicKey := types.TopicCompositeKey{OwnerAddress: ownerAddr, TopicName: msg.TopicName}
 	if k.HasTopic(ctx, topicKey) {
-		return nil, sdkerrors.Wrapf(types.ErrTopicExists, "topic <%s, %s>", msg.OwnerAddress, msg.TopicName)
+		return nil, errors.Wrapf(types.ErrTopicExists, "topic <%s, %s>", msg.OwnerAddress, msg.TopicName)
 	}
 
 	ownerKey := types.OwnerCompositeKey{OwnerAddress: ownerAddr}
@@ -29,5 +30,5 @@ func (k msgServer) CreateTopic(goCtx context.Context, msg *types.MsgCreateTopic)
 	topic := types.Topic{Description: msg.Description}
 	k.SetTopic(ctx, topicKey, topic)
 
-	return &types.MsgCreateTopicResponse{}, nil
+	return &types.MsgServiceCreateTopicResponse{}, nil
 }

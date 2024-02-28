@@ -31,7 +31,7 @@ func (suite *aolMsgServerTestSuite) TestMsgServer() {
 	ownerAddress := suite.GetAccAddress()
 
 	// create topic
-	msgCreateTopic := aoltypes.MsgCreateTopic{
+	msgCreateTopic := aoltypes.MsgServiceCreateTopicRequest{
 		TopicName:    topicName,
 		Description:  "topic description",
 		OwnerAddress: ownerAddress.String(),
@@ -41,7 +41,7 @@ func (suite *aolMsgServerTestSuite) TestMsgServer() {
 	suite.Require().NotNil(createTopicResponse)
 
 	// get topic
-	getTopicRequest := aoltypes.QueryTopicRequest{
+	getTopicRequest := aoltypes.QueryServiceTopicRequest{
 		OwnerAddress: ownerAddress.String(),
 		TopicName:    topicName,
 	}
@@ -54,7 +54,7 @@ func (suite *aolMsgServerTestSuite) TestMsgServer() {
 	// add writer
 	moniker := "testMoniker"
 	writerAddress := suite.GetAccAddress()
-	msgAddWriter := aoltypes.MsgAddWriter{
+	msgAddWriter := aoltypes.MsgServiceAddWriterRequest{
 		TopicName:     topicName,
 		Moniker:       moniker,
 		Description:   "write Description",
@@ -68,7 +68,7 @@ func (suite *aolMsgServerTestSuite) TestMsgServer() {
 
 	// add writer2
 	writerAddress2 := suite.GetAccAddress()
-	msgAddWriter = aoltypes.MsgAddWriter{
+	msgAddWriter = aoltypes.MsgServiceAddWriterRequest{
 		TopicName:     topicName,
 		Moniker:       moniker,
 		Description:   "write Description2",
@@ -81,7 +81,7 @@ func (suite *aolMsgServerTestSuite) TestMsgServer() {
 	suite.Require().NotNil(addWriterResponse)
 
 	// get writer
-	getWriterRequest := aoltypes.QueryWriterRequest{
+	getWriterRequest := aoltypes.QueryServiceWriterRequest{
 		OwnerAddress:  ownerAddress.String(),
 		TopicName:     topicName,
 		WriterAddress: writerAddress2.String(),
@@ -92,7 +92,7 @@ func (suite *aolMsgServerTestSuite) TestMsgServer() {
 	suite.Require().Equal(msgAddWriter.Moniker, getWriterResponse.Writer.Moniker)
 
 	// get writer2
-	getWriterRequest = aoltypes.QueryWriterRequest{
+	getWriterRequest = aoltypes.QueryServiceWriterRequest{
 		OwnerAddress:  ownerAddress.String(),
 		TopicName:     topicName,
 		WriterAddress: writerAddress2.String(),
@@ -103,7 +103,7 @@ func (suite *aolMsgServerTestSuite) TestMsgServer() {
 	suite.Require().Equal(msgAddWriter.Moniker, getWriterResponse.Writer.Moniker)
 
 	// add record
-	msgAddRecord := aoltypes.MsgAddRecord{
+	msgAddRecord := aoltypes.MsgServiceAddRecordRequest{
 		TopicName:       topicName,
 		Key:             []byte("key1"),
 		Value:           []byte("value1"),
@@ -116,7 +116,7 @@ func (suite *aolMsgServerTestSuite) TestMsgServer() {
 	suite.Require().NotNil(addRecordResponse)
 
 	// get record
-	getRecordRequest := aoltypes.QueryRecordRequest{
+	getRecordRequest := aoltypes.QueryServiceRecordRequest{
 		OwnerAddress: ownerAddress.String(),
 		TopicName:    topicName,
 		Offset:       0,
@@ -128,7 +128,7 @@ func (suite *aolMsgServerTestSuite) TestMsgServer() {
 	suite.Require().Equal(msgAddRecord.WriterAddress, getRecordResponse.Record.WriterAddress)
 
 	// add record2
-	msgAddRecord2 := aoltypes.MsgAddRecord{
+	msgAddRecord2 := aoltypes.MsgServiceAddRecordRequest{
 		TopicName:       topicName,
 		Key:             []byte("key2"),
 		Value:           []byte("value2"),
@@ -141,7 +141,7 @@ func (suite *aolMsgServerTestSuite) TestMsgServer() {
 	suite.Require().NotNil(addRecordResponse)
 
 	// get record
-	getRecordRequest = aoltypes.QueryRecordRequest{
+	getRecordRequest = aoltypes.QueryServiceRecordRequest{
 		OwnerAddress: ownerAddress.String(),
 		TopicName:    topicName,
 		Offset:       1,
@@ -153,7 +153,7 @@ func (suite *aolMsgServerTestSuite) TestMsgServer() {
 	suite.Require().Equal(msgAddRecord2.WriterAddress, getRecordResponse.Record.WriterAddress)
 
 	// get topic
-	getTopicRequest = aoltypes.QueryTopicRequest{
+	getTopicRequest = aoltypes.QueryServiceTopicRequest{
 		OwnerAddress: ownerAddress.String(),
 		TopicName:    topicName,
 	}
@@ -164,7 +164,7 @@ func (suite *aolMsgServerTestSuite) TestMsgServer() {
 	suite.Require().Equal(uint64(2), getTopicResponse.Topic.TotalWriters)
 
 	// delete writer
-	msgDeleteWriter := aoltypes.MsgDeleteWriter{
+	msgDeleteWriter := aoltypes.MsgServiceDeleteWriterRequest{
 		TopicName:     topicName,
 		WriterAddress: writerAddress2.String(),
 		OwnerAddress:  ownerAddress.String(),
@@ -174,7 +174,7 @@ func (suite *aolMsgServerTestSuite) TestMsgServer() {
 	suite.Require().NotNil(msgDeleteWriterResponse)
 
 	// get topic
-	getTopicRequest = aoltypes.QueryTopicRequest{
+	getTopicRequest = aoltypes.QueryServiceTopicRequest{
 		OwnerAddress: ownerAddress.String(),
 		TopicName:    topicName,
 	}

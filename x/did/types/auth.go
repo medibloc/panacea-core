@@ -3,8 +3,8 @@ package types
 import (
 	"fmt"
 
+	"github.com/cometbft/cometbft/crypto"
 	sdkcodec "github.com/cosmos/cosmos-sdk/codec"
-	"github.com/tendermint/tendermint/crypto"
 )
 
 func Sign(signableData sdkcodec.ProtoMarshaler, seq uint64, privKey crypto.PrivKey) ([]byte, error) {

@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/btcsuite/btcutil/base58"
-	"github.com/tendermint/tendermint/crypto/secp256k1"
+	"github.com/cometbft/cometbft/crypto/secp256k1"
 )
 
 // PrivKeyFromBytes converts a byte slice into a Secp256k1 private key.

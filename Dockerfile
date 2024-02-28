@@ -1,4 +1,4 @@
-FROM golang:1.19.2-bullseye AS build-env
+FROM golang:1.22.0-bullseye AS build-env
 
 # Install minimum necessary dependencies,
 ENV PACKAGES make git gcc

@@ -2,21 +2,21 @@ package cmd
 
 import (
 	"errors"
+	"github.com/cosmos/cosmos-sdk/client/config"
+	"github.com/cosmos/cosmos-sdk/client/pruning"
+	"github.com/cosmos/cosmos-sdk/client/snapshot"
+	"github.com/medibloc/panacea-core/v2/app/params"
+	"github.com/spf13/viper"
 	"io"
 	"os"
-	"path/filepath"
 
-	"github.com/cosmos/cosmos-sdk/snapshots"
-	"github.com/medibloc/panacea-core/v2/app/params"
-
-	"github.com/spf13/cast"
+	dbm "github.com/cometbft/cometbft-db"
+	cmbtcfg "github.com/cometbft/cometbft/config"
+	cmbtcli "github.com/cometbft/cometbft/libs/cli"
+	"github.com/cometbft/cometbft/libs/log"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
-	tmcli "github.com/tendermint/tendermint/libs/cli"
-	"github.com/tendermint/tendermint/libs/log"
-	dbm "github.com/tendermint/tm-db"
 
-	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/debug"
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -25,12 +25,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/server"
 	serverconfig "github.com/cosmos/cosmos-sdk/server/config"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
-	"github.com/cosmos/cosmos-sdk/store"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
-	vestingcli "github.com/cosmos/cosmos-sdk/x/auth/vesting/client/cli"
-	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	"github.com/cosmos/cosmos-sdk/x/crisis"
 	genutilcli "github.com/cosmos/cosmos-sdk/x/genutil/client/cli"
 	"github.com/medibloc/panacea-core/v2/app"
@@ -46,14 +42,14 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 
 	encodingConfig := app.MakeEncodingConfig()
 	initClientCtx := client.Context{}.
-		WithCodec(encodingConfig.Marshaler).
+		WithCodec(encodingConfig.Codec).
 		WithInterfaceRegistry(encodingConfig.InterfaceRegistry).
 		WithTxConfig(encodingConfig.TxConfig).
 		WithLegacyAmino(encodingConfig.Amino).
 		WithInput(os.Stdin).
 		WithAccountRetriever(types.AccountRetriever{}).
-		WithBroadcastMode(flags.BroadcastBlock).
-		WithHomeDir(app.DefaultNodeHome)
+		WithHomeDir(app.DefaultNodeHome).
+		WithViper("")
 
 	rootCmd := &cobra.Command{
 		Use:   app.Name + "d",
@@ -63,13 +59,24 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 			cmd.SetOut(cmd.OutOrStdout())
 			cmd.SetErr(cmd.ErrOrStderr())
 
+			initClientCtx, err := client.ReadPersistentCommandFlags(initClientCtx, cmd.Flags())
+			if err != nil {
+				return err
+			}
+
+			initClientCtx, err = config.ReadFromClientConfig(initClientCtx)
+			if err != nil {
+				return err
+			}
+
 			if err := client.SetCmdClientContextHandler(initClientCtx, cmd); err != nil {
 				return err
 			}
 
 			customAppTemplate, customAppConfig := initAppConfig()
+			customCometBFTConfig := initCometBFTConfig()
 
-			return server.InterceptConfigsPreRunHandler(cmd, customAppTemplate, customAppConfig)
+			return server.InterceptConfigsPreRunHandler(cmd, customAppTemplate, customAppConfig, customCometBFTConfig)
 		},
 	}
 
@@ -96,25 +103,32 @@ func initAppConfig() (string, interface{}) {
 	return serverconfig.DefaultConfigTemplate, PanaceaAppConfig
 }
 
+func initCometBFTConfig() *cmbtcfg.Config {
+	cfg := cmbtcfg.DefaultConfig()
+
+	// these values put a higher strain on node memory
+	// cfg.P2P.MaxNumInboundPeers = 100
+	// cfg.P2P.MaxNumOutboundPeers = 40
+
+	return cfg
+}
+
 func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
 	rootCmd.AddCommand(
 		InitCmd(app.ModuleBasics, app.DefaultNodeHome),
-		genutilcli.CollectGenTxsCmd(banktypes.GenesisBalancesIterator{}, app.DefaultNodeHome),
-		genutilcli.MigrateGenesisCmd(),
-		genutilcli.GenTxCmd(app.ModuleBasics, encodingConfig.TxConfig, banktypes.GenesisBalancesIterator{}, app.DefaultNodeHome),
-		genutilcli.ValidateGenesisCmd(app.ModuleBasics),
-		AddGenesisAccountCmd(app.DefaultNodeHome),
-		tmcli.NewCompletionCmd(rootCmd, true),
 		debug.Cmd(),
-		// this line is used by starport scaffolding # stargate/root/commands
+		config.Cmd(),
+		cmbtcli.NewCompletionCmd(rootCmd, true),
+		pruning.Cmd(newApp, app.DefaultNodeHome),
+		snapshot.Cmd(newApp),
 	)
 
-	a := appCreator{encodingConfig}
-	server.AddCommands(rootCmd, app.DefaultNodeHome, a.newApp, a.appExport, addModuleInitFlags)
+	server.AddCommands(rootCmd, app.DefaultNodeHome, newApp, appExport, addModuleInitFlags)
 
 	// add keybase, auxiliary RPC, query, and tx child commands
 	rootCmd.AddCommand(
 		rpc.StatusCommand(),
+		genesisCommand(encodingConfig),
 		queryCommand(),
 		txCommand(),
 		keys.Commands(app.DefaultNodeHome),
@@ -123,6 +137,16 @@ func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
 
 func addModuleInitFlags(startCmd *cobra.Command) {
 	crisis.AddModuleInitFlags(startCmd)
+}
+
+// genesisCommand builds genesis-related `simd genesis` command. Users may provide application specific commands as a parameter
+func genesisCommand(encodingConfig params.EncodingConfig, cmds ...*cobra.Command) *cobra.Command {
+	cmd := genutilcli.GenesisCoreCommand(encodingConfig.TxConfig, app.ModuleBasics, app.DefaultNodeHome)
+
+	for _, sub_cmd := range cmds {
+		cmd.AddCommand(sub_cmd)
+	}
+	return cmd
 }
 
 func queryCommand() *cobra.Command {
@@ -136,6 +160,7 @@ func queryCommand() *cobra.Command {
 	}
 
 	cmd.AddCommand(
+		rpc.QueryEventForTxCmd(),
 		authcmd.GetAccountCmd(),
 		rpc.ValidatorCommand(),
 		rpc.BlockCommand(),
@@ -144,7 +169,6 @@ func queryCommand() *cobra.Command {
 	)
 
 	app.ModuleBasics.AddQueryCommands(cmd)
-	cmd.PersistentFlags().String(flags.FlagChainID, "", "The network chain ID")
 
 	return cmd
 }
@@ -162,51 +186,27 @@ func txCommand() *cobra.Command {
 		authcmd.GetSignCommand(),
 		authcmd.GetSignBatchCommand(),
 		authcmd.GetMultiSignCommand(),
+		authcmd.GetMultiSignBatchCmd(),
 		authcmd.GetValidateSignaturesCommand(),
-		flags.LineBreak,
 		authcmd.GetBroadcastCommand(),
 		authcmd.GetEncodeCommand(),
 		authcmd.GetDecodeCommand(),
-		flags.LineBreak,
-		vestingcli.GetTxCmd(),
+		authcmd.GetAuxToFeeCommand(),
 	)
 
 	app.ModuleBasics.AddTxCommands(cmd)
-	cmd.PersistentFlags().String(flags.FlagChainID, "", "The network chain ID")
+	//cmd.PersistentFlags().String(flags.FlagChainID, "", "The network chain ID")
 
 	return cmd
 }
 
-type appCreator struct {
-	encCfg params.EncodingConfig
-}
-
-// newApp is an AppCreator
+/*// newApp is an AppCreator
 func (a appCreator) newApp(logger log.Logger, db dbm.DB, traceStore io.Writer, appOpts servertypes.AppOptions) servertypes.Application {
-	var cache sdk.MultiStorePersistentCache
-
-	if cast.ToBool(appOpts.Get(server.FlagInterBlockCache)) {
-		cache = store.NewCommitKVStoreCacheManager()
-	}
+	baseappOptions := server.DefaultBaseappOptions(appOpts)
 
 	skipUpgradeHeights := make(map[int64]bool)
 	for _, h := range cast.ToIntSlice(appOpts.Get(server.FlagUnsafeSkipUpgrades)) {
 		skipUpgradeHeights[int64(h)] = true
-	}
-
-	pruningOpts, err := server.GetPruningOptionsFromFlags(appOpts)
-	if err != nil {
-		panic(err)
-	}
-
-	snapshotDir := filepath.Join(cast.ToString(appOpts.Get(flags.FlagHome)), "data", "snapshots")
-	snapshotDB, err := sdk.NewLevelDB("metadata", snapshotDir)
-	if err != nil {
-		panic(err)
-	}
-	snapshotStore, err := snapshots.NewStore(snapshotDB, snapshotDir)
-	if err != nil {
-		panic(err)
 	}
 
 	return app.New(
@@ -216,17 +216,7 @@ func (a appCreator) newApp(logger log.Logger, db dbm.DB, traceStore io.Writer, a
 		a.encCfg,
 		// this line is used by starport scaffolding # stargate/root/appArgument
 		appOpts,
-		baseapp.SetPruning(pruningOpts),
-		baseapp.SetMinGasPrices(cast.ToString(appOpts.Get(server.FlagMinGasPrices))),
-		baseapp.SetMinRetainBlocks(cast.ToUint64(appOpts.Get(server.FlagMinRetainBlocks))),
-		baseapp.SetHaltHeight(cast.ToUint64(appOpts.Get(server.FlagHaltHeight))),
-		baseapp.SetHaltTime(cast.ToUint64(appOpts.Get(server.FlagHaltTime))),
-		baseapp.SetInterBlockCache(cache),
-		baseapp.SetTrace(cast.ToBool(appOpts.Get(server.FlagTrace))),
-		baseapp.SetIndexEvents(cast.ToStringSlice(appOpts.Get(server.FlagIndexEvents))),
-		baseapp.SetSnapshotStore(snapshotStore),
-		baseapp.SetSnapshotInterval(cast.ToUint64(appOpts.Get(server.FlagStateSyncSnapshotInterval))),
-		baseapp.SetSnapshotKeepRecent(cast.ToUint32(appOpts.Get(server.FlagStateSyncSnapshotKeepRecent))),
+		baseappOptions...,
 	)
 }
 
@@ -243,38 +233,75 @@ func (a appCreator) appExport(
 	}
 
 	if height != -1 {
-		anApp = app.New(
-			logger,
-			db,
-			traceStore,
-			false,
-			map[int64]bool{},
-			homePath,
-			uint(1),
-			a.encCfg,
-			// this line is used by starport scaffolding # stargate/root/exportArgument
-			appOpts,
-		)
+		anApp = app.New(logger, db, traceStore, false, map[int64]bool{}, homePath, uint(1), a.encCfg, appOpts)
 
 		if err := anApp.LoadHeight(height); err != nil {
 			return servertypes.ExportedApp{}, err
 		}
 	} else {
-		anApp = app.New(
-			logger,
-			db,
-			traceStore,
-			true,
-			map[int64]bool{},
-			homePath,
-			uint(1),
-			a.encCfg,
-			// this line is used by starport scaffolding # stargate/root/noHeightExportArgument
-			appOpts,
-		)
+		anApp = app.New(logger, db, traceStore, true, map[int64]bool{}, homePath, uint(1), a.encCfg, appOpts)
 	}
 
 	return anApp.ExportAppStateAndValidators(forZeroHeight, jailAllowedAddrs)
+}*/
+
+// newApp creates the application
+func newApp(
+	logger log.Logger,
+	db dbm.DB,
+	traceStore io.Writer,
+	appOpts servertypes.AppOptions,
+) servertypes.Application {
+
+	baseappOptions := server.DefaultBaseappOptions(appOpts)
+
+	return app.New(
+		logger, db, traceStore, true,
+		appOpts,
+		baseappOptions...,
+	)
+}
+
+// appExport creates a new simapp (optionally at a given height) and exports state.
+func appExport(
+	logger log.Logger,
+	db dbm.DB,
+	traceStore io.Writer,
+	height int64,
+	forZeroHeight bool,
+	jailAllowedAddrs []string,
+	appOpts servertypes.AppOptions,
+	modulesToExport []string,
+) (servertypes.ExportedApp, error) {
+	var panaceaApp *app.App
+
+	// this check is necessary as we use the flag in x/upgrade.
+	// we can exit more gracefully by checking the flag here.
+	homePath, ok := appOpts.Get(flags.FlagHome).(string)
+	if !ok || homePath == "" {
+		return servertypes.ExportedApp{}, errors.New("application home not set")
+	}
+
+	viperAppOpts, ok := appOpts.(*viper.Viper)
+	if !ok {
+		return servertypes.ExportedApp{}, errors.New("appOpts is not viper.Viper")
+	}
+
+	// overwrite the FlagInvCheckPeriod
+	viperAppOpts.Set(server.FlagInvCheckPeriod, 1)
+	appOpts = viperAppOpts
+
+	if height != -1 {
+		panaceaApp = app.New(logger, db, traceStore, false, appOpts)
+
+		if err := panaceaApp.LoadHeight(height); err != nil {
+			return servertypes.ExportedApp{}, err
+		}
+	} else {
+		panaceaApp = app.New(logger, db, traceStore, true, appOpts)
+	}
+
+	return panaceaApp.ExportAppStateAndValidators(forZeroHeight, jailAllowedAddrs, modulesToExport)
 }
 
 func overwriteFlagDefaults(c *cobra.Command, defaults map[string]string) {

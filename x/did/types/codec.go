@@ -9,20 +9,20 @@ import (
 
 func RegisterCodec(cdc *codec.LegacyAmino) {
 	// this line is used by starport scaffolding # 2
-	cdc.RegisterConcrete(&MsgCreateDID{}, "did/CreateDID", nil)
-	cdc.RegisterConcrete(&MsgUpdateDID{}, "did/UpdateDID", nil)
-	cdc.RegisterConcrete(&MsgDeactivateDID{}, "did/DeactivateDID", nil)
+	cdc.RegisterConcrete(&MsgServiceCreateDIDRequest{}, "did/CreateDID", nil)
+	cdc.RegisterConcrete(&MsgServiceUpdateDIDRequest{}, "did/UpdateDID", nil)
+	cdc.RegisterConcrete(&MsgServiceDeactivateDIDRequest{}, "did/DeactivateDID", nil)
 }
 
 func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 	// this line is used by starport scaffolding # 3
 	registry.RegisterImplementations((*sdk.Msg)(nil),
-		&MsgCreateDID{},
-		&MsgUpdateDID{},
-		&MsgDeactivateDID{},
+		&MsgServiceCreateDIDRequest{},
+		&MsgServiceUpdateDIDRequest{},
+		&MsgServiceDeactivateDIDRequest{},
 	)
 
-	msgservice.RegisterMsgServiceDesc(registry, &_Msg_serviceDesc)
+	msgservice.RegisterMsgServiceDesc(registry, &_MsgService_serviceDesc)
 }
 
 var (

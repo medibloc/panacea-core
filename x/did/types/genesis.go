@@ -1,6 +1,8 @@
 package types
 
-import sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+import (
+	"cosmossdk.io/errors"
+)
 
 // DefaultIndex is the default capability global index
 const DefaultIndex uint64 = 1
@@ -20,7 +22,7 @@ func (data GenesisState) Validate() error {
 		}
 
 		if !doc.Valid() {
-			return sdkerrors.Wrapf(ErrInvalidDIDDocumentWithSeq, "DIDDocumentWithSeq: %v", doc)
+			return errors.Wrapf(ErrInvalidDIDDocumentWithSeq, "DIDDocumentWithSeq: %v", doc)
 		}
 	}
 	return nil

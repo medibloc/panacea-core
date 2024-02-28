@@ -3,12 +3,12 @@ package keeper_test
 import (
 	"testing"
 
+	"github.com/cometbft/cometbft/crypto"
+	"github.com/cometbft/cometbft/crypto/secp256k1"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/medibloc/panacea-core/v2/types/testsuite"
 	aoltypes "github.com/medibloc/panacea-core/v2/x/aol/types"
 	"github.com/stretchr/testify/suite"
-	"github.com/tendermint/tendermint/crypto"
-	"github.com/tendermint/tendermint/crypto/secp256k1"
 )
 
 var (

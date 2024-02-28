@@ -7,7 +7,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/tendermint/tendermint/libs/rand"
+	"github.com/cometbft/cometbft/libs/rand"
 
 	"github.com/stretchr/testify/require"
 

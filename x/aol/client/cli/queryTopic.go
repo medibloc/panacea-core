@@ -17,9 +17,9 @@ func CmdGetTopic() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 
-			queryClient := types.NewQueryClient(clientCtx)
+			queryClient := types.NewQueryServiceClient(clientCtx)
 
-			params := &types.QueryTopicRequest{
+			params := &types.QueryServiceTopicRequest{
 				OwnerAddress: args[0],
 				TopicName:    args[1],
 			}
@@ -51,9 +51,9 @@ func CmdListTopics() *cobra.Command {
 				return err
 			}
 
-			queryClient := types.NewQueryClient(clientCtx)
+			queryClient := types.NewQueryServiceClient(clientCtx)
 
-			params := &types.QueryTopicsRequest{
+			params := &types.QueryServiceTopicsRequest{
 				OwnerAddress: args[0],
 				Pagination:   pageReq,
 			}

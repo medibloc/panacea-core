@@ -3,14 +3,14 @@ package keeper_test
 import (
 	"testing"
 
+	"github.com/cometbft/cometbft/crypto"
+	"github.com/cometbft/cometbft/crypto/secp256k1"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/medibloc/panacea-core/v2/types/testsuite"
 	"github.com/medibloc/panacea-core/v2/x/did/internal/secp256k1util"
 	didkeeper "github.com/medibloc/panacea-core/v2/x/did/keeper"
 	"github.com/medibloc/panacea-core/v2/x/did/types"
 	"github.com/stretchr/testify/suite"
-	"github.com/tendermint/tendermint/crypto"
-	"github.com/tendermint/tendermint/crypto/secp256k1"
 )
 
 type msgServerTestSuite struct {
@@ -90,7 +90,7 @@ func (suite *msgServerTestSuite) TestHandleMsgCreateDID_SigVerificationFailed() 
 	sig, _ := types.Sign(doc, types.InitialSequence, privKey)
 	sig[0] += 1 // pollute the signature
 
-	msg := types.NewMsgCreateDID(did, *doc, veriMethodID, sig, sdk.AccAddress{}.String())
+	msg := types.NewMsgServiceCreateDIDResponse(did, *doc, veriMethodID, sig, sdk.AccAddress{}.String())
 
 	res, err := didMsgServer.CreateDID(goContext, &msg)
 	suite.Require().ErrorIs(types.ErrSigVerificationFailed, err)
@@ -263,8 +263,8 @@ func (suite *msgServerTestSuite) TestHandleMsgDeactivateDID_SigVerificationFaile
 	sig, _ := types.Sign(&doc, docWithSeq.Sequence, privKey)
 	sig[0] += 1 // pollute the signature
 
-	deactivateMsg := types.NewMsgDeactivateDID(did, verificationMethodID, sig, sdk.AccAddress{}.String())
-	deactivateRes, err := didMsgServer.DeactivateDID(goContext, &deactivateMsg)
+	deactivateMsg := types.NewMsgServiceDeactivateDIDRequest(did, verificationMethodID, sig, sdk.AccAddress{}.String())
+	deactivateRes, err := didMsgServer.DeactivateDID(goContext, deactivateMsg)
 	suite.Require().Nil(deactivateRes)
 	suite.Require().ErrorIs(types.ErrSigVerificationFailed, err)
 }
@@ -320,24 +320,24 @@ func (suite *msgServerTestSuite) newDIDDocumentWithSeq(did string) (types.DIDDoc
 	return docWithSeq, privKey
 }
 
-func newMsgCreateDID(suite *msgServerTestSuite, doc types.DIDDocument, verificationMethodID string, privKey crypto.PrivKey) types.MsgCreateDID {
+func newMsgCreateDID(suite *msgServerTestSuite, doc types.DIDDocument, verificationMethodID string, privKey crypto.PrivKey) types.MsgServiceCreateDIDRequest {
 	sig, err := types.Sign(&doc, types.InitialSequence, privKey)
 	suite.Require().NoError(err)
-	return types.NewMsgCreateDID(doc.Id, doc, verificationMethodID, sig, sdk.AccAddress{}.String())
+	return types.NewMsgServiceCreateDIDResponse(doc.Id, doc, verificationMethodID, sig, sdk.AccAddress{}.String())
 }
 
-func newMsgUpdateDID(suite *msgServerTestSuite, newDoc types.DIDDocument, verificationMethodID string, privKey crypto.PrivKey, seq uint64) types.MsgUpdateDID {
+func newMsgUpdateDID(suite *msgServerTestSuite, newDoc types.DIDDocument, verificationMethodID string, privKey crypto.PrivKey, seq uint64) types.MsgServiceUpdateDIDRequest {
 	sig, err := types.Sign(&newDoc, seq, privKey)
 	suite.Require().NoError(err)
-	return types.NewMsgUpdateDID(newDoc.Id, newDoc, verificationMethodID, sig, sdk.AccAddress{}.String())
+	return *types.NewMsgUpdateDID(newDoc.Id, newDoc, verificationMethodID, sig, sdk.AccAddress{}.String())
 }
 
-func newMsgDeactivateDID(suite *msgServerTestSuite, did string, verificationMethodID string, privKey crypto.PrivKey, seq uint64) types.MsgDeactivateDID {
+func newMsgDeactivateDID(suite *msgServerTestSuite, did string, verificationMethodID string, privKey crypto.PrivKey, seq uint64) types.MsgServiceDeactivateDIDRequest {
 	doc := types.DIDDocument{
 		Id: did,
 	}
 
 	sig, err := types.Sign(&doc, seq, privKey)
 	suite.Require().NoError(err)
-	return types.NewMsgDeactivateDID(did, verificationMethodID, sig, sdk.AccAddress{}.String())
+	return *types.NewMsgServiceDeactivateDIDRequest(did, verificationMethodID, sig, sdk.AccAddress{}.String())
 }
