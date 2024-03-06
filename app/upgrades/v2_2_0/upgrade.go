@@ -64,7 +64,7 @@ func CreateUpgradeHandle(mm *module.Manager, configurator module.Configurator, k
 		}
 		// Current, panacea chain MinCommissionRate is 5%. So, we need to change minCommissionRate zero to 5%.
 		params := keepers.StakingKeeper.GetParams(ctx)
-		params.MinCommissionRate = sdk.NewDecWithPrec(5, 2)
+		params.MinCommissionRate = sdk.NewDecWithPrec(3, 2)
 		if err := keepers.StakingKeeper.SetParams(ctx, params); err != nil {
 			return fromVM, err
 		}
