@@ -10,7 +10,7 @@ import "panacea/aol/v2/topic.proto";
 option java_multiple_files = true;
 option go_package = "github.com/medibloc/panacea-core/x/aol/types";
 
-// Query defines the gRPC querier service.
+// QueryService defines the gRPC querier service.
 service QueryService {
   // Topic returns topic details.
   rpc Topic(QueryServiceTopicRequest) returns (QueryServiceTopicResponse) {

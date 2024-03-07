@@ -1,0 +1,60 @@
+syntax = "proto3";
+package panacea.pnft.v2;
+
+import "google/api/annotations.proto";
+import "cosmos/base/query/v1beta1/pagination.proto";
+import "panacea/pnft/v2/pnft.proto";
+
+option java_multiple_files = true;
+option go_package = "github.com/medibloc/panacea-core/x/pnft/types";
+
+// QueryService defines the gRPC querier service.
+service QueryService {
+  // Denoms returns denom list.
+  rpc Denoms(QueryServiceDenomsRequest) returns (QueryServiceDenomsResponse) {
+    option (google.api.http).get =
+        "/panacea/pnft/v2/denoms";
+  }
+
+  rpc DenomsByCreator(QueryServiceDenomsByCreatorRequest) returns (QueryServiceDenomsByCreatorResponse) {
+    option (google.api.http).get =
+        "/panacea/pnft/v2/denoms/creators/{creator}";
+  }
+
+  // Denom returns denom detail.
+  rpc Denom(QueryServiceDenomRequest) returns (QueryServiceDenomResponse) {
+    option (google.api.http).get =
+        "/panacea/pnft/v2/denoms/{id}";
+  }
+}
+
+// QueryServiceDenomsRequest is the response type for the Query RPC method.
+message QueryServiceDenomsRequest {
+  cosmos.base.query.v1beta1.PageRequest pagination = 2;
+}
+
+// QueryServiceDenomsResponse is the response type for the Query RPC method.
+message QueryServiceDenomsResponse {
+  repeated panacea.pnft.v2.Denom denoms = 1;
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+// QueryServiceDenomsByCreatorRequest is the response type for the Query RPC method.
+message QueryServiceDenomsByCreatorRequest {
+  string creator = 1;
+}
+
+// QueryServiceDenomsByCreatorResponse is the response type for the Query RPC method.
+message QueryServiceDenomsByCreatorResponse {
+  repeated panacea.pnft.v2.Denom denoms = 1;
+}
+
+// QueryServiceDenomRequest is the response type for the Query RPC method.
+message QueryServiceDenomRequest {
+  string id = 1;
+}
+
+// QueryServiceDenomResponse is the response type for the Query RPC method.
+message QueryServiceDenomResponse {
+  panacea.pnft.v2.Denom denom = 1;
+}

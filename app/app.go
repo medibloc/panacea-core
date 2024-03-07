@@ -21,10 +21,11 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/group"
 	groupmodule "github.com/cosmos/cosmos-sdk/x/group/module"
 	"github.com/cosmos/cosmos-sdk/x/nft"
-	nftmodule "github.com/cosmos/cosmos-sdk/x/nft/module"
 	"github.com/cosmos/cosmos-sdk/x/upgrade"
 	"github.com/medibloc/panacea-core/v2/app/keepers"
 	"github.com/medibloc/panacea-core/v2/app/upgrades"
+	"github.com/medibloc/panacea-core/v2/x/pnft"
+	pnfttypes "github.com/medibloc/panacea-core/v2/x/pnft/types"
 	"github.com/spf13/cast"
 	"io"
 	"os"
@@ -140,7 +141,6 @@ var (
 		authzmodule.AppModuleBasic{},
 		groupmodule.AppModuleBasic{},
 		vesting.AppModuleBasic{},
-		nftmodule.AppModuleBasic{},
 		consensus.AppModuleBasic{},
 		// ibc
 		ibc.AppModuleBasic{},
@@ -151,6 +151,7 @@ var (
 		aol.AppModuleBasic{},
 		did.AppModuleBasic{},
 		burn.AppModuleBasic{},
+		pnft.AppModuleBasic{},
 	)
 
 	// module account permissions
@@ -161,9 +162,9 @@ var (
 		stakingtypes.BondedPoolName:    {authtypes.Burner, authtypes.Staking},
 		stakingtypes.NotBondedPoolName: {authtypes.Burner, authtypes.Staking},
 		govtypes.ModuleName:            {authtypes.Burner},
-		nft.ModuleName:                 nil,
 		ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
 		burntypes.ModuleName:           {authtypes.Burner},
+		nft.ModuleName:                 nil,
 	}
 
 	_ runtime.AppI            = (*App)(nil)
@@ -284,13 +285,13 @@ func New(
 		params.NewAppModule(app.ParamsKeeper),
 		authzmodule.NewAppModule(appCodec, app.AuthzKeeper, app.AccountKeeper, app.BankKeeper, app.interfaceRegistry),
 		groupmodule.NewAppModule(appCodec, app.GroupKeeper, app.AccountKeeper, app.BankKeeper, app.interfaceRegistry),
-		nftmodule.NewAppModule(appCodec, app.NFTKeeper, app.AccountKeeper, app.BankKeeper, app.interfaceRegistry),
 		consensus.NewAppModule(appCodec, app.ConsensusParamsKeeper),
 		ibc.NewAppModule(app.IBCKeeper),
 		transfer.NewAppModule(app.TransferKeeper),
 		aol.NewAppModule(appCodec, app.AolKeeper),
 		did.NewAppModule(appCodec, app.DidKeeper),
 		burn.NewAppModule(appCodec, app.BurnKeeper),
+		pnft.NewAppModule(appCodec, &app.PnftKeeper),
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -305,7 +306,7 @@ func New(
 		authz.ModuleName, feegrant.ModuleName, nft.ModuleName, group.ModuleName,
 		paramstypes.ModuleName, vestingtypes.ModuleName, consensusparamtypes.ModuleName,
 		ibcexported.ModuleName, ibctransfertypes.ModuleName,
-		aoltypes.ModuleName, didtypes.ModuleName, burntypes.ModuleName,
+		aoltypes.ModuleName, didtypes.ModuleName, burntypes.ModuleName, pnfttypes.ModuleName,
 	)
 
 	app.ModuleManager.SetOrderEndBlockers(
@@ -316,7 +317,7 @@ func New(
 		feegrant.ModuleName, nft.ModuleName, group.ModuleName,
 		paramstypes.ModuleName, upgradetypes.ModuleName, vestingtypes.ModuleName, consensusparamtypes.ModuleName,
 		ibcexported.ModuleName, ibctransfertypes.ModuleName,
-		aoltypes.ModuleName, didtypes.ModuleName, burntypes.ModuleName,
+		aoltypes.ModuleName, didtypes.ModuleName, burntypes.ModuleName, pnfttypes.ModuleName,
 	)
 
 	// NOTE: The genutils module must occur after staking so that pools are
@@ -332,7 +333,7 @@ func New(
 		feegrant.ModuleName, nft.ModuleName, group.ModuleName, paramstypes.ModuleName, upgradetypes.ModuleName,
 		vestingtypes.ModuleName, consensusparamtypes.ModuleName,
 		ibcexported.ModuleName, ibctransfertypes.ModuleName,
-		aoltypes.ModuleName, didtypes.ModuleName, burntypes.ModuleName,
+		aoltypes.ModuleName, didtypes.ModuleName, burntypes.ModuleName, pnfttypes.ModuleName,
 	}
 	app.ModuleManager.SetOrderInitGenesis(genesisModuleOrder...)
 	app.ModuleManager.SetOrderExportGenesis(genesisModuleOrder...)

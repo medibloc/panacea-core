@@ -15,7 +15,6 @@ import (
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	"github.com/cosmos/cosmos-sdk/x/group"
 	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
-	nftkeeper "github.com/cosmos/cosmos-sdk/x/nft/keeper"
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	slashingtypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
@@ -25,6 +24,7 @@ import (
 	aoltypes "github.com/medibloc/panacea-core/v2/x/aol/types"
 	burntypes "github.com/medibloc/panacea-core/v2/x/burn/types"
 	didtypes "github.com/medibloc/panacea-core/v2/x/did/types"
+	pnfttypes "github.com/medibloc/panacea-core/v2/x/pnft/types"
 )
 
 func (appKeepers *AppKeepersWithKey) GenerateKeys() {
@@ -33,9 +33,9 @@ func (appKeepers *AppKeepersWithKey) GenerateKeys() {
 		minttypes.StoreKey, distrtypes.StoreKey, slashingtypes.StoreKey,
 		govtypes.StoreKey, paramstypes.StoreKey, consensusparamtypes.StoreKey, upgradetypes.StoreKey, feegrant.StoreKey,
 		evidencetypes.StoreKey, capabilitytypes.StoreKey,
-		authzkeeper.StoreKey, nftkeeper.StoreKey, group.StoreKey,
+		authzkeeper.StoreKey, group.StoreKey,
 		ibcexported.StoreKey, ibctransfertypes.StoreKey,
-		aoltypes.StoreKey, didtypes.StoreKey, burntypes.StoreKey,
+		aoltypes.StoreKey, didtypes.StoreKey, burntypes.StoreKey, pnfttypes.StoreKey,
 	)
 
 	appKeepers.tkeys = sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
