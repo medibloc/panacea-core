@@ -1,0 +1,21 @@
+syntax = "proto3";
+package panacea.pnft.v2;
+
+option go_package = "github.com/medibloc/panacea-core/x/pnft/types";
+option java_multiple_files = true;
+
+message Denom {
+  string id = 1;
+  string name = 2;
+  string symbol = 3;
+  string description = 4;
+  string uri = 5;
+  string uri_hash = 6;
+  string owner = 7;
+  string data = 8;
+}
+
+message DenomMeta {
+  string owner = 1;
+  string data = 2;
+}

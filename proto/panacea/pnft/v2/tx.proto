@@ -1,0 +1,58 @@
+syntax = "proto3";
+package panacea.pnft.v2;
+
+import "panacea/pnft/v2/pnft.proto";
+
+option go_package = "github.com/medibloc/panacea-core/x/pnft/types";
+option java_multiple_files = true;
+
+service MsgService {
+  rpc CreateDenom(MsgServiceCreateDenomRequest) returns (MsgServiceCreateDenomResponse);
+
+  rpc UpdateDenom(MsgServiceUpdateDenomRequest) returns (MsgServiceUpdateDenomResponse);
+
+  rpc DeleteDenom(MsgServiceDeleteDenomRequest) returns (MsgServiceDeleteDenomResponse);
+
+  rpc TransferDenom(MsgServiceTransferDenomRequest) returns (MsgServiceTransferDenomResponse);
+}
+
+message MsgServiceCreateDenomRequest {
+  string id = 1;
+  string name = 2;
+  string symbol = 3;
+  string description = 4;
+  string uri = 5;
+  string uri_hash = 6;
+  string data = 7;
+  string creator = 8;
+}
+
+message MsgServiceCreateDenomResponse {}
+
+message MsgServiceUpdateDenomRequest {
+  string id = 1;
+  string name = 2;
+  string symbol = 3;
+  string description = 4;
+  string uri = 5;
+  string uri_hash = 6;
+  string data = 7;
+  string updater = 8;
+}
+
+message MsgServiceUpdateDenomResponse {}
+
+message MsgServiceDeleteDenomRequest {
+  string id = 1;
+  string remover = 2;
+}
+
+message MsgServiceDeleteDenomResponse {}
+
+message MsgServiceTransferDenomRequest {
+  string id = 1;
+  string sender = 2;
+  string receiver = 3;
+}
+
+message MsgServiceTransferDenomResponse {}

@@ -32,7 +32,6 @@ import (
 	groupkeeper "github.com/cosmos/cosmos-sdk/x/group/keeper"
 	mintkeeper "github.com/cosmos/cosmos-sdk/x/mint/keeper"
 	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
-	nftkeeper "github.com/cosmos/cosmos-sdk/x/nft/keeper"
 	"github.com/cosmos/cosmos-sdk/x/params"
 	paramskeeper "github.com/cosmos/cosmos-sdk/x/params/keeper"
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
@@ -58,6 +57,8 @@ import (
 	burnkeeper "github.com/medibloc/panacea-core/v2/x/burn/keeper"
 	didkeeper "github.com/medibloc/panacea-core/v2/x/did/keeper"
 	didtypes "github.com/medibloc/panacea-core/v2/x/did/types"
+	pnftkeeper "github.com/medibloc/panacea-core/v2/x/pnft/keeper"
+	pnfttypes "github.com/medibloc/panacea-core/v2/x/pnft/types"
 	"github.com/spf13/cast"
 )
 
@@ -77,7 +78,6 @@ type AppKeepersWithKey struct {
 	EvidenceKeeper        evidencekeeper.Keeper
 	FeeGrantKeeper        feegrantkeeper.Keeper
 	GroupKeeper           groupkeeper.Keeper
-	NFTKeeper             nftkeeper.Keeper
 	ConsensusParamsKeeper consensusparamkeeper.Keeper
 
 	IBCKeeper      *ibckeeper.Keeper        // IBC Keeper must be a pointer in the app, so we can SetRouter on it correctly
@@ -90,6 +90,7 @@ type AppKeepersWithKey struct {
 	AolKeeper  aolkeeper.Keeper
 	DidKeeper  didkeeper.Keeper
 	BurnKeeper burnkeeper.Keeper
+	PnftKeeper pnftkeeper.Keeper
 
 	keys    map[string]*storetypes.KVStoreKey
 	tkeys   map[string]*storetypes.TransientStoreKey
@@ -165,8 +166,6 @@ func (appKeepers *AppKeepersWithKey) InitKeyAndKeepers(
 	// set the governance module account as the authority for conducting upgrades
 	appKeepers.UpgradeKeeper = upgradekeeper.NewKeeper(skipUpgradeHeights, appKeepers.keys[upgradetypes.StoreKey], appCodec, homePath, bApp, authtypes.NewModuleAddress(govtypes.ModuleName).String())
 
-	appKeepers.NFTKeeper = nftkeeper.NewKeeper(appKeepers.keys[nftkeeper.StoreKey], appCodec, appKeepers.AccountKeeper, appKeepers.BankKeeper)
-
 	// Create evidence Keeper for to register the IBC light client misbehaviour evidence route
 	evidenceKeeper := evidencekeeper.NewKeeper(
 		appCodec, appKeepers.keys[evidencetypes.StoreKey], appKeepers.StakingKeeper, appKeepers.SlashingKeeper,
@@ -208,6 +207,13 @@ func (appKeepers *AppKeepersWithKey) InitKeyAndKeepers(
 	)
 
 	appKeepers.BurnKeeper = *burnkeeper.NewKeeper(
+		appKeepers.BankKeeper,
+	)
+
+	appKeepers.PnftKeeper = pnftkeeper.NewKeeper(
+		appCodec,
+		appKeepers.keys[pnfttypes.StoreKey],
+		appKeepers.AccountKeeper,
 		appKeepers.BankKeeper,
 	)
 

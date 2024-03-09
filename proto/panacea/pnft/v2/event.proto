@@ -1,0 +1,26 @@
+syntax = "proto3";
+package panacea.pnft.v2;
+
+option go_package = "github.com/medibloc/panacea-core/x/pnft/types";
+option java_multiple_files = true;
+
+message EventSaveDenom {
+  string id = 1;
+  string creator = 2;
+}
+
+message EventUpdateDenom {
+  string id = 1;
+  string updater = 2;
+}
+
+message EventDeleteDenom {
+  string id = 1;
+  string remover = 2;
+}
+
+message EventTransferDenom {
+  string id = 1;
+  string sender = 2;
+  string receiver = 3;
+}
