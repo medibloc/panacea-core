@@ -2,7 +2,6 @@ package cli
 
 import (
 	sdkerrors "cosmossdk.io/errors"
-	"fmt"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
@@ -14,7 +13,7 @@ import (
 func NewCmdCreateDenom() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:  "create-denom",
-		Long: fmt.Sprintf(`Create a new denom.`),
+		Long: "Create a new denom.",
 		Args: cobra.ExactArgs(0),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
@@ -97,7 +96,7 @@ func NewCmdCreateDenom() *cobra.Command {
 func NewCmdUpdateDenom() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:  "update-denom [denom-id]",
-		Long: fmt.Sprintf(`update a exist denom.`),
+		Long: "update a exist denom.",
 		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
@@ -171,7 +170,7 @@ func NewCmdUpdateDenom() *cobra.Command {
 func NewCmdDeleteDenom() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:  "delete-denom [denom-id]",
-		Long: fmt.Sprintf(`delete a exist denom.`),
+		Long: "Delete a exist denom.",
 		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
@@ -199,7 +198,7 @@ func NewCmdDeleteDenom() *cobra.Command {
 func NewCmdTransferDenom() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:  "transfer-denom [denom-id] [receiver]",
-		Long: fmt.Sprintf(`transfer denom owner to receiver.`),
+		Long: "Transfer denom owner to receiver.",
 		Args: cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)

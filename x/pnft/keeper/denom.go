@@ -1,7 +1,6 @@
 package keeper
 
 import (
-	"errors"
 	"fmt"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/nft"
@@ -28,7 +27,7 @@ func (k Keeper) SaveDenom(
 }
 
 func (k Keeper) ParseDenoms(classes []*nft.Class) ([]*types.Denom, error) {
-	denoms := []*types.Denom{}
+	var denoms []*types.Denom
 	for _, class := range classes {
 		denom, err := types.NewDenomFromClass(k.cdc, class)
 		if err != nil {
@@ -49,7 +48,7 @@ func (k Keeper) UpdateDenom(ctx sdk.Context, msg *types.Denom) error {
 
 	updater := msg.Owner
 	if updater != denom.Owner {
-		return errors.New(fmt.Sprintf("permission denied: %s does not have permission to modify this resource.", updater))
+		return fmt.Errorf("permission denied: %s does not have permission to modify this resource", updater)
 	}
 
 	if msg.Name != "" {
@@ -93,7 +92,7 @@ func (k Keeper) DeleteDenom(ctx sdk.Context, id string, remover string) error {
 	}
 
 	if remover != denom.Owner {
-		return errors.New(fmt.Sprintf("permission denied: %s does not have permission to remove this resource.", remover))
+		return fmt.Errorf("permission denied: %s does not have permission to remove this resource", remover)
 	}
 
 	store := ctx.KVStore(k.storeKey)
@@ -117,7 +116,7 @@ func (k Keeper) TransferDenomOwner(
 	}
 
 	if sender != denom.Owner {
-		return errors.New(fmt.Sprintf("%s is not allowed transfer denom to %s", sender, receiver))
+		return fmt.Errorf("%s is not allowed transfer denom to %s", sender, receiver)
 	}
 
 	denom.Owner = receiver
@@ -154,7 +153,7 @@ func (k Keeper) GetAllDenoms(ctx sdk.Context) ([]*types.Denom, error) {
 func (k Keeper) GetDenom(ctx sdk.Context, id string) (*types.Denom, error) {
 	class, found := k.nftKeeper.GetClass(ctx, id)
 	if !found {
-		return nil, errors.New("not found class.")
+		return nil, fmt.Errorf("not found class")
 	}
 
 	return types.NewDenomFromClass(k.cdc, &class)
