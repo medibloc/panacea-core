@@ -6,6 +6,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
+	"github.com/google/uuid"
 	"github.com/medibloc/panacea-core/v2/x/pnft/types"
 	"github.com/spf13/cobra"
 )
@@ -21,7 +22,17 @@ func NewCmdCreateDenom() *cobra.Command {
 				return err
 			}
 
-			symbol, err := cmd.Flags().GetString(FlagSymbol)
+			id, err := cmd.Flags().GetString(FlagDenomId)
+
+			if err != nil {
+				return err
+			}
+
+			if id == "" {
+				id = uuid.New().String()
+			}
+
+			symbol, err := cmd.Flags().GetString(FlagDenomSymbol)
 			if err != nil {
 				return err
 			}
@@ -54,6 +65,7 @@ func NewCmdCreateDenom() *cobra.Command {
 			creator := clientCtx.GetFromAddress().String()
 
 			msg := types.NewMsgServiceCreateDenomRequest(
+				id,
 				symbol,
 				denomName,
 				description,
@@ -72,7 +84,8 @@ func NewCmdCreateDenom() *cobra.Command {
 	}
 	flags.AddTxFlagsToCmd(cmd)
 	_ = cmd.MarkFlagRequired(FlagDenomName)
-	cmd.Flags().String(FlagSymbol, "", "Set the symbol for a Denom")
+	cmd.Flags().String(FlagDenomId, "", "Set the id for a Denom. If this value is empty, a random value will be generated")
+	cmd.Flags().String(FlagDenomSymbol, "", "Set the symbol for a Denom")
 	cmd.Flags().String(FlagDenomName, "", "Set the name for a Denom")
 	cmd.Flags().String(FlagDenomDescription, "", "Set the description for a Denom")
 	cmd.Flags().String(FlagDenomURI, "", "Set the URI for a Denom")
@@ -94,7 +107,7 @@ func NewCmdUpdateDenom() *cobra.Command {
 
 			denomId := args[0]
 
-			symbol, err := cmd.Flags().GetString(FlagSymbol)
+			symbol, err := cmd.Flags().GetString(FlagDenomSymbol)
 			if err != nil {
 				return err
 			}
@@ -146,7 +159,7 @@ func NewCmdUpdateDenom() *cobra.Command {
 	}
 	flags.AddTxFlagsToCmd(cmd)
 	_ = cmd.MarkFlagRequired(FlagDenomName)
-	cmd.Flags().String(FlagSymbol, "", "Set the symbol for a Denom")
+	cmd.Flags().String(FlagDenomSymbol, "", "Set the symbol for a Denom")
 	cmd.Flags().String(FlagDenomName, "", "Set the name for a Denom")
 	cmd.Flags().String(FlagDenomDescription, "", "Set the description for a Denom")
 	cmd.Flags().String(FlagDenomURI, "", "Set the URI for a Denom")

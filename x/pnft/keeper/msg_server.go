@@ -22,7 +22,19 @@ func (m msgServer) CreateDenom(goCtx context.Context, request *types.MsgServiceC
 		return nil, err
 	}
 
-	err := m.Keeper.SaveDenom(ctx, request.Denom)
+	err := m.Keeper.SaveDenom(
+		ctx,
+		&types.Denom{
+			Id:          request.Id,
+			Name:        request.Name,
+			Symbol:      request.Symbol,
+			Description: request.Description,
+			Uri:         request.Uri,
+			UriHash:     request.UriHash,
+			Owner:       request.Creator,
+			Data:        request.Data,
+		},
+	)
 	if err != nil {
 		return nil, errors.Wrapf(types.ErrCreateDenom, err.Error())
 	}
@@ -45,10 +57,9 @@ func (m msgServer) UpdateDenom(goCtx context.Context, request *types.MsgServiceU
 			Description: request.Description,
 			Uri:         request.Uri,
 			UriHash:     request.UriHash,
-			Creator:     "",
+			Owner:       request.Updater,
 			Data:        request.Data,
 		},
-		request.Updater,
 	); err != nil {
 		return nil, errors.Wrapf(types.ErrUpdateDenom, err.Error())
 	}

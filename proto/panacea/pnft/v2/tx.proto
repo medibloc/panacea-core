@@ -17,7 +17,14 @@ service MsgService {
 }
 
 message MsgServiceCreateDenomRequest {
-    panacea.pnft.v2.Denom denom = 1;
+  string id = 1;
+  string name = 2;
+  string symbol = 3;
+  string description = 4;
+  string uri = 5;
+  string uri_hash = 6;
+  string data = 7;
+  string creator = 8;
 }
 
 message MsgServiceCreateDenomResponse {}

@@ -11,11 +11,11 @@ message Denom {
   string description = 4;
   string uri = 5;
   string uri_hash = 6;
-  string creator = 7;
+  string owner = 7;
   string data = 8;
 }
 
 message DenomMeta {
-  string creator = 1;
+  string owner = 1;
   string data = 2;
 }

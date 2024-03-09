@@ -3,10 +3,10 @@ package types
 import (
 	"errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/google/uuid"
 )
 
 func NewMsgServiceCreateDenomRequest(
+	id string,
 	symbol string,
 	name string,
 	description string,
@@ -16,16 +16,14 @@ func NewMsgServiceCreateDenomRequest(
 	data string,
 ) *MsgServiceCreateDenomRequest {
 	return &MsgServiceCreateDenomRequest{
-		Denom: &Denom{
-			Id:          uuid.New().String(),
-			Name:        name,
-			Symbol:      symbol,
-			Description: description,
-			Uri:         uri,
-			UriHash:     uriHash,
-			Creator:     creator,
-			Data:        data,
-		},
+		Id:          id,
+		Name:        name,
+		Symbol:      symbol,
+		Description: description,
+		Uri:         uri,
+		UriHash:     uriHash,
+		Data:        data,
+		Creator:     creator,
 	}
 }
 
@@ -36,7 +34,7 @@ func (msg *MsgServiceCreateDenomRequest) GetSignBytes() []byte {
 }
 
 func (msg *MsgServiceCreateDenomRequest) GetSigners() []sdk.AccAddress {
-	from, err := sdk.AccAddressFromBech32(msg.Denom.Creator)
+	from, err := sdk.AccAddressFromBech32(msg.Creator)
 	if err != nil {
 		panic(err)
 	}
@@ -44,27 +42,23 @@ func (msg *MsgServiceCreateDenomRequest) GetSigners() []sdk.AccAddress {
 }
 
 func (msg *MsgServiceCreateDenomRequest) ValidateBasic() error {
-	if msg.Denom == nil {
-		return errors.New("denom cannot be empty")
-	}
-
-	if msg.Denom.Id == "" {
+	if msg.Id == "" {
 		return errors.New("id cannot be empty")
 	}
 
-	if msg.Denom.Name == "" {
+	if msg.Name == "" {
 		return errors.New("name cannot be empty")
 	}
 
-	if msg.Denom.Symbol == "" {
+	if msg.Symbol == "" {
 		return errors.New("symbol cannot be empty")
 	}
 
-	if msg.Denom.Creator == "" {
+	if msg.Creator == "" {
 		return errors.New("creator cannot be empty")
 	}
 
-	if _, err := sdk.AccAddressFromBech32(msg.Denom.Creator); err != nil {
+	if _, err := sdk.AccAddressFromBech32(msg.Creator); err != nil {
 		return err
 	}
 

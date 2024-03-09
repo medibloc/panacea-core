@@ -23,7 +23,7 @@ func (k Keeper) SaveDenom(
 
 	return ctx.EventManager().EmitTypedEvent(&types.EventSaveDenom{
 		Id:      denom.Id,
-		Creator: denom.Creator,
+		Creator: denom.Owner,
 	})
 }
 
@@ -41,13 +41,14 @@ func (k Keeper) ParseDenoms(classes []*nft.Class) ([]*types.Denom, error) {
 	return denoms, nil
 }
 
-func (k Keeper) UpdateDenom(ctx sdk.Context, msg *types.Denom, updater string) error {
+func (k Keeper) UpdateDenom(ctx sdk.Context, msg *types.Denom) error {
 	denom, err := k.GetDenom(ctx, msg.GetId())
 	if err != nil {
 		return err
 	}
 
-	if updater != denom.Creator {
+	updater := msg.Owner
+	if updater != denom.Owner {
 		return errors.New(fmt.Sprintf("permission denied: %s does not have permission to modify this resource.", updater))
 	}
 
@@ -91,7 +92,7 @@ func (k Keeper) DeleteDenom(ctx sdk.Context, id string, remover string) error {
 		return err
 	}
 
-	if remover != denom.Creator {
+	if remover != denom.Owner {
 		return errors.New(fmt.Sprintf("permission denied: %s does not have permission to remove this resource.", remover))
 	}
 
@@ -115,11 +116,11 @@ func (k Keeper) TransferDenomOwner(
 		return err
 	}
 
-	if sender != denom.Creator {
+	if sender != denom.Owner {
 		return errors.New(fmt.Sprintf("%s is not allowed transfer denom to %s", sender, receiver))
 	}
 
-	denom.Creator = receiver
+	denom.Owner = receiver
 	class, err := types.NewClassFromDenom(k.cdc, denom)
 	if err != nil {
 		return err
