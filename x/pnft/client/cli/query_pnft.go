@@ -2,6 +2,7 @@ package cli
 
 import (
 	"context"
+	"cosmossdk.io/errors"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/medibloc/panacea-core/v2/x/pnft/types"
@@ -21,13 +22,13 @@ func NewCmdGetPNFTs() *cobra.Command {
 
 			msg := types.NewQueryServicePNFTsRequest(denomId)
 			if err := msg.ValidateBasic(); err != nil {
-				return err
+				return errors.Wrap(types.ErrGetPNFT, err.Error())
 			}
 
 			res, err := queryClient.PNFTs(context.Background(), msg)
 
 			if err != nil {
-				return err
+				return errors.Wrap(types.ErrGetPNFT, err.Error())
 			}
 			return clientCtx.PrintProto(res)
 		},
@@ -53,13 +54,13 @@ func NewCmdGetPNFTsByOwner() *cobra.Command {
 
 			msg := types.NewQueryServicePNFTsByOwnerRequest(denomId, owner)
 			if err := msg.ValidateBasic(); err != nil {
-				return err
+				return errors.Wrap(types.ErrGetPNFT, err.Error())
 			}
 
 			res, err := queryClient.PNFTsByDenomOwner(context.Background(), msg)
 
 			if err != nil {
-				return err
+				return errors.Wrap(types.ErrGetPNFT, err.Error())
 			}
 			return clientCtx.PrintProto(res)
 		},
@@ -85,13 +86,13 @@ func NewCmdGetPNFT() *cobra.Command {
 
 			msg := types.NewQueryServicePNFTRequest(denomId, id)
 			if err := msg.ValidateBasic(); err != nil {
-				return err
+				return errors.Wrap(types.ErrGetPNFT, err.Error())
 			}
 
 			res, err := queryClient.PNFT(context.Background(), msg)
 
 			if err != nil {
-				return err
+				return errors.Wrap(types.ErrGetPNFT, err.Error())
 			}
 			return clientCtx.PrintProto(res)
 		},

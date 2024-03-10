@@ -2,6 +2,7 @@ package cli
 
 import (
 	"context"
+	"cosmossdk.io/errors"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/medibloc/panacea-core/v2/x/pnft/types"
@@ -17,20 +18,20 @@ func NewCmdGetDenoms() *cobra.Command {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 			pagination, err := client.ReadPageRequest(cmd.Flags())
 			if err != nil {
-				return err
+				return errors.Wrap(types.ErrGetDenom, err.Error())
 			}
 
 			queryClient := types.NewQueryServiceClient(clientCtx)
 
 			msg := types.NewQueryServiceDenomsRequest(pagination)
 			if err := msg.ValidateBasic(); err != nil {
-				return err
+				return errors.Wrap(types.ErrGetDenom, err.Error())
 			}
 
 			res, err := queryClient.Denoms(context.Background(), msg)
 
 			if err != nil {
-				return err
+				return errors.Wrap(types.ErrGetDenom, err.Error())
 			}
 			return clientCtx.PrintProto(res)
 		},
@@ -55,13 +56,13 @@ func NewCmdGetDenomsByOwner() *cobra.Command {
 			msg := types.NewQueryServiceDenomsByOwnerRequest(owner)
 
 			if err := msg.ValidateBasic(); err != nil {
-				return err
+				return errors.Wrap(types.ErrGetDenom, err.Error())
 			}
 
 			res, err := queryClient.DenomsByOwner(context.Background(), msg)
 
 			if err != nil {
-				return err
+				return errors.Wrap(types.ErrGetDenom, err.Error())
 			}
 			return clientCtx.PrintProto(res)
 		},
@@ -86,13 +87,13 @@ func NewCmdGetDenom() *cobra.Command {
 			msg := types.NewQueryServiceDenomRequest(denomId)
 
 			if err := msg.ValidateBasic(); err != nil {
-				return err
+				return errors.Wrap(types.ErrGetDenom, err.Error())
 			}
 
 			res, err := queryClient.Denom(context.Background(), msg)
 
 			if err != nil {
-				return err
+				return errors.Wrap(types.ErrGetDenom, err.Error())
 			}
 			return clientCtx.PrintProto(res)
 		},

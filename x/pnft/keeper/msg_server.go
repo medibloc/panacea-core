@@ -19,7 +19,7 @@ func (m msgServer) CreateDenom(goCtx context.Context, request *types.MsgServiceC
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	if err := request.ValidateBasic(); err != nil {
-		return nil, err
+		return nil, errors.Wrap(types.ErrCreateDenom, err.Error())
 	}
 
 	err := m.Keeper.SaveDenom(
@@ -45,7 +45,7 @@ func (m msgServer) UpdateDenom(goCtx context.Context, request *types.MsgServiceU
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	if err := request.ValidateBasic(); err != nil {
-		return nil, err
+		return nil, errors.Wrap(types.ErrUpdateDenom, err.Error())
 	}
 
 	if err := m.Keeper.UpdateDenom(
@@ -71,7 +71,7 @@ func (m msgServer) DeleteDenom(goCtx context.Context, request *types.MsgServiceD
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	if err := request.ValidateBasic(); err != nil {
-		return nil, err
+		return nil, errors.Wrap(types.ErrDeleteDenom, err.Error())
 	}
 
 	if err := m.Keeper.DeleteDenom(ctx, request.Id, request.Remover); err != nil {
@@ -85,11 +85,11 @@ func (m msgServer) TransferDenom(goCtx context.Context, request *types.MsgServic
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	if err := request.ValidateBasic(); err != nil {
-		return nil, err
+		return nil, errors.Wrap(types.ErrTransferDenom, err.Error())
 	}
 
 	if err := m.Keeper.TransferDenomOwner(ctx, request.Id, request.Sender, request.Receiver); err != nil {
-		return nil, err
+		return nil, errors.Wrap(types.ErrTransferDenom, err.Error())
 	}
 
 	return &types.MsgServiceTransferDenomResponse{}, nil
@@ -99,7 +99,7 @@ func (m msgServer) MintPNFT(goCtx context.Context, request *types.MsgServiceMint
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	if err := request.ValidateBasic(); err != nil {
-		return nil, err
+		return nil, errors.Wrap(types.ErrMintPNFT, err.Error())
 	}
 
 	msg := &types.PNFT{
@@ -115,7 +115,7 @@ func (m msgServer) MintPNFT(goCtx context.Context, request *types.MsgServiceMint
 	}
 
 	if err := m.Keeper.MintPNFT(ctx, msg); err != nil {
-		return nil, err
+		return nil, errors.Wrap(types.ErrMintPNFT, err.Error())
 	}
 
 	return &types.MsgServiceMintPNFTResponse{}, nil
@@ -125,7 +125,7 @@ func (m msgServer) TransferPNFT(goCtx context.Context, request *types.MsgService
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	if err := request.ValidateBasic(); err != nil {
-		return nil, err
+		return nil, errors.Wrap(types.ErrTransferPNFT, err.Error())
 	}
 
 	if err := m.Keeper.TransferPNFT(
@@ -135,7 +135,7 @@ func (m msgServer) TransferPNFT(goCtx context.Context, request *types.MsgService
 		request.Sender,
 		request.Receiver,
 	); err != nil {
-		return nil, err
+		return nil, errors.Wrap(types.ErrTransferPNFT, err.Error())
 	}
 
 	return &types.MsgServiceTransferPNFTResponse{}, nil
@@ -145,7 +145,7 @@ func (m msgServer) BurnPNFT(goCtx context.Context, request *types.MsgServiceBurn
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	if err := request.ValidateBasic(); err != nil {
-		return nil, err
+		return nil, errors.Wrap(types.ErrBurnPNFT, err.Error())
 	}
 
 	if err := m.Keeper.BurnPNFT(
@@ -154,7 +154,7 @@ func (m msgServer) BurnPNFT(goCtx context.Context, request *types.MsgServiceBurn
 		request.Id,
 		request.Burner,
 	); err != nil {
-		return nil, err
+		return nil, errors.Wrap(types.ErrBurnPNFT, err.Error())
 	}
 
 	return &types.MsgServiceBurnPNFTResponse{}, nil
