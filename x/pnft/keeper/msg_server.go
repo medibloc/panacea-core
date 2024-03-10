@@ -94,3 +94,68 @@ func (m msgServer) TransferDenom(goCtx context.Context, request *types.MsgServic
 
 	return &types.MsgServiceTransferDenomResponse{}, nil
 }
+
+func (m msgServer) MintPNFT(goCtx context.Context, request *types.MsgServiceMintPNFTRequest) (*types.MsgServiceMintPNFTResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	if err := request.ValidateBasic(); err != nil {
+		return nil, err
+	}
+
+	msg := &types.PNFT{
+		DenomId:     request.DenomId,
+		Id:          request.Id,
+		Name:        request.Name,
+		Description: request.Description,
+		Uri:         request.Uri,
+		UriHash:     request.UriHash,
+		Data:        request.Data,
+		Creator:     request.Creator,
+		CreatedAt:   ctx.BlockTime(),
+	}
+
+	if err := m.Keeper.MintPNFT(ctx, msg); err != nil {
+		return nil, err
+	}
+
+	return &types.MsgServiceMintPNFTResponse{}, nil
+}
+
+func (m msgServer) TransferPNFT(goCtx context.Context, request *types.MsgServiceTransferPNFTRequest) (*types.MsgServiceTransferPNFTResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	if err := request.ValidateBasic(); err != nil {
+		return nil, err
+	}
+
+	if err := m.Keeper.TransferPNFT(
+		ctx,
+		request.DenomId,
+		request.Id,
+		request.Sender,
+		request.Receiver,
+	); err != nil {
+		return nil, err
+	}
+
+	return &types.MsgServiceTransferPNFTResponse{}, nil
+}
+
+func (m msgServer) BurnPNFT(goCtx context.Context, request *types.MsgServiceBurnPNFTRequest) (*types.MsgServiceBurnPNFTResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	if err := request.ValidateBasic(); err != nil {
+		return nil, err
+	}
+
+	if err := m.Keeper.BurnPNFT(
+		ctx,
+		request.DenomId,
+		request.Id,
+		request.Burner,
+	); err != nil {
+		return nil, err
+	}
+
+	return &types.MsgServiceBurnPNFTResponse{}, nil
+}

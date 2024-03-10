@@ -8,4 +8,9 @@ const (
 	FlagDenomData        = "denom-data"
 	FlagDenomURI         = "denom-uri"
 	FlagDenomURIHash     = "denom-uri-hash"
+	flagPNFTName         = "pnft-name"
+	flagPNFTDescription  = "pnft-description"
+	flagPNFTData         = "pnft-data"
+	flagPNFTUri          = "pnft-uri"
+	flagPNFTUriHash      = "pnft-uri-hash"
 )

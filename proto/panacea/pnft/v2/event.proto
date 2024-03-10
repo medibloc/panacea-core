@@ -24,3 +24,22 @@ message EventTransferDenom {
   string sender = 2;
   string receiver = 3;
 }
+
+message EventMintPNFT {
+  string denom_id = 1;
+  string id = 2;
+  string creator = 3;
+}
+
+message EventTransferPNFT {
+  string denom_id = 1;
+  string id = 2;
+  string sender = 3;
+  string receiver = 4;
+}
+
+message EventBurnPNFT {
+  string denom_id = 1;
+  string id = 2;
+  string burner = 3;
+}

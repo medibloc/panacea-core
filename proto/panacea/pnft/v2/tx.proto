@@ -14,6 +14,12 @@ service MsgService {
   rpc DeleteDenom(MsgServiceDeleteDenomRequest) returns (MsgServiceDeleteDenomResponse);
 
   rpc TransferDenom(MsgServiceTransferDenomRequest) returns (MsgServiceTransferDenomResponse);
+
+  rpc MintPNFT(MsgServiceMintPNFTRequest) returns (MsgServiceMintPNFTResponse);
+
+  rpc TransferPNFT(MsgServiceTransferPNFTRequest) returns (MsgServiceTransferPNFTResponse);
+
+  rpc BurnPNFT(MsgServiceBurnPNFTRequest) returns (MsgServiceBurnPNFTResponse);
 }
 
 message MsgServiceCreateDenomRequest {
@@ -56,3 +62,33 @@ message MsgServiceTransferDenomRequest {
 }
 
 message MsgServiceTransferDenomResponse {}
+
+message MsgServiceMintPNFTRequest {
+  string denom_id = 1;
+  string id = 2;
+  string name = 3;
+  string description = 4;
+  string uri = 5;
+  string uri_hash = 6;
+  string data = 7;
+  string creator = 8;
+}
+
+message MsgServiceMintPNFTResponse {}
+
+message MsgServiceTransferPNFTRequest {
+  string denom_id = 1;
+  string id = 2;
+  string sender = 3;
+  string receiver = 4;
+}
+
+message MsgServiceTransferPNFTResponse {}
+
+message MsgServiceBurnPNFTRequest {
+  string denom_id = 1;
+  string id = 2;
+  string burner = 3;
+}
+
+message MsgServiceBurnPNFTResponse {}

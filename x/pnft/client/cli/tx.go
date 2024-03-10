@@ -21,5 +21,9 @@ func NewTxCmd() *cobra.Command {
 	cmd.AddCommand(NewCmdDeleteDenom())
 	cmd.AddCommand(NewCmdTransferDenom())
 
+	cmd.AddCommand(NewCmdMintPNFT())
+	cmd.AddCommand(NewCmdTransferPNFT())
+	cmd.AddCommand(NewCmdBurnPNFT())
+
 	return cmd
 }

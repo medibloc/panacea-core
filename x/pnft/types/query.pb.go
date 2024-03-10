@@ -127,23 +127,23 @@ func (m *QueryServiceDenomsResponse) GetPagination() *query.PageResponse {
 	return nil
 }
 
-// QueryServiceDenomsByCreatorRequest is the response type for the Query RPC method.
-type QueryServiceDenomsByCreatorRequest struct {
-	Creator string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
+// QueryServiceDenomsByOwnerRequest is the response type for the Query RPC method.
+type QueryServiceDenomsByOwnerRequest struct {
+	Owner string `protobuf:"bytes,1,opt,name=owner,proto3" json:"owner,omitempty"`
 }
 
-func (m *QueryServiceDenomsByCreatorRequest) Reset()         { *m = QueryServiceDenomsByCreatorRequest{} }
-func (m *QueryServiceDenomsByCreatorRequest) String() string { return proto.CompactTextString(m) }
-func (*QueryServiceDenomsByCreatorRequest) ProtoMessage()    {}
-func (*QueryServiceDenomsByCreatorRequest) Descriptor() ([]byte, []int) {
+func (m *QueryServiceDenomsByOwnerRequest) Reset()         { *m = QueryServiceDenomsByOwnerRequest{} }
+func (m *QueryServiceDenomsByOwnerRequest) String() string { return proto.CompactTextString(m) }
+func (*QueryServiceDenomsByOwnerRequest) ProtoMessage()    {}
+func (*QueryServiceDenomsByOwnerRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_2ef03de89249ecec, []int{2}
 }
-func (m *QueryServiceDenomsByCreatorRequest) XXX_Unmarshal(b []byte) error {
+func (m *QueryServiceDenomsByOwnerRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *QueryServiceDenomsByCreatorRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *QueryServiceDenomsByOwnerRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_QueryServiceDenomsByCreatorRequest.Marshal(b, m, deterministic)
+		return xxx_messageInfo_QueryServiceDenomsByOwnerRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -153,42 +153,42 @@ func (m *QueryServiceDenomsByCreatorRequest) XXX_Marshal(b []byte, deterministic
 		return b[:n], nil
 	}
 }
-func (m *QueryServiceDenomsByCreatorRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_QueryServiceDenomsByCreatorRequest.Merge(m, src)
+func (m *QueryServiceDenomsByOwnerRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryServiceDenomsByOwnerRequest.Merge(m, src)
 }
-func (m *QueryServiceDenomsByCreatorRequest) XXX_Size() int {
+func (m *QueryServiceDenomsByOwnerRequest) XXX_Size() int {
 	return m.Size()
 }
-func (m *QueryServiceDenomsByCreatorRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_QueryServiceDenomsByCreatorRequest.DiscardUnknown(m)
+func (m *QueryServiceDenomsByOwnerRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryServiceDenomsByOwnerRequest.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_QueryServiceDenomsByCreatorRequest proto.InternalMessageInfo
+var xxx_messageInfo_QueryServiceDenomsByOwnerRequest proto.InternalMessageInfo
 
-func (m *QueryServiceDenomsByCreatorRequest) GetCreator() string {
+func (m *QueryServiceDenomsByOwnerRequest) GetOwner() string {
 	if m != nil {
-		return m.Creator
+		return m.Owner
 	}
 	return ""
 }
 
-// QueryServiceDenomsByCreatorResponse is the response type for the Query RPC method.
-type QueryServiceDenomsByCreatorResponse struct {
+// QueryServiceDenomsByOwnerResponse is the response type for the Query RPC method.
+type QueryServiceDenomsByOwnerResponse struct {
 	Denoms []*Denom `protobuf:"bytes,1,rep,name=denoms,proto3" json:"denoms,omitempty"`
 }
 
-func (m *QueryServiceDenomsByCreatorResponse) Reset()         { *m = QueryServiceDenomsByCreatorResponse{} }
-func (m *QueryServiceDenomsByCreatorResponse) String() string { return proto.CompactTextString(m) }
-func (*QueryServiceDenomsByCreatorResponse) ProtoMessage()    {}
-func (*QueryServiceDenomsByCreatorResponse) Descriptor() ([]byte, []int) {
+func (m *QueryServiceDenomsByOwnerResponse) Reset()         { *m = QueryServiceDenomsByOwnerResponse{} }
+func (m *QueryServiceDenomsByOwnerResponse) String() string { return proto.CompactTextString(m) }
+func (*QueryServiceDenomsByOwnerResponse) ProtoMessage()    {}
+func (*QueryServiceDenomsByOwnerResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_2ef03de89249ecec, []int{3}
 }
-func (m *QueryServiceDenomsByCreatorResponse) XXX_Unmarshal(b []byte) error {
+func (m *QueryServiceDenomsByOwnerResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *QueryServiceDenomsByCreatorResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *QueryServiceDenomsByOwnerResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_QueryServiceDenomsByCreatorResponse.Marshal(b, m, deterministic)
+		return xxx_messageInfo_QueryServiceDenomsByOwnerResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -198,19 +198,19 @@ func (m *QueryServiceDenomsByCreatorResponse) XXX_Marshal(b []byte, deterministi
 		return b[:n], nil
 	}
 }
-func (m *QueryServiceDenomsByCreatorResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_QueryServiceDenomsByCreatorResponse.Merge(m, src)
+func (m *QueryServiceDenomsByOwnerResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryServiceDenomsByOwnerResponse.Merge(m, src)
 }
-func (m *QueryServiceDenomsByCreatorResponse) XXX_Size() int {
+func (m *QueryServiceDenomsByOwnerResponse) XXX_Size() int {
 	return m.Size()
 }
-func (m *QueryServiceDenomsByCreatorResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_QueryServiceDenomsByCreatorResponse.DiscardUnknown(m)
+func (m *QueryServiceDenomsByOwnerResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryServiceDenomsByOwnerResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_QueryServiceDenomsByCreatorResponse proto.InternalMessageInfo
+var xxx_messageInfo_QueryServiceDenomsByOwnerResponse proto.InternalMessageInfo
 
-func (m *QueryServiceDenomsByCreatorResponse) GetDenoms() []*Denom {
+func (m *QueryServiceDenomsByOwnerResponse) GetDenoms() []*Denom {
 	if m != nil {
 		return m.Denoms
 	}
@@ -307,50 +307,354 @@ func (m *QueryServiceDenomResponse) GetDenom() *Denom {
 	return nil
 }
 
+// QueryServicePNFTsRequest is the response type for the Query RPC method.
+type QueryServicePNFTsRequest struct {
+	DenomId string `protobuf:"bytes,1,opt,name=denom_id,json=denomId,proto3" json:"denom_id,omitempty"`
+}
+
+func (m *QueryServicePNFTsRequest) Reset()         { *m = QueryServicePNFTsRequest{} }
+func (m *QueryServicePNFTsRequest) String() string { return proto.CompactTextString(m) }
+func (*QueryServicePNFTsRequest) ProtoMessage()    {}
+func (*QueryServicePNFTsRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_2ef03de89249ecec, []int{6}
+}
+func (m *QueryServicePNFTsRequest) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *QueryServicePNFTsRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_QueryServicePNFTsRequest.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *QueryServicePNFTsRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryServicePNFTsRequest.Merge(m, src)
+}
+func (m *QueryServicePNFTsRequest) XXX_Size() int {
+	return m.Size()
+}
+func (m *QueryServicePNFTsRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryServicePNFTsRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_QueryServicePNFTsRequest proto.InternalMessageInfo
+
+func (m *QueryServicePNFTsRequest) GetDenomId() string {
+	if m != nil {
+		return m.DenomId
+	}
+	return ""
+}
+
+// QueryServicePNFTsResponse is the response type for the Query RPC method.
+type QueryServicePNFTsResponse struct {
+	Pnfts []*PNFT `protobuf:"bytes,1,rep,name=pnfts,proto3" json:"pnfts,omitempty"`
+}
+
+func (m *QueryServicePNFTsResponse) Reset()         { *m = QueryServicePNFTsResponse{} }
+func (m *QueryServicePNFTsResponse) String() string { return proto.CompactTextString(m) }
+func (*QueryServicePNFTsResponse) ProtoMessage()    {}
+func (*QueryServicePNFTsResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_2ef03de89249ecec, []int{7}
+}
+func (m *QueryServicePNFTsResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *QueryServicePNFTsResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_QueryServicePNFTsResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *QueryServicePNFTsResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryServicePNFTsResponse.Merge(m, src)
+}
+func (m *QueryServicePNFTsResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *QueryServicePNFTsResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryServicePNFTsResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_QueryServicePNFTsResponse proto.InternalMessageInfo
+
+func (m *QueryServicePNFTsResponse) GetPnfts() []*PNFT {
+	if m != nil {
+		return m.Pnfts
+	}
+	return nil
+}
+
+// QueryServicePNFTsRequest is the response type for the Query RPC method.
+type QueryServicePNFTsByDenomOwnerRequest struct {
+	DenomId string `protobuf:"bytes,1,opt,name=denom_id,json=denomId,proto3" json:"denom_id,omitempty"`
+	Owner   string `protobuf:"bytes,2,opt,name=owner,proto3" json:"owner,omitempty"`
+}
+
+func (m *QueryServicePNFTsByDenomOwnerRequest) Reset()         { *m = QueryServicePNFTsByDenomOwnerRequest{} }
+func (m *QueryServicePNFTsByDenomOwnerRequest) String() string { return proto.CompactTextString(m) }
+func (*QueryServicePNFTsByDenomOwnerRequest) ProtoMessage()    {}
+func (*QueryServicePNFTsByDenomOwnerRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_2ef03de89249ecec, []int{8}
+}
+func (m *QueryServicePNFTsByDenomOwnerRequest) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *QueryServicePNFTsByDenomOwnerRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_QueryServicePNFTsByDenomOwnerRequest.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *QueryServicePNFTsByDenomOwnerRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryServicePNFTsByDenomOwnerRequest.Merge(m, src)
+}
+func (m *QueryServicePNFTsByDenomOwnerRequest) XXX_Size() int {
+	return m.Size()
+}
+func (m *QueryServicePNFTsByDenomOwnerRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryServicePNFTsByDenomOwnerRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_QueryServicePNFTsByDenomOwnerRequest proto.InternalMessageInfo
+
+func (m *QueryServicePNFTsByDenomOwnerRequest) GetDenomId() string {
+	if m != nil {
+		return m.DenomId
+	}
+	return ""
+}
+
+func (m *QueryServicePNFTsByDenomOwnerRequest) GetOwner() string {
+	if m != nil {
+		return m.Owner
+	}
+	return ""
+}
+
+// QueryServicePNFTsResponse is the response type for the Query RPC method.
+type QueryServicePNFTsByDenomOwnerResponse struct {
+	Pnfts []*PNFT `protobuf:"bytes,1,rep,name=pnfts,proto3" json:"pnfts,omitempty"`
+}
+
+func (m *QueryServicePNFTsByDenomOwnerResponse) Reset()         { *m = QueryServicePNFTsByDenomOwnerResponse{} }
+func (m *QueryServicePNFTsByDenomOwnerResponse) String() string { return proto.CompactTextString(m) }
+func (*QueryServicePNFTsByDenomOwnerResponse) ProtoMessage()    {}
+func (*QueryServicePNFTsByDenomOwnerResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_2ef03de89249ecec, []int{9}
+}
+func (m *QueryServicePNFTsByDenomOwnerResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *QueryServicePNFTsByDenomOwnerResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_QueryServicePNFTsByDenomOwnerResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *QueryServicePNFTsByDenomOwnerResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryServicePNFTsByDenomOwnerResponse.Merge(m, src)
+}
+func (m *QueryServicePNFTsByDenomOwnerResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *QueryServicePNFTsByDenomOwnerResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryServicePNFTsByDenomOwnerResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_QueryServicePNFTsByDenomOwnerResponse proto.InternalMessageInfo
+
+func (m *QueryServicePNFTsByDenomOwnerResponse) GetPnfts() []*PNFT {
+	if m != nil {
+		return m.Pnfts
+	}
+	return nil
+}
+
+// QueryServicePNFTRequest is the response type for the Query RPC method.
+type QueryServicePNFTRequest struct {
+	DenomId string `protobuf:"bytes,1,opt,name=denom_id,json=denomId,proto3" json:"denom_id,omitempty"`
+	Id      string `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`
+}
+
+func (m *QueryServicePNFTRequest) Reset()         { *m = QueryServicePNFTRequest{} }
+func (m *QueryServicePNFTRequest) String() string { return proto.CompactTextString(m) }
+func (*QueryServicePNFTRequest) ProtoMessage()    {}
+func (*QueryServicePNFTRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_2ef03de89249ecec, []int{10}
+}
+func (m *QueryServicePNFTRequest) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *QueryServicePNFTRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_QueryServicePNFTRequest.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *QueryServicePNFTRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryServicePNFTRequest.Merge(m, src)
+}
+func (m *QueryServicePNFTRequest) XXX_Size() int {
+	return m.Size()
+}
+func (m *QueryServicePNFTRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryServicePNFTRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_QueryServicePNFTRequest proto.InternalMessageInfo
+
+func (m *QueryServicePNFTRequest) GetDenomId() string {
+	if m != nil {
+		return m.DenomId
+	}
+	return ""
+}
+
+func (m *QueryServicePNFTRequest) GetId() string {
+	if m != nil {
+		return m.Id
+	}
+	return ""
+}
+
+// QueryServicePNFTResponse is the response type for the Query RPC method.
+type QueryServicePNFTResponse struct {
+	Pnft *PNFT `protobuf:"bytes,1,opt,name=pnft,proto3" json:"pnft,omitempty"`
+}
+
+func (m *QueryServicePNFTResponse) Reset()         { *m = QueryServicePNFTResponse{} }
+func (m *QueryServicePNFTResponse) String() string { return proto.CompactTextString(m) }
+func (*QueryServicePNFTResponse) ProtoMessage()    {}
+func (*QueryServicePNFTResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_2ef03de89249ecec, []int{11}
+}
+func (m *QueryServicePNFTResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *QueryServicePNFTResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_QueryServicePNFTResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *QueryServicePNFTResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryServicePNFTResponse.Merge(m, src)
+}
+func (m *QueryServicePNFTResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *QueryServicePNFTResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryServicePNFTResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_QueryServicePNFTResponse proto.InternalMessageInfo
+
+func (m *QueryServicePNFTResponse) GetPnft() *PNFT {
+	if m != nil {
+		return m.Pnft
+	}
+	return nil
+}
+
 func init() {
 	proto.RegisterType((*QueryServiceDenomsRequest)(nil), "panacea.pnft.v2.QueryServiceDenomsRequest")
 	proto.RegisterType((*QueryServiceDenomsResponse)(nil), "panacea.pnft.v2.QueryServiceDenomsResponse")
-	proto.RegisterType((*QueryServiceDenomsByCreatorRequest)(nil), "panacea.pnft.v2.QueryServiceDenomsByCreatorRequest")
-	proto.RegisterType((*QueryServiceDenomsByCreatorResponse)(nil), "panacea.pnft.v2.QueryServiceDenomsByCreatorResponse")
+	proto.RegisterType((*QueryServiceDenomsByOwnerRequest)(nil), "panacea.pnft.v2.QueryServiceDenomsByOwnerRequest")
+	proto.RegisterType((*QueryServiceDenomsByOwnerResponse)(nil), "panacea.pnft.v2.QueryServiceDenomsByOwnerResponse")
 	proto.RegisterType((*QueryServiceDenomRequest)(nil), "panacea.pnft.v2.QueryServiceDenomRequest")
 	proto.RegisterType((*QueryServiceDenomResponse)(nil), "panacea.pnft.v2.QueryServiceDenomResponse")
+	proto.RegisterType((*QueryServicePNFTsRequest)(nil), "panacea.pnft.v2.QueryServicePNFTsRequest")
+	proto.RegisterType((*QueryServicePNFTsResponse)(nil), "panacea.pnft.v2.QueryServicePNFTsResponse")
+	proto.RegisterType((*QueryServicePNFTsByDenomOwnerRequest)(nil), "panacea.pnft.v2.QueryServicePNFTsByDenomOwnerRequest")
+	proto.RegisterType((*QueryServicePNFTsByDenomOwnerResponse)(nil), "panacea.pnft.v2.QueryServicePNFTsByDenomOwnerResponse")
+	proto.RegisterType((*QueryServicePNFTRequest)(nil), "panacea.pnft.v2.QueryServicePNFTRequest")
+	proto.RegisterType((*QueryServicePNFTResponse)(nil), "panacea.pnft.v2.QueryServicePNFTResponse")
 }
 
 func init() { proto.RegisterFile("panacea/pnft/v2/query.proto", fileDescriptor_2ef03de89249ecec) }
 
 var fileDescriptor_2ef03de89249ecec = []byte{
-	// 490 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x9c, 0x94, 0xcf, 0x6e, 0xd3, 0x30,
-	0x1c, 0xc7, 0xeb, 0x4e, 0x2b, 0xc2, 0x43, 0x4c, 0xf2, 0x01, 0xb2, 0x30, 0x85, 0x2a, 0x20, 0x28,
-	0x61, 0xb3, 0xb5, 0x8c, 0x33, 0x87, 0x81, 0x40, 0xbb, 0x8d, 0x22, 0x2e, 0xdc, 0x9c, 0xc4, 0x04,
-	0x4b, 0xab, 0x9d, 0xc5, 0x6e, 0x45, 0x35, 0xed, 0x32, 0xf1, 0x00, 0x48, 0x88, 0xf7, 0xe0, 0x31,
-	0xb8, 0x20, 0x4d, 0xe2, 0xc2, 0x11, 0xb5, 0x3c, 0x08, 0xaa, 0xed, 0xc0, 0x48, 0x1b, 0x56, 0x76,
-	0x6b, 0xed, 0xef, 0x9f, 0x8f, 0xed, 0x9f, 0x02, 0x6f, 0x15, 0x54, 0xd0, 0x94, 0x51, 0x52, 0x88,
-	0x37, 0x9a, 0x8c, 0x62, 0x72, 0x34, 0x64, 0xe5, 0x18, 0x17, 0xa5, 0xd4, 0x12, 0xad, 0xbb, 0x4d,
-	0x3c, 0xdb, 0xc4, 0xa3, 0xd8, 0xdf, 0xcc, 0xa5, 0xcc, 0x0f, 0x19, 0xa1, 0x05, 0x27, 0x54, 0x08,
-	0xa9, 0xa9, 0xe6, 0x52, 0x28, 0x2b, 0xf7, 0xa3, 0x54, 0xaa, 0x81, 0x54, 0x24, 0xa1, 0x8a, 0xd9,
-	0x1c, 0x32, 0xda, 0x49, 0x98, 0xa6, 0x3b, 0xa4, 0xa0, 0x39, 0x17, 0x46, 0xec, 0xb4, 0x7e, 0xbd,
-	0xd7, 0x54, 0x98, 0xbd, 0x30, 0x85, 0x1b, 0x2f, 0x66, 0xee, 0x97, 0xac, 0x1c, 0xf1, 0x94, 0x3d,
-	0x65, 0x42, 0x0e, 0x54, 0x9f, 0x1d, 0x0d, 0x99, 0xd2, 0xe8, 0x19, 0x84, 0x7f, 0xc2, 0xbc, 0x76,
-	0x17, 0xf4, 0xd6, 0xe2, 0x7b, 0xd8, 0x36, 0xe3, 0x59, 0x33, 0xb6, 0x27, 0x70, 0xcd, 0xf8, 0x80,
-	0xe6, 0xcc, 0x79, 0xfb, 0xe7, 0x9c, 0xe1, 0x27, 0x00, 0xfd, 0x45, 0x2d, 0xaa, 0x90, 0x42, 0x31,
-	0x84, 0x61, 0x27, 0x33, 0x2b, 0x1e, 0xe8, 0xae, 0xf4, 0xd6, 0xe2, 0x1b, 0xb8, 0x76, 0x17, 0xd8,
-	0x18, 0xfa, 0x4e, 0x85, 0x9e, 0x2f, 0xc0, 0xba, 0x7f, 0x21, 0x96, 0x2d, 0xfb, 0x8b, 0xeb, 0x31,
-	0x0c, 0xe7, 0xb1, 0xf6, 0xc6, 0x4f, 0x4a, 0x46, 0xb5, 0x2c, 0xab, 0x5b, 0xf0, 0xe0, 0x95, 0xd4,
-	0xae, 0x78, 0xa0, 0x0b, 0x7a, 0x57, 0xfb, 0xd5, 0xdf, 0xf0, 0x15, 0xbc, 0xf3, 0x4f, 0xff, 0xe5,
-	0xce, 0x17, 0x46, 0xd0, 0x9b, 0x8b, 0xad, 0x60, 0xae, 0xc3, 0x36, 0xcf, 0x1c, 0x47, 0x9b, 0x67,
-	0xe1, 0xfe, 0x82, 0xf7, 0xfb, 0x5d, 0xbc, 0x05, 0x57, 0x4d, 0xa4, 0xd1, 0x37, 0xf7, 0x5a, 0x51,
-	0xfc, 0x75, 0x05, 0x5e, 0x3b, 0x9f, 0x85, 0x4e, 0x01, 0xec, 0xd8, 0x33, 0xa1, 0x68, 0xce, 0xda,
-	0x38, 0x35, 0xfe, 0xc3, 0xa5, 0xb4, 0x16, 0x31, 0xbc, 0x7d, 0xfa, 0xed, 0xe7, 0xc7, 0xf6, 0x06,
-	0xba, 0x49, 0xea, 0x43, 0xea, 0x1e, 0xfb, 0x33, 0x80, 0xeb, 0xb5, 0x8b, 0x45, 0xbb, 0x4b, 0x34,
-	0xd4, 0x9f, 0xd1, 0x7f, 0xf4, 0x7f, 0x26, 0xc7, 0x17, 0x1b, 0xbe, 0x2d, 0x14, 0x35, 0xf0, 0x11,
-	0x37, 0x0b, 0x8a, 0x1c, 0xbb, 0x5f, 0x27, 0xe8, 0x3d, 0x80, 0xab, 0x26, 0x0f, 0x3d, 0xb8, 0xb8,
-	0xb3, 0xc2, 0x8b, 0x96, 0x91, 0x3a, 0xa8, 0xbb, 0x06, 0x2a, 0x40, 0x9b, 0x4d, 0x50, 0xc7, 0x3c,
-	0x3b, 0xd9, 0xdb, 0xff, 0x32, 0x09, 0xc0, 0xd9, 0x24, 0x00, 0x3f, 0x26, 0x01, 0xf8, 0x30, 0x0d,
-	0x5a, 0x67, 0xd3, 0xa0, 0xf5, 0x7d, 0x1a, 0xb4, 0x0e, 0xc0, 0xeb, 0xed, 0x9c, 0xeb, 0xb7, 0xc3,
-	0x04, 0xa7, 0x72, 0x40, 0x06, 0x2c, 0xe3, 0xc9, 0xa1, 0x4c, 0xab, 0xb0, 0xed, 0x54, 0x96, 0x8c,
-	0xbc, 0xb3, 0x99, 0x7a, 0x5c, 0x30, 0x95, 0x74, 0xcc, 0xc7, 0x62, 0xf7, 0x57, 0x00, 0x00, 0x00,
-	0xff, 0xff, 0x14, 0x6e, 0xc6, 0x3f, 0xc2, 0x04, 0x00, 0x00,
+	// 688 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x9c, 0x95, 0x4f, 0x4f, 0x13, 0x4f,
+	0x18, 0xc7, 0x99, 0xfe, 0x28, 0xfc, 0x7c, 0xf0, 0x4f, 0x9c, 0xa8, 0x94, 0x95, 0xac, 0x75, 0x83,
+	0x58, 0x8a, 0xec, 0x48, 0x0d, 0xfe, 0x39, 0x99, 0x10, 0x44, 0xb9, 0x28, 0x16, 0x12, 0x13, 0x2f,
+	0x66, 0xbb, 0x3b, 0xd6, 0x4d, 0xe8, 0xce, 0xd2, 0x59, 0xaa, 0x0d, 0xe1, 0x42, 0x7c, 0x01, 0x44,
+	0xe3, 0x5b, 0xf0, 0xee, 0x6b, 0xf0, 0xe2, 0x91, 0xc4, 0x8b, 0x47, 0x03, 0xbe, 0x10, 0xb3, 0x33,
+	0xb3, 0xa5, 0xdb, 0xed, 0xba, 0x0b, 0x27, 0xb2, 0x79, 0xbe, 0xcf, 0xf7, 0xfb, 0x99, 0x79, 0xe6,
+	0xa1, 0x70, 0xdd, 0xb7, 0x3c, 0xcb, 0xa6, 0x16, 0xf1, 0xbd, 0xb7, 0x01, 0xe9, 0xd4, 0xc8, 0xf6,
+	0x0e, 0x6d, 0x77, 0x4d, 0xbf, 0xcd, 0x02, 0x86, 0x2f, 0xa9, 0xa2, 0x19, 0x16, 0xcd, 0x4e, 0x4d,
+	0x9b, 0x6e, 0x32, 0xd6, 0xdc, 0xa2, 0xc4, 0xf2, 0x5d, 0x62, 0x79, 0x1e, 0x0b, 0xac, 0xc0, 0x65,
+	0x1e, 0x97, 0x72, 0xad, 0x6a, 0x33, 0xde, 0x62, 0x9c, 0x34, 0x2c, 0x4e, 0xa5, 0x0f, 0xe9, 0x2c,
+	0x36, 0x68, 0x60, 0x2d, 0x12, 0xdf, 0x6a, 0xba, 0x9e, 0x10, 0x2b, 0x6d, 0x22, 0xd7, 0xa1, 0x1e,
+	0x6b, 0xa9, 0xa2, 0x36, 0x58, 0x14, 0xf9, 0xa2, 0x66, 0xd8, 0x30, 0xf5, 0x32, 0xb4, 0xde, 0xa0,
+	0xed, 0x8e, 0x6b, 0xd3, 0x95, 0xb0, 0x8d, 0xd7, 0xe9, 0xf6, 0x0e, 0xe5, 0x01, 0x5e, 0x05, 0x38,
+	0x49, 0x2a, 0x15, 0xca, 0xa8, 0x32, 0x51, 0x9b, 0x35, 0x25, 0x96, 0x19, 0x62, 0x99, 0xf2, 0x78,
+	0x0a, 0xcb, 0x5c, 0xb7, 0x9a, 0x54, 0xf5, 0xd6, 0xfb, 0x3a, 0x8d, 0x2f, 0x08, 0xb4, 0x61, 0x29,
+	0xdc, 0x67, 0x1e, 0xa7, 0xd8, 0x84, 0x31, 0x81, 0xcb, 0x4b, 0xa8, 0xfc, 0x5f, 0x65, 0xa2, 0x76,
+	0xcd, 0x1c, 0xb8, 0x28, 0x53, 0x34, 0xd4, 0x95, 0x0a, 0x3f, 0x1d, 0x82, 0x75, 0x3b, 0x13, 0x4b,
+	0x86, 0xc5, 0xb8, 0x1e, 0x42, 0x39, 0x89, 0xb5, 0xdc, 0x7d, 0xf1, 0xde, 0xa3, 0xed, 0xe8, 0x0e,
+	0xae, 0x40, 0x91, 0x85, 0xdf, 0x25, 0x54, 0x46, 0x95, 0x73, 0x75, 0xf9, 0x61, 0x6c, 0xc0, 0xcd,
+	0x7f, 0x74, 0x9e, 0xed, 0x5c, 0x46, 0x15, 0x4a, 0x09, 0xd3, 0x08, 0xe3, 0x22, 0x14, 0x5c, 0x47,
+	0x31, 0x14, 0x5c, 0xc7, 0x58, 0x1b, 0x32, 0xb7, 0x5e, 0xf0, 0x1d, 0x28, 0x0a, 0x4b, 0xa1, 0x4f,
+	0xcf, 0x95, 0x22, 0x63, 0x29, 0x1e, 0xbb, 0xfe, 0x7c, 0x75, 0xb3, 0xf7, 0x02, 0xa6, 0xe0, 0x7f,
+	0x21, 0x7a, 0xd3, 0x0b, 0x1f, 0x17, 0xdf, 0x6b, 0x8e, 0xf1, 0x2c, 0x4e, 0xa0, 0xda, 0x14, 0xc1,
+	0x3c, 0x14, 0xc3, 0xac, 0xe8, 0xe4, 0x57, 0x13, 0x04, 0xa1, 0xbc, 0x2e, 0x35, 0xc6, 0x2b, 0x98,
+	0x49, 0x38, 0x2d, 0x77, 0x05, 0x63, 0x6c, 0x14, 0xe9, 0x30, 0x27, 0x53, 0x2a, 0xf4, 0x4f, 0x69,
+	0x13, 0x6e, 0x65, 0x18, 0x9f, 0x05, 0x77, 0x05, 0x26, 0x07, 0x5d, 0x73, 0x10, 0xca, 0x01, 0x16,
+	0x7a, 0x03, 0x7c, 0x92, 0xbc, 0xf5, 0x1e, 0xce, 0x1c, 0x8c, 0x86, 0x51, 0x6a, 0x7c, 0x29, 0x34,
+	0x42, 0x52, 0xfb, 0x36, 0x0e, 0xe7, 0xfb, 0x7d, 0xf0, 0x3e, 0x82, 0x31, 0xf9, 0x1c, 0x71, 0x35,
+	0xd1, 0x98, 0xba, 0xea, 0xda, 0x7c, 0x2e, 0xad, 0xe4, 0x33, 0x6e, 0xec, 0xff, 0xfc, 0xf3, 0xb9,
+	0x30, 0x85, 0x27, 0xc9, 0xd0, 0x7f, 0x3b, 0x1c, 0x7f, 0x45, 0x70, 0x21, 0xb6, 0x13, 0x78, 0x31,
+	0x87, 0x7f, 0x7c, 0xf3, 0xb4, 0xda, 0x69, 0x5a, 0x14, 0x99, 0x29, 0xc8, 0x2a, 0x78, 0x36, 0x85,
+	0x8c, 0x88, 0x87, 0xc1, 0xc9, 0xae, 0xf8, 0xbb, 0x87, 0x3f, 0x22, 0x28, 0x0a, 0x27, 0x3c, 0x97,
+	0x9d, 0x16, 0x81, 0x55, 0xf3, 0x48, 0x15, 0xd0, 0x8c, 0x00, 0xd2, 0xf1, 0x74, 0x1a, 0xd0, 0xae,
+	0xeb, 0xec, 0xe1, 0x03, 0x04, 0x45, 0xf1, 0x3a, 0x33, 0x30, 0xfa, 0x77, 0x33, 0x03, 0x23, 0xb6,
+	0x8f, 0xc6, 0x5d, 0x81, 0x51, 0xc5, 0x95, 0x54, 0x8c, 0xe8, 0xdd, 0xee, 0x89, 0x0a, 0xc7, 0xdf,
+	0x11, 0x5c, 0x4e, 0x2c, 0x0c, 0x5e, 0xca, 0xce, 0x1c, 0xb2, 0xb9, 0xda, 0xfd, 0xd3, 0xb6, 0x29,
+	0xec, 0xc7, 0x02, 0xfb, 0x11, 0x7e, 0x90, 0x03, 0x3b, 0x3e, 0x59, 0x75, 0x8a, 0x4f, 0x08, 0x46,
+	0x43, 0x7b, 0x5c, 0xc9, 0x24, 0x88, 0x58, 0xe7, 0x72, 0x28, 0x15, 0xde, 0x92, 0xc0, 0x23, 0x78,
+	0x21, 0xef, 0xad, 0x8a, 0x69, 0x2f, 0xaf, 0xfd, 0x38, 0xd2, 0xd1, 0xe1, 0x91, 0x8e, 0x7e, 0x1f,
+	0xe9, 0xe8, 0xe0, 0x58, 0x1f, 0x39, 0x3c, 0xd6, 0x47, 0x7e, 0x1d, 0xeb, 0x23, 0xeb, 0xe8, 0xf5,
+	0x42, 0xd3, 0x0d, 0xde, 0xed, 0x34, 0x4c, 0x9b, 0xb5, 0x48, 0x8b, 0x3a, 0x6e, 0x63, 0x8b, 0xd9,
+	0x91, 0xfb, 0x82, 0xcd, 0xda, 0x94, 0x7c, 0x90, 0x21, 0x41, 0xd7, 0xa7, 0xbc, 0x31, 0x26, 0x7e,
+	0xc5, 0xef, 0xfd, 0x0d, 0x00, 0x00, 0xff, 0xff, 0x2e, 0xae, 0x6a, 0x83, 0x78, 0x08, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -367,9 +671,12 @@ const _ = grpc.SupportPackageIsVersion4
 type QueryServiceClient interface {
 	// Denoms returns denom list.
 	Denoms(ctx context.Context, in *QueryServiceDenomsRequest, opts ...grpc.CallOption) (*QueryServiceDenomsResponse, error)
-	DenomsByCreator(ctx context.Context, in *QueryServiceDenomsByCreatorRequest, opts ...grpc.CallOption) (*QueryServiceDenomsByCreatorResponse, error)
+	DenomsByOwner(ctx context.Context, in *QueryServiceDenomsByOwnerRequest, opts ...grpc.CallOption) (*QueryServiceDenomsByOwnerResponse, error)
 	// Denom returns denom detail.
 	Denom(ctx context.Context, in *QueryServiceDenomRequest, opts ...grpc.CallOption) (*QueryServiceDenomResponse, error)
+	PNFTs(ctx context.Context, in *QueryServicePNFTsRequest, opts ...grpc.CallOption) (*QueryServicePNFTsResponse, error)
+	PNFTsByDenomOwner(ctx context.Context, in *QueryServicePNFTsByDenomOwnerRequest, opts ...grpc.CallOption) (*QueryServicePNFTsByDenomOwnerResponse, error)
+	PNFT(ctx context.Context, in *QueryServicePNFTRequest, opts ...grpc.CallOption) (*QueryServicePNFTResponse, error)
 }
 
 type queryServiceClient struct {
@@ -389,9 +696,9 @@ func (c *queryServiceClient) Denoms(ctx context.Context, in *QueryServiceDenomsR
 	return out, nil
 }
 
-func (c *queryServiceClient) DenomsByCreator(ctx context.Context, in *QueryServiceDenomsByCreatorRequest, opts ...grpc.CallOption) (*QueryServiceDenomsByCreatorResponse, error) {
-	out := new(QueryServiceDenomsByCreatorResponse)
-	err := c.cc.Invoke(ctx, "/panacea.pnft.v2.QueryService/DenomsByCreator", in, out, opts...)
+func (c *queryServiceClient) DenomsByOwner(ctx context.Context, in *QueryServiceDenomsByOwnerRequest, opts ...grpc.CallOption) (*QueryServiceDenomsByOwnerResponse, error) {
+	out := new(QueryServiceDenomsByOwnerResponse)
+	err := c.cc.Invoke(ctx, "/panacea.pnft.v2.QueryService/DenomsByOwner", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -407,13 +714,43 @@ func (c *queryServiceClient) Denom(ctx context.Context, in *QueryServiceDenomReq
 	return out, nil
 }
 
+func (c *queryServiceClient) PNFTs(ctx context.Context, in *QueryServicePNFTsRequest, opts ...grpc.CallOption) (*QueryServicePNFTsResponse, error) {
+	out := new(QueryServicePNFTsResponse)
+	err := c.cc.Invoke(ctx, "/panacea.pnft.v2.QueryService/PNFTs", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *queryServiceClient) PNFTsByDenomOwner(ctx context.Context, in *QueryServicePNFTsByDenomOwnerRequest, opts ...grpc.CallOption) (*QueryServicePNFTsByDenomOwnerResponse, error) {
+	out := new(QueryServicePNFTsByDenomOwnerResponse)
+	err := c.cc.Invoke(ctx, "/panacea.pnft.v2.QueryService/PNFTsByDenomOwner", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *queryServiceClient) PNFT(ctx context.Context, in *QueryServicePNFTRequest, opts ...grpc.CallOption) (*QueryServicePNFTResponse, error) {
+	out := new(QueryServicePNFTResponse)
+	err := c.cc.Invoke(ctx, "/panacea.pnft.v2.QueryService/PNFT", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // QueryServiceServer is the server API for QueryService service.
 type QueryServiceServer interface {
 	// Denoms returns denom list.
 	Denoms(context.Context, *QueryServiceDenomsRequest) (*QueryServiceDenomsResponse, error)
-	DenomsByCreator(context.Context, *QueryServiceDenomsByCreatorRequest) (*QueryServiceDenomsByCreatorResponse, error)
+	DenomsByOwner(context.Context, *QueryServiceDenomsByOwnerRequest) (*QueryServiceDenomsByOwnerResponse, error)
 	// Denom returns denom detail.
 	Denom(context.Context, *QueryServiceDenomRequest) (*QueryServiceDenomResponse, error)
+	PNFTs(context.Context, *QueryServicePNFTsRequest) (*QueryServicePNFTsResponse, error)
+	PNFTsByDenomOwner(context.Context, *QueryServicePNFTsByDenomOwnerRequest) (*QueryServicePNFTsByDenomOwnerResponse, error)
+	PNFT(context.Context, *QueryServicePNFTRequest) (*QueryServicePNFTResponse, error)
 }
 
 // UnimplementedQueryServiceServer can be embedded to have forward compatible implementations.
@@ -423,11 +760,20 @@ type UnimplementedQueryServiceServer struct {
 func (*UnimplementedQueryServiceServer) Denoms(ctx context.Context, req *QueryServiceDenomsRequest) (*QueryServiceDenomsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Denoms not implemented")
 }
-func (*UnimplementedQueryServiceServer) DenomsByCreator(ctx context.Context, req *QueryServiceDenomsByCreatorRequest) (*QueryServiceDenomsByCreatorResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method DenomsByCreator not implemented")
+func (*UnimplementedQueryServiceServer) DenomsByOwner(ctx context.Context, req *QueryServiceDenomsByOwnerRequest) (*QueryServiceDenomsByOwnerResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DenomsByOwner not implemented")
 }
 func (*UnimplementedQueryServiceServer) Denom(ctx context.Context, req *QueryServiceDenomRequest) (*QueryServiceDenomResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Denom not implemented")
+}
+func (*UnimplementedQueryServiceServer) PNFTs(ctx context.Context, req *QueryServicePNFTsRequest) (*QueryServicePNFTsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PNFTs not implemented")
+}
+func (*UnimplementedQueryServiceServer) PNFTsByDenomOwner(ctx context.Context, req *QueryServicePNFTsByDenomOwnerRequest) (*QueryServicePNFTsByDenomOwnerResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PNFTsByDenomOwner not implemented")
+}
+func (*UnimplementedQueryServiceServer) PNFT(ctx context.Context, req *QueryServicePNFTRequest) (*QueryServicePNFTResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PNFT not implemented")
 }
 
 func RegisterQueryServiceServer(s grpc1.Server, srv QueryServiceServer) {
@@ -452,20 +798,20 @@ func _QueryService_Denoms_Handler(srv interface{}, ctx context.Context, dec func
 	return interceptor(ctx, in, info, handler)
 }
 
-func _QueryService_DenomsByCreator_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(QueryServiceDenomsByCreatorRequest)
+func _QueryService_DenomsByOwner_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryServiceDenomsByOwnerRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(QueryServiceServer).DenomsByCreator(ctx, in)
+		return srv.(QueryServiceServer).DenomsByOwner(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/panacea.pnft.v2.QueryService/DenomsByCreator",
+		FullMethod: "/panacea.pnft.v2.QueryService/DenomsByOwner",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(QueryServiceServer).DenomsByCreator(ctx, req.(*QueryServiceDenomsByCreatorRequest))
+		return srv.(QueryServiceServer).DenomsByOwner(ctx, req.(*QueryServiceDenomsByOwnerRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -488,6 +834,60 @@ func _QueryService_Denom_Handler(srv interface{}, ctx context.Context, dec func(
 	return interceptor(ctx, in, info, handler)
 }
 
+func _QueryService_PNFTs_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryServicePNFTsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(QueryServiceServer).PNFTs(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/panacea.pnft.v2.QueryService/PNFTs",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(QueryServiceServer).PNFTs(ctx, req.(*QueryServicePNFTsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _QueryService_PNFTsByDenomOwner_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryServicePNFTsByDenomOwnerRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(QueryServiceServer).PNFTsByDenomOwner(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/panacea.pnft.v2.QueryService/PNFTsByDenomOwner",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(QueryServiceServer).PNFTsByDenomOwner(ctx, req.(*QueryServicePNFTsByDenomOwnerRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _QueryService_PNFT_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryServicePNFTRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(QueryServiceServer).PNFT(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/panacea.pnft.v2.QueryService/PNFT",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(QueryServiceServer).PNFT(ctx, req.(*QueryServicePNFTRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _QueryService_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "panacea.pnft.v2.QueryService",
 	HandlerType: (*QueryServiceServer)(nil),
@@ -497,12 +897,24 @@ var _QueryService_serviceDesc = grpc.ServiceDesc{
 			Handler:    _QueryService_Denoms_Handler,
 		},
 		{
-			MethodName: "DenomsByCreator",
-			Handler:    _QueryService_DenomsByCreator_Handler,
+			MethodName: "DenomsByOwner",
+			Handler:    _QueryService_DenomsByOwner_Handler,
 		},
 		{
 			MethodName: "Denom",
 			Handler:    _QueryService_Denom_Handler,
+		},
+		{
+			MethodName: "PNFTs",
+			Handler:    _QueryService_PNFTs_Handler,
+		},
+		{
+			MethodName: "PNFTsByDenomOwner",
+			Handler:    _QueryService_PNFTsByDenomOwner_Handler,
+		},
+		{
+			MethodName: "PNFT",
+			Handler:    _QueryService_PNFT_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
@@ -593,7 +1005,7 @@ func (m *QueryServiceDenomsResponse) MarshalToSizedBuffer(dAtA []byte) (int, err
 	return len(dAtA) - i, nil
 }
 
-func (m *QueryServiceDenomsByCreatorRequest) Marshal() (dAtA []byte, err error) {
+func (m *QueryServiceDenomsByOwnerRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -603,27 +1015,27 @@ func (m *QueryServiceDenomsByCreatorRequest) Marshal() (dAtA []byte, err error) 
 	return dAtA[:n], nil
 }
 
-func (m *QueryServiceDenomsByCreatorRequest) MarshalTo(dAtA []byte) (int, error) {
+func (m *QueryServiceDenomsByOwnerRequest) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *QueryServiceDenomsByCreatorRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *QueryServiceDenomsByOwnerRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if len(m.Creator) > 0 {
-		i -= len(m.Creator)
-		copy(dAtA[i:], m.Creator)
-		i = encodeVarintQuery(dAtA, i, uint64(len(m.Creator)))
+	if len(m.Owner) > 0 {
+		i -= len(m.Owner)
+		copy(dAtA[i:], m.Owner)
+		i = encodeVarintQuery(dAtA, i, uint64(len(m.Owner)))
 		i--
 		dAtA[i] = 0xa
 	}
 	return len(dAtA) - i, nil
 }
 
-func (m *QueryServiceDenomsByCreatorResponse) Marshal() (dAtA []byte, err error) {
+func (m *QueryServiceDenomsByOwnerResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -633,12 +1045,12 @@ func (m *QueryServiceDenomsByCreatorResponse) Marshal() (dAtA []byte, err error)
 	return dAtA[:n], nil
 }
 
-func (m *QueryServiceDenomsByCreatorResponse) MarshalTo(dAtA []byte) (int, error) {
+func (m *QueryServiceDenomsByOwnerResponse) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *QueryServiceDenomsByCreatorResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *QueryServiceDenomsByOwnerResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -725,6 +1137,219 @@ func (m *QueryServiceDenomResponse) MarshalToSizedBuffer(dAtA []byte) (int, erro
 	return len(dAtA) - i, nil
 }
 
+func (m *QueryServicePNFTsRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *QueryServicePNFTsRequest) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *QueryServicePNFTsRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.DenomId) > 0 {
+		i -= len(m.DenomId)
+		copy(dAtA[i:], m.DenomId)
+		i = encodeVarintQuery(dAtA, i, uint64(len(m.DenomId)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *QueryServicePNFTsResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *QueryServicePNFTsResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *QueryServicePNFTsResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Pnfts) > 0 {
+		for iNdEx := len(m.Pnfts) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.Pnfts[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintQuery(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0xa
+		}
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *QueryServicePNFTsByDenomOwnerRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *QueryServicePNFTsByDenomOwnerRequest) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *QueryServicePNFTsByDenomOwnerRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Owner) > 0 {
+		i -= len(m.Owner)
+		copy(dAtA[i:], m.Owner)
+		i = encodeVarintQuery(dAtA, i, uint64(len(m.Owner)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.DenomId) > 0 {
+		i -= len(m.DenomId)
+		copy(dAtA[i:], m.DenomId)
+		i = encodeVarintQuery(dAtA, i, uint64(len(m.DenomId)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *QueryServicePNFTsByDenomOwnerResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *QueryServicePNFTsByDenomOwnerResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *QueryServicePNFTsByDenomOwnerResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Pnfts) > 0 {
+		for iNdEx := len(m.Pnfts) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.Pnfts[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintQuery(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0xa
+		}
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *QueryServicePNFTRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *QueryServicePNFTRequest) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *QueryServicePNFTRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Id) > 0 {
+		i -= len(m.Id)
+		copy(dAtA[i:], m.Id)
+		i = encodeVarintQuery(dAtA, i, uint64(len(m.Id)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.DenomId) > 0 {
+		i -= len(m.DenomId)
+		copy(dAtA[i:], m.DenomId)
+		i = encodeVarintQuery(dAtA, i, uint64(len(m.DenomId)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *QueryServicePNFTResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *QueryServicePNFTResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *QueryServicePNFTResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.Pnft != nil {
+		{
+			size, err := m.Pnft.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintQuery(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
 func encodeVarintQuery(dAtA []byte, offset int, v uint64) int {
 	offset -= sovQuery(v)
 	base := offset
@@ -768,20 +1393,20 @@ func (m *QueryServiceDenomsResponse) Size() (n int) {
 	return n
 }
 
-func (m *QueryServiceDenomsByCreatorRequest) Size() (n int) {
+func (m *QueryServiceDenomsByOwnerRequest) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	l = len(m.Creator)
+	l = len(m.Owner)
 	if l > 0 {
 		n += 1 + l + sovQuery(uint64(l))
 	}
 	return n
 }
 
-func (m *QueryServiceDenomsByCreatorResponse) Size() (n int) {
+func (m *QueryServiceDenomsByOwnerResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -817,6 +1442,96 @@ func (m *QueryServiceDenomResponse) Size() (n int) {
 	_ = l
 	if m.Denom != nil {
 		l = m.Denom.Size()
+		n += 1 + l + sovQuery(uint64(l))
+	}
+	return n
+}
+
+func (m *QueryServicePNFTsRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.DenomId)
+	if l > 0 {
+		n += 1 + l + sovQuery(uint64(l))
+	}
+	return n
+}
+
+func (m *QueryServicePNFTsResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if len(m.Pnfts) > 0 {
+		for _, e := range m.Pnfts {
+			l = e.Size()
+			n += 1 + l + sovQuery(uint64(l))
+		}
+	}
+	return n
+}
+
+func (m *QueryServicePNFTsByDenomOwnerRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.DenomId)
+	if l > 0 {
+		n += 1 + l + sovQuery(uint64(l))
+	}
+	l = len(m.Owner)
+	if l > 0 {
+		n += 1 + l + sovQuery(uint64(l))
+	}
+	return n
+}
+
+func (m *QueryServicePNFTsByDenomOwnerResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if len(m.Pnfts) > 0 {
+		for _, e := range m.Pnfts {
+			l = e.Size()
+			n += 1 + l + sovQuery(uint64(l))
+		}
+	}
+	return n
+}
+
+func (m *QueryServicePNFTRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.DenomId)
+	if l > 0 {
+		n += 1 + l + sovQuery(uint64(l))
+	}
+	l = len(m.Id)
+	if l > 0 {
+		n += 1 + l + sovQuery(uint64(l))
+	}
+	return n
+}
+
+func (m *QueryServicePNFTResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.Pnft != nil {
+		l = m.Pnft.Size()
 		n += 1 + l + sovQuery(uint64(l))
 	}
 	return n
@@ -1034,7 +1749,7 @@ func (m *QueryServiceDenomsResponse) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *QueryServiceDenomsByCreatorRequest) Unmarshal(dAtA []byte) error {
+func (m *QueryServiceDenomsByOwnerRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -1057,15 +1772,15 @@ func (m *QueryServiceDenomsByCreatorRequest) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: QueryServiceDenomsByCreatorRequest: wiretype end group for non-group")
+			return fmt.Errorf("proto: QueryServiceDenomsByOwnerRequest: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: QueryServiceDenomsByCreatorRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: QueryServiceDenomsByOwnerRequest: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Creator", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Owner", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -1093,7 +1808,7 @@ func (m *QueryServiceDenomsByCreatorRequest) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Creator = string(dAtA[iNdEx:postIndex])
+			m.Owner = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -1116,7 +1831,7 @@ func (m *QueryServiceDenomsByCreatorRequest) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *QueryServiceDenomsByCreatorResponse) Unmarshal(dAtA []byte) error {
+func (m *QueryServiceDenomsByOwnerResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -1139,10 +1854,10 @@ func (m *QueryServiceDenomsByCreatorResponse) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: QueryServiceDenomsByCreatorResponse: wiretype end group for non-group")
+			return fmt.Errorf("proto: QueryServiceDenomsByOwnerResponse: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: QueryServiceDenomsByCreatorResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: QueryServiceDenomsByOwnerResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -1344,6 +2059,570 @@ func (m *QueryServiceDenomResponse) Unmarshal(dAtA []byte) error {
 				m.Denom = &Denom{}
 			}
 			if err := m.Denom.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipQuery(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *QueryServicePNFTsRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowQuery
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: QueryServicePNFTsRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: QueryServicePNFTsRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field DenomId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.DenomId = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipQuery(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *QueryServicePNFTsResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowQuery
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: QueryServicePNFTsResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: QueryServicePNFTsResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Pnfts", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Pnfts = append(m.Pnfts, &PNFT{})
+			if err := m.Pnfts[len(m.Pnfts)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipQuery(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *QueryServicePNFTsByDenomOwnerRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowQuery
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: QueryServicePNFTsByDenomOwnerRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: QueryServicePNFTsByDenomOwnerRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field DenomId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.DenomId = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Owner", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Owner = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipQuery(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *QueryServicePNFTsByDenomOwnerResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowQuery
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: QueryServicePNFTsByDenomOwnerResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: QueryServicePNFTsByDenomOwnerResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Pnfts", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Pnfts = append(m.Pnfts, &PNFT{})
+			if err := m.Pnfts[len(m.Pnfts)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipQuery(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *QueryServicePNFTRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowQuery
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: QueryServicePNFTRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: QueryServicePNFTRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field DenomId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.DenomId = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Id", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Id = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipQuery(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *QueryServicePNFTResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowQuery
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: QueryServicePNFTResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: QueryServicePNFTResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Pnft", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Pnft == nil {
+				m.Pnft = &PNFT{}
+			}
+			if err := m.Pnft.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
