@@ -67,7 +67,7 @@ func (k Keeper) UpdateDenom(ctx sdk.Context, msg *types.Denom) error {
 		denom.UriHash = msg.UriHash
 	}
 	if msg.Data != "" {
-		denom.Data = msg.Name
+		denom.Data = msg.Data
 	}
 
 	class, err := types.NewClassFromDenom(k.cdc, denom)
