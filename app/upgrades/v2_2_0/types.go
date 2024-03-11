@@ -5,8 +5,8 @@ import (
 	consensustypes "github.com/cosmos/cosmos-sdk/x/consensus/types"
 	crisistypes "github.com/cosmos/cosmos-sdk/x/crisis/types"
 	"github.com/cosmos/cosmos-sdk/x/group"
-	"github.com/cosmos/cosmos-sdk/x/nft"
 	"github.com/medibloc/panacea-core/v2/app/upgrades"
+	pnfttypes "github.com/medibloc/panacea-core/v2/x/pnft/types"
 )
 
 var Upgrade = upgrades.Upgrade{
@@ -16,8 +16,8 @@ var Upgrade = upgrades.Upgrade{
 		Added: []string{
 			consensustypes.ModuleName,
 			crisistypes.ModuleName,
-			nft.ModuleName,
 			group.ModuleName,
+			pnfttypes.ModuleName,
 		},
 	},
 }
