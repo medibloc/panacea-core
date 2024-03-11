@@ -1,10 +1,8 @@
 package cli
 
 import (
-	"context"
 	"fmt"
 	"github.com/cosmos/cosmos-sdk/client"
-	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/medibloc/panacea-core/v2/x/pnft/types"
 	"github.com/spf13/cobra"
 )
@@ -19,38 +17,12 @@ func NewGetQueryCmd() *cobra.Command {
 	}
 
 	cmd.AddCommand(NewCmdGetDenoms())
+	cmd.AddCommand(NewCmdGetDenomsByOwner())
+	cmd.AddCommand(NewCmdGetDenom())
 
-	return cmd
-}
-
-func NewCmdGetDenoms() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "list-denom",
-		Short: "List all denoms",
-		Args:  cobra.ExactArgs(0),
-		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx := client.GetClientContextFromCmd(cmd)
-			pagination, err := client.ReadPageRequest(cmd.Flags())
-			if err != nil {
-				return err
-			}
-
-			queryClient := types.NewQueryServiceClient(clientCtx)
-
-			msg := &types.QueryServiceDenomsRequest{
-				Pagination: pagination,
-			}
-
-			res, err := queryClient.Denoms(context.Background(), msg)
-
-			if err != nil {
-				return err
-			}
-			return clientCtx.PrintProto(res)
-		},
-	}
-
-	flags.AddQueryFlagsToCmd(cmd)
+	cmd.AddCommand(NewCmdGetPNFTs())
+	cmd.AddCommand(NewCmdGetPNFTsByOwner())
+	cmd.AddCommand(NewCmdGetPNFT())
 
 	return cmd
 }

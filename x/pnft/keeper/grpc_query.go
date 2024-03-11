@@ -34,7 +34,7 @@ func (k Keeper) Denoms(goCtx context.Context, request *types.QueryServiceDenomsR
 	}, nil
 }
 
-func (k Keeper) DenomsByCreator(goCtx context.Context, request *types.QueryServiceDenomsByCreatorRequest) (*types.QueryServiceDenomsByCreatorResponse, error) {
+func (k Keeper) DenomsByOwner(goCtx context.Context, request *types.QueryServiceDenomsByOwnerRequest) (*types.QueryServiceDenomsByOwnerResponse, error) {
 	if request == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
@@ -49,7 +49,7 @@ func (k Keeper) DenomsByCreator(goCtx context.Context, request *types.QueryServi
 		return nil, err
 	}
 
-	return &types.QueryServiceDenomsByCreatorResponse{
+	return &types.QueryServiceDenomsByOwnerResponse{
 		Denoms: denoms,
 	}, nil
 }
@@ -61,7 +61,7 @@ func (k Keeper) Denom(goCtx context.Context, request *types.QueryServiceDenomReq
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	denom, err := k.GetDenom(ctx, request.GetId())
+	denom, err := k.GetDenom(ctx, request.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -69,4 +69,47 @@ func (k Keeper) Denom(goCtx context.Context, request *types.QueryServiceDenomReq
 	return &types.QueryServiceDenomResponse{
 		Denom: denom,
 	}, nil
+}
+
+func (k Keeper) PNFTs(goCtx context.Context, request *types.QueryServicePNFTsRequest) (*types.QueryServicePNFTsResponse, error) {
+	if request == nil {
+		return nil, status.Error(codes.InvalidArgument, "invalid request")
+	}
+
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	pnfts, err := k.GetPNFTsByDenomId(ctx, request.DenomId)
+	if err != nil {
+		return nil, err
+	}
+	return &types.QueryServicePNFTsResponse{Pnfts: pnfts}, nil
+}
+
+func (k Keeper) PNFTsByDenomOwner(goCtx context.Context, request *types.QueryServicePNFTsByDenomOwnerRequest) (*types.QueryServicePNFTsByDenomOwnerResponse, error) {
+	if request == nil {
+		return nil, status.Error(codes.InvalidArgument, "invalid request")
+	}
+
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	pnfts, err := k.GetPNFTsByDenomIdAndOwner(ctx, request.DenomId, request.Owner)
+	if err != nil {
+		return nil, err
+	}
+	return &types.QueryServicePNFTsByDenomOwnerResponse{Pnfts: pnfts}, nil
+}
+
+func (k Keeper) PNFT(goCtx context.Context, request *types.QueryServicePNFTRequest) (*types.QueryServicePNFTResponse, error) {
+	if request == nil {
+		return nil, status.Error(codes.InvalidArgument, "invalid request")
+	}
+
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	pnft, err := k.GetPNFT(ctx, request.DenomId, request.Id)
+	if err != nil {
+		return nil, err
+	}
+
+	return &types.QueryServicePNFTResponse{Pnft: pnft}, nil
 }

@@ -3,6 +3,7 @@ package panacea.pnft.v2;
 
 import "google/api/annotations.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";
+import "panacea/pnft/v2/denom.proto";
 import "panacea/pnft/v2/pnft.proto";
 
 option java_multiple_files = true;
@@ -16,15 +17,28 @@ service QueryService {
         "/panacea/pnft/v2/denoms";
   }
 
-  rpc DenomsByCreator(QueryServiceDenomsByCreatorRequest) returns (QueryServiceDenomsByCreatorResponse) {
+  rpc DenomsByOwner(QueryServiceDenomsByOwnerRequest) returns (QueryServiceDenomsByOwnerResponse) {
     option (google.api.http).get =
-        "/panacea/pnft/v2/denoms/creators/{creator}";
+        "/panacea/pnft/v2/denoms/owners/{owner}";
   }
 
   // Denom returns denom detail.
   rpc Denom(QueryServiceDenomRequest) returns (QueryServiceDenomResponse) {
     option (google.api.http).get =
         "/panacea/pnft/v2/denoms/{id}";
+  }
+
+  rpc PNFTs(QueryServicePNFTsRequest) returns (QueryServicePNFTsResponse) {
+    option (google.api.http).get = "/panacea/pnft/v2/denoms/{denom_id}/pnfts";
+  }
+
+  rpc PNFTsByDenomOwner(QueryServicePNFTsByDenomOwnerRequest) returns (QueryServicePNFTsByDenomOwnerResponse) {
+    option (google.api.http).get = "/panacea/pnft/v2/denoms/{denom_id}/owners/{owner}/pnfts";
+  }
+
+
+  rpc PNFT(QueryServicePNFTRequest) returns (QueryServicePNFTResponse) {
+    option (google.api.http).get = "/panacea/pnft/v2/denoms/{denom_id}/pnfts/{id}";
   }
 }
 
@@ -39,13 +53,13 @@ message QueryServiceDenomsResponse {
   cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 
-// QueryServiceDenomsByCreatorRequest is the response type for the Query RPC method.
-message QueryServiceDenomsByCreatorRequest {
-  string creator = 1;
+// QueryServiceDenomsByOwnerRequest is the response type for the Query RPC method.
+message QueryServiceDenomsByOwnerRequest {
+  string owner = 1;
 }
 
-// QueryServiceDenomsByCreatorResponse is the response type for the Query RPC method.
-message QueryServiceDenomsByCreatorResponse {
+// QueryServiceDenomsByOwnerResponse is the response type for the Query RPC method.
+message QueryServiceDenomsByOwnerResponse {
   repeated panacea.pnft.v2.Denom denoms = 1;
 }
 
@@ -57,4 +71,36 @@ message QueryServiceDenomRequest {
 // QueryServiceDenomResponse is the response type for the Query RPC method.
 message QueryServiceDenomResponse {
   panacea.pnft.v2.Denom denom = 1;
+}
+
+// QueryServicePNFTsRequest is the response type for the Query RPC method.
+message QueryServicePNFTsRequest {
+  string denom_id = 1;
+}
+
+// QueryServicePNFTsResponse is the response type for the Query RPC method.
+message QueryServicePNFTsResponse {
+  repeated panacea.pnft.v2.PNFT pnfts = 1;
+}
+
+// QueryServicePNFTsRequest is the response type for the Query RPC method.
+message QueryServicePNFTsByDenomOwnerRequest {
+  string denom_id = 1;
+  string owner = 2;
+}
+
+// QueryServicePNFTsResponse is the response type for the Query RPC method.
+message QueryServicePNFTsByDenomOwnerResponse {
+  repeated panacea.pnft.v2.PNFT pnfts = 1;
+}
+
+// QueryServicePNFTRequest is the response type for the Query RPC method.
+message QueryServicePNFTRequest {
+  string denom_id = 1;
+  string id = 2;
+}
+
+// QueryServicePNFTResponse is the response type for the Query RPC method.
+message QueryServicePNFTResponse {
+  panacea.pnft.v2.PNFT pnft = 1;
 }
