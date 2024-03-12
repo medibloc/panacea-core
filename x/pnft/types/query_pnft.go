@@ -5,13 +5,13 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func NewQueryServicePNFTsRequest(denomId string) *QueryServicePNFTsRequest {
-	return &QueryServicePNFTsRequest{
+func NewQueryPNFTsRequest(denomId string) *QueryPNFTsRequest {
+	return &QueryPNFTsRequest{
 		DenomId: denomId,
 	}
 }
 
-func (m *QueryServicePNFTsRequest) ValidateBasic() error {
+func (m *QueryPNFTsRequest) ValidateBasic() error {
 	if m.DenomId == "" {
 		return fmt.Errorf("denomId cannot be empty")
 	}
@@ -19,14 +19,14 @@ func (m *QueryServicePNFTsRequest) ValidateBasic() error {
 	return nil
 }
 
-func NewQueryServicePNFTsByOwnerRequest(denomId string, ownerId string) *QueryServicePNFTsByDenomOwnerRequest {
-	return &QueryServicePNFTsByDenomOwnerRequest{
+func NewQueryPNFTsByOwnerRequest(denomId string, ownerId string) *QueryPNFTsByDenomOwnerRequest {
+	return &QueryPNFTsByDenomOwnerRequest{
 		DenomId: denomId,
 		Owner:   ownerId,
 	}
 }
 
-func (m *QueryServicePNFTsByDenomOwnerRequest) ValidateBasic() error {
+func (m *QueryPNFTsByDenomOwnerRequest) ValidateBasic() error {
 	if m.DenomId == "" {
 		return fmt.Errorf("denomId cannot be empty")
 	}
@@ -41,14 +41,14 @@ func (m *QueryServicePNFTsByDenomOwnerRequest) ValidateBasic() error {
 	return nil
 }
 
-func NewQueryServicePNFTRequest(denomId, id string) *QueryServicePNFTRequest {
-	return &QueryServicePNFTRequest{
+func NewQueryPNFTRequest(denomId, id string) *QueryPNFTRequest {
+	return &QueryPNFTRequest{
 		DenomId: denomId,
 		Id:      id,
 	}
 }
 
-func (m *QueryServicePNFTRequest) ValidateBasic() error {
+func (m *QueryPNFTRequest) ValidateBasic() error {
 	if m.DenomId == "" {
 		return fmt.Errorf("denomId cannot be empty")
 	}

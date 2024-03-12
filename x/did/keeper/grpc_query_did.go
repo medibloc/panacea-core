@@ -10,7 +10,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (k Keeper) DID(c context.Context, req *types.QueryServiceDIDRequest) (*types.QueryServiceDIDResponse, error) {
+func (k Keeper) DID(c context.Context, req *types.QueryDIDRequest) (*types.QueryDIDResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
@@ -31,5 +31,5 @@ func (k Keeper) DID(c context.Context, req *types.QueryServiceDIDRequest) (*type
 		return nil, status.Error(codes.NotFound, "DID deactivated")
 	}
 
-	return &types.QueryServiceDIDResponse{DidDocumentWithSeq: &docWithSeq}, nil
+	return &types.QueryDIDResponse{DidDocumentWithSeq: &docWithSeq}, nil
 }

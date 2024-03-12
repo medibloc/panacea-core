@@ -324,9 +324,9 @@ func getPrivKeyFromKeyStore(verificationMethodID string, reader *bufio.Reader) (
 
 // signUsingCurrentSeq generates a signature using the current sequence stored in the blockchain.
 func signUsingCurrentSeq(clientCtx client.Context, did string, privKey crypto.PrivKey, data sdkcodec.ProtoMarshaler) ([]byte, error) {
-	queryClient := types.NewQueryServiceClient(clientCtx)
+	queryClient := types.NewQueryClient(clientCtx)
 
-	params := &types.QueryServiceDIDRequest{
+	params := &types.QueryDIDRequest{
 		DidBase64: base64.StdEncoding.EncodeToString([]byte(did)),
 	}
 

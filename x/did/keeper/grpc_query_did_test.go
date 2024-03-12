@@ -26,7 +26,7 @@ func (suite *queryDIDTestSuite) TestDIDDocumentWithSeq() {
 
 	didKeeper.SetDIDDocument(suite.Ctx, did, docWithSeq)
 
-	req := types.QueryServiceDIDRequest{DidBase64: base64.StdEncoding.EncodeToString([]byte(did))}
+	req := types.QueryDIDRequest{DidBase64: base64.StdEncoding.EncodeToString([]byte(did))}
 	res, err := didKeeper.DID(sdk.WrapSDKContext(suite.Ctx), &req)
 	suite.Require().NoError(err)
 	suite.Require().NotNil(res)

@@ -18,14 +18,14 @@ func CmdGetRecord() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 
-			queryClient := types.NewQueryServiceClient(clientCtx)
+			queryClient := types.NewQueryClient(clientCtx)
 
 			offset, err := strconv.ParseUint(args[2], 10, 64)
 			if err != nil {
 				return err
 			}
 
-			params := &types.QueryServiceRecordRequest{
+			params := &types.QueryRecordRequest{
 				OwnerAddress: args[0],
 				TopicName:    args[1],
 				Offset:       offset,

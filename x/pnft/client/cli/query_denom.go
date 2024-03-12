@@ -21,9 +21,9 @@ func NewCmdGetDenoms() *cobra.Command {
 				return errors.Wrap(types.ErrGetDenom, err.Error())
 			}
 
-			queryClient := types.NewQueryServiceClient(clientCtx)
+			queryClient := types.NewQueryClient(clientCtx)
 
-			msg := types.NewQueryServiceDenomsRequest(pagination)
+			msg := types.NewQueryDenomsRequest(pagination)
 			if err := msg.ValidateBasic(); err != nil {
 				return errors.Wrap(types.ErrGetDenom, err.Error())
 			}
@@ -51,9 +51,9 @@ func NewCmdGetDenomsByOwner() *cobra.Command {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 			owner := args[0]
 
-			queryClient := types.NewQueryServiceClient(clientCtx)
+			queryClient := types.NewQueryClient(clientCtx)
 
-			msg := types.NewQueryServiceDenomsByOwnerRequest(owner)
+			msg := types.NewQueryDenomsByOwnerRequest(owner)
 
 			if err := msg.ValidateBasic(); err != nil {
 				return errors.Wrap(types.ErrGetDenom, err.Error())
@@ -82,9 +82,9 @@ func NewCmdGetDenom() *cobra.Command {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 			denomId := args[0]
 
-			queryClient := types.NewQueryServiceClient(clientCtx)
+			queryClient := types.NewQueryClient(clientCtx)
 
-			msg := types.NewQueryServiceDenomRequest(denomId)
+			msg := types.NewQueryDenomRequest(denomId)
 
 			if err := msg.ValidateBasic(); err != nil {
 				return errors.Wrap(types.ErrGetDenom, err.Error())

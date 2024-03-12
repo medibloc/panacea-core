@@ -102,7 +102,7 @@ func (m msgServer) MintPNFT(goCtx context.Context, request *types.MsgServiceMint
 		return nil, errors.Wrap(types.ErrMintPNFT, err.Error())
 	}
 
-	msg := &types.PNFT{
+	msg := &types.Pnft{
 		DenomId:     request.DenomId,
 		Id:          request.Id,
 		Name:        request.Name,

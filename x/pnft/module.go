@@ -57,10 +57,10 @@ func (AppModuleBasic) ValidateGenesis(cdc codec.JSONCodec, _ client.TxEncodingCo
 }
 
 func (a AppModuleBasic) RegisterGRPCGatewayRoutes(clientContext client.Context, mux *runtime.ServeMux) {
-	if err := types.RegisterQueryServiceHandlerClient(
+	if err := types.RegisterQueryHandlerClient(
 		context.Background(),
 		mux,
-		types.NewQueryServiceClient(clientContext),
+		types.NewQueryClient(clientContext),
 	); err != nil {
 		panic(err)
 	}
@@ -93,7 +93,7 @@ func (AppModule) QuerierRoute() string { return types.QuerierRoute }
 // RegisterServices registers a GRPC query service to respond to the
 // module-specific GRPC queries.
 func (am AppModule) RegisterServices(cfg module.Configurator) {
-	types.RegisterQueryServiceServer(cfg.QueryServer(), am.keeper)
+	types.RegisterQueryServer(cfg.QueryServer(), am.keeper)
 	types.RegisterMsgServiceServer(cfg.MsgServer(), keeper.NewMsgServerImpl(am.keeper))
 }
 

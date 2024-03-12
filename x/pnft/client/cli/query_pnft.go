@@ -18,9 +18,9 @@ func NewCmdGetPNFTs() *cobra.Command {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 
 			denomId := args[0]
-			queryClient := types.NewQueryServiceClient(clientCtx)
+			queryClient := types.NewQueryClient(clientCtx)
 
-			msg := types.NewQueryServicePNFTsRequest(denomId)
+			msg := types.NewQueryPNFTsRequest(denomId)
 			if err := msg.ValidateBasic(); err != nil {
 				return errors.Wrap(types.ErrGetPNFT, err.Error())
 			}
@@ -50,9 +50,9 @@ func NewCmdGetPNFTsByOwner() *cobra.Command {
 			denomId := args[0]
 			owner := args[1]
 
-			queryClient := types.NewQueryServiceClient(clientCtx)
+			queryClient := types.NewQueryClient(clientCtx)
 
-			msg := types.NewQueryServicePNFTsByOwnerRequest(denomId, owner)
+			msg := types.NewQueryPNFTsByOwnerRequest(denomId, owner)
 			if err := msg.ValidateBasic(); err != nil {
 				return errors.Wrap(types.ErrGetPNFT, err.Error())
 			}
@@ -82,9 +82,9 @@ func NewCmdGetPNFT() *cobra.Command {
 			denomId := args[0]
 			id := args[1]
 
-			queryClient := types.NewQueryServiceClient(clientCtx)
+			queryClient := types.NewQueryClient(clientCtx)
 
-			msg := types.NewQueryServicePNFTRequest(denomId, id)
+			msg := types.NewQueryPNFTRequest(denomId, id)
 			if err := msg.ValidateBasic(); err != nil {
 				return errors.Wrap(types.ErrGetPNFT, err.Error())
 			}

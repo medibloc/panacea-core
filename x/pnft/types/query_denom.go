@@ -6,23 +6,23 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/query"
 )
 
-func NewQueryServiceDenomsRequest(pagination *query.PageRequest) *QueryServiceDenomsRequest {
-	return &QueryServiceDenomsRequest{
+func NewQueryDenomsRequest(pagination *query.PageRequest) *QueryDenomsRequest {
+	return &QueryDenomsRequest{
 		Pagination: pagination,
 	}
 }
 
-func (m *QueryServiceDenomsRequest) ValidateBasic() error {
+func (m *QueryDenomsRequest) ValidateBasic() error {
 	return nil
 }
 
-func NewQueryServiceDenomsByOwnerRequest(owner string) *QueryServiceDenomsByOwnerRequest {
-	return &QueryServiceDenomsByOwnerRequest{
+func NewQueryDenomsByOwnerRequest(owner string) *QueryDenomsByOwnerRequest {
+	return &QueryDenomsByOwnerRequest{
 		Owner: owner,
 	}
 }
 
-func (m *QueryServiceDenomsByOwnerRequest) ValidateBasic() error {
+func (m *QueryDenomsByOwnerRequest) ValidateBasic() error {
 	if m.Owner == "" {
 		return fmt.Errorf("owner cannot be empty")
 	}
@@ -33,13 +33,13 @@ func (m *QueryServiceDenomsByOwnerRequest) ValidateBasic() error {
 	return nil
 }
 
-func NewQueryServiceDenomRequest(id string) *QueryServiceDenomRequest {
-	return &QueryServiceDenomRequest{
+func NewQueryDenomRequest(id string) *QueryDenomRequest {
+	return &QueryDenomRequest{
 		Id: id,
 	}
 }
 
-func (m *QueryServiceDenomRequest) ValidateBasic() error {
+func (m *QueryDenomRequest) ValidateBasic() error {
 	if m.Id == "" {
 		return fmt.Errorf("id cannot be empty")
 	}
