@@ -12,6 +12,12 @@ func InitGenesis(ctx sdk.Context, k *keeper.Keeper, genState types.GenesisState)
 			panic(err)
 		}
 	}
+
+	for _, pnft := range genState.Pnfts {
+		if err := k.MintPNFT(ctx, pnft); err != nil {
+			panic(err)
+		}
+	}
 }
 
 // ExportGenesis returns the pnft module's exported genesis.
@@ -23,7 +29,17 @@ func ExportGenesis(ctx sdk.Context, k *keeper.Keeper) *types.GenesisState {
 		panic(err)
 	}
 
+	var pnfts []*types.Pnft
+	for _, denom := range denoms {
+		pnftsByDenom, err := k.GetPNFTsByDenomId(ctx, denom.Id)
+		if err != nil {
+			panic(err)
+		}
+		pnfts = append(pnfts, pnftsByDenom...)
+	}
+
 	genesis.Denoms = denoms
+	genesis.Pnfts = pnfts
 
 	return genesis
 }

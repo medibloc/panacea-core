@@ -33,8 +33,8 @@ var _ = utilities.NewDoubleArray
 var _ = descriptor.ForMessage
 var _ = metadata.Join
 
-func request_QueryService_DID_0(ctx context.Context, marshaler runtime.Marshaler, client QueryServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq QueryServiceDIDRequest
+func request_Query_DID_0(ctx context.Context, marshaler runtime.Marshaler, client QueryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq QueryDIDRequest
 	var metadata runtime.ServerMetadata
 
 	var (
@@ -60,8 +60,8 @@ func request_QueryService_DID_0(ctx context.Context, marshaler runtime.Marshaler
 
 }
 
-func local_request_QueryService_DID_0(ctx context.Context, marshaler runtime.Marshaler, server QueryServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq QueryServiceDIDRequest
+func local_request_Query_DID_0(ctx context.Context, marshaler runtime.Marshaler, server QueryServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq QueryDIDRequest
 	var metadata runtime.ServerMetadata
 
 	var (
@@ -87,13 +87,13 @@ func local_request_QueryService_DID_0(ctx context.Context, marshaler runtime.Mar
 
 }
 
-// RegisterQueryServiceHandlerServer registers the http handlers for service QueryService to "mux".
-// UnaryRPC     :call QueryServiceServer directly.
+// RegisterQueryHandlerServer registers the http handlers for service Query to "mux".
+// UnaryRPC     :call QueryServer directly.
 // StreamingRPC :currently unsupported pending https://github.com/grpc/grpc-go/issues/906.
-// Note that using this registration option will cause many gRPC library features to stop working. Consider using RegisterQueryServiceHandlerFromEndpoint instead.
-func RegisterQueryServiceHandlerServer(ctx context.Context, mux *runtime.ServeMux, server QueryServiceServer) error {
+// Note that using this registration option will cause many gRPC library features to stop working. Consider using RegisterQueryHandlerFromEndpoint instead.
+func RegisterQueryHandlerServer(ctx context.Context, mux *runtime.ServeMux, server QueryServer) error {
 
-	mux.Handle("GET", pattern_QueryService_DID_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_Query_DID_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
@@ -104,7 +104,7 @@ func RegisterQueryServiceHandlerServer(ctx context.Context, mux *runtime.ServeMu
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_QueryService_DID_0(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_Query_DID_0(rctx, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
@@ -112,16 +112,16 @@ func RegisterQueryServiceHandlerServer(ctx context.Context, mux *runtime.ServeMu
 			return
 		}
 
-		forward_QueryService_DID_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_Query_DID_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
 	return nil
 }
 
-// RegisterQueryServiceHandlerFromEndpoint is same as RegisterQueryServiceHandler but
+// RegisterQueryHandlerFromEndpoint is same as RegisterQueryHandler but
 // automatically dials to "endpoint" and closes the connection when "ctx" gets done.
-func RegisterQueryServiceHandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) (err error) {
+func RegisterQueryHandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) (err error) {
 	conn, err := grpc.Dial(endpoint, opts...)
 	if err != nil {
 		return err
@@ -141,23 +141,23 @@ func RegisterQueryServiceHandlerFromEndpoint(ctx context.Context, mux *runtime.S
 		}()
 	}()
 
-	return RegisterQueryServiceHandler(ctx, mux, conn)
+	return RegisterQueryHandler(ctx, mux, conn)
 }
 
-// RegisterQueryServiceHandler registers the http handlers for service QueryService to "mux".
+// RegisterQueryHandler registers the http handlers for service Query to "mux".
 // The handlers forward requests to the grpc endpoint over "conn".
-func RegisterQueryServiceHandler(ctx context.Context, mux *runtime.ServeMux, conn *grpc.ClientConn) error {
-	return RegisterQueryServiceHandlerClient(ctx, mux, NewQueryServiceClient(conn))
+func RegisterQueryHandler(ctx context.Context, mux *runtime.ServeMux, conn *grpc.ClientConn) error {
+	return RegisterQueryHandlerClient(ctx, mux, NewQueryClient(conn))
 }
 
-// RegisterQueryServiceHandlerClient registers the http handlers for service QueryService
-// to "mux". The handlers forward requests to the grpc endpoint over the given implementation of "QueryServiceClient".
-// Note: the gRPC framework executes interceptors within the gRPC handler. If the passed in "QueryServiceClient"
+// RegisterQueryHandlerClient registers the http handlers for service Query
+// to "mux". The handlers forward requests to the grpc endpoint over the given implementation of "QueryClient".
+// Note: the gRPC framework executes interceptors within the gRPC handler. If the passed in "QueryClient"
 // doesn't go through the normal gRPC flow (creating a gRPC client etc.) then it will be up to the passed in
-// "QueryServiceClient" to call the correct interceptors.
-func RegisterQueryServiceHandlerClient(ctx context.Context, mux *runtime.ServeMux, client QueryServiceClient) error {
+// "QueryClient" to call the correct interceptors.
+func RegisterQueryHandlerClient(ctx context.Context, mux *runtime.ServeMux, client QueryClient) error {
 
-	mux.Handle("GET", pattern_QueryService_DID_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_Query_DID_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -166,14 +166,14 @@ func RegisterQueryServiceHandlerClient(ctx context.Context, mux *runtime.ServeMu
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_QueryService_DID_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_Query_DID_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_QueryService_DID_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_Query_DID_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -181,9 +181,9 @@ func RegisterQueryServiceHandlerClient(ctx context.Context, mux *runtime.ServeMu
 }
 
 var (
-	pattern_QueryService_DID_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"panacea", "did", "v2", "dids", "did_base64"}, "", runtime.AssumeColonVerbOpt(false)))
+	pattern_Query_DID_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"panacea", "did", "v2", "dids", "did_base64"}, "", runtime.AssumeColonVerbOpt(false)))
 )
 
 var (
-	forward_QueryService_DID_0 = runtime.ForwardResponseMessage
+	forward_Query_DID_0 = runtime.ForwardResponseMessage
 )

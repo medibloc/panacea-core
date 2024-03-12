@@ -9,9 +9,9 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-var _ types.QueryServiceServer = Keeper{}
+var _ types.QueryServer = Keeper{}
 
-func (k Keeper) Denoms(goCtx context.Context, request *types.QueryServiceDenomsRequest) (*types.QueryServiceDenomsResponse, error) {
+func (k Keeper) Denoms(goCtx context.Context, request *types.QueryDenomsRequest) (*types.QueryDenomsResponse, error) {
 	if request == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
@@ -28,13 +28,13 @@ func (k Keeper) Denoms(goCtx context.Context, request *types.QueryServiceDenomsR
 		return nil, err
 	}
 
-	return &types.QueryServiceDenomsResponse{
+	return &types.QueryDenomsResponse{
 		Denoms:     denoms,
 		Pagination: classRes.Pagination,
 	}, nil
 }
 
-func (k Keeper) DenomsByOwner(goCtx context.Context, request *types.QueryServiceDenomsByOwnerRequest) (*types.QueryServiceDenomsByOwnerResponse, error) {
+func (k Keeper) DenomsByOwner(goCtx context.Context, request *types.QueryDenomsByOwnerRequest) (*types.QueryDenomsByOwnerResponse, error) {
 	if request == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
@@ -49,12 +49,12 @@ func (k Keeper) DenomsByOwner(goCtx context.Context, request *types.QueryService
 		return nil, err
 	}
 
-	return &types.QueryServiceDenomsByOwnerResponse{
+	return &types.QueryDenomsByOwnerResponse{
 		Denoms: denoms,
 	}, nil
 }
 
-func (k Keeper) Denom(goCtx context.Context, request *types.QueryServiceDenomRequest) (*types.QueryServiceDenomResponse, error) {
+func (k Keeper) Denom(goCtx context.Context, request *types.QueryDenomRequest) (*types.QueryDenomResponse, error) {
 	if request == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
@@ -66,12 +66,12 @@ func (k Keeper) Denom(goCtx context.Context, request *types.QueryServiceDenomReq
 		return nil, err
 	}
 
-	return &types.QueryServiceDenomResponse{
+	return &types.QueryDenomResponse{
 		Denom: denom,
 	}, nil
 }
 
-func (k Keeper) PNFTs(goCtx context.Context, request *types.QueryServicePNFTsRequest) (*types.QueryServicePNFTsResponse, error) {
+func (k Keeper) PNFTs(goCtx context.Context, request *types.QueryPNFTsRequest) (*types.QueryPNFTsResponse, error) {
 	if request == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
@@ -82,10 +82,10 @@ func (k Keeper) PNFTs(goCtx context.Context, request *types.QueryServicePNFTsReq
 	if err != nil {
 		return nil, err
 	}
-	return &types.QueryServicePNFTsResponse{Pnfts: pnfts}, nil
+	return &types.QueryPNFTsResponse{Pnfts: pnfts}, nil
 }
 
-func (k Keeper) PNFTsByDenomOwner(goCtx context.Context, request *types.QueryServicePNFTsByDenomOwnerRequest) (*types.QueryServicePNFTsByDenomOwnerResponse, error) {
+func (k Keeper) PNFTsByDenomOwner(goCtx context.Context, request *types.QueryPNFTsByDenomOwnerRequest) (*types.QueryPNFTsByDenomOwnerResponse, error) {
 	if request == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
@@ -96,10 +96,10 @@ func (k Keeper) PNFTsByDenomOwner(goCtx context.Context, request *types.QuerySer
 	if err != nil {
 		return nil, err
 	}
-	return &types.QueryServicePNFTsByDenomOwnerResponse{Pnfts: pnfts}, nil
+	return &types.QueryPNFTsByDenomOwnerResponse{Pnfts: pnfts}, nil
 }
 
-func (k Keeper) PNFT(goCtx context.Context, request *types.QueryServicePNFTRequest) (*types.QueryServicePNFTResponse, error) {
+func (k Keeper) PNFT(goCtx context.Context, request *types.QueryPNFTRequest) (*types.QueryPNFTResponse, error) {
 	if request == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
@@ -111,5 +111,5 @@ func (k Keeper) PNFT(goCtx context.Context, request *types.QueryServicePNFTReque
 		return nil, err
 	}
 
-	return &types.QueryServicePNFTResponse{Pnft: pnft}, nil
+	return &types.QueryPNFTResponse{Pnft: pnft}, nil
 }

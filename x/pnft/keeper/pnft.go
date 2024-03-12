@@ -10,7 +10,7 @@ import (
 
 func (k Keeper) MintPNFT(
 	ctx sdk.Context,
-	pnft *types.PNFT,
+	pnft *types.Pnft,
 ) error {
 	denom, err := k.GetDenom(ctx, pnft.DenomId)
 	if err != nil {
@@ -116,8 +116,8 @@ func (k Keeper) BurnPNFT(
 	})
 }
 
-func (k Keeper) GetPNFTsByDenomId(ctx sdk.Context, denomId string) ([]*types.PNFT, error) {
-	var pnfts []*types.PNFT
+func (k Keeper) GetPNFTsByDenomId(ctx sdk.Context, denomId string) ([]*types.Pnft, error) {
+	var pnfts []*types.Pnft
 	for _, n := range k.nftKeeper.GetNFTsOfClass(ctx, denomId) {
 		var meta types.PNFTMeta
 		if err := k.cdc.Unmarshal(n.Data.GetValue(), &meta); err != nil {
@@ -126,7 +126,7 @@ func (k Keeper) GetPNFTsByDenomId(ctx sdk.Context, denomId string) ([]*types.PNF
 
 		ownerAddr := k.nftKeeper.GetOwner(ctx, denomId, n.Id)
 
-		pnfts = append(pnfts, &types.PNFT{
+		pnfts = append(pnfts, &types.Pnft{
 			DenomId:     n.ClassId,
 			Id:          n.Id,
 			Name:        meta.Name,
@@ -143,8 +143,8 @@ func (k Keeper) GetPNFTsByDenomId(ctx sdk.Context, denomId string) ([]*types.PNF
 	return pnfts, nil
 }
 
-func (k Keeper) GetPNFTsByDenomIdAndOwner(ctx sdk.Context, denomId, owner string) ([]*types.PNFT, error) {
-	var pnfts []*types.PNFT
+func (k Keeper) GetPNFTsByDenomIdAndOwner(ctx sdk.Context, denomId, owner string) ([]*types.Pnft, error) {
+	var pnfts []*types.Pnft
 	ownerAddr, err := sdk.AccAddressFromBech32(owner)
 	if err != nil {
 		return nil, err
@@ -158,7 +158,7 @@ func (k Keeper) GetPNFTsByDenomIdAndOwner(ctx sdk.Context, denomId, owner string
 
 		ownerAddr := k.nftKeeper.GetOwner(ctx, denomId, n.Id)
 
-		pnfts = append(pnfts, &types.PNFT{
+		pnfts = append(pnfts, &types.Pnft{
 			DenomId:     n.ClassId,
 			Id:          n.Id,
 			Name:        meta.Name,
@@ -179,7 +179,7 @@ func (k Keeper) GetPNFT(
 	ctx sdk.Context,
 	denomId string,
 	id string,
-) (*types.PNFT, error) {
+) (*types.Pnft, error) {
 	nft, exist := k.nftKeeper.GetNFT(ctx, denomId, id)
 	if !exist {
 		return nil, fmt.Errorf("cannot found pnft. denomId: %s, pnftId: %s", denomId, id)
@@ -191,7 +191,7 @@ func (k Keeper) GetPNFT(
 	if err := k.cdc.Unmarshal(nft.Data.GetValue(), &meta); err != nil {
 		return nil, err
 	}
-	return &types.PNFT{
+	return &types.Pnft{
 		DenomId:     nft.ClassId,
 		Id:          nft.Id,
 		Name:        meta.Name,

@@ -1,8 +1,6 @@
 syntax = "proto3";
 package panacea.pnft.v2;
 
-import "panacea/pnft/v2/pnft.proto";
-
 option go_package = "github.com/medibloc/panacea-core/x/pnft/types";
 option java_multiple_files = true;
 

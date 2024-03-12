@@ -17,9 +17,9 @@ func CmdGetWriter() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 
-			queryClient := types.NewQueryServiceClient(clientCtx)
+			queryClient := types.NewQueryClient(clientCtx)
 
-			params := &types.QueryServiceWriterRequest{
+			params := &types.QueryWriterRequest{
 				OwnerAddress:  args[0],
 				TopicName:     args[1],
 				WriterAddress: args[2],
@@ -52,9 +52,9 @@ func CmdListWriters() *cobra.Command {
 				return err
 			}
 
-			queryClient := types.NewQueryServiceClient(clientCtx)
+			queryClient := types.NewQueryClient(clientCtx)
 
-			params := &types.QueryServiceWritersRequest{
+			params := &types.QueryWritersRequest{
 				OwnerAddress: args[0],
 				TopicName:    args[1],
 				Pagination:   pageReq,
