@@ -31,7 +31,7 @@ func (suite *aolMsgServerTestSuite) TestMsgServer() {
 	ownerAddress := suite.GetAccAddress()
 
 	// create topic
-	msgCreateTopic := aoltypes.MsgServiceCreateTopicRequest{
+	msgCreateTopic := aoltypes.MsgCreateTopicRequest{
 		TopicName:    topicName,
 		Description:  "topic description",
 		OwnerAddress: ownerAddress.String(),
@@ -54,7 +54,7 @@ func (suite *aolMsgServerTestSuite) TestMsgServer() {
 	// add writer
 	moniker := "testMoniker"
 	writerAddress := suite.GetAccAddress()
-	msgAddWriter := aoltypes.MsgServiceAddWriterRequest{
+	msgAddWriter := aoltypes.MsgAddWriterRequest{
 		TopicName:     topicName,
 		Moniker:       moniker,
 		Description:   "write Description",
@@ -68,7 +68,7 @@ func (suite *aolMsgServerTestSuite) TestMsgServer() {
 
 	// add writer2
 	writerAddress2 := suite.GetAccAddress()
-	msgAddWriter = aoltypes.MsgServiceAddWriterRequest{
+	msgAddWriter = aoltypes.MsgAddWriterRequest{
 		TopicName:     topicName,
 		Moniker:       moniker,
 		Description:   "write Description2",
@@ -103,7 +103,7 @@ func (suite *aolMsgServerTestSuite) TestMsgServer() {
 	suite.Require().Equal(msgAddWriter.Moniker, getWriterResponse.Writer.Moniker)
 
 	// add record
-	msgAddRecord := aoltypes.MsgServiceAddRecordRequest{
+	msgAddRecord := aoltypes.MsgAddRecordRequest{
 		TopicName:       topicName,
 		Key:             []byte("key1"),
 		Value:           []byte("value1"),
@@ -128,7 +128,7 @@ func (suite *aolMsgServerTestSuite) TestMsgServer() {
 	suite.Require().Equal(msgAddRecord.WriterAddress, getRecordResponse.Record.WriterAddress)
 
 	// add record2
-	msgAddRecord2 := aoltypes.MsgServiceAddRecordRequest{
+	msgAddRecord2 := aoltypes.MsgAddRecordRequest{
 		TopicName:       topicName,
 		Key:             []byte("key2"),
 		Value:           []byte("value2"),
@@ -164,7 +164,7 @@ func (suite *aolMsgServerTestSuite) TestMsgServer() {
 	suite.Require().Equal(uint64(2), getTopicResponse.Topic.TotalWriters)
 
 	// delete writer
-	msgDeleteWriter := aoltypes.MsgServiceDeleteWriterRequest{
+	msgDeleteWriter := aoltypes.MsgDeleteWriterRequest{
 		TopicName:     topicName,
 		WriterAddress: writerAddress2.String(),
 		OwnerAddress:  ownerAddress.String(),
