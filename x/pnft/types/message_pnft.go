@@ -5,7 +5,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func NewMsgServiceMintPNFTRequest(
+func NewMsgMintPNFTRequest(
 	denomId string,
 	id string,
 	name string,
@@ -14,8 +14,8 @@ func NewMsgServiceMintPNFTRequest(
 	uriHash string,
 	creator string,
 	data string,
-) *MsgServiceMintPNFTRequest {
-	return &MsgServiceMintPNFTRequest{
+) *MsgMintPNFTRequest {
+	return &MsgMintPNFTRequest{
 		DenomId:     denomId,
 		Id:          id,
 		Name:        name,
@@ -28,12 +28,12 @@ func NewMsgServiceMintPNFTRequest(
 }
 
 // GetSignBytes returns a byte array which is used to generate a signature for verifying DID ownership.
-func (msg *MsgServiceMintPNFTRequest) GetSignBytes() []byte {
+func (msg *MsgMintPNFTRequest) GetSignBytes() []byte {
 	bz := ModuleCdc.MustMarshalJSON(msg)
 	return sdk.MustSortJSON(bz)
 }
 
-func (msg *MsgServiceMintPNFTRequest) GetSigners() []sdk.AccAddress {
+func (msg *MsgMintPNFTRequest) GetSigners() []sdk.AccAddress {
 	from, err := sdk.AccAddressFromBech32(msg.Creator)
 	if err != nil {
 		panic(err)
@@ -41,7 +41,7 @@ func (msg *MsgServiceMintPNFTRequest) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{from}
 }
 
-func (msg *MsgServiceMintPNFTRequest) ValidateBasic() error {
+func (msg *MsgMintPNFTRequest) ValidateBasic() error {
 	if msg.DenomId == "" {
 		return fmt.Errorf("denomId cannot be empty")
 	}
@@ -65,13 +65,13 @@ func (msg *MsgServiceMintPNFTRequest) ValidateBasic() error {
 	return nil
 }
 
-func NewMsgServiceTransferPNFTRequest(
+func NewMsgTransferPNFTRequest(
 	denomId string,
 	id string,
 	sender string,
 	receiver string,
-) *MsgServiceTransferPNFTRequest {
-	return &MsgServiceTransferPNFTRequest{
+) *MsgTransferPNFTRequest {
+	return &MsgTransferPNFTRequest{
 		DenomId:  denomId,
 		Id:       id,
 		Sender:   sender,
@@ -80,12 +80,12 @@ func NewMsgServiceTransferPNFTRequest(
 }
 
 // GetSignBytes returns a byte array which is used to generate a signature for verifying DID ownership.
-func (msg *MsgServiceTransferPNFTRequest) GetSignBytes() []byte {
+func (msg *MsgTransferPNFTRequest) GetSignBytes() []byte {
 	bz := ModuleCdc.MustMarshalJSON(msg)
 	return sdk.MustSortJSON(bz)
 }
 
-func (msg *MsgServiceTransferPNFTRequest) GetSigners() []sdk.AccAddress {
+func (msg *MsgTransferPNFTRequest) GetSigners() []sdk.AccAddress {
 	from, err := sdk.AccAddressFromBech32(msg.Sender)
 	if err != nil {
 		panic(err)
@@ -93,7 +93,7 @@ func (msg *MsgServiceTransferPNFTRequest) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{from}
 }
 
-func (msg *MsgServiceTransferPNFTRequest) ValidateBasic() error {
+func (msg *MsgTransferPNFTRequest) ValidateBasic() error {
 	if msg.DenomId == "" {
 		return fmt.Errorf("denomId cannot be empty")
 	}
@@ -119,12 +119,12 @@ func (msg *MsgServiceTransferPNFTRequest) ValidateBasic() error {
 	return nil
 }
 
-func NewMsgServiceBurnPNFTRequest(
+func NewMsgBurnPNFTRequest(
 	denomId string,
 	id string,
 	bunner string,
-) *MsgServiceBurnPNFTRequest {
-	return &MsgServiceBurnPNFTRequest{
+) *MsgBurnPNFTRequest {
+	return &MsgBurnPNFTRequest{
 		DenomId: denomId,
 		Id:      id,
 		Burner:  bunner,
@@ -132,12 +132,12 @@ func NewMsgServiceBurnPNFTRequest(
 }
 
 // GetSignBytes returns a byte array which is used to generate a signature for verifying DID ownership.
-func (msg *MsgServiceBurnPNFTRequest) GetSignBytes() []byte {
+func (msg *MsgBurnPNFTRequest) GetSignBytes() []byte {
 	bz := ModuleCdc.MustMarshalJSON(msg)
 	return sdk.MustSortJSON(bz)
 }
 
-func (msg *MsgServiceBurnPNFTRequest) GetSigners() []sdk.AccAddress {
+func (msg *MsgBurnPNFTRequest) GetSigners() []sdk.AccAddress {
 	from, err := sdk.AccAddressFromBech32(msg.Burner)
 	if err != nil {
 		panic(err)
@@ -145,7 +145,7 @@ func (msg *MsgServiceBurnPNFTRequest) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{from}
 }
 
-func (msg *MsgServiceBurnPNFTRequest) ValidateBasic() error {
+func (msg *MsgBurnPNFTRequest) ValidateBasic() error {
 	if msg.DenomId == "" {
 		return fmt.Errorf("denomId cannot be empty")
 	}

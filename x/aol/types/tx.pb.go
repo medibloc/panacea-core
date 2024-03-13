@@ -28,24 +28,24 @@ var _ = math.Inf
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 // MsgCreateTopic defines the Msg/CreateTopic request type.
-type MsgServiceCreateTopicRequest struct {
+type MsgCreateTopicRequest struct {
 	TopicName    string `protobuf:"bytes,1,opt,name=topic_name,json=topicName,proto3" json:"topic_name,omitempty"`
 	Description  string `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
 	OwnerAddress string `protobuf:"bytes,3,opt,name=owner_address,json=ownerAddress,proto3" json:"owner_address,omitempty"`
 }
 
-func (m *MsgServiceCreateTopicRequest) Reset()         { *m = MsgServiceCreateTopicRequest{} }
-func (m *MsgServiceCreateTopicRequest) String() string { return proto.CompactTextString(m) }
-func (*MsgServiceCreateTopicRequest) ProtoMessage()    {}
-func (*MsgServiceCreateTopicRequest) Descriptor() ([]byte, []int) {
+func (m *MsgCreateTopicRequest) Reset()         { *m = MsgCreateTopicRequest{} }
+func (m *MsgCreateTopicRequest) String() string { return proto.CompactTextString(m) }
+func (*MsgCreateTopicRequest) ProtoMessage()    {}
+func (*MsgCreateTopicRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_e40917e58e4bb294, []int{0}
 }
-func (m *MsgServiceCreateTopicRequest) XXX_Unmarshal(b []byte) error {
+func (m *MsgCreateTopicRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *MsgServiceCreateTopicRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *MsgCreateTopicRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_MsgServiceCreateTopicRequest.Marshal(b, m, deterministic)
+		return xxx_messageInfo_MsgCreateTopicRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -55,33 +55,33 @@ func (m *MsgServiceCreateTopicRequest) XXX_Marshal(b []byte, deterministic bool)
 		return b[:n], nil
 	}
 }
-func (m *MsgServiceCreateTopicRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgServiceCreateTopicRequest.Merge(m, src)
+func (m *MsgCreateTopicRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgCreateTopicRequest.Merge(m, src)
 }
-func (m *MsgServiceCreateTopicRequest) XXX_Size() int {
+func (m *MsgCreateTopicRequest) XXX_Size() int {
 	return m.Size()
 }
-func (m *MsgServiceCreateTopicRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgServiceCreateTopicRequest.DiscardUnknown(m)
+func (m *MsgCreateTopicRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgCreateTopicRequest.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_MsgServiceCreateTopicRequest proto.InternalMessageInfo
+var xxx_messageInfo_MsgCreateTopicRequest proto.InternalMessageInfo
 
-func (m *MsgServiceCreateTopicRequest) GetTopicName() string {
+func (m *MsgCreateTopicRequest) GetTopicName() string {
 	if m != nil {
 		return m.TopicName
 	}
 	return ""
 }
 
-func (m *MsgServiceCreateTopicRequest) GetDescription() string {
+func (m *MsgCreateTopicRequest) GetDescription() string {
 	if m != nil {
 		return m.Description
 	}
 	return ""
 }
 
-func (m *MsgServiceCreateTopicRequest) GetOwnerAddress() string {
+func (m *MsgCreateTopicRequest) GetOwnerAddress() string {
 	if m != nil {
 		return m.OwnerAddress
 	}
@@ -89,21 +89,21 @@ func (m *MsgServiceCreateTopicRequest) GetOwnerAddress() string {
 }
 
 // MsgCreateTopicResponse defines the Msg/CreateTopic response type.
-type MsgServiceCreateTopicResponse struct {
+type MsgCreateTopicResponse struct {
 }
 
-func (m *MsgServiceCreateTopicResponse) Reset()         { *m = MsgServiceCreateTopicResponse{} }
-func (m *MsgServiceCreateTopicResponse) String() string { return proto.CompactTextString(m) }
-func (*MsgServiceCreateTopicResponse) ProtoMessage()    {}
-func (*MsgServiceCreateTopicResponse) Descriptor() ([]byte, []int) {
+func (m *MsgCreateTopicResponse) Reset()         { *m = MsgCreateTopicResponse{} }
+func (m *MsgCreateTopicResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgCreateTopicResponse) ProtoMessage()    {}
+func (*MsgCreateTopicResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_e40917e58e4bb294, []int{1}
 }
-func (m *MsgServiceCreateTopicResponse) XXX_Unmarshal(b []byte) error {
+func (m *MsgCreateTopicResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *MsgServiceCreateTopicResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *MsgCreateTopicResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_MsgServiceCreateTopicResponse.Marshal(b, m, deterministic)
+		return xxx_messageInfo_MsgCreateTopicResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -113,20 +113,20 @@ func (m *MsgServiceCreateTopicResponse) XXX_Marshal(b []byte, deterministic bool
 		return b[:n], nil
 	}
 }
-func (m *MsgServiceCreateTopicResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgServiceCreateTopicResponse.Merge(m, src)
+func (m *MsgCreateTopicResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgCreateTopicResponse.Merge(m, src)
 }
-func (m *MsgServiceCreateTopicResponse) XXX_Size() int {
+func (m *MsgCreateTopicResponse) XXX_Size() int {
 	return m.Size()
 }
-func (m *MsgServiceCreateTopicResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgServiceCreateTopicResponse.DiscardUnknown(m)
+func (m *MsgCreateTopicResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgCreateTopicResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_MsgServiceCreateTopicResponse proto.InternalMessageInfo
+var xxx_messageInfo_MsgCreateTopicResponse proto.InternalMessageInfo
 
 // MsgAddWriter defines the Msg/AddWriter request type.
-type MsgServiceAddWriterRequest struct {
+type MsgAddWriterRequest struct {
 	TopicName     string `protobuf:"bytes,1,opt,name=topic_name,json=topicName,proto3" json:"topic_name,omitempty"`
 	Moniker       string `protobuf:"bytes,2,opt,name=moniker,proto3" json:"moniker,omitempty"`
 	Description   string `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
@@ -134,18 +134,18 @@ type MsgServiceAddWriterRequest struct {
 	OwnerAddress  string `protobuf:"bytes,5,opt,name=owner_address,json=ownerAddress,proto3" json:"owner_address,omitempty"`
 }
 
-func (m *MsgServiceAddWriterRequest) Reset()         { *m = MsgServiceAddWriterRequest{} }
-func (m *MsgServiceAddWriterRequest) String() string { return proto.CompactTextString(m) }
-func (*MsgServiceAddWriterRequest) ProtoMessage()    {}
-func (*MsgServiceAddWriterRequest) Descriptor() ([]byte, []int) {
+func (m *MsgAddWriterRequest) Reset()         { *m = MsgAddWriterRequest{} }
+func (m *MsgAddWriterRequest) String() string { return proto.CompactTextString(m) }
+func (*MsgAddWriterRequest) ProtoMessage()    {}
+func (*MsgAddWriterRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_e40917e58e4bb294, []int{2}
 }
-func (m *MsgServiceAddWriterRequest) XXX_Unmarshal(b []byte) error {
+func (m *MsgAddWriterRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *MsgServiceAddWriterRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *MsgAddWriterRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_MsgServiceAddWriterRequest.Marshal(b, m, deterministic)
+		return xxx_messageInfo_MsgAddWriterRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -155,47 +155,47 @@ func (m *MsgServiceAddWriterRequest) XXX_Marshal(b []byte, deterministic bool) (
 		return b[:n], nil
 	}
 }
-func (m *MsgServiceAddWriterRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgServiceAddWriterRequest.Merge(m, src)
+func (m *MsgAddWriterRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgAddWriterRequest.Merge(m, src)
 }
-func (m *MsgServiceAddWriterRequest) XXX_Size() int {
+func (m *MsgAddWriterRequest) XXX_Size() int {
 	return m.Size()
 }
-func (m *MsgServiceAddWriterRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgServiceAddWriterRequest.DiscardUnknown(m)
+func (m *MsgAddWriterRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgAddWriterRequest.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_MsgServiceAddWriterRequest proto.InternalMessageInfo
+var xxx_messageInfo_MsgAddWriterRequest proto.InternalMessageInfo
 
-func (m *MsgServiceAddWriterRequest) GetTopicName() string {
+func (m *MsgAddWriterRequest) GetTopicName() string {
 	if m != nil {
 		return m.TopicName
 	}
 	return ""
 }
 
-func (m *MsgServiceAddWriterRequest) GetMoniker() string {
+func (m *MsgAddWriterRequest) GetMoniker() string {
 	if m != nil {
 		return m.Moniker
 	}
 	return ""
 }
 
-func (m *MsgServiceAddWriterRequest) GetDescription() string {
+func (m *MsgAddWriterRequest) GetDescription() string {
 	if m != nil {
 		return m.Description
 	}
 	return ""
 }
 
-func (m *MsgServiceAddWriterRequest) GetWriterAddress() string {
+func (m *MsgAddWriterRequest) GetWriterAddress() string {
 	if m != nil {
 		return m.WriterAddress
 	}
 	return ""
 }
 
-func (m *MsgServiceAddWriterRequest) GetOwnerAddress() string {
+func (m *MsgAddWriterRequest) GetOwnerAddress() string {
 	if m != nil {
 		return m.OwnerAddress
 	}
@@ -203,21 +203,21 @@ func (m *MsgServiceAddWriterRequest) GetOwnerAddress() string {
 }
 
 // MsgAddWriter defines the Msg/AddWriter response type.
-type MsgServiceAddWriterResponse struct {
+type MsgAddWriterResponse struct {
 }
 
-func (m *MsgServiceAddWriterResponse) Reset()         { *m = MsgServiceAddWriterResponse{} }
-func (m *MsgServiceAddWriterResponse) String() string { return proto.CompactTextString(m) }
-func (*MsgServiceAddWriterResponse) ProtoMessage()    {}
-func (*MsgServiceAddWriterResponse) Descriptor() ([]byte, []int) {
+func (m *MsgAddWriterResponse) Reset()         { *m = MsgAddWriterResponse{} }
+func (m *MsgAddWriterResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgAddWriterResponse) ProtoMessage()    {}
+func (*MsgAddWriterResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_e40917e58e4bb294, []int{3}
 }
-func (m *MsgServiceAddWriterResponse) XXX_Unmarshal(b []byte) error {
+func (m *MsgAddWriterResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *MsgServiceAddWriterResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *MsgAddWriterResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_MsgServiceAddWriterResponse.Marshal(b, m, deterministic)
+		return xxx_messageInfo_MsgAddWriterResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -227,37 +227,37 @@ func (m *MsgServiceAddWriterResponse) XXX_Marshal(b []byte, deterministic bool) 
 		return b[:n], nil
 	}
 }
-func (m *MsgServiceAddWriterResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgServiceAddWriterResponse.Merge(m, src)
+func (m *MsgAddWriterResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgAddWriterResponse.Merge(m, src)
 }
-func (m *MsgServiceAddWriterResponse) XXX_Size() int {
+func (m *MsgAddWriterResponse) XXX_Size() int {
 	return m.Size()
 }
-func (m *MsgServiceAddWriterResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgServiceAddWriterResponse.DiscardUnknown(m)
+func (m *MsgAddWriterResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgAddWriterResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_MsgServiceAddWriterResponse proto.InternalMessageInfo
+var xxx_messageInfo_MsgAddWriterResponse proto.InternalMessageInfo
 
 // MsgDeleteWriter defines the Msg/DeleteWriter request type.
-type MsgServiceDeleteWriterRequest struct {
+type MsgDeleteWriterRequest struct {
 	TopicName     string `protobuf:"bytes,1,opt,name=topic_name,json=topicName,proto3" json:"topic_name,omitempty"`
 	WriterAddress string `protobuf:"bytes,2,opt,name=writer_address,json=writerAddress,proto3" json:"writer_address,omitempty"`
 	OwnerAddress  string `protobuf:"bytes,3,opt,name=owner_address,json=ownerAddress,proto3" json:"owner_address,omitempty"`
 }
 
-func (m *MsgServiceDeleteWriterRequest) Reset()         { *m = MsgServiceDeleteWriterRequest{} }
-func (m *MsgServiceDeleteWriterRequest) String() string { return proto.CompactTextString(m) }
-func (*MsgServiceDeleteWriterRequest) ProtoMessage()    {}
-func (*MsgServiceDeleteWriterRequest) Descriptor() ([]byte, []int) {
+func (m *MsgDeleteWriterRequest) Reset()         { *m = MsgDeleteWriterRequest{} }
+func (m *MsgDeleteWriterRequest) String() string { return proto.CompactTextString(m) }
+func (*MsgDeleteWriterRequest) ProtoMessage()    {}
+func (*MsgDeleteWriterRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_e40917e58e4bb294, []int{4}
 }
-func (m *MsgServiceDeleteWriterRequest) XXX_Unmarshal(b []byte) error {
+func (m *MsgDeleteWriterRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *MsgServiceDeleteWriterRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *MsgDeleteWriterRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_MsgServiceDeleteWriterRequest.Marshal(b, m, deterministic)
+		return xxx_messageInfo_MsgDeleteWriterRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -267,33 +267,33 @@ func (m *MsgServiceDeleteWriterRequest) XXX_Marshal(b []byte, deterministic bool
 		return b[:n], nil
 	}
 }
-func (m *MsgServiceDeleteWriterRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgServiceDeleteWriterRequest.Merge(m, src)
+func (m *MsgDeleteWriterRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgDeleteWriterRequest.Merge(m, src)
 }
-func (m *MsgServiceDeleteWriterRequest) XXX_Size() int {
+func (m *MsgDeleteWriterRequest) XXX_Size() int {
 	return m.Size()
 }
-func (m *MsgServiceDeleteWriterRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgServiceDeleteWriterRequest.DiscardUnknown(m)
+func (m *MsgDeleteWriterRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgDeleteWriterRequest.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_MsgServiceDeleteWriterRequest proto.InternalMessageInfo
+var xxx_messageInfo_MsgDeleteWriterRequest proto.InternalMessageInfo
 
-func (m *MsgServiceDeleteWriterRequest) GetTopicName() string {
+func (m *MsgDeleteWriterRequest) GetTopicName() string {
 	if m != nil {
 		return m.TopicName
 	}
 	return ""
 }
 
-func (m *MsgServiceDeleteWriterRequest) GetWriterAddress() string {
+func (m *MsgDeleteWriterRequest) GetWriterAddress() string {
 	if m != nil {
 		return m.WriterAddress
 	}
 	return ""
 }
 
-func (m *MsgServiceDeleteWriterRequest) GetOwnerAddress() string {
+func (m *MsgDeleteWriterRequest) GetOwnerAddress() string {
 	if m != nil {
 		return m.OwnerAddress
 	}
@@ -301,21 +301,21 @@ func (m *MsgServiceDeleteWriterRequest) GetOwnerAddress() string {
 }
 
 // MsgDeleteWriter defines the Msg/DeleteWriter response type.
-type MsgServiceDeleteWriterResponse struct {
+type MsgDeleteWriterResponse struct {
 }
 
-func (m *MsgServiceDeleteWriterResponse) Reset()         { *m = MsgServiceDeleteWriterResponse{} }
-func (m *MsgServiceDeleteWriterResponse) String() string { return proto.CompactTextString(m) }
-func (*MsgServiceDeleteWriterResponse) ProtoMessage()    {}
-func (*MsgServiceDeleteWriterResponse) Descriptor() ([]byte, []int) {
+func (m *MsgDeleteWriterResponse) Reset()         { *m = MsgDeleteWriterResponse{} }
+func (m *MsgDeleteWriterResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgDeleteWriterResponse) ProtoMessage()    {}
+func (*MsgDeleteWriterResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_e40917e58e4bb294, []int{5}
 }
-func (m *MsgServiceDeleteWriterResponse) XXX_Unmarshal(b []byte) error {
+func (m *MsgDeleteWriterResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *MsgServiceDeleteWriterResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *MsgDeleteWriterResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_MsgServiceDeleteWriterResponse.Marshal(b, m, deterministic)
+		return xxx_messageInfo_MsgDeleteWriterResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -325,20 +325,20 @@ func (m *MsgServiceDeleteWriterResponse) XXX_Marshal(b []byte, deterministic boo
 		return b[:n], nil
 	}
 }
-func (m *MsgServiceDeleteWriterResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgServiceDeleteWriterResponse.Merge(m, src)
+func (m *MsgDeleteWriterResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgDeleteWriterResponse.Merge(m, src)
 }
-func (m *MsgServiceDeleteWriterResponse) XXX_Size() int {
+func (m *MsgDeleteWriterResponse) XXX_Size() int {
 	return m.Size()
 }
-func (m *MsgServiceDeleteWriterResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgServiceDeleteWriterResponse.DiscardUnknown(m)
+func (m *MsgDeleteWriterResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgDeleteWriterResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_MsgServiceDeleteWriterResponse proto.InternalMessageInfo
+var xxx_messageInfo_MsgDeleteWriterResponse proto.InternalMessageInfo
 
 // MsgAddRecord defines the Msg/AddRecord request type.
-type MsgServiceAddRecordRequest struct {
+type MsgAddRecordRequest struct {
 	TopicName       string `protobuf:"bytes,1,opt,name=topic_name,json=topicName,proto3" json:"topic_name,omitempty"`
 	Key             []byte `protobuf:"bytes,2,opt,name=key,proto3" json:"key,omitempty"`
 	Value           []byte `protobuf:"bytes,3,opt,name=value,proto3" json:"value,omitempty"`
@@ -347,18 +347,18 @@ type MsgServiceAddRecordRequest struct {
 	FeePayerAddress string `protobuf:"bytes,6,opt,name=fee_payer_address,json=feePayerAddress,proto3" json:"fee_payer_address,omitempty"`
 }
 
-func (m *MsgServiceAddRecordRequest) Reset()         { *m = MsgServiceAddRecordRequest{} }
-func (m *MsgServiceAddRecordRequest) String() string { return proto.CompactTextString(m) }
-func (*MsgServiceAddRecordRequest) ProtoMessage()    {}
-func (*MsgServiceAddRecordRequest) Descriptor() ([]byte, []int) {
+func (m *MsgAddRecordRequest) Reset()         { *m = MsgAddRecordRequest{} }
+func (m *MsgAddRecordRequest) String() string { return proto.CompactTextString(m) }
+func (*MsgAddRecordRequest) ProtoMessage()    {}
+func (*MsgAddRecordRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_e40917e58e4bb294, []int{6}
 }
-func (m *MsgServiceAddRecordRequest) XXX_Unmarshal(b []byte) error {
+func (m *MsgAddRecordRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *MsgServiceAddRecordRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *MsgAddRecordRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_MsgServiceAddRecordRequest.Marshal(b, m, deterministic)
+		return xxx_messageInfo_MsgAddRecordRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -368,54 +368,54 @@ func (m *MsgServiceAddRecordRequest) XXX_Marshal(b []byte, deterministic bool) (
 		return b[:n], nil
 	}
 }
-func (m *MsgServiceAddRecordRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgServiceAddRecordRequest.Merge(m, src)
+func (m *MsgAddRecordRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgAddRecordRequest.Merge(m, src)
 }
-func (m *MsgServiceAddRecordRequest) XXX_Size() int {
+func (m *MsgAddRecordRequest) XXX_Size() int {
 	return m.Size()
 }
-func (m *MsgServiceAddRecordRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgServiceAddRecordRequest.DiscardUnknown(m)
+func (m *MsgAddRecordRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgAddRecordRequest.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_MsgServiceAddRecordRequest proto.InternalMessageInfo
+var xxx_messageInfo_MsgAddRecordRequest proto.InternalMessageInfo
 
-func (m *MsgServiceAddRecordRequest) GetTopicName() string {
+func (m *MsgAddRecordRequest) GetTopicName() string {
 	if m != nil {
 		return m.TopicName
 	}
 	return ""
 }
 
-func (m *MsgServiceAddRecordRequest) GetKey() []byte {
+func (m *MsgAddRecordRequest) GetKey() []byte {
 	if m != nil {
 		return m.Key
 	}
 	return nil
 }
 
-func (m *MsgServiceAddRecordRequest) GetValue() []byte {
+func (m *MsgAddRecordRequest) GetValue() []byte {
 	if m != nil {
 		return m.Value
 	}
 	return nil
 }
 
-func (m *MsgServiceAddRecordRequest) GetWriterAddress() string {
+func (m *MsgAddRecordRequest) GetWriterAddress() string {
 	if m != nil {
 		return m.WriterAddress
 	}
 	return ""
 }
 
-func (m *MsgServiceAddRecordRequest) GetOwnerAddress() string {
+func (m *MsgAddRecordRequest) GetOwnerAddress() string {
 	if m != nil {
 		return m.OwnerAddress
 	}
 	return ""
 }
 
-func (m *MsgServiceAddRecordRequest) GetFeePayerAddress() string {
+func (m *MsgAddRecordRequest) GetFeePayerAddress() string {
 	if m != nil {
 		return m.FeePayerAddress
 	}
@@ -423,24 +423,24 @@ func (m *MsgServiceAddRecordRequest) GetFeePayerAddress() string {
 }
 
 // MsgAddRecordResponse defines the Msg/AddRecordResponse response type.
-type MsgServiceAddRecordResponse struct {
+type MsgAddRecordResponse struct {
 	OwnerAddress string `protobuf:"bytes,1,opt,name=owner_address,json=ownerAddress,proto3" json:"owner_address,omitempty"`
 	TopicName    string `protobuf:"bytes,2,opt,name=topic_name,json=topicName,proto3" json:"topic_name,omitempty"`
 	Offset       uint64 `protobuf:"varint,3,opt,name=offset,proto3" json:"offset,omitempty"`
 }
 
-func (m *MsgServiceAddRecordResponse) Reset()         { *m = MsgServiceAddRecordResponse{} }
-func (m *MsgServiceAddRecordResponse) String() string { return proto.CompactTextString(m) }
-func (*MsgServiceAddRecordResponse) ProtoMessage()    {}
-func (*MsgServiceAddRecordResponse) Descriptor() ([]byte, []int) {
+func (m *MsgAddRecordResponse) Reset()         { *m = MsgAddRecordResponse{} }
+func (m *MsgAddRecordResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgAddRecordResponse) ProtoMessage()    {}
+func (*MsgAddRecordResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_e40917e58e4bb294, []int{7}
 }
-func (m *MsgServiceAddRecordResponse) XXX_Unmarshal(b []byte) error {
+func (m *MsgAddRecordResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *MsgServiceAddRecordResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *MsgAddRecordResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_MsgServiceAddRecordResponse.Marshal(b, m, deterministic)
+		return xxx_messageInfo_MsgAddRecordResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -450,33 +450,33 @@ func (m *MsgServiceAddRecordResponse) XXX_Marshal(b []byte, deterministic bool) 
 		return b[:n], nil
 	}
 }
-func (m *MsgServiceAddRecordResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgServiceAddRecordResponse.Merge(m, src)
+func (m *MsgAddRecordResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgAddRecordResponse.Merge(m, src)
 }
-func (m *MsgServiceAddRecordResponse) XXX_Size() int {
+func (m *MsgAddRecordResponse) XXX_Size() int {
 	return m.Size()
 }
-func (m *MsgServiceAddRecordResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgServiceAddRecordResponse.DiscardUnknown(m)
+func (m *MsgAddRecordResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgAddRecordResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_MsgServiceAddRecordResponse proto.InternalMessageInfo
+var xxx_messageInfo_MsgAddRecordResponse proto.InternalMessageInfo
 
-func (m *MsgServiceAddRecordResponse) GetOwnerAddress() string {
+func (m *MsgAddRecordResponse) GetOwnerAddress() string {
 	if m != nil {
 		return m.OwnerAddress
 	}
 	return ""
 }
 
-func (m *MsgServiceAddRecordResponse) GetTopicName() string {
+func (m *MsgAddRecordResponse) GetTopicName() string {
 	if m != nil {
 		return m.TopicName
 	}
 	return ""
 }
 
-func (m *MsgServiceAddRecordResponse) GetOffset() uint64 {
+func (m *MsgAddRecordResponse) GetOffset() uint64 {
 	if m != nil {
 		return m.Offset
 	}
@@ -484,52 +484,52 @@ func (m *MsgServiceAddRecordResponse) GetOffset() uint64 {
 }
 
 func init() {
-	proto.RegisterType((*MsgServiceCreateTopicRequest)(nil), "panacea.aol.v2.MsgServiceCreateTopicRequest")
-	proto.RegisterType((*MsgServiceCreateTopicResponse)(nil), "panacea.aol.v2.MsgServiceCreateTopicResponse")
-	proto.RegisterType((*MsgServiceAddWriterRequest)(nil), "panacea.aol.v2.MsgServiceAddWriterRequest")
-	proto.RegisterType((*MsgServiceAddWriterResponse)(nil), "panacea.aol.v2.MsgServiceAddWriterResponse")
-	proto.RegisterType((*MsgServiceDeleteWriterRequest)(nil), "panacea.aol.v2.MsgServiceDeleteWriterRequest")
-	proto.RegisterType((*MsgServiceDeleteWriterResponse)(nil), "panacea.aol.v2.MsgServiceDeleteWriterResponse")
-	proto.RegisterType((*MsgServiceAddRecordRequest)(nil), "panacea.aol.v2.MsgServiceAddRecordRequest")
-	proto.RegisterType((*MsgServiceAddRecordResponse)(nil), "panacea.aol.v2.MsgServiceAddRecordResponse")
+	proto.RegisterType((*MsgCreateTopicRequest)(nil), "panacea.aol.v2.MsgCreateTopicRequest")
+	proto.RegisterType((*MsgCreateTopicResponse)(nil), "panacea.aol.v2.MsgCreateTopicResponse")
+	proto.RegisterType((*MsgAddWriterRequest)(nil), "panacea.aol.v2.MsgAddWriterRequest")
+	proto.RegisterType((*MsgAddWriterResponse)(nil), "panacea.aol.v2.MsgAddWriterResponse")
+	proto.RegisterType((*MsgDeleteWriterRequest)(nil), "panacea.aol.v2.MsgDeleteWriterRequest")
+	proto.RegisterType((*MsgDeleteWriterResponse)(nil), "panacea.aol.v2.MsgDeleteWriterResponse")
+	proto.RegisterType((*MsgAddRecordRequest)(nil), "panacea.aol.v2.MsgAddRecordRequest")
+	proto.RegisterType((*MsgAddRecordResponse)(nil), "panacea.aol.v2.MsgAddRecordResponse")
 }
 
 func init() { proto.RegisterFile("panacea/aol/v2/tx.proto", fileDescriptor_e40917e58e4bb294) }
 
 var fileDescriptor_e40917e58e4bb294 = []byte{
-	// 512 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x94, 0xcf, 0x6e, 0xd3, 0x40,
-	0x10, 0xc6, 0xb3, 0x49, 0x1b, 0x94, 0x69, 0x5a, 0x60, 0x85, 0x20, 0x0a, 0xc4, 0x44, 0x41, 0x48,
-	0xa8, 0xb4, 0xb6, 0x14, 0x9e, 0xa0, 0xc0, 0x81, 0x0b, 0xa8, 0x32, 0x48, 0x48, 0x5c, 0xa2, 0x8d,
-	0x3d, 0x29, 0xa6, 0xb6, 0xd7, 0xac, 0x37, 0x69, 0x73, 0xe7, 0xc4, 0x89, 0x77, 0xe1, 0x11, 0xb8,
-	0x70, 0xec, 0x11, 0x89, 0x0b, 0x4a, 0x5e, 0x04, 0x65, 0xbd, 0x69, 0x6d, 0xc7, 0x69, 0x8c, 0xc4,
-	0x2d, 0x33, 0xfe, 0xe2, 0xf9, 0x7e, 0xf3, 0xc7, 0x70, 0x2f, 0x62, 0x21, 0x73, 0x90, 0x59, 0x8c,
-	0xfb, 0xd6, 0xa4, 0x6f, 0xc9, 0x73, 0x33, 0x12, 0x5c, 0x72, 0xba, 0xa7, 0x1f, 0x98, 0x8c, 0xfb,
-	0xe6, 0xa4, 0xdf, 0xfb, 0x42, 0xe0, 0xc1, 0xeb, 0xf8, 0xe4, 0x2d, 0x8a, 0x89, 0xe7, 0xe0, 0x0b,
-	0x81, 0x4c, 0xe2, 0x3b, 0x1e, 0x79, 0x8e, 0x8d, 0x9f, 0xc7, 0x18, 0x4b, 0xda, 0x01, 0x90, 0x8b,
-	0x78, 0x10, 0xb2, 0x00, 0x5b, 0xa4, 0x4b, 0x9e, 0x34, 0xec, 0x86, 0xca, 0xbc, 0x61, 0x01, 0xd2,
-	0x2e, 0xec, 0xb8, 0x18, 0x3b, 0xc2, 0x8b, 0xa4, 0xc7, 0xc3, 0x56, 0x55, 0x3d, 0x4f, 0xa7, 0xe8,
-	0x23, 0xd8, 0xe5, 0x67, 0x21, 0x8a, 0x01, 0x73, 0x5d, 0x81, 0x71, 0xdc, 0xaa, 0x29, 0x4d, 0x53,
-	0x25, 0x8f, 0x92, 0x5c, 0xef, 0x21, 0x74, 0xd6, 0xb8, 0x88, 0x23, 0x1e, 0xc6, 0xd8, 0xfb, 0x41,
-	0xa0, 0x7d, 0xa5, 0x38, 0x72, 0xdd, 0xf7, 0xc2, 0x93, 0x28, 0x4a, 0xba, 0x6c, 0xc1, 0x8d, 0x80,
-	0x87, 0xde, 0x29, 0x0a, 0xed, 0x70, 0x19, 0xe6, 0xfd, 0xd7, 0x56, 0xfd, 0x3f, 0x86, 0xbd, 0x33,
-	0x55, 0xeb, 0x12, 0x60, 0x4b, 0x89, 0x76, 0x93, 0xac, 0x26, 0x58, 0xc5, 0xdc, 0x2e, 0xc0, 0xec,
-	0xc0, 0xfd, 0x42, 0x08, 0x0d, 0xf9, 0x95, 0xa4, 0xdb, 0xf0, 0x12, 0x7d, 0x94, 0xf8, 0x4f, 0x9c,
-	0xab, 0x5e, 0xab, 0xa5, 0xbc, 0x16, 0x8d, 0xa4, 0x0b, 0xc6, 0x3a, 0x2f, 0xda, 0xee, 0xef, 0xfc,
-	0x4c, 0x6c, 0x74, 0xb8, 0x70, 0x4b, 0x7a, 0xbd, 0x05, 0xb5, 0x53, 0x9c, 0x2a, 0x83, 0x4d, 0x7b,
-	0xf1, 0x93, 0xde, 0x81, 0xed, 0x09, 0xf3, 0xc7, 0xa8, 0xec, 0x34, 0xed, 0x24, 0xf8, 0x9f, 0xfd,
-	0xa7, 0xfb, 0x70, 0x7b, 0x84, 0x38, 0x88, 0xd8, 0x34, 0x25, 0xac, 0x2b, 0xe1, 0xcd, 0x11, 0xe2,
-	0xf1, 0x22, 0xbf, 0xe4, 0x9f, 0xe6, 0x66, 0xb5, 0x84, 0x4b, 0xe0, 0x57, 0xeb, 0x91, 0x82, 0x7a,
-	0xd9, 0x16, 0x54, 0xf3, 0x2d, 0xb8, 0x0b, 0x75, 0x3e, 0x1a, 0xc5, 0x28, 0x15, 0xf1, 0x96, 0xad,
-	0xa3, 0xfe, 0xf7, 0x1a, 0xc0, 0x55, 0x6d, 0xfa, 0x09, 0x76, 0x52, 0x27, 0x41, 0x0f, 0xcc, 0xec,
-	0x0d, 0x9b, 0xd7, 0xdd, 0x6f, 0xfb, 0xb0, 0xa4, 0x5a, 0x63, 0xb9, 0xd0, 0xb8, 0xdc, 0x4b, 0xba,
-	0xbf, 0xfe, 0xbf, 0xf9, 0x0b, 0x6c, 0x3f, 0x2d, 0xa5, 0xd5, 0x55, 0x02, 0x68, 0xa6, 0x37, 0x8a,
-	0x5e, 0x63, 0xb2, 0xe0, 0x0a, 0xda, 0x66, 0x59, 0x79, 0x06, 0x2a, 0x19, 0xe0, 0x06, 0xa8, 0xcc,
-	0x0a, 0x6f, 0x80, 0xca, 0x6e, 0xc4, 0xf3, 0x57, 0x3f, 0x67, 0x06, 0xb9, 0x98, 0x19, 0xe4, 0xcf,
-	0xcc, 0x20, 0xdf, 0xe6, 0x46, 0xe5, 0x62, 0x6e, 0x54, 0x7e, 0xcd, 0x8d, 0xca, 0x31, 0xf9, 0x70,
-	0x70, 0xe2, 0xc9, 0x8f, 0xe3, 0xa1, 0xe9, 0xf0, 0xc0, 0x0a, 0xd0, 0xf5, 0x86, 0x3e, 0x77, 0x2c,
-	0xfd, 0xee, 0x43, 0x87, 0x0b, 0xb4, 0xce, 0xd5, 0xa7, 0x5a, 0x4e, 0x23, 0x8c, 0x87, 0x75, 0xf5,
-	0xad, 0x7e, 0xf6, 0x37, 0x00, 0x00, 0xff, 0xff, 0x36, 0x58, 0x5c, 0x0b, 0xc6, 0x05, 0x00, 0x00,
+	// 509 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x94, 0xc1, 0x6e, 0xd3, 0x40,
+	0x10, 0x86, 0xe3, 0xa4, 0x0d, 0xca, 0x34, 0x2d, 0xb0, 0x94, 0xd4, 0x44, 0xc2, 0xaa, 0x52, 0x0a,
+	0x08, 0x81, 0x2d, 0x85, 0x27, 0x28, 0x70, 0xe0, 0x12, 0x54, 0x59, 0x08, 0x24, 0x84, 0x14, 0x6d,
+	0xec, 0x49, 0xb0, 0x6a, 0x7b, 0xcd, 0xee, 0x26, 0x6d, 0x0e, 0x9c, 0x78, 0x01, 0x1e, 0x88, 0x07,
+	0xe0, 0xd8, 0x03, 0x07, 0x8e, 0x28, 0x79, 0x05, 0x1e, 0x00, 0x65, 0xbd, 0x89, 0xe2, 0xd8, 0x25,
+	0x41, 0xea, 0xcd, 0x33, 0xfb, 0x7b, 0xe7, 0xfb, 0x77, 0x67, 0x16, 0x0e, 0x12, 0x1a, 0x53, 0x0f,
+	0xa9, 0x43, 0x59, 0xe8, 0x8c, 0xda, 0x8e, 0xbc, 0xb0, 0x13, 0xce, 0x24, 0x23, 0x7b, 0x7a, 0xc1,
+	0xa6, 0x2c, 0xb4, 0x47, 0xed, 0xd6, 0x17, 0xb8, 0xdb, 0x11, 0x83, 0x97, 0x1c, 0xa9, 0xc4, 0xb7,
+	0x2c, 0x09, 0x3c, 0x17, 0x3f, 0x0f, 0x51, 0x48, 0x72, 0x1f, 0x40, 0xce, 0xe2, 0x6e, 0x4c, 0x23,
+	0x34, 0x8d, 0x43, 0xe3, 0x71, 0xcd, 0xad, 0xa9, 0xcc, 0x1b, 0x1a, 0x21, 0x39, 0x84, 0x1d, 0x1f,
+	0x85, 0xc7, 0x83, 0x44, 0x06, 0x2c, 0x36, 0xcb, 0x6a, 0x7d, 0x39, 0x45, 0x8e, 0x60, 0x97, 0x9d,
+	0xc7, 0xc8, 0xbb, 0xd4, 0xf7, 0x39, 0x0a, 0x61, 0x56, 0x94, 0xa6, 0xae, 0x92, 0x27, 0x69, 0xae,
+	0x65, 0x42, 0x63, 0xb5, 0xbc, 0x48, 0x58, 0x2c, 0xb0, 0xf5, 0xdd, 0x80, 0x3b, 0x1d, 0x31, 0x38,
+	0xf1, 0xfd, 0xf7, 0x3c, 0x90, 0xc8, 0x37, 0xe4, 0x32, 0xe1, 0x46, 0xc4, 0xe2, 0xe0, 0x0c, 0xb9,
+	0x66, 0x9a, 0x87, 0xab, 0xc4, 0x95, 0x3c, 0xf1, 0x31, 0xec, 0x9d, 0xab, 0x5a, 0x0b, 0xe4, 0x2d,
+	0x25, 0xda, 0x4d, 0xb3, 0x9a, 0x39, 0x6f, 0x6c, 0xbb, 0xc0, 0x58, 0x03, 0xf6, 0xb3, 0xf4, 0xda,
+	0xd6, 0x57, 0x43, 0x39, 0x7e, 0x85, 0x21, 0x4a, 0xfc, 0x2f, 0x67, 0x79, 0xba, 0xf2, 0x46, 0x74,
+	0x45, 0xc7, 0x7e, 0x0f, 0x0e, 0x72, 0x10, 0x1a, 0xf0, 0xe7, 0xe2, 0xdc, 0x5d, 0xf4, 0x18, 0xf7,
+	0x37, 0xa4, 0xbb, 0x05, 0x95, 0x33, 0x1c, 0x2b, 0xa4, 0xba, 0x3b, 0xfb, 0x24, 0xfb, 0xb0, 0x3d,
+	0xa2, 0xe1, 0x10, 0x15, 0x40, 0xdd, 0x4d, 0x83, 0xeb, 0x3c, 0x63, 0xf2, 0x04, 0x6e, 0xf7, 0x11,
+	0xbb, 0x09, 0x1d, 0x2f, 0x09, 0xab, 0x4a, 0x78, 0xb3, 0x8f, 0x78, 0x3a, 0xcb, 0xcf, 0x1d, 0xf3,
+	0xf9, 0x7d, 0xcc, 0x5d, 0xa5, 0x76, 0xf3, 0x85, 0x8c, 0x82, 0x42, 0x59, 0xef, 0xe5, 0x55, 0xef,
+	0x0d, 0xa8, 0xb2, 0x7e, 0x5f, 0xa0, 0x54, 0x56, 0xb7, 0x5c, 0x1d, 0xb5, 0xff, 0x94, 0xa1, 0xd2,
+	0x11, 0x03, 0xf2, 0x11, 0x76, 0x96, 0x3a, 0x9c, 0x1c, 0xdb, 0xd9, 0x19, 0xb4, 0x0b, 0x07, 0xb0,
+	0xf9, 0x70, 0x9d, 0x4c, 0x3b, 0x78, 0x07, 0xb5, 0x45, 0x9b, 0x91, 0xa3, 0x82, 0x9f, 0x56, 0x47,
+	0xa8, 0xf9, 0xe0, 0xdf, 0x22, 0xbd, 0x6f, 0x17, 0xea, 0xcb, 0x0d, 0x42, 0x8a, 0x78, 0x0a, 0xda,
+	0xb8, 0xf9, 0x68, 0xad, 0x2e, 0x03, 0x9e, 0xde, 0xc7, 0x55, 0xe0, 0x99, 0x1e, 0xbc, 0x0a, 0x3c,
+	0x7b, 0xa5, 0x2f, 0x5e, 0xff, 0x98, 0x58, 0xc6, 0xe5, 0xc4, 0x32, 0x7e, 0x4f, 0x2c, 0xe3, 0xdb,
+	0xd4, 0x2a, 0x5d, 0x4e, 0xad, 0xd2, 0xaf, 0xa9, 0x55, 0x3a, 0x35, 0x3e, 0x3c, 0x1d, 0x04, 0xf2,
+	0xd3, 0xb0, 0x67, 0x7b, 0x2c, 0x72, 0x22, 0xf4, 0x83, 0x5e, 0xc8, 0x3c, 0x47, 0x6f, 0xfa, 0xcc,
+	0x63, 0x1c, 0x9d, 0x0b, 0xf5, 0x64, 0xca, 0x71, 0x82, 0xa2, 0x57, 0x55, 0x6f, 0xe6, 0xf3, 0xbf,
+	0x01, 0x00, 0x00, 0xff, 0xff, 0x5a, 0x60, 0xa2, 0xc4, 0x4e, 0x05, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -540,197 +540,197 @@ var _ grpc.ClientConn
 // is compatible with the grpc package it is being compiled against.
 const _ = grpc.SupportPackageIsVersion4
 
-// MsgServiceClient is the client API for MsgService service.
+// MsgClient is the client API for Msg service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
-type MsgServiceClient interface {
+type MsgClient interface {
 	// CreateTopic defines a method for creating a topic.
-	CreateTopic(ctx context.Context, in *MsgServiceCreateTopicRequest, opts ...grpc.CallOption) (*MsgServiceCreateTopicResponse, error)
+	CreateTopic(ctx context.Context, in *MsgCreateTopicRequest, opts ...grpc.CallOption) (*MsgCreateTopicResponse, error)
 	// AddWriter defines a method for adding a writer to the topic.
-	AddWriter(ctx context.Context, in *MsgServiceAddWriterRequest, opts ...grpc.CallOption) (*MsgServiceAddWriterResponse, error)
+	AddWriter(ctx context.Context, in *MsgAddWriterRequest, opts ...grpc.CallOption) (*MsgAddWriterResponse, error)
 	// DeleteWriter defines a method for deleting a writer to the topic.
-	DeleteWriter(ctx context.Context, in *MsgServiceDeleteWriterRequest, opts ...grpc.CallOption) (*MsgServiceDeleteWriterResponse, error)
+	DeleteWriter(ctx context.Context, in *MsgDeleteWriterRequest, opts ...grpc.CallOption) (*MsgDeleteWriterResponse, error)
 	// AddRecord defines a method for adding a record to the topic with the
 	// writer.
-	AddRecord(ctx context.Context, in *MsgServiceAddRecordRequest, opts ...grpc.CallOption) (*MsgServiceAddRecordResponse, error)
+	AddRecord(ctx context.Context, in *MsgAddRecordRequest, opts ...grpc.CallOption) (*MsgAddRecordResponse, error)
 }
 
-type msgServiceClient struct {
+type msgClient struct {
 	cc grpc1.ClientConn
 }
 
-func NewMsgServiceClient(cc grpc1.ClientConn) MsgServiceClient {
-	return &msgServiceClient{cc}
+func NewMsgClient(cc grpc1.ClientConn) MsgClient {
+	return &msgClient{cc}
 }
 
-func (c *msgServiceClient) CreateTopic(ctx context.Context, in *MsgServiceCreateTopicRequest, opts ...grpc.CallOption) (*MsgServiceCreateTopicResponse, error) {
-	out := new(MsgServiceCreateTopicResponse)
-	err := c.cc.Invoke(ctx, "/panacea.aol.v2.MsgService/CreateTopic", in, out, opts...)
+func (c *msgClient) CreateTopic(ctx context.Context, in *MsgCreateTopicRequest, opts ...grpc.CallOption) (*MsgCreateTopicResponse, error) {
+	out := new(MsgCreateTopicResponse)
+	err := c.cc.Invoke(ctx, "/panacea.aol.v2.Msg/CreateTopic", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *msgServiceClient) AddWriter(ctx context.Context, in *MsgServiceAddWriterRequest, opts ...grpc.CallOption) (*MsgServiceAddWriterResponse, error) {
-	out := new(MsgServiceAddWriterResponse)
-	err := c.cc.Invoke(ctx, "/panacea.aol.v2.MsgService/AddWriter", in, out, opts...)
+func (c *msgClient) AddWriter(ctx context.Context, in *MsgAddWriterRequest, opts ...grpc.CallOption) (*MsgAddWriterResponse, error) {
+	out := new(MsgAddWriterResponse)
+	err := c.cc.Invoke(ctx, "/panacea.aol.v2.Msg/AddWriter", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *msgServiceClient) DeleteWriter(ctx context.Context, in *MsgServiceDeleteWriterRequest, opts ...grpc.CallOption) (*MsgServiceDeleteWriterResponse, error) {
-	out := new(MsgServiceDeleteWriterResponse)
-	err := c.cc.Invoke(ctx, "/panacea.aol.v2.MsgService/DeleteWriter", in, out, opts...)
+func (c *msgClient) DeleteWriter(ctx context.Context, in *MsgDeleteWriterRequest, opts ...grpc.CallOption) (*MsgDeleteWriterResponse, error) {
+	out := new(MsgDeleteWriterResponse)
+	err := c.cc.Invoke(ctx, "/panacea.aol.v2.Msg/DeleteWriter", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *msgServiceClient) AddRecord(ctx context.Context, in *MsgServiceAddRecordRequest, opts ...grpc.CallOption) (*MsgServiceAddRecordResponse, error) {
-	out := new(MsgServiceAddRecordResponse)
-	err := c.cc.Invoke(ctx, "/panacea.aol.v2.MsgService/AddRecord", in, out, opts...)
+func (c *msgClient) AddRecord(ctx context.Context, in *MsgAddRecordRequest, opts ...grpc.CallOption) (*MsgAddRecordResponse, error) {
+	out := new(MsgAddRecordResponse)
+	err := c.cc.Invoke(ctx, "/panacea.aol.v2.Msg/AddRecord", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// MsgServiceServer is the server API for MsgService service.
-type MsgServiceServer interface {
+// MsgServer is the server API for Msg service.
+type MsgServer interface {
 	// CreateTopic defines a method for creating a topic.
-	CreateTopic(context.Context, *MsgServiceCreateTopicRequest) (*MsgServiceCreateTopicResponse, error)
+	CreateTopic(context.Context, *MsgCreateTopicRequest) (*MsgCreateTopicResponse, error)
 	// AddWriter defines a method for adding a writer to the topic.
-	AddWriter(context.Context, *MsgServiceAddWriterRequest) (*MsgServiceAddWriterResponse, error)
+	AddWriter(context.Context, *MsgAddWriterRequest) (*MsgAddWriterResponse, error)
 	// DeleteWriter defines a method for deleting a writer to the topic.
-	DeleteWriter(context.Context, *MsgServiceDeleteWriterRequest) (*MsgServiceDeleteWriterResponse, error)
+	DeleteWriter(context.Context, *MsgDeleteWriterRequest) (*MsgDeleteWriterResponse, error)
 	// AddRecord defines a method for adding a record to the topic with the
 	// writer.
-	AddRecord(context.Context, *MsgServiceAddRecordRequest) (*MsgServiceAddRecordResponse, error)
+	AddRecord(context.Context, *MsgAddRecordRequest) (*MsgAddRecordResponse, error)
 }
 
-// UnimplementedMsgServiceServer can be embedded to have forward compatible implementations.
-type UnimplementedMsgServiceServer struct {
+// UnimplementedMsgServer can be embedded to have forward compatible implementations.
+type UnimplementedMsgServer struct {
 }
 
-func (*UnimplementedMsgServiceServer) CreateTopic(ctx context.Context, req *MsgServiceCreateTopicRequest) (*MsgServiceCreateTopicResponse, error) {
+func (*UnimplementedMsgServer) CreateTopic(ctx context.Context, req *MsgCreateTopicRequest) (*MsgCreateTopicResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateTopic not implemented")
 }
-func (*UnimplementedMsgServiceServer) AddWriter(ctx context.Context, req *MsgServiceAddWriterRequest) (*MsgServiceAddWriterResponse, error) {
+func (*UnimplementedMsgServer) AddWriter(ctx context.Context, req *MsgAddWriterRequest) (*MsgAddWriterResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddWriter not implemented")
 }
-func (*UnimplementedMsgServiceServer) DeleteWriter(ctx context.Context, req *MsgServiceDeleteWriterRequest) (*MsgServiceDeleteWriterResponse, error) {
+func (*UnimplementedMsgServer) DeleteWriter(ctx context.Context, req *MsgDeleteWriterRequest) (*MsgDeleteWriterResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteWriter not implemented")
 }
-func (*UnimplementedMsgServiceServer) AddRecord(ctx context.Context, req *MsgServiceAddRecordRequest) (*MsgServiceAddRecordResponse, error) {
+func (*UnimplementedMsgServer) AddRecord(ctx context.Context, req *MsgAddRecordRequest) (*MsgAddRecordResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddRecord not implemented")
 }
 
-func RegisterMsgServiceServer(s grpc1.Server, srv MsgServiceServer) {
-	s.RegisterService(&_MsgService_serviceDesc, srv)
+func RegisterMsgServer(s grpc1.Server, srv MsgServer) {
+	s.RegisterService(&_Msg_serviceDesc, srv)
 }
 
-func _MsgService_CreateTopic_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(MsgServiceCreateTopicRequest)
+func _Msg_CreateTopic_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgCreateTopicRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MsgServiceServer).CreateTopic(ctx, in)
+		return srv.(MsgServer).CreateTopic(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/panacea.aol.v2.MsgService/CreateTopic",
+		FullMethod: "/panacea.aol.v2.Msg/CreateTopic",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MsgServiceServer).CreateTopic(ctx, req.(*MsgServiceCreateTopicRequest))
+		return srv.(MsgServer).CreateTopic(ctx, req.(*MsgCreateTopicRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _MsgService_AddWriter_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(MsgServiceAddWriterRequest)
+func _Msg_AddWriter_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgAddWriterRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MsgServiceServer).AddWriter(ctx, in)
+		return srv.(MsgServer).AddWriter(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/panacea.aol.v2.MsgService/AddWriter",
+		FullMethod: "/panacea.aol.v2.Msg/AddWriter",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MsgServiceServer).AddWriter(ctx, req.(*MsgServiceAddWriterRequest))
+		return srv.(MsgServer).AddWriter(ctx, req.(*MsgAddWriterRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _MsgService_DeleteWriter_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(MsgServiceDeleteWriterRequest)
+func _Msg_DeleteWriter_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgDeleteWriterRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MsgServiceServer).DeleteWriter(ctx, in)
+		return srv.(MsgServer).DeleteWriter(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/panacea.aol.v2.MsgService/DeleteWriter",
+		FullMethod: "/panacea.aol.v2.Msg/DeleteWriter",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MsgServiceServer).DeleteWriter(ctx, req.(*MsgServiceDeleteWriterRequest))
+		return srv.(MsgServer).DeleteWriter(ctx, req.(*MsgDeleteWriterRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _MsgService_AddRecord_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(MsgServiceAddRecordRequest)
+func _Msg_AddRecord_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgAddRecordRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MsgServiceServer).AddRecord(ctx, in)
+		return srv.(MsgServer).AddRecord(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/panacea.aol.v2.MsgService/AddRecord",
+		FullMethod: "/panacea.aol.v2.Msg/AddRecord",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MsgServiceServer).AddRecord(ctx, req.(*MsgServiceAddRecordRequest))
+		return srv.(MsgServer).AddRecord(ctx, req.(*MsgAddRecordRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-var _MsgService_serviceDesc = grpc.ServiceDesc{
-	ServiceName: "panacea.aol.v2.MsgService",
-	HandlerType: (*MsgServiceServer)(nil),
+var _Msg_serviceDesc = grpc.ServiceDesc{
+	ServiceName: "panacea.aol.v2.Msg",
+	HandlerType: (*MsgServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "CreateTopic",
-			Handler:    _MsgService_CreateTopic_Handler,
+			Handler:    _Msg_CreateTopic_Handler,
 		},
 		{
 			MethodName: "AddWriter",
-			Handler:    _MsgService_AddWriter_Handler,
+			Handler:    _Msg_AddWriter_Handler,
 		},
 		{
 			MethodName: "DeleteWriter",
-			Handler:    _MsgService_DeleteWriter_Handler,
+			Handler:    _Msg_DeleteWriter_Handler,
 		},
 		{
 			MethodName: "AddRecord",
-			Handler:    _MsgService_AddRecord_Handler,
+			Handler:    _Msg_AddRecord_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
 	Metadata: "panacea/aol/v2/tx.proto",
 }
 
-func (m *MsgServiceCreateTopicRequest) Marshal() (dAtA []byte, err error) {
+func (m *MsgCreateTopicRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -740,12 +740,12 @@ func (m *MsgServiceCreateTopicRequest) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *MsgServiceCreateTopicRequest) MarshalTo(dAtA []byte) (int, error) {
+func (m *MsgCreateTopicRequest) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *MsgServiceCreateTopicRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MsgCreateTopicRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -774,7 +774,7 @@ func (m *MsgServiceCreateTopicRequest) MarshalToSizedBuffer(dAtA []byte) (int, e
 	return len(dAtA) - i, nil
 }
 
-func (m *MsgServiceCreateTopicResponse) Marshal() (dAtA []byte, err error) {
+func (m *MsgCreateTopicResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -784,12 +784,12 @@ func (m *MsgServiceCreateTopicResponse) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *MsgServiceCreateTopicResponse) MarshalTo(dAtA []byte) (int, error) {
+func (m *MsgCreateTopicResponse) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *MsgServiceCreateTopicResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MsgCreateTopicResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -797,7 +797,7 @@ func (m *MsgServiceCreateTopicResponse) MarshalToSizedBuffer(dAtA []byte) (int, 
 	return len(dAtA) - i, nil
 }
 
-func (m *MsgServiceAddWriterRequest) Marshal() (dAtA []byte, err error) {
+func (m *MsgAddWriterRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -807,12 +807,12 @@ func (m *MsgServiceAddWriterRequest) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *MsgServiceAddWriterRequest) MarshalTo(dAtA []byte) (int, error) {
+func (m *MsgAddWriterRequest) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *MsgServiceAddWriterRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MsgAddWriterRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -855,7 +855,7 @@ func (m *MsgServiceAddWriterRequest) MarshalToSizedBuffer(dAtA []byte) (int, err
 	return len(dAtA) - i, nil
 }
 
-func (m *MsgServiceAddWriterResponse) Marshal() (dAtA []byte, err error) {
+func (m *MsgAddWriterResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -865,12 +865,12 @@ func (m *MsgServiceAddWriterResponse) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *MsgServiceAddWriterResponse) MarshalTo(dAtA []byte) (int, error) {
+func (m *MsgAddWriterResponse) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *MsgServiceAddWriterResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MsgAddWriterResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -878,7 +878,7 @@ func (m *MsgServiceAddWriterResponse) MarshalToSizedBuffer(dAtA []byte) (int, er
 	return len(dAtA) - i, nil
 }
 
-func (m *MsgServiceDeleteWriterRequest) Marshal() (dAtA []byte, err error) {
+func (m *MsgDeleteWriterRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -888,12 +888,12 @@ func (m *MsgServiceDeleteWriterRequest) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *MsgServiceDeleteWriterRequest) MarshalTo(dAtA []byte) (int, error) {
+func (m *MsgDeleteWriterRequest) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *MsgServiceDeleteWriterRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MsgDeleteWriterRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -922,7 +922,7 @@ func (m *MsgServiceDeleteWriterRequest) MarshalToSizedBuffer(dAtA []byte) (int, 
 	return len(dAtA) - i, nil
 }
 
-func (m *MsgServiceDeleteWriterResponse) Marshal() (dAtA []byte, err error) {
+func (m *MsgDeleteWriterResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -932,12 +932,12 @@ func (m *MsgServiceDeleteWriterResponse) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *MsgServiceDeleteWriterResponse) MarshalTo(dAtA []byte) (int, error) {
+func (m *MsgDeleteWriterResponse) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *MsgServiceDeleteWriterResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MsgDeleteWriterResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -945,7 +945,7 @@ func (m *MsgServiceDeleteWriterResponse) MarshalToSizedBuffer(dAtA []byte) (int,
 	return len(dAtA) - i, nil
 }
 
-func (m *MsgServiceAddRecordRequest) Marshal() (dAtA []byte, err error) {
+func (m *MsgAddRecordRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -955,12 +955,12 @@ func (m *MsgServiceAddRecordRequest) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *MsgServiceAddRecordRequest) MarshalTo(dAtA []byte) (int, error) {
+func (m *MsgAddRecordRequest) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *MsgServiceAddRecordRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MsgAddRecordRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -1010,7 +1010,7 @@ func (m *MsgServiceAddRecordRequest) MarshalToSizedBuffer(dAtA []byte) (int, err
 	return len(dAtA) - i, nil
 }
 
-func (m *MsgServiceAddRecordResponse) Marshal() (dAtA []byte, err error) {
+func (m *MsgAddRecordResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -1020,12 +1020,12 @@ func (m *MsgServiceAddRecordResponse) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *MsgServiceAddRecordResponse) MarshalTo(dAtA []byte) (int, error) {
+func (m *MsgAddRecordResponse) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *MsgServiceAddRecordResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MsgAddRecordResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -1063,7 +1063,7 @@ func encodeVarintTx(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	return base
 }
-func (m *MsgServiceCreateTopicRequest) Size() (n int) {
+func (m *MsgCreateTopicRequest) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -1084,7 +1084,7 @@ func (m *MsgServiceCreateTopicRequest) Size() (n int) {
 	return n
 }
 
-func (m *MsgServiceCreateTopicResponse) Size() (n int) {
+func (m *MsgCreateTopicResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -1093,7 +1093,7 @@ func (m *MsgServiceCreateTopicResponse) Size() (n int) {
 	return n
 }
 
-func (m *MsgServiceAddWriterRequest) Size() (n int) {
+func (m *MsgAddWriterRequest) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -1122,7 +1122,7 @@ func (m *MsgServiceAddWriterRequest) Size() (n int) {
 	return n
 }
 
-func (m *MsgServiceAddWriterResponse) Size() (n int) {
+func (m *MsgAddWriterResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -1131,7 +1131,7 @@ func (m *MsgServiceAddWriterResponse) Size() (n int) {
 	return n
 }
 
-func (m *MsgServiceDeleteWriterRequest) Size() (n int) {
+func (m *MsgDeleteWriterRequest) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -1152,7 +1152,7 @@ func (m *MsgServiceDeleteWriterRequest) Size() (n int) {
 	return n
 }
 
-func (m *MsgServiceDeleteWriterResponse) Size() (n int) {
+func (m *MsgDeleteWriterResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -1161,7 +1161,7 @@ func (m *MsgServiceDeleteWriterResponse) Size() (n int) {
 	return n
 }
 
-func (m *MsgServiceAddRecordRequest) Size() (n int) {
+func (m *MsgAddRecordRequest) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -1194,7 +1194,7 @@ func (m *MsgServiceAddRecordRequest) Size() (n int) {
 	return n
 }
 
-func (m *MsgServiceAddRecordResponse) Size() (n int) {
+func (m *MsgAddRecordResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -1220,7 +1220,7 @@ func sovTx(x uint64) (n int) {
 func sozTx(x uint64) (n int) {
 	return sovTx(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
-func (m *MsgServiceCreateTopicRequest) Unmarshal(dAtA []byte) error {
+func (m *MsgCreateTopicRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -1243,10 +1243,10 @@ func (m *MsgServiceCreateTopicRequest) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: MsgServiceCreateTopicRequest: wiretype end group for non-group")
+			return fmt.Errorf("proto: MsgCreateTopicRequest: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgServiceCreateTopicRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MsgCreateTopicRequest: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -1366,7 +1366,7 @@ func (m *MsgServiceCreateTopicRequest) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *MsgServiceCreateTopicResponse) Unmarshal(dAtA []byte) error {
+func (m *MsgCreateTopicResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -1389,10 +1389,10 @@ func (m *MsgServiceCreateTopicResponse) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: MsgServiceCreateTopicResponse: wiretype end group for non-group")
+			return fmt.Errorf("proto: MsgCreateTopicResponse: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgServiceCreateTopicResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MsgCreateTopicResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		default:
@@ -1416,7 +1416,7 @@ func (m *MsgServiceCreateTopicResponse) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *MsgServiceAddWriterRequest) Unmarshal(dAtA []byte) error {
+func (m *MsgAddWriterRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -1439,10 +1439,10 @@ func (m *MsgServiceAddWriterRequest) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: MsgServiceAddWriterRequest: wiretype end group for non-group")
+			return fmt.Errorf("proto: MsgAddWriterRequest: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgServiceAddWriterRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MsgAddWriterRequest: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -1626,7 +1626,7 @@ func (m *MsgServiceAddWriterRequest) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *MsgServiceAddWriterResponse) Unmarshal(dAtA []byte) error {
+func (m *MsgAddWriterResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -1649,10 +1649,10 @@ func (m *MsgServiceAddWriterResponse) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: MsgServiceAddWriterResponse: wiretype end group for non-group")
+			return fmt.Errorf("proto: MsgAddWriterResponse: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgServiceAddWriterResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MsgAddWriterResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		default:
@@ -1676,7 +1676,7 @@ func (m *MsgServiceAddWriterResponse) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *MsgServiceDeleteWriterRequest) Unmarshal(dAtA []byte) error {
+func (m *MsgDeleteWriterRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -1699,10 +1699,10 @@ func (m *MsgServiceDeleteWriterRequest) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: MsgServiceDeleteWriterRequest: wiretype end group for non-group")
+			return fmt.Errorf("proto: MsgDeleteWriterRequest: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgServiceDeleteWriterRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MsgDeleteWriterRequest: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -1822,7 +1822,7 @@ func (m *MsgServiceDeleteWriterRequest) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *MsgServiceDeleteWriterResponse) Unmarshal(dAtA []byte) error {
+func (m *MsgDeleteWriterResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -1845,10 +1845,10 @@ func (m *MsgServiceDeleteWriterResponse) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: MsgServiceDeleteWriterResponse: wiretype end group for non-group")
+			return fmt.Errorf("proto: MsgDeleteWriterResponse: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgServiceDeleteWriterResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MsgDeleteWriterResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		default:
@@ -1872,7 +1872,7 @@ func (m *MsgServiceDeleteWriterResponse) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *MsgServiceAddRecordRequest) Unmarshal(dAtA []byte) error {
+func (m *MsgAddRecordRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -1895,10 +1895,10 @@ func (m *MsgServiceAddRecordRequest) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: MsgServiceAddRecordRequest: wiretype end group for non-group")
+			return fmt.Errorf("proto: MsgAddRecordRequest: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgServiceAddRecordRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MsgAddRecordRequest: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -2118,7 +2118,7 @@ func (m *MsgServiceAddRecordRequest) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *MsgServiceAddRecordResponse) Unmarshal(dAtA []byte) error {
+func (m *MsgAddRecordResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -2141,10 +2141,10 @@ func (m *MsgServiceAddRecordResponse) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: MsgServiceAddRecordResponse: wiretype end group for non-group")
+			return fmt.Errorf("proto: MsgAddRecordResponse: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgServiceAddRecordResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MsgAddRecordResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:

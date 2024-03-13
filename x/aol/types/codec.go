@@ -9,22 +9,22 @@ import (
 
 func RegisterCodec(cdc *codec.LegacyAmino) {
 	// this line is used by starport scaffolding # 2
-	cdc.RegisterConcrete(&MsgServiceCreateTopicRequest{}, "aol/CreateTopic", nil)
-	cdc.RegisterConcrete(&MsgServiceAddWriterRequest{}, "aol/AddWriter", nil)
-	cdc.RegisterConcrete(&MsgServiceDeleteWriterRequest{}, "aol/DeleteWriter", nil)
-	cdc.RegisterConcrete(&MsgServiceAddRecordRequest{}, "aol/AddRecord", nil)
+	cdc.RegisterConcrete(&MsgCreateTopicRequest{}, "aol/CreateTopic", nil)
+	cdc.RegisterConcrete(&MsgAddWriterRequest{}, "aol/AddWriter", nil)
+	cdc.RegisterConcrete(&MsgDeleteWriterRequest{}, "aol/DeleteWriter", nil)
+	cdc.RegisterConcrete(&MsgAddRecordRequest{}, "aol/AddRecord", nil)
 }
 
 func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 	// this line is used by starport scaffolding # 3
 	registry.RegisterImplementations((*sdk.Msg)(nil),
-		&MsgServiceCreateTopicRequest{},
-		&MsgServiceAddWriterRequest{},
-		&MsgServiceDeleteWriterRequest{},
-		&MsgServiceAddRecordRequest{},
+		&MsgCreateTopicRequest{},
+		&MsgAddWriterRequest{},
+		&MsgDeleteWriterRequest{},
+		&MsgAddRecordRequest{},
 	)
 
-	msgservice.RegisterMsgServiceDesc(registry, &_MsgService_serviceDesc)
+	msgservice.RegisterMsgServiceDesc(registry, &_Msg_serviceDesc)
 }
 
 var (

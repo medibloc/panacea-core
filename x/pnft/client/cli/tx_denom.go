@@ -63,7 +63,7 @@ func NewCmdCreateDenom() *cobra.Command {
 
 			creator := clientCtx.GetFromAddress().String()
 
-			msg := types.NewMsgServiceCreateDenomRequest(
+			msg := types.NewMsgCreateDenomRequest(
 				id,
 				symbol,
 				denomName,
@@ -138,7 +138,7 @@ func NewCmdUpdateDenom() *cobra.Command {
 
 			updater := clientCtx.GetFromAddress().String()
 
-			msg := types.NewMsgServiceUpdateDenomRequest(
+			msg := types.NewMsgUpdateDenomRequest(
 				denomId,
 				symbol,
 				denomName,
@@ -182,7 +182,7 @@ func NewCmdDeleteDenom() *cobra.Command {
 
 			remover := clientCtx.GetFromAddress().String()
 
-			msg := types.NewMsgServiceDeleteDenomRequest(denomId, remover)
+			msg := types.NewMsgDeleteDenomRequest(denomId, remover)
 
 			if err := msg.ValidateBasic(); err != nil {
 				return sdkerrors.Wrap(types.ErrDeleteDenom, err.Error())
@@ -211,7 +211,7 @@ func NewCmdTransferDenom() *cobra.Command {
 
 			sender := clientCtx.GetFromAddress().String()
 
-			msg := types.NewMsgServiceTransferRequest(denomId, sender, receiver)
+			msg := types.NewMsgTransferRequest(denomId, sender, receiver)
 
 			if err := msg.ValidateBasic(); err != nil {
 				return sdkerrors.Wrap(types.ErrTransferDenom, err.Error())

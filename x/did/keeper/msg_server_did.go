@@ -9,7 +9,7 @@ import (
 	"github.com/medibloc/panacea-core/v2/x/did/types"
 )
 
-func (m msgServer) CreateDID(goCtx context.Context, msg *types.MsgServiceCreateDIDRequest) (*types.MsgServiceCreateDIDResponse, error) {
+func (m msgServer) CreateDID(goCtx context.Context, msg *types.MsgCreateDIDRequest) (*types.MsgCreateDIDResponse, error) {
 	keeper := m.Keeper
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
@@ -29,10 +29,10 @@ func (m msgServer) CreateDID(goCtx context.Context, msg *types.MsgServiceCreateD
 
 	docWithSeq := types.NewDIDDocumentWithSeq(msg.Document, uint64(seq))
 	keeper.SetDIDDocument(ctx, msg.Did, docWithSeq)
-	return &types.MsgServiceCreateDIDResponse{}, nil
+	return &types.MsgCreateDIDResponse{}, nil
 }
 
-func (m msgServer) UpdateDID(goCtx context.Context, msg *types.MsgServiceUpdateDIDRequest) (*types.MsgServiceUpdateDIDResponse, error) {
+func (m msgServer) UpdateDID(goCtx context.Context, msg *types.MsgUpdateDIDRequest) (*types.MsgUpdateDIDResponse, error) {
 	keeper := m.Keeper
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
@@ -51,10 +51,10 @@ func (m msgServer) UpdateDID(goCtx context.Context, msg *types.MsgServiceUpdateD
 
 	newDocWithSeq := types.NewDIDDocumentWithSeq(msg.Document, newSeq)
 	keeper.SetDIDDocument(ctx, msg.Did, newDocWithSeq)
-	return &types.MsgServiceUpdateDIDResponse{}, nil
+	return &types.MsgUpdateDIDResponse{}, nil
 }
 
-func (m msgServer) DeactivateDID(goCtx context.Context, msg *types.MsgServiceDeactivateDIDRequest) (*types.MsgServiceDeactivateDIDResponse, error) {
+func (m msgServer) DeactivateDID(goCtx context.Context, msg *types.MsgDeactivateDIDRequest) (*types.MsgDeactivateDIDResponse, error) {
 	keeper := m.Keeper
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
@@ -76,7 +76,7 @@ func (m msgServer) DeactivateDID(goCtx context.Context, msg *types.MsgServiceDea
 	}
 
 	keeper.SetDIDDocument(ctx, msg.Did, docWithSeq.Deactivate(newSeq))
-	return &types.MsgServiceDeactivateDIDResponse{}, nil
+	return &types.MsgDeactivateDIDResponse{}, nil
 
 }
 

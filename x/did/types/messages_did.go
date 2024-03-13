@@ -6,10 +6,10 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-var _ sdk.Msg = &MsgServiceCreateDIDRequest{}
+var _ sdk.Msg = &MsgCreateDIDRequest{}
 
-func NewMsgServiceCreateDIDResponse(did string, document DIDDocument, VerificationMethodID string, Signature []byte, FromAddress string) MsgServiceCreateDIDRequest {
-	return MsgServiceCreateDIDRequest{
+func NewMsgCreateDIDResponse(did string, document DIDDocument, VerificationMethodID string, Signature []byte, FromAddress string) MsgCreateDIDRequest {
+	return MsgCreateDIDRequest{
 		Did:                  did,
 		Document:             &document,
 		VerificationMethodId: VerificationMethodID,
@@ -18,15 +18,15 @@ func NewMsgServiceCreateDIDResponse(did string, document DIDDocument, Verificati
 	}
 }
 
-func (msg *MsgServiceCreateDIDRequest) Route() string {
+func (msg *MsgCreateDIDRequest) Route() string {
 	return RouterKey
 }
 
-func (msg *MsgServiceCreateDIDRequest) Type() string {
+func (msg *MsgCreateDIDRequest) Type() string {
 	return "create_did"
 }
 
-func (msg *MsgServiceCreateDIDRequest) GetSigners() []sdk.AccAddress {
+func (msg *MsgCreateDIDRequest) GetSigners() []sdk.AccAddress {
 	creator, err := sdk.AccAddressFromBech32(msg.FromAddress)
 	if err != nil {
 		panic(err)
@@ -34,11 +34,11 @@ func (msg *MsgServiceCreateDIDRequest) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{creator}
 }
 
-func (msg *MsgServiceCreateDIDRequest) GetSignBytes() []byte {
+func (msg *MsgCreateDIDRequest) GetSignBytes() []byte {
 	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
 }
 
-func (msg *MsgServiceCreateDIDRequest) ValidateBasic() error {
+func (msg *MsgCreateDIDRequest) ValidateBasic() error {
 	if !ValidateDID(msg.Did) {
 		return errors.Wrapf(ErrInvalidDID, "did: %v", msg.Did)
 	}
@@ -59,11 +59,11 @@ func (msg *MsgServiceCreateDIDRequest) ValidateBasic() error {
 	return nil
 }
 
-var _ sdk.Msg = &MsgServiceUpdateDIDRequest{}
+var _ sdk.Msg = &MsgUpdateDIDRequest{}
 
 // NewMsgUpdateDID is a constructor of MsgUpdateDID.
-func NewMsgUpdateDID(did string, doc DIDDocument, verificationMethodID string, sig []byte, fromAddr string) *MsgServiceUpdateDIDRequest {
-	return &MsgServiceUpdateDIDRequest{
+func NewMsgUpdateDID(did string, doc DIDDocument, verificationMethodID string, sig []byte, fromAddr string) *MsgUpdateDIDRequest {
+	return &MsgUpdateDIDRequest{
 		Did:                  did,
 		Document:             &doc,
 		VerificationMethodId: verificationMethodID,
@@ -73,13 +73,13 @@ func NewMsgUpdateDID(did string, doc DIDDocument, verificationMethodID string, s
 }
 
 // Route returns the name of the module.
-func (msg *MsgServiceUpdateDIDRequest) Route() string { return RouterKey }
+func (msg *MsgUpdateDIDRequest) Route() string { return RouterKey }
 
 // Type returns the name of the action.
-func (msg *MsgServiceUpdateDIDRequest) Type() string { return "update_did" }
+func (msg *MsgUpdateDIDRequest) Type() string { return "update_did" }
 
 // ValidateBasic runs stateless checks on the message.
-func (msg *MsgServiceUpdateDIDRequest) ValidateBasic() error {
+func (msg *MsgUpdateDIDRequest) ValidateBasic() error {
 	if !ValidateDID(msg.Did) {
 		return errors.Wrapf(ErrInvalidDID, "DID: %v", msg.Did)
 	}
@@ -100,12 +100,12 @@ func (msg *MsgServiceUpdateDIDRequest) ValidateBasic() error {
 }
 
 // GetSignBytes returns the canonical byte representation of the message. Used to generate a signature.
-func (msg *MsgServiceUpdateDIDRequest) GetSignBytes() []byte {
+func (msg *MsgUpdateDIDRequest) GetSignBytes() []byte {
 	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
 }
 
 // GetSigners return the addresses of signers that must sign.
-func (msg *MsgServiceUpdateDIDRequest) GetSigners() []sdk.AccAddress {
+func (msg *MsgUpdateDIDRequest) GetSigners() []sdk.AccAddress {
 	creator, err := sdk.AccAddressFromBech32(msg.FromAddress)
 	if err != nil {
 		panic(err)
@@ -113,21 +113,21 @@ func (msg *MsgServiceUpdateDIDRequest) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{creator}
 }
 
-var _ sdk.Msg = &MsgServiceDeactivateDIDRequest{}
+var _ sdk.Msg = &MsgDeactivateDIDRequest{}
 
-// NewMsgServiceDeactivateDIDRequest is a constructor of MsgDeactivateDID.
-func NewMsgServiceDeactivateDIDRequest(did string, verificationMethodID string, sig []byte, fromAddr string) *MsgServiceDeactivateDIDRequest {
-	return &MsgServiceDeactivateDIDRequest{did, verificationMethodID, sig, fromAddr}
+// NewMsgDeactivateDIDRequest is a constructor of MsgDeactivateDID.
+func NewMsgDeactivateDIDRequest(did string, verificationMethodID string, sig []byte, fromAddr string) *MsgDeactivateDIDRequest {
+	return &MsgDeactivateDIDRequest{did, verificationMethodID, sig, fromAddr}
 }
 
 // Route returns the name of the module.
-func (msg *MsgServiceDeactivateDIDRequest) Route() string { return RouterKey }
+func (msg *MsgDeactivateDIDRequest) Route() string { return RouterKey }
 
 // Type returns the name of the action.
-func (msg *MsgServiceDeactivateDIDRequest) Type() string { return "deactivate_did" }
+func (msg *MsgDeactivateDIDRequest) Type() string { return "deactivate_did" }
 
 // ValidateBasic runs stateless checks on the message.
-func (msg *MsgServiceDeactivateDIDRequest) ValidateBasic() error {
+func (msg *MsgDeactivateDIDRequest) ValidateBasic() error {
 	if !ValidateDID(msg.Did) {
 		return errors.Wrapf(ErrInvalidDID, "DID: %v", msg.Did)
 	}
@@ -146,12 +146,12 @@ func (msg *MsgServiceDeactivateDIDRequest) ValidateBasic() error {
 }
 
 // GetSignBytes returns the canonical byte representation of the message. Used to generate a signature.
-func (msg *MsgServiceDeactivateDIDRequest) GetSignBytes() []byte {
+func (msg *MsgDeactivateDIDRequest) GetSignBytes() []byte {
 	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
 }
 
 // GetSigners return the addresses of signers that must sign.
-func (msg *MsgServiceDeactivateDIDRequest) GetSigners() []sdk.AccAddress {
+func (msg *MsgDeactivateDIDRequest) GetSigners() []sdk.AccAddress {
 	creator, err := sdk.AccAddressFromBech32(msg.FromAddress)
 	if err != nil {
 		panic(err)

@@ -7,19 +7,19 @@ option go_package = "github.com/medibloc/panacea-core/x/did/types";
 import "panacea/did/v2/did.proto";
 
 // Msg defines the Msg service.
-service MsgService {
+service Msg {
   // CreateDID defines a method for creating a DID.
-  rpc CreateDID(MsgServiceCreateDIDRequest) returns (MsgServiceCreateDIDResponse);
+  rpc CreateDID(MsgCreateDIDRequest) returns (MsgCreateDIDResponse);
 
   // UpdateDID defines a method for updating a DID.
-  rpc UpdateDID(MsgServiceUpdateDIDRequest) returns (MsgServiceUpdateDIDResponse);
+  rpc UpdateDID(MsgUpdateDIDRequest) returns (MsgUpdateDIDResponse);
 
   // DeactivateDID defines a method for deactivating a DID.
-  rpc DeactivateDID(MsgServiceDeactivateDIDRequest) returns (MsgServiceDeactivateDIDResponse);
+  rpc DeactivateDID(MsgDeactivateDIDRequest) returns (MsgDeactivateDIDResponse);
 }
 
 // MsgCreateDID defines the Msg/CreateDID request type.
-message MsgServiceCreateDIDRequest {
+message MsgCreateDIDRequest {
   string did = 1;
   DIDDocument document = 2;
   string verification_method_id = 3;
@@ -28,10 +28,10 @@ message MsgServiceCreateDIDRequest {
 }
 
 // MsgCreateDIDResponse defines the Msg/CreateDID response type.
-message MsgServiceCreateDIDResponse {}
+message MsgCreateDIDResponse {}
 
 // MsgUpdateDID defines the Msg/UpdateDID request type.
-message MsgServiceUpdateDIDRequest {
+message MsgUpdateDIDRequest {
   string did = 1;
   DIDDocument document = 2;
   string verification_method_id = 3;
@@ -40,10 +40,10 @@ message MsgServiceUpdateDIDRequest {
 }
 
 // MsgUpdateDIDResponse defines the Msg/UpdateDID response type.
-message MsgServiceUpdateDIDResponse {}
+message MsgUpdateDIDResponse {}
 
 // MsgDeactivateDID defines the Msg/DeactivateDID request type.
-message MsgServiceDeactivateDIDRequest {
+message MsgDeactivateDIDRequest {
   string did = 1;
   string verification_method_id = 2;
   bytes signature = 3;
@@ -51,4 +51,4 @@ message MsgServiceDeactivateDIDRequest {
 }
 
 // MsgDeactivateDIDResponse defines the Msg/DeactivateDID response type.
-message MsgServiceDeactivateDIDResponse {}
+message MsgDeactivateDIDResponse {}

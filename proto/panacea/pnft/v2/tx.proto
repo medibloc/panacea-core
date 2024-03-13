@@ -4,23 +4,23 @@ package panacea.pnft.v2;
 option go_package = "github.com/medibloc/panacea-core/x/pnft/types";
 option java_multiple_files = true;
 
-service MsgService {
-  rpc CreateDenom(MsgServiceCreateDenomRequest) returns (MsgServiceCreateDenomResponse);
+service Msg {
+  rpc CreateDenom(MsgCreateDenomRequest) returns (MsgCreateDenomResponse);
 
-  rpc UpdateDenom(MsgServiceUpdateDenomRequest) returns (MsgServiceUpdateDenomResponse);
+  rpc UpdateDenom(MsgUpdateDenomRequest) returns (MsgUpdateDenomResponse);
 
-  rpc DeleteDenom(MsgServiceDeleteDenomRequest) returns (MsgServiceDeleteDenomResponse);
+  rpc DeleteDenom(MsgDeleteDenomRequest) returns (MsgDeleteDenomResponse);
 
-  rpc TransferDenom(MsgServiceTransferDenomRequest) returns (MsgServiceTransferDenomResponse);
+  rpc TransferDenom(MsgTransferDenomRequest) returns (MsgTransferDenomResponse);
 
-  rpc MintPNFT(MsgServiceMintPNFTRequest) returns (MsgServiceMintPNFTResponse);
+  rpc MintPNFT(MsgMintPNFTRequest) returns (MsgMintPNFTResponse);
 
-  rpc TransferPNFT(MsgServiceTransferPNFTRequest) returns (MsgServiceTransferPNFTResponse);
+  rpc TransferPNFT(MsgTransferPNFTRequest) returns (MsgTransferPNFTResponse);
 
-  rpc BurnPNFT(MsgServiceBurnPNFTRequest) returns (MsgServiceBurnPNFTResponse);
+  rpc BurnPNFT(MsgBurnPNFTRequest) returns (MsgBurnPNFTResponse);
 }
 
-message MsgServiceCreateDenomRequest {
+message MsgCreateDenomRequest {
   string id = 1;
   string name = 2;
   string symbol = 3;
@@ -31,9 +31,9 @@ message MsgServiceCreateDenomRequest {
   string creator = 8;
 }
 
-message MsgServiceCreateDenomResponse {}
+message MsgCreateDenomResponse {}
 
-message MsgServiceUpdateDenomRequest {
+message MsgUpdateDenomRequest {
   string id = 1;
   string name = 2;
   string symbol = 3;
@@ -44,24 +44,24 @@ message MsgServiceUpdateDenomRequest {
   string updater = 8;
 }
 
-message MsgServiceUpdateDenomResponse {}
+message MsgUpdateDenomResponse {}
 
-message MsgServiceDeleteDenomRequest {
+message MsgDeleteDenomRequest {
   string id = 1;
   string remover = 2;
 }
 
-message MsgServiceDeleteDenomResponse {}
+message MsgDeleteDenomResponse {}
 
-message MsgServiceTransferDenomRequest {
+message MsgTransferDenomRequest {
   string id = 1;
   string sender = 2;
   string receiver = 3;
 }
 
-message MsgServiceTransferDenomResponse {}
+message MsgTransferDenomResponse {}
 
-message MsgServiceMintPNFTRequest {
+message MsgMintPNFTRequest {
   string denom_id = 1;
   string id = 2;
   string name = 3;
@@ -72,21 +72,21 @@ message MsgServiceMintPNFTRequest {
   string creator = 8;
 }
 
-message MsgServiceMintPNFTResponse {}
+message MsgMintPNFTResponse {}
 
-message MsgServiceTransferPNFTRequest {
+message MsgTransferPNFTRequest {
   string denom_id = 1;
   string id = 2;
   string sender = 3;
   string receiver = 4;
 }
 
-message MsgServiceTransferPNFTResponse {}
+message MsgTransferPNFTResponse {}
 
-message MsgServiceBurnPNFTRequest {
+message MsgBurnPNFTRequest {
   string denom_id = 1;
   string id = 2;
   string burner = 3;
 }
 
-message MsgServiceBurnPNFTResponse {}
+message MsgBurnPNFTResponse {}

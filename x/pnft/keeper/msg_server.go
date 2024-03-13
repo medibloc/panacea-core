@@ -11,11 +11,11 @@ type msgServer struct {
 	*Keeper
 }
 
-func NewMsgServerImpl(keeper *Keeper) types.MsgServiceServer {
+func NewMsgServerImpl(keeper *Keeper) types.MsgServer {
 	return &msgServer{Keeper: keeper}
 }
 
-func (m msgServer) CreateDenom(goCtx context.Context, request *types.MsgServiceCreateDenomRequest) (*types.MsgServiceCreateDenomResponse, error) {
+func (m msgServer) CreateDenom(goCtx context.Context, request *types.MsgCreateDenomRequest) (*types.MsgCreateDenomResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	if err := request.ValidateBasic(); err != nil {
@@ -38,10 +38,10 @@ func (m msgServer) CreateDenom(goCtx context.Context, request *types.MsgServiceC
 	if err != nil {
 		return nil, errors.Wrapf(types.ErrCreateDenom, err.Error())
 	}
-	return &types.MsgServiceCreateDenomResponse{}, nil
+	return &types.MsgCreateDenomResponse{}, nil
 }
 
-func (m msgServer) UpdateDenom(goCtx context.Context, request *types.MsgServiceUpdateDenomRequest) (*types.MsgServiceUpdateDenomResponse, error) {
+func (m msgServer) UpdateDenom(goCtx context.Context, request *types.MsgUpdateDenomRequest) (*types.MsgUpdateDenomResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	if err := request.ValidateBasic(); err != nil {
@@ -64,10 +64,10 @@ func (m msgServer) UpdateDenom(goCtx context.Context, request *types.MsgServiceU
 		return nil, errors.Wrapf(types.ErrUpdateDenom, err.Error())
 	}
 
-	return &types.MsgServiceUpdateDenomResponse{}, nil
+	return &types.MsgUpdateDenomResponse{}, nil
 }
 
-func (m msgServer) DeleteDenom(goCtx context.Context, request *types.MsgServiceDeleteDenomRequest) (*types.MsgServiceDeleteDenomResponse, error) {
+func (m msgServer) DeleteDenom(goCtx context.Context, request *types.MsgDeleteDenomRequest) (*types.MsgDeleteDenomResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	if err := request.ValidateBasic(); err != nil {
@@ -78,10 +78,10 @@ func (m msgServer) DeleteDenom(goCtx context.Context, request *types.MsgServiceD
 		return nil, errors.Wrapf(types.ErrDeleteDenom, err.Error())
 	}
 
-	return &types.MsgServiceDeleteDenomResponse{}, nil
+	return &types.MsgDeleteDenomResponse{}, nil
 }
 
-func (m msgServer) TransferDenom(goCtx context.Context, request *types.MsgServiceTransferDenomRequest) (*types.MsgServiceTransferDenomResponse, error) {
+func (m msgServer) TransferDenom(goCtx context.Context, request *types.MsgTransferDenomRequest) (*types.MsgTransferDenomResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	if err := request.ValidateBasic(); err != nil {
@@ -92,10 +92,10 @@ func (m msgServer) TransferDenom(goCtx context.Context, request *types.MsgServic
 		return nil, errors.Wrap(types.ErrTransferDenom, err.Error())
 	}
 
-	return &types.MsgServiceTransferDenomResponse{}, nil
+	return &types.MsgTransferDenomResponse{}, nil
 }
 
-func (m msgServer) MintPNFT(goCtx context.Context, request *types.MsgServiceMintPNFTRequest) (*types.MsgServiceMintPNFTResponse, error) {
+func (m msgServer) MintPNFT(goCtx context.Context, request *types.MsgMintPNFTRequest) (*types.MsgMintPNFTResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	if err := request.ValidateBasic(); err != nil {
@@ -118,10 +118,10 @@ func (m msgServer) MintPNFT(goCtx context.Context, request *types.MsgServiceMint
 		return nil, errors.Wrap(types.ErrMintPNFT, err.Error())
 	}
 
-	return &types.MsgServiceMintPNFTResponse{}, nil
+	return &types.MsgMintPNFTResponse{}, nil
 }
 
-func (m msgServer) TransferPNFT(goCtx context.Context, request *types.MsgServiceTransferPNFTRequest) (*types.MsgServiceTransferPNFTResponse, error) {
+func (m msgServer) TransferPNFT(goCtx context.Context, request *types.MsgTransferPNFTRequest) (*types.MsgTransferPNFTResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	if err := request.ValidateBasic(); err != nil {
@@ -138,10 +138,10 @@ func (m msgServer) TransferPNFT(goCtx context.Context, request *types.MsgService
 		return nil, errors.Wrap(types.ErrTransferPNFT, err.Error())
 	}
 
-	return &types.MsgServiceTransferPNFTResponse{}, nil
+	return &types.MsgTransferPNFTResponse{}, nil
 }
 
-func (m msgServer) BurnPNFT(goCtx context.Context, request *types.MsgServiceBurnPNFTRequest) (*types.MsgServiceBurnPNFTResponse, error) {
+func (m msgServer) BurnPNFT(goCtx context.Context, request *types.MsgBurnPNFTRequest) (*types.MsgBurnPNFTResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	if err := request.ValidateBasic(); err != nil {
@@ -157,5 +157,5 @@ func (m msgServer) BurnPNFT(goCtx context.Context, request *types.MsgServiceBurn
 		return nil, errors.Wrap(types.ErrBurnPNFT, err.Error())
 	}
 
-	return &types.MsgServiceBurnPNFTResponse{}, nil
+	return &types.MsgBurnPNFTResponse{}, nil
 }

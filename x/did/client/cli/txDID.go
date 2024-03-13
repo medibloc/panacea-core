@@ -164,7 +164,7 @@ func CmdDeactivateDID() *cobra.Command {
 			}
 
 			fromAddress := clientCtx.GetFromAddress()
-			msg := types.NewMsgServiceDeactivateDIDRequest(did, verificationMethodID, sig, fromAddress.String())
+			msg := types.NewMsgDeactivateDIDRequest(did, verificationMethodID, sig, fromAddress.String())
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
@@ -254,7 +254,7 @@ func getCheckPassword(reader *bufio.Reader) (string, error) {
 // newMsgCreateDID creates a MsgCreateDID by generating a DID and a DID document from the networkID and privKey.
 // It generates the minimal DID document which contains only one public key information,
 // so that it can be extended by MsgUpdateDID later.
-func newMsgCreateDID(fromAddress sdk.AccAddress, privKey secp256k1.PrivKey) (types.MsgServiceCreateDIDRequest, error) {
+func newMsgCreateDID(fromAddress sdk.AccAddress, privKey secp256k1.PrivKey) (types.MsgCreateDIDRequest, error) {
 	pubKey := secp256k1util.PubKeyBytes(secp256k1util.DerivePubKey(privKey))
 	did := types.NewDID(pubKey)
 	verificationMethodID := types.NewVerificationMethodID(did, "key1")
@@ -270,12 +270,12 @@ func newMsgCreateDID(fromAddress sdk.AccAddress, privKey secp256k1.PrivKey) (typ
 
 	sig, err := types.Sign(&doc, types.InitialSequence, privKey)
 	if err != nil {
-		return types.MsgServiceCreateDIDRequest{}, err
+		return types.MsgCreateDIDRequest{}, err
 	}
 
-	msg := types.NewMsgServiceCreateDIDResponse(did, doc, verificationMethodID, sig, fromAddress.String())
+	msg := types.NewMsgCreateDIDResponse(did, doc, verificationMethodID, sig, fromAddress.String())
 	if err := msg.ValidateBasic(); err != nil {
-		return types.MsgServiceCreateDIDRequest{}, err
+		return types.MsgCreateDIDRequest{}, err
 	}
 	return msg, nil
 }

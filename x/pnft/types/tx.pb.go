@@ -27,7 +27,7 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
-type MsgServiceCreateDenomRequest struct {
+type MsgCreateDenomRequest struct {
 	Id          string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	Name        string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 	Symbol      string `protobuf:"bytes,3,opt,name=symbol,proto3" json:"symbol,omitempty"`
@@ -38,18 +38,18 @@ type MsgServiceCreateDenomRequest struct {
 	Creator     string `protobuf:"bytes,8,opt,name=creator,proto3" json:"creator,omitempty"`
 }
 
-func (m *MsgServiceCreateDenomRequest) Reset()         { *m = MsgServiceCreateDenomRequest{} }
-func (m *MsgServiceCreateDenomRequest) String() string { return proto.CompactTextString(m) }
-func (*MsgServiceCreateDenomRequest) ProtoMessage()    {}
-func (*MsgServiceCreateDenomRequest) Descriptor() ([]byte, []int) {
+func (m *MsgCreateDenomRequest) Reset()         { *m = MsgCreateDenomRequest{} }
+func (m *MsgCreateDenomRequest) String() string { return proto.CompactTextString(m) }
+func (*MsgCreateDenomRequest) ProtoMessage()    {}
+func (*MsgCreateDenomRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_da49c5b4a63605b2, []int{0}
 }
-func (m *MsgServiceCreateDenomRequest) XXX_Unmarshal(b []byte) error {
+func (m *MsgCreateDenomRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *MsgServiceCreateDenomRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *MsgCreateDenomRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_MsgServiceCreateDenomRequest.Marshal(b, m, deterministic)
+		return xxx_messageInfo_MsgCreateDenomRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -59,89 +59,89 @@ func (m *MsgServiceCreateDenomRequest) XXX_Marshal(b []byte, deterministic bool)
 		return b[:n], nil
 	}
 }
-func (m *MsgServiceCreateDenomRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgServiceCreateDenomRequest.Merge(m, src)
+func (m *MsgCreateDenomRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgCreateDenomRequest.Merge(m, src)
 }
-func (m *MsgServiceCreateDenomRequest) XXX_Size() int {
+func (m *MsgCreateDenomRequest) XXX_Size() int {
 	return m.Size()
 }
-func (m *MsgServiceCreateDenomRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgServiceCreateDenomRequest.DiscardUnknown(m)
+func (m *MsgCreateDenomRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgCreateDenomRequest.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_MsgServiceCreateDenomRequest proto.InternalMessageInfo
+var xxx_messageInfo_MsgCreateDenomRequest proto.InternalMessageInfo
 
-func (m *MsgServiceCreateDenomRequest) GetId() string {
+func (m *MsgCreateDenomRequest) GetId() string {
 	if m != nil {
 		return m.Id
 	}
 	return ""
 }
 
-func (m *MsgServiceCreateDenomRequest) GetName() string {
+func (m *MsgCreateDenomRequest) GetName() string {
 	if m != nil {
 		return m.Name
 	}
 	return ""
 }
 
-func (m *MsgServiceCreateDenomRequest) GetSymbol() string {
+func (m *MsgCreateDenomRequest) GetSymbol() string {
 	if m != nil {
 		return m.Symbol
 	}
 	return ""
 }
 
-func (m *MsgServiceCreateDenomRequest) GetDescription() string {
+func (m *MsgCreateDenomRequest) GetDescription() string {
 	if m != nil {
 		return m.Description
 	}
 	return ""
 }
 
-func (m *MsgServiceCreateDenomRequest) GetUri() string {
+func (m *MsgCreateDenomRequest) GetUri() string {
 	if m != nil {
 		return m.Uri
 	}
 	return ""
 }
 
-func (m *MsgServiceCreateDenomRequest) GetUriHash() string {
+func (m *MsgCreateDenomRequest) GetUriHash() string {
 	if m != nil {
 		return m.UriHash
 	}
 	return ""
 }
 
-func (m *MsgServiceCreateDenomRequest) GetData() string {
+func (m *MsgCreateDenomRequest) GetData() string {
 	if m != nil {
 		return m.Data
 	}
 	return ""
 }
 
-func (m *MsgServiceCreateDenomRequest) GetCreator() string {
+func (m *MsgCreateDenomRequest) GetCreator() string {
 	if m != nil {
 		return m.Creator
 	}
 	return ""
 }
 
-type MsgServiceCreateDenomResponse struct {
+type MsgCreateDenomResponse struct {
 }
 
-func (m *MsgServiceCreateDenomResponse) Reset()         { *m = MsgServiceCreateDenomResponse{} }
-func (m *MsgServiceCreateDenomResponse) String() string { return proto.CompactTextString(m) }
-func (*MsgServiceCreateDenomResponse) ProtoMessage()    {}
-func (*MsgServiceCreateDenomResponse) Descriptor() ([]byte, []int) {
+func (m *MsgCreateDenomResponse) Reset()         { *m = MsgCreateDenomResponse{} }
+func (m *MsgCreateDenomResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgCreateDenomResponse) ProtoMessage()    {}
+func (*MsgCreateDenomResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_da49c5b4a63605b2, []int{1}
 }
-func (m *MsgServiceCreateDenomResponse) XXX_Unmarshal(b []byte) error {
+func (m *MsgCreateDenomResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *MsgServiceCreateDenomResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *MsgCreateDenomResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_MsgServiceCreateDenomResponse.Marshal(b, m, deterministic)
+		return xxx_messageInfo_MsgCreateDenomResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -151,19 +151,19 @@ func (m *MsgServiceCreateDenomResponse) XXX_Marshal(b []byte, deterministic bool
 		return b[:n], nil
 	}
 }
-func (m *MsgServiceCreateDenomResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgServiceCreateDenomResponse.Merge(m, src)
+func (m *MsgCreateDenomResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgCreateDenomResponse.Merge(m, src)
 }
-func (m *MsgServiceCreateDenomResponse) XXX_Size() int {
+func (m *MsgCreateDenomResponse) XXX_Size() int {
 	return m.Size()
 }
-func (m *MsgServiceCreateDenomResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgServiceCreateDenomResponse.DiscardUnknown(m)
+func (m *MsgCreateDenomResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgCreateDenomResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_MsgServiceCreateDenomResponse proto.InternalMessageInfo
+var xxx_messageInfo_MsgCreateDenomResponse proto.InternalMessageInfo
 
-type MsgServiceUpdateDenomRequest struct {
+type MsgUpdateDenomRequest struct {
 	Id          string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	Name        string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 	Symbol      string `protobuf:"bytes,3,opt,name=symbol,proto3" json:"symbol,omitempty"`
@@ -174,18 +174,18 @@ type MsgServiceUpdateDenomRequest struct {
 	Updater     string `protobuf:"bytes,8,opt,name=updater,proto3" json:"updater,omitempty"`
 }
 
-func (m *MsgServiceUpdateDenomRequest) Reset()         { *m = MsgServiceUpdateDenomRequest{} }
-func (m *MsgServiceUpdateDenomRequest) String() string { return proto.CompactTextString(m) }
-func (*MsgServiceUpdateDenomRequest) ProtoMessage()    {}
-func (*MsgServiceUpdateDenomRequest) Descriptor() ([]byte, []int) {
+func (m *MsgUpdateDenomRequest) Reset()         { *m = MsgUpdateDenomRequest{} }
+func (m *MsgUpdateDenomRequest) String() string { return proto.CompactTextString(m) }
+func (*MsgUpdateDenomRequest) ProtoMessage()    {}
+func (*MsgUpdateDenomRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_da49c5b4a63605b2, []int{2}
 }
-func (m *MsgServiceUpdateDenomRequest) XXX_Unmarshal(b []byte) error {
+func (m *MsgUpdateDenomRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *MsgServiceUpdateDenomRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *MsgUpdateDenomRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_MsgServiceUpdateDenomRequest.Marshal(b, m, deterministic)
+		return xxx_messageInfo_MsgUpdateDenomRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -195,89 +195,89 @@ func (m *MsgServiceUpdateDenomRequest) XXX_Marshal(b []byte, deterministic bool)
 		return b[:n], nil
 	}
 }
-func (m *MsgServiceUpdateDenomRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgServiceUpdateDenomRequest.Merge(m, src)
+func (m *MsgUpdateDenomRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgUpdateDenomRequest.Merge(m, src)
 }
-func (m *MsgServiceUpdateDenomRequest) XXX_Size() int {
+func (m *MsgUpdateDenomRequest) XXX_Size() int {
 	return m.Size()
 }
-func (m *MsgServiceUpdateDenomRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgServiceUpdateDenomRequest.DiscardUnknown(m)
+func (m *MsgUpdateDenomRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgUpdateDenomRequest.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_MsgServiceUpdateDenomRequest proto.InternalMessageInfo
+var xxx_messageInfo_MsgUpdateDenomRequest proto.InternalMessageInfo
 
-func (m *MsgServiceUpdateDenomRequest) GetId() string {
+func (m *MsgUpdateDenomRequest) GetId() string {
 	if m != nil {
 		return m.Id
 	}
 	return ""
 }
 
-func (m *MsgServiceUpdateDenomRequest) GetName() string {
+func (m *MsgUpdateDenomRequest) GetName() string {
 	if m != nil {
 		return m.Name
 	}
 	return ""
 }
 
-func (m *MsgServiceUpdateDenomRequest) GetSymbol() string {
+func (m *MsgUpdateDenomRequest) GetSymbol() string {
 	if m != nil {
 		return m.Symbol
 	}
 	return ""
 }
 
-func (m *MsgServiceUpdateDenomRequest) GetDescription() string {
+func (m *MsgUpdateDenomRequest) GetDescription() string {
 	if m != nil {
 		return m.Description
 	}
 	return ""
 }
 
-func (m *MsgServiceUpdateDenomRequest) GetUri() string {
+func (m *MsgUpdateDenomRequest) GetUri() string {
 	if m != nil {
 		return m.Uri
 	}
 	return ""
 }
 
-func (m *MsgServiceUpdateDenomRequest) GetUriHash() string {
+func (m *MsgUpdateDenomRequest) GetUriHash() string {
 	if m != nil {
 		return m.UriHash
 	}
 	return ""
 }
 
-func (m *MsgServiceUpdateDenomRequest) GetData() string {
+func (m *MsgUpdateDenomRequest) GetData() string {
 	if m != nil {
 		return m.Data
 	}
 	return ""
 }
 
-func (m *MsgServiceUpdateDenomRequest) GetUpdater() string {
+func (m *MsgUpdateDenomRequest) GetUpdater() string {
 	if m != nil {
 		return m.Updater
 	}
 	return ""
 }
 
-type MsgServiceUpdateDenomResponse struct {
+type MsgUpdateDenomResponse struct {
 }
 
-func (m *MsgServiceUpdateDenomResponse) Reset()         { *m = MsgServiceUpdateDenomResponse{} }
-func (m *MsgServiceUpdateDenomResponse) String() string { return proto.CompactTextString(m) }
-func (*MsgServiceUpdateDenomResponse) ProtoMessage()    {}
-func (*MsgServiceUpdateDenomResponse) Descriptor() ([]byte, []int) {
+func (m *MsgUpdateDenomResponse) Reset()         { *m = MsgUpdateDenomResponse{} }
+func (m *MsgUpdateDenomResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgUpdateDenomResponse) ProtoMessage()    {}
+func (*MsgUpdateDenomResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_da49c5b4a63605b2, []int{3}
 }
-func (m *MsgServiceUpdateDenomResponse) XXX_Unmarshal(b []byte) error {
+func (m *MsgUpdateDenomResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *MsgServiceUpdateDenomResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *MsgUpdateDenomResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_MsgServiceUpdateDenomResponse.Marshal(b, m, deterministic)
+		return xxx_messageInfo_MsgUpdateDenomResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -287,35 +287,35 @@ func (m *MsgServiceUpdateDenomResponse) XXX_Marshal(b []byte, deterministic bool
 		return b[:n], nil
 	}
 }
-func (m *MsgServiceUpdateDenomResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgServiceUpdateDenomResponse.Merge(m, src)
+func (m *MsgUpdateDenomResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgUpdateDenomResponse.Merge(m, src)
 }
-func (m *MsgServiceUpdateDenomResponse) XXX_Size() int {
+func (m *MsgUpdateDenomResponse) XXX_Size() int {
 	return m.Size()
 }
-func (m *MsgServiceUpdateDenomResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgServiceUpdateDenomResponse.DiscardUnknown(m)
+func (m *MsgUpdateDenomResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgUpdateDenomResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_MsgServiceUpdateDenomResponse proto.InternalMessageInfo
+var xxx_messageInfo_MsgUpdateDenomResponse proto.InternalMessageInfo
 
-type MsgServiceDeleteDenomRequest struct {
+type MsgDeleteDenomRequest struct {
 	Id      string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	Remover string `protobuf:"bytes,2,opt,name=remover,proto3" json:"remover,omitempty"`
 }
 
-func (m *MsgServiceDeleteDenomRequest) Reset()         { *m = MsgServiceDeleteDenomRequest{} }
-func (m *MsgServiceDeleteDenomRequest) String() string { return proto.CompactTextString(m) }
-func (*MsgServiceDeleteDenomRequest) ProtoMessage()    {}
-func (*MsgServiceDeleteDenomRequest) Descriptor() ([]byte, []int) {
+func (m *MsgDeleteDenomRequest) Reset()         { *m = MsgDeleteDenomRequest{} }
+func (m *MsgDeleteDenomRequest) String() string { return proto.CompactTextString(m) }
+func (*MsgDeleteDenomRequest) ProtoMessage()    {}
+func (*MsgDeleteDenomRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_da49c5b4a63605b2, []int{4}
 }
-func (m *MsgServiceDeleteDenomRequest) XXX_Unmarshal(b []byte) error {
+func (m *MsgDeleteDenomRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *MsgServiceDeleteDenomRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *MsgDeleteDenomRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_MsgServiceDeleteDenomRequest.Marshal(b, m, deterministic)
+		return xxx_messageInfo_MsgDeleteDenomRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -325,47 +325,47 @@ func (m *MsgServiceDeleteDenomRequest) XXX_Marshal(b []byte, deterministic bool)
 		return b[:n], nil
 	}
 }
-func (m *MsgServiceDeleteDenomRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgServiceDeleteDenomRequest.Merge(m, src)
+func (m *MsgDeleteDenomRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgDeleteDenomRequest.Merge(m, src)
 }
-func (m *MsgServiceDeleteDenomRequest) XXX_Size() int {
+func (m *MsgDeleteDenomRequest) XXX_Size() int {
 	return m.Size()
 }
-func (m *MsgServiceDeleteDenomRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgServiceDeleteDenomRequest.DiscardUnknown(m)
+func (m *MsgDeleteDenomRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgDeleteDenomRequest.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_MsgServiceDeleteDenomRequest proto.InternalMessageInfo
+var xxx_messageInfo_MsgDeleteDenomRequest proto.InternalMessageInfo
 
-func (m *MsgServiceDeleteDenomRequest) GetId() string {
+func (m *MsgDeleteDenomRequest) GetId() string {
 	if m != nil {
 		return m.Id
 	}
 	return ""
 }
 
-func (m *MsgServiceDeleteDenomRequest) GetRemover() string {
+func (m *MsgDeleteDenomRequest) GetRemover() string {
 	if m != nil {
 		return m.Remover
 	}
 	return ""
 }
 
-type MsgServiceDeleteDenomResponse struct {
+type MsgDeleteDenomResponse struct {
 }
 
-func (m *MsgServiceDeleteDenomResponse) Reset()         { *m = MsgServiceDeleteDenomResponse{} }
-func (m *MsgServiceDeleteDenomResponse) String() string { return proto.CompactTextString(m) }
-func (*MsgServiceDeleteDenomResponse) ProtoMessage()    {}
-func (*MsgServiceDeleteDenomResponse) Descriptor() ([]byte, []int) {
+func (m *MsgDeleteDenomResponse) Reset()         { *m = MsgDeleteDenomResponse{} }
+func (m *MsgDeleteDenomResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgDeleteDenomResponse) ProtoMessage()    {}
+func (*MsgDeleteDenomResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_da49c5b4a63605b2, []int{5}
 }
-func (m *MsgServiceDeleteDenomResponse) XXX_Unmarshal(b []byte) error {
+func (m *MsgDeleteDenomResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *MsgServiceDeleteDenomResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *MsgDeleteDenomResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_MsgServiceDeleteDenomResponse.Marshal(b, m, deterministic)
+		return xxx_messageInfo_MsgDeleteDenomResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -375,36 +375,36 @@ func (m *MsgServiceDeleteDenomResponse) XXX_Marshal(b []byte, deterministic bool
 		return b[:n], nil
 	}
 }
-func (m *MsgServiceDeleteDenomResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgServiceDeleteDenomResponse.Merge(m, src)
+func (m *MsgDeleteDenomResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgDeleteDenomResponse.Merge(m, src)
 }
-func (m *MsgServiceDeleteDenomResponse) XXX_Size() int {
+func (m *MsgDeleteDenomResponse) XXX_Size() int {
 	return m.Size()
 }
-func (m *MsgServiceDeleteDenomResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgServiceDeleteDenomResponse.DiscardUnknown(m)
+func (m *MsgDeleteDenomResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgDeleteDenomResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_MsgServiceDeleteDenomResponse proto.InternalMessageInfo
+var xxx_messageInfo_MsgDeleteDenomResponse proto.InternalMessageInfo
 
-type MsgServiceTransferDenomRequest struct {
+type MsgTransferDenomRequest struct {
 	Id       string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	Sender   string `protobuf:"bytes,2,opt,name=sender,proto3" json:"sender,omitempty"`
 	Receiver string `protobuf:"bytes,3,opt,name=receiver,proto3" json:"receiver,omitempty"`
 }
 
-func (m *MsgServiceTransferDenomRequest) Reset()         { *m = MsgServiceTransferDenomRequest{} }
-func (m *MsgServiceTransferDenomRequest) String() string { return proto.CompactTextString(m) }
-func (*MsgServiceTransferDenomRequest) ProtoMessage()    {}
-func (*MsgServiceTransferDenomRequest) Descriptor() ([]byte, []int) {
+func (m *MsgTransferDenomRequest) Reset()         { *m = MsgTransferDenomRequest{} }
+func (m *MsgTransferDenomRequest) String() string { return proto.CompactTextString(m) }
+func (*MsgTransferDenomRequest) ProtoMessage()    {}
+func (*MsgTransferDenomRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_da49c5b4a63605b2, []int{6}
 }
-func (m *MsgServiceTransferDenomRequest) XXX_Unmarshal(b []byte) error {
+func (m *MsgTransferDenomRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *MsgServiceTransferDenomRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *MsgTransferDenomRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_MsgServiceTransferDenomRequest.Marshal(b, m, deterministic)
+		return xxx_messageInfo_MsgTransferDenomRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -414,54 +414,54 @@ func (m *MsgServiceTransferDenomRequest) XXX_Marshal(b []byte, deterministic boo
 		return b[:n], nil
 	}
 }
-func (m *MsgServiceTransferDenomRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgServiceTransferDenomRequest.Merge(m, src)
+func (m *MsgTransferDenomRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgTransferDenomRequest.Merge(m, src)
 }
-func (m *MsgServiceTransferDenomRequest) XXX_Size() int {
+func (m *MsgTransferDenomRequest) XXX_Size() int {
 	return m.Size()
 }
-func (m *MsgServiceTransferDenomRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgServiceTransferDenomRequest.DiscardUnknown(m)
+func (m *MsgTransferDenomRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgTransferDenomRequest.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_MsgServiceTransferDenomRequest proto.InternalMessageInfo
+var xxx_messageInfo_MsgTransferDenomRequest proto.InternalMessageInfo
 
-func (m *MsgServiceTransferDenomRequest) GetId() string {
+func (m *MsgTransferDenomRequest) GetId() string {
 	if m != nil {
 		return m.Id
 	}
 	return ""
 }
 
-func (m *MsgServiceTransferDenomRequest) GetSender() string {
+func (m *MsgTransferDenomRequest) GetSender() string {
 	if m != nil {
 		return m.Sender
 	}
 	return ""
 }
 
-func (m *MsgServiceTransferDenomRequest) GetReceiver() string {
+func (m *MsgTransferDenomRequest) GetReceiver() string {
 	if m != nil {
 		return m.Receiver
 	}
 	return ""
 }
 
-type MsgServiceTransferDenomResponse struct {
+type MsgTransferDenomResponse struct {
 }
 
-func (m *MsgServiceTransferDenomResponse) Reset()         { *m = MsgServiceTransferDenomResponse{} }
-func (m *MsgServiceTransferDenomResponse) String() string { return proto.CompactTextString(m) }
-func (*MsgServiceTransferDenomResponse) ProtoMessage()    {}
-func (*MsgServiceTransferDenomResponse) Descriptor() ([]byte, []int) {
+func (m *MsgTransferDenomResponse) Reset()         { *m = MsgTransferDenomResponse{} }
+func (m *MsgTransferDenomResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgTransferDenomResponse) ProtoMessage()    {}
+func (*MsgTransferDenomResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_da49c5b4a63605b2, []int{7}
 }
-func (m *MsgServiceTransferDenomResponse) XXX_Unmarshal(b []byte) error {
+func (m *MsgTransferDenomResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *MsgServiceTransferDenomResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *MsgTransferDenomResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_MsgServiceTransferDenomResponse.Marshal(b, m, deterministic)
+		return xxx_messageInfo_MsgTransferDenomResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -471,19 +471,19 @@ func (m *MsgServiceTransferDenomResponse) XXX_Marshal(b []byte, deterministic bo
 		return b[:n], nil
 	}
 }
-func (m *MsgServiceTransferDenomResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgServiceTransferDenomResponse.Merge(m, src)
+func (m *MsgTransferDenomResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgTransferDenomResponse.Merge(m, src)
 }
-func (m *MsgServiceTransferDenomResponse) XXX_Size() int {
+func (m *MsgTransferDenomResponse) XXX_Size() int {
 	return m.Size()
 }
-func (m *MsgServiceTransferDenomResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgServiceTransferDenomResponse.DiscardUnknown(m)
+func (m *MsgTransferDenomResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgTransferDenomResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_MsgServiceTransferDenomResponse proto.InternalMessageInfo
+var xxx_messageInfo_MsgTransferDenomResponse proto.InternalMessageInfo
 
-type MsgServiceMintPNFTRequest struct {
+type MsgMintPNFTRequest struct {
 	DenomId     string `protobuf:"bytes,1,opt,name=denom_id,json=denomId,proto3" json:"denom_id,omitempty"`
 	Id          string `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`
 	Name        string `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
@@ -494,18 +494,18 @@ type MsgServiceMintPNFTRequest struct {
 	Creator     string `protobuf:"bytes,8,opt,name=creator,proto3" json:"creator,omitempty"`
 }
 
-func (m *MsgServiceMintPNFTRequest) Reset()         { *m = MsgServiceMintPNFTRequest{} }
-func (m *MsgServiceMintPNFTRequest) String() string { return proto.CompactTextString(m) }
-func (*MsgServiceMintPNFTRequest) ProtoMessage()    {}
-func (*MsgServiceMintPNFTRequest) Descriptor() ([]byte, []int) {
+func (m *MsgMintPNFTRequest) Reset()         { *m = MsgMintPNFTRequest{} }
+func (m *MsgMintPNFTRequest) String() string { return proto.CompactTextString(m) }
+func (*MsgMintPNFTRequest) ProtoMessage()    {}
+func (*MsgMintPNFTRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_da49c5b4a63605b2, []int{8}
 }
-func (m *MsgServiceMintPNFTRequest) XXX_Unmarshal(b []byte) error {
+func (m *MsgMintPNFTRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *MsgServiceMintPNFTRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *MsgMintPNFTRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_MsgServiceMintPNFTRequest.Marshal(b, m, deterministic)
+		return xxx_messageInfo_MsgMintPNFTRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -515,89 +515,89 @@ func (m *MsgServiceMintPNFTRequest) XXX_Marshal(b []byte, deterministic bool) ([
 		return b[:n], nil
 	}
 }
-func (m *MsgServiceMintPNFTRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgServiceMintPNFTRequest.Merge(m, src)
+func (m *MsgMintPNFTRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgMintPNFTRequest.Merge(m, src)
 }
-func (m *MsgServiceMintPNFTRequest) XXX_Size() int {
+func (m *MsgMintPNFTRequest) XXX_Size() int {
 	return m.Size()
 }
-func (m *MsgServiceMintPNFTRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgServiceMintPNFTRequest.DiscardUnknown(m)
+func (m *MsgMintPNFTRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgMintPNFTRequest.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_MsgServiceMintPNFTRequest proto.InternalMessageInfo
+var xxx_messageInfo_MsgMintPNFTRequest proto.InternalMessageInfo
 
-func (m *MsgServiceMintPNFTRequest) GetDenomId() string {
+func (m *MsgMintPNFTRequest) GetDenomId() string {
 	if m != nil {
 		return m.DenomId
 	}
 	return ""
 }
 
-func (m *MsgServiceMintPNFTRequest) GetId() string {
+func (m *MsgMintPNFTRequest) GetId() string {
 	if m != nil {
 		return m.Id
 	}
 	return ""
 }
 
-func (m *MsgServiceMintPNFTRequest) GetName() string {
+func (m *MsgMintPNFTRequest) GetName() string {
 	if m != nil {
 		return m.Name
 	}
 	return ""
 }
 
-func (m *MsgServiceMintPNFTRequest) GetDescription() string {
+func (m *MsgMintPNFTRequest) GetDescription() string {
 	if m != nil {
 		return m.Description
 	}
 	return ""
 }
 
-func (m *MsgServiceMintPNFTRequest) GetUri() string {
+func (m *MsgMintPNFTRequest) GetUri() string {
 	if m != nil {
 		return m.Uri
 	}
 	return ""
 }
 
-func (m *MsgServiceMintPNFTRequest) GetUriHash() string {
+func (m *MsgMintPNFTRequest) GetUriHash() string {
 	if m != nil {
 		return m.UriHash
 	}
 	return ""
 }
 
-func (m *MsgServiceMintPNFTRequest) GetData() string {
+func (m *MsgMintPNFTRequest) GetData() string {
 	if m != nil {
 		return m.Data
 	}
 	return ""
 }
 
-func (m *MsgServiceMintPNFTRequest) GetCreator() string {
+func (m *MsgMintPNFTRequest) GetCreator() string {
 	if m != nil {
 		return m.Creator
 	}
 	return ""
 }
 
-type MsgServiceMintPNFTResponse struct {
+type MsgMintPNFTResponse struct {
 }
 
-func (m *MsgServiceMintPNFTResponse) Reset()         { *m = MsgServiceMintPNFTResponse{} }
-func (m *MsgServiceMintPNFTResponse) String() string { return proto.CompactTextString(m) }
-func (*MsgServiceMintPNFTResponse) ProtoMessage()    {}
-func (*MsgServiceMintPNFTResponse) Descriptor() ([]byte, []int) {
+func (m *MsgMintPNFTResponse) Reset()         { *m = MsgMintPNFTResponse{} }
+func (m *MsgMintPNFTResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgMintPNFTResponse) ProtoMessage()    {}
+func (*MsgMintPNFTResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_da49c5b4a63605b2, []int{9}
 }
-func (m *MsgServiceMintPNFTResponse) XXX_Unmarshal(b []byte) error {
+func (m *MsgMintPNFTResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *MsgServiceMintPNFTResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *MsgMintPNFTResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_MsgServiceMintPNFTResponse.Marshal(b, m, deterministic)
+		return xxx_messageInfo_MsgMintPNFTResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -607,37 +607,37 @@ func (m *MsgServiceMintPNFTResponse) XXX_Marshal(b []byte, deterministic bool) (
 		return b[:n], nil
 	}
 }
-func (m *MsgServiceMintPNFTResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgServiceMintPNFTResponse.Merge(m, src)
+func (m *MsgMintPNFTResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgMintPNFTResponse.Merge(m, src)
 }
-func (m *MsgServiceMintPNFTResponse) XXX_Size() int {
+func (m *MsgMintPNFTResponse) XXX_Size() int {
 	return m.Size()
 }
-func (m *MsgServiceMintPNFTResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgServiceMintPNFTResponse.DiscardUnknown(m)
+func (m *MsgMintPNFTResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgMintPNFTResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_MsgServiceMintPNFTResponse proto.InternalMessageInfo
+var xxx_messageInfo_MsgMintPNFTResponse proto.InternalMessageInfo
 
-type MsgServiceTransferPNFTRequest struct {
+type MsgTransferPNFTRequest struct {
 	DenomId  string `protobuf:"bytes,1,opt,name=denom_id,json=denomId,proto3" json:"denom_id,omitempty"`
 	Id       string `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`
 	Sender   string `protobuf:"bytes,3,opt,name=sender,proto3" json:"sender,omitempty"`
 	Receiver string `protobuf:"bytes,4,opt,name=receiver,proto3" json:"receiver,omitempty"`
 }
 
-func (m *MsgServiceTransferPNFTRequest) Reset()         { *m = MsgServiceTransferPNFTRequest{} }
-func (m *MsgServiceTransferPNFTRequest) String() string { return proto.CompactTextString(m) }
-func (*MsgServiceTransferPNFTRequest) ProtoMessage()    {}
-func (*MsgServiceTransferPNFTRequest) Descriptor() ([]byte, []int) {
+func (m *MsgTransferPNFTRequest) Reset()         { *m = MsgTransferPNFTRequest{} }
+func (m *MsgTransferPNFTRequest) String() string { return proto.CompactTextString(m) }
+func (*MsgTransferPNFTRequest) ProtoMessage()    {}
+func (*MsgTransferPNFTRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_da49c5b4a63605b2, []int{10}
 }
-func (m *MsgServiceTransferPNFTRequest) XXX_Unmarshal(b []byte) error {
+func (m *MsgTransferPNFTRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *MsgServiceTransferPNFTRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *MsgTransferPNFTRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_MsgServiceTransferPNFTRequest.Marshal(b, m, deterministic)
+		return xxx_messageInfo_MsgTransferPNFTRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -647,61 +647,61 @@ func (m *MsgServiceTransferPNFTRequest) XXX_Marshal(b []byte, deterministic bool
 		return b[:n], nil
 	}
 }
-func (m *MsgServiceTransferPNFTRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgServiceTransferPNFTRequest.Merge(m, src)
+func (m *MsgTransferPNFTRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgTransferPNFTRequest.Merge(m, src)
 }
-func (m *MsgServiceTransferPNFTRequest) XXX_Size() int {
+func (m *MsgTransferPNFTRequest) XXX_Size() int {
 	return m.Size()
 }
-func (m *MsgServiceTransferPNFTRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgServiceTransferPNFTRequest.DiscardUnknown(m)
+func (m *MsgTransferPNFTRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgTransferPNFTRequest.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_MsgServiceTransferPNFTRequest proto.InternalMessageInfo
+var xxx_messageInfo_MsgTransferPNFTRequest proto.InternalMessageInfo
 
-func (m *MsgServiceTransferPNFTRequest) GetDenomId() string {
+func (m *MsgTransferPNFTRequest) GetDenomId() string {
 	if m != nil {
 		return m.DenomId
 	}
 	return ""
 }
 
-func (m *MsgServiceTransferPNFTRequest) GetId() string {
+func (m *MsgTransferPNFTRequest) GetId() string {
 	if m != nil {
 		return m.Id
 	}
 	return ""
 }
 
-func (m *MsgServiceTransferPNFTRequest) GetSender() string {
+func (m *MsgTransferPNFTRequest) GetSender() string {
 	if m != nil {
 		return m.Sender
 	}
 	return ""
 }
 
-func (m *MsgServiceTransferPNFTRequest) GetReceiver() string {
+func (m *MsgTransferPNFTRequest) GetReceiver() string {
 	if m != nil {
 		return m.Receiver
 	}
 	return ""
 }
 
-type MsgServiceTransferPNFTResponse struct {
+type MsgTransferPNFTResponse struct {
 }
 
-func (m *MsgServiceTransferPNFTResponse) Reset()         { *m = MsgServiceTransferPNFTResponse{} }
-func (m *MsgServiceTransferPNFTResponse) String() string { return proto.CompactTextString(m) }
-func (*MsgServiceTransferPNFTResponse) ProtoMessage()    {}
-func (*MsgServiceTransferPNFTResponse) Descriptor() ([]byte, []int) {
+func (m *MsgTransferPNFTResponse) Reset()         { *m = MsgTransferPNFTResponse{} }
+func (m *MsgTransferPNFTResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgTransferPNFTResponse) ProtoMessage()    {}
+func (*MsgTransferPNFTResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_da49c5b4a63605b2, []int{11}
 }
-func (m *MsgServiceTransferPNFTResponse) XXX_Unmarshal(b []byte) error {
+func (m *MsgTransferPNFTResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *MsgServiceTransferPNFTResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *MsgTransferPNFTResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_MsgServiceTransferPNFTResponse.Marshal(b, m, deterministic)
+		return xxx_messageInfo_MsgTransferPNFTResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -711,36 +711,36 @@ func (m *MsgServiceTransferPNFTResponse) XXX_Marshal(b []byte, deterministic boo
 		return b[:n], nil
 	}
 }
-func (m *MsgServiceTransferPNFTResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgServiceTransferPNFTResponse.Merge(m, src)
+func (m *MsgTransferPNFTResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgTransferPNFTResponse.Merge(m, src)
 }
-func (m *MsgServiceTransferPNFTResponse) XXX_Size() int {
+func (m *MsgTransferPNFTResponse) XXX_Size() int {
 	return m.Size()
 }
-func (m *MsgServiceTransferPNFTResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgServiceTransferPNFTResponse.DiscardUnknown(m)
+func (m *MsgTransferPNFTResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgTransferPNFTResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_MsgServiceTransferPNFTResponse proto.InternalMessageInfo
+var xxx_messageInfo_MsgTransferPNFTResponse proto.InternalMessageInfo
 
-type MsgServiceBurnPNFTRequest struct {
+type MsgBurnPNFTRequest struct {
 	DenomId string `protobuf:"bytes,1,opt,name=denom_id,json=denomId,proto3" json:"denom_id,omitempty"`
 	Id      string `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`
 	Burner  string `protobuf:"bytes,3,opt,name=burner,proto3" json:"burner,omitempty"`
 }
 
-func (m *MsgServiceBurnPNFTRequest) Reset()         { *m = MsgServiceBurnPNFTRequest{} }
-func (m *MsgServiceBurnPNFTRequest) String() string { return proto.CompactTextString(m) }
-func (*MsgServiceBurnPNFTRequest) ProtoMessage()    {}
-func (*MsgServiceBurnPNFTRequest) Descriptor() ([]byte, []int) {
+func (m *MsgBurnPNFTRequest) Reset()         { *m = MsgBurnPNFTRequest{} }
+func (m *MsgBurnPNFTRequest) String() string { return proto.CompactTextString(m) }
+func (*MsgBurnPNFTRequest) ProtoMessage()    {}
+func (*MsgBurnPNFTRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_da49c5b4a63605b2, []int{12}
 }
-func (m *MsgServiceBurnPNFTRequest) XXX_Unmarshal(b []byte) error {
+func (m *MsgBurnPNFTRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *MsgServiceBurnPNFTRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *MsgBurnPNFTRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_MsgServiceBurnPNFTRequest.Marshal(b, m, deterministic)
+		return xxx_messageInfo_MsgBurnPNFTRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -750,54 +750,54 @@ func (m *MsgServiceBurnPNFTRequest) XXX_Marshal(b []byte, deterministic bool) ([
 		return b[:n], nil
 	}
 }
-func (m *MsgServiceBurnPNFTRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgServiceBurnPNFTRequest.Merge(m, src)
+func (m *MsgBurnPNFTRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgBurnPNFTRequest.Merge(m, src)
 }
-func (m *MsgServiceBurnPNFTRequest) XXX_Size() int {
+func (m *MsgBurnPNFTRequest) XXX_Size() int {
 	return m.Size()
 }
-func (m *MsgServiceBurnPNFTRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgServiceBurnPNFTRequest.DiscardUnknown(m)
+func (m *MsgBurnPNFTRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgBurnPNFTRequest.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_MsgServiceBurnPNFTRequest proto.InternalMessageInfo
+var xxx_messageInfo_MsgBurnPNFTRequest proto.InternalMessageInfo
 
-func (m *MsgServiceBurnPNFTRequest) GetDenomId() string {
+func (m *MsgBurnPNFTRequest) GetDenomId() string {
 	if m != nil {
 		return m.DenomId
 	}
 	return ""
 }
 
-func (m *MsgServiceBurnPNFTRequest) GetId() string {
+func (m *MsgBurnPNFTRequest) GetId() string {
 	if m != nil {
 		return m.Id
 	}
 	return ""
 }
 
-func (m *MsgServiceBurnPNFTRequest) GetBurner() string {
+func (m *MsgBurnPNFTRequest) GetBurner() string {
 	if m != nil {
 		return m.Burner
 	}
 	return ""
 }
 
-type MsgServiceBurnPNFTResponse struct {
+type MsgBurnPNFTResponse struct {
 }
 
-func (m *MsgServiceBurnPNFTResponse) Reset()         { *m = MsgServiceBurnPNFTResponse{} }
-func (m *MsgServiceBurnPNFTResponse) String() string { return proto.CompactTextString(m) }
-func (*MsgServiceBurnPNFTResponse) ProtoMessage()    {}
-func (*MsgServiceBurnPNFTResponse) Descriptor() ([]byte, []int) {
+func (m *MsgBurnPNFTResponse) Reset()         { *m = MsgBurnPNFTResponse{} }
+func (m *MsgBurnPNFTResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgBurnPNFTResponse) ProtoMessage()    {}
+func (*MsgBurnPNFTResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_da49c5b4a63605b2, []int{13}
 }
-func (m *MsgServiceBurnPNFTResponse) XXX_Unmarshal(b []byte) error {
+func (m *MsgBurnPNFTResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *MsgServiceBurnPNFTResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *MsgBurnPNFTResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_MsgServiceBurnPNFTResponse.Marshal(b, m, deterministic)
+		return xxx_messageInfo_MsgBurnPNFTResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -807,77 +807,77 @@ func (m *MsgServiceBurnPNFTResponse) XXX_Marshal(b []byte, deterministic bool) (
 		return b[:n], nil
 	}
 }
-func (m *MsgServiceBurnPNFTResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgServiceBurnPNFTResponse.Merge(m, src)
+func (m *MsgBurnPNFTResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgBurnPNFTResponse.Merge(m, src)
 }
-func (m *MsgServiceBurnPNFTResponse) XXX_Size() int {
+func (m *MsgBurnPNFTResponse) XXX_Size() int {
 	return m.Size()
 }
-func (m *MsgServiceBurnPNFTResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgServiceBurnPNFTResponse.DiscardUnknown(m)
+func (m *MsgBurnPNFTResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgBurnPNFTResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_MsgServiceBurnPNFTResponse proto.InternalMessageInfo
+var xxx_messageInfo_MsgBurnPNFTResponse proto.InternalMessageInfo
 
 func init() {
-	proto.RegisterType((*MsgServiceCreateDenomRequest)(nil), "panacea.pnft.v2.MsgServiceCreateDenomRequest")
-	proto.RegisterType((*MsgServiceCreateDenomResponse)(nil), "panacea.pnft.v2.MsgServiceCreateDenomResponse")
-	proto.RegisterType((*MsgServiceUpdateDenomRequest)(nil), "panacea.pnft.v2.MsgServiceUpdateDenomRequest")
-	proto.RegisterType((*MsgServiceUpdateDenomResponse)(nil), "panacea.pnft.v2.MsgServiceUpdateDenomResponse")
-	proto.RegisterType((*MsgServiceDeleteDenomRequest)(nil), "panacea.pnft.v2.MsgServiceDeleteDenomRequest")
-	proto.RegisterType((*MsgServiceDeleteDenomResponse)(nil), "panacea.pnft.v2.MsgServiceDeleteDenomResponse")
-	proto.RegisterType((*MsgServiceTransferDenomRequest)(nil), "panacea.pnft.v2.MsgServiceTransferDenomRequest")
-	proto.RegisterType((*MsgServiceTransferDenomResponse)(nil), "panacea.pnft.v2.MsgServiceTransferDenomResponse")
-	proto.RegisterType((*MsgServiceMintPNFTRequest)(nil), "panacea.pnft.v2.MsgServiceMintPNFTRequest")
-	proto.RegisterType((*MsgServiceMintPNFTResponse)(nil), "panacea.pnft.v2.MsgServiceMintPNFTResponse")
-	proto.RegisterType((*MsgServiceTransferPNFTRequest)(nil), "panacea.pnft.v2.MsgServiceTransferPNFTRequest")
-	proto.RegisterType((*MsgServiceTransferPNFTResponse)(nil), "panacea.pnft.v2.MsgServiceTransferPNFTResponse")
-	proto.RegisterType((*MsgServiceBurnPNFTRequest)(nil), "panacea.pnft.v2.MsgServiceBurnPNFTRequest")
-	proto.RegisterType((*MsgServiceBurnPNFTResponse)(nil), "panacea.pnft.v2.MsgServiceBurnPNFTResponse")
+	proto.RegisterType((*MsgCreateDenomRequest)(nil), "panacea.pnft.v2.MsgCreateDenomRequest")
+	proto.RegisterType((*MsgCreateDenomResponse)(nil), "panacea.pnft.v2.MsgCreateDenomResponse")
+	proto.RegisterType((*MsgUpdateDenomRequest)(nil), "panacea.pnft.v2.MsgUpdateDenomRequest")
+	proto.RegisterType((*MsgUpdateDenomResponse)(nil), "panacea.pnft.v2.MsgUpdateDenomResponse")
+	proto.RegisterType((*MsgDeleteDenomRequest)(nil), "panacea.pnft.v2.MsgDeleteDenomRequest")
+	proto.RegisterType((*MsgDeleteDenomResponse)(nil), "panacea.pnft.v2.MsgDeleteDenomResponse")
+	proto.RegisterType((*MsgTransferDenomRequest)(nil), "panacea.pnft.v2.MsgTransferDenomRequest")
+	proto.RegisterType((*MsgTransferDenomResponse)(nil), "panacea.pnft.v2.MsgTransferDenomResponse")
+	proto.RegisterType((*MsgMintPNFTRequest)(nil), "panacea.pnft.v2.MsgMintPNFTRequest")
+	proto.RegisterType((*MsgMintPNFTResponse)(nil), "panacea.pnft.v2.MsgMintPNFTResponse")
+	proto.RegisterType((*MsgTransferPNFTRequest)(nil), "panacea.pnft.v2.MsgTransferPNFTRequest")
+	proto.RegisterType((*MsgTransferPNFTResponse)(nil), "panacea.pnft.v2.MsgTransferPNFTResponse")
+	proto.RegisterType((*MsgBurnPNFTRequest)(nil), "panacea.pnft.v2.MsgBurnPNFTRequest")
+	proto.RegisterType((*MsgBurnPNFTResponse)(nil), "panacea.pnft.v2.MsgBurnPNFTResponse")
 }
 
 func init() { proto.RegisterFile("panacea/pnft/v2/tx.proto", fileDescriptor_da49c5b4a63605b2) }
 
 var fileDescriptor_da49c5b4a63605b2 = []byte{
-	// 601 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xd4, 0x56, 0x4d, 0x6f, 0xd3, 0x40,
-	0x10, 0xad, 0x93, 0x90, 0x84, 0x29, 0x5f, 0xda, 0x03, 0xda, 0x44, 0xc5, 0x0d, 0x39, 0x21, 0x50,
-	0x6c, 0x14, 0xfe, 0x41, 0xa9, 0x50, 0x7b, 0x28, 0xaa, 0x4a, 0xb9, 0x70, 0xa0, 0x72, 0xec, 0x69,
-	0xb3, 0x52, 0xbc, 0x6b, 0xd6, 0x76, 0xd4, 0x5e, 0xb8, 0x71, 0xe7, 0x67, 0x71, 0xec, 0x0d, 0x8e,
-	0x28, 0xf9, 0x23, 0xc8, 0xf6, 0x26, 0xfe, 0x48, 0xb2, 0x44, 0xbd, 0x20, 0x6e, 0x3b, 0xbb, 0xe3,
-	0x7d, 0xef, 0xed, 0xcc, 0x1b, 0x19, 0x68, 0xe0, 0x70, 0xc7, 0x45, 0xc7, 0x0e, 0xf8, 0x65, 0x64,
-	0x4f, 0x87, 0x76, 0x74, 0x6d, 0x05, 0x52, 0x44, 0x82, 0x3c, 0x56, 0x27, 0x56, 0x72, 0x62, 0x4d,
-	0x87, 0xfd, 0x9f, 0x06, 0xec, 0x9d, 0x84, 0x57, 0x1f, 0x50, 0x4e, 0x99, 0x8b, 0x6f, 0x25, 0x3a,
-	0x11, 0x1e, 0x22, 0x17, 0xfe, 0x19, 0x7e, 0x89, 0x31, 0x8c, 0xc8, 0x23, 0xa8, 0x31, 0x8f, 0x1a,
-	0x3d, 0xe3, 0xc5, 0xfd, 0xb3, 0x1a, 0xf3, 0x08, 0x81, 0x06, 0x77, 0x7c, 0xa4, 0xb5, 0x74, 0x27,
-	0x5d, 0x93, 0xa7, 0xd0, 0x0c, 0x6f, 0xfc, 0x91, 0x98, 0xd0, 0x7a, 0xba, 0xab, 0x22, 0xd2, 0x83,
-	0x5d, 0x0f, 0x43, 0x57, 0xb2, 0x20, 0x62, 0x82, 0xd3, 0x46, 0x7a, 0x58, 0xdc, 0x22, 0x4f, 0xa0,
-	0x1e, 0x4b, 0x46, 0xef, 0xa5, 0x27, 0xc9, 0x92, 0x74, 0xa0, 0x1d, 0x4b, 0x76, 0x31, 0x76, 0xc2,
-	0x31, 0x6d, 0xa6, 0xdb, 0xad, 0x58, 0xb2, 0x23, 0x27, 0x1c, 0x27, 0xd0, 0x9e, 0x13, 0x39, 0xb4,
-	0x95, 0x41, 0x27, 0x6b, 0x42, 0xa1, 0xe5, 0x26, 0xa4, 0x85, 0xa4, 0xed, 0x2c, 0x5b, 0x85, 0xfd,
-	0x7d, 0x78, 0xb6, 0x41, 0x58, 0x18, 0x08, 0x1e, 0x62, 0x45, 0xfa, 0xc7, 0xc0, 0xfb, 0xff, 0xa4,
-	0xc7, 0x29, 0xe9, 0xa5, 0x74, 0x15, 0x96, 0xa5, 0x97, 0x84, 0x29, 0xe9, 0x47, 0x45, 0xe5, 0x87,
-	0x38, 0xc1, 0xbf, 0x28, 0xa7, 0xd0, 0x92, 0xe8, 0x8b, 0x29, 0x4a, 0x25, 0x7e, 0x11, 0x96, 0xa1,
-	0x4a, 0x37, 0x29, 0x28, 0x0f, 0xcc, 0x3c, 0xe1, 0x5c, 0x3a, 0x3c, 0xbc, 0x44, 0xa9, 0x05, 0x4b,
-	0x9e, 0x14, 0xb9, 0xb7, 0xc4, 0x52, 0x11, 0xe9, 0x42, 0x5b, 0xa2, 0x8b, 0x2c, 0x61, 0x91, 0x3d,
-	0xf6, 0x32, 0xee, 0x3f, 0x87, 0xfd, 0x8d, 0x28, 0x79, 0xb9, 0x3b, 0x79, 0xce, 0x09, 0xe3, 0xd1,
-	0xe9, 0xfb, 0x77, 0xe7, 0x0b, 0x12, 0x1d, 0x68, 0x7b, 0x49, 0xfa, 0xc5, 0x92, 0x4a, 0x2b, 0x8d,
-	0x8f, 0x3d, 0xc5, 0xaf, 0xb6, 0xd2, 0x06, 0xf5, 0x42, 0x1b, 0xfc, 0xd3, 0x4e, 0xdf, 0x83, 0xee,
-	0x3a, 0x61, 0x4a, 0xf7, 0xd7, 0x62, 0x85, 0x16, 0x4f, 0x73, 0x47, 0xe9, 0x79, 0x69, 0xea, 0x1b,
-	0x4b, 0xd3, 0xa8, 0x94, 0xa6, 0xb7, 0xae, 0x01, 0x4a, 0x0c, 0x3f, 0x17, 0x0b, 0x73, 0x10, 0x4b,
-	0x7e, 0x77, 0x76, 0xa3, 0x58, 0xf2, 0x9c, 0x5d, 0x16, 0x95, 0xdf, 0x27, 0xbf, 0x3f, 0x43, 0x1f,
-	0x7e, 0x6b, 0x02, 0xe4, 0xc7, 0x64, 0x02, 0xbb, 0x85, 0x61, 0x41, 0x06, 0x56, 0x65, 0x62, 0x5a,
-	0xba, 0x69, 0xd9, 0xb5, 0xb6, 0x4d, 0xcf, 0xc0, 0x13, 0xb4, 0x82, 0x3f, 0xb5, 0x68, 0xab, 0x03,
-	0x4a, 0x8b, 0xb6, 0xc6, 0xf6, 0x09, 0x5a, 0xc1, 0xa2, 0x5a, 0xb4, 0xd5, 0xa1, 0xa0, 0x45, 0x5b,
-	0xe3, 0x7c, 0x22, 0xe1, 0x61, 0xc9, 0x89, 0xc4, 0xd6, 0x5c, 0xb0, 0x6e, 0x32, 0x74, 0x5f, 0x6f,
-	0xff, 0x81, 0xc2, 0x74, 0xa1, 0xbd, 0x30, 0x00, 0x79, 0xa9, 0xf9, 0xba, 0x62, 0xff, 0xee, 0xab,
-	0xad, 0x72, 0x15, 0x88, 0x80, 0x07, 0xc5, 0x3e, 0x26, 0xd6, 0x16, 0x34, 0x8b, 0x60, 0xf6, 0xd6,
-	0xf9, 0xb9, 0xaa, 0x45, 0xdb, 0x6a, 0x55, 0x55, 0xbc, 0xa3, 0x55, 0x55, 0xf5, 0xc1, 0xc1, 0xf1,
-	0x8f, 0x99, 0x69, 0xdc, 0xce, 0x4c, 0xe3, 0xf7, 0xcc, 0x34, 0xbe, 0xcf, 0xcd, 0x9d, 0xdb, 0xb9,
-	0xb9, 0xf3, 0x6b, 0x6e, 0xee, 0x9c, 0x1a, 0x9f, 0x06, 0x57, 0x2c, 0x1a, 0xc7, 0x23, 0xcb, 0x15,
-	0xbe, 0xed, 0xa3, 0xc7, 0x46, 0x13, 0xe1, 0xda, 0xea, 0xee, 0x81, 0x2b, 0x24, 0xda, 0xd7, 0xd9,
-	0xbf, 0x46, 0x74, 0x13, 0x60, 0x38, 0x6a, 0xa6, 0x3f, 0x1b, 0x6f, 0xfe, 0x04, 0x00, 0x00, 0xff,
-	0xff, 0xfb, 0xd7, 0xd8, 0xe0, 0x88, 0x08, 0x00, 0x00,
+	// 597 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xd4, 0x55, 0xdd, 0x6e, 0xd3, 0x30,
+	0x14, 0x6e, 0xda, 0xae, 0x2d, 0x1e, 0x7f, 0x32, 0xda, 0x70, 0x7b, 0x11, 0x4d, 0x05, 0xb1, 0x72,
+	0xb1, 0x44, 0x2a, 0x4f, 0xc0, 0x98, 0x10, 0xbb, 0x28, 0x9a, 0xa6, 0x4d, 0x48, 0x48, 0x30, 0xb9,
+	0x89, 0xd7, 0x5a, 0x6a, 0xec, 0x60, 0x27, 0x65, 0x7b, 0x0b, 0x1e, 0x80, 0x07, 0xe2, 0xb2, 0x97,
+	0x5c, 0xa2, 0xf6, 0x45, 0x50, 0x1c, 0xa7, 0x4d, 0x52, 0xd3, 0xa2, 0xdd, 0x20, 0xee, 0x7c, 0xec,
+	0x93, 0xef, 0x7c, 0xdf, 0xf1, 0xf9, 0x1c, 0x80, 0x42, 0xcc, 0xb0, 0x47, 0xb0, 0x1b, 0xb2, 0xeb,
+	0xc8, 0x9d, 0xf6, 0xdd, 0xe8, 0xc6, 0x09, 0x05, 0x8f, 0x38, 0x7c, 0xa4, 0x4f, 0x9c, 0xe4, 0xc4,
+	0x99, 0xf6, 0xbb, 0x33, 0x0b, 0xec, 0x0d, 0xe4, 0xe8, 0x8d, 0x20, 0x38, 0x22, 0x27, 0x84, 0xf1,
+	0xe0, 0x9c, 0x7c, 0x89, 0x89, 0x8c, 0xe0, 0x43, 0x50, 0xa5, 0x3e, 0xb2, 0x0e, 0xac, 0xde, 0xbd,
+	0xf3, 0x2a, 0xf5, 0x21, 0x04, 0x75, 0x86, 0x03, 0x82, 0xaa, 0x6a, 0x47, 0xad, 0xe1, 0x3e, 0x68,
+	0xc8, 0xdb, 0x60, 0xc8, 0x27, 0xa8, 0xa6, 0x76, 0x75, 0x04, 0x0f, 0xc0, 0xae, 0x4f, 0xa4, 0x27,
+	0x68, 0x18, 0x51, 0xce, 0x50, 0x5d, 0x1d, 0xe6, 0xb7, 0xe0, 0x63, 0x50, 0x8b, 0x05, 0x45, 0x3b,
+	0xea, 0x24, 0x59, 0xc2, 0x36, 0x68, 0xc5, 0x82, 0x5e, 0x8d, 0xb1, 0x1c, 0xa3, 0x86, 0xda, 0x6e,
+	0xc6, 0x82, 0xbe, 0xc3, 0x72, 0x9c, 0x94, 0xf6, 0x71, 0x84, 0x51, 0x33, 0x2d, 0x9d, 0xac, 0x21,
+	0x02, 0x4d, 0x2f, 0x21, 0xcd, 0x05, 0x6a, 0xa5, 0xd9, 0x3a, 0xec, 0x22, 0xb0, 0x5f, 0x56, 0x24,
+	0x43, 0xce, 0x24, 0xc9, 0xc4, 0x5e, 0x86, 0xfe, 0xff, 0x27, 0x36, 0x56, 0xa4, 0x97, 0x62, 0x75,
+	0xa8, 0xc5, 0x16, 0x14, 0x69, 0xb1, 0xaf, 0x95, 0xd6, 0x13, 0x32, 0x21, 0x5b, 0xb4, 0x22, 0xd0,
+	0x14, 0x24, 0xe0, 0x53, 0x22, 0xb4, 0xdc, 0x2c, 0xd4, 0xe0, 0x05, 0x08, 0x0d, 0xfe, 0x09, 0x3c,
+	0x1d, 0xc8, 0xd1, 0x85, 0xc0, 0x4c, 0x5e, 0x13, 0xb1, 0x11, 0x3e, 0x69, 0x1b, 0x61, 0xfe, 0x12,
+	0x5d, 0x47, 0xb0, 0x03, 0x5a, 0x82, 0x78, 0x84, 0x26, 0x75, 0xd3, 0x86, 0x2e, 0xe3, 0x6e, 0x07,
+	0xa0, 0x75, 0xf8, 0xd5, 0x25, 0xc2, 0x81, 0x1c, 0x0d, 0x28, 0x8b, 0xce, 0xde, 0xbf, 0xbd, 0xc8,
+	0xca, 0xb6, 0x41, 0xcb, 0x4f, 0xf2, 0xae, 0x96, 0xc5, 0x9b, 0x2a, 0x3e, 0xf5, 0x35, 0xa3, 0xea,
+	0xda, 0xe5, 0xd6, 0x72, 0x97, 0xfb, 0x4f, 0x27, 0x76, 0x0f, 0x3c, 0x29, 0x28, 0xd2, 0x4a, 0xbf,
+	0xaa, 0xf6, 0x67, 0x5d, 0xb8, 0xa3, 0xd8, 0x55, 0xfb, 0x6b, 0x7f, 0x6c, 0x7f, 0xbd, 0xd4, 0xfe,
+	0x76, 0xe1, 0x76, 0x0b, 0x9c, 0x3e, 0xa8, 0xe6, 0x1f, 0xc7, 0x82, 0xdd, 0x9d, 0xcf, 0x30, 0x16,
+	0x6c, 0xc5, 0x27, 0x8d, 0x74, 0x0f, 0x56, 0xc0, 0x69, 0xbd, 0xfe, 0xf7, 0x1d, 0x50, 0x1b, 0xc8,
+	0x11, 0xfc, 0x0c, 0x76, 0x73, 0x8e, 0x86, 0x2f, 0x9c, 0xd2, 0x43, 0xe6, 0x18, 0x1f, 0xb1, 0xce,
+	0xe1, 0xd6, 0xbc, 0xb4, 0x4e, 0x82, 0x9f, 0x33, 0x91, 0x19, 0x7f, 0xfd, 0xdd, 0x30, 0xe3, 0x1b,
+	0xdc, 0x98, 0xe0, 0xe7, 0x7c, 0x64, 0xc6, 0x5f, 0xf7, 0xaa, 0x19, 0xdf, 0x60, 0x48, 0xe8, 0x83,
+	0x07, 0x05, 0xbb, 0xc0, 0x9e, 0xe9, 0x4b, 0x93, 0x61, 0x3b, 0x2f, 0xff, 0x22, 0x53, 0x57, 0xb9,
+	0x04, 0xad, 0x6c, 0x4a, 0xe1, 0x33, 0xd3, 0x67, 0x25, 0x57, 0x76, 0x9e, 0x6f, 0x4e, 0xd2, 0xb0,
+	0x18, 0xdc, 0xcf, 0x0f, 0x1b, 0x3c, 0xdc, 0xc4, 0x28, 0x0f, 0xdf, 0xdb, 0x9e, 0xb8, 0x62, 0x9e,
+	0xcd, 0x96, 0x99, 0x79, 0x69, 0xa4, 0xcd, 0xcc, 0xcb, 0xe3, 0x79, 0x7c, 0xfa, 0x63, 0x6e, 0x5b,
+	0xb3, 0xb9, 0x6d, 0xfd, 0x9a, 0xdb, 0xd6, 0xb7, 0x85, 0x5d, 0x99, 0x2d, 0xec, 0xca, 0xcf, 0x85,
+	0x5d, 0x39, 0xb3, 0x3e, 0x1e, 0x8d, 0x68, 0x34, 0x8e, 0x87, 0x8e, 0xc7, 0x03, 0x37, 0x20, 0x3e,
+	0x1d, 0x4e, 0xb8, 0xe7, 0x6a, 0xd0, 0x23, 0x8f, 0x0b, 0xe2, 0xde, 0xa4, 0x3f, 0xe8, 0xe8, 0x36,
+	0x24, 0x72, 0xd8, 0x50, 0x7f, 0xe8, 0x57, 0xbf, 0x03, 0x00, 0x00, 0xff, 0xff, 0x74, 0x58, 0x77,
+	0xa3, 0xbd, 0x07, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -888,295 +888,295 @@ var _ grpc.ClientConn
 // is compatible with the grpc package it is being compiled against.
 const _ = grpc.SupportPackageIsVersion4
 
-// MsgServiceClient is the client API for MsgService service.
+// MsgClient is the client API for Msg service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
-type MsgServiceClient interface {
-	CreateDenom(ctx context.Context, in *MsgServiceCreateDenomRequest, opts ...grpc.CallOption) (*MsgServiceCreateDenomResponse, error)
-	UpdateDenom(ctx context.Context, in *MsgServiceUpdateDenomRequest, opts ...grpc.CallOption) (*MsgServiceUpdateDenomResponse, error)
-	DeleteDenom(ctx context.Context, in *MsgServiceDeleteDenomRequest, opts ...grpc.CallOption) (*MsgServiceDeleteDenomResponse, error)
-	TransferDenom(ctx context.Context, in *MsgServiceTransferDenomRequest, opts ...grpc.CallOption) (*MsgServiceTransferDenomResponse, error)
-	MintPNFT(ctx context.Context, in *MsgServiceMintPNFTRequest, opts ...grpc.CallOption) (*MsgServiceMintPNFTResponse, error)
-	TransferPNFT(ctx context.Context, in *MsgServiceTransferPNFTRequest, opts ...grpc.CallOption) (*MsgServiceTransferPNFTResponse, error)
-	BurnPNFT(ctx context.Context, in *MsgServiceBurnPNFTRequest, opts ...grpc.CallOption) (*MsgServiceBurnPNFTResponse, error)
+type MsgClient interface {
+	CreateDenom(ctx context.Context, in *MsgCreateDenomRequest, opts ...grpc.CallOption) (*MsgCreateDenomResponse, error)
+	UpdateDenom(ctx context.Context, in *MsgUpdateDenomRequest, opts ...grpc.CallOption) (*MsgUpdateDenomResponse, error)
+	DeleteDenom(ctx context.Context, in *MsgDeleteDenomRequest, opts ...grpc.CallOption) (*MsgDeleteDenomResponse, error)
+	TransferDenom(ctx context.Context, in *MsgTransferDenomRequest, opts ...grpc.CallOption) (*MsgTransferDenomResponse, error)
+	MintPNFT(ctx context.Context, in *MsgMintPNFTRequest, opts ...grpc.CallOption) (*MsgMintPNFTResponse, error)
+	TransferPNFT(ctx context.Context, in *MsgTransferPNFTRequest, opts ...grpc.CallOption) (*MsgTransferPNFTResponse, error)
+	BurnPNFT(ctx context.Context, in *MsgBurnPNFTRequest, opts ...grpc.CallOption) (*MsgBurnPNFTResponse, error)
 }
 
-type msgServiceClient struct {
+type msgClient struct {
 	cc grpc1.ClientConn
 }
 
-func NewMsgServiceClient(cc grpc1.ClientConn) MsgServiceClient {
-	return &msgServiceClient{cc}
+func NewMsgClient(cc grpc1.ClientConn) MsgClient {
+	return &msgClient{cc}
 }
 
-func (c *msgServiceClient) CreateDenom(ctx context.Context, in *MsgServiceCreateDenomRequest, opts ...grpc.CallOption) (*MsgServiceCreateDenomResponse, error) {
-	out := new(MsgServiceCreateDenomResponse)
-	err := c.cc.Invoke(ctx, "/panacea.pnft.v2.MsgService/CreateDenom", in, out, opts...)
+func (c *msgClient) CreateDenom(ctx context.Context, in *MsgCreateDenomRequest, opts ...grpc.CallOption) (*MsgCreateDenomResponse, error) {
+	out := new(MsgCreateDenomResponse)
+	err := c.cc.Invoke(ctx, "/panacea.pnft.v2.Msg/CreateDenom", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *msgServiceClient) UpdateDenom(ctx context.Context, in *MsgServiceUpdateDenomRequest, opts ...grpc.CallOption) (*MsgServiceUpdateDenomResponse, error) {
-	out := new(MsgServiceUpdateDenomResponse)
-	err := c.cc.Invoke(ctx, "/panacea.pnft.v2.MsgService/UpdateDenom", in, out, opts...)
+func (c *msgClient) UpdateDenom(ctx context.Context, in *MsgUpdateDenomRequest, opts ...grpc.CallOption) (*MsgUpdateDenomResponse, error) {
+	out := new(MsgUpdateDenomResponse)
+	err := c.cc.Invoke(ctx, "/panacea.pnft.v2.Msg/UpdateDenom", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *msgServiceClient) DeleteDenom(ctx context.Context, in *MsgServiceDeleteDenomRequest, opts ...grpc.CallOption) (*MsgServiceDeleteDenomResponse, error) {
-	out := new(MsgServiceDeleteDenomResponse)
-	err := c.cc.Invoke(ctx, "/panacea.pnft.v2.MsgService/DeleteDenom", in, out, opts...)
+func (c *msgClient) DeleteDenom(ctx context.Context, in *MsgDeleteDenomRequest, opts ...grpc.CallOption) (*MsgDeleteDenomResponse, error) {
+	out := new(MsgDeleteDenomResponse)
+	err := c.cc.Invoke(ctx, "/panacea.pnft.v2.Msg/DeleteDenom", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *msgServiceClient) TransferDenom(ctx context.Context, in *MsgServiceTransferDenomRequest, opts ...grpc.CallOption) (*MsgServiceTransferDenomResponse, error) {
-	out := new(MsgServiceTransferDenomResponse)
-	err := c.cc.Invoke(ctx, "/panacea.pnft.v2.MsgService/TransferDenom", in, out, opts...)
+func (c *msgClient) TransferDenom(ctx context.Context, in *MsgTransferDenomRequest, opts ...grpc.CallOption) (*MsgTransferDenomResponse, error) {
+	out := new(MsgTransferDenomResponse)
+	err := c.cc.Invoke(ctx, "/panacea.pnft.v2.Msg/TransferDenom", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *msgServiceClient) MintPNFT(ctx context.Context, in *MsgServiceMintPNFTRequest, opts ...grpc.CallOption) (*MsgServiceMintPNFTResponse, error) {
-	out := new(MsgServiceMintPNFTResponse)
-	err := c.cc.Invoke(ctx, "/panacea.pnft.v2.MsgService/MintPNFT", in, out, opts...)
+func (c *msgClient) MintPNFT(ctx context.Context, in *MsgMintPNFTRequest, opts ...grpc.CallOption) (*MsgMintPNFTResponse, error) {
+	out := new(MsgMintPNFTResponse)
+	err := c.cc.Invoke(ctx, "/panacea.pnft.v2.Msg/MintPNFT", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *msgServiceClient) TransferPNFT(ctx context.Context, in *MsgServiceTransferPNFTRequest, opts ...grpc.CallOption) (*MsgServiceTransferPNFTResponse, error) {
-	out := new(MsgServiceTransferPNFTResponse)
-	err := c.cc.Invoke(ctx, "/panacea.pnft.v2.MsgService/TransferPNFT", in, out, opts...)
+func (c *msgClient) TransferPNFT(ctx context.Context, in *MsgTransferPNFTRequest, opts ...grpc.CallOption) (*MsgTransferPNFTResponse, error) {
+	out := new(MsgTransferPNFTResponse)
+	err := c.cc.Invoke(ctx, "/panacea.pnft.v2.Msg/TransferPNFT", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *msgServiceClient) BurnPNFT(ctx context.Context, in *MsgServiceBurnPNFTRequest, opts ...grpc.CallOption) (*MsgServiceBurnPNFTResponse, error) {
-	out := new(MsgServiceBurnPNFTResponse)
-	err := c.cc.Invoke(ctx, "/panacea.pnft.v2.MsgService/BurnPNFT", in, out, opts...)
+func (c *msgClient) BurnPNFT(ctx context.Context, in *MsgBurnPNFTRequest, opts ...grpc.CallOption) (*MsgBurnPNFTResponse, error) {
+	out := new(MsgBurnPNFTResponse)
+	err := c.cc.Invoke(ctx, "/panacea.pnft.v2.Msg/BurnPNFT", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// MsgServiceServer is the server API for MsgService service.
-type MsgServiceServer interface {
-	CreateDenom(context.Context, *MsgServiceCreateDenomRequest) (*MsgServiceCreateDenomResponse, error)
-	UpdateDenom(context.Context, *MsgServiceUpdateDenomRequest) (*MsgServiceUpdateDenomResponse, error)
-	DeleteDenom(context.Context, *MsgServiceDeleteDenomRequest) (*MsgServiceDeleteDenomResponse, error)
-	TransferDenom(context.Context, *MsgServiceTransferDenomRequest) (*MsgServiceTransferDenomResponse, error)
-	MintPNFT(context.Context, *MsgServiceMintPNFTRequest) (*MsgServiceMintPNFTResponse, error)
-	TransferPNFT(context.Context, *MsgServiceTransferPNFTRequest) (*MsgServiceTransferPNFTResponse, error)
-	BurnPNFT(context.Context, *MsgServiceBurnPNFTRequest) (*MsgServiceBurnPNFTResponse, error)
+// MsgServer is the server API for Msg service.
+type MsgServer interface {
+	CreateDenom(context.Context, *MsgCreateDenomRequest) (*MsgCreateDenomResponse, error)
+	UpdateDenom(context.Context, *MsgUpdateDenomRequest) (*MsgUpdateDenomResponse, error)
+	DeleteDenom(context.Context, *MsgDeleteDenomRequest) (*MsgDeleteDenomResponse, error)
+	TransferDenom(context.Context, *MsgTransferDenomRequest) (*MsgTransferDenomResponse, error)
+	MintPNFT(context.Context, *MsgMintPNFTRequest) (*MsgMintPNFTResponse, error)
+	TransferPNFT(context.Context, *MsgTransferPNFTRequest) (*MsgTransferPNFTResponse, error)
+	BurnPNFT(context.Context, *MsgBurnPNFTRequest) (*MsgBurnPNFTResponse, error)
 }
 
-// UnimplementedMsgServiceServer can be embedded to have forward compatible implementations.
-type UnimplementedMsgServiceServer struct {
+// UnimplementedMsgServer can be embedded to have forward compatible implementations.
+type UnimplementedMsgServer struct {
 }
 
-func (*UnimplementedMsgServiceServer) CreateDenom(ctx context.Context, req *MsgServiceCreateDenomRequest) (*MsgServiceCreateDenomResponse, error) {
+func (*UnimplementedMsgServer) CreateDenom(ctx context.Context, req *MsgCreateDenomRequest) (*MsgCreateDenomResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateDenom not implemented")
 }
-func (*UnimplementedMsgServiceServer) UpdateDenom(ctx context.Context, req *MsgServiceUpdateDenomRequest) (*MsgServiceUpdateDenomResponse, error) {
+func (*UnimplementedMsgServer) UpdateDenom(ctx context.Context, req *MsgUpdateDenomRequest) (*MsgUpdateDenomResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateDenom not implemented")
 }
-func (*UnimplementedMsgServiceServer) DeleteDenom(ctx context.Context, req *MsgServiceDeleteDenomRequest) (*MsgServiceDeleteDenomResponse, error) {
+func (*UnimplementedMsgServer) DeleteDenom(ctx context.Context, req *MsgDeleteDenomRequest) (*MsgDeleteDenomResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteDenom not implemented")
 }
-func (*UnimplementedMsgServiceServer) TransferDenom(ctx context.Context, req *MsgServiceTransferDenomRequest) (*MsgServiceTransferDenomResponse, error) {
+func (*UnimplementedMsgServer) TransferDenom(ctx context.Context, req *MsgTransferDenomRequest) (*MsgTransferDenomResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method TransferDenom not implemented")
 }
-func (*UnimplementedMsgServiceServer) MintPNFT(ctx context.Context, req *MsgServiceMintPNFTRequest) (*MsgServiceMintPNFTResponse, error) {
+func (*UnimplementedMsgServer) MintPNFT(ctx context.Context, req *MsgMintPNFTRequest) (*MsgMintPNFTResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method MintPNFT not implemented")
 }
-func (*UnimplementedMsgServiceServer) TransferPNFT(ctx context.Context, req *MsgServiceTransferPNFTRequest) (*MsgServiceTransferPNFTResponse, error) {
+func (*UnimplementedMsgServer) TransferPNFT(ctx context.Context, req *MsgTransferPNFTRequest) (*MsgTransferPNFTResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method TransferPNFT not implemented")
 }
-func (*UnimplementedMsgServiceServer) BurnPNFT(ctx context.Context, req *MsgServiceBurnPNFTRequest) (*MsgServiceBurnPNFTResponse, error) {
+func (*UnimplementedMsgServer) BurnPNFT(ctx context.Context, req *MsgBurnPNFTRequest) (*MsgBurnPNFTResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method BurnPNFT not implemented")
 }
 
-func RegisterMsgServiceServer(s grpc1.Server, srv MsgServiceServer) {
-	s.RegisterService(&_MsgService_serviceDesc, srv)
+func RegisterMsgServer(s grpc1.Server, srv MsgServer) {
+	s.RegisterService(&_Msg_serviceDesc, srv)
 }
 
-func _MsgService_CreateDenom_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(MsgServiceCreateDenomRequest)
+func _Msg_CreateDenom_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgCreateDenomRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MsgServiceServer).CreateDenom(ctx, in)
+		return srv.(MsgServer).CreateDenom(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/panacea.pnft.v2.MsgService/CreateDenom",
+		FullMethod: "/panacea.pnft.v2.Msg/CreateDenom",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MsgServiceServer).CreateDenom(ctx, req.(*MsgServiceCreateDenomRequest))
+		return srv.(MsgServer).CreateDenom(ctx, req.(*MsgCreateDenomRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _MsgService_UpdateDenom_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(MsgServiceUpdateDenomRequest)
+func _Msg_UpdateDenom_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgUpdateDenomRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MsgServiceServer).UpdateDenom(ctx, in)
+		return srv.(MsgServer).UpdateDenom(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/panacea.pnft.v2.MsgService/UpdateDenom",
+		FullMethod: "/panacea.pnft.v2.Msg/UpdateDenom",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MsgServiceServer).UpdateDenom(ctx, req.(*MsgServiceUpdateDenomRequest))
+		return srv.(MsgServer).UpdateDenom(ctx, req.(*MsgUpdateDenomRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _MsgService_DeleteDenom_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(MsgServiceDeleteDenomRequest)
+func _Msg_DeleteDenom_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgDeleteDenomRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MsgServiceServer).DeleteDenom(ctx, in)
+		return srv.(MsgServer).DeleteDenom(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/panacea.pnft.v2.MsgService/DeleteDenom",
+		FullMethod: "/panacea.pnft.v2.Msg/DeleteDenom",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MsgServiceServer).DeleteDenom(ctx, req.(*MsgServiceDeleteDenomRequest))
+		return srv.(MsgServer).DeleteDenom(ctx, req.(*MsgDeleteDenomRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _MsgService_TransferDenom_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(MsgServiceTransferDenomRequest)
+func _Msg_TransferDenom_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgTransferDenomRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MsgServiceServer).TransferDenom(ctx, in)
+		return srv.(MsgServer).TransferDenom(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/panacea.pnft.v2.MsgService/TransferDenom",
+		FullMethod: "/panacea.pnft.v2.Msg/TransferDenom",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MsgServiceServer).TransferDenom(ctx, req.(*MsgServiceTransferDenomRequest))
+		return srv.(MsgServer).TransferDenom(ctx, req.(*MsgTransferDenomRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _MsgService_MintPNFT_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(MsgServiceMintPNFTRequest)
+func _Msg_MintPNFT_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgMintPNFTRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MsgServiceServer).MintPNFT(ctx, in)
+		return srv.(MsgServer).MintPNFT(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/panacea.pnft.v2.MsgService/MintPNFT",
+		FullMethod: "/panacea.pnft.v2.Msg/MintPNFT",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MsgServiceServer).MintPNFT(ctx, req.(*MsgServiceMintPNFTRequest))
+		return srv.(MsgServer).MintPNFT(ctx, req.(*MsgMintPNFTRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _MsgService_TransferPNFT_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(MsgServiceTransferPNFTRequest)
+func _Msg_TransferPNFT_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgTransferPNFTRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MsgServiceServer).TransferPNFT(ctx, in)
+		return srv.(MsgServer).TransferPNFT(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/panacea.pnft.v2.MsgService/TransferPNFT",
+		FullMethod: "/panacea.pnft.v2.Msg/TransferPNFT",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MsgServiceServer).TransferPNFT(ctx, req.(*MsgServiceTransferPNFTRequest))
+		return srv.(MsgServer).TransferPNFT(ctx, req.(*MsgTransferPNFTRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _MsgService_BurnPNFT_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(MsgServiceBurnPNFTRequest)
+func _Msg_BurnPNFT_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgBurnPNFTRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MsgServiceServer).BurnPNFT(ctx, in)
+		return srv.(MsgServer).BurnPNFT(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/panacea.pnft.v2.MsgService/BurnPNFT",
+		FullMethod: "/panacea.pnft.v2.Msg/BurnPNFT",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MsgServiceServer).BurnPNFT(ctx, req.(*MsgServiceBurnPNFTRequest))
+		return srv.(MsgServer).BurnPNFT(ctx, req.(*MsgBurnPNFTRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-var _MsgService_serviceDesc = grpc.ServiceDesc{
-	ServiceName: "panacea.pnft.v2.MsgService",
-	HandlerType: (*MsgServiceServer)(nil),
+var _Msg_serviceDesc = grpc.ServiceDesc{
+	ServiceName: "panacea.pnft.v2.Msg",
+	HandlerType: (*MsgServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "CreateDenom",
-			Handler:    _MsgService_CreateDenom_Handler,
+			Handler:    _Msg_CreateDenom_Handler,
 		},
 		{
 			MethodName: "UpdateDenom",
-			Handler:    _MsgService_UpdateDenom_Handler,
+			Handler:    _Msg_UpdateDenom_Handler,
 		},
 		{
 			MethodName: "DeleteDenom",
-			Handler:    _MsgService_DeleteDenom_Handler,
+			Handler:    _Msg_DeleteDenom_Handler,
 		},
 		{
 			MethodName: "TransferDenom",
-			Handler:    _MsgService_TransferDenom_Handler,
+			Handler:    _Msg_TransferDenom_Handler,
 		},
 		{
 			MethodName: "MintPNFT",
-			Handler:    _MsgService_MintPNFT_Handler,
+			Handler:    _Msg_MintPNFT_Handler,
 		},
 		{
 			MethodName: "TransferPNFT",
-			Handler:    _MsgService_TransferPNFT_Handler,
+			Handler:    _Msg_TransferPNFT_Handler,
 		},
 		{
 			MethodName: "BurnPNFT",
-			Handler:    _MsgService_BurnPNFT_Handler,
+			Handler:    _Msg_BurnPNFT_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
 	Metadata: "panacea/pnft/v2/tx.proto",
 }
 
-func (m *MsgServiceCreateDenomRequest) Marshal() (dAtA []byte, err error) {
+func (m *MsgCreateDenomRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -1186,12 +1186,12 @@ func (m *MsgServiceCreateDenomRequest) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *MsgServiceCreateDenomRequest) MarshalTo(dAtA []byte) (int, error) {
+func (m *MsgCreateDenomRequest) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *MsgServiceCreateDenomRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MsgCreateDenomRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -1255,7 +1255,7 @@ func (m *MsgServiceCreateDenomRequest) MarshalToSizedBuffer(dAtA []byte) (int, e
 	return len(dAtA) - i, nil
 }
 
-func (m *MsgServiceCreateDenomResponse) Marshal() (dAtA []byte, err error) {
+func (m *MsgCreateDenomResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -1265,12 +1265,12 @@ func (m *MsgServiceCreateDenomResponse) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *MsgServiceCreateDenomResponse) MarshalTo(dAtA []byte) (int, error) {
+func (m *MsgCreateDenomResponse) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *MsgServiceCreateDenomResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MsgCreateDenomResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -1278,7 +1278,7 @@ func (m *MsgServiceCreateDenomResponse) MarshalToSizedBuffer(dAtA []byte) (int, 
 	return len(dAtA) - i, nil
 }
 
-func (m *MsgServiceUpdateDenomRequest) Marshal() (dAtA []byte, err error) {
+func (m *MsgUpdateDenomRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -1288,12 +1288,12 @@ func (m *MsgServiceUpdateDenomRequest) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *MsgServiceUpdateDenomRequest) MarshalTo(dAtA []byte) (int, error) {
+func (m *MsgUpdateDenomRequest) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *MsgServiceUpdateDenomRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MsgUpdateDenomRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -1357,7 +1357,7 @@ func (m *MsgServiceUpdateDenomRequest) MarshalToSizedBuffer(dAtA []byte) (int, e
 	return len(dAtA) - i, nil
 }
 
-func (m *MsgServiceUpdateDenomResponse) Marshal() (dAtA []byte, err error) {
+func (m *MsgUpdateDenomResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -1367,12 +1367,12 @@ func (m *MsgServiceUpdateDenomResponse) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *MsgServiceUpdateDenomResponse) MarshalTo(dAtA []byte) (int, error) {
+func (m *MsgUpdateDenomResponse) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *MsgServiceUpdateDenomResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MsgUpdateDenomResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -1380,7 +1380,7 @@ func (m *MsgServiceUpdateDenomResponse) MarshalToSizedBuffer(dAtA []byte) (int, 
 	return len(dAtA) - i, nil
 }
 
-func (m *MsgServiceDeleteDenomRequest) Marshal() (dAtA []byte, err error) {
+func (m *MsgDeleteDenomRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -1390,12 +1390,12 @@ func (m *MsgServiceDeleteDenomRequest) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *MsgServiceDeleteDenomRequest) MarshalTo(dAtA []byte) (int, error) {
+func (m *MsgDeleteDenomRequest) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *MsgServiceDeleteDenomRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MsgDeleteDenomRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -1417,7 +1417,7 @@ func (m *MsgServiceDeleteDenomRequest) MarshalToSizedBuffer(dAtA []byte) (int, e
 	return len(dAtA) - i, nil
 }
 
-func (m *MsgServiceDeleteDenomResponse) Marshal() (dAtA []byte, err error) {
+func (m *MsgDeleteDenomResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -1427,12 +1427,12 @@ func (m *MsgServiceDeleteDenomResponse) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *MsgServiceDeleteDenomResponse) MarshalTo(dAtA []byte) (int, error) {
+func (m *MsgDeleteDenomResponse) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *MsgServiceDeleteDenomResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MsgDeleteDenomResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -1440,7 +1440,7 @@ func (m *MsgServiceDeleteDenomResponse) MarshalToSizedBuffer(dAtA []byte) (int, 
 	return len(dAtA) - i, nil
 }
 
-func (m *MsgServiceTransferDenomRequest) Marshal() (dAtA []byte, err error) {
+func (m *MsgTransferDenomRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -1450,12 +1450,12 @@ func (m *MsgServiceTransferDenomRequest) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *MsgServiceTransferDenomRequest) MarshalTo(dAtA []byte) (int, error) {
+func (m *MsgTransferDenomRequest) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *MsgServiceTransferDenomRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MsgTransferDenomRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -1484,7 +1484,7 @@ func (m *MsgServiceTransferDenomRequest) MarshalToSizedBuffer(dAtA []byte) (int,
 	return len(dAtA) - i, nil
 }
 
-func (m *MsgServiceTransferDenomResponse) Marshal() (dAtA []byte, err error) {
+func (m *MsgTransferDenomResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -1494,12 +1494,12 @@ func (m *MsgServiceTransferDenomResponse) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *MsgServiceTransferDenomResponse) MarshalTo(dAtA []byte) (int, error) {
+func (m *MsgTransferDenomResponse) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *MsgServiceTransferDenomResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MsgTransferDenomResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -1507,7 +1507,7 @@ func (m *MsgServiceTransferDenomResponse) MarshalToSizedBuffer(dAtA []byte) (int
 	return len(dAtA) - i, nil
 }
 
-func (m *MsgServiceMintPNFTRequest) Marshal() (dAtA []byte, err error) {
+func (m *MsgMintPNFTRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -1517,12 +1517,12 @@ func (m *MsgServiceMintPNFTRequest) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *MsgServiceMintPNFTRequest) MarshalTo(dAtA []byte) (int, error) {
+func (m *MsgMintPNFTRequest) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *MsgServiceMintPNFTRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MsgMintPNFTRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -1586,7 +1586,7 @@ func (m *MsgServiceMintPNFTRequest) MarshalToSizedBuffer(dAtA []byte) (int, erro
 	return len(dAtA) - i, nil
 }
 
-func (m *MsgServiceMintPNFTResponse) Marshal() (dAtA []byte, err error) {
+func (m *MsgMintPNFTResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -1596,12 +1596,12 @@ func (m *MsgServiceMintPNFTResponse) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *MsgServiceMintPNFTResponse) MarshalTo(dAtA []byte) (int, error) {
+func (m *MsgMintPNFTResponse) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *MsgServiceMintPNFTResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MsgMintPNFTResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -1609,7 +1609,7 @@ func (m *MsgServiceMintPNFTResponse) MarshalToSizedBuffer(dAtA []byte) (int, err
 	return len(dAtA) - i, nil
 }
 
-func (m *MsgServiceTransferPNFTRequest) Marshal() (dAtA []byte, err error) {
+func (m *MsgTransferPNFTRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -1619,12 +1619,12 @@ func (m *MsgServiceTransferPNFTRequest) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *MsgServiceTransferPNFTRequest) MarshalTo(dAtA []byte) (int, error) {
+func (m *MsgTransferPNFTRequest) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *MsgServiceTransferPNFTRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MsgTransferPNFTRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -1660,7 +1660,7 @@ func (m *MsgServiceTransferPNFTRequest) MarshalToSizedBuffer(dAtA []byte) (int, 
 	return len(dAtA) - i, nil
 }
 
-func (m *MsgServiceTransferPNFTResponse) Marshal() (dAtA []byte, err error) {
+func (m *MsgTransferPNFTResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -1670,12 +1670,12 @@ func (m *MsgServiceTransferPNFTResponse) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *MsgServiceTransferPNFTResponse) MarshalTo(dAtA []byte) (int, error) {
+func (m *MsgTransferPNFTResponse) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *MsgServiceTransferPNFTResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MsgTransferPNFTResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -1683,7 +1683,7 @@ func (m *MsgServiceTransferPNFTResponse) MarshalToSizedBuffer(dAtA []byte) (int,
 	return len(dAtA) - i, nil
 }
 
-func (m *MsgServiceBurnPNFTRequest) Marshal() (dAtA []byte, err error) {
+func (m *MsgBurnPNFTRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -1693,12 +1693,12 @@ func (m *MsgServiceBurnPNFTRequest) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *MsgServiceBurnPNFTRequest) MarshalTo(dAtA []byte) (int, error) {
+func (m *MsgBurnPNFTRequest) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *MsgServiceBurnPNFTRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MsgBurnPNFTRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -1727,7 +1727,7 @@ func (m *MsgServiceBurnPNFTRequest) MarshalToSizedBuffer(dAtA []byte) (int, erro
 	return len(dAtA) - i, nil
 }
 
-func (m *MsgServiceBurnPNFTResponse) Marshal() (dAtA []byte, err error) {
+func (m *MsgBurnPNFTResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -1737,12 +1737,12 @@ func (m *MsgServiceBurnPNFTResponse) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *MsgServiceBurnPNFTResponse) MarshalTo(dAtA []byte) (int, error) {
+func (m *MsgBurnPNFTResponse) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *MsgServiceBurnPNFTResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MsgBurnPNFTResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -1761,7 +1761,7 @@ func encodeVarintTx(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	return base
 }
-func (m *MsgServiceCreateDenomRequest) Size() (n int) {
+func (m *MsgCreateDenomRequest) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -1802,7 +1802,7 @@ func (m *MsgServiceCreateDenomRequest) Size() (n int) {
 	return n
 }
 
-func (m *MsgServiceCreateDenomResponse) Size() (n int) {
+func (m *MsgCreateDenomResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -1811,7 +1811,7 @@ func (m *MsgServiceCreateDenomResponse) Size() (n int) {
 	return n
 }
 
-func (m *MsgServiceUpdateDenomRequest) Size() (n int) {
+func (m *MsgUpdateDenomRequest) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -1852,7 +1852,7 @@ func (m *MsgServiceUpdateDenomRequest) Size() (n int) {
 	return n
 }
 
-func (m *MsgServiceUpdateDenomResponse) Size() (n int) {
+func (m *MsgUpdateDenomResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -1861,7 +1861,7 @@ func (m *MsgServiceUpdateDenomResponse) Size() (n int) {
 	return n
 }
 
-func (m *MsgServiceDeleteDenomRequest) Size() (n int) {
+func (m *MsgDeleteDenomRequest) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -1878,7 +1878,7 @@ func (m *MsgServiceDeleteDenomRequest) Size() (n int) {
 	return n
 }
 
-func (m *MsgServiceDeleteDenomResponse) Size() (n int) {
+func (m *MsgDeleteDenomResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -1887,7 +1887,7 @@ func (m *MsgServiceDeleteDenomResponse) Size() (n int) {
 	return n
 }
 
-func (m *MsgServiceTransferDenomRequest) Size() (n int) {
+func (m *MsgTransferDenomRequest) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -1908,7 +1908,7 @@ func (m *MsgServiceTransferDenomRequest) Size() (n int) {
 	return n
 }
 
-func (m *MsgServiceTransferDenomResponse) Size() (n int) {
+func (m *MsgTransferDenomResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -1917,7 +1917,7 @@ func (m *MsgServiceTransferDenomResponse) Size() (n int) {
 	return n
 }
 
-func (m *MsgServiceMintPNFTRequest) Size() (n int) {
+func (m *MsgMintPNFTRequest) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -1958,7 +1958,7 @@ func (m *MsgServiceMintPNFTRequest) Size() (n int) {
 	return n
 }
 
-func (m *MsgServiceMintPNFTResponse) Size() (n int) {
+func (m *MsgMintPNFTResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -1967,7 +1967,7 @@ func (m *MsgServiceMintPNFTResponse) Size() (n int) {
 	return n
 }
 
-func (m *MsgServiceTransferPNFTRequest) Size() (n int) {
+func (m *MsgTransferPNFTRequest) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -1992,7 +1992,7 @@ func (m *MsgServiceTransferPNFTRequest) Size() (n int) {
 	return n
 }
 
-func (m *MsgServiceTransferPNFTResponse) Size() (n int) {
+func (m *MsgTransferPNFTResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -2001,7 +2001,7 @@ func (m *MsgServiceTransferPNFTResponse) Size() (n int) {
 	return n
 }
 
-func (m *MsgServiceBurnPNFTRequest) Size() (n int) {
+func (m *MsgBurnPNFTRequest) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -2022,7 +2022,7 @@ func (m *MsgServiceBurnPNFTRequest) Size() (n int) {
 	return n
 }
 
-func (m *MsgServiceBurnPNFTResponse) Size() (n int) {
+func (m *MsgBurnPNFTResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -2037,7 +2037,7 @@ func sovTx(x uint64) (n int) {
 func sozTx(x uint64) (n int) {
 	return sovTx(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
-func (m *MsgServiceCreateDenomRequest) Unmarshal(dAtA []byte) error {
+func (m *MsgCreateDenomRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -2060,10 +2060,10 @@ func (m *MsgServiceCreateDenomRequest) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: MsgServiceCreateDenomRequest: wiretype end group for non-group")
+			return fmt.Errorf("proto: MsgCreateDenomRequest: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgServiceCreateDenomRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MsgCreateDenomRequest: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -2343,7 +2343,7 @@ func (m *MsgServiceCreateDenomRequest) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *MsgServiceCreateDenomResponse) Unmarshal(dAtA []byte) error {
+func (m *MsgCreateDenomResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -2366,10 +2366,10 @@ func (m *MsgServiceCreateDenomResponse) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: MsgServiceCreateDenomResponse: wiretype end group for non-group")
+			return fmt.Errorf("proto: MsgCreateDenomResponse: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgServiceCreateDenomResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MsgCreateDenomResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		default:
@@ -2393,7 +2393,7 @@ func (m *MsgServiceCreateDenomResponse) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *MsgServiceUpdateDenomRequest) Unmarshal(dAtA []byte) error {
+func (m *MsgUpdateDenomRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -2416,10 +2416,10 @@ func (m *MsgServiceUpdateDenomRequest) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: MsgServiceUpdateDenomRequest: wiretype end group for non-group")
+			return fmt.Errorf("proto: MsgUpdateDenomRequest: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgServiceUpdateDenomRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MsgUpdateDenomRequest: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -2699,7 +2699,7 @@ func (m *MsgServiceUpdateDenomRequest) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *MsgServiceUpdateDenomResponse) Unmarshal(dAtA []byte) error {
+func (m *MsgUpdateDenomResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -2722,10 +2722,10 @@ func (m *MsgServiceUpdateDenomResponse) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: MsgServiceUpdateDenomResponse: wiretype end group for non-group")
+			return fmt.Errorf("proto: MsgUpdateDenomResponse: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgServiceUpdateDenomResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MsgUpdateDenomResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		default:
@@ -2749,7 +2749,7 @@ func (m *MsgServiceUpdateDenomResponse) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *MsgServiceDeleteDenomRequest) Unmarshal(dAtA []byte) error {
+func (m *MsgDeleteDenomRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -2772,10 +2772,10 @@ func (m *MsgServiceDeleteDenomRequest) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: MsgServiceDeleteDenomRequest: wiretype end group for non-group")
+			return fmt.Errorf("proto: MsgDeleteDenomRequest: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgServiceDeleteDenomRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MsgDeleteDenomRequest: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -2863,7 +2863,7 @@ func (m *MsgServiceDeleteDenomRequest) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *MsgServiceDeleteDenomResponse) Unmarshal(dAtA []byte) error {
+func (m *MsgDeleteDenomResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -2886,10 +2886,10 @@ func (m *MsgServiceDeleteDenomResponse) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: MsgServiceDeleteDenomResponse: wiretype end group for non-group")
+			return fmt.Errorf("proto: MsgDeleteDenomResponse: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgServiceDeleteDenomResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MsgDeleteDenomResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		default:
@@ -2913,7 +2913,7 @@ func (m *MsgServiceDeleteDenomResponse) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *MsgServiceTransferDenomRequest) Unmarshal(dAtA []byte) error {
+func (m *MsgTransferDenomRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -2936,10 +2936,10 @@ func (m *MsgServiceTransferDenomRequest) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: MsgServiceTransferDenomRequest: wiretype end group for non-group")
+			return fmt.Errorf("proto: MsgTransferDenomRequest: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgServiceTransferDenomRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MsgTransferDenomRequest: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -3059,7 +3059,7 @@ func (m *MsgServiceTransferDenomRequest) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *MsgServiceTransferDenomResponse) Unmarshal(dAtA []byte) error {
+func (m *MsgTransferDenomResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -3082,10 +3082,10 @@ func (m *MsgServiceTransferDenomResponse) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: MsgServiceTransferDenomResponse: wiretype end group for non-group")
+			return fmt.Errorf("proto: MsgTransferDenomResponse: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgServiceTransferDenomResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MsgTransferDenomResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		default:
@@ -3109,7 +3109,7 @@ func (m *MsgServiceTransferDenomResponse) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *MsgServiceMintPNFTRequest) Unmarshal(dAtA []byte) error {
+func (m *MsgMintPNFTRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -3132,10 +3132,10 @@ func (m *MsgServiceMintPNFTRequest) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: MsgServiceMintPNFTRequest: wiretype end group for non-group")
+			return fmt.Errorf("proto: MsgMintPNFTRequest: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgServiceMintPNFTRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MsgMintPNFTRequest: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -3415,7 +3415,7 @@ func (m *MsgServiceMintPNFTRequest) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *MsgServiceMintPNFTResponse) Unmarshal(dAtA []byte) error {
+func (m *MsgMintPNFTResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -3438,10 +3438,10 @@ func (m *MsgServiceMintPNFTResponse) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: MsgServiceMintPNFTResponse: wiretype end group for non-group")
+			return fmt.Errorf("proto: MsgMintPNFTResponse: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgServiceMintPNFTResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MsgMintPNFTResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		default:
@@ -3465,7 +3465,7 @@ func (m *MsgServiceMintPNFTResponse) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *MsgServiceTransferPNFTRequest) Unmarshal(dAtA []byte) error {
+func (m *MsgTransferPNFTRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -3488,10 +3488,10 @@ func (m *MsgServiceTransferPNFTRequest) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: MsgServiceTransferPNFTRequest: wiretype end group for non-group")
+			return fmt.Errorf("proto: MsgTransferPNFTRequest: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgServiceTransferPNFTRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MsgTransferPNFTRequest: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -3643,7 +3643,7 @@ func (m *MsgServiceTransferPNFTRequest) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *MsgServiceTransferPNFTResponse) Unmarshal(dAtA []byte) error {
+func (m *MsgTransferPNFTResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -3666,10 +3666,10 @@ func (m *MsgServiceTransferPNFTResponse) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: MsgServiceTransferPNFTResponse: wiretype end group for non-group")
+			return fmt.Errorf("proto: MsgTransferPNFTResponse: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgServiceTransferPNFTResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MsgTransferPNFTResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		default:
@@ -3693,7 +3693,7 @@ func (m *MsgServiceTransferPNFTResponse) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *MsgServiceBurnPNFTRequest) Unmarshal(dAtA []byte) error {
+func (m *MsgBurnPNFTRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -3716,10 +3716,10 @@ func (m *MsgServiceBurnPNFTRequest) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: MsgServiceBurnPNFTRequest: wiretype end group for non-group")
+			return fmt.Errorf("proto: MsgBurnPNFTRequest: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgServiceBurnPNFTRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MsgBurnPNFTRequest: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -3839,7 +3839,7 @@ func (m *MsgServiceBurnPNFTRequest) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *MsgServiceBurnPNFTResponse) Unmarshal(dAtA []byte) error {
+func (m *MsgBurnPNFTResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -3862,10 +3862,10 @@ func (m *MsgServiceBurnPNFTResponse) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: MsgServiceBurnPNFTResponse: wiretype end group for non-group")
+			return fmt.Errorf("proto: MsgBurnPNFTResponse: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgServiceBurnPNFTResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MsgBurnPNFTResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		default:
