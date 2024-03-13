@@ -10,7 +10,7 @@ import (
 	"github.com/medibloc/panacea-core/v2/x/aol/types"
 )
 
-func (k msgServer) CreateTopic(goCtx context.Context, msg *types.MsgServiceCreateTopicRequest) (*types.MsgServiceCreateTopicResponse, error) {
+func (k msgServer) CreateTopic(goCtx context.Context, msg *types.MsgCreateTopicRequest) (*types.MsgCreateTopicResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	ownerAddr, err := sdk.AccAddressFromBech32(msg.OwnerAddress)
@@ -30,5 +30,5 @@ func (k msgServer) CreateTopic(goCtx context.Context, msg *types.MsgServiceCreat
 	topic := types.Topic{Description: msg.Description}
 	k.SetTopic(ctx, topicKey, topic)
 
-	return &types.MsgServiceCreateTopicResponse{}, nil
+	return &types.MsgCreateTopicResponse{}, nil
 }

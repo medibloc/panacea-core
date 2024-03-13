@@ -5,7 +5,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func NewMsgServiceCreateDenomRequest(
+func NewMsgCreateDenomRequest(
 	id string,
 	symbol string,
 	name string,
@@ -14,8 +14,8 @@ func NewMsgServiceCreateDenomRequest(
 	uriHash string,
 	creator string,
 	data string,
-) *MsgServiceCreateDenomRequest {
-	return &MsgServiceCreateDenomRequest{
+) *MsgCreateDenomRequest {
+	return &MsgCreateDenomRequest{
 		Id:          id,
 		Name:        name,
 		Symbol:      symbol,
@@ -28,12 +28,12 @@ func NewMsgServiceCreateDenomRequest(
 }
 
 // GetSignBytes returns a byte array which is used to generate a signature for verifying DID ownership.
-func (msg *MsgServiceCreateDenomRequest) GetSignBytes() []byte {
+func (msg *MsgCreateDenomRequest) GetSignBytes() []byte {
 	bz := ModuleCdc.MustMarshalJSON(msg)
 	return sdk.MustSortJSON(bz)
 }
 
-func (msg *MsgServiceCreateDenomRequest) GetSigners() []sdk.AccAddress {
+func (msg *MsgCreateDenomRequest) GetSigners() []sdk.AccAddress {
 	from, err := sdk.AccAddressFromBech32(msg.Creator)
 	if err != nil {
 		panic(err)
@@ -41,7 +41,7 @@ func (msg *MsgServiceCreateDenomRequest) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{from}
 }
 
-func (msg *MsgServiceCreateDenomRequest) ValidateBasic() error {
+func (msg *MsgCreateDenomRequest) ValidateBasic() error {
 	if msg.Id == "" {
 		return errors.New("id cannot be empty")
 	}
@@ -65,7 +65,7 @@ func (msg *MsgServiceCreateDenomRequest) ValidateBasic() error {
 	return nil
 }
 
-func NewMsgServiceUpdateDenomRequest(
+func NewMsgUpdateDenomRequest(
 	id string,
 	symbol string,
 	name string,
@@ -74,8 +74,8 @@ func NewMsgServiceUpdateDenomRequest(
 	uriHash string,
 	data string,
 	update string,
-) *MsgServiceUpdateDenomRequest {
-	return &MsgServiceUpdateDenomRequest{
+) *MsgUpdateDenomRequest {
+	return &MsgUpdateDenomRequest{
 		Id:          id,
 		Name:        name,
 		Symbol:      symbol,
@@ -88,12 +88,12 @@ func NewMsgServiceUpdateDenomRequest(
 }
 
 // GetSignBytes returns a byte array which is used to generate a signature for verifying DID ownership.
-func (msg *MsgServiceUpdateDenomRequest) GetSignBytes() []byte {
+func (msg *MsgUpdateDenomRequest) GetSignBytes() []byte {
 	bz := ModuleCdc.MustMarshalJSON(msg)
 	return sdk.MustSortJSON(bz)
 }
 
-func (msg *MsgServiceUpdateDenomRequest) GetSigners() []sdk.AccAddress {
+func (msg *MsgUpdateDenomRequest) GetSigners() []sdk.AccAddress {
 	from, err := sdk.AccAddressFromBech32(msg.Updater)
 	if err != nil {
 		panic(err)
@@ -101,7 +101,7 @@ func (msg *MsgServiceUpdateDenomRequest) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{from}
 }
 
-func (msg *MsgServiceUpdateDenomRequest) ValidateBasic() error {
+func (msg *MsgUpdateDenomRequest) ValidateBasic() error {
 	if msg.Id == "" {
 		return errors.New("Id cannot be empty")
 	}
@@ -116,23 +116,23 @@ func (msg *MsgServiceUpdateDenomRequest) ValidateBasic() error {
 	return nil
 }
 
-func NewMsgServiceDeleteDenomRequest(
+func NewMsgDeleteDenomRequest(
 	id string,
 	remover string,
-) *MsgServiceDeleteDenomRequest {
-	return &MsgServiceDeleteDenomRequest{
+) *MsgDeleteDenomRequest {
+	return &MsgDeleteDenomRequest{
 		Id:      id,
 		Remover: remover,
 	}
 }
 
 // GetSignBytes returns a byte array which is used to generate a signature for verifying DID ownership.
-func (msg *MsgServiceDeleteDenomRequest) GetSignBytes() []byte {
+func (msg *MsgDeleteDenomRequest) GetSignBytes() []byte {
 	bz := ModuleCdc.MustMarshalJSON(msg)
 	return sdk.MustSortJSON(bz)
 }
 
-func (msg *MsgServiceDeleteDenomRequest) GetSigners() []sdk.AccAddress {
+func (msg *MsgDeleteDenomRequest) GetSigners() []sdk.AccAddress {
 	from, err := sdk.AccAddressFromBech32(msg.Remover)
 	if err != nil {
 		panic(err)
@@ -140,7 +140,7 @@ func (msg *MsgServiceDeleteDenomRequest) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{from}
 }
 
-func (msg *MsgServiceDeleteDenomRequest) ValidateBasic() error {
+func (msg *MsgDeleteDenomRequest) ValidateBasic() error {
 	if msg.Id == "" {
 		return errors.New("id cannot be empty")
 	}
@@ -156,12 +156,12 @@ func (msg *MsgServiceDeleteDenomRequest) ValidateBasic() error {
 	return nil
 }
 
-func NewMsgServiceTransferRequest(
+func NewMsgTransferRequest(
 	id string,
 	sender string,
 	receiver string,
-) *MsgServiceTransferDenomRequest {
-	return &MsgServiceTransferDenomRequest{
+) *MsgTransferDenomRequest {
+	return &MsgTransferDenomRequest{
 		Id:       id,
 		Sender:   sender,
 		Receiver: receiver,
@@ -169,12 +169,12 @@ func NewMsgServiceTransferRequest(
 }
 
 // GetSignBytes returns a byte array which is used to generate a signature for verifying DID ownership.
-func (msg *MsgServiceTransferDenomRequest) GetSignBytes() []byte {
+func (msg *MsgTransferDenomRequest) GetSignBytes() []byte {
 	bz := ModuleCdc.MustMarshalJSON(msg)
 	return sdk.MustSortJSON(bz)
 }
 
-func (msg *MsgServiceTransferDenomRequest) GetSigners() []sdk.AccAddress {
+func (msg *MsgTransferDenomRequest) GetSigners() []sdk.AccAddress {
 	from, err := sdk.AccAddressFromBech32(msg.Sender)
 	if err != nil {
 		panic(err)
@@ -182,7 +182,7 @@ func (msg *MsgServiceTransferDenomRequest) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{from}
 }
 
-func (msg *MsgServiceTransferDenomRequest) ValidateBasic() error {
+func (msg *MsgTransferDenomRequest) ValidateBasic() error {
 	if msg.Id == "" {
 		return errors.New("id cannot be empty")
 	}

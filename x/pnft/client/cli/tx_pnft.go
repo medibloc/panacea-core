@@ -50,7 +50,7 @@ func NewCmdMintPNFT() *cobra.Command {
 
 			creator := clientCtx.GetFromAddress().String()
 
-			msg := types.NewMsgServiceMintPNFTRequest(
+			msg := types.NewMsgMintPNFTRequest(
 				denomId,
 				id,
 				name,
@@ -96,7 +96,7 @@ func NewCmdTransferPNFT() *cobra.Command {
 			receiver := args[2]
 			sender := clientCtx.GetFromAddress().String()
 
-			msg := types.NewMsgServiceTransferPNFTRequest(denomId, id, sender, receiver)
+			msg := types.NewMsgTransferPNFTRequest(denomId, id, sender, receiver)
 
 			if err := msg.ValidateBasic(); err != nil {
 				return sdkerrors.Wrap(types.ErrTransferPNFT, err.Error())
@@ -126,7 +126,7 @@ func NewCmdBurnPNFT() *cobra.Command {
 			id := args[1]
 			burner := clientCtx.GetFromAddress().String()
 
-			msg := types.NewMsgServiceBurnPNFTRequest(denomId, id, burner)
+			msg := types.NewMsgBurnPNFTRequest(denomId, id, burner)
 
 			if err := msg.ValidateBasic(); err != nil {
 				return sdkerrors.Wrap(types.ErrTransferPNFT, err.Error())

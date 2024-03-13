@@ -39,7 +39,7 @@ func CmdAddRecord() *cobra.Command {
 			writerAddress := clientCtx.GetFromAddress().String()
 			feePayerAddress := viper.GetString(flagFeePayer)
 
-			msg := types.NewMsgServiceAddRecordRequest(topicName, key, value, writerAddress, ownerAddress, feePayerAddress)
+			msg := types.NewMsgAddRecordRequest(topicName, key, value, writerAddress, ownerAddress, feePayerAddress)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}

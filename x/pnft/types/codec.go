@@ -8,28 +8,28 @@ import (
 )
 
 func RegisterCodec(cdc *codec.LegacyAmino) {
-	cdc.RegisterConcrete(&MsgServiceCreateDenomRequest{}, "pnft/CreateDenom", nil)
-	cdc.RegisterConcrete(&MsgServiceUpdateDenomRequest{}, "pnft/UpdateDenom", nil)
-	cdc.RegisterConcrete(&MsgServiceDeleteDenomRequest{}, "pnft/DeleteDenom", nil)
-	cdc.RegisterConcrete(&MsgServiceTransferDenomRequest{}, "pnft/TransferDenom", nil)
+	cdc.RegisterConcrete(&MsgCreateDenomRequest{}, "pnft/CreateDenom", nil)
+	cdc.RegisterConcrete(&MsgUpdateDenomRequest{}, "pnft/UpdateDenom", nil)
+	cdc.RegisterConcrete(&MsgDeleteDenomRequest{}, "pnft/DeleteDenom", nil)
+	cdc.RegisterConcrete(&MsgTransferDenomRequest{}, "pnft/TransferDenom", nil)
 
-	cdc.RegisterConcrete(&MsgServiceMintPNFTRequest{}, "pnft/MintPNFT", nil)
-	cdc.RegisterConcrete(&MsgServiceTransferPNFTRequest{}, "pnft/TransferPNFT", nil)
-	cdc.RegisterConcrete(&MsgServiceBurnPNFTRequest{}, "pnft/BurnPNFT", nil)
+	cdc.RegisterConcrete(&MsgMintPNFTRequest{}, "pnft/MintPNFT", nil)
+	cdc.RegisterConcrete(&MsgTransferPNFTRequest{}, "pnft/TransferPNFT", nil)
+	cdc.RegisterConcrete(&MsgBurnPNFTRequest{}, "pnft/BurnPNFT", nil)
 }
 
 func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 	registry.RegisterImplementations((*sdk.Msg)(nil),
-		&MsgServiceCreateDenomRequest{},
-		&MsgServiceUpdateDenomRequest{},
-		&MsgServiceDeleteDenomRequest{},
-		&MsgServiceTransferDenomRequest{},
-		&MsgServiceMintPNFTRequest{},
-		&MsgServiceTransferPNFTRequest{},
-		&MsgServiceBurnPNFTRequest{},
+		&MsgCreateDenomRequest{},
+		&MsgUpdateDenomRequest{},
+		&MsgDeleteDenomRequest{},
+		&MsgTransferDenomRequest{},
+		&MsgMintPNFTRequest{},
+		&MsgTransferPNFTRequest{},
+		&MsgBurnPNFTRequest{},
 	)
 
-	msgservice.RegisterMsgServiceDesc(registry, &_MsgService_serviceDesc)
+	msgservice.RegisterMsgServiceDesc(registry, &_Msg_serviceDesc)
 }
 
 var (

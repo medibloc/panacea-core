@@ -6,10 +6,10 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-var _ sdk.Msg = &MsgServiceAddRecordRequest{}
+var _ sdk.Msg = &MsgAddRecordRequest{}
 
-func NewMsgServiceAddRecordRequest(topicName string, key, value []byte, writerAddress, ownerAddress, feePayerAddress string) *MsgServiceAddRecordRequest {
-	return &MsgServiceAddRecordRequest{
+func NewMsgAddRecordRequest(topicName string, key, value []byte, writerAddress, ownerAddress, feePayerAddress string) *MsgAddRecordRequest {
+	return &MsgAddRecordRequest{
 		TopicName:       topicName,
 		Key:             key,
 		Value:           value,
@@ -19,15 +19,15 @@ func NewMsgServiceAddRecordRequest(topicName string, key, value []byte, writerAd
 	}
 }
 
-func (msg *MsgServiceAddRecordRequest) Route() string {
+func (msg *MsgAddRecordRequest) Route() string {
 	return RouterKey
 }
 
-func (msg *MsgServiceAddRecordRequest) Type() string {
+func (msg *MsgAddRecordRequest) Type() string {
 	return "AddRecord"
 }
 
-func (msg *MsgServiceAddRecordRequest) GetSigners() []sdk.AccAddress {
+func (msg *MsgAddRecordRequest) GetSigners() []sdk.AccAddress {
 	writerAddress, err := sdk.AccAddressFromBech32(msg.WriterAddress)
 	if err != nil {
 		panic(err)
@@ -44,12 +44,12 @@ func (msg *MsgServiceAddRecordRequest) GetSigners() []sdk.AccAddress {
 	}
 }
 
-func (msg *MsgServiceAddRecordRequest) GetSignBytes() []byte {
+func (msg *MsgAddRecordRequest) GetSignBytes() []byte {
 	bz := ModuleCdc.MustMarshalJSON(msg)
 	return sdk.MustSortJSON(bz)
 }
 
-func (msg *MsgServiceAddRecordRequest) ValidateBasic() error {
+func (msg *MsgAddRecordRequest) ValidateBasic() error {
 	if err := validateTopicName(msg.TopicName); err != nil {
 		return err
 	}

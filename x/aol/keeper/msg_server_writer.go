@@ -9,7 +9,7 @@ import (
 	"github.com/medibloc/panacea-core/v2/x/aol/types"
 )
 
-func (k msgServer) AddWriter(goCtx context.Context, msg *types.MsgServiceAddWriterRequest) (*types.MsgServiceAddWriterResponse, error) {
+func (k msgServer) AddWriter(goCtx context.Context, msg *types.MsgAddWriterRequest) (*types.MsgAddWriterResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	ownerAddr, err := sdk.AccAddressFromBech32(msg.OwnerAddress)
@@ -40,10 +40,10 @@ func (k msgServer) AddWriter(goCtx context.Context, msg *types.MsgServiceAddWrit
 	}
 	k.SetWriter(ctx, writerKey, writer)
 
-	return &types.MsgServiceAddWriterResponse{}, nil
+	return &types.MsgAddWriterResponse{}, nil
 }
 
-func (k msgServer) DeleteWriter(goCtx context.Context, msg *types.MsgServiceDeleteWriterRequest) (*types.MsgServiceDeleteWriterResponse, error) {
+func (k msgServer) DeleteWriter(goCtx context.Context, msg *types.MsgDeleteWriterRequest) (*types.MsgDeleteWriterResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	ownerAddr, err := sdk.AccAddressFromBech32(msg.OwnerAddress)
@@ -66,5 +66,5 @@ func (k msgServer) DeleteWriter(goCtx context.Context, msg *types.MsgServiceDele
 
 	k.RemoveWriter(ctx, writerKey)
 
-	return &types.MsgServiceDeleteWriterResponse{}, nil
+	return &types.MsgDeleteWriterResponse{}, nil
 }
