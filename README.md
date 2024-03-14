@@ -13,6 +13,7 @@ Panacea is a blockchain which is the key infrastructure for our services to rein
 - AOL (Append Only Log) for storing various data including medical data footprints
 - [DID](https://www.w3.org/TR/did-core/) (Decentralized Identifier) management
 - [IBC](https://ibcprotocol.org/) (Inter-Blockchain Communication)
+- PNFT (Panacea Non-Fungible Token) enables NFT functionalities within the Panacea ecosystem.
 
 
 ## Resources
