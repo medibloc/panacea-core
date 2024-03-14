@@ -2,7 +2,20 @@
 
 ## Unreleased
 
-TDB
+## [v2.2.0](https://github.com/medibloc/panacea-core/releases/tag/v2.2.0) - 2024-03-14
+
+### Improvements
+- [\#669](https://github.com/medibloc/panacea-core/pull/669) feat: Bump Cosmos SDK to v0.47.10
+- [\#670](https://github.com/medibloc/panacea-core/pull/670) feat: Included develop branch in CI build triggers
+- [\#671](https://github.com/medibloc/panacea-core/pull/671) feat: Changed minimum commission rate to 3%
+- [\#672](https://github.com/medibloc/panacea-core/pull/672) feat: Added nft module and denom feature
+- [\#673](https://github.com/medibloc/panacea-core/pull/673) feat: Added pnft feature in x/pnft
+- [\#675](https://github.com/medibloc/panacea-core/pull/675) feat: Added pnft module type to v2.2.0 store
+- [\#676](https://github.com/medibloc/panacea-core/pull/676) feat: Change name queryService to query in proto and add pnft genesis feature
+- [\#677](https://github.com/medibloc/panacea-core/pull/677) feat: Removed service word in proto services
+
+### Bug
+- [\#674](https://github.com/medibloc/panacea-core/pull/674) bug: fixed not change data of denom when execute update command
 
 ## [v2.0.7-2](https://github.com/medibloc/panacea-core/releases/tag/v2.0.7-2) - 2023-05-25
 
