@@ -19,30 +19,30 @@ Choose the `m5.large` instance type (minimum spec).
 
 ### Configure instance details
 
-Configuration | Value
---------------|-------
-Network | Choose an existing VPC or default one if you don't have any
-Subnet | Choose an existing subnet or default one if you don't have any
-Auto-assign Public IP | Enable only if you access a full node from the outside of its VPC
-Other fields | Follow default settings
+| Configuration         | Value |
+|-----------------------|------- |
+| Network               | Choose an existing VPC or default one if you don't have any |
+| Subnet                | Choose an existing subnet or default one if you don't have any |
+| Auto-assign Public IP | Enable only if you access a full node from the outside of its VPC |
+| Other fields          | Follow default settings |
 
 ### Add a storage
 
-Configuration | Value
---------------|-------
-Size | 500 GiB
-Volume Type | `General Purpose SSD (gp3)`
-IOPS | 3000
-Throughput | 125 MB/s
+| Configuration | Value |
+|---------------|------- |
+ | Size          | 500 GiB |
+ | Volume Type   | `General Purpose SSD (gp3)` |
+ | IOPS          | 3000 |
+ | Throughput    | 125 MB/s |
 
 ### Configure a Security Group
 
-Type | Protocol | Port range |  Description
------|----------|------------|-------------
-SSH | TCP | 22 |
-Custom TCP | TCP | 26656 | P2P with other nodes
-Custom TCP | TCP | 26657 | RPC
-Custom TCP | TCP | 1317 | HTTP
+| Type        | Protocol | Port range |  Description |
+|-------------|----------|------------|------------- |
+| SSH         | TCP | 22 |
+| Custom TCP  | TCP | 26656 | P2P with other nodes |
+| Custom TCP  | TCP | 26657 | RPC |
+| Custom TCP | TCP | 1317 | HTTP |
 
 The P2P `26656` port must be exposed to other Panacea nodes.
 If your node will be in the VPC guarded by Sentry nodes, expose `26656` to only Sentry nodes (recommended).
@@ -169,7 +169,7 @@ panacead status
 
 View the status of the network with the Block Explorer
 - Mainnet: https://explorer.medibloc.org
-- Testnet: ~~https://testnet-explorer.medibloc.org~~ https://dev.mintscan.io/hygieia
+- Testnet: https://testnet-explorer.medibloc.org
 
 ## Join as a validator
 
