@@ -1,6 +1,6 @@
 # Getting started
 
-This section will guide the reader to install, deploy, and interact with the Panacea blockchain.‌
+This section will guide the reader to install, deploy, and interact with the Panacea blockchain.
 
 ### Table of contents <a id="table-of-contents"></a>
 

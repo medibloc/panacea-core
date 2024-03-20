@@ -57,8 +57,8 @@ Confirm that the address displayed on the Ledger Nano device matches that displa
 You are now ready to start signing and sending transactions.
 ```bash
 panacead tx bank send <fromAddress> <toAddress> <amount>umed \
-  --node http://54.180.169.37:26657 \
-  --chain-id panacea-2 \
+  --node https://rpc.gopanacea.org \
+  --chain-id panacea-3 \
   --fees 1000000umed
 ```
 Be sure to set a proper full node address to the `--node` parameter. In the above example, one of the [Panacea Mainnet full nodes](https://github.com/medibloc/panacea-launch) was used.

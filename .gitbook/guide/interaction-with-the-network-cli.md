@@ -38,7 +38,7 @@ panacead keys add <account_name>
 
 Previously, you had to enter a password to save it to disk, but you do not currently need to.
 
-[Setting up the keyring](https://docs.cosmos.network/v0.42/run-node/keyring.html)
+[Setting up the keyring](https://docs.cosmos.network/v0.47/learn/beginner/accounts#keyring)
 
 If you check your private keys, you'll now see `<account_name>`:
 
@@ -85,7 +85,7 @@ panacead tx send ... --fees=1000000umed
 or
 
 ```bash
-panacead tx send ... --gas-prices=500.0umed
+panacead tx send ... --gas-prices=5umed
 ```
 
 ## Account
@@ -120,6 +120,8 @@ panacead tx bank send \
   <to_address> \
   <amount> \
   --chain-id <chain_id> \
+  --from <from_key> \
+  --fees 1000000umed
 ````
 
 where `to_address` is a key matching the format: `panacea1y3mhszahwatjc3023datq46a0u2fv337tes4n9`
@@ -148,6 +150,7 @@ panacead tx bank send \
   <from_key_or_address> \
   <to_address> \
   <amount> \
+  --from <from_key> \
   --chain-id <chain_id> \
   --dry-run
 ```
@@ -160,6 +163,7 @@ panacead tx bank send \
   <to_address> \
   <amount> \
   --chain-id <chain_id> \
+  --fees 1000000umed \
   --generate-only > unsignedSendTx.json
 ```
 
@@ -233,7 +237,8 @@ To unjail your jailed validator
 ```bash
 panacead tx slashing unjail \
   --from <validator-operator-addr> \
-  --chain-id <chain_id>
+  --chain-id <chain_id> \ 
+  --fees 1000000umed
 ```
 
 ### Signing Info
@@ -282,7 +287,7 @@ panacead tx staking create-validator \
   --commission-max-change-rate "0.01" \
   --min-self-delegation "1" \
   --amount 10000000umed \
-  --fees "1000000umed" \
+  --fees 1000000umed \
   --from <key-name>
 ```
 
@@ -327,7 +332,7 @@ panacead tx staking edit-validator \
   --chain-id <chain_id> \
   --commission-rate "0.15" \
   --from <key_name> \
-  --fees "1000000umed"
+  --fees 1000000umed
 ```
 
 **Note**: The `--commission-rate` value must adhere to the following invariants:
@@ -776,74 +781,130 @@ so that Panacea can verify that you are the DID owner.
 Deactivating a DID is not the same as deleting a DID. DIDs cannot be deleted permanently. They can just be deactivated.
 And DIDs cannot be reused to create another DID Documents forever.
 
-## Token
+## PNFT
 
-### Issue a new token
-
-A new token can be issued by the following command. Anyone can issue a new token with fee paid.
-After issuing, the token would appear in the issuer's account.
-
-The symbol doesn't have to be unique. `-` followed by random 3 letters will be appended to the provided symbol to avoid uniqueness constraint.
-Those 3 letters are the first three letters of the Tx hash of the `issue` transaction.
-The generated symbol will be returned as a Tx response.
-
-For more details of each parameter, please see the [Token specification](../specifications/token.md).
+### Creating a Denom
+To issue an NFT, you first need to create a Denom. The `--denom-id` value is optional; if left empty, a random UUID will be generated.
 
 ```bash
-# Note that the total supply must be in micro unit without a denomination.
-panacead tx token issue \
-    "my token" \
-    KAI \
-    1000000000 \
-    --mintable \
-    --from panacea126r28pr7sstg7yfmedv3qq4st4a4exlwccx2vc \
-    --chain-id testing
+panacead tx pnft create-denom \
+  --denom-id <your_denom_id> \
+  --denom-name <your_denom_name> \
+  --denom-description <your_denom_description> \
+  --denom-symbol <your_denom_symbol> \
+  --denom-uri <your_denom_uri> \
+  --denom-uri-hash <your_denom_hash> \
+  --denom-data <your_denom_data> \
+  --from <key or address> \
+  --chain-id <chain-id> \
+  --fees 1000000umed
 ```
 
-### Query a token
+You can confirm the creation of the denom with the following query:
 
 ```bash
-# List all token symbols
-$ panacead query token list-tokens --chain-id testing
+panacead q pnft get-denom <denom_id>
 
-- KAI-0C5
-- KAI-0EA
-
-# Query a token
-$ panacead query token get-token KAI-0EA
-
-name: my secret token
-symbol: KAI-0EA
-totalsupply:
-  denom: ukai0ea
-  amount: "1000000000"
-mintable: true
-owneraddress: panacea126r28pr7sstg7yfmedv3qq4st4a4exlwccx2vc
+## Response
+denom:
+  data: This is panacea denom data
+  description: panacea denom detail
+  id: 6a0e781a-c4a8-43ff-b15f-1a885adda8e3
+  name: panacea denom
+  owner: panacea1a392sz78y3hx72aegsczuu29v3rx7l8p9vxgqk
+  symbol: panacea
+  uri: https://medibloc.org
+  uri_hash: hash...
 ```
 
-### Query account balances and send tokens
+### Updating a Denom
+You can update a denom. All fields except the id are updatable.
 
-Of course, the new token is visible in the account balance.
 ```bash
-$ panacead query account panacea126r28pr7sstg7yfmedv3qq4st4a4exlwccx2vc
-
-  address: panacea126r28pr7sstg7yfmedv3qq4st4a4exlwccx2vc
-  coins:
-  - denom: ukai0c5
-    amount: "1000000000"
-  - denom: ukai0ea
-    amount: "999999900"
-  - denom: ukai62e
-    amount: "1000000000"
-  - denom: umed
-    amount: "99000000000000"
-  pubkey: panaceapub1addwnpepqf2m7rxgazcem4e6x4hjnwexeagrqjfdlkvz65e0jpxv5sn76jurgpqmpd5
-  accountnumber: 0
-  sequence: 6
+panacead tx pnft update-denom <denom_id> \
+  --denom-name <update_denom_name> \
+  --denom-description <update_denom_description> \
+  --denom-symbol <update_denom_symbol> \
+  --denom-uri <update_denom_uri> \
+  --denom-uri-hash <update_denom_hash> \
+  --denom-data <update_denom_data> \
+  --from <key or address> \
+  --chain-id <chain-id> \
+  --fees 1000000umed
 ```
 
-Also, the new token can be sent to other accounts.
-Note that the `amount` must be specified with the micro-denomination that contains the 3-letter suffix (without `-`).
+### Transferring a Denom
+You can change the owner of a denom. Only the current owner (`sender_address`) can initiate this transfer.
+
 ```bash
-panacead tx send <from-address> <to-address> 1000000ukai0ea
+panacead tx pnft transfer-denom <denom_id> <sender_address> <receiver_address> \
+  --from <sender_key or sender_address> \
+  --chain-id <chain-id> \
+  --fees 1000000umed
+```
+
+### Deleting a Denom
+A denom can be deleted. Only the current owner (`remover_address`) can initiate this deletion.
+
+```bash
+panacead tx pnft delete-denom <denom_id> \
+  --from <remover_address> \
+  --chain-id <chain-id> \
+  --fees 1000000umed
+```
+
+
+### Minting PNFT
+You can mint an NFT, but only the owner of the corresponding Denom has the right to do so.
+
+```bash
+panacead tx pnft mint-pnft <denom_id> <id> \
+  --pnft-name <your_nft_name> \
+  --pnft-description <your_nft_description> \
+  --pnft--uri <your_nft_uri> \
+  --pnft-uri-hash <your_nft_uri_hash> \
+  --pnft-data <your_nft_data> \
+  --from <key or address> \
+  --chain-id <chain-id> \
+  --fees 1000000umed
+```
+
+The NFT can be queried with the following:
+
+```bash
+panacead q pnft get-pnf <denom_id> <id>
+
+# Response
+pnft:
+  created_at: "2024-03-20T00:27:12.970988074Z"
+  creator: panacea1a392sz78y3hx72aegsczuu29v3rx7l8p9vxgqk
+  data: ""
+  denom_id: 6a0e781a-c4a8-43ff-b15f-1a885adda8e3
+  description: ""
+  id: token1
+  name: med
+  owner: panacea1a392sz78y3hx72aegsczuu29v3rx7l8p9vxgqk
+  uri: ""
+  uri_hash: ""
+```
+
+### Transferring PNFT
+You can transfer the ownership of an NFT to another account.
+
+```bash
+panacead tx pnft transfer-pnft <denom_id> <id> <receiver> \
+  --from <key or address> \
+  --chain-id <chain-id> \
+  --fees 1000000umed
+```
+
+### Burning PNFT
+An NFT can be burned, which is an action that can only be performed by the owner.
+This command permanently removes the specified PNFT from the blockchain. Once an NFT is burned, it cannot be recovered, so this action should be considered final and irreversible.
+
+```bash
+panacead tx pnft burn-pnft <denom_id> <id> \
+  --from <key or address> \
+  --chain-id <chain-id> \
+  --fees 1000000umed
 ```

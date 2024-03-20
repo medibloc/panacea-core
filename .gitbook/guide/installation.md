@@ -3,7 +3,7 @@
 
 ## Install Go
 
-[Go 1.19+](https://golang.org/doc/install) is required.
+[Go 1.22+](https://golang.org/doc/install) is required.
 
 ## Install the `panacead`
 
@@ -12,7 +12,7 @@ please clone the `panacea-core` project and build it.
 
 ```bash
 # Make sure to checkout the correct branch.
-git clone -b v2.0.7-2 https://github.com/medibloc/panacea-core
+git clone -b v2.2.0 https://github.com/medibloc/panacea-core
 cd panacea-core
 make install  # All binaries are installed in $GOPATH/bin
 ```
@@ -20,7 +20,7 @@ make install  # All binaries are installed in $GOPATH/bin
 Verify that the `panacead` binary is installed successfully.
 ```bash
 $ panacead version
-2.0.6
+2.2.0
 ```
 
 ## Import `panacea-core` as a Go dependency
@@ -33,13 +33,14 @@ As a workaround, please add `replace` directives in your `go.mod` as below.
 ```
 module your.com/yours
 
-go 1.19
+go 1.22
 
 replace (
-	github.com/cosmos/cosmos-sdk => github.com/medibloc/cosmos-sdk v0.45.12-panacea.1
-	github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
-	github.com/tendermint/tendermint => github.com/informalsystems/tendermint v0.34.24
-	google.golang.org/grpc => google.golang.org/grpc v1.33.2
+    github.com/99designs/keyring => github.com/cosmos/keyring v1.2.0
+    github.com/syndtr/goleveldb => github.com/syndtr/goleveldb v1.0.1-0.20210819022825-2ae1ddf74ef7
+    
+    // If you are using a ledger, you may need to replace the line as shown below:
+    github.com/cosmos/ledger-cosmos-go => github.com/cosmos/ledger-cosmos-go v0.12.4
 )
 ```
 
