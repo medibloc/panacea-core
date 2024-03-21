@@ -73,7 +73,7 @@ func NewCmdGetPNFTsByOwner() *cobra.Command {
 
 func NewCmdGetPNFT() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "get-pnf [denom-id] [id]",
+		Use:   "get-pnft [denom-id] [id]",
 		Short: "Get pnft by denomId and id",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
