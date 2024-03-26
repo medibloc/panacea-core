@@ -124,7 +124,6 @@ To set state sync enabled, RPC servers and trusted block info (height and hash) 
 You can use the following public RPC endpoints provided by Medibloc team.
 - 3.35.82.40:26657
 - 13.124.96.254:26657
-- 52.79.108.35:26657
 
 trusted block info can be obtained via RPC.
 
