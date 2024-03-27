@@ -110,7 +110,7 @@ Seed nodes can be found in:
 Insert those `<node_id>@<ip>`s with 26656 port to the `persistent_peers` field in `~/.panacead/config/config.toml`.
 ```toml
 # Comma separated list of nodes to keep persistent connections to
-persistent_peers = "8c41cc8a6fc59f05138ae6c16a9eec05d601ef71@13.209.177.91:26656,cc0285c4d9cec8489f8bfed0a749dd8636406a0d@54.180.169.37:26656,1fc4a41660986ee22106445b67444ec094221e76@52.78.132.151:26656"
+persistent_peers = "c238f279c970764d6893ae44bdf5c949dc22b009@13.114.44.199:26656,395aead00e99f828e4af92531dcd8c8da1255a8f@3.36.50.133:26656,00c57e36559b49ce7d29fa4920b5132584994368@52.77.227.241:26656"
 ```
 
 For more information on seeds and peers, see the [Using Tendermint: Peers](https://docs.tendermint.com/master/tendermint-core/using-tendermint.html#peers).
@@ -121,15 +121,10 @@ Your node can rapidly sync with the network using state sync without replaying h
 
 To set state sync enabled, RPC servers and trusted block info (height and hash) are required.
 
-You can use the following public RPC endpoints provided by Medibloc team.
-- 3.35.82.40:26657
-- 13.124.96.254:26657
-- 52.79.108.35:26657
-
 trusted block info can be obtained via RPC.
 
 ```shell
-curl -s 15.165.191.68:26657/block | jq -r '.result.block.header.height + "\n" + .result.block_id.hash'
+curl -s https://rpc.gopanacea.org/block | jq -r '.result.block.header.height + "\n" + .result.block_id.hash'
 # 7700000 (height)
 # 0D3E53F02ABCDDA8AAC1520342D37A290DDABE4C28190EE6E2C6B0C819F74D4A (hash)
 ```
@@ -141,7 +136,7 @@ Then, you need to edit several things in `~/.panacea/config/config.toml` file.
 
 enable = true
 
-rpc_servers = "15.165.191.68:26657,54.254.66.59:26657" # rpc addresses
+rpc_servers = "15.165.191.68:26657,13.209.53.86:26657" # rpc addresses
 trust_height = <trusted-block-height>
 trust_hash = "<trusted-block-hash>"
 trust_period = "336h0m0s" # 2/3 of 21 days (unbonding period)
