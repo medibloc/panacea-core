@@ -178,13 +178,11 @@ func (appKeepers *AppKeepersWithKey) InitKeyAndKeepers(
 		appCodec, appKeepers.keys[ibcexported.StoreKey], appKeepers.GetSubspace(ibcexported.ModuleName), appKeepers.StakingKeeper, appKeepers.UpgradeKeeper, appKeepers.ScopedIBCKeeper,
 	)
 
-	/*
-		Example of setting gov params:
-		govConfig.MaxMetadataLen = 10000
-	*/
+	govConfig := govtypes.DefaultConfig()
+	govConfig.MaxMetadataLen = 10200
 	appKeepers.GovKeeper = *govkeeper.NewKeeper(
 		appCodec, appKeepers.keys[govtypes.StoreKey], appKeepers.AccountKeeper, appKeepers.BankKeeper,
-		appKeepers.StakingKeeper, bApp.MsgServiceRouter(), govtypes.DefaultConfig(), authtypes.NewModuleAddress(govtypes.ModuleName).String(),
+		appKeepers.StakingKeeper, bApp.MsgServiceRouter(), govConfig, authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
 
 	// Create Transfer Keepers
