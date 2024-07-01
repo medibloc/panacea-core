@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- [\#700](https://github.com/medibloc/panacea-core/pull/700) feat: Bump cosmos-sdk and ibc-go modules, update gov module's config size
+
 ## [v2.2.0](https://github.com/medibloc/panacea-core/releases/tag/v2.2.0) - 2024-03-14
 
 ### Improvements
