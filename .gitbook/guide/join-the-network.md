@@ -110,7 +110,7 @@ Seed nodes can be found in:
 Insert those `<node_id>@<ip>`s with 26656 port to the `persistent_peers` field in `~/.panacead/config/config.toml`.
 ```toml
 # Comma separated list of nodes to keep persistent connections to
-persistent_peers = "c238f279c970764d6893ae44bdf5c949dc22b009@13.114.44.199:26656,395aead00e99f828e4af92531dcd8c8da1255a8f@3.36.50.133:26656,00c57e36559b49ce7d29fa4920b5132584994368@52.77.227.241:26656"
+persistent_peers = "2f75e475009b8514efdadf063e40f662be76dfdf@52.79.108.35:26656,0e030ab48abc25ff2918ab019fd74d5447d7582e@15.165.127.151:26656,f808eb775180345c3b443d55afcc3c148dd19183@3.37.237.120:26656"
 ```
 
 For more information on seeds and peers, see the [Using Tendermint: Peers](https://docs.tendermint.com/master/tendermint-core/using-tendermint.html#peers).

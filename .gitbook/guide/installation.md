@@ -12,7 +12,7 @@ please clone the `panacea-core` project and build it.
 
 ```bash
 # Make sure to checkout the correct branch.
-git clone -b v2.2.1 https://github.com/medibloc/panacea-core
+git clone -b v2.2.0-1 https://github.com/medibloc/panacea-core
 cd panacea-core
 make install  # All binaries are installed in $GOPATH/bin
 ```
@@ -20,7 +20,7 @@ make install  # All binaries are installed in $GOPATH/bin
 Verify that the `panacead` binary is installed successfully.
 ```bash
 $ panacead version
-2.2.1
+2.2.0-1
 ```
 
 ## Import `panacea-core` as a Go dependency
