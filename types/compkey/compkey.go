@@ -128,7 +128,7 @@ func DecodeFromString(encoded string, separator string, out CompositeKey) error 
 	return out.FromStrings(values)
 }
 
-// MustDecodeToString calls DecodeToString internally, but it panics if DecodeToString returns a non-nil error.
+// MustDecodeFromString calls DecodeToString internally, but it panics if DecodeToString returns a non-nil error.
 func MustDecodeFromString(encoded string, separator string, out CompositeKey) {
 	if err := DecodeFromString(encoded, separator, out); err != nil {
 		panic(err)
