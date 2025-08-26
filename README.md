@@ -36,3 +36,7 @@ Panacea is a blockchain which is the key infrastructure for our services to rein
 ## License
 
 [Apache-2.0 License](LICENSE)
+
+## Install Guide
+- See detailed instructions: https://docs.gopanacea.org
+- For releases: https://github.com/medibloc/panacea-core/releases
