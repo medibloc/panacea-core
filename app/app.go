@@ -98,6 +98,7 @@ import (
 	"github.com/medibloc/panacea-core/v2/x/did"
 	didtypes "github.com/medibloc/panacea-core/v2/x/did/types"
 
+	"github.com/medibloc/panacea-core/v2/app/upgrades/pan_19_noop_rehearsal"
 	"github.com/medibloc/panacea-core/v2/app/upgrades/v2_0_5"
 	"github.com/medibloc/panacea-core/v2/app/upgrades/v2_0_6"
 	"github.com/medibloc/panacea-core/v2/app/upgrades/v2_0_7"
@@ -174,6 +175,7 @@ var (
 		v2_0_6.Upgrade,
 		v2_0_7.Upgrade,
 		v2_2_0.Upgrade,
+		pan_19_noop_rehearsal.Upgrade,
 	}
 )
 
