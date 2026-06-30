@@ -1,8 +1,8 @@
 module github.com/medibloc/panacea-core/v2
 
-go 1.22.7
+go 1.23.12
 
-toolchain go1.23.6
+toolchain go1.23.12
 
 require (
 	cosmossdk.io/api v0.3.1
