@@ -2,8 +2,8 @@ package keeper
 
 import (
 	"context"
+	"cosmossdk.io/x/nft"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/nft"
 	"github.com/medibloc/panacea-core/v2/x/pnft/types"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"

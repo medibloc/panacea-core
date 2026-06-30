@@ -2,12 +2,12 @@ package keeper
 
 import (
 	storetypes "cosmossdk.io/store/types"
+	"cosmossdk.io/x/nft"
+	nftkeeper "cosmossdk.io/x/nft/keeper"
 	"fmt"
 	"github.com/cometbft/cometbft/libs/log"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/nft"
-	nftkeeper "github.com/cosmos/cosmos-sdk/x/nft/keeper"
 	"github.com/medibloc/panacea-core/v2/x/pnft/types"
 )
 

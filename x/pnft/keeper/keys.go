@@ -1,6 +1,6 @@
 package keeper
 
-import nftkeeper "github.com/cosmos/cosmos-sdk/x/nft/keeper"
+import nftkeeper "cosmossdk.io/x/nft/keeper"
 
 // classStoreKey returns the byte representation of the nft class key
 // reference from x/nft/keeper/keys.go

@@ -1,10 +1,10 @@
 package keeper
 
 import (
+	"cosmossdk.io/x/nft"
 	"fmt"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/nft"
 	"github.com/medibloc/panacea-core/v2/x/pnft/types"
 )
 

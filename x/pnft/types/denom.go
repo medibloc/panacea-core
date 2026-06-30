@@ -1,10 +1,10 @@
 package types
 
 import (
+	"cosmossdk.io/x/nft"
 	"errors"
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
-	"github.com/cosmos/cosmos-sdk/x/nft"
 )
 
 func NewClassFromDenom(cdc codec.BinaryCodec, denom *Denom) (*nft.Class, error) {
