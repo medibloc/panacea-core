@@ -5,7 +5,7 @@ import (
 
 	"github.com/medibloc/panacea-core/v2/types/compkey"
 
-	"github.com/cosmos/cosmos-sdk/store/prefix"
+	"cosmossdk.io/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/query"
 	"github.com/medibloc/panacea-core/v2/x/aol/types"
