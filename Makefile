@@ -49,10 +49,10 @@ ARTIFACT_DIR := artifacts
 
 # DB backend selection
 ifeq (cleveldb,$(findstring cleveldb,$(COSMOS_BUILD_OPTIONS)))
-  build_tags += gcc
+  $(error cleveldb is not supported in Cosmos SDK v0.50; use goleveldb)
 endif
 ifeq (badgerdb,$(findstring badgerdb,$(COSMOS_BUILD_OPTIONS)))
-  build_tags += badgerdb
+  $(error badgerdb is not supported in Cosmos SDK v0.50; use goleveldb)
 endif
 # handle rocksdb
 ifeq (rocksdb,$(findstring rocksdb,$(COSMOS_BUILD_OPTIONS)))
@@ -61,7 +61,7 @@ ifeq (rocksdb,$(findstring rocksdb,$(COSMOS_BUILD_OPTIONS)))
 endif
 # handle boltdb
 ifeq (boltdb,$(findstring boltdb,$(COSMOS_BUILD_OPTIONS)))
-  build_tags += boltdb
+  $(error boltdb is not supported in Cosmos SDK v0.50; use goleveldb)
 endif
 
 build_tags += $(BUILD_TAGS)
