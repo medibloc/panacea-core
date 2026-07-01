@@ -1,5 +1,5 @@
 export VERSION := $(shell echo $(shell git describe --tags) | sed 's/^v//')
-export TMVERSION := $(shell go list -m github.com/cometbft/cometbft | sed 's:.* ::')
+export CMTVERSION := $(shell go list -m github.com/cometbft/cometbft | sed 's:.* ::')
 export COMMIT := $(shell git log -1 --format='%H')
 LEDGER_ENABLED ?= true
 BINDIR ?= $(GOPATH)/bin
@@ -53,7 +53,7 @@ ldflags = -X github.com/cosmos/cosmos-sdk/version.Name=panacea-core \
 		  -X github.com/cosmos/cosmos-sdk/version.Version=$(VERSION) \
 		  -X github.com/cosmos/cosmos-sdk/version.Commit=$(COMMIT) \
 		  -X "github.com/cosmos/cosmos-sdk/version.BuildTags=$(build_tags_comma_sep)" \
-		  -X github.com/tendermint/tendermint/version.TMCoreSemVer=$(TMVERSION)
+		  -X github.com/cometbft/cometbft/version.TMCoreSemVer=$(CMTVERSION)
 
 ARTIFACT_DIR := artifacts
 
