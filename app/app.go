@@ -3,7 +3,6 @@ package app
 import (
 	autocliv1 "cosmossdk.io/api/cosmos/autocli/v1"
 	reflectionv1 "cosmossdk.io/api/cosmos/reflection/v1"
-	"cosmossdk.io/store/streaming"
 	"cosmossdk.io/x/nft"
 	"cosmossdk.io/x/upgrade"
 	"encoding/json"
@@ -236,7 +235,7 @@ func New(
 	app.InitKeyAndKeepers(encodingConfig, maccPerms, BlockedAddresses(), appOpts, bApp)
 
 	// load state streaming if enabled
-	if _, _, err := streaming.LoadStreamingServices(bApp, appOpts, appCodec, logger, app.GetKVStoreKey()); err != nil {
+	if err := app.RegisterStreamingServices(appOpts, app.GetKVStoreKey()); err != nil {
 		logger.Error("failed to load state streaming", "err", err)
 		os.Exit(1)
 	}
