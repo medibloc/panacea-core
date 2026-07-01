@@ -3,13 +3,13 @@ package app
 import (
 	autocliv1 "cosmossdk.io/api/cosmos/autocli/v1"
 	reflectionv1 "cosmossdk.io/api/cosmos/reflection/v1"
+	"cosmossdk.io/log"
 	"cosmossdk.io/x/nft"
 	"cosmossdk.io/x/upgrade"
 	"encoding/json"
 	"fmt"
 	dbm "github.com/cometbft/cometbft-db"
 	abci "github.com/cometbft/cometbft/abci/types"
-	"github.com/cometbft/cometbft/libs/log"
 	"github.com/cosmos/cosmos-sdk/runtime"
 	runtimeservices "github.com/cosmos/cosmos-sdk/runtime/services"
 	"github.com/cosmos/cosmos-sdk/server"
@@ -232,7 +232,7 @@ func New(
 		interfaceRegistry: interfaceRegistry,
 	}
 
-	app.InitKeyAndKeepers(encodingConfig, maccPerms, BlockedAddresses(), appOpts, bApp)
+	app.InitKeyAndKeepers(encodingConfig, maccPerms, BlockedAddresses(), appOpts, bApp, logger)
 
 	// load state streaming if enabled
 	if err := app.RegisterStreamingServices(appOpts, app.GetKVStoreKey()); err != nil {

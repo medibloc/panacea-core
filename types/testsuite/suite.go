@@ -1,17 +1,18 @@
 package testsuite
 
 import (
+	"cosmossdk.io/log"
 	"cosmossdk.io/store"
 	storetypes "cosmossdk.io/store/types"
 	upgradekeeper "cosmossdk.io/x/upgrade/keeper"
 	upgradetypes "cosmossdk.io/x/upgrade/types"
 	dbm "github.com/cometbft/cometbft-db"
 	"github.com/cometbft/cometbft/crypto/secp256k1"
-	"github.com/cometbft/cometbft/libs/log"
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	"github.com/cometbft/cometbft/types/time"
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
+	"github.com/cosmos/cosmos-sdk/runtime"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	"github.com/cosmos/cosmos-sdk/x/auth/tx"
@@ -142,10 +143,11 @@ func (suite *TestSuite) SetupTest() {
 	suite.AolMsgServer = aolkeeper.NewMsgServerImpl(suite.AolKeeper)
 	suite.BankKeeper = bankkeeper.NewBaseKeeper(
 		appCodec,
-		keyParams[banktypes.StoreKey],
+		runtime.NewKVStoreService(keyParams[banktypes.StoreKey]),
 		suite.AccountKeeper,
 		BlockedAddresses(maccPerms),
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
+		log.NewNopLogger(),
 	)
 	if err := suite.BankKeeper.SetParams(ctx, banktypes.DefaultParams()); err != nil {
 		panic(err)

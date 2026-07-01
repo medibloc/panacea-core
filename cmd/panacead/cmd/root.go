@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"cosmossdk.io/log"
 	"errors"
 	"github.com/cosmos/cosmos-sdk/client/config"
 	"github.com/cosmos/cosmos-sdk/client/pruning"
@@ -13,7 +14,6 @@ import (
 	dbm "github.com/cometbft/cometbft-db"
 	cmbtcfg "github.com/cometbft/cometbft/config"
 	cmbtcli "github.com/cometbft/cometbft/libs/cli"
-	"github.com/cometbft/cometbft/libs/log"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 

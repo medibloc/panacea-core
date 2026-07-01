@@ -1,9 +1,8 @@
 package keeper
 
 import (
+	"cosmossdk.io/log"
 	"fmt"
-
-	"github.com/cometbft/cometbft/libs/log"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/medibloc/panacea-core/v2/x/burn/types"

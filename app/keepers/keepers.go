@@ -1,6 +1,7 @@
 package keepers
 
 import (
+	"cosmossdk.io/log"
 	storetypes "cosmossdk.io/store/types"
 	evidencekeeper "cosmossdk.io/x/evidence/keeper"
 	evidencetypes "cosmossdk.io/x/evidence/types"
@@ -12,6 +13,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/codec"
+	"github.com/cosmos/cosmos-sdk/runtime"
 	"github.com/cosmos/cosmos-sdk/server"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -103,6 +105,7 @@ func (appKeepers *AppKeepersWithKey) InitKeyAndKeepers(
 	blockedAddrs map[string]bool,
 	appOpts servertypes.AppOptions,
 	bApp *baseapp.BaseApp,
+	logger log.Logger,
 ) {
 	appKeepers.GenerateKeys()
 
@@ -125,10 +128,11 @@ func (appKeepers *AppKeepersWithKey) InitKeyAndKeepers(
 
 	appKeepers.BankKeeper = bankkeeper.NewBaseKeeper(
 		appCodec,
-		appKeepers.keys[banktypes.StoreKey],
+		runtime.NewKVStoreService(appKeepers.keys[banktypes.StoreKey]),
 		appKeepers.AccountKeeper,
 		blockedAddrs,
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
+		logger,
 	)
 
 	appKeepers.StakingKeeper = stakingkeeper.NewKeeper(
