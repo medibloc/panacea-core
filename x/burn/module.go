@@ -1,6 +1,7 @@
 package burn
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 
@@ -139,16 +140,19 @@ func (am AppModule) ExportGenesis(ctx sdk.Context, cdc codec.JSONCodec) json.Raw
 }
 
 // BeginBlock executes all ABCI BeginBlock logic respective to the capability module.
-func (am AppModule) BeginBlock(_ sdk.Context, _ abci.RequestBeginBlock) {}
+func (am AppModule) BeginBlock(_ context.Context) error {
+	return nil
+}
 
 // EndBlock executes all ABCI EndBlock logic respective to the capability module. It
 // returns no validator updates.
-func (am AppModule) EndBlock(ctx sdk.Context, _ abci.RequestEndBlock) []abci.ValidatorUpdate {
-	err := am.keeper.BurnCoins(ctx, types.BurnAddress)
+func (am AppModule) EndBlock(ctx context.Context) error {
+	sdkCtx := sdk.UnwrapSDKContext(ctx)
+	err := am.keeper.BurnCoins(sdkCtx, types.BurnAddress)
 	if err != nil {
-		ctx.Logger().Error("Failed burn.", fmt.Sprintf("msg : %s", err.Error()))
+		sdkCtx.Logger().Error("Failed burn.", fmt.Sprintf("msg : %s", err.Error()))
 	}
-	return []abci.ValidatorUpdate{}
+	return nil
 }
 
 // ConsensusVersion implements AppModule/ConsensusVersion.
