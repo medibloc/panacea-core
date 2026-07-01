@@ -44,16 +44,6 @@ endif
 whitespace :=
 whitespace += $(whitespace)
 comma := ,
-build_tags_comma_sep := $(subst $(whitespace),$(comma),$(build_tags))
-
-# process linker flags
-
-ldflags = -X github.com/cosmos/cosmos-sdk/version.Name=panacea-core \
-		  -X github.com/cosmos/cosmos-sdk/version.AppName=panacead \
-		  -X github.com/cosmos/cosmos-sdk/version.Version=$(VERSION) \
-		  -X github.com/cosmos/cosmos-sdk/version.Commit=$(COMMIT) \
-		  -X "github.com/cosmos/cosmos-sdk/version.BuildTags=$(build_tags_comma_sep)" \
-		  -X github.com/cometbft/cometbft/version.TMCoreSemVer=$(CMTVERSION)
 
 ARTIFACT_DIR := artifacts
 
@@ -74,14 +64,24 @@ ifeq (boltdb,$(findstring boltdb,$(COSMOS_BUILD_OPTIONS)))
   build_tags += boltdb
 endif
 
+build_tags += $(BUILD_TAGS)
+build_tags := $(strip $(build_tags))
+build_tags_comma_sep := $(subst $(whitespace),$(comma),$(build_tags))
+
+# process linker flags
+
+ldflags = -X github.com/cosmos/cosmos-sdk/version.Name=panacea-core \
+		  -X github.com/cosmos/cosmos-sdk/version.AppName=panacead \
+		  -X github.com/cosmos/cosmos-sdk/version.Version=$(VERSION) \
+		  -X github.com/cosmos/cosmos-sdk/version.Commit=$(COMMIT) \
+		  -X "github.com/cosmos/cosmos-sdk/version.BuildTags=$(build_tags_comma_sep)" \
+		  -X github.com/cometbft/cometbft/version.TMCoreSemVer=$(CMTVERSION)
+
 ifeq (,$(findstring nostrip,$(COSMOS_BUILD_OPTIONS)))
   ldflags += -w -s
 endif
 #ldflags += $(LDFLAGS)
 ldflags := $(strip $(ldflags))
-
-build_tags += $(BUILD_TAGS)
-build_tags := $(strip $(build_tags))
 
 BUILD_FLAGS := -tags "$(build_tags)" -ldflags '$(ldflags)'
 # check for nostrip option
