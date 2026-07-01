@@ -118,7 +118,7 @@ $(BUILDDIR)/:
 
 .PHONY: build build-linux
 
-distclean: clean tools-clean
+distclean: clean
 clean:
 	rm -rf \
     $(BUILDDIR)/ \
