@@ -10,3 +10,5 @@ breaking:
 lint:
   use:
     - DEFAULT
+  except:
+    - SERVICE_SUFFIX

@@ -126,14 +126,11 @@ paths:
           description: >-
             reverse is set to true if results are to be returned in the
             descending order.
-
-
-            Since: cosmos-sdk 0.43
           in: query
           required: false
           type: boolean
       tags:
-        - QueryService
+        - Query
   /panacea/aol/v2/owners/{owner_address}/topics/{topic_name}:
     get:
       summary: Topic returns topic details.
@@ -191,7 +188,7 @@ paths:
           required: true
           type: string
       tags:
-        - QueryService
+        - Query
   /panacea/aol/v2/owners/{owner_address}/topics/{topic_name}/records/{offset}:
     get:
       summary: Record returns record details.
@@ -257,7 +254,7 @@ paths:
           type: string
           format: uint64
       tags:
-        - QueryService
+        - Query
   /panacea/aol/v2/owners/{owner_address}/topics/{topic_name}/writers:
     get:
       summary: Writers returns writer addresses.
@@ -384,14 +381,11 @@ paths:
           description: >-
             reverse is set to true if results are to be returned in the
             descending order.
-
-
-            Since: cosmos-sdk 0.43
           in: query
           required: false
           type: boolean
       tags:
-        - QueryService
+        - Query
   /panacea/aol/v2/owners/{owner_address}/topics/{topic_name}/writers/{writer_address}:
     get:
       summary: Writer returns writer details.
@@ -452,7 +446,7 @@ paths:
           required: true
           type: string
       tags:
-        - QueryService
+        - Query
   /panacea/did/v2/dids/{did_base64}:
     get:
       summary: DID returns a DID Document with a sequence number.
@@ -695,7 +689,7 @@ paths:
           required: true
           type: string
       tags:
-        - QueryService
+        - Query
 definitions:
   cosmos.base.query.v1beta1.PageRequest:
     type: object
@@ -739,9 +733,6 @@ definitions:
         description: >-
           reverse is set to true if results are to be returned in the descending
           order.
-
-
-          Since: cosmos-sdk 0.43
     description: |-
       message SomeRequest {
                Foo some_parameter = 1;
@@ -802,7 +793,7 @@ definitions:
             value:
               type: string
               format: byte
-  panacea.aol.v2.QueryServiceRecordResponse:
+  panacea.aol.v2.QueryRecordResponse:
     type: object
     properties:
       record:
@@ -821,7 +812,7 @@ definitions:
             type: string
         description: Record defines a record type.
     description: QueryRecordResponse is the response type for the Query/Record RPC method.
-  panacea.aol.v2.QueryServiceTopicResponse:
+  panacea.aol.v2.QueryTopicResponse:
     type: object
     properties:
       topic:
@@ -837,7 +828,7 @@ definitions:
             format: uint64
         description: Topic defines a topic type.
     description: QueryTopicResponse is the response type for the Query/Topic RPC method.
-  panacea.aol.v2.QueryServiceTopicsResponse:
+  panacea.aol.v2.QueryTopicsResponse:
     type: object
     properties:
       topic_names:
@@ -871,7 +862,7 @@ definitions:
                    PageResponse page = 2;
            }
     description: QueryTopicsResponse is the response type for the Query/Topics RPC method.
-  panacea.aol.v2.QueryServiceWriterResponse:
+  panacea.aol.v2.QueryWriterResponse:
     type: object
     properties:
       writer:
@@ -886,7 +877,7 @@ definitions:
             format: int64
         description: Topic defines a topic type.
     description: QueryWriterResponse is the response type for the Query/Writer RPC method.
-  panacea.aol.v2.QueryServiceWritersResponse:
+  panacea.aol.v2.QueryWritersResponse:
     type: object
     properties:
       writer_addresses:
@@ -1303,7 +1294,7 @@ definitions:
       number
 
       for preventing replay attacks.
-  panacea.did.v2.QueryServiceDIDResponse:
+  panacea.did.v2.QueryDIDResponse:
     type: object
     properties:
       did_document_with_seq:
