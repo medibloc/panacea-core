@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"cosmossdk.io/log"
+	confixcmd "cosmossdk.io/tools/confix/cmd"
 	"errors"
 	"github.com/cosmos/cosmos-sdk/client/config"
 	"github.com/cosmos/cosmos-sdk/client/pruning"
@@ -117,7 +118,7 @@ func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
 	rootCmd.AddCommand(
 		InitCmd(app.ModuleBasics, app.DefaultNodeHome),
 		debug.Cmd(),
-		config.Cmd(),
+		confixcmd.ConfigCommand(),
 		cmbtcli.NewCompletionCmd(rootCmd, true),
 		pruning.Cmd(newApp, app.DefaultNodeHome),
 		snapshot.Cmd(newApp),
