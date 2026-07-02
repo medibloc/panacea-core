@@ -79,12 +79,17 @@ import (
 
 	upgradeclient "github.com/cosmos/cosmos-sdk/x/upgrade/client"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
+	ibcfee "github.com/cosmos/ibc-go/v7/modules/apps/29-fee"
+	ibcfeetypes "github.com/cosmos/ibc-go/v7/modules/apps/29-fee/types"
 	"github.com/cosmos/ibc-go/v7/modules/apps/transfer"
 	ibctransfertypes "github.com/cosmos/ibc-go/v7/modules/apps/transfer/types"
 	ibc "github.com/cosmos/ibc-go/v7/modules/core"
 	ibcgovclient "github.com/cosmos/ibc-go/v7/modules/core/02-client/client"
 	ibcexported "github.com/cosmos/ibc-go/v7/modules/core/exported"
 	ibctm "github.com/cosmos/ibc-go/v7/modules/light-clients/07-tendermint"
+
+	packetforward "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v7/packetforward"
+	packetforwardtypes "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v7/packetforward/types"
 
 	appparams "github.com/medibloc/panacea-core/v2/app/params"
 
@@ -103,6 +108,7 @@ import (
 	"github.com/medibloc/panacea-core/v2/app/upgrades/v2_0_7"
 	"github.com/medibloc/panacea-core/v2/app/upgrades/v2_2_0"
 	"github.com/medibloc/panacea-core/v2/app/upgrades/v2_2_1"
+	"github.com/medibloc/panacea-core/v2/app/upgrades/v2_3_0"
 )
 
 const Name = "panacea"
@@ -145,6 +151,8 @@ var (
 		// ibc
 		ibc.AppModuleBasic{},
 		transfer.AppModuleBasic{},
+		ibcfee.AppModuleBasic{},
+		packetforward.AppModuleBasic{},
 		// register light clients on IBC
 		ibctm.AppModuleBasic{},
 		// panacea
@@ -163,6 +171,8 @@ var (
 		stakingtypes.NotBondedPoolName: {authtypes.Burner, authtypes.Staking},
 		govtypes.ModuleName:            {authtypes.Burner},
 		ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
+		ibcfeetypes.ModuleName:         nil,
+		packetforwardtypes.ModuleName:  nil,
 		burntypes.ModuleName:           {authtypes.Burner},
 		nft.ModuleName:                 nil,
 	}
@@ -176,6 +186,7 @@ var (
 		v2_0_7.Upgrade,
 		v2_2_0.Upgrade,
 		v2_2_1.Upgrade,
+		v2_3_0.Upgrade,
 	}
 )
 
@@ -289,6 +300,8 @@ func New(
 		consensus.NewAppModule(appCodec, app.ConsensusParamsKeeper),
 		ibc.NewAppModule(app.IBCKeeper),
 		transfer.NewAppModule(app.TransferKeeper),
+		ibcfee.NewAppModule(app.IBCFeeKeeper),
+		packetforward.NewAppModule(app.PacketForwardKeeper, app.GetSubspace(packetforwardtypes.ModuleName)),
 		aol.NewAppModule(appCodec, app.AolKeeper),
 		did.NewAppModule(appCodec, app.DidKeeper),
 		burn.NewAppModule(appCodec, app.BurnKeeper),
@@ -306,7 +319,7 @@ func New(
 		authtypes.ModuleName, banktypes.ModuleName, govtypes.ModuleName, crisistypes.ModuleName, genutiltypes.ModuleName,
 		authz.ModuleName, feegrant.ModuleName, group.ModuleName,
 		paramstypes.ModuleName, vestingtypes.ModuleName, consensusparamtypes.ModuleName,
-		ibcexported.ModuleName, ibctransfertypes.ModuleName,
+		ibcexported.ModuleName, ibctransfertypes.ModuleName, ibcfeetypes.ModuleName, packetforwardtypes.ModuleName,
 		aoltypes.ModuleName, didtypes.ModuleName, burntypes.ModuleName, pnfttypes.ModuleName,
 	)
 
@@ -317,7 +330,7 @@ func New(
 		genutiltypes.ModuleName, evidencetypes.ModuleName, authz.ModuleName,
 		feegrant.ModuleName, group.ModuleName,
 		paramstypes.ModuleName, upgradetypes.ModuleName, vestingtypes.ModuleName, consensusparamtypes.ModuleName,
-		ibcexported.ModuleName, ibctransfertypes.ModuleName,
+		ibcexported.ModuleName, ibctransfertypes.ModuleName, ibcfeetypes.ModuleName, packetforwardtypes.ModuleName,
 		aoltypes.ModuleName, didtypes.ModuleName, burntypes.ModuleName, pnfttypes.ModuleName,
 	)
 
@@ -333,7 +346,7 @@ func New(
 		minttypes.ModuleName, crisistypes.ModuleName, genutiltypes.ModuleName, evidencetypes.ModuleName, authz.ModuleName,
 		feegrant.ModuleName, group.ModuleName, paramstypes.ModuleName, upgradetypes.ModuleName,
 		vestingtypes.ModuleName, consensusparamtypes.ModuleName,
-		ibcexported.ModuleName, ibctransfertypes.ModuleName,
+		ibcexported.ModuleName, ibctransfertypes.ModuleName, ibcfeetypes.ModuleName, packetforwardtypes.ModuleName,
 		aoltypes.ModuleName, didtypes.ModuleName, burntypes.ModuleName, pnfttypes.ModuleName,
 	}
 	app.ModuleManager.SetOrderInitGenesis(genesisModuleOrder...)
