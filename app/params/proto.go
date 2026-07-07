@@ -15,12 +15,19 @@ import (
 type EncodingConfigOption func(*encodingConfigOptions)
 
 type encodingConfigOptions struct {
-	customGetSigners []txsigning.CustomGetSigner
+	customGetSigners          []txsigning.CustomGetSigner
+	aminoJSONEncoderModifiers []func(aminojson.Encoder) aminojson.Encoder
 }
 
 func WithCustomGetSigners(customGetSigners ...txsigning.CustomGetSigner) EncodingConfigOption {
 	return func(options *encodingConfigOptions) {
 		options.customGetSigners = append(options.customGetSigners, customGetSigners...)
+	}
+}
+
+func WithAminoJSONEncoderModifiers(modifiers ...func(aminojson.Encoder) aminojson.Encoder) EncodingConfigOption {
+	return func(options *encodingConfigOptions) {
+		options.aminoJSONEncoderModifiers = append(options.aminoJSONEncoderModifiers, modifiers...)
 	}
 }
 
@@ -53,6 +60,9 @@ func MakeEncodingConfig(configOptions ...EncodingConfigOption) EncodingConfig {
 	aminoJSONEncoder := aminojson.NewEncoder(aminojson.EncoderOptions{
 		FileResolver: interfaceRegistry,
 	})
+	for _, modifier := range options.aminoJSONEncoderModifiers {
+		aminoJSONEncoder = modifier(aminoJSONEncoder)
+	}
 
 	txConfig, err := tx.NewTxConfigWithOptions(protoCodec, tx.ConfigOptions{
 		EnabledSignModes: []signingtypes.SignMode{
