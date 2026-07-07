@@ -13,7 +13,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/runtime"
 	runtimeservices "github.com/cosmos/cosmos-sdk/runtime/services"
 	"github.com/cosmos/cosmos-sdk/server"
-	"github.com/cosmos/cosmos-sdk/std"
 	"github.com/cosmos/cosmos-sdk/testutil/testdata"
 	"github.com/cosmos/cosmos-sdk/x/auth/posthandler"
 	authsims "github.com/cosmos/cosmos-sdk/x/auth/simulation"
@@ -82,8 +81,6 @@ import (
 	ibc "github.com/cosmos/ibc-go/v8/modules/core"
 	ibcexported "github.com/cosmos/ibc-go/v8/modules/core/exported"
 	ibctm "github.com/cosmos/ibc-go/v8/modules/light-clients/07-tendermint"
-
-	appparams "github.com/medibloc/panacea-core/v2/app/params"
 
 	"github.com/medibloc/panacea-core/v2/x/aol"
 	aoltypes "github.com/medibloc/panacea-core/v2/x/aol/types"
@@ -210,7 +207,7 @@ func New(
 	appOpts servertypes.AppOptions,
 	baseAppOptions ...func(*baseapp.BaseApp),
 ) *App {
-	encodingConfig := makeEncodingConfig()
+	encodingConfig := MakeEncodingConfig()
 
 	appCodec := encodingConfig.Codec
 	legacyAmino := encodingConfig.Amino
@@ -580,13 +577,4 @@ func (app *App) setupUpgradeHandlers() {
 			u.CreateUpgradeHandler(app.ModuleManager, app.configurator, &app.AppKeepersWithKey),
 		)
 	}
-}
-
-func makeEncodingConfig() appparams.EncodingConfig {
-	encodingConfig := appparams.MakeEncodingConfig()
-	std.RegisterLegacyAminoCodec(encodingConfig.Amino)
-	std.RegisterInterfaces(encodingConfig.InterfaceRegistry)
-	ModuleBasics.RegisterLegacyAminoCodec(encodingConfig.Amino)
-	ModuleBasics.RegisterInterfaces(encodingConfig.InterfaceRegistry)
-	return encodingConfig
 }

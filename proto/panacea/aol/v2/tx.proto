@@ -1,11 +1,17 @@
 syntax = "proto3";
 package panacea.aol.v2;
 
+import "amino/amino.proto";
+import "cosmos/msg/v1/msg.proto";
+import "cosmos_proto/cosmos.proto";
+
 option java_multiple_files = true;
 option go_package = "github.com/medibloc/panacea-core/x/aol/types";
 
 // Msg defines the Msg service.
 service Msg {
+  option (cosmos.msg.v1.service) = true;
+
   // CreateTopic defines a method for creating a topic.
   rpc CreateTopic(MsgCreateTopicRequest) returns (MsgCreateTopicResponse);
 
@@ -22,9 +28,12 @@ service Msg {
 
 // MsgCreateTopic defines the Msg/CreateTopic request type.
 message MsgCreateTopicRequest {
+  option (cosmos.msg.v1.signer) = "owner_address";
+  option (amino.name) = "aol/CreateTopic";
+
   string topic_name = 1;
   string description = 2;
-  string owner_address = 3;
+  string owner_address = 3 [(cosmos_proto.scalar) = "cosmos.AddressString"];
 }
 
 // MsgCreateTopicResponse defines the Msg/CreateTopic response type.
@@ -32,11 +41,14 @@ message MsgCreateTopicResponse {}
 
 // MsgAddWriter defines the Msg/AddWriter request type.
 message MsgAddWriterRequest {
+  option (cosmos.msg.v1.signer) = "owner_address";
+  option (amino.name) = "aol/AddWriter";
+
   string topic_name = 1;
   string moniker = 2;
   string description = 3;
-  string writer_address = 4;
-  string owner_address = 5;
+  string writer_address = 4 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  string owner_address = 5 [(cosmos_proto.scalar) = "cosmos.AddressString"];
 }
 
 // MsgAddWriter defines the Msg/AddWriter response type.
@@ -44,9 +56,12 @@ message MsgAddWriterResponse {}
 
 // MsgDeleteWriter defines the Msg/DeleteWriter request type.
 message MsgDeleteWriterRequest {
+  option (cosmos.msg.v1.signer) = "owner_address";
+  option (amino.name) = "aol/DeleteWriter";
+
   string topic_name = 1;
-  string writer_address = 2;
-  string owner_address = 3;
+  string writer_address = 2 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  string owner_address = 3 [(cosmos_proto.scalar) = "cosmos.AddressString"];
 }
 
 // MsgDeleteWriter defines the Msg/DeleteWriter response type.
@@ -54,17 +69,19 @@ message MsgDeleteWriterResponse {}
 
 // MsgAddRecord defines the Msg/AddRecord request type.
 message MsgAddRecordRequest {
+  option (amino.name) = "aol/AddRecord";
+
   string topic_name = 1;
   bytes key = 2;
   bytes value = 3;
-  string writer_address = 4;
-  string owner_address = 5;
-  string fee_payer_address = 6;
+  string writer_address = 4 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  string owner_address = 5 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  string fee_payer_address = 6 [(cosmos_proto.scalar) = "cosmos.AddressString"];
 }
 
 // MsgAddRecordResponse defines the Msg/AddRecordResponse response type.
 message MsgAddRecordResponse {
-  string owner_address = 1;
+  string owner_address = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
   string topic_name = 2;
   uint64 offset = 3;
 }

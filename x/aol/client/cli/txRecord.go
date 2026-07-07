@@ -2,15 +2,15 @@ package cli
 
 import (
 	"bufio"
+	"context"
 	"fmt"
 	"os"
-
-	xauthsigning "github.com/cosmos/cosmos-sdk/x/auth/signing"
 
 	"github.com/cosmos/cosmos-sdk/client/input"
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/tx/signing"
+	authsigning "github.com/cosmos/cosmos-sdk/x/auth/signing"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
@@ -136,6 +136,7 @@ func broadcastTxWithMultiSigners(clientCtx client.Context, txf tx.Factory, signe
 
 type accountInKeyring struct {
 	keyInfo       *keyring.Record
+	address       sdk.AccAddress
 	accountNumber uint64
 	sequence      uint64
 }
@@ -161,6 +162,7 @@ func retrieveAccounts(clientCtx client.Context, txf tx.Factory, addrs []sdk.AccA
 
 		accounts = append(accounts, accountInKeyring{
 			keyInfo:       keyInfo,
+			address:       addr,
 			accountNumber: accNum,
 			sequence:      accSeq,
 		})
@@ -195,16 +197,22 @@ func signWithMultiSigners(clientCtx client.Context, txBuilder client.TxBuilder, 
 	var sigsV2 []signing.SignatureV2
 
 	for _, account := range accounts {
-		signerData := xauthsigning.SignerData{
-			ChainID:       clientCtx.ChainID,
-			AccountNumber: account.accountNumber,
-			Sequence:      account.sequence,
-		}
-		signBytes, err := clientCtx.TxConfig.SignModeHandler().GetSignBytes(signMode, signerData, txBuilder.GetTx())
+		pubKey, err := account.keyInfo.GetPubKey()
 		if err != nil {
 			return err
 		}
-		signature, pubKey, err := clientCtx.Keyring.Sign(account.keyInfo.Name, signBytes)
+		signerData := authsigning.SignerData{
+			Address:       account.address.String(),
+			ChainID:       clientCtx.ChainID,
+			AccountNumber: account.accountNumber,
+			Sequence:      account.sequence,
+			PubKey:        pubKey,
+		}
+		signBytes, err := authsigning.GetSignBytesAdapter(context.Background(), clientCtx.TxConfig.SignModeHandler(), signMode, signerData, txBuilder.GetTx())
+		if err != nil {
+			return err
+		}
+		signature, pubKey, err := clientCtx.Keyring.Sign(account.keyInfo.Name, signBytes, signMode)
 		if err != nil {
 			return err
 		}
