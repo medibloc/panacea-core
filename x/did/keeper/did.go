@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"cosmossdk.io/store/prefix"
+	storetypes "cosmossdk.io/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/medibloc/panacea-core/v2/x/did/types"
 )
@@ -30,7 +31,7 @@ func (k Keeper) ListDIDs(ctx sdk.Context) []string {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.DIDKeyPrefix)
 	dids := make([]string, 0)
 
-	iter := sdk.KVStorePrefixIterator(store, []byte{})
+	iter := storetypes.KVStorePrefixIterator(store, []byte{})
 	defer iter.Close()
 	for ; iter.Valid(); iter.Next() {
 		did := string(iter.Key())
