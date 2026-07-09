@@ -299,7 +299,6 @@ func New(
 		authz.ModuleName, feegrant.ModuleName, group.ModuleName,
 		paramstypes.ModuleName, vestingtypes.ModuleName, consensusparamtypes.ModuleName,
 		ibcexported.ModuleName, ibctransfertypes.ModuleName,
-		aoltypes.ModuleName, didtypes.ModuleName, burntypes.ModuleName, pnfttypes.ModuleName,
 	)
 
 	app.ModuleManager.SetOrderEndBlockers(
@@ -310,7 +309,7 @@ func New(
 		feegrant.ModuleName, group.ModuleName,
 		paramstypes.ModuleName, upgradetypes.ModuleName, vestingtypes.ModuleName, consensusparamtypes.ModuleName,
 		ibcexported.ModuleName, ibctransfertypes.ModuleName,
-		aoltypes.ModuleName, didtypes.ModuleName, burntypes.ModuleName, pnfttypes.ModuleName,
+		burntypes.ModuleName,
 	)
 
 	// NOTE: The genutils module must occur after staking so that pools are

@@ -22,10 +22,9 @@ import (
 )
 
 var (
-	_ module.AppModule          = AppModule{}
-	_ module.AppModuleBasic     = AppModuleBasic{}
-	_ appmodule.HasBeginBlocker = AppModule{}
-	_ appmodule.HasEndBlocker   = AppModule{}
+	_ module.AppModule      = AppModule{}
+	_ module.AppModuleBasic = AppModuleBasic{}
+	_ appmodule.AppModule   = AppModule{}
 )
 
 // ----------------------------------------------------------------------------
@@ -149,17 +148,6 @@ func (am AppModule) InitGenesis(ctx sdk.Context, cdc codec.JSONCodec, gs json.Ra
 func (am AppModule) ExportGenesis(ctx sdk.Context, cdc codec.JSONCodec) json.RawMessage {
 	genState := ExportGenesis(ctx, am.keeper)
 	return cdc.MustMarshalJSON(genState)
-}
-
-// BeginBlock executes all ABCI BeginBlock logic respective to the capability module.
-func (am AppModule) BeginBlock(_ context.Context) error {
-	return nil
-}
-
-// EndBlock executes all ABCI EndBlock logic respective to the capability module. It
-// returns no validator updates.
-func (am AppModule) EndBlock(_ context.Context) error {
-	return nil
 }
 
 // ConsensusVersion implements AppModule/ConsensusVersion.

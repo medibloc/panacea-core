@@ -20,10 +20,9 @@ import (
 )
 
 var (
-	_ module.AppModule          = AppModule{}
-	_ module.AppModuleBasic     = AppModuleBasic{}
-	_ appmodule.HasBeginBlocker = AppModule{}
-	_ appmodule.HasEndBlocker   = AppModule{}
+	_ module.AppModule      = AppModule{}
+	_ module.AppModuleBasic = AppModuleBasic{}
+	_ appmodule.AppModule   = AppModule{}
 )
 
 type AppModuleBasic struct {
@@ -125,15 +124,6 @@ func (am AppModule) InitGenesis(ctx sdk.Context, cdc codec.JSONCodec, data json.
 func (am AppModule) ExportGenesis(ctx sdk.Context, cdc codec.JSONCodec) json.RawMessage {
 	genState := ExportGenesis(ctx, am.keeper)
 	return cdc.MustMarshalJSON(genState)
-}
-
-// BeginBlock executes all ABCI BeginBlock logic respective to the capability module.
-func (am AppModule) BeginBlock(_ context.Context) error {
-	return nil
-}
-
-func (am AppModule) EndBlock(_ context.Context) error {
-	return nil
 }
 
 // ConsensusVersion implements AppModule/ConsensusVersion.
