@@ -32,9 +32,11 @@ import (
 	tmjson "github.com/cometbft/cometbft/libs/json"
 	"github.com/cosmos/cosmos-sdk/codec"
 
-	"github.com/cometbft/cometbft/types"
+	cmttypes "github.com/cometbft/cometbft/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
+	"github.com/cosmos/cosmos-sdk/version"
+	genutiltypes "github.com/cosmos/cosmos-sdk/x/genutil/types"
 	"github.com/medibloc/panacea-core/v2/types/assets"
 	"github.com/spf13/cobra"
 )
@@ -133,36 +135,40 @@ func InitCmd(mbm module.BasicManager, defaultNodeHome string) *cobra.Command {
 				sdk.DefaultBondDenom = defaultDenom
 			}
 			appGenState := mbm.DefaultGenesis(cdc)
-			genDoc := &types.GenesisDoc{}
+			appGenesis := &genutiltypes.AppGenesis{}
 			if _, err := os.Stat(genFile); err != nil {
 				if !os.IsNotExist(err) {
 					return err
 				}
 			} else {
-				genDoc, err = types.GenesisDocFromFile(genFile)
+				appGenesis, err = genutiltypes.AppGenesisFromFile(genFile)
 				if err != nil {
 					return errors.Wrap(err, "Failed to read genesis doc from file")
 				}
 			}
 
-			genDoc.ChainID = chainID
-			genDoc.Validators = nil
-			genDoc.InitialHeight = initHeight
-			genDoc.ConsensusParams = &types.ConsensusParams{
-				Block:     types.DefaultBlockParams(),
-				Evidence:  types.DefaultEvidenceParams(),
-				Validator: types.DefaultValidatorParams(),
-				Version:   types.DefaultVersionParams(),
+			appGenesis.AppName = version.AppName
+			appGenesis.AppVersion = version.Version
+			appGenesis.ChainID = chainID
+			appGenesis.InitialHeight = initHeight
+			appGenesis.Consensus = &genutiltypes.ConsensusGenesis{
+				Validators: nil,
+				Params: &cmttypes.ConsensusParams{
+					Block:     cmttypes.DefaultBlockParams(),
+					Evidence:  cmttypes.DefaultEvidenceParams(),
+					Validator: cmttypes.DefaultValidatorParams(),
+					Version:   cmttypes.DefaultVersionParams(),
+				},
 			}
 
-			appState, err := overrideGenesis(cdc, genDoc, appGenState)
+			appState, err := overrideGenesis(cdc, appGenesis, appGenState)
 			if err != nil {
 				return errors.Wrap(err, "Failed to marshal default genesis state")
 			}
 
-			genDoc.AppState = appState
+			appGenesis.AppState = appState
 
-			if err = genutil.ExportGenesisFile(genDoc, genFile); err != nil {
+			if err = genutil.ExportGenesisFile(appGenesis, genFile); err != nil {
 				return errors.Wrap(err, "Failed to export genesis file")
 			}
 
@@ -183,7 +189,7 @@ func InitCmd(mbm module.BasicManager, defaultNodeHome string) *cobra.Command {
 }
 
 // overrideGenesis overrides some parameters in the genesis doc to the panacea-specific values.
-func overrideGenesis(cdc codec.JSONCodec, genDoc *types.GenesisDoc, appState map[string]json.RawMessage) (json.RawMessage, error) {
+func overrideGenesis(cdc codec.JSONCodec, appGenesis *genutiltypes.AppGenesis, appState map[string]json.RawMessage) (json.RawMessage, error) {
 	var stakingGenState stakingtypes.GenesisState
 	if err := cdc.UnmarshalJSON(appState[stakingtypes.ModuleName], &stakingGenState); err != nil {
 		return nil, err
@@ -243,8 +249,8 @@ func overrideGenesis(cdc codec.JSONCodec, genDoc *types.GenesisDoc, appState map
 	appState[slashingtypes.ModuleName] = cdc.MustMarshalJSON(&slashingGenState)
 
 	// Override Tendermint consensus params: https://docs.tendermint.com/master/tendermint-core/using-tendermint.html#fields
-	genDoc.ConsensusParams.Evidence.MaxAgeDuration = unbondingPeriod // should correspond with unbondingPeriod for handling Nothing-At-Stake attacks
-	genDoc.ConsensusParams.Evidence.MaxAgeNumBlocks = int64(unbondingPeriod.Seconds()) / blockTimeSec
+	appGenesis.Consensus.Params.Evidence.MaxAgeDuration = unbondingPeriod // should correspond with unbondingPeriod for handling Nothing-At-Stake attacks
+	appGenesis.Consensus.Params.Evidence.MaxAgeNumBlocks = int64(unbondingPeriod.Seconds()) / blockTimeSec
 
 	return tmjson.Marshal(appState)
 }
