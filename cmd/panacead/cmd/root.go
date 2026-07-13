@@ -16,9 +16,9 @@ import (
 	"github.com/medibloc/panacea-core/v2/app/params"
 	"github.com/spf13/viper"
 
-	dbm "github.com/cometbft/cometbft-db"
 	cmbtcfg "github.com/cometbft/cometbft/config"
 	cmbtcli "github.com/cometbft/cometbft/libs/cli"
+	dbm "github.com/cosmos/cosmos-db"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 
