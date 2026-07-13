@@ -1,6 +1,7 @@
 package cmd_test
 
 import (
+	"bytes"
 	"encoding/json"
 	"io"
 	"path/filepath"
@@ -8,6 +9,7 @@ import (
 	"time"
 
 	svrcmd "github.com/cosmos/cosmos-sdk/server/cmd"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	genutiltypes "github.com/cosmos/cosmos-sdk/x/genutil/types"
 	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/require"
@@ -36,18 +38,44 @@ func TestNewRootCmdCommandTree(t *testing.T) {
 		requireCommandPath(t, root, "tx", "gov", "submit-legacy-proposal", "param-change")
 	})
 
-	t.Run("keeps Panacea module commands", func(t *testing.T) {
-		expectedPaths := [][]string{
-			{"query", "aol", "get-topic"},
-			{"tx", "aol", "create-topic"},
-			{"query", "did", "get-did"},
-			{"tx", "did", "create-did"},
-			{"query", "pnft", "get-pnft"},
-			{"tx", "pnft", "mint-pnft"},
+	t.Run("keeps all Panacea module commands", func(t *testing.T) {
+		testCases := []struct {
+			path     []string
+			expected []string
+		}{
+			{
+				path:     []string{"query", "aol"},
+				expected: []string{"get-topic", "list-topic", "get-writer", "list-writer", "get-record"},
+			},
+			{
+				path:     []string{"tx", "aol"},
+				expected: []string{"create-topic", "add-writer", "delete-writer", "add-record"},
+			},
+			{
+				path:     []string{"query", "did"},
+				expected: []string{"get-did"},
+			},
+			{
+				path:     []string{"tx", "did"},
+				expected: []string{"create-did", "update-did", "deactivate-did"},
+			},
+			{
+				path:     []string{"query", "pnft"},
+				expected: []string{"list-denom", "list-denom-by-owner", "get-denom", "list-pnft", "list-pnft-by-owner", "get-pnft"},
+			},
+			{
+				path:     []string{"tx", "pnft"},
+				expected: []string{"create-denom", "update-denom", "delete-denom", "transfer-denom", "mint-pnft", "transfer-pnft", "burn-pnft"},
+			},
 		}
 
-		for _, path := range expectedPaths {
-			requireCommandPath(t, root, path...)
+		for _, testCase := range testCases {
+			moduleCommand := requireCommandPath(t, root, testCase.path...)
+			actual := make([]string, 0, len(moduleCommand.Commands()))
+			for _, command := range moduleCommand.Commands() {
+				actual = append(actual, command.Name())
+			}
+			require.ElementsMatch(t, testCase.expected, actual, "unexpected command set at %v", testCase.path)
 		}
 	})
 
@@ -89,6 +117,43 @@ func TestNewRootCmdCommandTree(t *testing.T) {
 		require.NoError(t, json.Unmarshal(appGenesis.AppState, &appState))
 		require.NotEmpty(t, appState)
 	})
+}
+
+func TestAutoCLIUnjailGeneratesTransaction(t *testing.T) {
+	root, _ := panaceacmd.NewRootCmd()
+	addressBytes := bytes.Repeat([]byte{1}, 20)
+	account := sdk.AccAddress(addressBytes).String()
+	validator := sdk.ValAddress(addressBytes).String()
+	output := new(bytes.Buffer)
+	home := t.TempDir()
+
+	root.SetArgs([]string{
+		"tx", "slashing", "unjail",
+		"--from", account,
+		"--generate-only",
+		"--chain-id", "test-chain",
+		"--home", home,
+	})
+	root.SetOut(output)
+	root.SetErr(io.Discard)
+
+	require.NoError(t, svrcmd.Execute(root, "", home))
+	require.Contains(t, output.String(), `"@type":"/cosmos.slashing.v1beta1.MsgUnjail"`)
+	require.Contains(t, output.String(), `"validator_addr":"`+validator+`"`)
+}
+
+func TestAutoCLIValidatorQueryRejectsInvalidAddress(t *testing.T) {
+	root, _ := panaceacmd.NewRootCmd()
+	home := t.TempDir()
+	root.SetArgs([]string{
+		"query", "staking", "validator", "not-a-validator-address",
+		"--home", home,
+	})
+	root.SetOut(io.Discard)
+	root.SetErr(io.Discard)
+
+	err := svrcmd.Execute(root, "", home)
+	require.ErrorContains(t, err, "decoding bech32 failed")
 }
 
 func requireUniqueChildNames(t *testing.T, parent *cobra.Command) {
