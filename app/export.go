@@ -87,7 +87,11 @@ func (app *App) prepForZeroHeightGenesis(ctx sdk.Context, jailAllowedAddrs []str
 	}
 
 	// withdraw all delegator rewards
-	dels := app.StakingKeeper.GetAllDelegations(ctx)
+	dels, err := app.StakingKeeper.GetAllDelegations(ctx)
+	if err != nil {
+		panic(err)
+	}
+
 	for _, delegation := range dels {
 		valAddr, err := sdk.ValAddressFromBech32(delegation.ValidatorAddress)
 		if err != nil {
