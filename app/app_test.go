@@ -2,16 +2,21 @@ package app_test
 
 import (
 	"bytes"
+	"context"
 	"testing"
 	"time"
 
+	"cosmossdk.io/core/header"
 	"cosmossdk.io/log"
 	"cosmossdk.io/x/feegrant"
 	"cosmossdk.io/x/nft"
+	upgradetypes "cosmossdk.io/x/upgrade/types"
+	abci "github.com/cometbft/cometbft/abci/types"
 	cmtproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	dbm "github.com/cosmos/cosmos-db"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/module"
 	capabilitytypes "github.com/cosmos/ibc-go/modules/capability/types"
 	ibctransfertypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
 	ibcexported "github.com/cosmos/ibc-go/v8/modules/core/exported"
@@ -151,4 +156,52 @@ func TestFeeGrantWiringWithStandaloneModule(t *testing.T) {
 	basicAllowance, ok := allowance.(*feegrant.BasicAllowance)
 	require.True(t, ok)
 	require.Equal(t, spendLimit, basicAllowance.SpendLimit)
+}
+
+func TestUpgradeWiringWithStandaloneModule(t *testing.T) {
+	panaceaapp.SetConfig()
+	appOpts := viper.New()
+	appOpts.Set(flags.FlagHome, t.TempDir())
+	testApp := panaceaapp.New(log.NewNopLogger(), dbm.NewMemDB(), nil, false, appOpts)
+	require.NoError(t, testApp.LoadLatestVersion())
+
+	require.Contains(t, testApp.GetKVStoreKey(), upgradetypes.StoreKey)
+	require.Contains(t, testApp.ModuleManager.Modules, upgradetypes.ModuleName)
+	require.Equal(t, []string{upgradetypes.ModuleName}, testApp.ModuleManager.OrderPreBlockers)
+	require.Same(t, testApp.BaseApp, testApp.UpgradeKeeper.GetVersionSetter())
+
+	const (
+		upgradeName   = "test-standalone-upgrade"
+		upgradeHeight = int64(10)
+	)
+	blockTime := time.Now()
+	ctx := testApp.NewUncachedContext(false, cmtproto.Header{Height: upgradeHeight, Time: blockTime}).
+		WithHeaderInfo(header.Info{Height: upgradeHeight, Time: blockTime})
+	require.NoError(t, testApp.UpgradeKeeper.SetModuleVersionMap(ctx, testApp.ModuleManager.GetVersionMap()))
+
+	handlerCalled := false
+	testApp.UpgradeKeeper.SetUpgradeHandler(
+		upgradeName,
+		func(_ context.Context, _ upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
+			handlerCalled = true
+			return fromVM, nil
+		},
+	)
+
+	plan := upgradetypes.Plan{Name: upgradeName, Height: upgradeHeight}
+	require.NoError(t, testApp.UpgradeKeeper.ScheduleUpgrade(ctx, plan))
+	storedPlan, err := testApp.UpgradeKeeper.GetUpgradePlan(ctx)
+	require.NoError(t, err)
+	require.Equal(t, plan, storedPlan)
+
+	response, err := testApp.PreBlocker(ctx, &abci.RequestFinalizeBlock{})
+	require.NoError(t, err)
+	require.True(t, response.ConsensusParamsChanged)
+	require.True(t, handlerCalled)
+
+	doneHeight, err := testApp.UpgradeKeeper.GetDoneHeight(ctx, upgradeName)
+	require.NoError(t, err)
+	require.Equal(t, upgradeHeight, doneHeight)
+	_, err = testApp.UpgradeKeeper.GetUpgradePlan(ctx)
+	require.ErrorIs(t, err, upgradetypes.ErrNoUpgradePlanFound)
 }
