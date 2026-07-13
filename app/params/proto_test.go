@@ -42,6 +42,13 @@ func TestCustomMsgsRetainValidateBasic(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			require.Implements(t, (*sdk.HasValidateBasic)(nil), tc.msg)
+
+			validator := tc.msg.(sdk.HasValidateBasic)
+			var err error
+			require.NotPanics(t, func() {
+				err = validator.ValidateBasic()
+			})
+			require.Error(t, err)
 		})
 	}
 }
