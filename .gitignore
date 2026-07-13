@@ -3,6 +3,9 @@
 *.iml
 build/
 
+# macOS
+.DS_Store
+
 # artifacts
 artifacts/
 .local/
