@@ -1,6 +1,8 @@
 package app
 
 import (
+	"context"
+
 	storetypes "cosmossdk.io/store/types"
 	"cosmossdk.io/x/nft"
 	upgradetypes "cosmossdk.io/x/upgrade/types"
@@ -54,9 +56,11 @@ func (app App) RegisterUpgradeHandlers() {
 
 		app.UpgradeKeeper.SetUpgradeHandler(
 			"v2.2.0",
-			func(ctx sdk.Context, _ upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
+			func(ctx context.Context, _ upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
+				sdkCtx := sdk.UnwrapSDKContext(ctx)
+
 				// Migrate Tendermint consensus parameters from x/params module to a dedicated x/consensus module.
-				baseapp.MigrateParams(ctx, baseAppLegacySS, &app.ConsensusParamsKeeper)
+				baseapp.MigrateParams(sdkCtx, baseAppLegacySS, &app.ConsensusParamsKeeper)
 
 				// Note: this migration is optional,
 				// You can include x/gov proposal migration documented in [UPGRADING.md](https://github.com/cosmos/cosmos-sdk/blob/main/UPGRADING.md)
@@ -89,7 +93,9 @@ func (app App) UpradeHandler_v2_2_0() {
 	upgradeName := "v2.2.0"
 	app.UpgradeKeeper.SetUpgradeHandler(
 		upgradeName,
-		func(ctx sdk.Context, _ upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
+		func(ctx context.Context, _ upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
+			sdkCtx := sdk.UnwrapSDKContext(ctx)
+
 			// Set param key table for params module migration
 			for _, subspace := range app.ParamsKeeper.GetSubspaces() {
 				subspace := subspace
@@ -122,7 +128,7 @@ func (app App) UpradeHandler_v2_2_0() {
 			baseAppLegacySS := app.ParamsKeeper.Subspace(baseapp.Paramspace).WithKeyTable(paramstypes.ConsensusParamsKeyTable())
 
 			// Migrate Tendermint consensus parameters from x/params module to a dedicated x/consensus module.
-			baseapp.MigrateParams(ctx, baseAppLegacySS, &app.ConsensusParamsKeeper)
+			baseapp.MigrateParams(sdkCtx, baseAppLegacySS, &app.ConsensusParamsKeeper)
 
 			// Note: this migration is optional,
 			// You can include x/gov proposal migration documented in [UPGRADING.md](https://github.com/cosmos/cosmos-sdk/blob/main/UPGRADING.md)
