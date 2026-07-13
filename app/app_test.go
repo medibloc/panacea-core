@@ -6,6 +6,9 @@ import (
 	"cosmossdk.io/log"
 	dbm "github.com/cosmos/cosmos-db"
 	"github.com/cosmos/cosmos-sdk/client/flags"
+	capabilitytypes "github.com/cosmos/ibc-go/modules/capability/types"
+	ibctransfertypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
+	ibcexported "github.com/cosmos/ibc-go/v8/modules/core/exported"
 	ibctm "github.com/cosmos/ibc-go/v8/modules/light-clients/07-tendermint"
 	"github.com/spf13/viper"
 	"github.com/stretchr/testify/require"
@@ -40,4 +43,23 @@ func TestRuntimeModulesHaveBootstrapBasics(t *testing.T) {
 		}
 	}
 	require.ElementsMatch(t, []string{ibctm.ModuleName}, bootstrapOnly)
+}
+
+func TestCapabilityWiring(t *testing.T) {
+	panaceaapp.SetConfig()
+	appOpts := viper.New()
+	appOpts.Set(flags.FlagHome, t.TempDir())
+	testApp := panaceaapp.New(log.NewNopLogger(), dbm.NewMemDB(), nil, false, appOpts)
+
+	require.True(t, testApp.CapabilityKeeper.HasModule(ibcexported.ModuleName))
+	require.True(t, testApp.CapabilityKeeper.HasModule(ibctransfertypes.ModuleName))
+	require.True(t, testApp.CapabilityKeeper.IsSealed())
+	require.Contains(t, testApp.ModuleManager.Modules, capabilitytypes.ModuleName)
+
+	require.NotEmpty(t, testApp.ModuleManager.OrderBeginBlockers)
+	require.Equal(t, capabilitytypes.ModuleName, testApp.ModuleManager.OrderBeginBlockers[0])
+	require.NotEmpty(t, testApp.ModuleManager.OrderInitGenesis)
+	require.Equal(t, capabilitytypes.ModuleName, testApp.ModuleManager.OrderInitGenesis[0])
+	require.NotEmpty(t, testApp.ModuleManager.OrderExportGenesis)
+	require.Equal(t, capabilitytypes.ModuleName, testApp.ModuleManager.OrderExportGenesis[0])
 }
