@@ -42,6 +42,10 @@ func TestNewRootCmdCommandTree(t *testing.T) {
 		requireCommandPath(t, root, "tx", "gov", "submit-legacy-proposal", "param-change")
 	})
 
+	t.Run("keeps the governance cancel proposal command", func(t *testing.T) {
+		requireCommandPath(t, root, "tx", "gov", "cancel-proposal")
+	})
+
 	t.Run("keeps all Panacea module commands", func(t *testing.T) {
 		testCases := []struct {
 			path     []string
@@ -141,6 +145,9 @@ func TestNewRootCmdCommandTree(t *testing.T) {
 		require.NotNil(t, govGenesis.Params.ExpeditedVotingPeriod)
 		require.Equal(t, govv1types.DefaultExpeditedPeriod, *govGenesis.Params.ExpeditedVotingPeriod)
 		require.Equal(t, govv1types.DefaultExpeditedThreshold.String(), govGenesis.Params.ExpeditedThreshold)
+
+		require.Equal(t, "0.500000000000000000", govGenesis.Params.ProposalCancelRatio)
+		require.Empty(t, govGenesis.Params.ProposalCancelDest)
 	})
 }
 
