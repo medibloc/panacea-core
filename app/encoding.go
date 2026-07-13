@@ -13,6 +13,8 @@ func MakeEncodingConfig() params.EncodingConfig {
 		params.WithCustomGetSigners(aoltypes.CustomGetSigners()...),
 		params.WithAminoJSONEncoderModifiers(didtypes.AminoJSONEncoderModifiers()...),
 	)
+	// Keep legacy Amino registrations for SIGN_MODE_LEGACY_AMINO_JSON
+	// and compatibility with existing clients and hardware wallets.
 	std.RegisterLegacyAminoCodec(encodingConfig.Amino)
 	std.RegisterInterfaces(encodingConfig.InterfaceRegistry)
 	ModuleBasics.RegisterLegacyAminoCodec(encodingConfig.Amino)
