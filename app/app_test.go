@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"cosmossdk.io/log"
+	"cosmossdk.io/x/feegrant"
 	"cosmossdk.io/x/nft"
 	cmtproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	dbm "github.com/cosmos/cosmos-db"
@@ -116,4 +117,38 @@ func TestPNFTWiringWithStandaloneNFTKeeper(t *testing.T) {
 	require.NoError(t, testApp.PnftKeeper.BurnPNFT(ctx, denom.Id, token.Id, receiver))
 	_, err = testApp.PnftKeeper.GetPNFT(ctx, denom.Id, token.Id)
 	require.Error(t, err)
+}
+
+func TestFeeGrantWiringWithStandaloneModule(t *testing.T) {
+	panaceaapp.SetConfig()
+	appOpts := viper.New()
+	appOpts.Set(flags.FlagHome, t.TempDir())
+	testApp := panaceaapp.New(log.NewNopLogger(), dbm.NewMemDB(), nil, false, appOpts)
+	require.NoError(t, testApp.LoadLatestVersion())
+
+	require.Contains(t, testApp.GetKVStoreKey(), feegrant.StoreKey)
+	require.Contains(t, testApp.ModuleManager.Modules, feegrant.ModuleName)
+
+	ctx := testApp.NewUncachedContext(false, cmtproto.Header{Time: time.Now()})
+	granter := sdk.AccAddress(bytes.Repeat([]byte{3}, 20))
+	grantee := sdk.AccAddress(bytes.Repeat([]byte{4}, 20))
+	spendLimit := sdk.NewCoins(sdk.NewInt64Coin("umed", 100))
+
+	msg, err := feegrant.NewMsgGrantAllowance(
+		&feegrant.BasicAllowance{SpendLimit: spendLimit},
+		granter,
+		grantee,
+	)
+	require.NoError(t, err)
+
+	handler := testApp.MsgServiceRouter().Handler(msg)
+	require.NotNil(t, handler)
+	_, err = handler(ctx, msg)
+	require.NoError(t, err)
+
+	allowance, err := testApp.FeeGrantKeeper.GetAllowance(ctx, granter, grantee)
+	require.NoError(t, err)
+	basicAllowance, ok := allowance.(*feegrant.BasicAllowance)
+	require.True(t, ok)
+	require.Equal(t, spendLimit, basicAllowance.SpendLimit)
 }
