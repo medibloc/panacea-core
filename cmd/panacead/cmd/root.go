@@ -219,55 +219,9 @@ func txCommand(basicManager module.BasicManager) *cobra.Command {
 	)
 
 	basicManager.AddTxCommands(cmd)
-	//cmd.PersistentFlags().String(flags.FlagChainID, "", "The network chain ID")
 
 	return cmd
 }
-
-/*// newApp is an AppCreator
-func (a appCreator) newApp(logger log.Logger, db dbm.DB, traceStore io.Writer, appOpts servertypes.AppOptions) servertypes.Application {
-	baseappOptions := server.DefaultBaseappOptions(appOpts)
-
-	skipUpgradeHeights := make(map[int64]bool)
-	for _, h := range cast.ToIntSlice(appOpts.Get(server.FlagUnsafeSkipUpgrades)) {
-		skipUpgradeHeights[int64(h)] = true
-	}
-
-	return app.New(
-		logger, db, traceStore, true, skipUpgradeHeights,
-		cast.ToString(appOpts.Get(flags.FlagHome)),
-		cast.ToUint(appOpts.Get(server.FlagInvCheckPeriod)),
-		a.encCfg,
-		// this line is used by starport scaffolding # stargate/root/appArgument
-		appOpts,
-		baseappOptions...,
-	)
-}
-
-// appExport creates a new simapp (optionally at a given height)
-func (a appCreator) appExport(
-	logger log.Logger, db dbm.DB, traceStore io.Writer, height int64, forZeroHeight bool, jailAllowedAddrs []string,
-	appOpts servertypes.AppOptions) (servertypes.ExportedApp, error) {
-
-	var anApp *app.App
-
-	homePath, ok := appOpts.Get(flags.FlagHome).(string)
-	if !ok || homePath == "" {
-		return servertypes.ExportedApp{}, errors.New("application home not set")
-	}
-
-	if height != -1 {
-		anApp = app.New(logger, db, traceStore, false, map[int64]bool{}, homePath, uint(1), a.encCfg, appOpts)
-
-		if err := anApp.LoadHeight(height); err != nil {
-			return servertypes.ExportedApp{}, err
-		}
-	} else {
-		anApp = app.New(logger, db, traceStore, true, map[int64]bool{}, homePath, uint(1), a.encCfg, appOpts)
-	}
-
-	return anApp.ExportAppStateAndValidators(forZeroHeight, jailAllowedAddrs)
-}*/
 
 // newApp creates the application
 func newApp(
