@@ -244,7 +244,7 @@ func (doc DIDDocument) Valid() bool {
 	}
 
 	for _, verificationMethod := range doc.VerificationMethods {
-		if !verificationMethod.Valid(doc.Id) {
+		if verificationMethod == nil || !verificationMethod.Valid(doc.Id) {
 			return false
 		}
 	}
@@ -266,7 +266,7 @@ func (doc DIDDocument) Valid() bool {
 	}
 
 	for _, service := range doc.Services {
-		if !service.Valid() {
+		if service == nil || !service.Valid() {
 			return false
 		}
 	}

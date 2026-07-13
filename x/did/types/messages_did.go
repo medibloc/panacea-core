@@ -42,7 +42,7 @@ func (msg *MsgCreateDIDRequest) ValidateBasic() error {
 	if !ValidateDID(msg.Did) {
 		return errors.Wrapf(ErrInvalidDID, "did: %v", msg.Did)
 	}
-	if !msg.Document.Valid() {
+	if msg.Document == nil || !msg.Document.Valid() {
 		return errors.Wrapf(ErrInvalidDIDDocument, "DIDDocument: %v", msg.Document)
 	}
 	if msg.Signature == nil || len(msg.Signature) == 0 {
@@ -83,7 +83,7 @@ func (msg *MsgUpdateDIDRequest) ValidateBasic() error {
 	if !ValidateDID(msg.Did) {
 		return errors.Wrapf(ErrInvalidDID, "DID: %v", msg.Did)
 	}
-	if !msg.Document.Valid() {
+	if msg.Document == nil || !msg.Document.Valid() {
 		return errors.Wrapf(ErrInvalidDIDDocument, "DIDDocument: %v", msg.Document)
 	}
 	if msg.Signature == nil || len(msg.Signature) == 0 {

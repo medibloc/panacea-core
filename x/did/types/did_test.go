@@ -102,6 +102,16 @@ func TestDIDDocument_Invalid(t *testing.T) {
 
 }
 
+func TestDIDDocument_InvalidNilNestedMessage(t *testing.T) {
+	doc := getValidDIDDocument()
+	doc.VerificationMethods = append(doc.VerificationMethods, nil)
+	require.False(t, doc.Valid())
+
+	doc = getValidDIDDocument()
+	doc.Services = append(doc.Services, nil)
+	require.False(t, doc.Valid())
+}
+
 func TestDIDDocument_VerificationMethodByID(t *testing.T) {
 	did := "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm"
 	pubKey := secp256k1util.PubKeyBytes(secp256k1util.DerivePubKey(secp256k1.GenPrivKey()))
