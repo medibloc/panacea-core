@@ -60,7 +60,9 @@ func (app App) RegisterUpgradeHandlers() {
 				sdkCtx := sdk.UnwrapSDKContext(ctx)
 
 				// Migrate Tendermint consensus parameters from x/params module to a dedicated x/consensus module.
-				baseapp.MigrateParams(sdkCtx, baseAppLegacySS, app.ConsensusParamsKeeper.ParamsStore)
+				if err := baseapp.MigrateParams(sdkCtx, baseAppLegacySS, app.ConsensusParamsKeeper.ParamsStore); err != nil {
+					return nil, err
+				}
 
 				// Note: this migration is optional,
 				// You can include x/gov proposal migration documented in [UPGRADING.md](https://github.com/cosmos/cosmos-sdk/blob/main/UPGRADING.md)
@@ -128,7 +130,9 @@ func (app App) UpradeHandler_v2_2_0() {
 			baseAppLegacySS := app.ParamsKeeper.Subspace(baseapp.Paramspace).WithKeyTable(paramstypes.ConsensusParamsKeyTable())
 
 			// Migrate Tendermint consensus parameters from x/params module to a dedicated x/consensus module.
-			baseapp.MigrateParams(sdkCtx, baseAppLegacySS, app.ConsensusParamsKeeper.ParamsStore)
+			if err := baseapp.MigrateParams(sdkCtx, baseAppLegacySS, app.ConsensusParamsKeeper.ParamsStore); err != nil {
+				return nil, err
+			}
 
 			// Note: this migration is optional,
 			// You can include x/gov proposal migration documented in [UPGRADING.md](https://github.com/cosmos/cosmos-sdk/blob/main/UPGRADING.md)
