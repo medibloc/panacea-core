@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"bufio"
+	"cosmossdk.io/math"
 	"encoding/json"
 	"fmt"
 	cfg "github.com/cometbft/cometbft/config"
@@ -197,18 +198,18 @@ func overrideGenesis(cdc codec.JSONCodec, appGenesis *genutiltypes.AppGenesis, a
 	stakingGenState.Params.UnbondingTime = unbondingPeriod
 	stakingGenState.Params.MaxValidators = 50
 	stakingGenState.Params.BondDenom = assets.MicroMedDenom
-	stakingGenState.Params.MinCommissionRate = sdk.NewDecWithPrec(5, 2)
+	stakingGenState.Params.MinCommissionRate = math.LegacyNewDecWithPrec(5, 2)
 	appState[stakingtypes.ModuleName] = cdc.MustMarshalJSON(&stakingGenState)
 
 	var mintGenState minttypes.GenesisState
 	if err := cdc.UnmarshalJSON(appState[minttypes.ModuleName], &mintGenState); err != nil {
 		return nil, err
 	}
-	mintGenState.Minter = minttypes.InitialMinter(sdk.NewDecWithPrec(7, 2)) // 7% inflation
+	mintGenState.Minter = minttypes.InitialMinter(math.LegacyNewDecWithPrec(7, 2)) // 7% inflation
 	mintGenState.Params.MintDenom = assets.MicroMedDenom
-	mintGenState.Params.InflationRateChange = sdk.NewDecWithPrec(3, 2) // 3%
-	mintGenState.Params.InflationMin = sdk.NewDecWithPrec(7, 2)        // 7%
-	mintGenState.Params.InflationMax = sdk.NewDecWithPrec(10, 2)       // 10%
+	mintGenState.Params.InflationRateChange = math.LegacyNewDecWithPrec(3, 2) // 3%
+	mintGenState.Params.InflationMin = math.LegacyNewDecWithPrec(7, 2)        // 7%
+	mintGenState.Params.InflationMax = math.LegacyNewDecWithPrec(10, 2)       // 10%
 	mintGenState.Params.BlocksPerYear = uint64(60*60*24*365) / uint64(blockTimeSec)
 	appState[minttypes.ModuleName] = cdc.MustMarshalJSON(&mintGenState)
 
@@ -216,7 +217,7 @@ func overrideGenesis(cdc codec.JSONCodec, appGenesis *genutiltypes.AppGenesis, a
 	if err := cdc.UnmarshalJSON(appState[distrtypes.ModuleName], &distrGenState); err != nil {
 		return nil, err
 	}
-	distrGenState.Params.CommunityTax = sdk.ZeroDec()
+	distrGenState.Params.CommunityTax = math.LegacyZeroDec()
 	appState[distrtypes.ModuleName] = cdc.MustMarshalJSON(&distrGenState)
 
 	var govGenState govv1types.GenesisState
@@ -235,7 +236,7 @@ func overrideGenesis(cdc codec.JSONCodec, appGenesis *genutiltypes.AppGenesis, a
 	if err := cdc.UnmarshalJSON(appState[crisistypes.ModuleName], &crisisGenState); err != nil {
 		return nil, err
 	}
-	crisisGenState.ConstantFee = sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(1000000000000)) // Spend 1,000,000 MED for invariants check
+	crisisGenState.ConstantFee = sdk.NewCoin(assets.MicroMedDenom, math.NewInt(1000000000000)) // Spend 1,000,000 MED for invariants check
 	appState[crisistypes.ModuleName] = cdc.MustMarshalJSON(&crisisGenState)
 
 	var slashingGenState slashingtypes.GenesisState
@@ -243,9 +244,9 @@ func overrideGenesis(cdc codec.JSONCodec, appGenesis *genutiltypes.AppGenesis, a
 		return nil, err
 	}
 	slashingGenState.Params.SignedBlocksWindow = 10000
-	slashingGenState.Params.MinSignedPerWindow = sdk.NewDecWithPrec(5, 2)
-	slashingGenState.Params.SlashFractionDoubleSign = sdk.NewDecWithPrec(5, 2) // 5%
-	slashingGenState.Params.SlashFractionDowntime = sdk.NewDecWithPrec(1, 4)   // 0.01%
+	slashingGenState.Params.MinSignedPerWindow = math.LegacyNewDecWithPrec(5, 2)
+	slashingGenState.Params.SlashFractionDoubleSign = math.LegacyNewDecWithPrec(5, 2) // 5%
+	slashingGenState.Params.SlashFractionDowntime = math.LegacyNewDecWithPrec(1, 4)   // 0.01%
 	appState[slashingtypes.ModuleName] = cdc.MustMarshalJSON(&slashingGenState)
 
 	// Override Tendermint consensus params: https://docs.tendermint.com/master/tendermint-core/using-tendermint.html#fields
