@@ -3,6 +3,8 @@ package app
 import (
 	autocliv1 "cosmossdk.io/api/cosmos/autocli/v1"
 	reflectionv1 "cosmossdk.io/api/cosmos/reflection/v1"
+	"cosmossdk.io/client/v2/autocli"
+	"cosmossdk.io/core/appmodule"
 	"cosmossdk.io/log"
 	"cosmossdk.io/x/nft"
 	"cosmossdk.io/x/upgrade"
@@ -492,6 +494,21 @@ func (app *App) InterfaceRegistry() types.InterfaceRegistry {
 // TxConfig returns SimApp's TxConfig
 func (app *App) TxConfig() client.TxConfig {
 	return app.txConfig
+}
+
+// AutoCliOpts returns the autocli options for the app.
+func (app *App) AutoCliOpts() autocli.AppOptions {
+	modules := make(map[string]appmodule.AppModule, len(app.ModuleManager.Modules))
+	for name, appModule := range app.ModuleManager.Modules {
+		if appModule, ok := appModule.(appmodule.AppModule); ok {
+			modules[name] = appModule
+		}
+	}
+
+	return autocli.AppOptions{
+		Modules:       modules,
+		ModuleOptions: runtimeservices.ExtractAutoCLIOptions(app.ModuleManager.Modules),
+	}
 }
 
 // DefaultGenesis returns a default genesis from the registered AppModuleBasic's.
