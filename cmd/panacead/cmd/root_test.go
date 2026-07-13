@@ -11,10 +11,14 @@ import (
 	svrcmd "github.com/cosmos/cosmos-sdk/server/cmd"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	genutiltypes "github.com/cosmos/cosmos-sdk/x/genutil/types"
+	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
+	govv1types "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
 	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/require"
 
+	panaceaapp "github.com/medibloc/panacea-core/v2/app"
 	panaceacmd "github.com/medibloc/panacea-core/v2/cmd/panacead/cmd"
+	"github.com/medibloc/panacea-core/v2/types/assets"
 )
 
 func TestNewRootCmdCommandTree(t *testing.T) {
@@ -116,6 +120,27 @@ func TestNewRootCmdCommandTree(t *testing.T) {
 		var appState map[string]json.RawMessage
 		require.NoError(t, json.Unmarshal(appGenesis.AppState, &appState))
 		require.NotEmpty(t, appState)
+
+		var govGenesis govv1types.GenesisState
+		encodingConfig := panaceaapp.MakeEncodingConfig()
+		require.NoError(t, encodingConfig.Codec.UnmarshalJSON(appState[govtypes.ModuleName], &govGenesis))
+		require.NoError(t, govGenesis.Params.ValidateBasic())
+
+		require.Len(t, govGenesis.Params.MinDeposit, 1)
+		require.Len(t, govGenesis.Params.ExpeditedMinDeposit, 1)
+		minDeposit := govGenesis.Params.MinDeposit[0]
+		expeditedMinDeposit := govGenesis.Params.ExpeditedMinDeposit[0]
+		require.Equal(t, assets.MicroMedDenom, minDeposit.Denom)
+		require.Equal(t, minDeposit.Denom, expeditedMinDeposit.Denom)
+		require.True(t, minDeposit.Amount.Equal(sdk.TokensFromConsensusPower(100000, sdk.DefaultPowerReduction)))
+		require.True(t, expeditedMinDeposit.Amount.Equal(sdk.TokensFromConsensusPower(500000, sdk.DefaultPowerReduction)))
+		require.True(t, expeditedMinDeposit.Amount.Equal(minDeposit.Amount.MulRaw(govv1types.DefaultMinExpeditedDepositTokensRatio)))
+
+		require.NotNil(t, govGenesis.Params.VotingPeriod)
+		require.Equal(t, 3*24*time.Hour, *govGenesis.Params.VotingPeriod)
+		require.NotNil(t, govGenesis.Params.ExpeditedVotingPeriod)
+		require.Equal(t, govv1types.DefaultExpeditedPeriod, *govGenesis.Params.ExpeditedVotingPeriod)
+		require.Equal(t, govv1types.DefaultExpeditedThreshold.String(), govGenesis.Params.ExpeditedThreshold)
 	})
 }
 

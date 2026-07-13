@@ -226,10 +226,22 @@ func overrideGenesis(cdc codec.JSONCodec, appGenesis *genutiltypes.AppGenesis, a
 	}
 	minDepositTokens := sdk.TokensFromConsensusPower(100000, sdk.DefaultPowerReduction) // 100,000 MED
 	govGenState.Params.MinDeposit = sdk.Coins{sdk.NewCoin(assets.MicroMedDenom, minDepositTokens)}
+	govGenState.Params.ExpeditedMinDeposit = sdk.Coins{
+		sdk.NewCoin(
+			assets.MicroMedDenom,
+			minDepositTokens.MulRaw(govv1types.DefaultMinExpeditedDepositTokensRatio),
+		),
+	}
 	maxDepositPeriod := 60 * 60 * 24 * 14 * time.Second // 14 days
 	govGenState.Params.MaxDepositPeriod = &maxDepositPeriod
 	votingPeriod := 60 * 60 * 24 * 3 * time.Second // 3 days (shortened voting period: https://www.mintscan.io/medibloc/proposals/5)
 	govGenState.Params.VotingPeriod = &votingPeriod
+	expeditedVotingPeriod := govv1types.DefaultExpeditedPeriod
+	govGenState.Params.ExpeditedVotingPeriod = &expeditedVotingPeriod
+	govGenState.Params.ExpeditedThreshold = govv1types.DefaultExpeditedThreshold.String()
+	if err := govGenState.Params.ValidateBasic(); err != nil {
+		return nil, fmt.Errorf("invalid governance params: %w", err)
+	}
 	appState[govtypes.ModuleName] = cdc.MustMarshalJSON(&govGenState)
 
 	var crisisGenState crisistypes.GenesisState
