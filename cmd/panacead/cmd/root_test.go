@@ -46,6 +46,19 @@ func TestNewRootCmdCommandTree(t *testing.T) {
 		requireCommandPath(t, root, "tx", "gov", "cancel-proposal")
 	})
 
+	t.Run("keeps SDK genesis account command", func(t *testing.T) {
+		command := requireCommandPath(t, root, "genesis", "add-genesis-account")
+		for _, flagName := range []string{
+			"append",
+			"module-name",
+			"vesting-amount",
+			"vesting-end-time",
+			"vesting-start-time",
+		} {
+			require.NotNil(t, command.Flags().Lookup(flagName), "missing flag %q", flagName)
+		}
+	})
+
 	t.Run("keeps all Panacea module commands", func(t *testing.T) {
 		testCases := []struct {
 			path     []string
