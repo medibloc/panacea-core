@@ -186,6 +186,60 @@ func TestCustomMsgLegacyAminoJSONSignBytesEquivalence(t *testing.T) {
 	}
 }
 
+func TestCustomMsgSignerInferenceMatchesLegacyGetSigners(t *testing.T) {
+	configureTestBech32()
+
+	encodingConfig := MakeEncodingConfig(
+		WithCustomGetSigners(aoltypes.CustomGetSigners()...),
+	)
+	aoltypes.RegisterInterfaces(encodingConfig.InterfaceRegistry)
+	didtypes.RegisterInterfaces(encodingConfig.InterfaceRegistry)
+	pnfttypes.RegisterInterfaces(encodingConfig.InterfaceRegistry)
+	require.NoError(t, encodingConfig.InterfaceRegistry.SigningContext().Validate())
+
+	addr1 := sdk.AccAddress(repeatedBytes(1)).String()
+	addr2 := sdk.AccAddress(repeatedBytes(2)).String()
+
+	testCases := []struct {
+		name string
+		msg  sdk.Msg
+	}{
+		{name: "aol/CreateTopic", msg: &aoltypes.MsgCreateTopicRequest{OwnerAddress: addr1}},
+		{name: "aol/AddWriter", msg: &aoltypes.MsgAddWriterRequest{OwnerAddress: addr1}},
+		{name: "aol/DeleteWriter", msg: &aoltypes.MsgDeleteWriterRequest{OwnerAddress: addr1}},
+		{name: "aol/AddRecord without fee payer", msg: &aoltypes.MsgAddRecordRequest{WriterAddress: addr2}},
+		{name: "aol/AddRecord with distinct fee payer", msg: &aoltypes.MsgAddRecordRequest{WriterAddress: addr2, FeePayerAddress: addr1}},
+		{name: "aol/AddRecord with writer as fee payer", msg: &aoltypes.MsgAddRecordRequest{WriterAddress: addr2, FeePayerAddress: addr2}},
+		{name: "did/CreateDID", msg: &didtypes.MsgCreateDIDRequest{FromAddress: addr1}},
+		{name: "did/UpdateDID", msg: &didtypes.MsgUpdateDIDRequest{FromAddress: addr1}},
+		{name: "did/DeactivateDID", msg: &didtypes.MsgDeactivateDIDRequest{FromAddress: addr1}},
+		{name: "pnft/CreateDenom", msg: &pnfttypes.MsgCreateDenomRequest{Creator: addr1}},
+		{name: "pnft/UpdateDenom", msg: &pnfttypes.MsgUpdateDenomRequest{Updater: addr1}},
+		{name: "pnft/DeleteDenom", msg: &pnfttypes.MsgDeleteDenomRequest{Remover: addr1}},
+		{name: "pnft/TransferDenom", msg: &pnfttypes.MsgTransferDenomRequest{Sender: addr1}},
+		{name: "pnft/MintPNFT", msg: &pnfttypes.MsgMintPNFTRequest{Creator: addr1}},
+		{name: "pnft/TransferPNFT", msg: &pnfttypes.MsgTransferPNFTRequest{Sender: addr1}},
+		{name: "pnft/BurnPNFT", msg: &pnfttypes.MsgBurnPNFTRequest{Burner: addr1}},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			legacyMsg, ok := tc.msg.(sdk.LegacyMsg)
+			require.True(t, ok)
+
+			legacySigners := legacyMsg.GetSigners()
+			expected := make([][]byte, len(legacySigners))
+			for i, signer := range legacySigners {
+				expected[i] = signer
+			}
+
+			actual, _, err := encodingConfig.Codec.GetMsgV1Signers(tc.msg)
+			require.NoError(t, err)
+			require.Equal(t, expected, actual)
+		})
+	}
+}
+
 func TestDIDMsgAnnotatedSigners(t *testing.T) {
 	configureTestBech32()
 
