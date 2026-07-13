@@ -9,7 +9,6 @@ import (
 
 	"cosmossdk.io/core/appmodule"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
-	"github.com/spf13/cobra"
 
 	abci "github.com/cometbft/cometbft/abci/types"
 
@@ -77,16 +76,6 @@ func (AppModuleBasic) ValidateGenesis(cdc codec.JSONCodec, _ client.TxEncodingCo
 // RegisterGRPCGatewayRoutes registers the gRPC Gateway routes for the module.
 func (AppModuleBasic) RegisterGRPCGatewayRoutes(client.Context, *runtime.ServeMux) {
 	// this line is used by starport scaffolding # 2
-}
-
-// GetTxCmd returns the capability module's root tx command.
-func (AppModuleBasic) GetTxCmd() *cobra.Command {
-	return nil
-}
-
-// GetQueryCmd returns the capability module's root query command.
-func (AppModuleBasic) GetQueryCmd() *cobra.Command {
-	return nil
 }
 
 // ----------------------------------------------------------------------------
