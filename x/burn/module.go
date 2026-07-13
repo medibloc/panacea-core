@@ -22,10 +22,12 @@ import (
 )
 
 var (
-	_ module.AppModule        = AppModule{}
-	_ module.AppModuleBasic   = AppModuleBasic{}
-	_ appmodule.AppModule     = AppModule{}
-	_ appmodule.HasEndBlocker = AppModule{}
+	_ module.AppModule           = AppModule{}
+	_ module.AppModuleBasic      = AppModuleBasic{}
+	_ module.HasABCIGenesis      = AppModule{}
+	_ module.HasConsensusVersion = AppModule{}
+	_ appmodule.AppModule        = AppModule{}
+	_ appmodule.HasEndBlocker    = AppModule{}
 )
 
 // ----------------------------------------------------------------------------
