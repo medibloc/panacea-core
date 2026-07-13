@@ -524,6 +524,11 @@ func (app *App) moduleBasics() module.BasicManager {
 	return ModuleBasics
 }
 
+// BasicManager returns the module basics derived from the initialized module manager.
+func (app *App) BasicManager() module.BasicManager {
+	return app.moduleBasics()
+}
+
 // SimulationManager implements the SimulationApp interface
 func (app *App) SimulationManager() *module.SimulationManager {
 	return app.sm

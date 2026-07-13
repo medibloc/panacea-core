@@ -7,6 +7,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/config"
 	"github.com/cosmos/cosmos-sdk/client/pruning"
 	"github.com/cosmos/cosmos-sdk/client/snapshot"
+	addresscodec "github.com/cosmos/cosmos-sdk/codec/address"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/medibloc/panacea-core/v2/app/params"
 	"github.com/spf13/viper"
 	"io"
@@ -40,6 +43,18 @@ var ChainID string
 func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 	// Set config for prefixes
 	app.SetConfig()
+
+	tempHome, err := os.MkdirTemp("", "panacea-autocli-")
+	if err != nil {
+		panic(err)
+	}
+	defer func() {
+		_ = os.RemoveAll(tempHome)
+	}()
+
+	tempAppOpts := viper.New()
+	tempAppOpts.Set(flags.FlagHome, tempHome)
+	tempApp := app.New(log.NewNopLogger(), dbm.NewMemDB(), nil, false, tempAppOpts)
 
 	encodingConfig := app.MakeEncodingConfig()
 	initClientCtx := client.Context{}.
@@ -81,7 +96,17 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 		},
 	}
 
-	initRootCmd(rootCmd, encodingConfig)
+	initRootCmd(rootCmd, encodingConfig, tempApp.BasicManager())
+
+	autoCliOpts := tempApp.AutoCliOpts()
+	autoCliOpts.AddressCodec = addresscodec.NewBech32Codec(sdk.GetConfig().GetBech32AccountAddrPrefix())
+	autoCliOpts.ValidatorAddressCodec = addresscodec.NewBech32Codec(sdk.GetConfig().GetBech32ValidatorAddrPrefix())
+	autoCliOpts.ConsensusAddressCodec = addresscodec.NewBech32Codec(sdk.GetConfig().GetBech32ConsensusAddrPrefix())
+	autoCliOpts.ClientCtx = initClientCtx
+	if err := autoCliOpts.EnhanceRootCommand(rootCmd); err != nil {
+		panic(err)
+	}
+
 	overwriteFlagDefaults(rootCmd, map[string]string{
 		flags.FlagChainID:        ChainID,
 		flags.FlagKeyringBackend: "test",
@@ -114,9 +139,9 @@ func initCometBFTConfig() *cmbtcfg.Config {
 	return cfg
 }
 
-func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
+func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig, basicManager module.BasicManager) {
 	rootCmd.AddCommand(
-		InitCmd(app.ModuleBasics, app.DefaultNodeHome),
+		InitCmd(basicManager, app.DefaultNodeHome),
 		debug.Cmd(),
 		confixcmd.ConfigCommand(),
 		cmbtcli.NewCompletionCmd(rootCmd, true),
@@ -129,9 +154,9 @@ func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
 	// add keybase, auxiliary RPC, query, and tx child commands
 	rootCmd.AddCommand(
 		rpc.StatusCommand(),
-		genesisCommand(encodingConfig),
+		genesisCommand(encodingConfig, basicManager),
 		queryCommand(),
-		txCommand(),
+		txCommand(basicManager),
 		keys.Commands(app.DefaultNodeHome),
 	)
 }
@@ -141,8 +166,8 @@ func addModuleInitFlags(startCmd *cobra.Command) {
 }
 
 // genesisCommand builds genesis-related `simd genesis` command. Users may provide application specific commands as a parameter
-func genesisCommand(encodingConfig params.EncodingConfig, cmds ...*cobra.Command) *cobra.Command {
-	cmd := genutilcli.GenesisCoreCommand(encodingConfig.TxConfig, app.ModuleBasics, app.DefaultNodeHome)
+func genesisCommand(encodingConfig params.EncodingConfig, basicManager module.BasicManager, cmds ...*cobra.Command) *cobra.Command {
+	cmd := genutilcli.GenesisCoreCommand(encodingConfig.TxConfig, basicManager, app.DefaultNodeHome)
 
 	for _, sub_cmd := range cmds {
 		cmd.AddCommand(sub_cmd)
@@ -169,12 +194,10 @@ func queryCommand() *cobra.Command {
 		authcmd.QueryTxCmd(),
 	)
 
-	app.ModuleBasics.AddQueryCommands(cmd)
-
 	return cmd
 }
 
-func txCommand() *cobra.Command {
+func txCommand(basicManager module.BasicManager) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:                        "tx",
 		Short:                      "Transactions subcommands",
@@ -195,7 +218,7 @@ func txCommand() *cobra.Command {
 		authcmd.GetAuxToFeeCommand(),
 	)
 
-	app.ModuleBasics.AddTxCommands(cmd)
+	basicManager.AddTxCommands(cmd)
 	//cmd.PersistentFlags().String(flags.FlagChainID, "", "The network chain ID")
 
 	return cmd
