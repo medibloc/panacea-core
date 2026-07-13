@@ -18,6 +18,34 @@ import (
 	"google.golang.org/protobuf/types/dynamicpb"
 )
 
+func TestCustomMsgsRetainValidateBasic(t *testing.T) {
+	testCases := []struct {
+		name string
+		msg  sdk.Msg
+	}{
+		{name: "aol/CreateTopic", msg: &aoltypes.MsgCreateTopicRequest{}},
+		{name: "aol/AddWriter", msg: &aoltypes.MsgAddWriterRequest{}},
+		{name: "aol/DeleteWriter", msg: &aoltypes.MsgDeleteWriterRequest{}},
+		{name: "aol/AddRecord", msg: &aoltypes.MsgAddRecordRequest{}},
+		{name: "did/CreateDID", msg: &didtypes.MsgCreateDIDRequest{}},
+		{name: "did/UpdateDID", msg: &didtypes.MsgUpdateDIDRequest{}},
+		{name: "did/DeactivateDID", msg: &didtypes.MsgDeactivateDIDRequest{}},
+		{name: "pnft/CreateDenom", msg: &pnfttypes.MsgCreateDenomRequest{}},
+		{name: "pnft/UpdateDenom", msg: &pnfttypes.MsgUpdateDenomRequest{}},
+		{name: "pnft/DeleteDenom", msg: &pnfttypes.MsgDeleteDenomRequest{}},
+		{name: "pnft/TransferDenom", msg: &pnfttypes.MsgTransferDenomRequest{}},
+		{name: "pnft/MintPNFT", msg: &pnfttypes.MsgMintPNFTRequest{}},
+		{name: "pnft/TransferPNFT", msg: &pnfttypes.MsgTransferPNFTRequest{}},
+		{name: "pnft/BurnPNFT", msg: &pnfttypes.MsgBurnPNFTRequest{}},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			require.Implements(t, (*sdk.HasValidateBasic)(nil), tc.msg)
+		})
+	}
+}
+
 func TestCustomMsgLegacyAminoJSONSignBytesEquivalence(t *testing.T) {
 	configureTestBech32()
 
