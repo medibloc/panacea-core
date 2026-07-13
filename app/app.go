@@ -181,6 +181,11 @@ type App struct {
 	// the module manager
 	ModuleManager *module.Manager
 
+	// basicManager is derived from ModuleManager after keepers are wired. The
+	// package-level ModuleBasics is still used by bootstrap paths that run before
+	// ModuleManager exists.
+	basicManager module.BasicManager
+
 	// simulation manager
 	sm *module.SimulationManager
 
@@ -280,6 +285,17 @@ func New(
 		did.NewAppModule(appCodec, app.DidKeeper),
 		burn.NewAppModule(appCodec, app.BurnKeeper),
 		pnft.NewAppModule(appCodec, &app.PnftKeeper),
+	)
+	app.basicManager = module.NewBasicManagerFromManager(
+		app.ModuleManager,
+		map[string]module.AppModuleBasic{
+			genutiltypes.ModuleName: genutil.NewAppModuleBasic(genutiltypes.DefaultMessageValidator),
+			govtypes.ModuleName: gov.NewAppModuleBasic(
+				[]govclient.ProposalHandler{
+					paramsclient.ProposalHandler,
+				},
+			),
+		},
 	)
 
 	// NOTE: upgrade module is required to be prioritized.
@@ -480,7 +496,15 @@ func (app *App) TxConfig() client.TxConfig {
 
 // DefaultGenesis returns a default genesis from the registered AppModuleBasic's.
 func (a *App) DefaultGenesis() map[string]json.RawMessage {
-	return ModuleBasics.DefaultGenesis(a.appCodec)
+	return a.moduleBasics().DefaultGenesis(a.appCodec)
+}
+
+func (app *App) moduleBasics() module.BasicManager {
+	if app.basicManager != nil {
+		return app.basicManager
+	}
+
+	return ModuleBasics
 }
 
 // SimulationManager implements the SimulationApp interface
@@ -502,7 +526,7 @@ func (app *App) RegisterAPIRoutes(apiSvr *api.Server, apiConfig config.APIConfig
 	nodeservice.RegisterGRPCGatewayRoutes(clientCtx, apiSvr.GRPCGatewayRouter)
 
 	// Register legacy and grpc-gateway routes for all modules.
-	ModuleBasics.RegisterGRPCGatewayRoutes(clientCtx, apiSvr.GRPCGatewayRouter)
+	app.moduleBasics().RegisterGRPCGatewayRoutes(clientCtx, apiSvr.GRPCGatewayRouter)
 
 	// register swagger API from root so that other applications can override easily
 	if err := server.RegisterSwaggerAPI(apiSvr.ClientCtx, apiSvr.Router, apiConfig.Swagger); err != nil {
