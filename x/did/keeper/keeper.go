@@ -14,15 +14,13 @@ type (
 	Keeper struct {
 		cdc      codec.Codec
 		storeKey storetypes.StoreKey
-		memKey   storetypes.StoreKey
 	}
 )
 
-func NewKeeper(cdc codec.Codec, storeKey, memKey storetypes.StoreKey) *Keeper {
+func NewKeeper(cdc codec.Codec, storeKey storetypes.StoreKey) *Keeper {
 	return &Keeper{
 		cdc:      cdc,
 		storeKey: storeKey,
-		memKey:   memKey,
 	}
 }
 

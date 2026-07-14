@@ -287,13 +287,11 @@ func (appKeepers *AppKeepersWithKey) InitKeyAndKeepers(
 	appKeepers.AolKeeper = *aolkeeper.NewKeeper(
 		appCodec,
 		appKeepers.keys[aoltypes.StoreKey],
-		appKeepers.keys[aoltypes.MemStoreKey],
 	)
 
 	appKeepers.DidKeeper = *didkeeper.NewKeeper(
 		appCodec,
 		appKeepers.keys[didtypes.StoreKey],
-		appKeepers.keys[didtypes.MemStoreKey],
 	)
 
 	appKeepers.BurnKeeper = *burnkeeper.NewKeeper(

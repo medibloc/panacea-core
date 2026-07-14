@@ -148,7 +148,6 @@ func (suite *TestSuite) SetupTest() {
 	suite.AolKeeper = *aolkeeper.NewKeeper(
 		appCodec,
 		keyParams[aoltypes.StoreKey],
-		memKeys[aoltypes.MemStoreKey],
 	)
 	suite.AolMsgServer = aolkeeper.NewMsgServerImpl(suite.AolKeeper)
 	suite.BankKeeper = bankkeeper.NewBaseKeeper(
@@ -195,7 +194,6 @@ func (suite *TestSuite) SetupTest() {
 	suite.DIDKeeper = *didkeeper.NewKeeper(
 		appCodec,
 		keyParams[didtypes.StoreKey],
-		memKeys[didtypes.MemStoreKey],
 	)
 	suite.DIDMsgServer = didkeeper.NewMsgServerImpl(suite.DIDKeeper)
 }

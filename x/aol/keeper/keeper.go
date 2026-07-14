@@ -15,21 +15,18 @@ type (
 	Keeper struct {
 		cdc      codec.Codec
 		storeKey storetypes.StoreKey
-		memKey   storetypes.StoreKey
 		// this line is used by starport scaffolding # ibc/keeper/attribute
 	}
 )
 
 func NewKeeper(
 	cdc codec.Codec,
-	storeKey,
-	memKey storetypes.StoreKey,
+	storeKey storetypes.StoreKey,
 	// this line is used by starport scaffolding # ibc/keeper/parameter
 ) *Keeper {
 	return &Keeper{
 		cdc:      cdc,
 		storeKey: storeKey,
-		memKey:   memKey,
 		// this line is used by starport scaffolding # ibc/keeper/return
 	}
 }
