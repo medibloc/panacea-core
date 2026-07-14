@@ -7,6 +7,9 @@ import (
 	"github.com/medibloc/panacea-core/v2/x/pnft/types"
 )
 
+// PNFT intentionally retains its existing MsgServer-level validation in addition
+// to app-level validation so direct service calls and module error wrapping keep
+// their pre-v0.50 behavior.
 type msgServer struct {
 	*Keeper
 }

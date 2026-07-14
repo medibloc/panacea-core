@@ -19,6 +19,8 @@ import (
 )
 
 func TestCustomMsgsRetainValidateBasic(t *testing.T) {
+	// These messages predate SDK v0.50. Keep the optional validation contract
+	// instead of mechanically duplicating every check in the MsgServer layer.
 	testCases := []struct {
 		name string
 		msg  sdk.Msg
