@@ -6,7 +6,6 @@ import (
 	"crypto/sha256"
 	"encoding/json"
 	"fmt"
-	"log"
 	"regexp"
 	"strings"
 
@@ -402,7 +401,8 @@ func ValidateKeyType(keyType string) bool {
 	if keyType == "" {
 		return false
 	}
-	log.Printf("[warn] unknown key type: %s\n", keyType) // TODO: Use tendermint logger
+	// Verification method types are extensible. Unknown non-empty types may be
+	// stored, but only supported types can authorize DID changes.
 	return true
 }
 

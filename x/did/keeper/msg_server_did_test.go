@@ -281,6 +281,30 @@ func (suite *msgServerTestSuite) TestVerifyDIDOwnership() {
 	suite.Require().Equal(docWithSeq.Sequence+1, newSeq)
 }
 
+func (suite *msgServerTestSuite) TestVerifyDIDOwnership_UnknownKeyTypeCoexistsWithSupportedAuthentication() {
+	did := "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm"
+	docWithSeq, privKey := suite.newDIDDocumentWithSeq(did)
+	doc := docWithSeq.Document
+	es256VerificationMethodID := doc.VerificationMethods[0].Id
+
+	unknownVerificationMethod := types.NewVerificationMethod(
+		types.NewVerificationMethodID(did, "future-key"),
+		"FutureKeyType2030",
+		did,
+		[]byte("future public key"),
+	)
+	doc.VerificationMethods = append(doc.VerificationMethods, &unknownVerificationMethod)
+	doc.AssertionMethods = append(doc.AssertionMethods, types.NewVerificationRelationship(unknownVerificationMethod.Id))
+	suite.Require().True(doc.Valid())
+
+	sig, err := types.Sign(doc, docWithSeq.Sequence, privKey)
+	suite.Require().NoError(err)
+
+	newSeq, err := didkeeper.VerifyDIDOwnership(doc, docWithSeq.Sequence, doc, es256VerificationMethodID, sig)
+	suite.Require().NoError(err)
+	suite.Require().Equal(docWithSeq.Sequence+1, newSeq)
+}
+
 func (suite *msgServerTestSuite) TestVerifyDIDOwnership_SigVerificationFailed() {
 	did := "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm"
 	docWithSeq, privKey := suite.newDIDDocumentWithSeq(did)
@@ -290,6 +314,21 @@ func (suite *msgServerTestSuite) TestVerifyDIDOwnership_SigVerificationFailed() 
 
 	_, err := didkeeper.VerifyDIDOwnership(doc, docWithSeq.Sequence, docWithSeq.Document, docWithSeq.Document.VerificationMethods[0].Id, sig)
 	suite.Require().ErrorIs(types.ErrSigVerificationFailed, err)
+}
+
+func (suite *msgServerTestSuite) TestVerifyDIDOwnership_KeyTypeNotImplemented() {
+	did := "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm"
+	docWithSeq, privKey := suite.newDIDDocumentWithSeq(did)
+	doc := docWithSeq.Document
+	doc.VerificationMethods[0].Type = "FutureKeyType2030"
+	suite.Require().True(doc.Valid())
+
+	sig, err := types.Sign(doc, docWithSeq.Sequence, privKey)
+	suite.Require().NoError(err)
+
+	newSeq, err := didkeeper.VerifyDIDOwnership(doc, docWithSeq.Sequence, doc, doc.VerificationMethods[0].Id, sig)
+	suite.Require().ErrorIs(types.ErrVerificationMethodKeyTypeNotImplemented, err)
+	suite.Require().Zero(newSeq)
 }
 
 func (suite *msgServerTestSuite) makeTestData() (string, types.DIDDocumentWithSeq, crypto.PrivKey, string) {
