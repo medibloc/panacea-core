@@ -64,6 +64,9 @@ func MakeEncodingConfig(configOptions ...EncodingConfigOption) EncodingConfig {
 		aminoJSONEncoder = modifier(aminoJSONEncoder)
 	}
 
+	// SIGN_MODE_TEXTUAL is intentionally not enabled. It requires an online coin
+	// metadata query and does not support offline signing. Panacea retains direct,
+	// direct-aux, and legacy Amino JSON signing for existing client compatibility.
 	txConfig, err := tx.NewTxConfigWithOptions(protoCodec, tx.ConfigOptions{
 		EnabledSignModes: []signingtypes.SignMode{
 			signingtypes.SignMode_SIGN_MODE_DIRECT,
