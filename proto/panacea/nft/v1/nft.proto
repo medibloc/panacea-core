@@ -1,0 +1,98 @@
+syntax = "proto3";
+package panacea.nft.v1;
+
+import "cosmos/nft/v1beta1/nft.proto";
+import "cosmos_proto/cosmos.proto";
+import "google/protobuf/any.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/medibloc/panacea-core/v2/x/nft/types";
+option java_multiple_files = true;
+
+// TransferPolicy defines whether an NFT owner may transfer an NFT.
+enum TransferPolicy {
+  TRANSFER_POLICY_UNSPECIFIED = 0;
+  TRANSFER_POLICY_LOCKED = 1;
+  TRANSFER_POLICY_OWNER_TRANSFERABLE = 2;
+}
+
+// LiveNFTStatus defines the lifecycle state of a live NFT.
+enum LiveNFTStatus {
+  LIVE_NFT_STATUS_UNSPECIFIED = 0;
+  LIVE_NFT_STATUS_ACTIVE = 1;
+  LIVE_NFT_STATUS_REVOKED = 2;
+}
+
+// BasicNFTData is the only NFT Data type accepted in v1.
+message BasicNFTData {
+  string name = 1;
+  string description = 2;
+  string image_uri = 3;
+}
+
+// ClassPolicy stores Panacea policy state for one standard NFT class.
+message ClassPolicy {
+  string class_id = 1;
+  string creator = 2 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  string controller = 3 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  TransferPolicy transfer_policy = 4;
+  bool revocable = 5;
+  uint64 max_supply = 6;
+}
+
+// MintRecord stores immutable mint provenance.
+message MintRecord {
+  google.protobuf.Timestamp minted_at = 1;
+  string minted_by = 2 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+}
+
+// Revocation stores an irreversible revocation.
+message Revocation {
+  google.protobuf.Timestamp revoked_at = 1;
+  string revoked_by = 2 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+}
+
+// LifecycleRecord stores provenance and optional revocation for a live NFT.
+message LifecycleRecord {
+  string class_id = 1;
+  string nft_id = 2;
+  MintRecord mint = 3;
+  Revocation revocation = 4;
+}
+
+// BurnTombstone permanently preserves a burned NFT's metadata and lifecycle.
+message BurnTombstone {
+  string class_id = 1;
+  string nft_id = 2;
+  MintRecord mint = 3;
+  string uri = 4;
+  string uri_hash = 5;
+  google.protobuf.Any data = 6;
+  Revocation revocation = 7;
+  google.protobuf.Timestamp burned_at = 8;
+  string burned_by = 9 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+}
+
+// ClassRecord combines a standard NFT class with its Panacea policy state.
+message ClassRecord {
+  cosmos.nft.v1beta1.Class class = 1;
+  ClassPolicy policy = 2;
+  uint64 minted_count = 3;
+}
+
+// LiveNFTRecord combines a standard NFT with owner and lifecycle state.
+message LiveNFTRecord {
+  cosmos.nft.v1beta1.NFT nft = 1;
+  string owner = 2 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  LiveNFTStatus status = 3;
+  MintRecord mint = 4;
+  Revocation revocation = 5;
+}
+
+// NFTRecord returns either a live NFT or its burn tombstone.
+message NFTRecord {
+  oneof record {
+    LiveNFTRecord live = 1;
+    BurnTombstone burn_tombstone = 2;
+  }
+}
