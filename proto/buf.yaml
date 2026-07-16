@@ -13,3 +13,6 @@ lint:
     - DEFAULT
   except:
     - SERVICE_SUFFIX
+  ignore_only:
+    RPC_REQUEST_STANDARD_NAME:
+      - cosmos/nft/v1beta1/tx.proto

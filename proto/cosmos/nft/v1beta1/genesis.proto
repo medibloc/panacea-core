@@ -1,0 +1,26 @@
+// Vendored from cosmossdk.io/x/nft v0.1.1 because the split module's proto
+// sources are not included in the repository's Cosmos SDK Buf dependency.
+syntax = "proto3";
+package cosmos.nft.v1beta1;
+
+import "cosmos/nft/v1beta1/nft.proto";
+
+option go_package = "cosmossdk.io/x/nft";
+
+// GenesisState defines the NFT module's genesis state.
+message GenesisState {
+  // classes defines all NFT classes.
+  repeated cosmos.nft.v1beta1.Class classes = 1;
+
+  // entries groups live NFTs by owner.
+  repeated Entry entries = 2;
+}
+
+// Entry defines all NFTs owned by one account.
+message Entry {
+  // owner is the owner address of the NFTs.
+  string owner = 1;
+
+  // nfts contains the owner's NFTs.
+  repeated cosmos.nft.v1beta1.NFT nfts = 2;
+}
