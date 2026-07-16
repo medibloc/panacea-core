@@ -1,0 +1,50 @@
+// Vendored from cosmossdk.io/x/nft v0.1.1 because the split module's proto
+// sources are not included in the repository's Cosmos SDK Buf dependency.
+syntax = "proto3";
+package cosmos.nft.v1beta1;
+
+import "google/protobuf/any.proto";
+
+option go_package = "cosmossdk.io/x/nft";
+
+// Class defines the class of the nft type.
+message Class {
+  // id defines the unique identifier of the NFT classification.
+  string id = 1;
+
+  // name defines the human-readable name of the NFT classification.
+  string name = 2;
+
+  // symbol is an abbreviated name for the NFT classification.
+  string symbol = 3;
+
+  // description is a brief description of the NFT classification.
+  string description = 4;
+
+  // uri points to class metadata stored off chain.
+  string uri = 5;
+
+  // uri_hash is a hash of the document pointed to by uri.
+  string uri_hash = 6;
+
+  // data is app-specific class metadata.
+  google.protobuf.Any data = 7;
+}
+
+// NFT defines an NFT.
+message NFT {
+  // class_id identifies the NFT class.
+  string class_id = 1;
+
+  // id uniquely identifies the NFT within its class.
+  string id = 2;
+
+  // uri points to NFT metadata stored off chain.
+  string uri = 3;
+
+  // uri_hash is a hash of the document pointed to by uri.
+  string uri_hash = 4;
+
+  // data is app-specific NFT metadata.
+  google.protobuf.Any data = 10;
+}
