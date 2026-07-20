@@ -22,6 +22,7 @@ type Keeper struct {
 	addressCodec       address.Codec
 	nftStoreService    corestore.KVStoreService
 	policyStoreService corestore.KVStoreService
+	accountKeeper      upstreamnft.AccountKeeper
 	nftKeeper          upstreamkeeper.Keeper
 
 	schema        collections.Schema
@@ -98,6 +99,7 @@ func NewKeeper(
 		addressCodec:       addressCodec,
 		nftStoreService:    nftStoreService,
 		policyStoreService: policyStoreService,
+		accountKeeper:      accountKeeper,
 		nftKeeper: upstreamkeeper.NewKeeper(
 			nftStoreService,
 			cdc,
