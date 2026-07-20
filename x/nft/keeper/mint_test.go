@@ -516,6 +516,7 @@ func TestMintRollsBackWhenPolicyWriteFails(t *testing.T) {
 				},
 				fixture.accountKeeper,
 				testBankKeeper{},
+				fixture.moduleAccountAddresses,
 			)
 			request := validMintRequest(classID, controller, recipient)
 

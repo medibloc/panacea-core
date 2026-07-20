@@ -7,6 +7,7 @@ import (
 
 	"cosmossdk.io/core/address"
 	"cosmossdk.io/core/appmodule"
+	upstreamnft "cosmossdk.io/x/nft"
 	abci "github.com/cometbft/cometbft/abci/types"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -101,10 +102,11 @@ func (AppModule) IsAppModule() {}
 // QuerierRoute returns the legacy query route name.
 func (AppModule) QuerierRoute() string { return types.QuerierRoute }
 
-// RegisterServices registers only Panacea's policy-aware services. The
-// upstream NFT MsgServer remains unreachable.
+// RegisterServices binds both message APIs to Panacea's policy-aware servers.
+// The unrestricted upstream NFT keeper MsgServer remains unreachable.
 func (am AppModule) RegisterServices(configurator module.Configurator) {
 	types.RegisterMsgServer(configurator.MsgServer(), keeper.NewMsgServer(am.keeper))
+	upstreamnft.RegisterMsgServer(configurator.MsgServer(), keeper.NewStandardMsgServer(am.keeper))
 	types.RegisterQueryServer(configurator.QueryServer(), keeper.NewQueryServer(am.keeper))
 }
 

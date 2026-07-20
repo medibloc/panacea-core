@@ -83,14 +83,22 @@ func TestAppModuleEmptyGenesisRoundTrip(t *testing.T) {
 	require.Equal(t, uint64(1), appModule.ConsensusVersion())
 }
 
-func TestAppModuleRegistersOnlyPanaceaRuntimeServices(t *testing.T) {
+func TestAppModuleRegistersOnlyPolicyAwareRuntimeServices(t *testing.T) {
 	appModule := NewAppModule(addresscodec.NewBech32Codec("panacea"), keeper.Keeper{})
 	configurator := &countingConfigurator{}
 
 	appModule.RegisterServices(configurator)
 
-	require.Equal(t, []string{"panacea.nft.v1.Msg"}, configurator.msgServer.services)
+	require.Equal(t, []string{
+		"panacea.nft.v1.Msg",
+		"cosmos.nft.v1beta1.Msg",
+	}, configurator.msgServer.services)
 	require.Equal(t, []string{"panacea.nft.v1.Query"}, configurator.queryServer.services)
+	require.IsType(
+		t,
+		keeper.NewStandardMsgServer(keeper.Keeper{}),
+		configurator.msgServer.implementations["cosmos.nft.v1beta1.Msg"],
+	)
 	require.Empty(t, configurator.directServices)
 	require.Zero(t, configurator.migrations)
 }
@@ -140,6 +148,7 @@ func newModuleTestKeeper(t *testing.T) (keeper.Keeper, sdk.Context, address.Code
 		runtime.NewKVStoreService(policyKey),
 		moduleTestAccountKeeper{addressCodec: addressCodec},
 		moduleTestBankKeeper{},
+		[]sdk.AccAddress{authtypes.NewModuleAddress(upstreamnft.ModuleName)},
 	)
 	ctx := sdk.NewContext(multiStore, cmtproto.Header{}, false, log.NewNopLogger())
 	return moduleKeeper, ctx, addressCodec, cdc
@@ -168,9 +177,14 @@ func (c *countingConfigurator) RegisterMigration(string, uint64, module.Migratio
 }
 
 type countingGRPCServer struct {
-	services []string
+	services        []string
+	implementations map[string]interface{}
 }
 
-func (s *countingGRPCServer) RegisterService(descriptor *googlegrpc.ServiceDesc, _ interface{}) {
+func (s *countingGRPCServer) RegisterService(descriptor *googlegrpc.ServiceDesc, implementation interface{}) {
 	s.services = append(s.services, descriptor.ServiceName)
+	if s.implementations == nil {
+		s.implementations = make(map[string]interface{})
+	}
+	s.implementations[descriptor.ServiceName] = implementation
 }

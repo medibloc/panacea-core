@@ -261,6 +261,7 @@ func TestUpdateControllerRollsBackWhenPolicyWriteFails(t *testing.T) {
 		},
 		fixture.accountKeeper,
 		testBankKeeper{},
+		fixture.moduleAccountAddresses,
 	)
 
 	_, err := NewMsgServer(failingKeeper).UpdateController(

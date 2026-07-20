@@ -24,6 +24,7 @@ type Keeper struct {
 	policyStoreService corestore.KVStoreService
 	accountKeeper      upstreamnft.AccountKeeper
 	nftKeeper          upstreamkeeper.Keeper
+	moduleAccounts     map[string]struct{}
 
 	schema        collections.Schema
 	classPolicies collections.Map[string, types.ClassPolicy]
@@ -39,6 +40,7 @@ func NewKeeper(
 	policyStoreService corestore.KVStoreService,
 	accountKeeper upstreamnft.AccountKeeper,
 	bankKeeper upstreamnft.BankKeeper,
+	moduleAccountAddresses []sdk.AccAddress,
 ) Keeper {
 	if cdc == nil {
 		panic("nft keeper requires a codec")
@@ -55,9 +57,19 @@ func NewKeeper(
 	if bankKeeper == nil {
 		panic("nft keeper requires a bank keeper")
 	}
+	if len(moduleAccountAddresses) == 0 {
+		panic("nft keeper requires module account addresses")
+	}
 	addressCodec := accountKeeper.AddressCodec()
 	if addressCodec == nil {
 		panic("nft keeper requires an account address codec")
+	}
+	moduleAccounts := make(map[string]struct{}, len(moduleAccountAddresses))
+	for _, moduleAddress := range moduleAccountAddresses {
+		if len(moduleAddress) == 0 {
+			panic("nft keeper requires non-empty module account addresses")
+		}
+		moduleAccounts[string(moduleAddress)] = struct{}{}
 	}
 
 	schemaBuilder := collections.NewSchemaBuilder(policyStoreService)
@@ -100,6 +112,7 @@ func NewKeeper(
 		nftStoreService:    nftStoreService,
 		policyStoreService: policyStoreService,
 		accountKeeper:      accountKeeper,
+		moduleAccounts:     moduleAccounts,
 		nftKeeper: upstreamkeeper.NewKeeper(
 			nftStoreService,
 			cdc,

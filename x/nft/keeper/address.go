@@ -1,7 +1,6 @@
 package keeper
 
 import (
-	"context"
 	"fmt"
 
 	errorsmod "cosmossdk.io/errors"
@@ -11,7 +10,6 @@ import (
 )
 
 func (k Keeper) canonicalNonModuleAccount(
-	ctx context.Context,
 	field string,
 	value string,
 ) (string, sdk.AccAddress, error) {
@@ -19,7 +17,7 @@ func (k Keeper) canonicalNonModuleAccount(
 	if err != nil {
 		return "", nil, err
 	}
-	if _, isModuleAccount := k.accountKeeper.GetAccount(ctx, address).(sdk.ModuleAccountI); isModuleAccount {
+	if _, isModuleAccount := k.moduleAccounts[string(address)]; isModuleAccount {
 		return "", nil, errorsmod.Wrapf(
 			sdkerrors.ErrInvalidRequest,
 			"%s must not be a module account",
@@ -36,7 +34,7 @@ func (k Keeper) validateCanonicalClassID(classID string) error {
 	}
 	canonicalCreator, _, err := k.canonicalAddress("class creator", creator)
 	if err != nil {
-		return err
+		return sdkerrors.ErrInvalidRequest.Wrapf("class_id has invalid creator: %v", err)
 	}
 	if creator != canonicalCreator {
 		return sdkerrors.ErrInvalidRequest.Wrap("class_id creator must use its canonical address")

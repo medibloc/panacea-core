@@ -225,6 +225,7 @@ func TestCreateClassWritesBothStoresAtomically(t *testing.T) {
 				policyService,
 				fixture.accountKeeper,
 				testBankKeeper{},
+				fixture.moduleAccountAddresses,
 			)
 
 			_, err := NewMsgServer(failingKeeper).CreateClass(

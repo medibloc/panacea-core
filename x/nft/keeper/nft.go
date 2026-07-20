@@ -136,7 +136,7 @@ func (k Keeper) getLiveNFTRecord(
 	if err != nil {
 		return nil, fmt.Errorf("encode owner for nft %s: %w", nftID, err)
 	}
-	canonicalOwner, _, err := k.canonicalNonModuleAccount(ctx, "stored owner", owner)
+	canonicalOwner, _, err := k.canonicalNonModuleAccount("stored owner", owner)
 	if err != nil {
 		return nil, fmt.Errorf("nft %s has invalid stored owner: %w", nftID, err)
 	}
@@ -152,6 +152,42 @@ func (k Keeper) getLiveNFTRecord(
 		Mint:       state.lifecycle.Mint,
 		Revocation: state.lifecycle.Revocation,
 	}, nil
+}
+
+func (k Keeper) ensureNFTTransferAllowed(ctx sdk.Context, classID, nftID string) error {
+	state, err := k.loadNFTState(ctx, classID, nftID)
+	if err != nil {
+		return err
+	}
+	if err := state.validateLiveCombination(classID, nftID); err != nil {
+		return err
+	}
+	if !state.hasNFT {
+		return upstreamnft.ErrNFTNotExists.Wrapf(
+			"nft %s in class %s not found",
+			nftID,
+			classID,
+		)
+	}
+	if state.lifecycle.Revocation != nil {
+		return types.ErrNFTRevoked.Wrapf(
+			"nft %s in class %s is revoked",
+			nftID,
+			classID,
+		)
+	}
+
+	record, err := k.getClassRecord(ctx, classID)
+	if err != nil {
+		return fmt.Errorf("load class policy for nft %s: %w", nftID, err)
+	}
+	if record.Policy.TransferPolicy != types.TransferPolicy_TRANSFER_POLICY_OWNER_TRANSFERABLE {
+		return types.ErrTransferNotAllowed.Wrapf(
+			"class %s does not allow owner transfers",
+			classID,
+		)
+	}
+	return nil
 }
 
 func (k Keeper) loadNFTState(

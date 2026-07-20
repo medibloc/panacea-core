@@ -51,12 +51,13 @@ type testBankKeeper struct{}
 func (testBankKeeper) SpendableCoins(context.Context, sdk.AccAddress) sdk.Coins { return nil }
 
 type keeperFixture struct {
-	keeper        Keeper
-	ctx           sdk.Context
-	cdc           *codec.ProtoCodec
-	nftService    *storetypes.KVStoreKey
-	policyService *storetypes.KVStoreKey
-	accountKeeper *testAccountKeeper
+	keeper                 Keeper
+	ctx                    sdk.Context
+	cdc                    *codec.ProtoCodec
+	nftService             *storetypes.KVStoreKey
+	policyService          *storetypes.KVStoreKey
+	accountKeeper          *testAccountKeeper
+	moduleAccountAddresses []sdk.AccAddress
 }
 
 func TestNewKeeperOwnsTypedPolicyCollections(t *testing.T) {
@@ -120,15 +121,47 @@ func TestNewKeeperRequiresBothStoresAndModuleAccount(t *testing.T) {
 	bankKeeper := testBankKeeper{}
 	nftService := runtime.NewKVStoreService(fixture.nftService)
 	policyService := runtime.NewKVStoreService(fixture.policyService)
+	moduleAccountAddresses := fixture.moduleAccountAddresses
 
 	require.PanicsWithValue(t, "nft keeper requires the nft store service", func() {
-		NewKeeper(fixture.cdc, nil, policyService, fixture.accountKeeper, bankKeeper)
+		NewKeeper(
+			fixture.cdc,
+			nil,
+			policyService,
+			fixture.accountKeeper,
+			bankKeeper,
+			moduleAccountAddresses,
+		)
 	})
 	require.PanicsWithValue(t, "nft keeper requires the nftpolicy store service", func() {
-		NewKeeper(fixture.cdc, nftService, nil, fixture.accountKeeper, bankKeeper)
+		NewKeeper(
+			fixture.cdc,
+			nftService,
+			nil,
+			fixture.accountKeeper,
+			bankKeeper,
+			moduleAccountAddresses,
+		)
+	})
+	require.PanicsWithValue(t, "nft keeper requires module account addresses", func() {
+		NewKeeper(
+			fixture.cdc,
+			nftService,
+			policyService,
+			fixture.accountKeeper,
+			bankKeeper,
+			nil,
+		)
 	})
 	require.PanicsWithValue(t, "the nft module account has not been set", func() {
-		NewKeeper(fixture.cdc, nftService, policyService, accountKeeper, bankKeeper)
+		NewKeeper(
+			fixture.cdc,
+			nftService,
+			policyService,
+			accountKeeper,
+			bankKeeper,
+			moduleAccountAddresses,
+		)
 	})
 }
 
@@ -193,16 +226,28 @@ func newKeeperFixture(t *testing.T, mountNFT, mountPolicy bool) keeperFixture {
 	accountKeeper.accounts[string(accountKeeper.moduleAddress)] = authtypes.NewEmptyModuleAccount(
 		upstreamnft.ModuleName,
 	)
+	moduleAccountAddresses := []sdk.AccAddress{
+		accountKeeper.moduleAddress,
+		authtypes.NewModuleAddress("unmaterialized_test_module"),
+	}
 	nftService := runtime.NewKVStoreService(nftKey)
 	policyService := runtime.NewKVStoreService(policyKey)
-	k := NewKeeper(cdc, nftService, policyService, accountKeeper, testBankKeeper{})
+	k := NewKeeper(
+		cdc,
+		nftService,
+		policyService,
+		accountKeeper,
+		testBankKeeper{},
+		moduleAccountAddresses,
+	)
 
 	return keeperFixture{
-		keeper:        k,
-		ctx:           sdk.NewContext(multiStore, cmtproto.Header{}, false, log.NewNopLogger()),
-		cdc:           cdc,
-		nftService:    nftKey,
-		policyService: policyKey,
-		accountKeeper: accountKeeper,
+		keeper:                 k,
+		ctx:                    sdk.NewContext(multiStore, cmtproto.Header{}, false, log.NewNopLogger()),
+		cdc:                    cdc,
+		nftService:             nftKey,
+		policyService:          policyKey,
+		accountKeeper:          accountKeeper,
+		moduleAccountAddresses: moduleAccountAddresses,
 	}
 }

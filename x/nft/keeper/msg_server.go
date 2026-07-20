@@ -43,8 +43,7 @@ func (m msgServer) CreateClass(
 		return nil, err
 	}
 
-	ctx := sdk.UnwrapSDKContext(goCtx)
-	creator, _, err := m.keeper.canonicalNonModuleAccount(ctx, "creator", request.Creator)
+	creator, _, err := m.keeper.canonicalNonModuleAccount("creator", request.Creator)
 	if err != nil {
 		return nil, err
 	}
@@ -69,6 +68,7 @@ func (m msgServer) CreateClass(
 		Revocable:      request.Revocable,
 		MaxSupply:      request.MaxSupply,
 	}
+	ctx := sdk.UnwrapSDKContext(goCtx)
 	if err := m.keeper.createClass(ctx, class, policy); err != nil {
 		return nil, err
 	}
@@ -88,19 +88,18 @@ func (m msgServer) UpdateController(
 		return nil, err
 	}
 
-	ctx := sdk.UnwrapSDKContext(goCtx)
 	controller, _, err := m.keeper.canonicalAddress("controller", request.Controller)
 	if err != nil {
 		return nil, err
 	}
 	newController, _, err := m.keeper.canonicalNonModuleAccount(
-		ctx,
 		"new controller",
 		request.NewController,
 	)
 	if err != nil {
 		return nil, err
 	}
+	ctx := sdk.UnwrapSDKContext(goCtx)
 	if err := m.keeper.updateController(
 		ctx,
 		request.ClassId,
@@ -135,12 +134,11 @@ func (m msgServer) Mint(
 		return nil, err
 	}
 
-	ctx := sdk.UnwrapSDKContext(goCtx)
 	controller, _, err := m.keeper.canonicalAddress("controller", request.Controller)
 	if err != nil {
 		return nil, err
 	}
-	_, recipient, err := m.keeper.canonicalNonModuleAccount(ctx, "recipient", request.Recipient)
+	_, recipient, err := m.keeper.canonicalNonModuleAccount("recipient", request.Recipient)
 	if err != nil {
 		return nil, err
 	}
@@ -151,6 +149,7 @@ func (m msgServer) Mint(
 		UriHash: request.UriHash,
 		Data:    data,
 	}
+	ctx := sdk.UnwrapSDKContext(goCtx)
 	if err := m.keeper.mintNFT(ctx, token, controller, recipient); err != nil {
 		return nil, err
 	}
