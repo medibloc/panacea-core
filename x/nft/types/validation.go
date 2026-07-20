@@ -1,11 +1,14 @@
 package types
 
 import (
+	"bytes"
+	"fmt"
 	"regexp"
 	"strings"
 	"unicode"
 	"unicode/utf8"
 
+	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
@@ -16,6 +19,8 @@ const (
 	maxClassSymbolBytes      = 32
 	maxClassDescriptionBytes = 1024
 	maxURIBytes              = 256
+	maxNFTIDBytes            = 64
+	maxBasicNFTDataBytes     = 1024
 )
 
 var uriHashPattern = regexp.MustCompile(`^sha256:[0-9a-f]{64}$`)
@@ -37,6 +42,31 @@ func ValidateLocalClassID(localClassID string) error {
 		}
 		return sdkerrors.ErrInvalidRequest.Wrap(
 			"local_class_id must contain only lowercase letters, digits, '.', '_', or '-'",
+		)
+	}
+	return nil
+}
+
+// ValidateNFTID enforces the class-local immutable NFT identifier contract.
+func ValidateNFTID(nftID string) error {
+	if len(nftID) == 0 || len(nftID) > maxNFTIDBytes {
+		return sdkerrors.ErrInvalidRequest.Wrapf(
+			"nft_id must be between 1 and %d bytes",
+			maxNFTIDBytes,
+		)
+	}
+	if nftID == "." || nftID == ".." {
+		return sdkerrors.ErrInvalidRequest.Wrap("nft_id must not be '.' or '..'")
+	}
+	for i := 0; i < len(nftID); i++ {
+		character := nftID[i]
+		if (character >= 'a' && character <= 'z') ||
+			(character >= '0' && character <= '9') ||
+			character == '.' || character == '_' || character == '-' {
+			continue
+		}
+		return sdkerrors.ErrInvalidRequest.Wrap(
+			"nft_id must contain only lowercase letters, digits, '.', '_', or '-'",
 		)
 	}
 	return nil
@@ -94,6 +124,76 @@ func ValidateURI(uri, uriHash string) error {
 		)
 	}
 	return nil
+}
+
+// CanonicalizeNFTData validates the closed NFTData interface and returns a
+// fresh Any containing only its canonical type URL and deterministic bytes.
+// Copying the wire fields before unpacking deliberately ignores cached values.
+func CanonicalizeNFTData(
+	unpacker cdctypes.AnyUnpacker,
+	data *cdctypes.Any,
+) (*cdctypes.Any, error) {
+	if data == nil {
+		return nil, nil
+	}
+	if unpacker == nil {
+		return nil, fmt.Errorf("nft data validation requires an Any unpacker")
+	}
+	if data.TypeUrl != BasicNFTDataTypeURL {
+		return nil, sdkerrors.ErrInvalidRequest.Wrapf(
+			"data type_url must be %s",
+			BasicNFTDataTypeURL,
+		)
+	}
+
+	wireData := &cdctypes.Any{
+		TypeUrl: data.TypeUrl,
+		Value:   append([]byte(nil), data.Value...),
+	}
+	var unpacked NFTData
+	if err := unpacker.UnpackAny(wireData, &unpacked); err != nil {
+		return nil, sdkerrors.ErrInvalidRequest.Wrapf("unpack data: %v", err)
+	}
+	metadata, ok := unpacked.(*BasicNFTData)
+	if !ok {
+		return nil, sdkerrors.ErrInvalidRequest.Wrapf(
+			"unsupported data implementation %T",
+			unpacked,
+		)
+	}
+	if metadata.Name == "" && metadata.Description == "" && metadata.ImageUri == "" {
+		return nil, sdkerrors.ErrInvalidRequest.Wrap("data must contain at least one field")
+	}
+	if err := validateText("data.name", metadata.Name, maxBasicNFTDataBytes); err != nil {
+		return nil, err
+	}
+	if err := validateText("data.description", metadata.Description, maxBasicNFTDataBytes); err != nil {
+		return nil, err
+	}
+	if err := ValidateURI(metadata.ImageUri, ""); err != nil {
+		return nil, sdkerrors.ErrInvalidRequest.Wrapf("invalid data.image_uri: %v", err)
+	}
+
+	canonicalValue, err := metadata.Marshal()
+	if err != nil {
+		return nil, sdkerrors.ErrInvalidRequest.Wrapf("encode data: %v", err)
+	}
+	if len(canonicalValue) > maxBasicNFTDataBytes {
+		return nil, sdkerrors.ErrInvalidRequest.Wrapf(
+			"data must not exceed %d encoded bytes",
+			maxBasicNFTDataBytes,
+		)
+	}
+	if !bytes.Equal(data.Value, canonicalValue) {
+		return nil, sdkerrors.ErrInvalidRequest.Wrap(
+			"data must use canonical deterministic protobuf encoding",
+		)
+	}
+
+	return &cdctypes.Any{
+		TypeUrl: BasicNFTDataTypeURL,
+		Value:   canonicalValue,
+	}, nil
 }
 
 // ValidateTransferPolicy rejects the protobuf default and unknown values.

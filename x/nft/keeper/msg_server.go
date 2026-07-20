@@ -112,3 +112,48 @@ func (m msgServer) UpdateController(
 
 	return &types.MsgUpdateControllerResponse{}, nil
 }
+
+// Mint creates one standard NFT and its ACTIVE Panacea lifecycle atomically.
+func (m msgServer) Mint(
+	goCtx context.Context,
+	request *types.MsgMintRequest,
+) (*types.MsgMintResponse, error) {
+	if request == nil {
+		return nil, sdkerrors.ErrInvalidRequest.Wrap("empty request")
+	}
+	if err := m.keeper.validateCanonicalClassID(request.ClassId); err != nil {
+		return nil, err
+	}
+	if err := types.ValidateNFTID(request.NftId); err != nil {
+		return nil, err
+	}
+	if err := types.ValidateURI(request.Uri, request.UriHash); err != nil {
+		return nil, err
+	}
+	data, err := types.CanonicalizeNFTData(m.keeper.cdc, request.Data)
+	if err != nil {
+		return nil, err
+	}
+
+	ctx := sdk.UnwrapSDKContext(goCtx)
+	controller, _, err := m.keeper.canonicalAddress("controller", request.Controller)
+	if err != nil {
+		return nil, err
+	}
+	_, recipient, err := m.keeper.canonicalNonModuleAccount(ctx, "recipient", request.Recipient)
+	if err != nil {
+		return nil, err
+	}
+	token := upstreamnft.NFT{
+		ClassId: request.ClassId,
+		Id:      request.NftId,
+		Uri:     request.Uri,
+		UriHash: request.UriHash,
+		Data:    data,
+	}
+	if err := m.keeper.mintNFT(ctx, token, controller, recipient); err != nil {
+		return nil, err
+	}
+
+	return &types.MsgMintResponse{}, nil
+}

@@ -319,6 +319,28 @@ func TestBasicNFTDataAnyRoundTrip(t *testing.T) {
 	})
 }
 
+func TestMsgMintRequestUnpacksNFTData(t *testing.T) {
+	_, cdc := newTestCodec()
+	data, err := cdctypes.NewAnyWithValue(&BasicNFTData{Name: "metadata"})
+	require.NoError(t, err)
+	request := &MsgMintRequest{Data: data}
+
+	binary, err := cdc.Marshal(request)
+	require.NoError(t, err)
+	var decoded MsgMintRequest
+	require.NoError(t, cdc.Unmarshal(binary, &decoded))
+	require.IsType(t, &BasicNFTData{}, decoded.Data.GetCachedValue())
+
+	unknown := &MsgMintRequest{Data: &cdctypes.Any{
+		TypeUrl: "/panacea.nft.v1.UnknownNFTData",
+		Value:   data.Value,
+	}}
+	binary, err = cdc.Marshal(unknown)
+	require.NoError(t, err)
+	err = cdc.Unmarshal(binary, &decoded)
+	require.ErrorContains(t, err, "no concrete type registered for type URL")
+}
+
 func TestUnknownNFTDataTypeURLFailsToDecode(t *testing.T) {
 	registry, cdc := newTestCodec()
 	unknown := &cdctypes.Any{

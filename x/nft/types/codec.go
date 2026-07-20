@@ -18,6 +18,15 @@ type NFTData interface {
 
 func (*BasicNFTData) isNFTData() {}
 
+// UnpackInterfaces resolves nested NFT metadata during transaction decoding.
+func (m *MsgMintRequest) UnpackInterfaces(unpacker cdctypes.AnyUnpacker) error {
+	if m == nil || m.Data == nil {
+		return nil
+	}
+	var data NFTData
+	return unpacker.UnpackAny(m.Data, &data)
+}
+
 // RegisterInterfaces registers the standard and Panacea NFT wire types.
 func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 	upstreamnft.RegisterInterfaces(registry)

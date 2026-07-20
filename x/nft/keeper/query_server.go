@@ -43,3 +43,33 @@ func (q queryServer) ClassRecord(
 	}
 	return &types.QueryClassRecordResponse{ClassRecord: record}, nil
 }
+
+// NFTRecord returns one ACTIVE or REVOKED standard NFT with its lifecycle.
+func (q queryServer) NFTRecord(
+	goCtx context.Context,
+	request *types.QueryNFTRecordRequest,
+) (*types.QueryNFTRecordResponse, error) {
+	if request == nil {
+		return nil, status.Error(codes.InvalidArgument, "empty request")
+	}
+	if err := q.keeper.validateCanonicalClassID(request.ClassId); err != nil {
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+	if err := types.ValidateNFTID(request.NftId); err != nil {
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	ctx := sdk.UnwrapSDKContext(goCtx)
+	live, err := q.keeper.getLiveNFTRecord(ctx, request.ClassId, request.NftId)
+	if errors.Is(err, upstreamnft.ErrNFTNotExists) {
+		return nil, status.Error(codes.NotFound, err.Error())
+	}
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+	return &types.QueryNFTRecordResponse{
+		NftRecord: &types.NFTRecord{
+			Record: &types.NFTRecord_Live{Live: live},
+		},
+	}, nil
+}
