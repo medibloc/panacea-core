@@ -75,3 +75,40 @@ func (m msgServer) CreateClass(
 
 	return &types.MsgCreateClassResponse{ClassId: classID}, nil
 }
+
+// UpdateController transfers class operations to a new non-module account.
+func (m msgServer) UpdateController(
+	goCtx context.Context,
+	request *types.MsgUpdateControllerRequest,
+) (*types.MsgUpdateControllerResponse, error) {
+	if request == nil {
+		return nil, sdkerrors.ErrInvalidRequest.Wrap("empty request")
+	}
+	if err := m.keeper.validateCanonicalClassID(request.ClassId); err != nil {
+		return nil, err
+	}
+
+	ctx := sdk.UnwrapSDKContext(goCtx)
+	controller, _, err := m.keeper.canonicalAddress("controller", request.Controller)
+	if err != nil {
+		return nil, err
+	}
+	newController, _, err := m.keeper.canonicalNonModuleAccount(
+		ctx,
+		"new controller",
+		request.NewController,
+	)
+	if err != nil {
+		return nil, err
+	}
+	if err := m.keeper.updateController(
+		ctx,
+		request.ClassId,
+		controller,
+		newController,
+	); err != nil {
+		return nil, err
+	}
+
+	return &types.MsgUpdateControllerResponse{}, nil
+}

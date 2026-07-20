@@ -85,3 +85,42 @@ func (k Keeper) getClassRecord(ctx sdk.Context, classID string) (*types.ClassRec
 		MintedCount: mintedCount,
 	}, nil
 }
+
+func (k Keeper) updateController(
+	ctx sdk.Context,
+	classID string,
+	controller string,
+	newController string,
+) error {
+	record, err := k.getClassRecord(ctx, classID)
+	if err != nil {
+		return err
+	}
+	if record.Policy.Controller != controller {
+		return sdkerrors.ErrUnauthorized.Wrapf(
+			"account %s does not control class %s",
+			controller,
+			classID,
+		)
+	}
+	if controller == newController {
+		return sdkerrors.ErrInvalidRequest.Wrap("new controller must differ from current controller")
+	}
+
+	policy := *record.Policy
+	policy.Controller = newController
+
+	cacheCtx, writeCache := ctx.CacheContext()
+	if err := k.classPolicies.Set(cacheCtx, classID, policy); err != nil {
+		return fmt.Errorf("update class controller: %w", err)
+	}
+	if err := cacheCtx.EventManager().EmitTypedEvent(&types.EventControllerUpdated{
+		ClassId:       classID,
+		OldController: controller,
+		NewController: newController,
+	}); err != nil {
+		return fmt.Errorf("emit controller updated event: %w", err)
+	}
+	writeCache()
+	return nil
+}
