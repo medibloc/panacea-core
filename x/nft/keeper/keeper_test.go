@@ -28,6 +28,7 @@ import (
 type testAccountKeeper struct {
 	addressCodec  address.Codec
 	moduleAddress sdk.AccAddress
+	accounts      map[string]sdk.AccountI
 	requested     []string
 }
 
@@ -39,7 +40,9 @@ func (k *testAccountKeeper) GetModuleAddress(name string) sdk.AccAddress {
 	return nil
 }
 
-func (*testAccountKeeper) GetAccount(context.Context, sdk.AccAddress) sdk.AccountI { return nil }
+func (k *testAccountKeeper) GetAccount(_ context.Context, address sdk.AccAddress) sdk.AccountI {
+	return k.accounts[string(address)]
+}
 
 func (k *testAccountKeeper) AddressCodec() address.Codec { return k.addressCodec }
 
@@ -185,7 +188,11 @@ func newKeeperFixture(t *testing.T, mountNFT, mountPolicy bool) keeperFixture {
 	accountKeeper := &testAccountKeeper{
 		addressCodec:  addresscodec.NewBech32Codec("panacea"),
 		moduleAddress: authtypes.NewModuleAddress(upstreamnft.ModuleName),
+		accounts:      map[string]sdk.AccountI{},
 	}
+	accountKeeper.accounts[string(accountKeeper.moduleAddress)] = authtypes.NewEmptyModuleAccount(
+		upstreamnft.ModuleName,
+	)
 	nftService := runtime.NewKVStoreService(nftKey)
 	policyService := runtime.NewKVStoreService(policyKey)
 	k := NewKeeper(cdc, nftService, policyService, accountKeeper, testBankKeeper{})
