@@ -1,7 +1,9 @@
 package types
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"testing"
 
 	errorsmod "cosmossdk.io/errors"
@@ -187,7 +189,9 @@ func TestLegacyAminoJSONSignModeWithNFTData(t *testing.T) {
 		txBuilder.GetTx(),
 	)
 	require.NoError(t, err)
-	require.JSONEq(t, `
+
+	var expectedSignBytes bytes.Buffer
+	require.NoError(t, json.Compact(&expectedSignBytes, []byte(`
 		{
 			"account_number": "7",
 			"chain_id": "test-chain",
@@ -218,7 +222,8 @@ func TestLegacyAminoJSONSignModeWithNFTData(t *testing.T) {
 			"sequence": "11",
 			"timeout_height": "123"
 		}
-	`, string(signBytes))
+	`)))
+	require.Equal(t, expectedSignBytes.Bytes(), signBytes)
 }
 
 func TestRegisterInterfacesMsgServiceResponses(t *testing.T) {
