@@ -1,6 +1,7 @@
 package nft
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 
@@ -66,9 +67,16 @@ func (am AppModuleBasic) ValidateGenesis(cdc codec.JSONCodec, _ client.TxEncodin
 	return types.ValidateGenesis(genesis, am.addressCodec)
 }
 
-// RegisterGRPCGatewayRoutes is intentionally empty until the standard and
-// Panacea query wrappers are implemented.
-func (AppModuleBasic) RegisterGRPCGatewayRoutes(client.Context, *runtime.ServeMux) {}
+// RegisterGRPCGatewayRoutes registers the Panacea combined query routes.
+func (AppModuleBasic) RegisterGRPCGatewayRoutes(clientContext client.Context, mux *runtime.ServeMux) {
+	if err := types.RegisterQueryHandlerClient(
+		context.Background(),
+		mux,
+		types.NewQueryClient(clientContext),
+	); err != nil {
+		panic(err)
+	}
+}
 
 // AppModule is Panacea's single NFT runtime module.
 type AppModule struct {
@@ -93,9 +101,12 @@ func (AppModule) IsAppModule() {}
 // QuerierRoute returns the legacy query route name.
 func (AppModule) QuerierRoute() string { return types.QuerierRoute }
 
-// RegisterServices intentionally registers neither the upstream NFT services
-// nor incomplete Panacea handlers in the empty skeleton.
-func (AppModule) RegisterServices(module.Configurator) {}
+// RegisterServices registers only Panacea's policy-aware services. The
+// upstream NFT MsgServer remains unreachable.
+func (am AppModule) RegisterServices(configurator module.Configurator) {
+	types.RegisterMsgServer(configurator.MsgServer(), keeper.NewMsgServer(am.keeper))
+	types.RegisterQueryServer(configurator.QueryServer(), keeper.NewQueryServer(am.keeper))
+}
 
 // RegisterInvariants registers no runtime-wide invariant route.
 func (AppModule) RegisterInvariants(sdk.InvariantRegistry) {}

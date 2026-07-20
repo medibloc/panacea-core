@@ -83,14 +83,15 @@ func TestAppModuleEmptyGenesisRoundTrip(t *testing.T) {
 	require.Equal(t, uint64(1), appModule.ConsensusVersion())
 }
 
-func TestAppModuleDoesNotRegisterRuntimeServicesYet(t *testing.T) {
+func TestAppModuleRegistersOnlyPanaceaRuntimeServices(t *testing.T) {
 	appModule := NewAppModule(addresscodec.NewBech32Codec("panacea"), keeper.Keeper{})
 	configurator := &countingConfigurator{}
 
 	appModule.RegisterServices(configurator)
-	appModule.RegisterServices(configurator)
 
-	require.Zero(t, configurator.services)
+	require.Equal(t, []string{"panacea.nft.v1.Msg"}, configurator.msgServer.services)
+	require.Equal(t, []string{"panacea.nft.v1.Query"}, configurator.queryServer.services)
+	require.Empty(t, configurator.directServices)
 	require.Zero(t, configurator.migrations)
 }
 
@@ -145,21 +146,31 @@ func newModuleTestKeeper(t *testing.T) (keeper.Keeper, sdk.Context, address.Code
 }
 
 type countingConfigurator struct {
-	services   int
-	migrations int
+	msgServer      countingGRPCServer
+	queryServer    countingGRPCServer
+	directServices []string
+	migrations     int
 }
 
-func (c *countingConfigurator) RegisterService(*googlegrpc.ServiceDesc, interface{}) {
-	c.services++
+func (c *countingConfigurator) RegisterService(descriptor *googlegrpc.ServiceDesc, _ interface{}) {
+	c.directServices = append(c.directServices, descriptor.ServiceName)
 }
 
 func (*countingConfigurator) Error() error { return nil }
 
-func (c *countingConfigurator) MsgServer() grpc.Server { return c }
+func (c *countingConfigurator) MsgServer() grpc.Server { return &c.msgServer }
 
-func (c *countingConfigurator) QueryServer() grpc.Server { return c }
+func (c *countingConfigurator) QueryServer() grpc.Server { return &c.queryServer }
 
 func (c *countingConfigurator) RegisterMigration(string, uint64, module.MigrationHandler) error {
 	c.migrations++
 	return nil
+}
+
+type countingGRPCServer struct {
+	services []string
+}
+
+func (s *countingGRPCServer) RegisterService(descriptor *googlegrpc.ServiceDesc, _ interface{}) {
+	s.services = append(s.services, descriptor.ServiceName)
 }
