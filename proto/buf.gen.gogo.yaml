@@ -5,4 +5,6 @@ plugins:
     opt: plugins=grpc,Mgoogle/protobuf/any.proto=github.com/cosmos/cosmos-sdk/codec/types,Mcosmos/orm/v1/orm.proto=cosmossdk.io/orm
   - name: grpc-gateway
     out: ..
+    # Class IDs contain ":" and appear as the final REST path segment. Keep
+    # this enabled so grpc-gateway does not interpret the local ID as a verb.
     opt: logtostderr=true,allow_colon_final_segments=true
