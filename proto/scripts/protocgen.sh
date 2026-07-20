@@ -22,15 +22,44 @@ set -eo pipefail
 
 echo "Generating gogo proto code"
 cd proto
-proto_dirs=$(find ./panacea -path -prune -o -name '*.proto' -print0 | xargs -0 -n1 dirname | sort | uniq)
-for dir in $proto_dirs; do
-  for file in $(find "${dir}" -maxdepth 1 -name '*.proto'); do
-    buf generate --template buf.gen.gogo.yaml $file
-  done
-done
+while IFS= read -r -d '' file; do
+  buf generate --template buf.gen.gogo.yaml "$file"
+done < <(find ./panacea -name '*.proto' -print0)
 
 cd ..
 
 # move proto files to the right places
-cp -r github.com/medibloc/panacea-core/* ./
-rm -rf github.com
+module_path=$(awk '$1 == "module" { print $2; exit }' go.mod)
+if [[ -z "$module_path" || "$module_path" != */* ]]; then
+  echo "failed to determine a valid module path from go.mod" >&2
+  exit 1
+fi
+
+generated_module_dir=$module_path
+module_version=${module_path##*/}
+
+# Older protos still generate below the pre-v2 import path. Copy those entries
+# individually so the module-version directory itself is not copied to ./v2.
+case "$module_version" in
+  v[2-9]|v[1-9][0-9]*)
+    generated_legacy_dir=${module_path%/*}
+    if [[ -d "$generated_legacy_dir" ]]; then
+      for generated_entry in "$generated_legacy_dir"/*; do
+        [[ -e "$generated_entry" ]] || continue
+        [[ "$generated_entry" == "$generated_module_dir" ]] && continue
+        cp -R "$generated_entry" ./
+      done
+    fi
+    ;;
+esac
+
+if [[ -d "$generated_module_dir" ]]; then
+  cp -R "$generated_module_dir"/. ./
+fi
+
+generated_namespace=${module_path%%/*}
+if [[ ! "$generated_namespace" =~ ^[[:alnum:]][[:alnum:].-]*$ ]]; then
+  echo "refusing to remove invalid generated namespace: $generated_namespace" >&2
+  exit 1
+fi
+rm -rf -- "$generated_namespace"

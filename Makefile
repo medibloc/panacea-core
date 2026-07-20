@@ -104,7 +104,7 @@ build: BUILD_ARGS=-o $(BUILDDIR)/
 build-linux:
 	GOOS=linux GOARCH=$(if $(findstring aarch64,$(shell uname -m)) || $(findstring arm64,$(shell uname -m)),arm64,amd64) LEDGER_ENABLED=false $(MAKE) build
 
-test:
+test: proto-gen-test
 	mkdir -p $(ARTIFACT_DIR)
 	go test -covermode=count -coverprofile=$(ARTIFACT_DIR)/coverage.out ./...
 	go tool cover -html=$(ARTIFACT_DIR)/coverage.out -o $(ARTIFACT_DIR)/coverage.html
@@ -175,7 +175,10 @@ proto-all: proto-format proto-lint proto-gen
 
 proto-gen:
 	@echo "Generating Protobuf files"
-	@$(protoImage) sh ./proto/scripts/protocgen.sh
+	@$(protoImage) bash ./proto/scripts/protocgen.sh
+
+proto-gen-test:
+	@bash ./proto/scripts/protocgen_test.sh
 
 proto-swagger-gen:
 	@echo "Generating Protobuf Swagger"
@@ -194,4 +197,4 @@ proto-update-deps:
 	@echo "Updating Protobuf dependencies"
 	$(DOCKER) run --rm -v $(CURDIR)/proto:/workspace --workdir /workspace $(protoImageName) buf mod update
 
-.PHONY: proto-all proto-gen proto-swagger-gen proto-format proto-lint proto-check-breaking proto-update-deps
+.PHONY: proto-all proto-gen proto-gen-test proto-swagger-gen proto-format proto-lint proto-check-breaking proto-update-deps
