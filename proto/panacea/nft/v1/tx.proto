@@ -63,7 +63,7 @@ message MsgMintRequest {
   string recipient = 4 [(cosmos_proto.scalar) = "cosmos.AddressString"];
   string uri = 5;
   string uri_hash = 6;
-  google.protobuf.Any data = 7;
+  google.protobuf.Any data = 7 [(cosmos_proto.accepts_interface) = "panacea.nft.v1.NFTData"];
 }
 
 // MsgMintResponse is the response for Mint.

@@ -26,6 +26,8 @@ enum LiveNFTStatus {
 
 // BasicNFTData is the only NFT Data type accepted in v1.
 message BasicNFTData {
+  option (cosmos_proto.implements_interface) = "panacea.nft.v1.NFTData";
+
   string name = 1;
   string description = 2;
   string image_uri = 3;
@@ -74,7 +76,7 @@ message BurnTombstone {
   MintRecord mint = 3;
   string uri = 4;
   string uri_hash = 5;
-  google.protobuf.Any data = 6;
+  google.protobuf.Any data = 6 [(cosmos_proto.accepts_interface) = "panacea.nft.v1.NFTData"];
   Revocation revocation = 7;
   google.protobuf.Timestamp burned_at = 8 [
     (gogoproto.nullable) = false,
