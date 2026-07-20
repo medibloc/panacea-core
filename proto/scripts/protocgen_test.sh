@@ -49,7 +49,7 @@ chmod +x "$fixture_root/bin/buf"
 
 (
   cd "$fixture_root/repo"
-  PATH="$fixture_root/bin:$PATH" bash ./proto/scripts/protocgen.sh
+  PATH="$fixture_root/bin:$PATH" sh ./proto/scripts/protocgen.sh
 )
 
 test -f "$fixture_root/repo/x/nft/types/nft.pb.go"

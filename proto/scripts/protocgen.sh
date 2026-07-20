@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
 #== Requirements ==
 #
@@ -18,22 +18,24 @@
 # go get github.com/regen-network/cosmos-proto@latest # doesn't work in install mode
 
 
-set -eo pipefail
+set -eu
 
 echo "Generating gogo proto code"
 cd proto
-while IFS= read -r -d '' file; do
-  buf generate --template buf.gen.gogo.yaml "$file"
-done < <(find ./panacea -name '*.proto' -print0)
+find ./panacea -name '*.proto' \
+  -exec buf generate --template buf.gen.gogo.yaml {} \;
 
 cd ..
 
 # move proto files to the right places
 module_path=$(awk '$1 == "module" { print $2; exit }' go.mod)
-if [[ -z "$module_path" || "$module_path" != */* ]]; then
-  echo "failed to determine a valid module path from go.mod" >&2
-  exit 1
-fi
+case "$module_path" in
+  */*) ;;
+  *)
+    echo "failed to determine a valid module path from go.mod" >&2
+    exit 1
+    ;;
+esac
 
 generated_module_dir=$module_path
 module_version=${module_path##*/}
@@ -43,23 +45,25 @@ module_version=${module_path##*/}
 case "$module_version" in
   v[2-9]|v[1-9][0-9]*)
     generated_legacy_dir=${module_path%/*}
-    if [[ -d "$generated_legacy_dir" ]]; then
+    if [ -d "$generated_legacy_dir" ]; then
       for generated_entry in "$generated_legacy_dir"/*; do
-        [[ -e "$generated_entry" ]] || continue
-        [[ "$generated_entry" == "$generated_module_dir" ]] && continue
+        [ -e "$generated_entry" ] || continue
+        [ "$generated_entry" = "$generated_module_dir" ] && continue
         cp -R "$generated_entry" ./
       done
     fi
     ;;
 esac
 
-if [[ -d "$generated_module_dir" ]]; then
+if [ -d "$generated_module_dir" ]; then
   cp -R "$generated_module_dir"/. ./
 fi
 
 generated_namespace=${module_path%%/*}
-if [[ ! "$generated_namespace" =~ ^[[:alnum:]][[:alnum:].-]*$ ]]; then
-  echo "refusing to remove invalid generated namespace: $generated_namespace" >&2
-  exit 1
-fi
+case "$generated_namespace" in
+  ''|[![:alnum:]]*|*[![:alnum:].-]*)
+    echo "refusing to remove invalid generated namespace: $generated_namespace" >&2
+    exit 1
+    ;;
+esac
 rm -rf -- "$generated_namespace"

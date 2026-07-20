@@ -175,7 +175,7 @@ proto-all: proto-format proto-lint proto-gen
 
 proto-gen:
 	@echo "Generating Protobuf files"
-	@$(protoImage) bash ./proto/scripts/protocgen.sh
+	@$(protoImage) sh ./proto/scripts/protocgen.sh
 
 proto-gen-test:
 	@bash ./proto/scripts/protocgen_test.sh

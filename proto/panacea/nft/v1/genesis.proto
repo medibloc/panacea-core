@@ -1,0 +1,16 @@
+syntax = "proto3";
+package panacea.nft.v1;
+
+import "cosmos/nft/v1beta1/genesis.proto";
+import "panacea/nft/v1/nft.proto";
+
+option go_package = "github.com/medibloc/panacea-core/v2/x/nft/types";
+option java_multiple_files = true;
+
+// GenesisState combines standard NFT state with Panacea policy state.
+message GenesisState {
+  cosmos.nft.v1beta1.GenesisState nft_state = 1;
+  repeated ClassPolicy class_policies = 2;
+  repeated LifecycleRecord lifecycles = 3;
+  repeated BurnTombstone tombstones = 4;
+}
