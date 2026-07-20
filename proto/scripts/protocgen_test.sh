@@ -10,6 +10,8 @@ mkdir -p \
   "$fixture_root/repo/proto/scripts" \
   "$fixture_root/repo/proto/panacea/nft/v1" \
   "$fixture_root/repo/proto/panacea/pnft/v2" \
+  "$fixture_root/repo/x/nft/types" \
+  "$fixture_root/repo/github.com/private-data" \
   "$fixture_root/bin"
 
 cp "$repo_root/proto/scripts/protocgen.sh" "$fixture_root/repo/proto/scripts/protocgen.sh"
@@ -19,7 +21,10 @@ EOF
 touch \
   "$fixture_root/repo/proto/buf.gen.gogo.yaml" \
   "$fixture_root/repo/proto/panacea/nft/v1/nft.proto" \
-  "$fixture_root/repo/proto/panacea/pnft/v2/pnft.proto"
+  "$fixture_root/repo/proto/panacea/pnft/v2/pnft.proto" \
+  "$fixture_root/repo/x/nft/types/stale.pb.go" \
+  "$fixture_root/repo/x/nft/types/handwritten.go" \
+  "$fixture_root/repo/github.com/private-data/sentinel.txt"
 
 cat >"$fixture_root/bin/buf" <<'EOF'
 #!/usr/bin/env bash
@@ -52,9 +57,31 @@ chmod +x "$fixture_root/bin/buf"
   PATH="$fixture_root/bin:$PATH" sh ./proto/scripts/protocgen.sh
 )
 
-test -f "$fixture_root/repo/x/nft/types/nft.pb.go"
-test -f "$fixture_root/repo/x/pnft/types/pnft.pb.go"
-test ! -e "$fixture_root/repo/v2"
-test ! -e "$fixture_root/repo/github.com"
+failures=0
+
+assert_file() {
+  if [[ ! -f "$1" ]]; then
+    echo "expected file to exist: $1" >&2
+    failures=1
+  fi
+}
+
+assert_absent() {
+  if [[ -e "$1" ]]; then
+    echo "expected path to be absent: $1" >&2
+    failures=1
+  fi
+}
+
+assert_file "$fixture_root/repo/x/nft/types/nft.pb.go"
+assert_file "$fixture_root/repo/x/pnft/types/pnft.pb.go"
+assert_absent "$fixture_root/repo/x/nft/types/stale.pb.go"
+assert_file "$fixture_root/repo/x/nft/types/handwritten.go"
+assert_file "$fixture_root/repo/github.com/private-data/sentinel.txt"
+assert_absent "$fixture_root/repo/v2"
+
+if ((failures != 0)); then
+  exit 1
+fi
 
 echo "protocgen path test passed"

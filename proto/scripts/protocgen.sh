@@ -20,15 +20,25 @@
 
 set -eu
 
+script_dir=$(CDPATH='' cd "$(dirname "$0")" && pwd)
+repo_root=$(CDPATH='' cd "$script_dir/../.." && pwd)
+generation_root=$(mktemp -d "${TMPDIR:-/tmp}/panacea-protocgen.XXXXXX")
+
+cleanup() {
+  rm -rf -- "$generation_root"
+}
+
+trap cleanup EXIT
+trap 'exit 1' HUP INT TERM
+
 echo "Generating gogo proto code"
-cd proto
+cp -R "$repo_root/proto" "$generation_root/proto"
+cd "$generation_root/proto"
 find ./panacea -name '*.proto' \
   -exec buf generate --template buf.gen.gogo.yaml {} \;
 
-cd ..
-
 # move proto files to the right places
-module_path=$(awk '$1 == "module" { print $2; exit }' go.mod)
+module_path=$(awk '$1 == "module" { print $2; exit }' "$repo_root/go.mod")
 case "$module_path" in
   */*) ;;
   *)
@@ -37,33 +47,59 @@ case "$module_path" in
     ;;
 esac
 
-generated_module_dir=$module_path
+case "$module_path" in
+  /*|../*|*/../*|*/..|./*|*/./*|*/.)
+    echo "refusing to use unsafe module path: $module_path" >&2
+    exit 1
+    ;;
+esac
+
+generated_module_dir=$generation_root/$module_path
 module_version=${module_path##*/}
+staged_repo_root=$generation_root/staged-repo
+mkdir -p "$staged_repo_root"
 
 # Older protos still generate below the pre-v2 import path. Copy those entries
 # individually so the module-version directory itself is not copied to ./v2.
 case "$module_version" in
   v[2-9]|v[1-9][0-9]*)
-    generated_legacy_dir=${module_path%/*}
+    generated_legacy_dir=$generation_root/${module_path%/*}
     if [ -d "$generated_legacy_dir" ]; then
       for generated_entry in "$generated_legacy_dir"/*; do
         [ -e "$generated_entry" ] || continue
         [ "$generated_entry" = "$generated_module_dir" ] && continue
-        cp -R "$generated_entry" ./
+        cp -R "$generated_entry" "$staged_repo_root"/
       done
     fi
     ;;
 esac
 
 if [ -d "$generated_module_dir" ]; then
-  cp -R "$generated_module_dir"/. ./
+  cp -R "$generated_module_dir"/. "$staged_repo_root"/
 fi
 
-generated_namespace=${module_path%%/*}
-case "$generated_namespace" in
-  ''|[![:alnum:]]*|*[![:alnum:].-]*)
-    echo "refusing to remove invalid generated namespace: $generated_namespace" >&2
-    exit 1
-    ;;
-esac
-rm -rf -- "$generated_namespace"
+generated_manifest=$generation_root/generated-files.txt
+(
+  cd "$staged_repo_root"
+  find ./x -type f \( -name '*.pb.go' -o -name '*.pb.gw.go' \) -print \
+    | LC_ALL=C sort >"$generated_manifest"
+)
+
+if [ ! -s "$generated_manifest" ]; then
+  echo "protobuf generation produced no Go files" >&2
+  exit 1
+fi
+
+cp -R "$staged_repo_root"/. "$repo_root"/
+
+# All protobuf Go files below x/ are generated from proto/panacea. Remove files
+# that were not produced by this run so deleted or renamed protos cannot linger.
+(
+  cd "$repo_root"
+  find ./x -type f \( -name '*.pb.go' -o -name '*.pb.gw.go' \) -print |
+    while IFS= read -r generated_file; do
+      if ! grep -Fqx "$generated_file" "$generated_manifest"; then
+        rm -f -- "$generated_file"
+      fi
+    done
+)
