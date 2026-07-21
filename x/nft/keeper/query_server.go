@@ -2,9 +2,7 @@ package keeper
 
 import (
 	"context"
-	"errors"
 
-	upstreamnft "cosmossdk.io/x/nft"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/medibloc/panacea-core/v2/x/nft/types"
 	"google.golang.org/grpc/codes"
@@ -35,11 +33,8 @@ func (q queryServer) ClassRecord(
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	record, err := q.keeper.getClassRecord(ctx, request.ClassId)
-	if errors.Is(err, upstreamnft.ErrClassNotExists) {
-		return nil, status.Error(codes.NotFound, err.Error())
-	}
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, mapQueryStateError(err)
 	}
 	return &types.QueryClassRecordResponse{ClassRecord: record}, nil
 }
@@ -61,11 +56,8 @@ func (q queryServer) NFTRecord(
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	record, err := q.keeper.getNFTRecord(ctx, request.ClassId, request.NftId)
-	if errors.Is(err, upstreamnft.ErrNFTNotExists) {
-		return nil, status.Error(codes.NotFound, err.Error())
-	}
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, mapQueryStateError(err)
 	}
 	return &types.QueryNFTRecordResponse{NftRecord: record}, nil
 }
