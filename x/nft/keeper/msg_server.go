@@ -188,3 +188,36 @@ func (m msgServer) Revoke(
 
 	return &types.MsgRevokeResponse{}, nil
 }
+
+// Burn permanently removes one live NFT and preserves its history.
+func (m msgServer) Burn(
+	goCtx context.Context,
+	request *types.MsgBurnRequest,
+) (*types.MsgBurnResponse, error) {
+	if request == nil {
+		return nil, sdkerrors.ErrInvalidRequest.Wrap("empty request")
+	}
+	if err := m.keeper.validateCanonicalClassID(request.ClassId); err != nil {
+		return nil, err
+	}
+	if err := types.ValidateNFTID(request.NftId); err != nil {
+		return nil, err
+	}
+	owner, ownerAddress, err := m.keeper.canonicalNonModuleAccount("owner", request.Owner)
+	if err != nil {
+		return nil, err
+	}
+
+	ctx := sdk.UnwrapSDKContext(goCtx)
+	if err := m.keeper.burnNFT(
+		ctx,
+		request.ClassId,
+		request.NftId,
+		owner,
+		ownerAddress,
+	); err != nil {
+		return nil, err
+	}
+
+	return &types.MsgBurnResponse{}, nil
+}
