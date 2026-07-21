@@ -90,23 +90,9 @@ func (k Keeper) getLiveNFTRecord(
 	classID string,
 	nftID string,
 ) (*types.LiveNFTRecord, error) {
-	state, err := k.loadNFTState(ctx, classID, nftID)
+	state, classRecord, err := k.loadLiveNFTState(ctx, classID, nftID)
 	if err != nil {
 		return nil, err
-	}
-	if err := state.validateLiveCombination(classID, nftID); err != nil {
-		return nil, err
-	}
-	if !state.hasNFT {
-		return nil, upstreamnft.ErrNFTNotExists.Wrapf(
-			"nft %s in class %s not found",
-			nftID,
-			classID,
-		)
-	}
-	classRecord, err := k.getClassRecord(ctx, classID)
-	if err != nil {
-		return nil, fmt.Errorf("load class for nft %s: %w", nftID, err)
 	}
 	liveSupply := k.nftKeeper.GetTotalSupply(ctx, classID)
 	if liveSupply == 0 || classRecord.MintedCount == 0 || liveSupply > classRecord.MintedCount {
@@ -155,19 +141,9 @@ func (k Keeper) getLiveNFTRecord(
 }
 
 func (k Keeper) ensureNFTTransferAllowed(ctx sdk.Context, classID, nftID string) error {
-	state, err := k.loadNFTState(ctx, classID, nftID)
+	state, record, err := k.loadLiveNFTState(ctx, classID, nftID)
 	if err != nil {
 		return err
-	}
-	if err := state.validateLiveCombination(classID, nftID); err != nil {
-		return err
-	}
-	if !state.hasNFT {
-		return upstreamnft.ErrNFTNotExists.Wrapf(
-			"nft %s in class %s not found",
-			nftID,
-			classID,
-		)
 	}
 	if state.lifecycle.Revocation != nil {
 		return types.ErrNFTRevoked.Wrapf(
@@ -177,10 +153,6 @@ func (k Keeper) ensureNFTTransferAllowed(ctx sdk.Context, classID, nftID string)
 		)
 	}
 
-	record, err := k.getClassRecord(ctx, classID)
-	if err != nil {
-		return fmt.Errorf("load class policy for nft %s: %w", nftID, err)
-	}
 	if record.Policy.TransferPolicy != types.TransferPolicy_TRANSFER_POLICY_OWNER_TRANSFERABLE {
 		return types.ErrTransferNotAllowed.Wrapf(
 			"class %s does not allow owner transfers",
@@ -188,6 +160,39 @@ func (k Keeper) ensureNFTTransferAllowed(ctx sdk.Context, classID, nftID string)
 		)
 	}
 	return nil
+}
+
+func (k Keeper) loadLiveNFTState(
+	ctx sdk.Context,
+	classID string,
+	nftID string,
+) (storedNFTState, *types.ClassRecord, error) {
+	state, err := k.loadNFTState(ctx, classID, nftID)
+	if err != nil {
+		return storedNFTState{}, nil, err
+	}
+	if err := state.validateLiveCombination(classID, nftID); err != nil {
+		return storedNFTState{}, nil, err
+	}
+	if !state.hasNFT {
+		return storedNFTState{}, nil, upstreamnft.ErrNFTNotExists.Wrapf(
+			"nft %s in class %s not found",
+			nftID,
+			classID,
+		)
+	}
+	record, err := k.getClassRecord(ctx, classID)
+	if errors.Is(err, upstreamnft.ErrClassNotExists) {
+		return storedNFTState{}, nil, fmt.Errorf(
+			"live nft %s in class %s references missing class state",
+			nftID,
+			classID,
+		)
+	}
+	if err != nil {
+		return storedNFTState{}, nil, fmt.Errorf("load class state for nft %s: %w", nftID, err)
+	}
+	return state, record, nil
 }
 
 func (k Keeper) loadNFTState(
@@ -247,6 +252,39 @@ func (k Keeper) loadNFTState(
 		if canonicalMinter != state.lifecycle.Mint.MintedBy {
 			return storedNFTState{}, fmt.Errorf(
 				"nft lifecycle minter is not canonical for %s/%s",
+				classID,
+				nftID,
+			)
+		}
+	}
+	if state.hasLifecycle && state.lifecycle.Revocation != nil {
+		revocation := state.lifecycle.Revocation
+		if revocation.RevokedAt.IsZero() {
+			return storedNFTState{}, fmt.Errorf(
+				"nft lifecycle has no revocation time for %s/%s",
+				classID,
+				nftID,
+			)
+		}
+		if revocation.RevokedAt.Before(state.lifecycle.Mint.MintedAt) {
+			return storedNFTState{}, fmt.Errorf(
+				"nft lifecycle revocation predates mint for %s/%s",
+				classID,
+				nftID,
+			)
+		}
+		canonicalRevoker, _, err := k.canonicalAddress("stored revoked_by", revocation.RevokedBy)
+		if err != nil {
+			return storedNFTState{}, fmt.Errorf(
+				"nft lifecycle has invalid revoker for %s/%s: %w",
+				classID,
+				nftID,
+				err,
+			)
+		}
+		if canonicalRevoker != revocation.RevokedBy {
+			return storedNFTState{}, fmt.Errorf(
+				"nft lifecycle revoker is not canonical for %s/%s",
 				classID,
 				nftID,
 			)

@@ -156,3 +156,35 @@ func (m msgServer) Mint(
 
 	return &types.MsgMintResponse{}, nil
 }
+
+// Revoke irreversibly transitions one live NFT from ACTIVE to REVOKED.
+func (m msgServer) Revoke(
+	goCtx context.Context,
+	request *types.MsgRevokeRequest,
+) (*types.MsgRevokeResponse, error) {
+	if request == nil {
+		return nil, sdkerrors.ErrInvalidRequest.Wrap("empty request")
+	}
+	if err := m.keeper.validateCanonicalClassID(request.ClassId); err != nil {
+		return nil, err
+	}
+	if err := types.ValidateNFTID(request.NftId); err != nil {
+		return nil, err
+	}
+	controller, _, err := m.keeper.canonicalAddress("controller", request.Controller)
+	if err != nil {
+		return nil, err
+	}
+
+	ctx := sdk.UnwrapSDKContext(goCtx)
+	if err := m.keeper.revokeNFT(
+		ctx,
+		request.ClassId,
+		request.NftId,
+		controller,
+	); err != nil {
+		return nil, err
+	}
+
+	return &types.MsgRevokeResponse{}, nil
+}
