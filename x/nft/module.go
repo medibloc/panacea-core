@@ -59,13 +59,17 @@ func (AppModuleBasic) DefaultGenesis(cdc codec.JSONCodec) json.RawMessage {
 	return cdc.MustMarshalJSON(types.DefaultGenesis())
 }
 
-// ValidateGenesis validates the empty combined genesis contract.
+// ValidateGenesis validates the combined standard and policy genesis contract.
 func (am AppModuleBasic) ValidateGenesis(cdc codec.JSONCodec, _ client.TxEncodingConfig, data json.RawMessage) error {
 	var genesis types.GenesisState
 	if err := cdc.UnmarshalJSON(data, &genesis); err != nil {
 		return fmt.Errorf("unmarshal %s genesis: %w", types.ModuleName, err)
 	}
-	return types.ValidateGenesis(genesis, am.addressCodec)
+	unpacker, ok := cdc.(cdctypes.AnyUnpacker)
+	if !ok {
+		return fmt.Errorf("%s genesis codec cannot unpack protobuf Any values", types.ModuleName)
+	}
+	return types.ValidateGenesis(genesis, am.addressCodec, unpacker)
 }
 
 // RegisterGRPCGatewayRoutes registers the Panacea combined query routes.
@@ -113,7 +117,7 @@ func (am AppModule) RegisterServices(configurator module.Configurator) {
 // RegisterInvariants registers no runtime-wide invariant route.
 func (AppModule) RegisterInvariants(sdk.InvariantRegistry) {}
 
-// InitGenesis initializes both empty stores and returns no validator updates.
+// InitGenesis atomically initializes both stores and returns no validator updates.
 func (am AppModule) InitGenesis(ctx sdk.Context, cdc codec.JSONCodec, data json.RawMessage) []abci.ValidatorUpdate {
 	var genesis types.GenesisState
 	cdc.MustUnmarshalJSON(data, &genesis)
