@@ -44,7 +44,7 @@ func (q queryServer) ClassRecord(
 	return &types.QueryClassRecordResponse{ClassRecord: record}, nil
 }
 
-// NFTRecord returns one ACTIVE or REVOKED standard NFT with its lifecycle.
+// NFTRecord returns one live NFT or its permanent burn tombstone.
 func (q queryServer) NFTRecord(
 	goCtx context.Context,
 	request *types.QueryNFTRecordRequest,
@@ -60,16 +60,12 @@ func (q queryServer) NFTRecord(
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	live, err := q.keeper.getLiveNFTRecord(ctx, request.ClassId, request.NftId)
+	record, err := q.keeper.getNFTRecord(ctx, request.ClassId, request.NftId)
 	if errors.Is(err, upstreamnft.ErrNFTNotExists) {
 		return nil, status.Error(codes.NotFound, err.Error())
 	}
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
-	return &types.QueryNFTRecordResponse{
-		NftRecord: &types.NFTRecord{
-			Record: &types.NFTRecord_Live{Live: live},
-		},
-	}, nil
+	return &types.QueryNFTRecordResponse{NftRecord: record}, nil
 }

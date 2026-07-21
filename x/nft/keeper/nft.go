@@ -140,6 +140,218 @@ func (k Keeper) getLiveNFTRecord(
 	}, nil
 }
 
+func (k Keeper) getNFTRecord(
+	ctx sdk.Context,
+	classID string,
+	nftID string,
+) (*types.NFTRecord, error) {
+	state, err := k.loadNFTState(ctx, classID, nftID)
+	if err != nil {
+		return nil, err
+	}
+	if err := state.validateLiveCombination(classID, nftID); err != nil {
+		return nil, err
+	}
+	if state.hasNFT {
+		live, err := k.getLiveNFTRecord(ctx, classID, nftID)
+		if err != nil {
+			return nil, err
+		}
+		return &types.NFTRecord{
+			Record: &types.NFTRecord_Live{Live: live},
+		}, nil
+	}
+	if state.hasTombstone {
+		tombstone, err := k.getBurnTombstone(ctx, classID, nftID, state.tombstone)
+		if err != nil {
+			return nil, err
+		}
+		return &types.NFTRecord{
+			Record: &types.NFTRecord_BurnTombstone{BurnTombstone: tombstone},
+		}, nil
+	}
+	return nil, upstreamnft.ErrNFTNotExists.Wrapf(
+		"nft %s in class %s not found",
+		nftID,
+		classID,
+	)
+}
+
+func (k Keeper) getBurnTombstone(
+	ctx sdk.Context,
+	classID string,
+	nftID string,
+	tombstone types.BurnTombstone,
+) (*types.BurnTombstone, error) {
+	classRecord, err := k.getClassRecord(ctx, classID)
+	if errors.Is(err, upstreamnft.ErrClassNotExists) {
+		return nil, fmt.Errorf(
+			"nft tombstone %s in class %s references missing class state",
+			nftID,
+			classID,
+		)
+	}
+	if err != nil {
+		return nil, fmt.Errorf("load class state for nft tombstone %s: %w", nftID, err)
+	}
+	liveSupply := k.nftKeeper.GetTotalSupply(ctx, classID)
+	if classRecord.MintedCount == 0 || liveSupply >= classRecord.MintedCount {
+		return nil, fmt.Errorf(
+			"nft tombstone %s in class %s has inconsistent supply %d and minted count %d",
+			nftID,
+			classID,
+			liveSupply,
+			classRecord.MintedCount,
+		)
+	}
+
+	canonical, err := k.canonicalBurnTombstone(classID, nftID, tombstone)
+	if err != nil {
+		return nil, err
+	}
+	return &canonical, nil
+}
+
+func (k Keeper) canonicalBurnTombstone(
+	classID string,
+	nftID string,
+	tombstone types.BurnTombstone,
+) (types.BurnTombstone, error) {
+	if tombstone.ClassId != classID || tombstone.NftId != nftID {
+		return types.BurnTombstone{}, fmt.Errorf(
+			"nft tombstone key does not match value for %s/%s",
+			classID,
+			nftID,
+		)
+	}
+	if tombstone.Mint == nil {
+		return types.BurnTombstone{}, fmt.Errorf(
+			"nft tombstone has no mint record for %s/%s",
+			classID,
+			nftID,
+		)
+	}
+	if tombstone.Mint.MintedAt.IsZero() {
+		return types.BurnTombstone{}, fmt.Errorf(
+			"nft tombstone has no mint time for %s/%s",
+			classID,
+			nftID,
+		)
+	}
+	canonicalMinter, _, err := k.canonicalNonModuleAccount(
+		"stored tombstone minted_by",
+		tombstone.Mint.MintedBy,
+	)
+	if err != nil {
+		return types.BurnTombstone{}, fmt.Errorf(
+			"nft tombstone has invalid minter for %s/%s: %w",
+			classID,
+			nftID,
+			err,
+		)
+	}
+	if canonicalMinter != tombstone.Mint.MintedBy {
+		return types.BurnTombstone{}, fmt.Errorf(
+			"nft tombstone minter is not canonical for %s/%s",
+			classID,
+			nftID,
+		)
+	}
+	if err := types.ValidateURI(tombstone.Uri, tombstone.UriHash); err != nil {
+		return types.BurnTombstone{}, fmt.Errorf(
+			"nft tombstone %s has invalid stored URI metadata: %w",
+			nftID,
+			err,
+		)
+	}
+	canonicalData, err := types.CanonicalizeNFTData(k.cdc, tombstone.Data)
+	if err != nil {
+		return types.BurnTombstone{}, fmt.Errorf(
+			"nft tombstone %s has invalid stored data: %w",
+			nftID,
+			err,
+		)
+	}
+	if tombstone.Revocation != nil {
+		if tombstone.Revocation.RevokedAt.IsZero() {
+			return types.BurnTombstone{}, fmt.Errorf(
+				"nft tombstone has no revocation time for %s/%s",
+				classID,
+				nftID,
+			)
+		}
+		if tombstone.Revocation.RevokedAt.Before(tombstone.Mint.MintedAt) {
+			return types.BurnTombstone{}, fmt.Errorf(
+				"nft tombstone revocation predates mint for %s/%s",
+				classID,
+				nftID,
+			)
+		}
+		canonicalRevoker, _, err := k.canonicalNonModuleAccount(
+			"stored tombstone revoked_by",
+			tombstone.Revocation.RevokedBy,
+		)
+		if err != nil {
+			return types.BurnTombstone{}, fmt.Errorf(
+				"nft tombstone has invalid revoker for %s/%s: %w",
+				classID,
+				nftID,
+				err,
+			)
+		}
+		if canonicalRevoker != tombstone.Revocation.RevokedBy {
+			return types.BurnTombstone{}, fmt.Errorf(
+				"nft tombstone revoker is not canonical for %s/%s",
+				classID,
+				nftID,
+			)
+		}
+	}
+	if tombstone.BurnedAt.IsZero() {
+		return types.BurnTombstone{}, fmt.Errorf(
+			"nft tombstone has no burn time for %s/%s",
+			classID,
+			nftID,
+		)
+	}
+	if tombstone.BurnedAt.Before(tombstone.Mint.MintedAt) {
+		return types.BurnTombstone{}, fmt.Errorf(
+			"nft tombstone burn predates mint for %s/%s",
+			classID,
+			nftID,
+		)
+	}
+	if tombstone.Revocation != nil && tombstone.BurnedAt.Before(tombstone.Revocation.RevokedAt) {
+		return types.BurnTombstone{}, fmt.Errorf(
+			"nft tombstone burn predates revocation for %s/%s",
+			classID,
+			nftID,
+		)
+	}
+	canonicalBurner, _, err := k.canonicalNonModuleAccount(
+		"stored tombstone burned_by",
+		tombstone.BurnedBy,
+	)
+	if err != nil {
+		return types.BurnTombstone{}, fmt.Errorf(
+			"nft tombstone has invalid burner for %s/%s: %w",
+			classID,
+			nftID,
+			err,
+		)
+	}
+	if canonicalBurner != tombstone.BurnedBy {
+		return types.BurnTombstone{}, fmt.Errorf(
+			"nft tombstone burner is not canonical for %s/%s",
+			classID,
+			nftID,
+		)
+	}
+
+	tombstone.Data = canonicalData
+	return tombstone, nil
+}
+
 func (k Keeper) ensureNFTTransferAllowed(ctx sdk.Context, classID, nftID string) error {
 	state, record, err := k.loadLiveNFTState(ctx, classID, nftID)
 	if err != nil {
