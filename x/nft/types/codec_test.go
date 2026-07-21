@@ -168,13 +168,18 @@ func TestLegacyAminoJSONSignModeWithNFTData(t *testing.T) {
 		UriHash:    "nft-hash",
 		Data:       data,
 	}
+	binary, err := encodingConfig.Codec.Marshal(msg)
+	require.NoError(t, err)
+	var decodedMsg MsgMintRequest
+	require.NoError(t, encodingConfig.Codec.Unmarshal(binary, &decodedMsg))
+	require.IsType(t, &BasicNFTData{}, decodedMsg.Data.GetCachedValue())
 
 	txBuilder := encodingConfig.TxConfig.NewTxBuilder()
 	txBuilder.SetFeeAmount(sdk.NewCoins(sdk.NewInt64Coin("umed", 10)))
 	txBuilder.SetGasLimit(200000)
 	txBuilder.SetMemo("memo")
 	txBuilder.SetTimeoutHeight(123)
-	require.NoError(t, txBuilder.SetMsgs(msg))
+	require.NoError(t, txBuilder.SetMsgs(&decodedMsg))
 
 	signBytes, err := authsigning.GetSignBytesAdapter(
 		context.Background(),
@@ -390,6 +395,66 @@ func TestBurnTombstoneContainersUnpackNFTData(t *testing.T) {
 	require.NoError(t, err)
 	err = cdc.Unmarshal(binary, &decodedTombstone)
 	require.ErrorContains(t, err, "no concrete type registered for type URL")
+}
+
+func TestLiveNFTContainersUnpackNFTData(t *testing.T) {
+	_, cdc := newTestCodec()
+	data, err := cdctypes.NewAnyWithValue(&BasicNFTData{Name: "metadata"})
+	require.NoError(t, err)
+	live := &LiveNFTRecord{
+		Nft: &upstreamnft.NFT{Data: data},
+	}
+
+	binary, err := cdc.Marshal(live)
+	require.NoError(t, err)
+	var decodedLive LiveNFTRecord
+	require.NoError(t, cdc.Unmarshal(binary, &decodedLive))
+	require.IsType(t, &BasicNFTData{}, decodedLive.Nft.Data.GetCachedValue())
+
+	pointResponse := &QueryNFTRecordResponse{
+		NftRecord: &NFTRecord{
+			Record: &NFTRecord_Live{Live: live},
+		},
+	}
+	binary, err = cdc.Marshal(pointResponse)
+	require.NoError(t, err)
+	var decodedPointResponse QueryNFTRecordResponse
+	require.NoError(t, cdc.Unmarshal(binary, &decodedPointResponse))
+	require.IsType(
+		t,
+		&BasicNFTData{},
+		decodedPointResponse.NftRecord.GetLive().Nft.Data.GetCachedValue(),
+	)
+
+	listResponse := &QueryNFTRecordsResponse{
+		NftRecords: []*LiveNFTRecord{live},
+	}
+	binary, err = cdc.Marshal(listResponse)
+	require.NoError(t, err)
+	var decodedListResponse QueryNFTRecordsResponse
+	require.NoError(t, cdc.Unmarshal(binary, &decodedListResponse))
+	require.IsType(
+		t,
+		&BasicNFTData{},
+		decodedListResponse.NftRecords[0].Nft.Data.GetCachedValue(),
+	)
+
+	genesis := &GenesisState{
+		NftState: &upstreamnft.GenesisState{
+			Entries: []*upstreamnft.Entry{
+				{Nfts: []*upstreamnft.NFT{{Data: data}}},
+			},
+		},
+	}
+	binary, err = cdc.Marshal(genesis)
+	require.NoError(t, err)
+	var decodedGenesis GenesisState
+	require.NoError(t, cdc.Unmarshal(binary, &decodedGenesis))
+	require.IsType(
+		t,
+		&BasicNFTData{},
+		decodedGenesis.NftState.Entries[0].Nfts[0].Data.GetCachedValue(),
+	)
 }
 
 func TestUnknownNFTDataTypeURLFailsToDecode(t *testing.T) {
