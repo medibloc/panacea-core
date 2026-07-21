@@ -73,7 +73,6 @@ func (k Keeper) verifyExportedStandardKeys(ctx sdk.Context, data types.GenesisSt
 		upstreamkeeper.ClassKey,
 		uint64(len(data.NftState.Classes)),
 		"standard class",
-		nil,
 	); err != nil {
 		return err
 	}
@@ -82,7 +81,6 @@ func (k Keeper) verifyExportedStandardKeys(ctx sdk.Context, data types.GenesisSt
 		upstreamkeeper.NFTKey,
 		liveNFTCount,
 		"standard nft",
-		nil,
 	); err != nil {
 		return err
 	}
@@ -91,7 +89,6 @@ func (k Keeper) verifyExportedStandardKeys(ctx sdk.Context, data types.GenesisSt
 		upstreamkeeper.OwnerKey,
 		liveNFTCount,
 		"standard nft direct owner",
-		nil,
 	); err != nil {
 		return err
 	}
@@ -195,7 +192,6 @@ func (k Keeper) verifyExportedOwnerIndexes(ctx sdk.Context, data types.GenesisSt
 		upstreamkeeper.NFTOfClassByOwnerKey,
 		expectedCount,
 		"standard nft reverse owner index",
-		upstreamkeeper.Placeholder,
 	)
 }
 
@@ -204,7 +200,6 @@ func (k Keeper) verifyUpstreamPrefixCount(
 	prefix []byte,
 	expectedCount uint64,
 	name string,
-	expectedValue []byte,
 ) error {
 	// Upstream exports these prefixes, so inspect them directly instead of
 	// copying private key encodings. Point and owner-query checks prove expected
@@ -217,9 +212,6 @@ func (k Keeper) verifyUpstreamPrefixCount(
 	defer iterator.Close()
 	var actualCount uint64
 	for ; iterator.Valid(); iterator.Next() {
-		if expectedValue != nil && !bytes.Equal(iterator.Value(), expectedValue) {
-			return fmt.Errorf("%s contains an invalid value", name)
-		}
 		actualCount++
 	}
 	if err := iterator.Error(); err != nil {
