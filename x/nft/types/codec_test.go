@@ -341,6 +341,57 @@ func TestMsgMintRequestUnpacksNFTData(t *testing.T) {
 	require.ErrorContains(t, err, "no concrete type registered for type URL")
 }
 
+func TestBurnTombstoneContainersUnpackNFTData(t *testing.T) {
+	_, cdc := newTestCodec()
+	data, err := cdctypes.NewAnyWithValue(&BasicNFTData{Name: "metadata"})
+	require.NoError(t, err)
+	tombstone := &BurnTombstone{Data: data}
+
+	binary, err := cdc.Marshal(tombstone)
+	require.NoError(t, err)
+	var decodedTombstone BurnTombstone
+	require.NoError(t, cdc.Unmarshal(binary, &decodedTombstone))
+	require.IsType(t, &BasicNFTData{}, decodedTombstone.Data.GetCachedValue())
+
+	genesis := &GenesisState{
+		NftState:   upstreamnft.DefaultGenesisState(),
+		Tombstones: []*BurnTombstone{tombstone},
+	}
+	binary, err = cdc.Marshal(genesis)
+	require.NoError(t, err)
+	var decodedGenesis GenesisState
+	require.NoError(t, cdc.Unmarshal(binary, &decodedGenesis))
+	require.IsType(
+		t,
+		&BasicNFTData{},
+		decodedGenesis.Tombstones[0].Data.GetCachedValue(),
+	)
+
+	response := &QueryNFTRecordResponse{
+		NftRecord: &NFTRecord{
+			Record: &NFTRecord_BurnTombstone{BurnTombstone: tombstone},
+		},
+	}
+	binary, err = cdc.Marshal(response)
+	require.NoError(t, err)
+	var decodedResponse QueryNFTRecordResponse
+	require.NoError(t, cdc.Unmarshal(binary, &decodedResponse))
+	require.IsType(
+		t,
+		&BasicNFTData{},
+		decodedResponse.NftRecord.GetBurnTombstone().Data.GetCachedValue(),
+	)
+
+	unknown := &BurnTombstone{Data: &cdctypes.Any{
+		TypeUrl: "/panacea.nft.v1.UnknownNFTData",
+		Value:   data.Value,
+	}}
+	binary, err = cdc.Marshal(unknown)
+	require.NoError(t, err)
+	err = cdc.Unmarshal(binary, &decodedTombstone)
+	require.ErrorContains(t, err, "no concrete type registered for type URL")
+}
+
 func TestUnknownNFTDataTypeURLFailsToDecode(t *testing.T) {
 	registry, cdc := newTestCodec()
 	unknown := &cdctypes.Any{
