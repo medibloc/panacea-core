@@ -152,6 +152,9 @@ func (k Keeper) ExportGenesis(ctx sdk.Context) (*types.GenesisState, error) {
 	if err := k.verifyExportedDerivedState(ctx, *exported); err != nil {
 		return nil, err
 	}
+	if err := k.verifyExportedPhysicalState(ctx, *exported); err != nil {
+		return nil, err
+	}
 	return exported, nil
 }
 
