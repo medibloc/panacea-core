@@ -5,6 +5,7 @@ import (
 
 	upstreamnft "cosmossdk.io/x/nft"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/medibloc/panacea-core/v2/x/nft/types"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -41,4 +42,27 @@ func (q standardQueryServer) Class(
 		return nil, mapQueryStateError(err)
 	}
 	return &upstreamnft.QueryClassResponse{Class: record.Class}, nil
+}
+
+// NFT returns standard NFT metadata for an active or revoked NFT.
+func (q standardQueryServer) NFT(
+	goCtx context.Context,
+	request *upstreamnft.QueryNFTRequest,
+) (*upstreamnft.QueryNFTResponse, error) {
+	if request == nil {
+		return nil, status.Error(codes.InvalidArgument, "empty request")
+	}
+	if err := q.keeper.validateCanonicalClassID(request.ClassId); err != nil {
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+	if err := types.ValidateNFTID(request.Id); err != nil {
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	ctx := sdk.UnwrapSDKContext(goCtx)
+	live, err := q.keeper.getLiveNFTRecord(ctx, request.ClassId, request.Id)
+	if err != nil {
+		return nil, mapQueryStateError(err)
+	}
+	return &upstreamnft.QueryNFTResponse{Nft: live.Nft}, nil
 }
