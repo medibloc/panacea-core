@@ -24,7 +24,8 @@ import (
 func TestModuleConstants(t *testing.T) {
 	require.Equal(t, upstreamnft.ModuleName, ModuleName)
 	require.Equal(t, upstreamnft.StoreKey, StoreKey)
-	require.Equal(t, "nftpolicy", PolicyStoreKey)
+	require.Equal(t, "policy_nft", PolicyStoreKey)
+	require.Equal(t, "nftpolicy", PolicyCodespace)
 	require.Equal(t, ModuleName, RouterKey)
 	require.Equal(t, ModuleName, QuerierRoute)
 	require.Equal(t, "/panacea.nft.v1.BasicNFTData", BasicNFTDataTypeURL)
@@ -47,7 +48,7 @@ func TestSentinelErrorContract(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			codespace, code, _ := errorsmod.ABCIInfo(tc.err, false)
-			require.Equal(t, PolicyStoreKey, codespace)
+			require.Equal(t, PolicyCodespace, codespace)
 			require.Equal(t, tc.code, code)
 		})
 	}

@@ -9,11 +9,13 @@ import (
 	storetypes "cosmossdk.io/store/types"
 	upgradetypes "cosmossdk.io/x/upgrade/types"
 	dbm "github.com/cosmos/cosmos-db"
+	nfttypes "github.com/medibloc/panacea-core/v2/x/nft/types"
 	pnfttypes "github.com/medibloc/panacea-core/v2/x/pnft/types"
 	"github.com/stretchr/testify/require"
 )
 
-func TestStoreUpgradeDeletesLegacyPNFTStore(t *testing.T) {
+func TestStoreUpgradeAddsNFTStoresAndDeletesLegacyPNFTStore(t *testing.T) {
+	require.Equal(t, []string{nfttypes.StoreKey, nfttypes.PolicyStoreKey}, Upgrade.StoreUpgrades.Added)
 	require.Equal(t, []string{pnfttypes.StoreKey}, Upgrade.StoreUpgrades.Deleted)
 
 	db := dbm.NewMemDB()
@@ -31,14 +33,24 @@ func TestStoreUpgradeDeletesLegacyPNFTStore(t *testing.T) {
 	require.Equal(t, int64(1), legacyStore.Commit().Version)
 
 	upgradedStore := rootmulti.NewStore(db, log.NewNopLogger(), metrics.NewNoOpMetrics())
+	nftKey := storetypes.NewKVStoreKey(nfttypes.StoreKey)
+	policyKey := storetypes.NewKVStoreKey(nfttypes.PolicyStoreKey)
 	upgradedStore.MountStoreWithDB(stableKey, storetypes.StoreTypeIAVL, nil)
+	upgradedStore.MountStoreWithDB(nftKey, storetypes.StoreTypeIAVL, nil)
+	upgradedStore.MountStoreWithDB(policyKey, storetypes.StoreTypeIAVL, nil)
 	loader := upgradetypes.UpgradeStoreLoader(2, &Upgrade.StoreUpgrades)
 	require.NoError(t, loader(upgradedStore))
 	require.Equal(t, []byte("value"), upgradedStore.GetStore(stableKey).(storetypes.KVStore).Get([]byte("preserved")))
+
+	require.NotNil(t, upgradedStore.GetStore(nftKey))
+	require.NotNil(t, upgradedStore.GetStore(policyKey))
 	require.Equal(t, int64(2), upgradedStore.Commit().Version)
 
 	commitInfo, err := upgradedStore.GetCommitInfo(2)
 	require.NoError(t, err)
-	require.Len(t, commitInfo.StoreInfos, 1)
-	require.Equal(t, "stable", commitInfo.StoreInfos[0].Name)
+	storeNames := make([]string, 0, len(commitInfo.StoreInfos))
+	for _, storeInfo := range commitInfo.StoreInfos {
+		storeNames = append(storeNames, storeInfo.Name)
+	}
+	require.ElementsMatch(t, []string{"stable", nfttypes.StoreKey, nfttypes.PolicyStoreKey}, storeNames)
 }

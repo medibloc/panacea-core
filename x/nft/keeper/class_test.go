@@ -209,7 +209,7 @@ func TestCreateClassRejectsDuplicate(t *testing.T) {
 }
 
 func TestCreateClassWritesBothStoresAtomically(t *testing.T) {
-	for _, failStore := range []string{"nft", "nftpolicy"} {
+	for _, failStore := range []string{"nft", "policy_nft"} {
 		t.Run(failStore, func(t *testing.T) {
 			fixture := newKeeperFixture(t, true, true)
 			creator := fixture.accountAddress(t, sdk.AccAddress(bytes.Repeat([]byte{5}, 20)))

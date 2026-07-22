@@ -9,7 +9,6 @@ import (
 	"cosmossdk.io/core/header"
 	"cosmossdk.io/log"
 	"cosmossdk.io/x/feegrant"
-	"cosmossdk.io/x/nft"
 	upgradetypes "cosmossdk.io/x/upgrade/types"
 	abci "github.com/cometbft/cometbft/abci/types"
 	cmtjson "github.com/cometbft/cometbft/libs/json"
@@ -36,6 +35,7 @@ import (
 
 	panaceaapp "github.com/medibloc/panacea-core/v2/app"
 	"github.com/medibloc/panacea-core/v2/app/upgrades/v2_3_0"
+	nfttypes "github.com/medibloc/panacea-core/v2/x/nft/types"
 	pnftlegacy "github.com/medibloc/panacea-core/v2/x/pnft/legacy"
 	pnfttypes "github.com/medibloc/panacea-core/v2/x/pnft/types"
 )
@@ -88,22 +88,32 @@ func TestCapabilityWiring(t *testing.T) {
 	require.Equal(t, capabilitytypes.ModuleName, testApp.ModuleManager.OrderExportGenesis[0])
 }
 
-func TestPNFTCompatibilityWiring(t *testing.T) {
+func TestNFTStoreAndPNFTCompatibilityWiring(t *testing.T) {
 	panaceaapp.SetConfig()
 	appOpts := viper.New()
 	appOpts.Set(flags.FlagHome, t.TempDir())
 	testApp := panaceaapp.New(log.NewNopLogger(), dbm.NewMemDB(), nil, false, appOpts)
 
 	require.NotContains(t, testApp.GetKVStoreKey(), pnfttypes.StoreKey)
-	require.NotContains(t, testApp.GetKVStoreKey(), nft.ModuleName)
+	require.Contains(t, testApp.GetKVStoreKey(), nfttypes.StoreKey)
+	require.Contains(t, testApp.GetKVStoreKey(), nfttypes.PolicyStoreKey)
 	require.NotContains(t, testApp.ModuleManager.Modules, pnfttypes.ModuleName)
-	require.NotContains(t, testApp.ModuleManager.Modules, nft.ModuleName)
+	require.NotContains(t, testApp.ModuleManager.Modules, nfttypes.ModuleName)
 	require.NotContains(t, testApp.BasicManager(), pnfttypes.ModuleName)
+	require.NotContains(t, testApp.BasicManager(), nfttypes.ModuleName)
 	require.NotContains(t, panaceaapp.ModuleBasics, pnfttypes.ModuleName)
+	require.NotContains(t, panaceaapp.ModuleBasics, nfttypes.ModuleName)
 	require.NotContains(t, testApp.DefaultGenesis(), pnfttypes.ModuleName)
 	require.NotContains(t, testApp.ModuleManager.GetVersionMap(), pnfttypes.ModuleName)
 	require.NotContains(t, testApp.ModuleManager.OrderInitGenesis, pnfttypes.ModuleName)
 	require.NotContains(t, testApp.ModuleManager.OrderExportGenesis, pnfttypes.ModuleName)
+
+	require.NoError(t, testApp.LoadLatestVersion())
+	ctx := testApp.NewUncachedContext(false, cmtproto.Header{Time: time.Now()})
+	exported, err := testApp.NFTKeeper.ExportGenesis(ctx)
+	require.NoError(t, err)
+	require.NotNil(t, exported.NftState)
+	require.Empty(t, exported.ClassPolicies)
 }
 
 func TestPNFTMsgRouteUsesLegacyRejectionServer(t *testing.T) {

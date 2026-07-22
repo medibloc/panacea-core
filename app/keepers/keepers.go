@@ -1,6 +1,8 @@
 package keepers
 
 import (
+	"sort"
+
 	"cosmossdk.io/log"
 	storetypes "cosmossdk.io/store/types"
 	evidencekeeper "cosmossdk.io/x/evidence/keeper"
@@ -59,6 +61,8 @@ import (
 	burnkeeper "github.com/medibloc/panacea-core/v2/x/burn/keeper"
 	didkeeper "github.com/medibloc/panacea-core/v2/x/did/keeper"
 	didtypes "github.com/medibloc/panacea-core/v2/x/did/types"
+	nftkeeper "github.com/medibloc/panacea-core/v2/x/nft/keeper"
+	nfttypes "github.com/medibloc/panacea-core/v2/x/nft/types"
 	"github.com/spf13/cast"
 )
 
@@ -90,6 +94,7 @@ type AppKeepersWithKey struct {
 	AolKeeper  aolkeeper.Keeper
 	DidKeeper  didkeeper.Keeper
 	BurnKeeper burnkeeper.Keeper
+	NFTKeeper  nftkeeper.Keeper
 
 	keys    map[string]*storetypes.KVStoreKey
 	tkeys   map[string]*storetypes.TransientStoreKey
@@ -148,6 +153,14 @@ func (appKeepers *AppKeepersWithKey) InitKeyAndKeepers(
 		blockedAddrs,
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 		logger,
+	)
+	appKeepers.NFTKeeper = nftkeeper.NewKeeper(
+		appCodec,
+		runtime.NewKVStoreService(appKeepers.keys[nfttypes.StoreKey]),
+		runtime.NewKVStoreService(appKeepers.keys[nfttypes.PolicyStoreKey]),
+		appKeepers.AccountKeeper,
+		appKeepers.BankKeeper,
+		moduleAccountAddresses(maccPerms),
 	)
 
 	appKeepers.StakingKeeper = stakingkeeper.NewKeeper(
@@ -317,6 +330,20 @@ func (appKeepers *AppKeepersWithKey) InitKeyAndKeepers(
 	// Setting Router will finalize all routes by sealing router
 	// No more routes can be added
 	appKeepers.IBCKeeper.SetRouter(ibcRouter)
+}
+
+func moduleAccountAddresses(maccPerms map[string][]string) []sdk.AccAddress {
+	moduleNames := make([]string, 0, len(maccPerms))
+	for moduleName := range maccPerms {
+		moduleNames = append(moduleNames, moduleName)
+	}
+	sort.Strings(moduleNames)
+
+	addresses := make([]sdk.AccAddress, 0, len(moduleNames))
+	for _, moduleName := range moduleNames {
+		addresses = append(addresses, authtypes.NewModuleAddress(moduleName))
+	}
+	return addresses
 }
 
 func initParamsKeeper(appCodec codec.Codec, legacyAmino *codec.LegacyAmino, key, tkey storetypes.StoreKey) paramskeeper.Keeper {
