@@ -10,6 +10,7 @@ import (
 	"time"
 
 	upstreamnft "cosmossdk.io/x/nft"
+	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/gogogateway"
 	gatewayruntime "github.com/grpc-ecosystem/grpc-gateway/runtime"
@@ -46,6 +47,11 @@ func TestNFTRoutesRoundTripClassColonAndNFTDot(t *testing.T) {
 	require.Contains(t, classID, ":")
 
 	const nftID = "nft.1"
+	data, err := cdctypes.NewAnyWithValue(&types.BasicNFTData{
+		Name:        "Gateway metadata",
+		Description: "Metadata resolved through the REST gateway",
+	})
+	require.NoError(t, err)
 	_, err = keeper.NewMsgServer(moduleKeeper).Mint(
 		sdk.WrapSDKContext(sdkContext),
 		&types.MsgMintRequest{
@@ -55,6 +61,7 @@ func TestNFTRoutesRoundTripClassColonAndNFTDot(t *testing.T) {
 			Recipient:  owner,
 			Uri:        "https://example.test/nft.1.json",
 			UriHash:    "sha256:" + strings.Repeat("b", 64),
+			Data:       data,
 		},
 	)
 	require.NoError(t, err)
@@ -81,27 +88,30 @@ func TestNFTRoutesRoundTripClassColonAndNFTDot(t *testing.T) {
 	))
 
 	for _, testCase := range []struct {
-		name       string
-		path       string
-		containsID string
+		name         string
+		path         string
+		containsID   string
+		containsData bool
 	}{
 		{
 			name: "standard class",
 			path: "/cosmos/nft/v1beta1/classes/" + classID,
 		},
 		{
-			name:       "standard nft",
-			path:       "/cosmos/nft/v1beta1/nfts/" + classID + "/" + nftID,
-			containsID: nftID,
+			name:         "standard nft",
+			path:         "/cosmos/nft/v1beta1/nfts/" + classID + "/" + nftID,
+			containsID:   nftID,
+			containsData: true,
 		},
 		{
 			name: "panacea class record",
 			path: "/panacea/nft/v1/classes/" + classID,
 		},
 		{
-			name:       "panacea nft record",
-			path:       "/panacea/nft/v1/nfts/" + classID + "/" + nftID,
-			containsID: nftID,
+			name:         "panacea nft record",
+			path:         "/panacea/nft/v1/nfts/" + classID + "/" + nftID,
+			containsID:   nftID,
+			containsData: true,
 		},
 	} {
 		t.Run(testCase.name, func(t *testing.T) {
@@ -114,6 +124,10 @@ func TestNFTRoutesRoundTripClassColonAndNFTDot(t *testing.T) {
 			require.Contains(t, response.Body.String(), classID)
 			if testCase.containsID != "" {
 				require.Contains(t, response.Body.String(), testCase.containsID)
+			}
+			if testCase.containsData {
+				require.Contains(t, response.Body.String(), types.BasicNFTDataTypeURL)
+				require.Contains(t, response.Body.String(), "Gateway metadata")
 			}
 		})
 	}
