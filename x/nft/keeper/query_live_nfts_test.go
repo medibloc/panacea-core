@@ -151,11 +151,25 @@ func createNFTsForClassQueryTest(
 	fixture *keeperFixture,
 	nftIDs ...string,
 ) (classID, controller, owner string) {
+	return createNFTsForQueryTest(
+		t,
+		fixture,
+		sdk.AccAddress(bytes.Repeat([]byte{93}, 20)),
+		nftIDs...,
+	)
+}
+
+func createNFTsForQueryTest(
+	t *testing.T,
+	fixture *keeperFixture,
+	creatorAddress sdk.AccAddress,
+	nftIDs ...string,
+) (classID, controller, owner string) {
 	t.Helper()
 	classID, controller = createClassForMintTest(
 		t,
 		fixture,
-		sdk.AccAddress(bytes.Repeat([]byte{93}, 20)),
+		creatorAddress,
 		uint64(len(nftIDs)),
 	)
 	ownerAddress := sdk.AccAddress(bytes.Repeat([]byte{94}, 32))
