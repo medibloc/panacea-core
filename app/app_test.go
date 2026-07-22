@@ -26,6 +26,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	panaceaapp "github.com/medibloc/panacea-core/v2/app"
+	"github.com/medibloc/panacea-core/v2/app/upgrades/v2_3_0"
 	pnftlegacy "github.com/medibloc/panacea-core/v2/x/pnft/legacy"
 	pnfttypes "github.com/medibloc/panacea-core/v2/x/pnft/types"
 )
@@ -219,4 +220,32 @@ func TestUpgradeWiringWithStandaloneModule(t *testing.T) {
 	require.Equal(t, upgradeHeight, doneHeight)
 	_, err = testApp.UpgradeKeeper.GetUpgradePlan(ctx)
 	require.ErrorIs(t, err, upgradetypes.ErrNoUpgradePlanFound)
+}
+
+func TestV230UpgradeDropsLegacyPNFTModuleVersion(t *testing.T) {
+	panaceaapp.SetConfig()
+	appOpts := viper.New()
+	appOpts.Set(flags.FlagHome, t.TempDir())
+	testApp := panaceaapp.New(log.NewNopLogger(), dbm.NewMemDB(), nil, false, appOpts)
+	require.NoError(t, testApp.LoadLatestVersion())
+
+	const upgradeHeight = int64(10)
+	blockTime := time.Now()
+	ctx := testApp.NewUncachedContext(false, cmtproto.Header{Height: upgradeHeight, Time: blockTime}).
+		WithHeaderInfo(header.Info{Height: upgradeHeight, Time: blockTime})
+
+	fromVM := testApp.ModuleManager.GetVersionMap()
+	fromVM[pnfttypes.ModuleName] = 1
+	require.NoError(t, testApp.UpgradeKeeper.SetModuleVersionMap(ctx, fromVM))
+	require.NoError(t, testApp.UpgradeKeeper.ScheduleUpgrade(ctx, upgradetypes.Plan{
+		Name:   v2_3_0.UpgradeName,
+		Height: upgradeHeight,
+	}))
+
+	_, err := testApp.PreBlocker(ctx, &abci.RequestFinalizeBlock{})
+	require.NoError(t, err)
+
+	toVM, err := testApp.UpgradeKeeper.GetModuleVersionMap(ctx)
+	require.NoError(t, err)
+	require.NotContains(t, toVM, pnfttypes.ModuleName)
 }

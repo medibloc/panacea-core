@@ -64,7 +64,8 @@ func (appKeepers *AppKeepersWithKey) GetMemoryStoreKey() map[string]*storetypes.
 
 // GetKey returns the KVStoreKey for the provided store key.
 //
-// NOTE: This is solely to be used for testing purposes.
+// Application modules should use their scoped store services. This raw key is
+// exposed for app-level store migrations and tests.
 func (appKeepers *AppKeepersWithKey) GetKey(storeKey string) *storetypes.KVStoreKey {
 	return appKeepers.keys[storeKey]
 }
