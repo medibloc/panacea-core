@@ -5,6 +5,7 @@ import (
 	"github.com/medibloc/panacea-core/v2/app/params"
 	aoltypes "github.com/medibloc/panacea-core/v2/x/aol/types"
 	didtypes "github.com/medibloc/panacea-core/v2/x/did/types"
+	pnfttypes "github.com/medibloc/panacea-core/v2/x/pnft/types"
 )
 
 // MakeEncodingConfig creates an EncodingConfig for testing
@@ -19,6 +20,8 @@ func MakeEncodingConfig() params.EncodingConfig {
 	std.RegisterInterfaces(encodingConfig.InterfaceRegistry)
 	ModuleBasics.RegisterLegacyAminoCodec(encodingConfig.Amino)
 	ModuleBasics.RegisterInterfaces(encodingConfig.InterfaceRegistry)
+	pnfttypes.RegisterCodec(encodingConfig.Amino)
+	pnfttypes.RegisterInterfaces(encodingConfig.InterfaceRegistry)
 	if err := encodingConfig.InterfaceRegistry.SigningContext().Validate(); err != nil {
 		panic(err)
 	}

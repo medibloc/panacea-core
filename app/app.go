@@ -24,7 +24,8 @@ import (
 	groupmodule "github.com/cosmos/cosmos-sdk/x/group/module"
 	"github.com/medibloc/panacea-core/v2/app/keepers"
 	"github.com/medibloc/panacea-core/v2/app/upgrades"
-	"github.com/medibloc/panacea-core/v2/x/pnft"
+	pnftlegacy "github.com/medibloc/panacea-core/v2/x/pnft/legacy"
+	pnfttypes "github.com/medibloc/panacea-core/v2/x/pnft/types"
 	"github.com/spf13/cast"
 	"io"
 	"os"
@@ -140,7 +141,6 @@ var (
 		aol.AppModuleBasic{},
 		did.AppModuleBasic{},
 		burn.AppModuleBasic{},
-		pnft.AppModuleBasic{},
 	)
 
 	// module account permissions
@@ -287,7 +287,6 @@ func New(
 		aol.NewAppModule(appCodec, app.AolKeeper),
 		did.NewAppModule(appCodec, app.DidKeeper),
 		burn.NewAppModule(appCodec, app.BurnKeeper),
-		pnft.NewAppModule(appCodec),
 	)
 	app.basicManager = module.NewBasicManagerFromManager(
 		app.ModuleManager,
@@ -355,6 +354,7 @@ func New(
 	app.ModuleManager.RegisterInvariants(app.CrisisKeeper)
 	app.configurator = module.NewConfigurator(app.appCodec, app.MsgServiceRouter(), app.GRPCQueryRouter())
 	app.ModuleManager.RegisterServices(app.configurator)
+	pnfttypes.RegisterMsgServer(app.configurator.MsgServer(), pnftlegacy.NewMsgServer())
 
 	// RegisterUpgradeHandlers is used for registering any on-chain upgrades.
 	// Make sure it's called after `app.ModuleManager` and `app.configurator` are set.

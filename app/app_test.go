@@ -78,7 +78,7 @@ func TestCapabilityWiring(t *testing.T) {
 	require.Equal(t, capabilitytypes.ModuleName, testApp.ModuleManager.OrderExportGenesis[0])
 }
 
-func TestPNFTCompatibilityModuleWiring(t *testing.T) {
+func TestPNFTCompatibilityWiring(t *testing.T) {
 	panaceaapp.SetConfig()
 	appOpts := viper.New()
 	appOpts.Set(flags.FlagHome, t.TempDir())
@@ -86,8 +86,12 @@ func TestPNFTCompatibilityModuleWiring(t *testing.T) {
 
 	require.NotContains(t, testApp.GetKVStoreKey(), pnfttypes.StoreKey)
 	require.NotContains(t, testApp.GetKVStoreKey(), nft.ModuleName)
-	require.Contains(t, testApp.ModuleManager.Modules, pnfttypes.ModuleName)
+	require.NotContains(t, testApp.ModuleManager.Modules, pnfttypes.ModuleName)
 	require.NotContains(t, testApp.ModuleManager.Modules, nft.ModuleName)
+	require.NotContains(t, testApp.BasicManager(), pnfttypes.ModuleName)
+	require.NotContains(t, panaceaapp.ModuleBasics, pnfttypes.ModuleName)
+	require.NotContains(t, testApp.DefaultGenesis(), pnfttypes.ModuleName)
+	require.NotContains(t, testApp.ModuleManager.GetVersionMap(), pnfttypes.ModuleName)
 	require.NotContains(t, testApp.ModuleManager.OrderInitGenesis, pnfttypes.ModuleName)
 	require.NotContains(t, testApp.ModuleManager.OrderExportGenesis, pnfttypes.ModuleName)
 }
