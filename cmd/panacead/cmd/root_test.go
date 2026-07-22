@@ -80,10 +80,6 @@ func TestNewRootCmdCommandTree(t *testing.T) {
 				path:     []string{"tx", "did"},
 				expected: []string{"create-did", "update-did", "deactivate-did"},
 			},
-			{
-				path:     []string{"query", "pnft"},
-				expected: []string{"list-denom", "list-denom-by-owner", "get-denom", "list-pnft", "list-pnft-by-owner", "get-pnft"},
-			},
 		}
 
 		for _, testCase := range testCases {
@@ -99,6 +95,11 @@ func TestNewRootCmdCommandTree(t *testing.T) {
 	t.Run("does not expose legacy PNFT transaction commands", func(t *testing.T) {
 		tx := requireDirectChild(t, root, "tx")
 		requireNoDirectChild(t, tx, "pnft")
+	})
+
+	t.Run("does not expose legacy PNFT query commands", func(t *testing.T) {
+		query := requireDirectChild(t, root, "query")
+		requireNoDirectChild(t, query, "pnft")
 	})
 
 	t.Run("keeps SDK module commands", func(t *testing.T) {

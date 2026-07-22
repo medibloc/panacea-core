@@ -13,7 +13,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
-	"github.com/medibloc/panacea-core/v2/x/pnft/client/cli"
 	"github.com/medibloc/panacea-core/v2/x/pnft/keeper"
 	"github.com/medibloc/panacea-core/v2/x/pnft/legacy"
 	"github.com/medibloc/panacea-core/v2/x/pnft/types"
@@ -78,7 +77,7 @@ func (a AppModuleBasic) GetTxCmd() *cobra.Command {
 }
 
 func (a AppModuleBasic) GetQueryCmd() *cobra.Command {
-	return cli.NewGetQueryCmd()
+	return nil
 }
 
 type AppModule struct {
