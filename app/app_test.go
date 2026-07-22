@@ -9,6 +9,7 @@ import (
 	"cosmossdk.io/core/header"
 	"cosmossdk.io/log"
 	"cosmossdk.io/x/feegrant"
+	upstreamnft "cosmossdk.io/x/nft"
 	upgradetypes "cosmossdk.io/x/upgrade/types"
 	abci "github.com/cometbft/cometbft/abci/types"
 	cmtjson "github.com/cometbft/cometbft/libs/json"
@@ -35,6 +36,7 @@ import (
 
 	panaceaapp "github.com/medibloc/panacea-core/v2/app"
 	"github.com/medibloc/panacea-core/v2/app/upgrades/v2_3_0"
+	panaceanft "github.com/medibloc/panacea-core/v2/x/nft"
 	nfttypes "github.com/medibloc/panacea-core/v2/x/nft/types"
 	pnftlegacy "github.com/medibloc/panacea-core/v2/x/pnft/legacy"
 	pnfttypes "github.com/medibloc/panacea-core/v2/x/pnft/types"
@@ -88,7 +90,7 @@ func TestCapabilityWiring(t *testing.T) {
 	require.Equal(t, capabilitytypes.ModuleName, testApp.ModuleManager.OrderExportGenesis[0])
 }
 
-func TestNFTStoreAndPNFTCompatibilityWiring(t *testing.T) {
+func TestNFTRuntimeAndPNFTCompatibilityWiring(t *testing.T) {
 	panaceaapp.SetConfig()
 	appOpts := viper.New()
 	appOpts.Set(flags.FlagHome, t.TempDir())
@@ -98,15 +100,25 @@ func TestNFTStoreAndPNFTCompatibilityWiring(t *testing.T) {
 	require.Contains(t, testApp.GetKVStoreKey(), nfttypes.StoreKey)
 	require.Contains(t, testApp.GetKVStoreKey(), nfttypes.PolicyStoreKey)
 	require.NotContains(t, testApp.ModuleManager.Modules, pnfttypes.ModuleName)
-	require.NotContains(t, testApp.ModuleManager.Modules, nfttypes.ModuleName)
+	require.Contains(t, testApp.ModuleManager.Modules, nfttypes.ModuleName)
+	require.IsType(t, panaceanft.AppModule{}, testApp.ModuleManager.Modules[nfttypes.ModuleName])
 	require.NotContains(t, testApp.BasicManager(), pnfttypes.ModuleName)
-	require.NotContains(t, testApp.BasicManager(), nfttypes.ModuleName)
+	require.Contains(t, testApp.BasicManager(), nfttypes.ModuleName)
 	require.NotContains(t, panaceaapp.ModuleBasics, pnfttypes.ModuleName)
-	require.NotContains(t, panaceaapp.ModuleBasics, nfttypes.ModuleName)
+	require.Contains(t, panaceaapp.ModuleBasics, nfttypes.ModuleName)
 	require.NotContains(t, testApp.DefaultGenesis(), pnfttypes.ModuleName)
+	require.Contains(t, testApp.DefaultGenesis(), nfttypes.ModuleName)
 	require.NotContains(t, testApp.ModuleManager.GetVersionMap(), pnfttypes.ModuleName)
+	require.Equal(t, uint64(1), testApp.ModuleManager.GetVersionMap()[nfttypes.ModuleName])
 	require.NotContains(t, testApp.ModuleManager.OrderInitGenesis, pnfttypes.ModuleName)
+	require.Contains(t, testApp.ModuleManager.OrderInitGenesis, nfttypes.ModuleName)
 	require.NotContains(t, testApp.ModuleManager.OrderExportGenesis, pnfttypes.ModuleName)
+	require.Contains(t, testApp.ModuleManager.OrderExportGenesis, nfttypes.ModuleName)
+
+	require.NotNil(t, testApp.MsgServiceRouter().Handler(&nfttypes.MsgCreateClassRequest{}))
+	require.NotNil(t, testApp.MsgServiceRouter().Handler(&upstreamnft.MsgSend{}))
+	require.NotNil(t, testApp.GRPCQueryRouter().Route("/panacea.nft.v1.Query/ClassRecord"))
+	require.NotNil(t, testApp.GRPCQueryRouter().Route("/cosmos.nft.v1beta1.Query/NFT"))
 
 	require.NoError(t, testApp.LoadLatestVersion())
 	ctx := testApp.NewUncachedContext(false, cmtproto.Header{Time: time.Now()})
@@ -413,6 +425,7 @@ func TestV230UpgradeDropsLegacyPNFTModuleVersion(t *testing.T) {
 		WithHeaderInfo(header.Info{Height: upgradeHeight, Time: blockTime})
 
 	fromVM := testApp.ModuleManager.GetVersionMap()
+	delete(fromVM, nfttypes.ModuleName)
 	fromVM[pnfttypes.ModuleName] = 1
 	require.NoError(t, testApp.UpgradeKeeper.SetModuleVersionMap(ctx, fromVM))
 	require.NoError(t, testApp.UpgradeKeeper.ScheduleUpgrade(ctx, upgradetypes.Plan{
@@ -426,4 +439,5 @@ func TestV230UpgradeDropsLegacyPNFTModuleVersion(t *testing.T) {
 	toVM, err := testApp.UpgradeKeeper.GetModuleVersionMap(ctx)
 	require.NoError(t, err)
 	require.NotContains(t, toVM, pnfttypes.ModuleName)
+	require.Equal(t, uint64(1), toVM[nfttypes.ModuleName])
 }

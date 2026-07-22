@@ -6,7 +6,6 @@ import (
 	"cosmossdk.io/client/v2/autocli"
 	"cosmossdk.io/core/appmodule"
 	"cosmossdk.io/log"
-	"cosmossdk.io/x/nft"
 	"cosmossdk.io/x/upgrade"
 	"encoding/json"
 	"fmt"
@@ -40,6 +39,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/grpc/cmtservice"
 	nodeservice "github.com/cosmos/cosmos-sdk/client/grpc/node"
 	"github.com/cosmos/cosmos-sdk/codec"
+	addresscodec "github.com/cosmos/cosmos-sdk/codec/address"
 	"github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/cosmos-sdk/server/api"
 	"github.com/cosmos/cosmos-sdk/server/config"
@@ -90,6 +90,8 @@ import (
 	burntypes "github.com/medibloc/panacea-core/v2/x/burn/types"
 	"github.com/medibloc/panacea-core/v2/x/did"
 	didtypes "github.com/medibloc/panacea-core/v2/x/did/types"
+	panaceanft "github.com/medibloc/panacea-core/v2/x/nft"
+	nfttypes "github.com/medibloc/panacea-core/v2/x/nft/types"
 
 	"github.com/medibloc/panacea-core/v2/app/upgrades/pan_19_noop_rehearsal"
 	"github.com/medibloc/panacea-core/v2/app/upgrades/v2_0_5"
@@ -141,6 +143,7 @@ var (
 		aol.AppModuleBasic{},
 		did.AppModuleBasic{},
 		burn.AppModuleBasic{},
+		panaceanft.NewAppModuleBasic(addresscodec.NewBech32Codec(AccountAddressPrefix)),
 	)
 
 	// module account permissions
@@ -153,7 +156,7 @@ var (
 		govtypes.ModuleName:            {authtypes.Burner},
 		ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
 		burntypes.ModuleName:           {authtypes.Burner},
-		nft.ModuleName:                 nil,
+		nfttypes.ModuleName:            nil,
 	}
 
 	_ runtime.AppI            = (*App)(nil)
@@ -287,6 +290,7 @@ func New(
 		aol.NewAppModule(appCodec, app.AolKeeper),
 		did.NewAppModule(appCodec, app.DidKeeper),
 		burn.NewAppModule(appCodec, app.BurnKeeper),
+		panaceanft.NewAppModule(app.AccountKeeper.AddressCodec(), app.NFTKeeper),
 	)
 	app.basicManager = module.NewBasicManagerFromManager(
 		app.ModuleManager,
@@ -343,7 +347,7 @@ func New(
 		feegrant.ModuleName, group.ModuleName, paramstypes.ModuleName, upgradetypes.ModuleName,
 		vestingtypes.ModuleName, consensusparamtypes.ModuleName,
 		ibcexported.ModuleName, ibctransfertypes.ModuleName,
-		aoltypes.ModuleName, didtypes.ModuleName, burntypes.ModuleName,
+		aoltypes.ModuleName, didtypes.ModuleName, burntypes.ModuleName, nfttypes.ModuleName,
 	}
 	app.ModuleManager.SetOrderInitGenesis(genesisModuleOrder...)
 	app.ModuleManager.SetOrderExportGenesis(genesisModuleOrder...)
