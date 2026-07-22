@@ -133,7 +133,7 @@ func TestNewKeeperRequiresBothStoresAndModuleAccount(t *testing.T) {
 			moduleAccountAddresses,
 		)
 	})
-	require.PanicsWithValue(t, "nft keeper requires the nftpolicy store service", func() {
+	require.PanicsWithValue(t, "nft keeper requires the panacea_nft store service", func() {
 		NewKeeper(
 			fixture.cdc,
 			nftService,
@@ -172,7 +172,7 @@ func TestKeeperContextRequiresBothMountedStores(t *testing.T) {
 		mountPolicy bool
 	}{
 		{name: "missing nft store", mountPolicy: true},
-		{name: "missing nftpolicy store", mountNFT: true},
+		{name: "missing panacea_nft store", mountNFT: true},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			fixture := newKeeperFixture(t, tc.mountNFT, tc.mountPolicy)

@@ -10,11 +10,11 @@ const (
 	// PolicyStoreKey stores Panacea-specific NFT policy and lifecycle state.
 	// It must not share a prefix with StoreKey because the SDK uses store names
 	// as database prefixes and rejects potentially colliding names.
-	PolicyStoreKey = "policy_nft"
+	PolicyStoreKey = "panacea_nft"
 
-	// PolicyCodespace identifies Panacea-specific NFT errors. It is independent
-	// from the physical policy store name and remains part of the client API.
-	PolicyCodespace = "nftpolicy"
+	// PolicyCodespace identifies Panacea-specific NFT errors and intentionally
+	// matches the policy store namespace.
+	PolicyCodespace = PolicyStoreKey
 
 	// RouterKey is the legacy message routing key.
 	RouterKey = ModuleName

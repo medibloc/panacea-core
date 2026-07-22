@@ -24,8 +24,8 @@ import (
 func TestModuleConstants(t *testing.T) {
 	require.Equal(t, upstreamnft.ModuleName, ModuleName)
 	require.Equal(t, upstreamnft.StoreKey, StoreKey)
-	require.Equal(t, "policy_nft", PolicyStoreKey)
-	require.Equal(t, "nftpolicy", PolicyCodespace)
+	require.Equal(t, "panacea_nft", PolicyStoreKey)
+	require.Equal(t, PolicyStoreKey, PolicyCodespace)
 	require.Equal(t, ModuleName, RouterKey)
 	require.Equal(t, ModuleName, QuerierRoute)
 	require.Equal(t, "/panacea.nft.v1.BasicNFTData", BasicNFTDataTypeURL)

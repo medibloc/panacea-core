@@ -365,7 +365,7 @@ func (k Keeper) ensureStoresAvailable(ctx sdk.Context) error {
 		return fmt.Errorf("open nft store: %w", err)
 	}
 	if _, err := k.policyStoreService.OpenKVStore(ctx).Has(storeAvailabilityProbeKey); err != nil {
-		return fmt.Errorf("open nftpolicy store: %w", err)
+		return fmt.Errorf("open panacea_nft store: %w", err)
 	}
 	return nil
 }

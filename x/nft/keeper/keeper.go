@@ -49,7 +49,7 @@ func NewKeeper(
 		panic("nft keeper requires the nft store service")
 	}
 	if policyStoreService == nil {
-		panic("nft keeper requires the nftpolicy store service")
+		panic("nft keeper requires the panacea_nft store service")
 	}
 	if accountKeeper == nil {
 		panic("nft keeper requires an account keeper")
@@ -103,7 +103,7 @@ func NewKeeper(
 	)
 	schema, err := schemaBuilder.Build()
 	if err != nil {
-		panic(fmt.Errorf("build nftpolicy schema: %w", err))
+		panic(fmt.Errorf("build panacea_nft schema: %w", err))
 	}
 
 	return Keeper{
