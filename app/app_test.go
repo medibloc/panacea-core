@@ -149,6 +149,26 @@ func TestPNFTMsgRouteUsesLegacyRejectionServer(t *testing.T) {
 	require.ErrorContains(t, err, pnftlegacy.DisabledErrorMessage)
 }
 
+func TestPNFTQueryRoutesAreNotRegistered(t *testing.T) {
+	panaceaapp.SetConfig()
+	appOpts := viper.New()
+	appOpts.Set(flags.FlagHome, t.TempDir())
+	testApp := panaceaapp.New(log.NewNopLogger(), dbm.NewMemDB(), nil, false, appOpts)
+
+	for _, path := range []string{
+		"/panacea.pnft.v2.Query/Denoms",
+		"/panacea.pnft.v2.Query/DenomsByOwner",
+		"/panacea.pnft.v2.Query/Denom",
+		"/panacea.pnft.v2.Query/PNFTs",
+		"/panacea.pnft.v2.Query/PNFTsByDenomOwner",
+		"/panacea.pnft.v2.Query/PNFT",
+	} {
+		t.Run(path, func(t *testing.T) {
+			require.Nil(t, testApp.GRPCQueryRouter().Route(path))
+		})
+	}
+}
+
 func TestFeeGrantWiringWithStandaloneModule(t *testing.T) {
 	panaceaapp.SetConfig()
 	appOpts := viper.New()
