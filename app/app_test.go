@@ -16,6 +16,7 @@ import (
 	dbm "github.com/cosmos/cosmos-db"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	capabilitytypes "github.com/cosmos/ibc-go/modules/capability/types"
 	ibctransfertypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
@@ -25,6 +26,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	panaceaapp "github.com/medibloc/panacea-core/v2/app"
+	pnftlegacy "github.com/medibloc/panacea-core/v2/x/pnft/legacy"
 	pnfttypes "github.com/medibloc/panacea-core/v2/x/pnft/types"
 )
 
@@ -122,6 +124,29 @@ func TestPNFTWiringWithStandaloneNFTKeeper(t *testing.T) {
 	require.NoError(t, testApp.PnftKeeper.BurnPNFT(ctx, denom.Id, token.Id, receiver))
 	_, err = testApp.PnftKeeper.GetPNFT(ctx, denom.Id, token.Id)
 	require.Error(t, err)
+}
+
+func TestPNFTMsgRouteUsesLegacyRejectionServer(t *testing.T) {
+	panaceaapp.SetConfig()
+	appOpts := viper.New()
+	appOpts.Set(flags.FlagHome, t.TempDir())
+	testApp := panaceaapp.New(log.NewNopLogger(), dbm.NewMemDB(), nil, false, appOpts)
+	require.NoError(t, testApp.LoadLatestVersion())
+
+	msg := &pnfttypes.MsgMintPNFTRequest{
+		DenomId: "legacy-denom",
+		Id:      "legacy-pnft",
+		Name:    "Legacy PNFT",
+		Creator: sdk.AccAddress(bytes.Repeat([]byte{5}, 20)).String(),
+	}
+	handler := testApp.MsgServiceRouter().Handler(msg)
+	require.NotNil(t, handler)
+
+	ctx := testApp.NewUncachedContext(false, cmtproto.Header{Time: time.Now()})
+	response, err := handler(ctx, msg)
+	require.Nil(t, response)
+	require.ErrorIs(t, err, sdkerrors.ErrInvalidRequest)
+	require.ErrorContains(t, err, pnftlegacy.DisabledErrorMessage)
 }
 
 func TestFeeGrantWiringWithStandaloneModule(t *testing.T) {

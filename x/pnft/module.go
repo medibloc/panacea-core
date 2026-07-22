@@ -15,6 +15,7 @@ import (
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/medibloc/panacea-core/v2/x/pnft/client/cli"
 	"github.com/medibloc/panacea-core/v2/x/pnft/keeper"
+	"github.com/medibloc/panacea-core/v2/x/pnft/legacy"
 	"github.com/medibloc/panacea-core/v2/x/pnft/types"
 	"github.com/spf13/cobra"
 )
@@ -106,7 +107,7 @@ func (AppModule) QuerierRoute() string { return types.QuerierRoute }
 // module-specific GRPC queries.
 func (am AppModule) RegisterServices(cfg module.Configurator) {
 	types.RegisterQueryServer(cfg.QueryServer(), am.keeper)
-	types.RegisterMsgServer(cfg.MsgServer(), keeper.NewMsgServerImpl(am.keeper))
+	types.RegisterMsgServer(cfg.MsgServer(), legacy.NewMsgServer())
 }
 
 // RegisterInvariants registers the module's invariants.
