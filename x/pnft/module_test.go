@@ -6,9 +6,15 @@ import (
 	"testing"
 
 	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/types/module"
 	gatewayruntime "github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/stretchr/testify/require"
 )
+
+func TestAppModuleDoesNotImplementGenesisLifecycle(t *testing.T) {
+	_, hasGenesisLifecycle := any(NewAppModule(nil)).(module.HasABCIGenesis)
+	require.False(t, hasGenesisLifecycle)
+}
 
 func TestAppModuleBasicDoesNotRegisterLegacyGatewayRoutes(t *testing.T) {
 	mux := gatewayruntime.NewServeMux()

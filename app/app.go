@@ -25,7 +25,6 @@ import (
 	"github.com/medibloc/panacea-core/v2/app/keepers"
 	"github.com/medibloc/panacea-core/v2/app/upgrades"
 	"github.com/medibloc/panacea-core/v2/x/pnft"
-	pnfttypes "github.com/medibloc/panacea-core/v2/x/pnft/types"
 	"github.com/spf13/cast"
 	"io"
 	"os"
@@ -286,7 +285,7 @@ func New(
 		aol.NewAppModule(appCodec, app.AolKeeper),
 		did.NewAppModule(appCodec, app.DidKeeper),
 		burn.NewAppModule(appCodec, app.BurnKeeper),
-		pnft.NewAppModule(appCodec, &app.PnftKeeper),
+		pnft.NewAppModule(appCodec),
 	)
 	app.basicManager = module.NewBasicManagerFromManager(
 		app.ModuleManager,
@@ -343,7 +342,7 @@ func New(
 		feegrant.ModuleName, group.ModuleName, paramstypes.ModuleName, upgradetypes.ModuleName,
 		vestingtypes.ModuleName, consensusparamtypes.ModuleName,
 		ibcexported.ModuleName, ibctransfertypes.ModuleName,
-		aoltypes.ModuleName, didtypes.ModuleName, burntypes.ModuleName, pnfttypes.ModuleName,
+		aoltypes.ModuleName, didtypes.ModuleName, burntypes.ModuleName,
 	}
 	app.ModuleManager.SetOrderInitGenesis(genesisModuleOrder...)
 	app.ModuleManager.SetOrderExportGenesis(genesisModuleOrder...)

@@ -89,6 +89,8 @@ func TestPNFTWiringWithStandaloneNFTKeeper(t *testing.T) {
 	require.NotContains(t, testApp.GetKVStoreKey(), nft.ModuleName)
 	require.Contains(t, testApp.ModuleManager.Modules, pnfttypes.ModuleName)
 	require.NotContains(t, testApp.ModuleManager.Modules, nft.ModuleName)
+	require.NotContains(t, testApp.ModuleManager.OrderInitGenesis, pnfttypes.ModuleName)
+	require.NotContains(t, testApp.ModuleManager.OrderExportGenesis, pnfttypes.ModuleName)
 
 	ctx := testApp.NewUncachedContext(false, cmtproto.Header{Time: time.Now()})
 	owner := sdk.AccAddress(bytes.Repeat([]byte{1}, 20)).String()
