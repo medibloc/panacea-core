@@ -3,6 +3,7 @@ package keeper
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	upstreamnft "cosmossdk.io/x/nft"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -93,4 +94,44 @@ func (q standardQueryServer) Owner(
 		return nil, mapQueryStateError(err)
 	}
 	return &upstreamnft.QueryOwnerResponse{Owner: live.Owner}, nil
+}
+
+// Supply returns the number of active and revoked NFTs in a class. Missing
+// classes retain the standard service's zero response.
+func (q standardQueryServer) Supply(
+	goCtx context.Context,
+	request *upstreamnft.QuerySupplyRequest,
+) (*upstreamnft.QuerySupplyResponse, error) {
+	if request == nil {
+		return nil, status.Error(codes.InvalidArgument, "empty request")
+	}
+	if err := q.keeper.validateCanonicalClassID(request.ClassId); err != nil {
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	ctx := sdk.UnwrapSDKContext(goCtx)
+	supply := q.keeper.nftKeeper.GetTotalSupply(ctx, request.ClassId)
+	record, err := q.keeper.getClassRecord(ctx, request.ClassId)
+	if errors.Is(err, upstreamnft.ErrClassNotExists) {
+		if supply == 0 {
+			return &upstreamnft.QuerySupplyResponse{}, nil
+		}
+		return nil, mapQueryStateError(fmt.Errorf(
+			"missing class %s has supply %d",
+			request.ClassId,
+			supply,
+		))
+	}
+	if err != nil {
+		return nil, mapQueryStateError(err)
+	}
+	if supply > record.MintedCount {
+		return nil, mapQueryStateError(fmt.Errorf(
+			"class %s supply %d exceeds minted count %d",
+			request.ClassId,
+			supply,
+			record.MintedCount,
+		))
+	}
+	return &upstreamnft.QuerySupplyResponse{Amount: supply}, nil
 }
