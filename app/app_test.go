@@ -12,12 +12,21 @@ import (
 	"cosmossdk.io/x/nft"
 	upgradetypes "cosmossdk.io/x/upgrade/types"
 	abci "github.com/cometbft/cometbft/abci/types"
+	cmtjson "github.com/cometbft/cometbft/libs/json"
 	cmtproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	dbm "github.com/cosmos/cosmos-db"
 	"github.com/cosmos/cosmos-sdk/client/flags"
+	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
+	simtestutil "github.com/cosmos/cosmos-sdk/testutil/sims"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/types/module"
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
+	govmodule "github.com/cosmos/cosmos-sdk/x/gov"
+	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
+	govv1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
+	"github.com/cosmos/cosmos-sdk/x/group"
 	capabilitytypes "github.com/cosmos/ibc-go/modules/capability/types"
 	ibctransfertypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
 	ibcexported "github.com/cosmos/ibc-go/v8/modules/core/exported"
@@ -118,6 +127,165 @@ func TestPNFTMsgRouteUsesLegacyRejectionServer(t *testing.T) {
 	require.Nil(t, response)
 	require.ErrorIs(t, err, sdkerrors.ErrInvalidRequest)
 	require.ErrorContains(t, err, pnftlegacy.DisabledErrorMessage)
+}
+
+func TestLegacyPNFTProposalExecutionFails(t *testing.T) {
+	t.Run("governance proposal", func(t *testing.T) {
+		testApp, voter, ctx := newPNFTProposalTestApp(t)
+		legacyMsg := newLegacyProposalPNFTMsg(authtypes.NewModuleAddress(govtypes.ModuleName).String())
+
+		proposal, err := testApp.GovKeeper.SubmitProposal(
+			ctx,
+			[]sdk.Msg{legacyMsg},
+			"",
+			"Legacy PNFT proposal",
+			"Execute a legacy PNFT message",
+			voter,
+			false,
+		)
+		require.NoError(t, err)
+		require.NoError(t, testApp.GovKeeper.ActivateVotingPeriod(ctx, proposal))
+		require.NoError(t, testApp.GovKeeper.AddVote(
+			ctx,
+			proposal.Id,
+			voter,
+			govv1.NewNonSplitVoteOption(govv1.OptionYes),
+			"",
+		))
+
+		stored, err := testApp.GovKeeper.Proposals.Get(ctx, proposal.Id)
+		require.NoError(t, err)
+		require.NotNil(t, stored.VotingEndTime)
+
+		executionCtx := ctx.WithBlockTime(stored.VotingEndTime.Add(time.Nanosecond))
+		require.NoError(t, govmodule.EndBlocker(executionCtx, &testApp.GovKeeper))
+
+		failed, err := testApp.GovKeeper.Proposals.Get(executionCtx, proposal.Id)
+		require.NoError(t, err)
+		require.Equal(t, govv1.StatusFailed, failed.Status)
+		require.Contains(t, failed.FailedReason, pnftlegacy.DisabledErrorMessage)
+	})
+
+	t.Run("group proposal", func(t *testing.T) {
+		testApp, member, ctx := newPNFTProposalTestApp(t)
+
+		createGroup := &group.MsgCreateGroupWithPolicy{
+			Admin: member.String(),
+			Members: []group.MemberRequest{{
+				Address: member.String(),
+				Weight:  "1",
+			}},
+		}
+		require.NoError(t, createGroup.SetDecisionPolicy(
+			group.NewThresholdDecisionPolicy("1", time.Hour, 0),
+		))
+		created, err := testApp.GroupKeeper.CreateGroupWithPolicy(ctx, createGroup)
+		require.NoError(t, err)
+
+		legacyMsg := newLegacyProposalPNFTMsg(created.GroupPolicyAddress)
+		submit, err := group.NewMsgSubmitProposal(
+			created.GroupPolicyAddress,
+			[]string{member.String()},
+			[]sdk.Msg{legacyMsg},
+			"",
+			group.Exec_EXEC_UNSPECIFIED,
+			"Legacy PNFT proposal",
+			"Execute a legacy PNFT message",
+		)
+		require.NoError(t, err)
+		submitted, err := testApp.GroupKeeper.SubmitProposal(ctx, submit)
+		require.NoError(t, err)
+		_, err = testApp.GroupKeeper.Vote(ctx, &group.MsgVote{
+			ProposalId: submitted.ProposalId,
+			Voter:      member.String(),
+			Option:     group.VOTE_OPTION_YES,
+		})
+		require.NoError(t, err)
+
+		executionCtx := ctx.WithEventManager(sdk.NewEventManager())
+		executed, err := testApp.GroupKeeper.Exec(executionCtx, &group.MsgExec{
+			ProposalId: submitted.ProposalId,
+			Executor:   member.String(),
+		})
+		require.NoError(t, err)
+		require.Equal(t, group.PROPOSAL_EXECUTOR_RESULT_FAILURE, executed.Result)
+
+		stored, err := testApp.GroupKeeper.Proposal(executionCtx, &group.QueryProposalRequest{
+			ProposalId: submitted.ProposalId,
+		})
+		require.NoError(t, err)
+		require.Equal(t, group.PROPOSAL_STATUS_ACCEPTED, stored.Proposal.Status)
+		require.Equal(t, group.PROPOSAL_EXECUTOR_RESULT_FAILURE, stored.Proposal.ExecutorResult)
+
+		var executionEvent *group.EventExec
+		for _, event := range executionCtx.EventManager().ABCIEvents() {
+			parsed, parseErr := sdk.ParseTypedEvent(event)
+			require.NoError(t, parseErr)
+			if typed, ok := parsed.(*group.EventExec); ok {
+				executionEvent = typed
+				break
+			}
+		}
+		require.NotNil(t, executionEvent)
+		require.Contains(t, executionEvent.Logs, pnftlegacy.DisabledErrorMessage)
+	})
+}
+
+func newPNFTProposalTestApp(t *testing.T) (*panaceaapp.App, sdk.AccAddress, sdk.Context) {
+	t.Helper()
+
+	panaceaapp.SetConfig()
+	appOpts := viper.New()
+	appOpts.Set(flags.FlagHome, t.TempDir())
+	testApp := panaceaapp.New(log.NewNopLogger(), dbm.NewMemDB(), nil, false, appOpts)
+	require.NoError(t, testApp.LoadLatestVersion())
+
+	validatorSet, err := simtestutil.CreateRandomValidatorSet()
+	require.NoError(t, err)
+	privateKey := secp256k1.GenPrivKey()
+	account := authtypes.NewBaseAccount(privateKey.PubKey().Address().Bytes(), privateKey.PubKey(), 0, 0)
+	balance := banktypes.Balance{
+		Address: account.GetAddress().String(),
+		Coins:   sdk.NewCoins(sdk.NewInt64Coin(sdk.DefaultBondDenom, 1_000_000_000)),
+	}
+	genesisState, err := simtestutil.GenesisStateWithValSet(
+		testApp.AppCodec(),
+		testApp.DefaultGenesis(),
+		validatorSet,
+		[]authtypes.GenesisAccount{account},
+		balance,
+	)
+	require.NoError(t, err)
+	genesisBytes, err := cmtjson.Marshal(genesisState)
+	require.NoError(t, err)
+
+	blockTime := time.Now().UTC()
+	_, err = testApp.InitChain(&abci.RequestInitChain{
+		Time:            blockTime,
+		ConsensusParams: simtestutil.DefaultConsensusParams,
+		AppStateBytes:   genesisBytes,
+	})
+	require.NoError(t, err)
+	_, err = testApp.FinalizeBlock(&abci.RequestFinalizeBlock{
+		Height:             1,
+		Time:               blockTime,
+		NextValidatorsHash: validatorSet.Hash(),
+	})
+	require.NoError(t, err)
+	_, err = testApp.Commit()
+	require.NoError(t, err)
+
+	ctx := testApp.NewUncachedContext(false, cmtproto.Header{Height: 2, Time: blockTime})
+	return testApp, account.GetAddress(), ctx
+}
+
+func newLegacyProposalPNFTMsg(authority string) *pnfttypes.MsgMintPNFTRequest {
+	return &pnfttypes.MsgMintPNFTRequest{
+		DenomId: "legacy-denom",
+		Id:      "legacy-pnft",
+		Name:    "Legacy PNFT",
+		Creator: authority,
+	}
 }
 
 func TestPNFTQueryRoutesAreNotRegistered(t *testing.T) {
