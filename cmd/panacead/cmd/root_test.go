@@ -84,10 +84,6 @@ func TestNewRootCmdCommandTree(t *testing.T) {
 				path:     []string{"query", "pnft"},
 				expected: []string{"list-denom", "list-denom-by-owner", "get-denom", "list-pnft", "list-pnft-by-owner", "get-pnft"},
 			},
-			{
-				path:     []string{"tx", "pnft"},
-				expected: []string{"create-denom", "update-denom", "delete-denom", "transfer-denom", "mint-pnft", "transfer-pnft", "burn-pnft"},
-			},
 		}
 
 		for _, testCase := range testCases {
@@ -98,6 +94,11 @@ func TestNewRootCmdCommandTree(t *testing.T) {
 			}
 			require.ElementsMatch(t, testCase.expected, actual, "unexpected command set at %v", testCase.path)
 		}
+	})
+
+	t.Run("does not expose legacy PNFT transaction commands", func(t *testing.T) {
+		tx := requireDirectChild(t, root, "tx")
+		requireNoDirectChild(t, tx, "pnft")
 	})
 
 	t.Run("keeps SDK module commands", func(t *testing.T) {
@@ -236,4 +237,12 @@ func requireDirectChild(t *testing.T, parent *cobra.Command, name string) *cobra
 
 	require.Len(t, matches, 1, "expected exactly one %q command under %q", name, parent.CommandPath())
 	return matches[0]
+}
+
+func requireNoDirectChild(t *testing.T, parent *cobra.Command, name string) {
+	t.Helper()
+
+	for _, child := range parent.Commands() {
+		require.NotEqual(t, name, child.Name(), "unexpected %q command under %q", name, parent.CommandPath())
+	}
 }
