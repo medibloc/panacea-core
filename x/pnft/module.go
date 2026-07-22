@@ -1,7 +1,6 @@
 package pnft
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 
@@ -62,15 +61,7 @@ func (AppModuleBasic) ValidateGenesis(cdc codec.JSONCodec, _ client.TxEncodingCo
 	return genState.ValidateBasic()
 }
 
-func (a AppModuleBasic) RegisterGRPCGatewayRoutes(clientContext client.Context, mux *runtime.ServeMux) {
-	if err := types.RegisterQueryHandlerClient(
-		context.Background(),
-		mux,
-		types.NewQueryClient(clientContext),
-	); err != nil {
-		panic(err)
-	}
-}
+func (AppModuleBasic) RegisterGRPCGatewayRoutes(client.Context, *runtime.ServeMux) {}
 
 func (a AppModuleBasic) GetTxCmd() *cobra.Command {
 	return nil
