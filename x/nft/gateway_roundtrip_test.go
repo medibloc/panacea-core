@@ -45,6 +45,8 @@ func TestNFTRoutesRoundTripClassColonAndNFTDot(t *testing.T) {
 	require.NoError(t, err)
 	classID := classResponse.ClassId
 	require.Contains(t, classID, ":")
+	encodedClassID := strings.Replace(classID, ":", "%3A", 1)
+	require.Contains(t, encodedClassID, "%3A")
 
 	const nftID = "nft.1"
 	data, err := cdctypes.NewAnyWithValue(&types.BasicNFTData{
@@ -88,30 +90,64 @@ func TestNFTRoutesRoundTripClassColonAndNFTDot(t *testing.T) {
 	))
 
 	for _, testCase := range []struct {
-		name         string
-		path         string
-		containsID   string
-		containsData bool
+		name     string
+		path     string
+		expected []string
 	}{
 		{
-			name: "standard class",
-			path: "/cosmos/nft/v1beta1/classes/" + classID,
+			name:     "standard class",
+			path:     "/cosmos/nft/v1beta1/classes/" + classID,
+			expected: []string{classID},
 		},
 		{
-			name:         "standard nft",
-			path:         "/cosmos/nft/v1beta1/nfts/" + classID + "/" + nftID,
-			containsID:   nftID,
-			containsData: true,
+			name:     "standard class with encoded colon",
+			path:     "/cosmos/nft/v1beta1/classes/" + encodedClassID,
+			expected: []string{classID},
 		},
 		{
-			name: "panacea class record",
-			path: "/panacea/nft/v1/classes/" + classID,
+			name: "standard nft",
+			path: "/cosmos/nft/v1beta1/nfts/" + classID + "/" + nftID,
+			expected: []string{
+				classID,
+				nftID,
+				types.BasicNFTDataTypeURL,
+				"Gateway metadata",
+			},
 		},
 		{
-			name:         "panacea nft record",
-			path:         "/panacea/nft/v1/nfts/" + classID + "/" + nftID,
-			containsID:   nftID,
-			containsData: true,
+			name:     "standard supply",
+			path:     "/cosmos/nft/v1beta1/supply/" + classID,
+			expected: []string{`"amount":"1"`},
+		},
+		{
+			name:     "standard balance",
+			path:     "/cosmos/nft/v1beta1/balance/" + owner + "/" + classID,
+			expected: []string{`"amount":"1"`},
+		},
+		{
+			name:     "standard owner",
+			path:     "/cosmos/nft/v1beta1/owner/" + classID + "/" + nftID,
+			expected: []string{owner},
+		},
+		{
+			name:     "panacea class record",
+			path:     "/panacea/nft/v1/classes/" + classID,
+			expected: []string{classID},
+		},
+		{
+			name:     "panacea class record with encoded colon",
+			path:     "/panacea/nft/v1/classes/" + encodedClassID,
+			expected: []string{classID},
+		},
+		{
+			name: "panacea nft record",
+			path: "/panacea/nft/v1/nfts/" + classID + "/" + nftID,
+			expected: []string{
+				classID,
+				nftID,
+				types.BasicNFTDataTypeURL,
+				"Gateway metadata",
+			},
 		},
 	} {
 		t.Run(testCase.name, func(t *testing.T) {
@@ -121,13 +157,8 @@ func TestNFTRoutesRoundTripClassColonAndNFTDot(t *testing.T) {
 			mux.ServeHTTP(response, request)
 
 			require.Equal(t, http.StatusOK, response.Code, response.Body.String())
-			require.Contains(t, response.Body.String(), classID)
-			if testCase.containsID != "" {
-				require.Contains(t, response.Body.String(), testCase.containsID)
-			}
-			if testCase.containsData {
-				require.Contains(t, response.Body.String(), types.BasicNFTDataTypeURL)
-				require.Contains(t, response.Body.String(), "Gateway metadata")
+			for _, expected := range testCase.expected {
+				require.Contains(t, response.Body.String(), expected)
 			}
 		})
 	}
