@@ -93,11 +93,19 @@ func TestAppModuleRegistersOnlyPolicyAwareRuntimeServices(t *testing.T) {
 		"panacea.nft.v1.Msg",
 		"cosmos.nft.v1beta1.Msg",
 	}, configurator.msgServer.services)
-	require.Equal(t, []string{"panacea.nft.v1.Query"}, configurator.queryServer.services)
+	require.Equal(t, []string{
+		"panacea.nft.v1.Query",
+		"cosmos.nft.v1beta1.Query",
+	}, configurator.queryServer.services)
 	require.IsType(
 		t,
 		keeper.NewStandardMsgServer(keeper.Keeper{}),
 		configurator.msgServer.implementations["cosmos.nft.v1beta1.Msg"],
+	)
+	require.IsType(
+		t,
+		keeper.NewStandardQueryServer(keeper.Keeper{}),
+		configurator.queryServer.implementations["cosmos.nft.v1beta1.Query"],
 	)
 	require.Empty(t, configurator.directServices)
 	require.Zero(t, configurator.migrations)

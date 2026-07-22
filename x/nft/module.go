@@ -106,12 +106,16 @@ func (AppModule) IsAppModule() {}
 // QuerierRoute returns the legacy query route name.
 func (AppModule) QuerierRoute() string { return types.QuerierRoute }
 
-// RegisterServices binds both message APIs to Panacea's policy-aware servers.
-// The unrestricted upstream NFT keeper MsgServer remains unreachable.
+// RegisterServices binds both message and query APIs to Panacea's policy-aware
+// servers. The unrestricted upstream NFT keeper servers remain unreachable.
 func (am AppModule) RegisterServices(configurator module.Configurator) {
 	types.RegisterMsgServer(configurator.MsgServer(), keeper.NewMsgServer(am.keeper))
 	upstreamnft.RegisterMsgServer(configurator.MsgServer(), keeper.NewStandardMsgServer(am.keeper))
 	types.RegisterQueryServer(configurator.QueryServer(), keeper.NewQueryServer(am.keeper))
+	upstreamnft.RegisterQueryServer(
+		configurator.QueryServer(),
+		keeper.NewStandardQueryServer(am.keeper),
+	)
 }
 
 // RegisterInvariants registers no runtime-wide invariant route.
