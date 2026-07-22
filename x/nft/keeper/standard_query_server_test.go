@@ -351,3 +351,92 @@ func TestStandardQuerySupplyErrorMapping(t *testing.T) {
 	)
 	require.Equal(t, codes.Internal, status.Code(err))
 }
+
+func TestStandardQueryBalanceTracksLiveOwnership(t *testing.T) {
+	fixture := newKeeperFixture(t, true, true)
+	classID, controller, owner, _, _ := createNFTForBurnTest(t, &fixture)
+	server := NewStandardQueryServer(fixture.keeper)
+	request := &upstreamnft.QueryBalanceRequest{
+		ClassId: classID,
+		Owner:   strings.ToUpper(owner),
+	}
+
+	response, err := server.Balance(sdk.WrapSDKContext(fixture.ctx), request)
+	require.NoError(t, err)
+	require.Equal(t, uint64(1), response.Amount)
+
+	fixture.ctx = fixture.ctx.WithBlockTime(fixture.ctx.BlockTime().Add(time.Hour))
+	_, err = NewMsgServer(fixture.keeper).Revoke(
+		sdk.WrapSDKContext(fixture.ctx),
+		&nfttypes.MsgRevokeRequest{
+			ClassId: classID, NftId: "nft-1", Controller: controller,
+		},
+	)
+	require.NoError(t, err)
+	response, err = server.Balance(sdk.WrapSDKContext(fixture.ctx), request)
+	require.NoError(t, err)
+	require.Equal(t, uint64(1), response.Amount)
+
+	fixture.ctx = fixture.ctx.WithBlockTime(fixture.ctx.BlockTime().Add(time.Hour))
+	_, err = NewMsgServer(fixture.keeper).Burn(
+		sdk.WrapSDKContext(fixture.ctx),
+		&nfttypes.MsgBurnRequest{ClassId: classID, NftId: "nft-1", Owner: owner},
+	)
+	require.NoError(t, err)
+	response, err = server.Balance(sdk.WrapSDKContext(fixture.ctx), request)
+	require.NoError(t, err)
+	require.Zero(t, response.Amount)
+}
+
+func TestStandardQueryBalanceReturnsZeroForUnownedAndUnknownClasses(t *testing.T) {
+	fixture := newKeeperFixture(t, true, true)
+	classID, creator, _, _, _ := createNFTForBurnTest(t, &fixture)
+	otherOwner := fixture.accountAddress(t, sdk.AccAddress(bytes.Repeat([]byte{67}, 20)))
+	server := NewStandardQueryServer(fixture.keeper)
+
+	for _, targetClassID := range []string{
+		classID,
+		creator + ":unknown",
+	} {
+		response, err := server.Balance(
+			sdk.WrapSDKContext(fixture.ctx),
+			&upstreamnft.QueryBalanceRequest{ClassId: targetClassID, Owner: otherOwner},
+		)
+		require.NoError(t, err)
+		require.Zero(t, response.Amount)
+	}
+}
+
+func TestStandardQueryBalanceErrorMapping(t *testing.T) {
+	fixture := newKeeperFixture(t, true, true)
+	server := NewStandardQueryServer(fixture.keeper)
+	creator := fixture.accountAddress(t, sdk.AccAddress(bytes.Repeat([]byte{68}, 20)))
+	owner := fixture.accountAddress(t, sdk.AccAddress(bytes.Repeat([]byte{69}, 20)))
+	goCtx := sdk.WrapSDKContext(fixture.ctx)
+
+	_, err := server.Balance(goCtx, nil)
+	require.Equal(t, codes.InvalidArgument, status.Code(err))
+
+	_, err = server.Balance(goCtx, &upstreamnft.QueryBalanceRequest{
+		ClassId: "invalid",
+		Owner:   owner,
+	})
+	require.Equal(t, codes.InvalidArgument, status.Code(err))
+
+	_, err = server.Balance(goCtx, &upstreamnft.QueryBalanceRequest{
+		ClassId: creator + ":class",
+		Owner:   "invalid",
+	})
+	require.Equal(t, codes.InvalidArgument, status.Code(err))
+
+	orphanClassID := creator + ":orphan"
+	require.NoError(t, fixture.keeper.nftKeeper.SaveClass(
+		fixture.ctx,
+		upstreamnft.Class{Id: orphanClassID},
+	))
+	_, err = server.Balance(goCtx, &upstreamnft.QueryBalanceRequest{
+		ClassId: orphanClassID,
+		Owner:   owner,
+	})
+	require.Equal(t, codes.Internal, status.Code(err))
+}

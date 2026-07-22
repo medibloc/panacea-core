@@ -7,6 +7,7 @@ import (
 
 	upstreamnft "cosmossdk.io/x/nft"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/medibloc/panacea-core/v2/x/nft/types"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -134,4 +135,37 @@ func (q standardQueryServer) Supply(
 		))
 	}
 	return &upstreamnft.QuerySupplyResponse{Amount: supply}, nil
+}
+
+// Balance returns the number of active and revoked NFTs in a class owned by
+// an account. Missing classes retain the standard service's zero response.
+func (q standardQueryServer) Balance(
+	goCtx context.Context,
+	request *upstreamnft.QueryBalanceRequest,
+) (*upstreamnft.QueryBalanceResponse, error) {
+	if request == nil {
+		return nil, status.Error(codes.InvalidArgument, "empty request")
+	}
+	if err := q.keeper.validateCanonicalClassID(request.ClassId); err != nil {
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+	_, owner, err := q.keeper.canonicalAddress("owner", request.Owner)
+	if errors.Is(err, sdkerrors.ErrInvalidAddress) {
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+	if err != nil {
+		return nil, mapQueryStateError(err)
+	}
+
+	ctx := sdk.UnwrapSDKContext(goCtx)
+	_, err = q.keeper.getClassRecord(ctx, request.ClassId)
+	if errors.Is(err, upstreamnft.ErrClassNotExists) {
+		return &upstreamnft.QueryBalanceResponse{}, nil
+	}
+	if err != nil {
+		return nil, mapQueryStateError(err)
+	}
+	return &upstreamnft.QueryBalanceResponse{
+		Amount: q.keeper.nftKeeper.GetBalance(ctx, request.ClassId, owner),
+	}, nil
 }
