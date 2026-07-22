@@ -2,6 +2,8 @@ package nft
 
 import (
 	"context"
+	"net/http"
+	"net/http/httptest"
 	"testing"
 
 	"cosmossdk.io/core/address"
@@ -12,6 +14,7 @@ import (
 	upstreamnft "cosmossdk.io/x/nft"
 	cmtproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	dbm "github.com/cosmos/cosmos-db"
+	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
 	addresscodec "github.com/cosmos/cosmos-sdk/codec/address"
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
@@ -20,6 +23,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	grpc "github.com/cosmos/gogoproto/grpc"
+	gatewayruntime "github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/medibloc/panacea-core/v2/x/nft/keeper"
 	"github.com/medibloc/panacea-core/v2/x/nft/types"
 	"github.com/stretchr/testify/require"
@@ -67,6 +71,29 @@ func TestAppModuleBasicGenesisContract(t *testing.T) {
 
 	nilNFTState := cdc.MustMarshalJSON(&types.GenesisState{})
 	require.ErrorContains(t, basic.ValidateGenesis(cdc, nil, nilNFTState), "nft_state must not be nil")
+}
+
+func TestAppModuleBasicRegistersStandardAndPanaceaGatewayRoutes(t *testing.T) {
+	basic := NewAppModuleBasic(addresscodec.NewBech32Codec("panacea"))
+	mux := gatewayruntime.NewServeMux()
+	require.NotPanics(t, func() {
+		basic.RegisterGRPCGatewayRoutes(client.Context{}, mux)
+	})
+
+	for _, path := range []string{
+		"/cosmos/nft/v1beta1/nfts",
+		"/panacea/nft/v1/nfts",
+	} {
+		request := httptest.NewRequest(http.MethodGet, path, nil)
+		response := httptest.NewRecorder()
+		mux.ServeHTTP(response, request)
+		require.NotEqual(t, http.StatusNotFound, response.Code, path)
+	}
+
+	request := httptest.NewRequest(http.MethodGet, "/unregistered/nft/route", nil)
+	response := httptest.NewRecorder()
+	mux.ServeHTTP(response, request)
+	require.Equal(t, http.StatusNotFound, response.Code)
 }
 
 func TestAppModuleEmptyGenesisRoundTrip(t *testing.T) {

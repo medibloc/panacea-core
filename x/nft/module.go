@@ -72,8 +72,15 @@ func (am AppModuleBasic) ValidateGenesis(cdc codec.JSONCodec, _ client.TxEncodin
 	return types.ValidateGenesis(genesis, am.addressCodec, unpacker)
 }
 
-// RegisterGRPCGatewayRoutes registers the Panacea combined query routes.
+// RegisterGRPCGatewayRoutes registers the standard and Panacea query routes.
 func (AppModuleBasic) RegisterGRPCGatewayRoutes(clientContext client.Context, mux *runtime.ServeMux) {
+	if err := upstreamnft.RegisterQueryHandlerClient(
+		context.Background(),
+		mux,
+		upstreamnft.NewQueryClient(clientContext),
+	); err != nil {
+		panic(err)
+	}
 	if err := types.RegisterQueryHandlerClient(
 		context.Background(),
 		mux,
