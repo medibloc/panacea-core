@@ -78,12 +78,11 @@ func TestCapabilityWiring(t *testing.T) {
 	require.Equal(t, capabilitytypes.ModuleName, testApp.ModuleManager.OrderExportGenesis[0])
 }
 
-func TestPNFTWiringWithStandaloneNFTKeeper(t *testing.T) {
+func TestPNFTCompatibilityModuleWiring(t *testing.T) {
 	panaceaapp.SetConfig()
 	appOpts := viper.New()
 	appOpts.Set(flags.FlagHome, t.TempDir())
 	testApp := panaceaapp.New(log.NewNopLogger(), dbm.NewMemDB(), nil, false, appOpts)
-	require.NoError(t, testApp.LoadLatestVersion())
 
 	require.Contains(t, testApp.GetKVStoreKey(), pnfttypes.StoreKey)
 	require.NotContains(t, testApp.GetKVStoreKey(), nft.ModuleName)
@@ -91,41 +90,6 @@ func TestPNFTWiringWithStandaloneNFTKeeper(t *testing.T) {
 	require.NotContains(t, testApp.ModuleManager.Modules, nft.ModuleName)
 	require.NotContains(t, testApp.ModuleManager.OrderInitGenesis, pnfttypes.ModuleName)
 	require.NotContains(t, testApp.ModuleManager.OrderExportGenesis, pnfttypes.ModuleName)
-
-	ctx := testApp.NewUncachedContext(false, cmtproto.Header{Time: time.Now()})
-	owner := sdk.AccAddress(bytes.Repeat([]byte{1}, 20)).String()
-	receiver := sdk.AccAddress(bytes.Repeat([]byte{2}, 20)).String()
-
-	denom := &pnfttypes.Denom{
-		Id:     "test-denom",
-		Name:   "Test Denom",
-		Symbol: "TEST",
-		Owner:  owner,
-	}
-	require.NoError(t, testApp.PnftKeeper.SaveDenom(ctx, denom))
-
-	token := &pnfttypes.Pnft{
-		DenomId:   denom.Id,
-		Id:        "test-pnft",
-		Name:      "Test PNFT",
-		Creator:   owner,
-		Owner:     owner,
-		CreatedAt: time.Now(),
-	}
-	require.NoError(t, testApp.PnftKeeper.MintPNFT(ctx, token))
-
-	stored, err := testApp.PnftKeeper.GetPNFT(ctx, denom.Id, token.Id)
-	require.NoError(t, err)
-	require.Equal(t, owner, stored.Owner)
-
-	require.NoError(t, testApp.PnftKeeper.TransferPNFT(ctx, denom.Id, token.Id, owner, receiver))
-	stored, err = testApp.PnftKeeper.GetPNFT(ctx, denom.Id, token.Id)
-	require.NoError(t, err)
-	require.Equal(t, receiver, stored.Owner)
-
-	require.NoError(t, testApp.PnftKeeper.BurnPNFT(ctx, denom.Id, token.Id, receiver))
-	_, err = testApp.PnftKeeper.GetPNFT(ctx, denom.Id, token.Id)
-	require.Error(t, err)
 }
 
 func TestPNFTMsgRouteUsesLegacyRejectionServer(t *testing.T) {

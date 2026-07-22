@@ -59,8 +59,6 @@ import (
 	burnkeeper "github.com/medibloc/panacea-core/v2/x/burn/keeper"
 	didkeeper "github.com/medibloc/panacea-core/v2/x/did/keeper"
 	didtypes "github.com/medibloc/panacea-core/v2/x/did/types"
-	pnftkeeper "github.com/medibloc/panacea-core/v2/x/pnft/keeper"
-	pnfttypes "github.com/medibloc/panacea-core/v2/x/pnft/types"
 	"github.com/spf13/cast"
 )
 
@@ -92,7 +90,6 @@ type AppKeepersWithKey struct {
 	AolKeeper  aolkeeper.Keeper
 	DidKeeper  didkeeper.Keeper
 	BurnKeeper burnkeeper.Keeper
-	PnftKeeper pnftkeeper.Keeper
 
 	keys    map[string]*storetypes.KVStoreKey
 	tkeys   map[string]*storetypes.TransientStoreKey
@@ -295,15 +292,6 @@ func (appKeepers *AppKeepersWithKey) InitKeyAndKeepers(
 	)
 
 	appKeepers.BurnKeeper = *burnkeeper.NewKeeper(
-		appKeepers.BankKeeper,
-	)
-
-	pnftStoreService := runtime.NewKVStoreService(appKeepers.keys[pnfttypes.StoreKey])
-	appKeepers.PnftKeeper = pnftkeeper.NewKeeper(
-		appCodec,
-		appKeepers.keys[pnfttypes.StoreKey],
-		pnftStoreService,
-		appKeepers.AccountKeeper,
 		appKeepers.BankKeeper,
 	)
 
