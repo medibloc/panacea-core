@@ -75,6 +75,9 @@ func (k Keeper) getClassRecord(ctx sdk.Context, classID string) (*types.ClassRec
 	if mintedCountErr != nil {
 		return nil, fmt.Errorf("load minted count: %w", mintedCountErr)
 	}
+	if class.Id != classID {
+		return nil, fmt.Errorf("standard class key does not match value for %s", classID)
+	}
 	if policy.ClassId != classID {
 		return nil, fmt.Errorf("class policy key does not match value for %s", classID)
 	}

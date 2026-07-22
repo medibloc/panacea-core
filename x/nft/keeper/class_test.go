@@ -10,6 +10,7 @@ import (
 
 	corestore "cosmossdk.io/core/store"
 	upstreamnft "cosmossdk.io/x/nft"
+	upstreamkeeper "cosmossdk.io/x/nft/keeper"
 	"github.com/cosmos/cosmos-sdk/runtime"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -289,6 +290,31 @@ func TestQueryClassRecordErrorMapping(t *testing.T) {
 		)
 		require.Equal(t, codes.Internal, status.Code(err))
 	})
+}
+
+func TestGetClassRecordRejectsMismatchedStandardClassID(t *testing.T) {
+	fixture := newKeeperFixture(t, true, true)
+	creator := fixture.accountAddress(t, sdk.AccAddress(bytes.Repeat([]byte{9}, 20)))
+	response, err := NewMsgServer(fixture.keeper).CreateClass(
+		sdk.WrapSDKContext(fixture.ctx),
+		validCreateClassRequest(creator),
+	)
+	require.NoError(t, err)
+
+	class, found := fixture.keeper.nftKeeper.GetClass(fixture.ctx, response.ClassId)
+	require.True(t, found)
+	class.Id = creator + ":different"
+	classBytes, err := fixture.cdc.Marshal(&class)
+	require.NoError(t, err)
+	classKey := append(append([]byte(nil), upstreamkeeper.ClassKey...), response.ClassId...)
+	require.NoError(t, fixture.keeper.nftStoreService.OpenKVStore(fixture.ctx).Set(
+		classKey,
+		classBytes,
+	))
+
+	record, err := fixture.keeper.getClassRecord(fixture.ctx, response.ClassId)
+	require.Nil(t, record)
+	require.ErrorContains(t, err, "standard class key does not match value")
 }
 
 func validCreateClassRequest(creator string) *types.MsgCreateClassRequest {
