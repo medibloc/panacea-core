@@ -95,6 +95,7 @@ import (
 	"github.com/medibloc/panacea-core/v2/app/upgrades/v2_0_6"
 	"github.com/medibloc/panacea-core/v2/app/upgrades/v2_0_7"
 	"github.com/medibloc/panacea-core/v2/app/upgrades/v2_2_0"
+	"github.com/medibloc/panacea-core/v2/app/upgrades/v2_3_0"
 )
 
 const Name = "panacea"
@@ -163,6 +164,7 @@ var (
 		v2_0_6.Upgrade,
 		v2_0_7.Upgrade,
 		v2_2_0.Upgrade,
+		v2_3_0.Upgrade,
 		pan_19_noop_rehearsal.Upgrade,
 	}
 )

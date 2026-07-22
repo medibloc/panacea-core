@@ -23,7 +23,6 @@ import (
 	aoltypes "github.com/medibloc/panacea-core/v2/x/aol/types"
 	burntypes "github.com/medibloc/panacea-core/v2/x/burn/types"
 	didtypes "github.com/medibloc/panacea-core/v2/x/did/types"
-	pnfttypes "github.com/medibloc/panacea-core/v2/x/pnft/types"
 )
 
 func (appKeepers *AppKeepersWithKey) GenerateKeys() {
@@ -34,7 +33,7 @@ func (appKeepers *AppKeepersWithKey) GenerateKeys() {
 		evidencetypes.StoreKey, capabilitytypes.StoreKey,
 		authzkeeper.StoreKey, group.StoreKey,
 		ibcexported.StoreKey, ibctransfertypes.StoreKey,
-		aoltypes.StoreKey, didtypes.StoreKey, burntypes.StoreKey, pnfttypes.StoreKey,
+		aoltypes.StoreKey, didtypes.StoreKey, burntypes.StoreKey,
 	)
 
 	appKeepers.tkeys = storetypes.NewTransientStoreKeys(paramstypes.TStoreKey)

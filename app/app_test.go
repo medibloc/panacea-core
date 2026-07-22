@@ -84,7 +84,7 @@ func TestPNFTCompatibilityModuleWiring(t *testing.T) {
 	appOpts.Set(flags.FlagHome, t.TempDir())
 	testApp := panaceaapp.New(log.NewNopLogger(), dbm.NewMemDB(), nil, false, appOpts)
 
-	require.Contains(t, testApp.GetKVStoreKey(), pnfttypes.StoreKey)
+	require.NotContains(t, testApp.GetKVStoreKey(), pnfttypes.StoreKey)
 	require.NotContains(t, testApp.GetKVStoreKey(), nft.ModuleName)
 	require.Contains(t, testApp.ModuleManager.Modules, pnfttypes.ModuleName)
 	require.NotContains(t, testApp.ModuleManager.Modules, nft.ModuleName)
