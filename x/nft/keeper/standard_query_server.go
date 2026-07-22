@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"context"
+	"errors"
 
 	upstreamnft "cosmossdk.io/x/nft"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -65,4 +66,31 @@ func (q standardQueryServer) NFT(
 		return nil, mapQueryStateError(err)
 	}
 	return &upstreamnft.QueryNFTResponse{Nft: live.Nft}, nil
+}
+
+// Owner returns the current owner of an active or revoked NFT. Burned and
+// unissued IDs retain the standard service's empty-owner response.
+func (q standardQueryServer) Owner(
+	goCtx context.Context,
+	request *upstreamnft.QueryOwnerRequest,
+) (*upstreamnft.QueryOwnerResponse, error) {
+	if request == nil {
+		return nil, status.Error(codes.InvalidArgument, "empty request")
+	}
+	if err := q.keeper.validateCanonicalClassID(request.ClassId); err != nil {
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+	if err := types.ValidateNFTID(request.Id); err != nil {
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	ctx := sdk.UnwrapSDKContext(goCtx)
+	live, err := q.keeper.getLiveNFTRecord(ctx, request.ClassId, request.Id)
+	if errors.Is(err, upstreamnft.ErrNFTNotExists) {
+		return &upstreamnft.QueryOwnerResponse{}, nil
+	}
+	if err != nil {
+		return nil, mapQueryStateError(err)
+	}
+	return &upstreamnft.QueryOwnerResponse{Owner: live.Owner}, nil
 }

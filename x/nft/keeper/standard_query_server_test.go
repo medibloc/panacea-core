@@ -168,3 +168,96 @@ func TestStandardQueryNFTErrorMapping(t *testing.T) {
 	)
 	require.Equal(t, codes.Internal, status.Code(err))
 }
+
+func TestStandardQueryOwnerIncludesActiveAndRevoked(t *testing.T) {
+	t.Run("active", func(t *testing.T) {
+		fixture := newKeeperFixture(t, true, true)
+		classID, _, owner, _, _ := createNFTForBurnTest(t, &fixture)
+
+		response, err := NewStandardQueryServer(fixture.keeper).Owner(
+			sdk.WrapSDKContext(fixture.ctx),
+			&upstreamnft.QueryOwnerRequest{ClassId: classID, Id: "nft-1"},
+		)
+		require.NoError(t, err)
+		require.Equal(t, owner, response.Owner)
+	})
+
+	t.Run("revoked", func(t *testing.T) {
+		fixture := newKeeperFixture(t, true, true)
+		classID, controller, owner, _ := createNFTForRevokeTest(t, &fixture, true)
+		fixture.ctx = fixture.ctx.WithBlockTime(fixture.ctx.BlockTime().Add(time.Hour))
+		_, err := NewMsgServer(fixture.keeper).Revoke(
+			sdk.WrapSDKContext(fixture.ctx),
+			&nfttypes.MsgRevokeRequest{
+				ClassId: classID, NftId: "nft-1", Controller: controller,
+			},
+		)
+		require.NoError(t, err)
+
+		response, err := NewStandardQueryServer(fixture.keeper).Owner(
+			sdk.WrapSDKContext(fixture.ctx),
+			&upstreamnft.QueryOwnerRequest{ClassId: classID, Id: "nft-1"},
+		)
+		require.NoError(t, err)
+		require.Equal(t, owner, response.Owner)
+	})
+}
+
+func TestStandardQueryOwnerReturnsEmptyForBurnedAndUnknownIDs(t *testing.T) {
+	fixture := newKeeperFixture(t, true, true)
+	classID, _, owner, _, _ := createNFTForBurnTest(t, &fixture)
+	server := NewStandardQueryServer(fixture.keeper)
+
+	response, err := server.Owner(
+		sdk.WrapSDKContext(fixture.ctx),
+		&upstreamnft.QueryOwnerRequest{ClassId: classID, Id: "unknown"},
+	)
+	require.NoError(t, err)
+	require.Empty(t, response.Owner)
+
+	fixture.ctx = fixture.ctx.WithBlockTime(fixture.ctx.BlockTime().Add(time.Hour))
+	_, err = NewMsgServer(fixture.keeper).Burn(
+		sdk.WrapSDKContext(fixture.ctx),
+		&nfttypes.MsgBurnRequest{ClassId: classID, NftId: "nft-1", Owner: owner},
+	)
+	require.NoError(t, err)
+	response, err = server.Owner(
+		sdk.WrapSDKContext(fixture.ctx),
+		&upstreamnft.QueryOwnerRequest{ClassId: classID, Id: "nft-1"},
+	)
+	require.NoError(t, err)
+	require.Empty(t, response.Owner)
+}
+
+func TestStandardQueryOwnerErrorMapping(t *testing.T) {
+	fixture := newKeeperFixture(t, true, true)
+	server := NewStandardQueryServer(fixture.keeper)
+	creator := fixture.accountAddress(t, sdk.AccAddress(bytes.Repeat([]byte{64}, 20)))
+	goCtx := sdk.WrapSDKContext(fixture.ctx)
+
+	_, err := server.Owner(goCtx, nil)
+	require.Equal(t, codes.InvalidArgument, status.Code(err))
+
+	_, err = server.Owner(goCtx, &upstreamnft.QueryOwnerRequest{
+		ClassId: "invalid",
+		Id:      "nft-1",
+	})
+	require.Equal(t, codes.InvalidArgument, status.Code(err))
+
+	_, err = server.Owner(goCtx, &upstreamnft.QueryOwnerRequest{
+		ClassId: creator + ":class",
+		Id:      ".",
+	})
+	require.Equal(t, codes.InvalidArgument, status.Code(err))
+
+	classID, _, _, _, _ := createNFTForBurnTest(t, &fixture)
+	require.NoError(t, fixture.keeper.lifecycles.Remove(
+		fixture.ctx,
+		collections.Join(classID, "nft-1"),
+	))
+	_, err = server.Owner(
+		sdk.WrapSDKContext(fixture.ctx),
+		&upstreamnft.QueryOwnerRequest{ClassId: classID, Id: "nft-1"},
+	)
+	require.Equal(t, codes.Internal, status.Code(err))
+}
