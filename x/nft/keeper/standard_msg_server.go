@@ -36,11 +36,11 @@ func (m standardMsgServer) Send(
 	if err := types.ValidateNFTID(request.Id); err != nil {
 		return nil, err
 	}
-	sender, _, err := m.keeper.canonicalAddress("sender", request.Sender)
+	sender, senderAddress, err := m.keeper.canonicalAddress("sender", request.Sender)
 	if err != nil {
 		return nil, err
 	}
-	receiver, _, err := m.keeper.canonicalNonModuleAccount("receiver", request.Receiver)
+	receiver, receiverAddress, err := m.keeper.canonicalNonModuleAccount("receiver", request.Receiver)
 	if err != nil {
 		return nil, err
 	}
@@ -52,5 +52,19 @@ func (m standardMsgServer) Send(
 	canonicalRequest := *request
 	canonicalRequest.Sender = sender
 	canonicalRequest.Receiver = receiver
-	return m.keeper.nftKeeper.Send(goCtx, &canonicalRequest)
+	cacheCtx, writeCache := ctx.CacheContext()
+	response, err := m.keeper.nftKeeper.Send(sdk.WrapSDKContext(cacheCtx), &canonicalRequest)
+	if err != nil {
+		return nil, err
+	}
+	if err := m.keeper.transferOwnerClassCount(
+		cacheCtx,
+		request.ClassId,
+		senderAddress,
+		receiverAddress,
+	); err != nil {
+		return nil, err
+	}
+	writeCache()
+	return response, nil
 }

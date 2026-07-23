@@ -3,6 +3,7 @@ package keeper
 import (
 	"bytes"
 	"fmt"
+	"sort"
 
 	"cosmossdk.io/collections"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -16,11 +17,16 @@ type genesisNFTKey struct {
 	nftID   string
 }
 
+type genesisOwnerClassKey struct {
+	classID string
+	owner   string
+}
+
 type expectedGenesisState struct {
 	supply          map[string]uint64
 	mintedCount     map[string]uint64
 	ownerByNFT      map[genesisNFTKey]sdk.AccAddress
-	ownerClassCount map[string]map[string]uint64
+	ownerClassCount map[genesisOwnerClassKey]uint64
 }
 
 // InitGenesis atomically restores standard NFT state and its coupled policy
@@ -77,6 +83,20 @@ func (k Keeper) InitGenesis(ctx sdk.Context, data *types.GenesisState) error {
 	for _, class := range data.NftState.Classes {
 		if err := k.mintedCounts.Set(cacheCtx, class.Id, expected.mintedCount[class.Id]); err != nil {
 			return fmt.Errorf("initialize minted count for class %s: %w", class.Id, err)
+		}
+	}
+	for _, key := range sortedGenesisOwnerClassKeys(expected.ownerClassCount) {
+		if err := k.ownerClassCounts.Set(
+			cacheCtx,
+			collections.Join(key.classID, key.owner),
+			expected.ownerClassCount[key],
+		); err != nil {
+			return fmt.Errorf(
+				"initialize owner %s class %s balance count: %w",
+				key.owner,
+				key.classID,
+				err,
+			)
 		}
 	}
 	if err := k.verifyInitializedGenesis(cacheCtx, *data, expected); err != nil {
@@ -219,7 +239,7 @@ func (k Keeper) expectedGenesisState(data types.GenesisState) (expectedGenesisSt
 		supply:          make(map[string]uint64, len(data.NftState.Classes)),
 		mintedCount:     make(map[string]uint64, len(data.NftState.Classes)),
 		ownerByNFT:      make(map[genesisNFTKey]sdk.AccAddress),
-		ownerClassCount: make(map[string]map[string]uint64),
+		ownerClassCount: make(map[genesisOwnerClassKey]uint64),
 	}
 	for _, class := range data.NftState.Classes {
 		expected.supply[class.Id] = 0
@@ -230,13 +250,15 @@ func (k Keeper) expectedGenesisState(data types.GenesisState) (expectedGenesisSt
 		if err != nil {
 			return expectedGenesisState{}, fmt.Errorf("decode validated nft owner %s: %w", entry.Owner, err)
 		}
-		expected.ownerClassCount[entry.Owner] = make(map[string]uint64)
 		for _, token := range entry.Nfts {
 			key := genesisNFTKey{classID: token.ClassId, nftID: token.Id}
 			expected.ownerByNFT[key] = sdk.AccAddress(append([]byte(nil), ownerBytes...))
 			expected.supply[token.ClassId]++
 			expected.mintedCount[token.ClassId]++
-			expected.ownerClassCount[entry.Owner][token.ClassId]++
+			expected.ownerClassCount[genesisOwnerClassKey{
+				classID: token.ClassId,
+				owner:   entry.Owner,
+			}]++
 		}
 	}
 	for _, tombstone := range data.Tombstones {
@@ -296,7 +318,10 @@ func (k Keeper) verifyInitializedGenesis(
 				continue
 			}
 			checkedClasses[token.ClassId] = struct{}{}
-			expectedCount := expected.ownerClassCount[entry.Owner][token.ClassId]
+			expectedCount := expected.ownerClassCount[genesisOwnerClassKey{
+				classID: token.ClassId,
+				owner:   entry.Owner,
+			}]
 			actual := k.nftKeeper.GetBalance(ctx, token.ClassId, sdk.AccAddress(ownerBytes))
 			if actual != expectedCount {
 				return fmt.Errorf(
@@ -309,7 +334,7 @@ func (k Keeper) verifyInitializedGenesis(
 			}
 		}
 	}
-	return nil
+	return k.verifyOwnerClassCountState(ctx, expected.ownerClassCount, "initialized")
 }
 
 func (k Keeper) verifyExportedDerivedState(ctx sdk.Context, data types.GenesisState) error {
@@ -357,7 +382,116 @@ func (k Keeper) verifyExportedDerivedState(ctx sdk.Context, data types.GenesisSt
 	}); err != nil {
 		return err
 	}
+	expected, err := k.expectedGenesisState(data)
+	if err != nil {
+		return fmt.Errorf("derive exported owner class counts: %w", err)
+	}
+	return k.verifyOwnerClassCountState(ctx, expected.ownerClassCount, "exported")
+}
+
+func (k Keeper) verifyOwnerClassCountState(
+	ctx sdk.Context,
+	expected map[genesisOwnerClassKey]uint64,
+	phase string,
+) error {
+	for _, key := range sortedGenesisOwnerClassKeys(expected) {
+		actual, found, err := k.loadOwnerClassCount(
+			ctx,
+			collections.Join(key.classID, key.owner),
+		)
+		if err != nil {
+			return fmt.Errorf(
+				"load %s owner %s class %s balance count: %w",
+				phase,
+				key.owner,
+				key.classID,
+				err,
+			)
+		}
+		if !found {
+			return fmt.Errorf(
+				"%s owner %s class %s balance count is missing",
+				phase,
+				key.owner,
+				key.classID,
+			)
+		}
+		if actual != expected[key] {
+			return fmt.Errorf(
+				"%s owner %s class %s balance count %d does not match expected %d",
+				phase,
+				key.owner,
+				key.classID,
+				actual,
+				expected[key],
+			)
+		}
+	}
+
+	var actualEntries int
+	if err := k.ownerClassCounts.Walk(
+		ctx,
+		nil,
+		func(key collections.Pair[string, string], count uint64) (bool, error) {
+			logicalKey := genesisOwnerClassKey{classID: key.K1(), owner: key.K2()}
+			expectedCount, exists := expected[logicalKey]
+			if !exists {
+				return true, fmt.Errorf(
+					"%s owner %s class %s balance count has no live nfts",
+					phase,
+					logicalKey.owner,
+					logicalKey.classID,
+				)
+			}
+			if count == 0 {
+				return true, fmt.Errorf(
+					"%s owner %s class %s has a stored zero balance count",
+					phase,
+					logicalKey.owner,
+					logicalKey.classID,
+				)
+			}
+			if count != expectedCount {
+				return true, fmt.Errorf(
+					"%s owner %s class %s balance count %d does not match expected %d",
+					phase,
+					logicalKey.owner,
+					logicalKey.classID,
+					count,
+					expectedCount,
+				)
+			}
+			actualEntries++
+			return false, nil
+		},
+	); err != nil {
+		return fmt.Errorf("verify %s owner class balance counts: %w", phase, err)
+	}
+	if actualEntries != len(expected) {
+		return fmt.Errorf(
+			"%s owner class balance count entries %d do not match expected %d",
+			phase,
+			actualEntries,
+			len(expected),
+		)
+	}
 	return nil
+}
+
+func sortedGenesisOwnerClassKeys(
+	counts map[genesisOwnerClassKey]uint64,
+) []genesisOwnerClassKey {
+	keys := make([]genesisOwnerClassKey, 0, len(counts))
+	for key := range counts {
+		keys = append(keys, key)
+	}
+	sort.Slice(keys, func(i, j int) bool {
+		if keys[i].classID != keys[j].classID {
+			return keys[i].classID < keys[j].classID
+		}
+		return keys[i].owner < keys[j].owner
+	})
+	return keys
 }
 
 func (k Keeper) ensureStoresAvailable(ctx sdk.Context) error {

@@ -81,6 +81,9 @@ func (k Keeper) mintNFT(
 	if err := k.mintedCounts.Set(cacheCtx, token.ClassId, nextCount); err != nil {
 		return fmt.Errorf("update minted count: %w", err)
 	}
+	if err := k.incrementOwnerClassCount(cacheCtx, token.ClassId, recipient); err != nil {
+		return err
+	}
 	writeCache()
 	return nil
 }

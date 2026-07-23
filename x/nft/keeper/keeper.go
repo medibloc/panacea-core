@@ -26,11 +26,12 @@ type Keeper struct {
 	nftKeeper          upstreamkeeper.Keeper
 	moduleAccounts     map[string]struct{}
 
-	schema        collections.Schema
-	classPolicies collections.Map[string, types.ClassPolicy]
-	mintedCounts  collections.Map[string, uint64]
-	lifecycles    collections.Map[collections.Pair[string, string], types.LifecycleRecord]
-	tombstones    collections.Map[collections.Pair[string, string], types.BurnTombstone]
+	schema           collections.Schema
+	classPolicies    collections.Map[string, types.ClassPolicy]
+	mintedCounts     collections.Map[string, uint64]
+	lifecycles       collections.Map[collections.Pair[string, string], types.LifecycleRecord]
+	tombstones       collections.Map[collections.Pair[string, string], types.BurnTombstone]
+	ownerClassCounts collections.Map[collections.Pair[string, string], uint64]
 }
 
 // NewKeeper creates the single keeper that owns both NFT stores.
@@ -101,6 +102,13 @@ func NewKeeper(
 		nftKeyCodec,
 		codec.CollValue[types.BurnTombstone](cdc),
 	)
+	ownerClassCounts := collections.NewMap(
+		schemaBuilder,
+		ownerClassCountsPrefix,
+		"owner_class_counts",
+		nftKeyCodec,
+		collections.Uint64Value,
+	)
 	schema, err := schemaBuilder.Build()
 	if err != nil {
 		panic(fmt.Errorf("build panacea_nft schema: %w", err))
@@ -119,11 +127,12 @@ func NewKeeper(
 			accountKeeper,
 			bankKeeper,
 		),
-		schema:        schema,
-		classPolicies: classPolicies,
-		mintedCounts:  mintedCounts,
-		lifecycles:    lifecycles,
-		tombstones:    tombstones,
+		schema:           schema,
+		classPolicies:    classPolicies,
+		mintedCounts:     mintedCounts,
+		lifecycles:       lifecycles,
+		tombstones:       tombstones,
+		ownerClassCounts: ownerClassCounts,
 	}
 }
 

@@ -593,8 +593,20 @@ func assertClassNFTInvariants(
 		},
 	)
 	require.NoError(t, err)
+	var ownerClassCount uint64
+	err = fixture.keeper.ownerClassCounts.Walk(
+		fixture.ctx,
+		collections.NewPrefixedPairRange[string, string](classID),
+		func(_ collections.Pair[string, string], count uint64) (bool, error) {
+			require.NotZero(t, count)
+			ownerClassCount += count
+			return false, nil
+		},
+	)
+	require.NoError(t, err)
 	require.Equal(t, wantLive, liveCount)
 	require.Equal(t, wantTombstones, tombstoneCount)
+	require.Equal(t, wantLive, ownerClassCount)
 	require.Equal(t, mintedCount, liveCount+tombstoneCount)
 	require.Equal(t, fixture.keeper.nftKeeper.GetTotalSupply(fixture.ctx, classID), liveCount)
 }

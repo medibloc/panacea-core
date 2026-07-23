@@ -494,6 +494,7 @@ func TestMintRollsBackWhenPolicyWriteFails(t *testing.T) {
 	}{
 		{name: "lifecycle write", failAt: 1},
 		{name: "minted count write", failAt: 2},
+		{name: "owner class count write", failAt: 3},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			fixture := newKeeperFixture(t, true, true)

@@ -70,7 +70,17 @@ func TestNewKeeperOwnsTypedPolicyCollections(t *testing.T) {
 	for _, collection := range collectionsByName {
 		names = append(names, collection.GetName())
 	}
-	require.Equal(t, []string{"class_policies", "lifecycles", "minted_counts", "tombstones"}, names)
+	require.Equal(
+		t,
+		[]string{
+			"class_policies",
+			"lifecycles",
+			"minted_counts",
+			"owner_class_counts",
+			"tombstones",
+		},
+		names,
+	)
 }
 
 func TestNFTPairKeyCodecDoesNotConcatenateAmbiguousIDs(t *testing.T) {

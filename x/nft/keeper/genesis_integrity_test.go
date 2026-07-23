@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"testing"
 
+	"cosmossdk.io/collections"
 	upstreamkeeper "cosmossdk.io/x/nft/keeper"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	nfttypes "github.com/medibloc/panacea-core/v2/x/nft/types"
@@ -151,4 +152,65 @@ func TestExportGenesisAcceptsZeroSupplyStorageForms(t *testing.T) {
 		_, err = fixture.keeper.ExportGenesis(fixture.ctx)
 		require.NoError(t, err)
 	})
+}
+
+func TestExportGenesisRejectsInvalidOwnerClassCounts(t *testing.T) {
+	for _, test := range []struct {
+		name        string
+		mutate      func(t *testing.T, fixture *keeperFixture, classID, owner string)
+		errorString string
+	}{
+		{
+			name: "missing",
+			mutate: func(t *testing.T, fixture *keeperFixture, classID, owner string) {
+				require.NoError(t, fixture.keeper.ownerClassCounts.Remove(
+					fixture.ctx,
+					collections.Join(classID, owner),
+				))
+			},
+			errorString: "balance count is missing",
+		},
+		{
+			name: "mismatched",
+			mutate: func(t *testing.T, fixture *keeperFixture, classID, owner string) {
+				require.NoError(t, fixture.keeper.ownerClassCounts.Set(
+					fixture.ctx,
+					collections.Join(classID, owner),
+					2,
+				))
+			},
+			errorString: "balance count 2 does not match expected 1",
+		},
+		{
+			name: "stored zero",
+			mutate: func(t *testing.T, fixture *keeperFixture, classID, owner string) {
+				require.NoError(t, fixture.keeper.ownerClassCounts.Set(
+					fixture.ctx,
+					collections.Join(classID, owner),
+					0,
+				))
+			},
+			errorString: "stored zero balance count",
+		},
+		{
+			name: "orphan",
+			mutate: func(t *testing.T, fixture *keeperFixture, _ string, owner string) {
+				require.NoError(t, fixture.keeper.ownerClassCounts.Set(
+					fixture.ctx,
+					collections.Join("orphan-class", owner),
+					1,
+				))
+			},
+			errorString: "balance count has no live nfts",
+		},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			fixture := newKeeperFixture(t, true, true)
+			classID, _, owner, _, _ := createNFTForBurnTest(t, &fixture)
+			test.mutate(t, &fixture, classID, owner)
+
+			_, err := fixture.keeper.ExportGenesis(fixture.ctx)
+			require.ErrorContains(t, err, test.errorString)
+		})
+	}
 }

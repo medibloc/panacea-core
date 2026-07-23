@@ -63,6 +63,7 @@ func TestBurnedStateGenesisRoundTrip(t *testing.T) {
 	)
 	require.True(t, found)
 	require.Equal(t, secondRequest.Uri, importedLive.Uri)
+	requireOwnerClassCount(t, &importedFixture, classID, owner, 1)
 	assertClassNFTInvariants(t, &importedFixture, classID, 2, 1, 1)
 
 	reexported, err := importedFixture.keeper.ExportGenesis(importedFixture.ctx)

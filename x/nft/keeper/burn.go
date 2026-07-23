@@ -130,6 +130,9 @@ func (k Keeper) burnNFT(
 	if err := k.tombstones.Set(cacheCtx, key, tombstone); err != nil {
 		return fmt.Errorf("save nft tombstone: %w", err)
 	}
+	if err := k.decrementOwnerClassCount(cacheCtx, classID, ownerAddress); err != nil {
+		return err
+	}
 	writeCache()
 	return nil
 }
