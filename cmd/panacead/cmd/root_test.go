@@ -166,6 +166,9 @@ func TestNewRootCmdCommandTree(t *testing.T) {
 		appConfig, err := serverconfig.GetConfig(appConfigReader)
 		require.NoError(t, err)
 		require.Equal(t, uint64(10_000_000), appConfig.QueryGasLimit)
+		require.Equal(t, uint(10), appConfig.API.RPCWriteTimeout)
+		require.Equal(t, serverconfig.DefaultGRPCMaxRecvMsgSize, appConfig.GRPC.MaxRecvMsgSize)
+		require.Equal(t, serverconfig.DefaultGRPCMaxRecvMsgSize, appConfig.GRPC.MaxSendMsgSize)
 
 		appGenesis, err := genutiltypes.AppGenesisFromFile(filepath.Join(home, "config", "genesis.json"))
 		require.NoError(t, err)

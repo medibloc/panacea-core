@@ -39,9 +39,15 @@ import (
 
 var ChainID string
 
-// defaultQueryGasLimit gives newly initialized nodes bounded REST/gRPC query
-// work with more than five times the measured maximum NFT page gas.
-const defaultQueryGasLimit uint64 = 10_000_000
+const (
+	// defaultQueryGasLimit gives newly initialized nodes more than five times
+	// the measured maximum NFT page gas.
+	defaultQueryGasLimit uint64 = 10_000_000
+
+	// defaultAPIRPCWriteTimeout bounds REST response handling like the SDK's
+	// existing default read timeout.
+	defaultAPIRPCWriteTimeout uint = 10
+)
 
 // NewRootCmd creates a new root command for simd. It is called once in the
 // main function.
@@ -129,6 +135,8 @@ func initAppConfig() (string, interface{}) {
 	srvCfg := serverconfig.DefaultConfig()
 	srvCfg.MinGasPrices = "5umed"
 	srvCfg.QueryGasLimit = defaultQueryGasLimit
+	srvCfg.API.RPCWriteTimeout = defaultAPIRPCWriteTimeout
+	srvCfg.GRPC.MaxSendMsgSize = serverconfig.DefaultGRPCMaxRecvMsgSize
 
 	PanaceaAppConfig := CustomAppConfig{Config: *srvCfg}
 
