@@ -1,6 +1,8 @@
 package keeper
 
 import (
+	"fmt"
+
 	"cosmossdk.io/store/prefix"
 	storetypes "cosmossdk.io/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -33,7 +35,11 @@ func (k Keeper) HasTopic(ctx sdk.Context, key types.TopicCompositeKey) bool {
 func (k Keeper) GetAllTopics(ctx sdk.Context) ([]types.TopicCompositeKey, []types.Topic) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.TopicKeyPrefix)
 	iterator := storetypes.KVStorePrefixIterator(store, []byte{})
-	defer iterator.Close()
+	defer func() {
+		if err := iterator.Close(); err != nil {
+			panic(fmt.Errorf("close topic iterator: %w", err))
+		}
+	}()
 
 	keys := make([]types.TopicCompositeKey, 0)
 	values := make([]types.Topic, 0)

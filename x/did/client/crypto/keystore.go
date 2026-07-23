@@ -8,6 +8,7 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -64,11 +65,11 @@ func (ks *KeyStore) Save(address string, key []byte, passwd string) (string, err
 	return ks.save(address, encryptedKey)
 }
 
-func (ks *KeyStore) save(address string, key encryptedKey) (string, error) {
+func (ks *KeyStore) save(address string, key encryptedKey) (path string, err error) {
 	ks.mtx.Lock()
 	defer ks.mtx.Unlock()
 
-	path := ks.newPath(address)
+	path = ks.newPath(address)
 	if fileExists(path) {
 		return "", fmt.Errorf("file is already exists: %s", path)
 	}
@@ -77,7 +78,11 @@ func (ks *KeyStore) save(address string, key encryptedKey) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	defer file.Close()
+	defer func() {
+		if closeErr := file.Close(); closeErr != nil {
+			err = errors.Join(err, fmt.Errorf("close keystore file: %w", closeErr))
+		}
+	}()
 
 	if err := json.NewEncoder(file).Encode(key); err != nil {
 		return "", fmt.Errorf("fail to encode encryptedKey: %w", err)
@@ -109,9 +114,7 @@ func (ks *KeyStore) LoadByAddress(address string, passwd string) ([]byte, error)
 	return ks.Load(path, passwd)
 }
 
-func (ks *KeyStore) load(path string) (encryptedKey, error) {
-	var key encryptedKey
-
+func (ks *KeyStore) load(path string) (key encryptedKey, err error) {
 	ks.mtx.RLock()
 	defer ks.mtx.RUnlock()
 
@@ -119,7 +122,11 @@ func (ks *KeyStore) load(path string) (encryptedKey, error) {
 	if err != nil {
 		return key, err
 	}
-	defer file.Close()
+	defer func() {
+		if closeErr := file.Close(); closeErr != nil {
+			err = errors.Join(err, fmt.Errorf("close keystore file: %w", closeErr))
+		}
+	}()
 
 	if err := json.NewDecoder(file).Decode(&key); err != nil {
 		return key, fmt.Errorf("fail to decode encryptedKey: %w", err)
