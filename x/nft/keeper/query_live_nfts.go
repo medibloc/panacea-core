@@ -57,8 +57,9 @@ func (k Keeper) listLiveNFTRecords(
 		return nil, nil, fmt.Errorf("standard nft query returned no pagination")
 	}
 
+	cache := newLiveNFTListCache()
 	if classID != "" {
-		_, err = k.getClassRecord(ctx, classID)
+		_, err = cache.classRecord(k, ctx, classID)
 		if errors.Is(err, upstreamnft.ErrClassNotExists) {
 			if len(response.Nfts) == 0 {
 				return []*types.LiveNFTRecord{}, response.Pagination, nil
@@ -93,7 +94,7 @@ func (k Keeper) listLiveNFTRecords(
 		if err := types.ValidateNFTID(token.Id); err != nil {
 			return nil, nil, fmt.Errorf("listed nft has invalid stored ID %q: %w", token.Id, err)
 		}
-		live, err := k.getLiveNFTRecord(ctx, token.ClassId, token.Id)
+		live, err := k.getLiveNFTRecordForList(ctx, token.ClassId, token.Id, cache)
 		if errors.Is(err, upstreamnft.ErrNFTNotExists) {
 			return nil, nil, fmt.Errorf(
 				"listed nft %s/%s has no coupled live state",
@@ -121,4 +122,81 @@ func (k Keeper) listLiveNFTRecords(
 		records = append(records, live)
 	}
 	return records, response.Pagination, nil
+}
+
+type liveNFTListClassState struct {
+	record      *types.ClassRecord
+	supply      uint64
+	supplyKnown bool
+}
+
+type liveNFTListCache struct {
+	classes map[string]*liveNFTListClassState
+}
+
+func newLiveNFTListCache() *liveNFTListCache {
+	return &liveNFTListCache{classes: make(map[string]*liveNFTListClassState)}
+}
+
+func (c *liveNFTListCache) classRecord(
+	k Keeper,
+	ctx sdk.Context,
+	classID string,
+) (*types.ClassRecord, error) {
+	if cached, exists := c.classes[classID]; exists {
+		return cached.record, nil
+	}
+	record, err := k.getClassRecord(ctx, classID)
+	if err != nil {
+		return nil, err
+	}
+	c.classes[classID] = &liveNFTListClassState{record: record}
+	return record, nil
+}
+
+func (c *liveNFTListCache) classSupply(
+	k Keeper,
+	ctx sdk.Context,
+	classID string,
+) (uint64, error) {
+	cached, exists := c.classes[classID]
+	if !exists {
+		if _, err := c.classRecord(k, ctx, classID); err != nil {
+			return 0, err
+		}
+		cached = c.classes[classID]
+	}
+	if !cached.supplyKnown {
+		cached.supply = k.nftKeeper.GetTotalSupply(ctx, classID)
+		cached.supplyKnown = true
+	}
+	return cached.supply, nil
+}
+
+func (k Keeper) getLiveNFTRecordForList(
+	ctx sdk.Context,
+	classID string,
+	nftID string,
+	cache *liveNFTListCache,
+) (*types.LiveNFTRecord, error) {
+	state, err := k.loadLiveNFTStateOnly(ctx, classID, nftID)
+	if err != nil {
+		return nil, err
+	}
+	classRecord, err := cache.classRecord(k, ctx, classID)
+	if errors.Is(err, upstreamnft.ErrClassNotExists) {
+		return nil, fmt.Errorf(
+			"live nft %s in class %s references missing class state",
+			nftID,
+			classID,
+		)
+	}
+	if err != nil {
+		return nil, fmt.Errorf("load class state for nft %s: %w", nftID, err)
+	}
+	liveSupply, err := cache.classSupply(k, ctx, classID)
+	if err != nil {
+		return nil, fmt.Errorf("load supply for nft %s: %w", nftID, err)
+	}
+	return k.buildLiveNFTRecord(ctx, classID, nftID, state, classRecord, liveSupply)
 }

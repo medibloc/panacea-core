@@ -98,6 +98,17 @@ func (k Keeper) getLiveNFTRecord(
 		return nil, err
 	}
 	liveSupply := k.nftKeeper.GetTotalSupply(ctx, classID)
+	return k.buildLiveNFTRecord(ctx, classID, nftID, state, classRecord, liveSupply)
+}
+
+func (k Keeper) buildLiveNFTRecord(
+	ctx sdk.Context,
+	classID string,
+	nftID string,
+	state storedNFTState,
+	classRecord *types.ClassRecord,
+	liveSupply uint64,
+) (*types.LiveNFTRecord, error) {
 	if liveSupply == 0 || classRecord.MintedCount == 0 || liveSupply > classRecord.MintedCount {
 		return nil, fmt.Errorf(
 			"nft %s in class %s has inconsistent supply %d and minted count %d",
@@ -382,19 +393,9 @@ func (k Keeper) loadLiveNFTState(
 	classID string,
 	nftID string,
 ) (storedNFTState, *types.ClassRecord, error) {
-	state, err := k.loadNFTState(ctx, classID, nftID)
+	state, err := k.loadLiveNFTStateOnly(ctx, classID, nftID)
 	if err != nil {
 		return storedNFTState{}, nil, err
-	}
-	if err := state.validateLiveCombination(classID, nftID); err != nil {
-		return storedNFTState{}, nil, err
-	}
-	if !state.hasNFT {
-		return storedNFTState{}, nil, upstreamnft.ErrNFTNotExists.Wrapf(
-			"nft %s in class %s not found",
-			nftID,
-			classID,
-		)
 	}
 	record, err := k.getClassRecord(ctx, classID)
 	if errors.Is(err, upstreamnft.ErrClassNotExists) {
@@ -408,6 +409,28 @@ func (k Keeper) loadLiveNFTState(
 		return storedNFTState{}, nil, fmt.Errorf("load class state for nft %s: %w", nftID, err)
 	}
 	return state, record, nil
+}
+
+func (k Keeper) loadLiveNFTStateOnly(
+	ctx sdk.Context,
+	classID string,
+	nftID string,
+) (storedNFTState, error) {
+	state, err := k.loadNFTState(ctx, classID, nftID)
+	if err != nil {
+		return storedNFTState{}, err
+	}
+	if err := state.validateLiveCombination(classID, nftID); err != nil {
+		return storedNFTState{}, err
+	}
+	if !state.hasNFT {
+		return storedNFTState{}, upstreamnft.ErrNFTNotExists.Wrapf(
+			"nft %s in class %s not found",
+			nftID,
+			classID,
+		)
+	}
+	return state, nil
 }
 
 func (k Keeper) loadNFTState(
