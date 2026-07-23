@@ -314,11 +314,13 @@ func (appKeepers *AppKeepersWithKey) InitKeyAndKeepers(
 	// Deprecated: Avoid adding new handlers, instead use the new proposal flow
 	// by granting the governance module the right to execute the message.
 	// See: https://docs.cosmos.network/main/modules/gov#proposal-messages
+	//nolint:staticcheck // Retain execution support for legacy IBC client proposals already in governance state.
+	legacyIBCClientProposalHandler := ibcclient.NewClientProposalHandler(appKeepers.IBCKeeper.ClientKeeper)
 	govRouter := govv1beta1.NewRouter()
 	govRouter.AddRoute(govtypes.RouterKey, govv1beta1.ProposalHandler).
 		AddRoute(paramproposal.RouterKey, params.NewParamChangeProposalHandler(appKeepers.ParamsKeeper)).
-		AddRoute(ibcexported.RouterKey, ibcclient.NewClientProposalHandler(appKeepers.IBCKeeper.ClientKeeper)).
-		AddRoute(ibcclienttypes.RouterKey, ibcclient.NewClientProposalHandler(appKeepers.IBCKeeper.ClientKeeper))
+		AddRoute(ibcexported.RouterKey, legacyIBCClientProposalHandler).
+		AddRoute(ibcclienttypes.RouterKey, legacyIBCClientProposalHandler)
 
 	// Set legacy router for backwards compatibility with gov v1beta1
 	appKeepers.GovKeeper.SetLegacyRouter(govRouter)

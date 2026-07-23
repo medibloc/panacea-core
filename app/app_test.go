@@ -30,6 +30,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/group"
 	capabilitytypes "github.com/cosmos/ibc-go/modules/capability/types"
 	ibctransfertypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
+	ibcclienttypes "github.com/cosmos/ibc-go/v8/modules/core/02-client/types"
 	ibcexported "github.com/cosmos/ibc-go/v8/modules/core/exported"
 	ibctm "github.com/cosmos/ibc-go/v8/modules/light-clients/07-tendermint"
 	"github.com/spf13/viper"
@@ -89,6 +90,19 @@ func TestCapabilityWiring(t *testing.T) {
 	require.Equal(t, capabilitytypes.ModuleName, testApp.ModuleManager.OrderInitGenesis[0])
 	require.NotEmpty(t, testApp.ModuleManager.OrderExportGenesis)
 	require.Equal(t, capabilitytypes.ModuleName, testApp.ModuleManager.OrderExportGenesis[0])
+}
+
+func TestIBCGovernanceWiring(t *testing.T) {
+	panaceaapp.SetConfig()
+	appOpts := viper.New()
+	appOpts.Set(flags.FlagHome, t.TempDir())
+	testApp := panaceaapp.New(log.NewNopLogger(), dbm.NewMemDB(), nil, false, appOpts)
+
+	legacyRouter := testApp.GovKeeper.LegacyRouter()
+	require.True(t, legacyRouter.HasRoute(ibcexported.RouterKey))
+	require.True(t, legacyRouter.HasRoute(ibcclienttypes.RouterKey))
+	require.NotNil(t, testApp.MsgServiceRouter().Handler(&ibcclienttypes.MsgRecoverClient{}))
+	require.NotNil(t, testApp.MsgServiceRouter().Handler(&ibcclienttypes.MsgIBCSoftwareUpgrade{}))
 }
 
 func TestNFTRuntimeAndPNFTCompatibilityWiring(t *testing.T) {
