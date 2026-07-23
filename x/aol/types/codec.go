@@ -27,9 +27,6 @@ func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 	msgservice.RegisterMsgServiceDesc(registry, &_Msg_serviceDesc)
 }
 
-var (
-	amino = codec.NewLegacyAmino()
-	// ModuleCdc is retained for the legacy GetSignBytes API.
-	// Cosmos SDK v0.50 transaction signing uses TxConfig instead.
-	ModuleCdc = codec.NewAminoCodec(amino)
-)
+// ModuleCdc is retained for the legacy GetSignBytes API.
+// Cosmos SDK v0.50 transaction signing uses TxConfig instead.
+var ModuleCdc = codec.NewLegacyAmino()
