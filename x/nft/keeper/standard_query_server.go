@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 
+	"cosmossdk.io/collections"
 	upstreamnft "cosmossdk.io/x/nft"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -149,7 +150,7 @@ func (q standardQueryServer) Balance(
 	if err := q.keeper.validateCanonicalClassID(request.ClassId); err != nil {
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
-	_, owner, err := q.keeper.canonicalAddress("owner", request.Owner)
+	owner, _, err := q.keeper.canonicalAddress("owner", request.Owner)
 	if errors.Is(err, sdkerrors.ErrInvalidAddress) {
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
@@ -165,7 +166,15 @@ func (q standardQueryServer) Balance(
 	if err != nil {
 		return nil, mapQueryStateError(err)
 	}
-	return &upstreamnft.QueryBalanceResponse{
-		Amount: q.keeper.nftKeeper.GetBalance(ctx, request.ClassId, owner),
-	}, nil
+	count, found, err := q.keeper.loadOwnerClassCount(
+		ctx,
+		collections.Join(request.ClassId, owner),
+	)
+	if err != nil {
+		return nil, mapQueryStateError(err)
+	}
+	if !found {
+		return &upstreamnft.QueryBalanceResponse{}, nil
+	}
+	return &upstreamnft.QueryBalanceResponse{Amount: count}, nil
 }

@@ -67,9 +67,8 @@ func BenchmarkStandardQueryBalanceCountCandidates(b *testing.B) {
 		name := fmt.Sprintf("owner_%d/class_%d", scenario.ownerNFTs, scenario.classNFTs)
 		b.Run(name, func(b *testing.B) {
 			query := newBalanceQueryFixture(b, scenario.ownerNFTs, scenario.classNFTs, nil)
-			counts := newBenchmarkBalanceCounts(b, query)
 
-			b.Run("current_full_query", func(b *testing.B) {
+			b.Run("optimized_full_query", func(b *testing.B) {
 				b.ReportAllocs()
 				for i := 0; i < b.N; i++ {
 					response, err := query.server.Balance(query.goCtx, query.request)
@@ -104,7 +103,7 @@ func BenchmarkStandardQueryBalanceCountCandidates(b *testing.B) {
 				key := collections.Join(query.classID, query.request.Owner)
 				b.ReportAllocs()
 				for i := 0; i < b.N; i++ {
-					count, err := counts.Get(query.ctx, key)
+					count, err := query.keeper.ownerClassCounts.Get(query.ctx, key)
 					if err != nil {
 						b.Fatal(err)
 					}
@@ -119,51 +118,42 @@ func BenchmarkStandardQueryBalanceCountCandidates(b *testing.B) {
 
 func TestStandardQueryBalanceStoreReadScaling(t *testing.T) {
 	tests := []struct {
-		name          string
-		ownerNFTs     int
-		classNFTs     int
-		expectedGets  uint64
-		expectedIters uint64
-		expectedNexts uint64
+		name      string
+		ownerNFTs int
+		classNFTs int
 	}{
 		{
-			name:          "one owned out of one",
-			ownerNFTs:     1,
-			classNFTs:     1,
-			expectedGets:  2,
-			expectedIters: 1,
-			expectedNexts: 1,
+			name:      "one owned out of one",
+			ownerNFTs: 1,
+			classNFTs: 1,
 		},
 		{
-			name:          "one owned out of one thousand",
-			ownerNFTs:     1,
-			classNFTs:     1_000,
-			expectedGets:  2,
-			expectedIters: 1,
-			expectedNexts: 1,
+			name:      "one owned out of one thousand",
+			ownerNFTs: 1,
+			classNFTs: 1_000,
 		},
 		{
-			name:          "one thousand owned out of one thousand",
-			ownerNFTs:     1_000,
-			classNFTs:     1_000,
-			expectedGets:  1_001,
-			expectedIters: 1,
-			expectedNexts: 1_000,
+			name:      "one thousand owned out of one thousand",
+			ownerNFTs: 1_000,
+			classNFTs: 1_000,
 		},
 	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			counters := &balanceStoreCounters{}
+			counters := &balanceQueryStoreCounters{}
 			query := newBalanceQueryFixture(t, test.ownerNFTs, test.classNFTs, counters)
 			counters.reset()
 
 			response, err := query.server.Balance(query.goCtx, query.request)
 			require.NoError(t, err)
 			require.Equal(t, uint64(test.ownerNFTs), response.Amount)
-			require.Equal(t, test.expectedGets, counters.gets)
-			require.Equal(t, test.expectedIters, counters.iterators)
-			require.Equal(t, test.expectedNexts, counters.iteratorNexts)
+			require.Equal(t, uint64(1), counters.nft.gets)
+			require.Zero(t, counters.nft.iterators)
+			require.Zero(t, counters.nft.iteratorNexts)
+			require.Equal(t, uint64(3), counters.policy.gets)
+			require.Zero(t, counters.policy.iterators)
+			require.Zero(t, counters.policy.iteratorNexts)
 		})
 	}
 }
@@ -181,7 +171,6 @@ func TestStandardQueryBalanceCountCandidatesAgree(t *testing.T) {
 		name := fmt.Sprintf("owner_%d/class_%d", test.ownerNFTs, test.classNFTs)
 		t.Run(name, func(t *testing.T) {
 			query := newBalanceQueryFixture(t, test.ownerNFTs, test.classNFTs, nil)
-			counts := newBenchmarkBalanceCounts(t, query)
 
 			ownerIndexCount, err := countBenchmarkOwnerIndex(
 				query.ctx,
@@ -192,12 +181,16 @@ func TestStandardQueryBalanceCountCandidatesAgree(t *testing.T) {
 			require.NoError(t, err)
 			require.Equal(t, uint64(test.ownerNFTs), ownerIndexCount)
 
-			derivedCount, err := counts.Get(
+			derivedCount, err := query.keeper.ownerClassCounts.Get(
 				query.ctx,
 				collections.Join(query.classID, query.request.Owner),
 			)
 			require.NoError(t, err)
 			require.Equal(t, uint64(test.ownerNFTs), derivedCount)
+
+			response, err := query.server.Balance(query.goCtx, query.request)
+			require.NoError(t, err)
+			require.Equal(t, derivedCount, response.Amount)
 		})
 	}
 }
@@ -216,7 +209,7 @@ func newBalanceQueryFixture(
 	t testing.TB,
 	ownerNFTs int,
 	classNFTs int,
-	counters *balanceStoreCounters,
+	counters *balanceQueryStoreCounters,
 ) balanceQueryFixture {
 	t.Helper()
 	require.Positive(t, ownerNFTs)
@@ -226,12 +219,16 @@ func newBalanceQueryFixture(
 	if counters != nil {
 		nftService := balanceCountingStoreService{
 			delegate: runtime.NewKVStoreService(fixture.nftService),
-			counters: counters,
+			counters: &counters.nft,
+		}
+		policyService := balanceCountingStoreService{
+			delegate: runtime.NewKVStoreService(fixture.policyService),
+			counters: &counters.policy,
 		}
 		fixture.keeper = NewKeeper(
 			fixture.cdc,
 			nftService,
-			runtime.NewKVStoreService(fixture.policyService),
+			policyService,
 			fixture.accountKeeper,
 			testBankKeeper{},
 			fixture.moduleAccountAddresses,
@@ -325,27 +322,14 @@ func countBenchmarkOwnerIndex(
 	return count, nil
 }
 
-func newBenchmarkBalanceCounts(
-	t testing.TB,
-	query balanceQueryFixture,
-) collections.Map[collections.Pair[string, string], uint64] {
-	t.Helper()
-	builder := collections.NewSchemaBuilder(query.keeper.policyStoreService)
-	counts := collections.NewMap(
-		builder,
-		collections.NewPrefix(255),
-		"benchmark_balance_counts",
-		nftKeyCodec,
-		collections.Uint64Value,
-	)
-	_, err := builder.Build()
-	require.NoError(t, err)
-	require.NoError(t, counts.Set(
-		query.ctx,
-		collections.Join(query.classID, query.request.Owner),
-		uint64(query.keeper.nftKeeper.GetBalance(query.ctx, query.classID, query.owner)),
-	))
-	return counts
+type balanceQueryStoreCounters struct {
+	nft    balanceStoreCounters
+	policy balanceStoreCounters
+}
+
+func (c *balanceQueryStoreCounters) reset() {
+	c.nft.reset()
+	c.policy.reset()
 }
 
 type balanceStoreCounters struct {

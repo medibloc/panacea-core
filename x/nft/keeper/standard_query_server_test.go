@@ -2,12 +2,16 @@ package keeper
 
 import (
 	"bytes"
+	"context"
+	"errors"
 	"strings"
 	"testing"
 	"time"
 
 	"cosmossdk.io/collections"
+	corestore "cosmossdk.io/core/store"
 	upstreamnft "cosmossdk.io/x/nft"
+	"github.com/cosmos/cosmos-sdk/runtime"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	nfttypes "github.com/medibloc/panacea-core/v2/x/nft/types"
 	"github.com/stretchr/testify/require"
@@ -439,4 +443,77 @@ func TestStandardQueryBalanceErrorMapping(t *testing.T) {
 		Owner:   owner,
 	})
 	require.Equal(t, codes.Internal, status.Code(err))
+}
+
+func TestStandardQueryBalanceRejectsOwnerClassCountReadFailures(t *testing.T) {
+	t.Run("stored zero", func(t *testing.T) {
+		fixture := newKeeperFixture(t, true, true)
+		classID, _, owner, _, _ := createNFTForBurnTest(t, &fixture)
+		require.NoError(t, fixture.keeper.ownerClassCounts.Set(
+			fixture.ctx,
+			collections.Join(classID, owner),
+			0,
+		))
+
+		_, err := NewStandardQueryServer(fixture.keeper).Balance(
+			sdk.WrapSDKContext(fixture.ctx),
+			&upstreamnft.QueryBalanceRequest{ClassId: classID, Owner: owner},
+		)
+		require.Equal(t, codes.Internal, status.Code(err))
+		require.ErrorContains(t, err, "stored zero balance count")
+	})
+
+	t.Run("store error", func(t *testing.T) {
+		fixture := newKeeperFixture(t, true, true)
+		classID, _, owner, _, _ := createNFTForBurnTest(t, &fixture)
+		getCalls := 0
+		failingKeeper := NewKeeper(
+			fixture.cdc,
+			runtime.NewKVStoreService(fixture.nftService),
+			failingNthGetStoreService{
+				delegate: runtime.NewKVStoreService(fixture.policyService),
+				calls:    &getCalls,
+				failAt:   3,
+			},
+			fixture.accountKeeper,
+			testBankKeeper{},
+			fixture.moduleAccountAddresses,
+		)
+
+		_, err := NewStandardQueryServer(failingKeeper).Balance(
+			sdk.WrapSDKContext(fixture.ctx),
+			&upstreamnft.QueryBalanceRequest{ClassId: classID, Owner: owner},
+		)
+		require.Equal(t, codes.Internal, status.Code(err))
+		require.ErrorContains(t, err, "forced get failure")
+		require.Equal(t, 3, getCalls)
+	})
+}
+
+type failingNthGetStoreService struct {
+	delegate corestore.KVStoreService
+	calls    *int
+	failAt   int
+}
+
+func (s failingNthGetStoreService) OpenKVStore(ctx context.Context) corestore.KVStore {
+	return failingNthGetStore{
+		KVStore: s.delegate.OpenKVStore(ctx),
+		calls:   s.calls,
+		failAt:  s.failAt,
+	}
+}
+
+type failingNthGetStore struct {
+	corestore.KVStore
+	calls  *int
+	failAt int
+}
+
+func (s failingNthGetStore) Get(key []byte) ([]byte, error) {
+	*s.calls++
+	if *s.calls == s.failAt {
+		return nil, errors.New("forced get failure")
+	}
+	return s.KVStore.Get(key)
 }
