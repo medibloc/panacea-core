@@ -327,6 +327,63 @@ func TestLegacyAminoJSONSignModeWithNFTData(t *testing.T) {
 	require.Equal(t, expectedSignBytes.Bytes(), signBytes)
 }
 
+func TestLegacyAminoJSONSignModeWithStandardMsgSend(t *testing.T) {
+	encodingConfig := params.MakeEncodingConfig()
+	RegisterInterfaces(encodingConfig.InterfaceRegistry)
+
+	msg := &upstreamnft.MsgSend{
+		ClassId:  "panacea1creator:certificate",
+		Id:       "nft-1",
+		Sender:   "panacea1sender",
+		Receiver: "panacea1receiver",
+	}
+	txBuilder := encodingConfig.TxConfig.NewTxBuilder()
+	txBuilder.SetFeeAmount(sdk.NewCoins(sdk.NewInt64Coin("umed", 10)))
+	txBuilder.SetGasLimit(200000)
+	txBuilder.SetMemo("memo")
+	txBuilder.SetTimeoutHeight(123)
+	require.NoError(t, txBuilder.SetMsgs(msg))
+
+	signBytes, err := authsigning.GetSignBytesAdapter(
+		context.Background(),
+		encodingConfig.TxConfig.SignModeHandler(),
+		signingtypes.SignMode_SIGN_MODE_LEGACY_AMINO_JSON,
+		authsigning.SignerData{
+			Address:       msg.Sender,
+			ChainID:       "test-chain",
+			AccountNumber: 7,
+			Sequence:      11,
+		},
+		txBuilder.GetTx(),
+	)
+	require.NoError(t, err)
+
+	var expectedSignBytes bytes.Buffer
+	require.NoError(t, json.Compact(&expectedSignBytes, []byte(`
+		{
+			"account_number": "7",
+			"chain_id": "test-chain",
+			"fee": {
+				"amount": [{"amount": "10", "denom": "umed"}],
+				"gas": "200000"
+			},
+			"memo": "memo",
+			"msgs": [{
+				"type": "/cosmos.nft.v1beta1.MsgSend",
+				"value": {
+					"class_id": "panacea1creator:certificate",
+					"id": "nft-1",
+					"receiver": "panacea1receiver",
+					"sender": "panacea1sender"
+				}
+			}],
+			"sequence": "11",
+			"timeout_height": "123"
+		}
+	`)))
+	require.Equal(t, expectedSignBytes.Bytes(), signBytes)
+}
+
 func TestRegisterInterfacesMsgServiceResponses(t *testing.T) {
 	registry, _ := newTestCodec()
 
