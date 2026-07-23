@@ -355,6 +355,141 @@ func TestLegacyAminoJSONSignModeWithNFTData(t *testing.T) {
 	require.Equal(t, expectedSignBytes.Bytes(), signBytes)
 }
 
+func TestLegacyAminoJSONSignModeWithPanaceaMessages(t *testing.T) {
+	encodingConfig := params.MakeEncodingConfig()
+	RegisterInterfaces(encodingConfig.InterfaceRegistry)
+
+	testCases := []struct {
+		name            string
+		signer          string
+		msg             sdk.Msg
+		expectedMessage string
+	}{
+		{
+			name:   "create class",
+			signer: "panacea1creator",
+			msg: &MsgCreateClassRequest{
+				Creator:        "panacea1creator",
+				LocalClassId:   "certificate",
+				Name:           "Certificate",
+				Symbol:         "CERT",
+				Description:    "A certificate class",
+				Uri:            "https://example.com/class.json",
+				UriHash:        "class-hash",
+				TransferPolicy: TransferPolicy_TRANSFER_POLICY_OWNER_TRANSFERABLE,
+				Revocable:      true,
+				MaxSupply:      100,
+			},
+			expectedMessage: `{
+				"type": "/panacea.nft.v1.MsgCreateClassRequest",
+				"value": {
+					"creator": "panacea1creator",
+					"description": "A certificate class",
+					"local_class_id": "certificate",
+					"max_supply": "100",
+					"name": "Certificate",
+					"revocable": true,
+					"symbol": "CERT",
+					"transfer_policy": 2,
+					"uri": "https://example.com/class.json",
+					"uri_hash": "class-hash"
+				}
+			}`,
+		},
+		{
+			name:   "update controller",
+			signer: "panacea1controller",
+			msg: &MsgUpdateControllerRequest{
+				ClassId:       "panacea1creator:certificate",
+				Controller:    "panacea1controller",
+				NewController: "panacea1newcontroller",
+			},
+			expectedMessage: `{
+				"type": "/panacea.nft.v1.MsgUpdateControllerRequest",
+				"value": {
+					"class_id": "panacea1creator:certificate",
+					"controller": "panacea1controller",
+					"new_controller": "panacea1newcontroller"
+				}
+			}`,
+		},
+		{
+			name:   "revoke",
+			signer: "panacea1controller",
+			msg: &MsgRevokeRequest{
+				ClassId:    "panacea1creator:certificate",
+				NftId:      "nft-1",
+				Controller: "panacea1controller",
+			},
+			expectedMessage: `{
+				"type": "/panacea.nft.v1.MsgRevokeRequest",
+				"value": {
+					"class_id": "panacea1creator:certificate",
+					"controller": "panacea1controller",
+					"nft_id": "nft-1"
+				}
+			}`,
+		},
+		{
+			name:   "burn",
+			signer: "panacea1owner",
+			msg: &MsgBurnRequest{
+				ClassId: "panacea1creator:certificate",
+				NftId:   "nft-1",
+				Owner:   "panacea1owner",
+			},
+			expectedMessage: `{
+				"type": "/panacea.nft.v1.MsgBurnRequest",
+				"value": {
+					"class_id": "panacea1creator:certificate",
+					"nft_id": "nft-1",
+					"owner": "panacea1owner"
+				}
+			}`,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			txBuilder := encodingConfig.TxConfig.NewTxBuilder()
+			txBuilder.SetFeeAmount(sdk.NewCoins(sdk.NewInt64Coin("umed", 10)))
+			txBuilder.SetGasLimit(200000)
+			txBuilder.SetMemo("memo")
+			txBuilder.SetTimeoutHeight(123)
+			require.NoError(t, txBuilder.SetMsgs(tc.msg))
+
+			signBytes, err := authsigning.GetSignBytesAdapter(
+				context.Background(),
+				encodingConfig.TxConfig.SignModeHandler(),
+				signingtypes.SignMode_SIGN_MODE_LEGACY_AMINO_JSON,
+				authsigning.SignerData{
+					Address:       tc.signer,
+					ChainID:       "test-chain",
+					AccountNumber: 7,
+					Sequence:      11,
+				},
+				txBuilder.GetTx(),
+			)
+			require.NoError(t, err)
+
+			var expectedSignBytes bytes.Buffer
+			require.NoError(t, json.Compact(&expectedSignBytes, []byte(`{
+				"account_number": "7",
+				"chain_id": "test-chain",
+				"fee": {
+					"amount": [{"amount": "10", "denom": "umed"}],
+					"gas": "200000"
+				},
+				"memo": "memo",
+				"msgs": [`+tc.expectedMessage+`],
+				"sequence": "11",
+				"timeout_height": "123"
+			}`)))
+			require.Equal(t, expectedSignBytes.Bytes(), signBytes)
+		})
+	}
+}
+
 func TestLegacyAminoJSONSignModeWithStandardMsgSend(t *testing.T) {
 	encodingConfig := params.MakeEncodingConfig()
 	RegisterInterfaces(encodingConfig.InterfaceRegistry)
