@@ -244,6 +244,34 @@ func TestRegisterInterfacesMessageRoundTrip(t *testing.T) {
 	}
 }
 
+func TestNFTMessageSignerInference(t *testing.T) {
+	encodingConfig := params.MakeEncodingConfig()
+	RegisterInterfaces(encodingConfig.InterfaceRegistry)
+	require.NoError(t, encodingConfig.InterfaceRegistry.SigningContext().Validate())
+
+	signer := sdk.AccAddress(bytes.Repeat([]byte{0x01}, 20))
+	signerAddress := signer.String()
+	testCases := []struct {
+		name string
+		msg  sdk.Msg
+	}{
+		{name: "create class", msg: &MsgCreateClassRequest{Creator: signerAddress}},
+		{name: "update controller", msg: &MsgUpdateControllerRequest{Controller: signerAddress}},
+		{name: "mint", msg: &MsgMintRequest{Controller: signerAddress}},
+		{name: "revoke", msg: &MsgRevokeRequest{Controller: signerAddress}},
+		{name: "burn", msg: &MsgBurnRequest{Owner: signerAddress}},
+		{name: "standard send", msg: &upstreamnft.MsgSend{Sender: signerAddress}},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			signers, _, err := encodingConfig.Codec.GetMsgV1Signers(tc.msg)
+			require.NoError(t, err)
+			require.Equal(t, [][]byte{signer}, signers)
+		})
+	}
+}
+
 func TestLegacyAminoJSONSignModeWithNFTData(t *testing.T) {
 	encodingConfig := params.MakeEncodingConfig()
 	RegisterInterfaces(encodingConfig.InterfaceRegistry)
