@@ -12,7 +12,6 @@ import (
 	storetypes "cosmossdk.io/store/types"
 	upstreamnft "cosmossdk.io/x/nft"
 	upstreamkeeper "cosmossdk.io/x/nft/keeper"
-	"github.com/cosmos/cosmos-sdk/runtime"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/address"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
@@ -141,7 +140,7 @@ func TestStandardQueryBalanceStoreReadScaling(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			counters := &balanceQueryStoreCounters{}
+			counters := &queryStoreCounters{}
 			query := newBalanceQueryFixture(t, test.ownerNFTs, test.classNFTs, counters)
 			counters.reset()
 
@@ -149,9 +148,11 @@ func TestStandardQueryBalanceStoreReadScaling(t *testing.T) {
 			require.NoError(t, err)
 			require.Equal(t, uint64(test.ownerNFTs), response.Amount)
 			require.Equal(t, uint64(1), counters.nft.gets)
+			require.Zero(t, counters.nft.has)
 			require.Zero(t, counters.nft.iterators)
 			require.Zero(t, counters.nft.iteratorNexts)
 			require.Equal(t, uint64(3), counters.policy.gets)
+			require.Zero(t, counters.policy.has)
 			require.Zero(t, counters.policy.iterators)
 			require.Zero(t, counters.policy.iteratorNexts)
 		})
@@ -209,7 +210,7 @@ func newBalanceQueryFixture(
 	t testing.TB,
 	ownerNFTs int,
 	classNFTs int,
-	counters *balanceQueryStoreCounters,
+	counters *queryStoreCounters,
 ) balanceQueryFixture {
 	t.Helper()
 	require.Positive(t, ownerNFTs)
@@ -217,22 +218,7 @@ func newBalanceQueryFixture(
 
 	fixture := newKeeperFixture(t, true, true)
 	if counters != nil {
-		nftService := balanceCountingStoreService{
-			delegate: runtime.NewKVStoreService(fixture.nftService),
-			counters: &counters.nft,
-		}
-		policyService := balanceCountingStoreService{
-			delegate: runtime.NewKVStoreService(fixture.policyService),
-			counters: &counters.policy,
-		}
-		fixture.keeper = NewKeeper(
-			fixture.cdc,
-			nftService,
-			policyService,
-			fixture.accountKeeper,
-			testBankKeeper{},
-			fixture.moduleAccountAddresses,
-		)
+		fixture.keeper = newQueryCountingKeeper(fixture, counters)
 	}
 	fixture.ctx = fixture.ctx.WithBlockTime(time.Date(2026, time.July, 23, 0, 0, 0, 0, time.UTC))
 
@@ -320,70 +306,4 @@ func countBenchmarkOwnerIndex(
 		return 0, err
 	}
 	return count, nil
-}
-
-type balanceQueryStoreCounters struct {
-	nft    balanceStoreCounters
-	policy balanceStoreCounters
-}
-
-func (c *balanceQueryStoreCounters) reset() {
-	c.nft.reset()
-	c.policy.reset()
-}
-
-type balanceStoreCounters struct {
-	gets          uint64
-	iterators     uint64
-	iteratorNexts uint64
-}
-
-func (c *balanceStoreCounters) reset() {
-	c.gets = 0
-	c.iterators = 0
-	c.iteratorNexts = 0
-}
-
-type balanceCountingStoreService struct {
-	delegate corestore.KVStoreService
-	counters *balanceStoreCounters
-}
-
-func (s balanceCountingStoreService) OpenKVStore(ctx context.Context) corestore.KVStore {
-	return balanceCountingStore{
-		KVStore:  s.delegate.OpenKVStore(ctx),
-		counters: s.counters,
-	}
-}
-
-type balanceCountingStore struct {
-	corestore.KVStore
-	counters *balanceStoreCounters
-}
-
-func (s balanceCountingStore) Get(key []byte) ([]byte, error) {
-	s.counters.gets++
-	return s.KVStore.Get(key)
-}
-
-func (s balanceCountingStore) Iterator(start, end []byte) (corestore.Iterator, error) {
-	s.counters.iterators++
-	iterator, err := s.KVStore.Iterator(start, end)
-	if err != nil {
-		return nil, err
-	}
-	return balanceCountingIterator{
-		Iterator: iterator,
-		counters: s.counters,
-	}, nil
-}
-
-type balanceCountingIterator struct {
-	corestore.Iterator
-	counters *balanceStoreCounters
-}
-
-func (i balanceCountingIterator) Next() {
-	i.counters.iteratorNexts++
-	i.Iterator.Next()
 }
