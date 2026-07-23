@@ -332,7 +332,7 @@ func validCreateClassRequest(creator string) *types.MsgCreateClassRequest {
 	}
 }
 
-func (f keeperFixture) accountAddress(t *testing.T, address sdk.AccAddress) string {
+func (f keeperFixture) accountAddress(t testing.TB, address sdk.AccAddress) string {
 	t.Helper()
 	encoded, err := f.accountKeeper.addressCodec.BytesToString(address)
 	require.NoError(t, err)

@@ -198,7 +198,7 @@ func TestEmptyGenesisRoundTrip(t *testing.T) {
 	require.NotNil(t, exported.Tombstones)
 }
 
-func newKeeperFixture(t *testing.T, mountNFT, mountPolicy bool) keeperFixture {
+func newKeeperFixture(t testing.TB, mountNFT, mountPolicy bool) keeperFixture {
 	t.Helper()
 
 	registry := cdctypes.NewInterfaceRegistry()
