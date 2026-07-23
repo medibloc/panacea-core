@@ -7,10 +7,14 @@ import (
 	"testing"
 	"time"
 
+	"cosmossdk.io/collections"
 	corestore "cosmossdk.io/core/store"
+	storetypes "cosmossdk.io/store/types"
 	upstreamnft "cosmossdk.io/x/nft"
+	upstreamkeeper "cosmossdk.io/x/nft/keeper"
 	"github.com/cosmos/cosmos-sdk/runtime"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/address"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	"github.com/stretchr/testify/require"
 )
@@ -46,6 +50,69 @@ func BenchmarkStandardQueryBalance(b *testing.B) {
 					b.Fatalf("balance %d, expected %d", response.Amount, scenario.ownerNFTs)
 				}
 			}
+		})
+	}
+}
+
+func BenchmarkStandardQueryBalanceCountCandidates(b *testing.B) {
+	scenarios := []struct {
+		ownerNFTs int
+		classNFTs int
+	}{
+		{ownerNFTs: 1, classNFTs: 1_000},
+		{ownerNFTs: 1_000, classNFTs: 1_000},
+	}
+
+	for _, scenario := range scenarios {
+		name := fmt.Sprintf("owner_%d/class_%d", scenario.ownerNFTs, scenario.classNFTs)
+		b.Run(name, func(b *testing.B) {
+			query := newBalanceQueryFixture(b, scenario.ownerNFTs, scenario.classNFTs, nil)
+			counts := newBenchmarkBalanceCounts(b, query)
+
+			b.Run("current_full_query", func(b *testing.B) {
+				b.ReportAllocs()
+				for i := 0; i < b.N; i++ {
+					response, err := query.server.Balance(query.goCtx, query.request)
+					if err != nil {
+						b.Fatal(err)
+					}
+					if response.Amount != uint64(scenario.ownerNFTs) {
+						b.Fatalf("balance %d, expected %d", response.Amount, scenario.ownerNFTs)
+					}
+				}
+			})
+
+			b.Run("owner_index_count_only", func(b *testing.B) {
+				b.ReportAllocs()
+				for i := 0; i < b.N; i++ {
+					count, err := countBenchmarkOwnerIndex(
+						query.ctx,
+						query.keeper.nftStoreService,
+						query.classID,
+						query.owner,
+					)
+					if err != nil {
+						b.Fatal(err)
+					}
+					if count != uint64(scenario.ownerNFTs) {
+						b.Fatalf("balance %d, expected %d", count, scenario.ownerNFTs)
+					}
+				}
+			})
+
+			b.Run("derived_index_count_only", func(b *testing.B) {
+				key := collections.Join(query.classID, query.request.Owner)
+				b.ReportAllocs()
+				for i := 0; i < b.N; i++ {
+					count, err := counts.Get(query.ctx, key)
+					if err != nil {
+						b.Fatal(err)
+					}
+					if count != uint64(scenario.ownerNFTs) {
+						b.Fatalf("balance %d, expected %d", count, scenario.ownerNFTs)
+					}
+				}
+			})
 		})
 	}
 }
@@ -101,7 +168,45 @@ func TestStandardQueryBalanceStoreReadScaling(t *testing.T) {
 	}
 }
 
+func TestStandardQueryBalanceCountCandidatesAgree(t *testing.T) {
+	tests := []struct {
+		ownerNFTs int
+		classNFTs int
+	}{
+		{ownerNFTs: 1, classNFTs: 1_000},
+		{ownerNFTs: 1_000, classNFTs: 1_000},
+	}
+
+	for _, test := range tests {
+		name := fmt.Sprintf("owner_%d/class_%d", test.ownerNFTs, test.classNFTs)
+		t.Run(name, func(t *testing.T) {
+			query := newBalanceQueryFixture(t, test.ownerNFTs, test.classNFTs, nil)
+			counts := newBenchmarkBalanceCounts(t, query)
+
+			ownerIndexCount, err := countBenchmarkOwnerIndex(
+				query.ctx,
+				query.keeper.nftStoreService,
+				query.classID,
+				query.owner,
+			)
+			require.NoError(t, err)
+			require.Equal(t, uint64(test.ownerNFTs), ownerIndexCount)
+
+			derivedCount, err := counts.Get(
+				query.ctx,
+				collections.Join(query.classID, query.request.Owner),
+			)
+			require.NoError(t, err)
+			require.Equal(t, uint64(test.ownerNFTs), derivedCount)
+		})
+	}
+}
+
 type balanceQueryFixture struct {
+	keeper  Keeper
+	ctx     sdk.Context
+	owner   sdk.AccAddress
+	classID string
 	server  upstreamnft.QueryServer
 	goCtx   context.Context
 	request *upstreamnft.QueryBalanceRequest
@@ -168,13 +273,79 @@ func newBalanceQueryFixture(
 	fixture.ctx = fixture.ctx.WithEventManager(sdk.NewEventManager())
 
 	return balanceQueryFixture{
-		server: NewStandardQueryServer(fixture.keeper),
-		goCtx:  sdk.WrapSDKContext(fixture.ctx),
+		keeper:  fixture.keeper,
+		ctx:     fixture.ctx,
+		owner:   ownerAddress,
+		classID: created.ClassId,
+		server:  NewStandardQueryServer(fixture.keeper),
+		goCtx:   sdk.WrapSDKContext(fixture.ctx),
 		request: &upstreamnft.QueryBalanceRequest{
 			ClassId: created.ClassId,
 			Owner:   owner,
 		},
 	}
+}
+
+func countBenchmarkOwnerIndex(
+	ctx context.Context,
+	storeService corestore.KVStoreService,
+	classID string,
+	owner sdk.AccAddress,
+) (uint64, error) {
+	// This intentionally mirrors the upstream private
+	// nftOfClassByOwnerStoreKey encoding to measure that candidate's cost.
+	lengthPrefixedOwner := address.MustLengthPrefix(owner)
+	prefix := make(
+		[]byte,
+		0,
+		len(upstreamkeeper.NFTOfClassByOwnerKey)+
+			len(lengthPrefixedOwner)+
+			len(upstreamkeeper.Delimiter)+
+			len(classID)+
+			len(upstreamkeeper.Delimiter),
+	)
+	prefix = append(prefix, upstreamkeeper.NFTOfClassByOwnerKey...)
+	prefix = append(prefix, lengthPrefixedOwner...)
+	prefix = append(prefix, upstreamkeeper.Delimiter...)
+	prefix = append(prefix, classID...)
+	prefix = append(prefix, upstreamkeeper.Delimiter...)
+
+	store := storeService.OpenKVStore(ctx)
+	iterator, err := store.Iterator(prefix, storetypes.PrefixEndBytes(prefix))
+	if err != nil {
+		return 0, err
+	}
+	var count uint64
+	for ; iterator.Valid(); iterator.Next() {
+		count++
+	}
+	if err := iterator.Close(); err != nil {
+		return 0, err
+	}
+	return count, nil
+}
+
+func newBenchmarkBalanceCounts(
+	t testing.TB,
+	query balanceQueryFixture,
+) collections.Map[collections.Pair[string, string], uint64] {
+	t.Helper()
+	builder := collections.NewSchemaBuilder(query.keeper.policyStoreService)
+	counts := collections.NewMap(
+		builder,
+		collections.NewPrefix(255),
+		"benchmark_balance_counts",
+		nftKeyCodec,
+		collections.Uint64Value,
+	)
+	_, err := builder.Build()
+	require.NoError(t, err)
+	require.NoError(t, counts.Set(
+		query.ctx,
+		collections.Join(query.classID, query.request.Owner),
+		uint64(query.keeper.nftKeeper.GetBalance(query.ctx, query.classID, query.owner)),
+	))
+	return counts
 }
 
 type balanceStoreCounters struct {
