@@ -173,6 +173,18 @@ protoImage=$(DOCKER) run --rm -v $(CURDIR):/workspace --workdir /workspace $(pro
 
 proto-all: proto-format proto-lint proto-gen
 
+proto-check-generated:
+	@$(MAKE) --no-print-directory proto-lint
+	@$(MAKE) --no-print-directory proto-gen-test
+	@$(MAKE) --no-print-directory proto-gen
+	@if [ -n "$$(git status --porcelain --untracked-files=all -- \
+		':(glob)x/**/*.pb.go' ':(glob)x/**/*.pb.gw.go')" ]; then \
+		echo "protobuf generation left uncommitted changes:" >&2; \
+		git status --short --untracked-files=all -- \
+			':(glob)x/**/*.pb.go' ':(glob)x/**/*.pb.gw.go' >&2; \
+		exit 1; \
+	fi
+
 proto-gen:
 	@echo "Generating Protobuf files"
 	@$(protoImage) sh ./proto/scripts/protocgen.sh
@@ -197,4 +209,4 @@ proto-update-deps:
 	@echo "Updating Protobuf dependencies"
 	$(DOCKER) run --rm -v $(CURDIR)/proto:/workspace --workdir /workspace $(protoImageName) buf mod update
 
-.PHONY: proto-all proto-gen proto-gen-test proto-swagger-gen proto-format proto-lint proto-check-breaking proto-update-deps
+.PHONY: proto-all proto-check-generated proto-gen proto-gen-test proto-swagger-gen proto-format proto-lint proto-check-breaking proto-update-deps
