@@ -80,6 +80,17 @@ func TestNewRootCmdCommandTree(t *testing.T) {
 				path:     []string{"tx", "did"},
 				expected: []string{"create-did", "update-did", "deactivate-did"},
 			},
+			{
+				path: []string{"tx", "nft"},
+				expected: []string{
+					"create-class",
+					"update-controller",
+					"mint",
+					"revoke",
+					"burn",
+					"send",
+				},
+			},
 		}
 
 		for _, testCase := range testCases {
@@ -164,6 +175,57 @@ func TestNewRootCmdCommandTree(t *testing.T) {
 		require.Equal(t, "0.500000000000000000", govGenesis.Params.ProposalCancelRatio)
 		require.Empty(t, govGenesis.Params.ProposalCancelDest)
 	})
+}
+
+func TestNFTTransactionCommandsGenerateMessages(t *testing.T) {
+	signer := sdk.AccAddress(bytes.Repeat([]byte{1}, 20)).String()
+	receiver := sdk.AccAddress(bytes.Repeat([]byte{2}, 20)).String()
+
+	testCases := []struct {
+		name             string
+		args             []string
+		expectedTypeURL  string
+		expectedSignerKV string
+		expectedIDKV     string
+	}{
+		{
+			name:             "Panacea revoke",
+			args:             []string{"tx", "nft", "revoke", "class-id", "nft-id"},
+			expectedTypeURL:  "/panacea.nft.v1.MsgRevokeRequest",
+			expectedSignerKV: `"controller":"` + signer + `"`,
+			expectedIDKV:     `"nft_id":"nft-id"`,
+		},
+		{
+			name:             "standard send",
+			args:             []string{"tx", "nft", "send", "class-id", "nft-id", receiver},
+			expectedTypeURL:  "/cosmos.nft.v1beta1.MsgSend",
+			expectedSignerKV: `"sender":"` + signer + `"`,
+			expectedIDKV:     `"id":"nft-id"`,
+		},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.name, func(t *testing.T) {
+			root, _ := panaceacmd.NewRootCmd()
+			output := new(bytes.Buffer)
+			home := t.TempDir()
+
+			root.SetArgs(append(testCase.args,
+				"--from", signer,
+				"--generate-only",
+				"--chain-id", "test-chain",
+				"--home", home,
+			))
+			root.SetOut(output)
+			root.SetErr(io.Discard)
+
+			require.NoError(t, svrcmd.Execute(root, "", home))
+			require.Contains(t, output.String(), `"@type":"`+testCase.expectedTypeURL+`"`)
+			require.Contains(t, output.String(), testCase.expectedSignerKV)
+			require.Contains(t, output.String(), `"class_id":"class-id"`)
+			require.Contains(t, output.String(), testCase.expectedIDKV)
+		})
+	}
 }
 
 func TestAutoCLIUnjailGeneratesTransaction(t *testing.T) {

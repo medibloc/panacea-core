@@ -15,8 +15,10 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
+	"github.com/medibloc/panacea-core/v2/x/nft/client/cli"
 	"github.com/medibloc/panacea-core/v2/x/nft/keeper"
 	"github.com/medibloc/panacea-core/v2/x/nft/types"
+	"github.com/spf13/cobra"
 )
 
 var (
@@ -88,6 +90,12 @@ func (AppModuleBasic) RegisterGRPCGatewayRoutes(clientContext client.Context, mu
 	); err != nil {
 		panic(err)
 	}
+}
+
+// GetTxCmd returns the custom root used to combine Panacea transactions with
+// the policy-aware standard NFT Send command.
+func (AppModuleBasic) GetTxCmd() *cobra.Command {
+	return cli.GetTxCmd()
 }
 
 // AppModule is Panacea's single NFT runtime module.
