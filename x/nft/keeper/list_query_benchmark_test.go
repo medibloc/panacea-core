@@ -7,6 +7,7 @@ import (
 	"testing"
 	"time"
 
+	storetypes "cosmossdk.io/store/types"
 	upstreamnft "cosmossdk.io/x/nft"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/query"
@@ -154,6 +155,57 @@ func TestMaximumPageListQueryStoreReads(t *testing.T) {
 	}
 }
 
+func TestMaximumPageListQueryGas(t *testing.T) {
+	t.Run("standard classes", func(t *testing.T) {
+		fixture := newMaximumPageClassesFixture(t, nil)
+		meter := storetypes.NewInfiniteGasMeter()
+		fixture.goCtx = sdk.WrapSDKContext(
+			sdk.UnwrapSDKContext(fixture.goCtx).WithGasMeter(meter),
+		)
+		response, err := fixture.standard.Classes(
+			fixture.goCtx,
+			&upstreamnft.QueryClassesRequest{
+				Pagination: &query.PageRequest{Limit: maximumQueryPageLimit},
+			},
+		)
+		require.NoError(t, err)
+		require.Len(t, response.Classes, int(maximumQueryPageLimit))
+		require.Equal(t, uint64(552537), meter.GasConsumed())
+	})
+
+	for _, filter := range maximumPageNFTFilters() {
+		t.Run("standard nfts/"+filter.name, func(t *testing.T) {
+			fixture := newMaximumPageNFTFixture(t, nil)
+			meter := storetypes.NewInfiniteGasMeter()
+			fixture.goCtx = sdk.WrapSDKContext(
+				sdk.UnwrapSDKContext(fixture.goCtx).WithGasMeter(meter),
+			)
+			response, err := fixture.standard.NFTs(
+				fixture.goCtx,
+				filter.standardRequest(fixture),
+			)
+			require.NoError(t, err)
+			require.Len(t, response.Nfts, int(maximumQueryPageLimit))
+			require.Equal(t, filter.expectedQueryGas, meter.GasConsumed())
+		})
+
+		t.Run("panacea nft records/"+filter.name, func(t *testing.T) {
+			fixture := newMaximumPageNFTFixture(t, nil)
+			meter := storetypes.NewInfiniteGasMeter()
+			fixture.goCtx = sdk.WrapSDKContext(
+				sdk.UnwrapSDKContext(fixture.goCtx).WithGasMeter(meter),
+			)
+			response, err := fixture.panacea.NFTRecords(
+				fixture.goCtx,
+				filter.panaceaRequest(fixture),
+			)
+			require.NoError(t, err)
+			require.Len(t, response.NftRecords, int(maximumQueryPageLimit))
+			require.Equal(t, filter.expectedQueryGas, meter.GasConsumed())
+		})
+	}
+}
+
 type maximumPageQueryFixture struct {
 	goCtx    context.Context
 	classID  string
@@ -245,6 +297,7 @@ type maximumPageNFTFilter struct {
 	name                string
 	expectedNFTReads    storeReadCounters
 	expectedPolicyReads storeReadCounters
+	expectedQueryGas    uint64
 	standardRequest     func(maximumPageQueryFixture) *upstreamnft.QueryNFTsRequest
 	panaceaRequest      func(maximumPageQueryFixture) *nfttypes.QueryNFTRecordsRequest
 }
@@ -262,6 +315,7 @@ func maximumPageNFTFilters() []maximumPageNFTFilter {
 				iteratorNexts: 100,
 			},
 			expectedPolicyReads: storeReadCounters{gets: 202},
+			expectedQueryGas:    668870,
 			standardRequest: func(fixture maximumPageQueryFixture) *upstreamnft.QueryNFTsRequest {
 				return &upstreamnft.QueryNFTsRequest{
 					ClassId:    fixture.classID,
@@ -283,6 +337,7 @@ func maximumPageNFTFilters() []maximumPageNFTFilter {
 				iteratorNexts: 100,
 			},
 			expectedPolicyReads: storeReadCounters{gets: 202},
+			expectedQueryGas:    799638,
 			standardRequest: func(fixture maximumPageQueryFixture) *upstreamnft.QueryNFTsRequest {
 				return &upstreamnft.QueryNFTsRequest{
 					Owner:      fixture.owner,
@@ -304,6 +359,7 @@ func maximumPageNFTFilters() []maximumPageNFTFilter {
 				iteratorNexts: 100,
 			},
 			expectedPolicyReads: storeReadCounters{gets: 202},
+			expectedQueryGas:    799638,
 			standardRequest: func(fixture maximumPageQueryFixture) *upstreamnft.QueryNFTsRequest {
 				return &upstreamnft.QueryNFTsRequest{
 					ClassId:    fixture.classID,
