@@ -107,7 +107,7 @@ func (k Keeper) verifyExportedOwnerIndexes(ctx sdk.Context, data types.GenesisSt
 		firstPage := true
 		for {
 			response, err := k.nftKeeper.NFTs(
-				sdk.WrapSDKContext(ctx),
+				ctx,
 				&upstreamnft.QueryNFTsRequest{
 					Owner: entry.Owner,
 					Pagination: &query.PageRequest{

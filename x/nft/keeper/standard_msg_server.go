@@ -53,7 +53,7 @@ func (m standardMsgServer) Send(
 	canonicalRequest.Sender = sender
 	canonicalRequest.Receiver = receiver
 	cacheCtx, writeCache := ctx.CacheContext()
-	response, err := m.keeper.nftKeeper.Send(sdk.WrapSDKContext(cacheCtx), &canonicalRequest)
+	response, err := m.keeper.nftKeeper.Send(cacheCtx, &canonicalRequest)
 	if err != nil {
 		return nil, err
 	}

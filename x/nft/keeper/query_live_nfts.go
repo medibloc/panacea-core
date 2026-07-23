@@ -43,7 +43,7 @@ func (k Keeper) listLiveNFTRecords(
 	}
 
 	response, err := k.nftKeeper.NFTs(
-		sdk.WrapSDKContext(ctx),
+		ctx,
 		&upstreamnft.QueryNFTsRequest{
 			ClassId:    classID,
 			Owner:      owner,
