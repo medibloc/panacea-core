@@ -2,10 +2,10 @@ package nft
 
 import autocliv1 "cosmossdk.io/api/cosmos/autocli/v1"
 
-// AutoCLIOptions adds the Panacea Msg service commands to the custom NFT
-// transaction root, which already contains the policy-aware standard Send.
+// AutoCLIOptions combines generated commands with the custom NFT roots.
 func (AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 	return &autocliv1.ModuleOptions{
+		Query: standardQueryCommandDescriptor(),
 		Tx: &autocliv1.ServiceCommandDescriptor{
 			Service:              "panacea.nft.v1.Msg",
 			EnhanceCustomCommand: true,
@@ -60,6 +60,73 @@ func (AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 						{ProtoField: "nft_id"},
 					},
 				},
+			},
+		},
+	}
+}
+
+// standardQueryCommandDescriptor adds the standard NFT Query service to the
+// custom query root, which already contains Panacea record queries.
+func standardQueryCommandDescriptor() *autocliv1.ServiceCommandDescriptor {
+	return &autocliv1.ServiceCommandDescriptor{
+		Service:              "cosmos.nft.v1beta1.Query",
+		EnhanceCustomCommand: true,
+		RpcCommandOptions: []*autocliv1.RpcCommandOptions{
+			{
+				RpcMethod: "Balance",
+				Use:       "balance [owner] [class-id]",
+				Short:     "Query an owner's NFT balance in a class",
+				PositionalArgs: []*autocliv1.PositionalArgDescriptor{
+					{ProtoField: "owner"},
+					{ProtoField: "class_id"},
+				},
+			},
+			{
+				RpcMethod: "Owner",
+				Use:       "owner [class-id] [nft-id]",
+				Short:     "Query the owner of an NFT",
+				PositionalArgs: []*autocliv1.PositionalArgDescriptor{
+					{ProtoField: "class_id"},
+					{ProtoField: "id"},
+				},
+			},
+			{
+				RpcMethod: "Supply",
+				Use:       "supply [class-id]",
+				Short:     "Query the live NFT supply of a class",
+				PositionalArgs: []*autocliv1.PositionalArgDescriptor{
+					{ProtoField: "class_id"},
+				},
+			},
+			{
+				RpcMethod: "NFTs",
+				Use:       "nfts [class-id]",
+				Short:     "Query live NFTs by class, owner, or both",
+				PositionalArgs: []*autocliv1.PositionalArgDescriptor{
+					{ProtoField: "class_id", Optional: true},
+				},
+			},
+			{
+				RpcMethod: "NFT",
+				Use:       "nft [class-id] [nft-id]",
+				Short:     "Query a live NFT",
+				PositionalArgs: []*autocliv1.PositionalArgDescriptor{
+					{ProtoField: "class_id"},
+					{ProtoField: "id"},
+				},
+			},
+			{
+				RpcMethod: "Class",
+				Use:       "class [class-id]",
+				Short:     "Query a standard NFT class",
+				PositionalArgs: []*autocliv1.PositionalArgDescriptor{
+					{ProtoField: "class_id"},
+				},
+			},
+			{
+				RpcMethod: "Classes",
+				Use:       "classes",
+				Short:     "Query all standard NFT classes",
 			},
 		},
 	}

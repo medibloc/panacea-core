@@ -81,6 +81,21 @@ func TestNewRootCmdCommandTree(t *testing.T) {
 				expected: []string{"create-did", "update-did", "deactivate-did"},
 			},
 			{
+				path: []string{"query", "nft"},
+				expected: []string{
+					"balance",
+					"owner",
+					"supply",
+					"nfts",
+					"nft",
+					"class",
+					"classes",
+					"class-record",
+					"nft-record",
+					"nft-records",
+				},
+			},
+			{
 				path: []string{"tx", "nft"},
 				expected: []string{
 					"create-class",
@@ -111,6 +126,13 @@ func TestNewRootCmdCommandTree(t *testing.T) {
 	t.Run("does not expose legacy PNFT query commands", func(t *testing.T) {
 		query := requireDirectChild(t, root, "query")
 		requireNoDirectChild(t, query, "pnft")
+	})
+
+	t.Run("supports standard NFT owner-only list queries", func(t *testing.T) {
+		nfts := requireCommandPath(t, root, "query", "nft", "nfts")
+		require.NotNil(t, nfts.Flags().Lookup("owner"))
+		require.NotNil(t, nfts.Args)
+		require.NoError(t, nfts.Args(nfts, nil))
 	})
 
 	t.Run("keeps SDK module commands", func(t *testing.T) {

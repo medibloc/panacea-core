@@ -98,6 +98,12 @@ func (AppModuleBasic) GetTxCmd() *cobra.Command {
 	return cli.GetTxCmd()
 }
 
+// GetQueryCmd returns the custom root used to combine Panacea record queries
+// with the policy-aware standard NFT Query service.
+func (AppModuleBasic) GetQueryCmd() *cobra.Command {
+	return cli.GetQueryCmd()
+}
+
 // AppModule is Panacea's single NFT runtime module.
 type AppModule struct {
 	AppModuleBasic
