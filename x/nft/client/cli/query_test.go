@@ -131,9 +131,8 @@ func newQueryTestConnection(t *testing.T, queryServer types.QueryServer) *grpc.C
 		require.NoError(t, listener.Close())
 	})
 
-	connection, err := grpc.DialContext(
-		context.Background(),
-		"bufnet",
+	connection, err := grpc.NewClient(
+		"passthrough:///bufnet",
 		grpc.WithContextDialer(func(context.Context, string) (net.Conn, error) {
 			return listener.Dial()
 		}),
