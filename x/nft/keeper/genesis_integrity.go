@@ -209,13 +209,15 @@ func (k Keeper) verifyUpstreamPrefixCount(
 	if err != nil {
 		return fmt.Errorf("iterate %s keys: %w", name, err)
 	}
-	defer iterator.Close()
 	var actualCount uint64
 	for ; iterator.Valid(); iterator.Next() {
 		actualCount++
 	}
-	if err := iterator.Error(); err != nil {
-		return fmt.Errorf("iterate %s keys: %w", name, err)
+	// cacheMergeIterator reports normal exhaustion as an invalid iterator.
+	// Do not call Error after the loop; Close still releases the iterator
+	// and reports resource cleanup failures.
+	if err := iterator.Close(); err != nil {
+		return fmt.Errorf("close %s key iterator: %w", name, err)
 	}
 	if actualCount != expectedCount {
 		return fmt.Errorf(

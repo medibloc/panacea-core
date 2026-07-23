@@ -24,6 +24,19 @@ func TestExportGenesisRejectsStaleUnknownOwnerIndex(t *testing.T) {
 	require.ErrorContains(t, err, "standard nft reverse owner index key count 2 does not match expected count 1")
 }
 
+func TestExportGenesisAcceptsCacheContext(t *testing.T) {
+	fixture := newKeeperFixture(t, true, true)
+	classID, _, _, _, _ := createNFTForBurnTest(t, &fixture)
+	cacheCtx, _ := fixture.ctx.CacheContext()
+
+	exported, err := fixture.keeper.ExportGenesis(cacheCtx)
+	require.NoError(t, err)
+	require.Len(t, exported.NftState.Classes, 1)
+	require.Equal(t, classID, exported.NftState.Classes[0].Id)
+	require.Len(t, exported.NftState.Entries, 1)
+	require.Len(t, exported.NftState.Entries[0].Nfts, 1)
+}
+
 func TestExportGenesisRejectsOrphanStandardKeys(t *testing.T) {
 	tests := []struct {
 		name        string
