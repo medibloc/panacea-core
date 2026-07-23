@@ -7,7 +7,6 @@ import (
 
 	"cosmossdk.io/collections"
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	nfttypes "github.com/medibloc/panacea-core/v2/x/nft/types"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/codes"
@@ -19,7 +18,7 @@ func TestNFTRecordReturnsBurnTombstone(t *testing.T) {
 	classID, _, owner, _, _ := createNFTForBurnTest(t, &fixture)
 	fixture.ctx = fixture.ctx.WithBlockTime(fixture.ctx.BlockTime().Add(time.Hour))
 	_, err := NewMsgServer(fixture.keeper).Burn(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		&nfttypes.MsgBurnRequest{ClassId: classID, NftId: "nft-1", Owner: owner},
 	)
 	require.NoError(t, err)
@@ -30,7 +29,7 @@ func TestNFTRecordReturnsBurnTombstone(t *testing.T) {
 	require.NoError(t, err)
 
 	queryResponse, err := NewQueryServer(fixture.keeper).NFTRecord(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		&nfttypes.QueryNFTRecordRequest{ClassId: classID, NftId: "nft-1"},
 	)
 	require.NoError(t, err)
@@ -65,7 +64,7 @@ func TestNFTRecordReturnsBurnedRevocation(t *testing.T) {
 	revokedAt := fixture.ctx.BlockTime().Add(time.Hour)
 	fixture.ctx = fixture.ctx.WithBlockTime(revokedAt)
 	_, err := NewMsgServer(fixture.keeper).Revoke(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		&nfttypes.MsgRevokeRequest{
 			ClassId: classID, NftId: "nft-1", Controller: controller,
 		},
@@ -78,13 +77,13 @@ func TestNFTRecordReturnsBurnedRevocation(t *testing.T) {
 	require.NoError(t, err)
 	fixture.ctx = fixture.ctx.WithBlockTime(revokedAt.Add(time.Hour))
 	_, err = NewMsgServer(fixture.keeper).Burn(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		&nfttypes.MsgBurnRequest{ClassId: classID, NftId: "nft-1", Owner: owner},
 	)
 	require.NoError(t, err)
 
 	queryResponse, err := NewQueryServer(fixture.keeper).NFTRecord(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		&nfttypes.QueryNFTRecordRequest{ClassId: classID, NftId: "nft-1"},
 	)
 	require.NoError(t, err)
@@ -193,7 +192,7 @@ func TestNFTRecordRejectsInvalidTombstone(t *testing.T) {
 			classID, _, owner, _, _ := createNFTForBurnTest(t, &fixture)
 			fixture.ctx = fixture.ctx.WithBlockTime(fixture.ctx.BlockTime().Add(time.Hour))
 			_, err := NewMsgServer(fixture.keeper).Burn(
-				sdk.WrapSDKContext(fixture.ctx),
+				fixture.ctx,
 				&nfttypes.MsgBurnRequest{ClassId: classID, NftId: "nft-1", Owner: owner},
 			)
 			require.NoError(t, err)
@@ -204,7 +203,7 @@ func TestNFTRecordRejectsInvalidTombstone(t *testing.T) {
 			require.NoError(t, fixture.keeper.tombstones.Set(fixture.ctx, key, tombstone))
 
 			_, err = NewQueryServer(fixture.keeper).NFTRecord(
-				sdk.WrapSDKContext(fixture.ctx),
+				fixture.ctx,
 				&nfttypes.QueryNFTRecordRequest{ClassId: classID, NftId: "nft-1"},
 			)
 			require.Equal(t, codes.Internal, status.Code(err))
@@ -218,7 +217,7 @@ func TestNFTRecordReturnsNotFoundForUnknownID(t *testing.T) {
 	classID, _, _, _, _ := createNFTForBurnTest(t, &fixture)
 
 	_, err := NewQueryServer(fixture.keeper).NFTRecord(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		&nfttypes.QueryNFTRecordRequest{ClassId: classID, NftId: "unknown"},
 	)
 	require.Equal(t, codes.NotFound, status.Code(err))

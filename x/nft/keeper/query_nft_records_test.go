@@ -40,7 +40,7 @@ func TestQueryNFTRecordsSupportsClassAndOwnerFilters(t *testing.T) {
 	fixture.accountKeeper.accounts[string(receiverAddress)] =
 		authtypes.NewBaseAccountWithAddress(receiverAddress)
 	_, err := NewStandardMsgServer(fixture.keeper).Send(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		&upstreamnft.MsgSend{
 			ClassId:  classID,
 			Id:       "beta",
@@ -52,7 +52,7 @@ func TestQueryNFTRecordsSupportsClassAndOwnerFilters(t *testing.T) {
 
 	fixture.ctx = fixture.ctx.WithBlockTime(fixture.ctx.BlockTime().Add(time.Hour))
 	_, err = NewMsgServer(fixture.keeper).Revoke(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		&types.MsgRevokeRequest{
 			ClassId:    classID,
 			NftId:      "alpha",
@@ -62,14 +62,14 @@ func TestQueryNFTRecordsSupportsClassAndOwnerFilters(t *testing.T) {
 	require.NoError(t, err)
 	fixture.ctx = fixture.ctx.WithBlockTime(fixture.ctx.BlockTime().Add(time.Hour))
 	_, err = NewMsgServer(fixture.keeper).Burn(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		&types.MsgBurnRequest{ClassId: classID, NftId: "gamma", Owner: owner},
 	)
 	require.NoError(t, err)
 
 	server := NewQueryServer(fixture.keeper)
 	first, err := server.NFTRecords(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		&types.QueryNFTRecordsRequest{
 			ClassId:    classID,
 			Pagination: &query.PageRequest{Limit: 1},
@@ -83,7 +83,7 @@ func TestQueryNFTRecordsSupportsClassAndOwnerFilters(t *testing.T) {
 	require.NotEmpty(t, first.Pagination.NextKey)
 
 	second, err := server.NFTRecords(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		&types.QueryNFTRecordsRequest{
 			ClassId: classID,
 			Pagination: &query.PageRequest{
@@ -104,7 +104,7 @@ func TestQueryNFTRecordsSupportsClassAndOwnerFilters(t *testing.T) {
 	}
 	originalOwner := ownerRequest.Owner
 	originalPagination := *ownerRequest.Pagination
-	ownerResponse, err := server.NFTRecords(sdk.WrapSDKContext(fixture.ctx), ownerRequest)
+	ownerResponse, err := server.NFTRecords(fixture.ctx, ownerRequest)
 	require.NoError(t, err)
 	expectedOwnerKeys := []string{classID + "/alpha", otherClassID + "/delta"}
 	sort.Strings(expectedOwnerKeys)
@@ -113,7 +113,7 @@ func TestQueryNFTRecordsSupportsClassAndOwnerFilters(t *testing.T) {
 	require.Equal(t, originalPagination, *ownerRequest.Pagination)
 
 	intersection, err := server.NFTRecords(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		&types.QueryNFTRecordsRequest{ClassId: classID, Owner: receiver},
 	)
 	require.NoError(t, err)
@@ -121,7 +121,7 @@ func TestQueryNFTRecordsSupportsClassAndOwnerFilters(t *testing.T) {
 	require.NotNil(t, intersection.Pagination)
 
 	burned, err := server.NFTRecord(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		&types.QueryNFTRecordRequest{ClassId: classID, NftId: "gamma"},
 	)
 	require.NoError(t, err)
@@ -134,7 +134,7 @@ func TestQueryNFTRecordsReturnsEmptyForUnknownFilters(t *testing.T) {
 	owner := fixture.accountAddress(t, sdk.AccAddress(bytes.Repeat([]byte{110}, 20)))
 
 	response, err := NewQueryServer(fixture.keeper).NFTRecords(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		&types.QueryNFTRecordsRequest{
 			ClassId: creator + ":unknown",
 			Owner:   owner,
@@ -149,7 +149,7 @@ func TestQueryNFTRecordsReturnsEmptyForUnknownFilters(t *testing.T) {
 func TestQueryNFTRecordsErrorMapping(t *testing.T) {
 	fixture := newKeeperFixture(t, true, true)
 	server := NewQueryServer(fixture.keeper)
-	goCtx := sdk.WrapSDKContext(fixture.ctx)
+	goCtx := fixture.ctx
 	creator := fixture.accountAddress(t, sdk.AccAddress(bytes.Repeat([]byte{111}, 20)))
 
 	invalidRequests := []*types.QueryNFTRecordsRequest{
@@ -182,7 +182,7 @@ func TestQueryNFTRecordsErrorMapping(t *testing.T) {
 		collections.Join(classID, "alpha"),
 	))
 	_, err := server.NFTRecords(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		&types.QueryNFTRecordsRequest{ClassId: classID},
 	)
 	require.Equal(t, codes.Internal, status.Code(err))

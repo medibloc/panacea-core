@@ -93,13 +93,13 @@ func newMaximumPayloadClassesFixture(t testing.TB) maximumPageQueryFixture {
 	server := NewMsgServer(fixture.keeper)
 	for index := 0; index < maximumPageBenchmarkStateSize; index++ {
 		request := maximumPayloadClassRequest(creator, index)
-		response, err := server.CreateClass(sdk.WrapSDKContext(fixture.ctx), request)
+		response, err := server.CreateClass(fixture.ctx, request)
 		require.NoError(t, err)
 		require.Len(t, response.ClassId, 131)
 	}
 	fixture.ctx = fixture.ctx.WithEventManager(sdk.NewEventManager())
 	return maximumPageQueryFixture{
-		goCtx:    sdk.WrapSDKContext(fixture.ctx),
+		goCtx:    fixture.ctx,
 		standard: NewStandardQueryServer(fixture.keeper),
 		panacea:  NewQueryServer(fixture.keeper),
 	}
@@ -125,7 +125,7 @@ func newMaximumPayloadNFTFixture(t testing.TB) maximumPageQueryFixture {
 	classRequest := maximumPayloadClassRequest(creator, 0)
 	classRequest.MaxSupply = 0
 	classResponse, err := NewMsgServer(fixture.keeper).CreateClass(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		classRequest,
 	)
 	require.NoError(t, err)
@@ -147,12 +147,12 @@ func newMaximumPayloadNFTFixture(t testing.TB) maximumPageQueryFixture {
 			TypeUrl: data.TypeUrl,
 			Value:   append([]byte(nil), data.Value...),
 		}
-		_, err := server.Mint(sdk.WrapSDKContext(fixture.ctx), request)
+		_, err := server.Mint(fixture.ctx, request)
 		require.NoError(t, err)
 	}
 	fixture.ctx = fixture.ctx.WithEventManager(sdk.NewEventManager())
 	return maximumPageQueryFixture{
-		goCtx:    sdk.WrapSDKContext(fixture.ctx),
+		goCtx:    fixture.ctx,
 		classID:  classResponse.ClassId,
 		owner:    owner,
 		standard: NewStandardQueryServer(fixture.keeper),
@@ -182,7 +182,6 @@ func contextWithQueryGasMeter(
 	goCtx context.Context,
 ) (context.Context, storetypes.GasMeter) {
 	meter := storetypes.NewInfiniteGasMeter()
-	return sdk.WrapSDKContext(
-		sdk.UnwrapSDKContext(goCtx).WithGasMeter(meter),
-	), meter
+	return sdk.UnwrapSDKContext(goCtx).WithGasMeter(meter),
+		meter
 }

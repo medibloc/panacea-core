@@ -136,7 +136,7 @@ func TestExportGenesisAcceptsZeroSupplyStorageForms(t *testing.T) {
 		fixture := newKeeperFixture(t, true, true)
 		classID, _, owner, _, _ := createNFTForBurnTest(t, &fixture)
 		_, err := NewMsgServer(fixture.keeper).Burn(
-			sdk.WrapSDKContext(fixture.ctx),
+			fixture.ctx,
 			&nfttypes.MsgBurnRequest{ClassId: classID, NftId: "nft-1", Owner: owner},
 		)
 		require.NoError(t, err)

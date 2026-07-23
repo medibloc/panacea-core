@@ -36,7 +36,7 @@ func TestListedValuesCannotReplacePhysicalKeyValidation(t *testing.T) {
 		))
 
 		upstream, err := fixture.keeper.nftKeeper.Classes(
-			sdk.WrapSDKContext(fixture.ctx),
+			fixture.ctx,
 			&upstreamnft.QueryClassesRequest{
 				Pagination: &query.PageRequest{Limit: 1},
 			},
@@ -46,7 +46,7 @@ func TestListedValuesCannotReplacePhysicalKeyValidation(t *testing.T) {
 		require.Equal(t, class.Id, upstream.Classes[0].Id)
 
 		_, err = NewStandardQueryServer(fixture.keeper).Classes(
-			sdk.WrapSDKContext(fixture.ctx),
+			fixture.ctx,
 			&upstreamnft.QueryClassesRequest{
 				Pagination: &query.PageRequest{Limit: 1},
 			},
@@ -81,7 +81,7 @@ func TestListedValuesCannotReplacePhysicalKeyValidation(t *testing.T) {
 		))
 
 		upstream, err := fixture.keeper.nftKeeper.NFTs(
-			sdk.WrapSDKContext(fixture.ctx),
+			fixture.ctx,
 			&upstreamnft.QueryNFTsRequest{
 				ClassId:    classID,
 				Pagination: &query.PageRequest{Limit: 1},
@@ -92,7 +92,7 @@ func TestListedValuesCannotReplacePhysicalKeyValidation(t *testing.T) {
 		require.Equal(t, token.Id, upstream.Nfts[0].Id)
 
 		_, err = NewStandardQueryServer(fixture.keeper).NFTs(
-			sdk.WrapSDKContext(fixture.ctx),
+			fixture.ctx,
 			&upstreamnft.QueryNFTsRequest{
 				ClassId:    classID,
 				Pagination: &query.PageRequest{Limit: 1},
@@ -124,7 +124,7 @@ func TestListQueryPageCacheHandlesMultipleClasses(t *testing.T) {
 	require.Equal(t, owner, secondOwner)
 	fixture.ctx = fixture.ctx.WithBlockTime(fixture.ctx.BlockTime().Add(time.Hour))
 	_, err := NewMsgServer(fixture.keeper).Revoke(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		&nfttypes.MsgRevokeRequest{
 			ClassId:    firstClassID,
 			NftId:      "alpha",

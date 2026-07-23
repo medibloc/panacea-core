@@ -68,13 +68,13 @@ func TestListLiveNFTRecordsByClassIncludesRevokedAndExcludesBurned(t *testing.T)
 
 	fixture.ctx = fixture.ctx.WithBlockTime(fixture.ctx.BlockTime().Add(time.Hour))
 	_, err := NewMsgServer(fixture.keeper).Revoke(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		&nfttypes.MsgRevokeRequest{ClassId: classID, NftId: "beta", Controller: controller},
 	)
 	require.NoError(t, err)
 	fixture.ctx = fixture.ctx.WithBlockTime(fixture.ctx.BlockTime().Add(time.Hour))
 	_, err = NewMsgServer(fixture.keeper).Burn(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		&nfttypes.MsgBurnRequest{ClassId: classID, NftId: "alpha", Owner: owner},
 	)
 	require.NoError(t, err)
@@ -180,7 +180,7 @@ func createNFTsForQueryTest(
 		request := validMintRequest(classID, controller, owner)
 		request.NftId = nftID
 		request.Uri = "https://example.test/" + nftID + ".json"
-		_, err := NewMsgServer(fixture.keeper).Mint(sdk.WrapSDKContext(fixture.ctx), request)
+		_, err := NewMsgServer(fixture.keeper).Mint(fixture.ctx, request)
 		require.NoError(t, err)
 	}
 	fixture.ctx = fixture.ctx.WithEventManager(sdk.NewEventManager())

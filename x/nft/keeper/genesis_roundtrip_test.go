@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"cosmossdk.io/collections"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	nfttypes "github.com/medibloc/panacea-core/v2/x/nft/types"
 	"github.com/stretchr/testify/require"
 )
@@ -19,13 +18,13 @@ func TestBurnedStateGenesisRoundTrip(t *testing.T) {
 	secondRequest.Uri = "https://example.test/nft-2.json"
 	secondRequest.UriHash = "sha256:" + strings.Repeat("c", 64)
 	_, err := NewMsgServer(fixture.keeper).Mint(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		secondRequest,
 	)
 	require.NoError(t, err)
 	fixture.ctx = fixture.ctx.WithBlockTime(fixture.ctx.BlockTime().Add(time.Hour))
 	_, err = NewMsgServer(fixture.keeper).Burn(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		&nfttypes.MsgBurnRequest{ClassId: classID, NftId: "nft-1", Owner: owner},
 	)
 	require.NoError(t, err)
@@ -76,7 +75,7 @@ func TestBurnedStateGenesisRoundTrip(t *testing.T) {
 	remint := validMintRequest(classID, controller, owner)
 	remint.Data = data
 	_, err = NewMsgServer(importedFixture.keeper).Mint(
-		sdk.WrapSDKContext(importedFixture.ctx),
+		importedFixture.ctx,
 		remint,
 	)
 	require.ErrorIs(t, err, nfttypes.ErrNFTIDPermanentlyUsed)

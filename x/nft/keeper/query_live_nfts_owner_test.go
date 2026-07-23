@@ -93,7 +93,7 @@ func TestListLiveNFTRecordsByOwnerSupportsClassIntersection(t *testing.T) {
 	fixture.accountKeeper.accounts[string(receiverAddress)] =
 		authtypes.NewBaseAccountWithAddress(receiverAddress)
 	_, err := NewStandardMsgServer(fixture.keeper).Send(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		&upstreamnft.MsgSend{
 			ClassId:  classID,
 			Id:       "beta",
@@ -105,7 +105,7 @@ func TestListLiveNFTRecordsByOwnerSupportsClassIntersection(t *testing.T) {
 
 	fixture.ctx = fixture.ctx.WithBlockTime(fixture.ctx.BlockTime().Add(time.Hour))
 	_, err = NewMsgServer(fixture.keeper).Revoke(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		&nfttypes.MsgRevokeRequest{
 			ClassId:    classID,
 			NftId:      "gamma",
@@ -115,7 +115,7 @@ func TestListLiveNFTRecordsByOwnerSupportsClassIntersection(t *testing.T) {
 	require.NoError(t, err)
 	fixture.ctx = fixture.ctx.WithBlockTime(fixture.ctx.BlockTime().Add(time.Hour))
 	_, err = NewMsgServer(fixture.keeper).Burn(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		&nfttypes.MsgBurnRequest{ClassId: classID, NftId: "alpha", Owner: owner},
 	)
 	require.NoError(t, err)

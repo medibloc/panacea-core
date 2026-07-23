@@ -235,7 +235,7 @@ func newBalanceQueryFixture(
 	createRequest := validCreateClassRequest(creator)
 	createRequest.MaxSupply = 0
 	created, err := NewMsgServer(fixture.keeper).CreateClass(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		createRequest,
 	)
 	require.NoError(t, err)
@@ -250,7 +250,7 @@ func newBalanceQueryFixture(
 		mintRequest := validMintRequest(created.ClassId, creator, recipient)
 		mintRequest.NftId = nftID
 		mintRequest.Uri = "https://example.test/" + nftID + ".json"
-		_, err := msgServer.Mint(sdk.WrapSDKContext(fixture.ctx), mintRequest)
+		_, err := msgServer.Mint(fixture.ctx, mintRequest)
 		require.NoError(t, err)
 	}
 	fixture.ctx = fixture.ctx.WithEventManager(sdk.NewEventManager())
@@ -261,7 +261,7 @@ func newBalanceQueryFixture(
 		owner:   ownerAddress,
 		classID: created.ClassId,
 		server:  NewStandardQueryServer(fixture.keeper),
-		goCtx:   sdk.WrapSDKContext(fixture.ctx),
+		goCtx:   fixture.ctx,
 		request: &upstreamnft.QueryBalanceRequest{
 			ClassId: created.ClassId,
 			Owner:   owner,

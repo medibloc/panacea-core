@@ -18,7 +18,7 @@ func TestStandardQueryClassesReturnsEmptyPage(t *testing.T) {
 	request := &upstreamnft.QueryClassesRequest{}
 
 	response, err := NewStandardQueryServer(fixture.keeper).Classes(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		request,
 	)
 
@@ -34,7 +34,7 @@ func TestStandardQueryClassesPaginatesInClassIDOrder(t *testing.T) {
 	fixture := newKeeperFixture(t, true, true)
 	classIDs := createClassesForStandardQueryTest(t, &fixture, "gamma", "alpha", "beta")
 	server := NewStandardQueryServer(fixture.keeper)
-	goCtx := sdk.WrapSDKContext(fixture.ctx)
+	goCtx := fixture.ctx
 
 	first, err := server.Classes(goCtx, &upstreamnft.QueryClassesRequest{
 		Pagination: &query.PageRequest{Limit: 2},
@@ -57,7 +57,7 @@ func TestStandardQueryClassesSupportsReversePagination(t *testing.T) {
 	fixture := newKeeperFixture(t, true, true)
 	classIDs := createClassesForStandardQueryTest(t, &fixture, "gamma", "alpha", "beta")
 	server := NewStandardQueryServer(fixture.keeper)
-	goCtx := sdk.WrapSDKContext(fixture.ctx)
+	goCtx := fixture.ctx
 
 	first, err := server.Classes(goCtx, &upstreamnft.QueryClassesRequest{
 		Pagination: &query.PageRequest{Limit: 2, Reverse: true},
@@ -81,7 +81,7 @@ func TestStandardQueryClassesSupportsReversePagination(t *testing.T) {
 func TestStandardQueryClassesErrorMapping(t *testing.T) {
 	fixture := newKeeperFixture(t, true, true)
 	server := NewStandardQueryServer(fixture.keeper)
-	goCtx := sdk.WrapSDKContext(fixture.ctx)
+	goCtx := fixture.ctx
 
 	_, err := server.Classes(goCtx, nil)
 	require.Equal(t, codes.InvalidArgument, status.Code(err))
@@ -117,7 +117,7 @@ func createClassesForStandardQueryTest(
 	for _, localClassID := range localClassIDs {
 		request := validCreateClassRequest(creator)
 		request.LocalClassId = localClassID
-		response, err := server.CreateClass(sdk.WrapSDKContext(fixture.ctx), request)
+		response, err := server.CreateClass(fixture.ctx, request)
 		require.NoError(t, err)
 		classIDs = append(classIDs, response.ClassId)
 	}

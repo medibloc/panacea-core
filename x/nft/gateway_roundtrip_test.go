@@ -28,7 +28,7 @@ func TestNFTRoutesRoundTripClassColonAndNFTDot(t *testing.T) {
 	require.NoError(t, err)
 
 	classResponse, err := keeper.NewMsgServer(moduleKeeper).CreateClass(
-		sdk.WrapSDKContext(sdkContext),
+		sdkContext,
 		&types.MsgCreateClassRequest{
 			Creator:        creator,
 			LocalClassId:   "rest.class",
@@ -55,7 +55,7 @@ func TestNFTRoutesRoundTripClassColonAndNFTDot(t *testing.T) {
 	})
 	require.NoError(t, err)
 	_, err = keeper.NewMsgServer(moduleKeeper).Mint(
-		sdk.WrapSDKContext(sdkContext),
+		sdkContext,
 		&types.MsgMintRequest{
 			ClassId:    classID,
 			NftId:      nftID,
@@ -152,7 +152,7 @@ func TestNFTRoutesRoundTripClassColonAndNFTDot(t *testing.T) {
 	} {
 		t.Run(testCase.name, func(t *testing.T) {
 			request := httptest.NewRequest(http.MethodGet, testCase.path, nil)
-			request = request.WithContext(sdk.WrapSDKContext(sdkContext))
+			request = request.WithContext(sdkContext)
 			response := httptest.NewRecorder()
 			mux.ServeHTTP(response, request)
 

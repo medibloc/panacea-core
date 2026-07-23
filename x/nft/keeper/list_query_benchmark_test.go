@@ -159,9 +159,7 @@ func TestMaximumPageListQueryGas(t *testing.T) {
 	t.Run("standard classes", func(t *testing.T) {
 		fixture := newMaximumPageClassesFixture(t, nil)
 		meter := storetypes.NewInfiniteGasMeter()
-		fixture.goCtx = sdk.WrapSDKContext(
-			sdk.UnwrapSDKContext(fixture.goCtx).WithGasMeter(meter),
-		)
+		fixture.goCtx = sdk.UnwrapSDKContext(fixture.goCtx).WithGasMeter(meter)
 		response, err := fixture.standard.Classes(
 			fixture.goCtx,
 			&upstreamnft.QueryClassesRequest{
@@ -177,9 +175,7 @@ func TestMaximumPageListQueryGas(t *testing.T) {
 		t.Run("standard nfts/"+filter.name, func(t *testing.T) {
 			fixture := newMaximumPageNFTFixture(t, nil)
 			meter := storetypes.NewInfiniteGasMeter()
-			fixture.goCtx = sdk.WrapSDKContext(
-				sdk.UnwrapSDKContext(fixture.goCtx).WithGasMeter(meter),
-			)
+			fixture.goCtx = sdk.UnwrapSDKContext(fixture.goCtx).WithGasMeter(meter)
 			response, err := fixture.standard.NFTs(
 				fixture.goCtx,
 				filter.standardRequest(fixture),
@@ -192,9 +188,7 @@ func TestMaximumPageListQueryGas(t *testing.T) {
 		t.Run("panacea nft records/"+filter.name, func(t *testing.T) {
 			fixture := newMaximumPageNFTFixture(t, nil)
 			meter := storetypes.NewInfiniteGasMeter()
-			fixture.goCtx = sdk.WrapSDKContext(
-				sdk.UnwrapSDKContext(fixture.goCtx).WithGasMeter(meter),
-			)
+			fixture.goCtx = sdk.UnwrapSDKContext(fixture.goCtx).WithGasMeter(meter)
 			response, err := fixture.panacea.NFTRecords(
 				fixture.goCtx,
 				filter.panaceaRequest(fixture),
@@ -234,12 +228,12 @@ func newMaximumPageClassesFixture(
 	for index := 0; index < maximumPageBenchmarkStateSize; index++ {
 		request := validCreateClassRequest(creator)
 		request.LocalClassId = fmt.Sprintf("benchmark%03d", index)
-		_, err := server.CreateClass(sdk.WrapSDKContext(fixture.ctx), request)
+		_, err := server.CreateClass(fixture.ctx, request)
 		require.NoError(t, err)
 	}
 	fixture.ctx = fixture.ctx.WithEventManager(sdk.NewEventManager())
 	return maximumPageQueryFixture{
-		goCtx:    sdk.WrapSDKContext(fixture.ctx),
+		goCtx:    fixture.ctx,
 		standard: NewStandardQueryServer(fixture.keeper),
 		panacea:  NewQueryServer(fixture.keeper),
 	}
@@ -270,7 +264,7 @@ func newMaximumPageNFTFixture(
 	classRequest.LocalClassId = "benchmarknfts"
 	classRequest.MaxSupply = 0
 	classResponse, err := NewMsgServer(fixture.keeper).CreateClass(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		classRequest,
 	)
 	require.NoError(t, err)
@@ -280,12 +274,12 @@ func newMaximumPageNFTFixture(
 		request := validMintRequest(classResponse.ClassId, creator, owner)
 		request.NftId = nftID
 		request.Uri = "https://example.test/" + nftID + ".json"
-		_, err := server.Mint(sdk.WrapSDKContext(fixture.ctx), request)
+		_, err := server.Mint(fixture.ctx, request)
 		require.NoError(t, err)
 	}
 	fixture.ctx = fixture.ctx.WithEventManager(sdk.NewEventManager())
 	return maximumPageQueryFixture{
-		goCtx:    sdk.WrapSDKContext(fixture.ctx),
+		goCtx:    fixture.ctx,
 		classID:  classResponse.ClassId,
 		owner:    owner,
 		standard: NewStandardQueryServer(fixture.keeper),
