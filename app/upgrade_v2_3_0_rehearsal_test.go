@@ -34,10 +34,12 @@ func TestV230StoreUpgradeAndRestartRehearsal(t *testing.T) {
 		upgradeHeight = int64(3)
 	)
 	var (
-		preservedKey   = []byte("v2.3.0-rehearsal/preserved")
-		preservedValue = []byte("stable-state")
-		legacyPNFTKey  = []byte("legacy-pnft")
-		legacyPNFTData = []byte("discarded")
+		preservedKey    = []byte("v2.3.0-rehearsal/preserved")
+		preservedValue  = []byte("stable-state")
+		legacyPNFTKey   = []byte("legacy-pnft")
+		legacyPNFTData  = []byte("discarded")
+		uncommittedKey  = []byte("v2.3.0-rehearsal/uncommitted")
+		uncommittedData = []byte("must-not-persist")
 	)
 
 	homeDir := t.TempDir()
@@ -94,8 +96,55 @@ func TestV230StoreUpgradeAndRestartRehearsal(t *testing.T) {
 	require.NoError(t, templateDB.Close())
 	require.NoError(t, legacyDB.Close())
 
+	// Simulate the new process stopping after the store loader and PreBlock
+	// succeed but before commit. Its in-memory store changes must not advance or
+	// alter the persisted legacy commit.
+	interruptedDB := openRehearsalDB(t, dataDir)
+	interruptedApp := panaceaapp.New(log.NewNopLogger(), interruptedDB, nil, false, appOpts)
+	require.NoError(t, interruptedApp.LoadLatestVersion())
+	require.Equal(t, legacyHeight, interruptedApp.LastBlockHeight())
+
+	interruptedCtx := interruptedApp.NewUncachedContext(
+		false,
+		cmtproto.Header{Height: upgradeHeight, Time: blockTime},
+	).WithHeaderInfo(header.Info{Height: upgradeHeight, Time: blockTime})
+	interruptedCtx.KVStore(interruptedApp.GetKey(nfttypes.PolicyStoreKey)).Set(uncommittedKey, uncommittedData)
+	require.Equal(
+		t,
+		uncommittedData,
+		interruptedCtx.KVStore(interruptedApp.GetKey(nfttypes.PolicyStoreKey)).Get(uncommittedKey),
+	)
+	uncommittedStoreNames := rehearsalStoreNames(
+		t,
+		interruptedApp.CommitMultiStore().(*rootmulti.Store),
+		legacyHeight,
+	)
+	require.Contains(t, uncommittedStoreNames, pnfttypes.StoreKey)
+	require.NotContains(t, uncommittedStoreNames, nfttypes.StoreKey)
+	require.NotContains(t, uncommittedStoreNames, nfttypes.PolicyStoreKey)
+
+	_, interruptedPreBlockErr := interruptedApp.PreBlocker(
+		interruptedCtx,
+		&abci.RequestFinalizeBlock{Height: upgradeHeight},
+	)
+	require.NoError(t, interruptedPreBlockErr)
+	interruptedVM, interruptedVMErr := interruptedApp.UpgradeKeeper.GetModuleVersionMap(interruptedCtx)
+	require.NoError(t, interruptedVMErr)
+	require.Equal(t, uint64(1), interruptedVM[nfttypes.ModuleName])
+	require.Equal(t, uint64(1), interruptedVM[pnfttypes.ModuleName])
+	interruptedDoneHeight, interruptedDoneErr := interruptedApp.UpgradeKeeper.GetDoneHeight(
+		interruptedCtx,
+		v2_3_0.UpgradeName,
+	)
+	require.NoError(t, interruptedDoneErr)
+	require.Equal(t, upgradeHeight, interruptedDoneHeight)
+	_, interruptedPlanErr := interruptedApp.UpgradeKeeper.GetUpgradePlan(interruptedCtx)
+	require.ErrorIs(t, interruptedPlanErr, upgradetypes.ErrNoUpgradePlanFound)
+	require.NoError(t, interruptedDB.Close())
+
 	// The new binary reads the real upgrade-info file while it is constructed.
-	// Loading the latest version therefore applies the production v2.3.0 loader.
+	// Restarting from the unchanged legacy commit reapplies the production
+	// v2.3.0 loader.
 	upgradeDB := openRehearsalDB(t, dataDir)
 	upgradedApp := panaceaapp.New(log.NewNopLogger(), upgradeDB, nil, false, appOpts)
 	require.NoError(t, upgradedApp.LoadLatestVersion())
@@ -105,6 +154,23 @@ func TestV230StoreUpgradeAndRestartRehearsal(t *testing.T) {
 		false,
 		cmtproto.Header{Height: upgradeHeight, Time: blockTime},
 	).WithHeaderInfo(header.Info{Height: upgradeHeight, Time: blockTime})
+	recoveredVM, recoveredVMErr := upgradedApp.UpgradeKeeper.GetModuleVersionMap(upgradeCtx)
+	require.NoError(t, recoveredVMErr)
+	require.NotContains(t, recoveredVM, nfttypes.ModuleName)
+	require.Equal(t, uint64(1), recoveredVM[pnfttypes.ModuleName])
+	recoveredDoneHeight, recoveredDoneErr := upgradedApp.UpgradeKeeper.GetDoneHeight(
+		upgradeCtx,
+		v2_3_0.UpgradeName,
+	)
+	require.NoError(t, recoveredDoneErr)
+	require.Zero(t, recoveredDoneHeight)
+	recoveredPlan, recoveredPlanErr := upgradedApp.UpgradeKeeper.GetUpgradePlan(upgradeCtx)
+	require.NoError(t, recoveredPlanErr)
+	require.Equal(t, plan, recoveredPlan)
+	require.Nil(
+		t,
+		upgradeCtx.KVStore(upgradedApp.GetKey(nfttypes.PolicyStoreKey)).Get(uncommittedKey),
+	)
 	_, err := upgradedApp.PreBlocker(upgradeCtx, &abci.RequestFinalizeBlock{Height: upgradeHeight})
 	require.NoError(t, err)
 
