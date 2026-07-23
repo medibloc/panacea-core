@@ -35,7 +35,7 @@ func TestBurnMovesActiveNFTToPermanentTombstone(t *testing.T) {
 	secondRequest.Uri = "https://example.test/nft-2.json"
 	secondRequest.UriHash = "sha256:" + strings.Repeat("c", 64)
 	_, err = NewMsgServer(fixture.keeper).Mint(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		secondRequest,
 	)
 	require.NoError(t, err)
@@ -50,7 +50,7 @@ func TestBurnMovesActiveNFTToPermanentTombstone(t *testing.T) {
 	}
 	original := *request
 	response, err := NewMsgServer(fixture.keeper).Burn(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		request,
 	)
 	require.NoError(t, err)
@@ -87,12 +87,12 @@ func TestBurnMovesActiveNFTToPermanentTombstone(t *testing.T) {
 	require.Equal(t, owner, tombstone.BurnedBy)
 
 	_, err = fixture.keeper.nftKeeper.NFT(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		&upstreamnft.QueryNFTRequest{ClassId: classID, Id: "nft-1"},
 	)
 	require.ErrorIs(t, err, upstreamnft.ErrNFTNotExists)
 	ownerResponse, err := fixture.keeper.nftKeeper.Owner(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		&upstreamnft.QueryOwnerRequest{ClassId: classID, Id: "nft-1"},
 	)
 	require.NoError(t, err)
@@ -116,7 +116,7 @@ func TestBurnPreservesRevocationInTombstone(t *testing.T) {
 	revokedAt := fixture.ctx.BlockTime().Add(time.Hour)
 	fixture.ctx = fixture.ctx.WithBlockTime(revokedAt)
 	_, err := NewMsgServer(fixture.keeper).Revoke(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		&nfttypes.MsgRevokeRequest{
 			ClassId: classID, NftId: "nft-1", Controller: controller,
 		},
@@ -133,7 +133,7 @@ func TestBurnPreservesRevocationInTombstone(t *testing.T) {
 		WithEventManager(sdk.NewEventManager())
 
 	_, err = NewMsgServer(fixture.keeper).Burn(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		&nfttypes.MsgBurnRequest{ClassId: classID, NftId: "nft-1", Owner: owner},
 	)
 	require.NoError(t, err)
@@ -176,7 +176,7 @@ func TestBurnEnforcesCurrentOwner(t *testing.T) {
 				fixture.accountKeeper.accounts[string(newOwnerAddress)] =
 					authtypes.NewBaseAccountWithAddress(newOwnerAddress)
 				_, err := NewStandardMsgServer(fixture.keeper).Send(
-					sdk.WrapSDKContext(fixture.ctx),
+					fixture.ctx,
 					&upstreamnft.MsgSend{
 						ClassId: classID, Id: "nft-1", Sender: owner, Receiver: newOwner,
 					},
@@ -195,7 +195,7 @@ func TestBurnEnforcesCurrentOwner(t *testing.T) {
 			before := snapshotRevokeState(t, &fixture, classID, "nft-1")
 
 			_, err := NewMsgServer(fixture.keeper).Burn(
-				sdk.WrapSDKContext(fixture.ctx),
+				fixture.ctx,
 				&nfttypes.MsgBurnRequest{ClassId: classID, NftId: "nft-1", Owner: signer},
 			)
 			require.ErrorIs(t, err, sdkerrors.ErrUnauthorized)
@@ -212,20 +212,20 @@ func TestBurnReturnsNFTNotExistsForUnusedAndBurnedIDs(t *testing.T) {
 	fixture.ctx = fixture.ctx.WithBlockTime(fixture.ctx.BlockTime().Add(time.Hour))
 
 	_, err := server.Burn(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		&nfttypes.MsgBurnRequest{ClassId: classID, NftId: "unused", Owner: owner},
 	)
 	require.ErrorIs(t, err, upstreamnft.ErrNFTNotExists)
 	require.Empty(t, fixture.ctx.EventManager().Events())
 
 	_, err = server.Burn(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		&nfttypes.MsgBurnRequest{ClassId: classID, NftId: "nft-1", Owner: owner},
 	)
 	require.NoError(t, err)
 	fixture.ctx = fixture.ctx.WithEventManager(sdk.NewEventManager())
 	_, err = server.Burn(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		&nfttypes.MsgBurnRequest{ClassId: classID, NftId: "nft-1", Owner: owner},
 	)
 	require.ErrorIs(t, err, upstreamnft.ErrNFTNotExists)
@@ -297,7 +297,7 @@ func TestBurnRejectsInvalidRequests(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			before := snapshotRevokeState(t, &fixture, classID, "nft-1")
 			_, err := NewMsgServer(fixture.keeper).Burn(
-				sdk.WrapSDKContext(fixture.ctx),
+				fixture.ctx,
 				tc.request,
 			)
 			require.ErrorIs(t, err, tc.targetErr)
@@ -342,7 +342,7 @@ func TestBurnRejectsInvalidBlockTime(t *testing.T) {
 				revokedAt := fixture.ctx.BlockTime().Add(time.Hour)
 				fixture.ctx = fixture.ctx.WithBlockTime(revokedAt)
 				_, err := NewMsgServer(fixture.keeper).Revoke(
-					sdk.WrapSDKContext(fixture.ctx),
+					fixture.ctx,
 					&nfttypes.MsgRevokeRequest{
 						ClassId: classID, NftId: "nft-1", Controller: controller,
 					},
@@ -360,7 +360,7 @@ func TestBurnRejectsInvalidBlockTime(t *testing.T) {
 			before := snapshotRevokeState(t, &fixture, classID, "nft-1")
 
 			_, err := NewMsgServer(fixture.keeper).Burn(
-				sdk.WrapSDKContext(fixture.ctx),
+				fixture.ctx,
 				&nfttypes.MsgBurnRequest{ClassId: classID, NftId: "nft-1", Owner: owner},
 			)
 			require.ErrorContains(t, err, tc.expectedError)
@@ -431,7 +431,7 @@ func TestBurnRejectsInconsistentLiveState(t *testing.T) {
 			before := snapshotRevokeState(t, &fixture, classID, "nft-1")
 
 			_, err := NewMsgServer(fixture.keeper).Burn(
-				sdk.WrapSDKContext(fixture.ctx),
+				fixture.ctx,
 				&nfttypes.MsgBurnRequest{ClassId: classID, NftId: "nft-1", Owner: owner},
 			)
 			require.ErrorContains(t, err, tc.expectedError)
@@ -468,7 +468,7 @@ func TestBurnRollsBackWhenTombstoneWriteFails(t *testing.T) {
 	)
 
 	_, err := NewMsgServer(failingKeeper).Burn(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		&nfttypes.MsgBurnRequest{ClassId: classID, NftId: "nft-1", Owner: owner},
 	)
 	require.ErrorContains(t, err, "forced set failure")
@@ -514,7 +514,7 @@ func TestBurnRollsBackWhenUpstreamBurnEventFails(t *testing.T) {
 	)
 
 	_, err := NewMsgServer(failingKeeper).Burn(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		&nfttypes.MsgBurnRequest{ClassId: classID, NftId: "nft-1", Owner: owner},
 	)
 	require.ErrorContains(t, err, "emitted 0 events instead of one")
@@ -553,7 +553,7 @@ func createNFTForBurnTest(
 	require.NoError(t, err)
 	request := validMintRequest(classID, controller, owner)
 	request.Data = data
-	_, err = NewMsgServer(fixture.keeper).Mint(sdk.WrapSDKContext(fixture.ctx), request)
+	_, err = NewMsgServer(fixture.keeper).Mint(fixture.ctx, request)
 	require.NoError(t, err)
 	fixture.ctx = fixture.ctx.WithEventManager(sdk.NewEventManager())
 	return classID, controller, owner, ownerAddress, data

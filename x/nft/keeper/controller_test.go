@@ -31,7 +31,7 @@ func TestUpdateControllerChangesOnlyController(t *testing.T) {
 	mintedCountBefore := recordBefore.MintedCount
 
 	response, err := NewMsgServer(fixture.keeper).UpdateController(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		&types.MsgUpdateControllerRequest{
 			ClassId:       classID,
 			Controller:    strings.ToUpper(creator),
@@ -50,7 +50,7 @@ func TestUpdateControllerChangesOnlyController(t *testing.T) {
 	require.Equal(t, mintedCountBefore, recordAfter.MintedCount)
 
 	queryResponse, err := NewQueryServer(fixture.keeper).ClassRecord(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		&types.QueryClassRecordRequest{ClassId: classID},
 	)
 	require.NoError(t, err)
@@ -79,7 +79,7 @@ func TestUpdateControllerTransfersAuthorityImmediately(t *testing.T) {
 	server := NewMsgServer(fixture.keeper)
 
 	_, err := server.UpdateController(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		&types.MsgUpdateControllerRequest{
 			ClassId:       classID,
 			Controller:    creator,
@@ -90,7 +90,7 @@ func TestUpdateControllerTransfersAuthorityImmediately(t *testing.T) {
 	fixture.ctx = fixture.ctx.WithEventManager(sdk.NewEventManager())
 
 	_, err = server.UpdateController(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		&types.MsgUpdateControllerRequest{
 			ClassId:       classID,
 			Controller:    creator,
@@ -101,7 +101,7 @@ func TestUpdateControllerTransfersAuthorityImmediately(t *testing.T) {
 	require.Empty(t, fixture.ctx.EventManager().Events())
 
 	_, err = server.UpdateController(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		&types.MsgUpdateControllerRequest{
 			ClassId:       classID,
 			Controller:    second,
@@ -234,7 +234,7 @@ func TestUpdateControllerRejectsInvalidRequests(t *testing.T) {
 	server := NewMsgServer(fixture.keeper)
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			_, err := server.UpdateController(sdk.WrapSDKContext(fixture.ctx), tc.request)
+			_, err := server.UpdateController(fixture.ctx, tc.request)
 			require.ErrorIs(t, err, tc.targetErr)
 		})
 	}
@@ -265,7 +265,7 @@ func TestUpdateControllerRollsBackWhenPolicyWriteFails(t *testing.T) {
 	)
 
 	_, err := NewMsgServer(failingKeeper).UpdateController(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		&types.MsgUpdateControllerRequest{
 			ClassId:       classID,
 			Controller:    creator,
@@ -290,7 +290,7 @@ func createClassForControllerTest(
 	fixture.accountKeeper.accounts[string(creatorAddress)] =
 		authtypes.NewBaseAccountWithAddress(creatorAddress)
 	response, err := NewMsgServer(fixture.keeper).CreateClass(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		validCreateClassRequest(creator),
 	)
 	require.NoError(t, err)

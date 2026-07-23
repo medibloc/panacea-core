@@ -30,7 +30,7 @@ func TestCreateClassAndQueryClassRecord(t *testing.T) {
 	request.MaxSupply = math.MaxUint64
 
 	response, err := NewMsgServer(fixture.keeper).CreateClass(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		request,
 	)
 	require.NoError(t, err)
@@ -60,7 +60,7 @@ func TestCreateClassAndQueryClassRecord(t *testing.T) {
 	require.Zero(t, mintedCount)
 
 	queryResponse, err := NewQueryServer(fixture.keeper).ClassRecord(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		&types.QueryClassRecordRequest{ClassId: expectedClassID},
 	)
 	require.NoError(t, err)
@@ -111,7 +111,7 @@ func TestCreateClassAcceptsNonModuleAccountShapes(t *testing.T) {
 			request.MaxSupply = tc.maxSupply
 
 			response, err := NewMsgServer(fixture.keeper).CreateClass(
-				sdk.WrapSDKContext(fixture.ctx),
+				fixture.ctx,
 				request,
 			)
 			require.NoError(t, err)
@@ -186,7 +186,7 @@ func TestCreateClassRejectsInvalidRequests(t *testing.T) {
 	server := NewMsgServer(fixture.keeper)
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			_, err := server.CreateClass(sdk.WrapSDKContext(fixture.ctx), tc.request)
+			_, err := server.CreateClass(fixture.ctx, tc.request)
 			require.ErrorIs(t, err, tc.targetErr)
 		})
 	}
@@ -200,9 +200,9 @@ func TestCreateClassRejectsDuplicate(t *testing.T) {
 	request := validCreateClassRequest(creator)
 	server := NewMsgServer(fixture.keeper)
 
-	_, err := server.CreateClass(sdk.WrapSDKContext(fixture.ctx), request)
+	_, err := server.CreateClass(fixture.ctx, request)
 	require.NoError(t, err)
-	_, err = server.CreateClass(sdk.WrapSDKContext(fixture.ctx), request)
+	_, err = server.CreateClass(fixture.ctx, request)
 	require.ErrorIs(t, err, upstreamnft.ErrClassExists)
 	require.Len(t, fixture.keeper.nftKeeper.GetClasses(fixture.ctx), 1)
 	require.Len(t, fixture.ctx.EventManager().Events(), 1)
@@ -230,7 +230,7 @@ func TestCreateClassWritesBothStoresAtomically(t *testing.T) {
 			)
 
 			_, err := NewMsgServer(failingKeeper).CreateClass(
-				sdk.WrapSDKContext(fixture.ctx),
+				fixture.ctx,
 				validCreateClassRequest(creator),
 			)
 			require.ErrorContains(t, err, "forced set failure")
@@ -254,15 +254,15 @@ func TestQueryClassRecordErrorMapping(t *testing.T) {
 		server := NewQueryServer(fixture.keeper)
 		creator := fixture.accountAddress(t, sdk.AccAddress(bytes.Repeat([]byte{8}, 20)))
 
-		_, err := server.ClassRecord(sdk.WrapSDKContext(fixture.ctx), nil)
+		_, err := server.ClassRecord(fixture.ctx, nil)
 		require.Equal(t, codes.InvalidArgument, status.Code(err))
 		_, err = server.ClassRecord(
-			sdk.WrapSDKContext(fixture.ctx),
+			fixture.ctx,
 			&types.QueryClassRecordRequest{ClassId: "invalid"},
 		)
 		require.Equal(t, codes.InvalidArgument, status.Code(err))
 		_, err = server.ClassRecord(
-			sdk.WrapSDKContext(fixture.ctx),
+			fixture.ctx,
 			&types.QueryClassRecordRequest{ClassId: strings.ToUpper(creator) + ":class"},
 		)
 		require.Equal(t, codes.InvalidArgument, status.Code(err))
@@ -272,7 +272,7 @@ func TestQueryClassRecordErrorMapping(t *testing.T) {
 		fixture := newKeeperFixture(t, true, true)
 		creator := fixture.accountAddress(t, sdk.AccAddress(bytes.Repeat([]byte{6}, 20)))
 		_, err := NewQueryServer(fixture.keeper).ClassRecord(
-			sdk.WrapSDKContext(fixture.ctx),
+			fixture.ctx,
 			&types.QueryClassRecordRequest{ClassId: creator + ":missing"},
 		)
 		require.Equal(t, codes.NotFound, status.Code(err))
@@ -285,7 +285,7 @@ func TestQueryClassRecordErrorMapping(t *testing.T) {
 		require.NoError(t, fixture.keeper.nftKeeper.SaveClass(fixture.ctx, upstreamnft.Class{Id: classID}))
 
 		_, err := NewQueryServer(fixture.keeper).ClassRecord(
-			sdk.WrapSDKContext(fixture.ctx),
+			fixture.ctx,
 			&types.QueryClassRecordRequest{ClassId: classID},
 		)
 		require.Equal(t, codes.Internal, status.Code(err))
@@ -296,7 +296,7 @@ func TestGetClassRecordRejectsMismatchedStandardClassID(t *testing.T) {
 	fixture := newKeeperFixture(t, true, true)
 	creator := fixture.accountAddress(t, sdk.AccAddress(bytes.Repeat([]byte{9}, 20)))
 	response, err := NewMsgServer(fixture.keeper).CreateClass(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		validCreateClassRequest(creator),
 	)
 	require.NoError(t, err)

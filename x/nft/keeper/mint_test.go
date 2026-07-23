@@ -49,7 +49,7 @@ func TestMintCreatesActiveNFTRecord(t *testing.T) {
 	request := validMintRequest(classID, strings.ToUpper(controller), strings.ToUpper(recipient))
 	request.Data = data
 
-	response, err := NewMsgServer(fixture.keeper).Mint(sdk.WrapSDKContext(fixture.ctx), request)
+	response, err := NewMsgServer(fixture.keeper).Mint(fixture.ctx, request)
 	require.NoError(t, err)
 	require.Equal(t, &nfttypes.MsgMintResponse{}, response)
 
@@ -90,7 +90,7 @@ func TestMintCreatesActiveNFTRecord(t *testing.T) {
 	require.Equal(t, uint64(1), mintedCount)
 
 	classResponse, err := NewQueryServer(fixture.keeper).ClassRecord(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		&nfttypes.QueryClassRecordRequest{ClassId: classID},
 	)
 	require.NoError(t, err)
@@ -99,7 +99,7 @@ func TestMintCreatesActiveNFTRecord(t *testing.T) {
 	require.Equal(t, uint64(1), classResponse.ClassRecord.MintedCount)
 
 	nftResponse, err := NewQueryServer(fixture.keeper).NFTRecord(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		&nfttypes.QueryNFTRecordRequest{ClassId: classID, NftId: request.NftId},
 	)
 	require.NoError(t, err)
@@ -152,9 +152,9 @@ func TestMintValidatesAnyWireDataWithOrWithoutCache(t *testing.T) {
 	withoutCache.NftId = "nft-2"
 
 	server := NewMsgServer(fixture.keeper)
-	_, err = server.Mint(sdk.WrapSDKContext(fixture.ctx), &withCache)
+	_, err = server.Mint(fixture.ctx, &withCache)
 	require.NoError(t, err)
-	_, err = server.Mint(sdk.WrapSDKContext(fixture.ctx), &withoutCache)
+	_, err = server.Mint(fixture.ctx, &withoutCache)
 	require.NoError(t, err)
 
 	first, found := fixture.keeper.nftKeeper.GetNFT(fixture.ctx, classID, withCache.NftId)
@@ -282,7 +282,7 @@ func TestMintRejectsInvalidRequests(t *testing.T) {
 	server := NewMsgServer(fixture.keeper)
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			_, err := server.Mint(sdk.WrapSDKContext(fixture.ctx), tc.request)
+			_, err := server.Mint(fixture.ctx, tc.request)
 			require.ErrorIs(t, err, tc.targetErr)
 		})
 	}
@@ -313,14 +313,14 @@ func TestMintEnforcesLifetimeSupply(t *testing.T) {
 		recipient := fixture.accountAddress(t, sdk.AccAddress(bytes.Repeat([]byte{30}, 20)))
 		server := NewMsgServer(fixture.keeper)
 		_, err := server.Mint(
-			sdk.WrapSDKContext(fixture.ctx),
+			fixture.ctx,
 			validMintRequest(classID, controller, recipient),
 		)
 		require.NoError(t, err)
 		fixture.ctx = fixture.ctx.WithEventManager(sdk.NewEventManager())
 		second := validMintRequest(classID, controller, recipient)
 		second.NftId = "nft-2"
-		_, err = server.Mint(sdk.WrapSDKContext(fixture.ctx), second)
+		_, err = server.Mint(fixture.ctx, second)
 		require.ErrorIs(t, err, nfttypes.ErrMaxSupplyReached)
 		require.False(t, fixture.keeper.nftKeeper.HasNFT(fixture.ctx, classID, second.NftId))
 		require.Equal(t, uint64(1), fixture.keeper.nftKeeper.GetTotalSupply(fixture.ctx, classID))
@@ -343,7 +343,7 @@ func TestMintEnforcesLifetimeSupply(t *testing.T) {
 		for _, nftID := range []string{"nft-1", "nft-2"} {
 			request := validMintRequest(classID, controller, recipient)
 			request.NftId = nftID
-			_, err := server.Mint(sdk.WrapSDKContext(fixture.ctx), request)
+			_, err := server.Mint(fixture.ctx, request)
 			require.NoError(t, err)
 		}
 		require.Equal(t, uint64(2), fixture.keeper.nftKeeper.GetTotalSupply(fixture.ctx, classID))
@@ -394,11 +394,11 @@ func TestMintRejectsLiveAndBurnedIDReuse(t *testing.T) {
 		recipient := fixture.accountAddress(t, sdk.AccAddress(bytes.Repeat([]byte{34}, 20)))
 		request := validMintRequest(classID, controller, recipient)
 		server := NewMsgServer(fixture.keeper)
-		_, err := server.Mint(sdk.WrapSDKContext(fixture.ctx), request)
+		_, err := server.Mint(fixture.ctx, request)
 		require.NoError(t, err)
 		fixture.ctx = fixture.ctx.WithEventManager(sdk.NewEventManager())
 
-		_, err = server.Mint(sdk.WrapSDKContext(fixture.ctx), request)
+		_, err = server.Mint(fixture.ctx, request)
 		require.ErrorIs(t, err, upstreamnft.ErrNFTExists)
 		require.Equal(t, uint64(1), fixture.keeper.nftKeeper.GetTotalSupply(fixture.ctx, classID))
 		mintedCount, err := fixture.keeper.mintedCounts.Get(fixture.ctx, classID)
@@ -423,7 +423,7 @@ func TestMintRejectsLiveAndBurnedIDReuse(t *testing.T) {
 			nfttypes.BurnTombstone{ClassId: classID, NftId: request.NftId},
 		))
 
-		_, err := NewMsgServer(fixture.keeper).Mint(sdk.WrapSDKContext(fixture.ctx), request)
+		_, err := NewMsgServer(fixture.keeper).Mint(fixture.ctx, request)
 		require.ErrorIs(t, err, nfttypes.ErrNFTIDPermanentlyUsed)
 		require.False(t, fixture.keeper.nftKeeper.HasNFT(fixture.ctx, classID, request.NftId))
 		require.Zero(t, fixture.keeper.nftKeeper.GetTotalSupply(fixture.ctx, classID))
@@ -453,7 +453,7 @@ func TestMintRejectsInconsistentNFTState(t *testing.T) {
 		))
 		fixture.ctx = fixture.ctx.WithEventManager(sdk.NewEventManager())
 
-		_, err := NewMsgServer(fixture.keeper).Mint(sdk.WrapSDKContext(fixture.ctx), request)
+		_, err := NewMsgServer(fixture.keeper).Mint(fixture.ctx, request)
 		require.ErrorContains(t, err, "inconsistent standard, lifecycle, and tombstone state")
 		require.Empty(t, fixture.ctx.EventManager().Events())
 	})
@@ -481,7 +481,7 @@ func TestMintRejectsInconsistentNFTState(t *testing.T) {
 			},
 		))
 
-		_, err := NewMsgServer(fixture.keeper).Mint(sdk.WrapSDKContext(fixture.ctx), request)
+		_, err := NewMsgServer(fixture.keeper).Mint(fixture.ctx, request)
 		require.ErrorContains(t, err, "inconsistent standard, lifecycle, and tombstone state")
 		require.Empty(t, fixture.ctx.EventManager().Events())
 	})
@@ -521,7 +521,7 @@ func TestMintRollsBackWhenPolicyWriteFails(t *testing.T) {
 			)
 			request := validMintRequest(classID, controller, recipient)
 
-			_, err := NewMsgServer(failingKeeper).Mint(sdk.WrapSDKContext(fixture.ctx), request)
+			_, err := NewMsgServer(failingKeeper).Mint(fixture.ctx, request)
 			require.ErrorContains(t, err, "forced set failure")
 			require.False(t, fixture.keeper.nftKeeper.HasNFT(fixture.ctx, classID, request.NftId))
 			require.Empty(t, fixture.keeper.nftKeeper.GetOwner(fixture.ctx, classID, request.NftId))
@@ -545,20 +545,20 @@ func TestQueryNFTRecordErrorMapping(t *testing.T) {
 	creator := fixture.accountAddress(t, sdk.AccAddress(bytes.Repeat([]byte{43}, 20)))
 	server := NewQueryServer(fixture.keeper)
 
-	_, err := server.NFTRecord(sdk.WrapSDKContext(fixture.ctx), nil)
+	_, err := server.NFTRecord(fixture.ctx, nil)
 	require.Equal(t, codes.InvalidArgument, status.Code(err))
 	_, err = server.NFTRecord(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		&nfttypes.QueryNFTRecordRequest{ClassId: "invalid", NftId: "nft-1"},
 	)
 	require.Equal(t, codes.InvalidArgument, status.Code(err))
 	_, err = server.NFTRecord(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		&nfttypes.QueryNFTRecordRequest{ClassId: creator + ":missing", NftId: "."},
 	)
 	require.Equal(t, codes.InvalidArgument, status.Code(err))
 	_, err = server.NFTRecord(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		&nfttypes.QueryNFTRecordRequest{ClassId: creator + ":missing", NftId: "nft-1"},
 	)
 	require.Equal(t, codes.NotFound, status.Code(err))
@@ -582,7 +582,7 @@ func TestQueryNFTRecordErrorMapping(t *testing.T) {
 		},
 	))
 	_, err = server.NFTRecord(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		&nfttypes.QueryNFTRecordRequest{ClassId: classID, NftId: "nft-1"},
 	)
 	require.Equal(t, codes.Internal, status.Code(err))
@@ -615,7 +615,7 @@ func createClassForMintTest(
 	request := validCreateClassRequest(creator)
 	request.MaxSupply = maxSupply
 	response, err := NewMsgServer(fixture.keeper).CreateClass(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		request,
 	)
 	require.NoError(t, err)
@@ -635,7 +635,7 @@ func updateControllerForMintTest(
 	fixture.accountKeeper.accounts[string(newControllerAddress)] =
 		authtypes.NewBaseAccountWithAddress(newControllerAddress)
 	_, err := NewMsgServer(fixture.keeper).UpdateController(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		&nfttypes.MsgUpdateControllerRequest{
 			ClassId:       classID,
 			Controller:    controller,

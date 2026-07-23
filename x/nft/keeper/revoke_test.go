@@ -39,7 +39,7 @@ func TestRevokeTransitionsActiveNFTToRevoked(t *testing.T) {
 	require.NoError(t, err)
 
 	response, err := NewMsgServer(fixture.keeper).Revoke(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		&nfttypes.MsgRevokeRequest{
 			ClassId:    classID,
 			NftId:      "nft-1",
@@ -76,7 +76,7 @@ func TestRevokeTransitionsActiveNFTToRevoked(t *testing.T) {
 	require.Equal(t, uint64(1), classAfter.MintedCount)
 
 	queryResponse, err := NewQueryServer(fixture.keeper).NFTRecord(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		&nfttypes.QueryNFTRecordRequest{ClassId: classID, NftId: "nft-1"},
 	)
 	require.NoError(t, err)
@@ -99,7 +99,7 @@ func TestRevokeTransitionsActiveNFTToRevoked(t *testing.T) {
 	fixture.ctx = fixture.ctx.WithEventManager(sdk.NewEventManager())
 	receiver := fixture.accountAddress(t, sdk.AccAddress(bytes.Repeat([]byte{73}, 20)))
 	_, err = NewStandardMsgServer(fixture.keeper).Send(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		&upstreamnft.MsgSend{
 			ClassId: classID, Id: "nft-1", Sender: owner, Receiver: receiver,
 		},
@@ -120,7 +120,7 @@ func TestRevokeEnforcesControllerAndClassPolicy(t *testing.T) {
 		fixture.ctx = fixture.ctx.WithBlockTime(fixture.ctx.BlockTime().Add(time.Hour))
 
 		_, err := NewMsgServer(fixture.keeper).Revoke(
-			sdk.WrapSDKContext(fixture.ctx),
+			fixture.ctx,
 			&nfttypes.MsgRevokeRequest{
 				ClassId: classID, NftId: "nft-1", Controller: controller,
 			},
@@ -142,7 +142,7 @@ func TestRevokeEnforcesControllerAndClassPolicy(t *testing.T) {
 		fixture.ctx = fixture.ctx.WithBlockTime(fixture.ctx.BlockTime().Add(time.Hour))
 
 		_, err := NewMsgServer(fixture.keeper).Revoke(
-			sdk.WrapSDKContext(fixture.ctx),
+			fixture.ctx,
 			&nfttypes.MsgRevokeRequest{
 				ClassId: classID, NftId: "nft-1", Controller: creator,
 			},
@@ -158,7 +158,7 @@ func TestRevokeEnforcesControllerAndClassPolicy(t *testing.T) {
 		fixture.ctx = fixture.ctx.WithBlockTime(fixture.ctx.BlockTime().Add(time.Hour))
 
 		_, err := NewMsgServer(fixture.keeper).Revoke(
-			sdk.WrapSDKContext(fixture.ctx),
+			fixture.ctx,
 			&nfttypes.MsgRevokeRequest{
 				ClassId: classID, NftId: "nft-1", Controller: arbitrary,
 			},
@@ -177,7 +177,7 @@ func TestRevokeIsIrreversible(t *testing.T) {
 		ClassId: classID, NftId: "nft-1", Controller: controller,
 	}
 
-	_, err := server.Revoke(sdk.WrapSDKContext(fixture.ctx), request)
+	_, err := server.Revoke(fixture.ctx, request)
 	require.NoError(t, err)
 	first, err := fixture.keeper.lifecycles.Get(
 		fixture.ctx,
@@ -188,7 +188,7 @@ func TestRevokeIsIrreversible(t *testing.T) {
 		WithBlockTime(fixture.ctx.BlockTime().Add(time.Hour)).
 		WithEventManager(sdk.NewEventManager())
 
-	_, err = server.Revoke(sdk.WrapSDKContext(fixture.ctx), request)
+	_, err = server.Revoke(fixture.ctx, request)
 	require.ErrorIs(t, err, nfttypes.ErrNFTRevoked)
 	second, err := fixture.keeper.lifecycles.Get(
 		fixture.ctx,
@@ -235,7 +235,7 @@ func TestRevokeRejectsInvalidBlockTime(t *testing.T) {
 			before := snapshotRevokeState(t, &fixture, classID, "nft-1")
 
 			_, err = NewMsgServer(fixture.keeper).Revoke(
-				sdk.WrapSDKContext(fixture.ctx),
+				fixture.ctx,
 				&nfttypes.MsgRevokeRequest{
 					ClassId: classID, NftId: "nft-1", Controller: controller,
 				},
@@ -259,7 +259,7 @@ func TestRevokeReturnsNFTNotExistsForUnusedAndBurnedIDs(t *testing.T) {
 	server := NewMsgServer(fixture.keeper)
 
 	_, err := server.Revoke(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		&nfttypes.MsgRevokeRequest{
 			ClassId: classID, NftId: "unused", Controller: controller,
 		},
@@ -272,7 +272,7 @@ func TestRevokeReturnsNFTNotExistsForUnusedAndBurnedIDs(t *testing.T) {
 		nfttypes.BurnTombstone{ClassId: classID, NftId: "burned"},
 	))
 	_, err = server.Revoke(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		&nfttypes.MsgRevokeRequest{
 			ClassId: classID, NftId: "burned", Controller: controller,
 		},
@@ -345,7 +345,7 @@ func TestRevokeRejectsInvalidRequests(t *testing.T) {
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			_, err := NewMsgServer(fixture.keeper).Revoke(
-				sdk.WrapSDKContext(fixture.ctx),
+				fixture.ctx,
 				tc.request,
 			)
 			require.ErrorIs(t, err, tc.targetErr)
@@ -420,7 +420,7 @@ func TestRevokeRejectsInconsistentNFTState(t *testing.T) {
 			before := snapshotRevokeState(t, &fixture, classID, "nft-1")
 
 			_, err := NewMsgServer(fixture.keeper).Revoke(
-				sdk.WrapSDKContext(fixture.ctx),
+				fixture.ctx,
 				&nfttypes.MsgRevokeRequest{
 					ClassId: classID, NftId: "nft-1", Controller: controller,
 				},
@@ -487,7 +487,7 @@ func TestLoadNFTStateRejectsInvalidRevocation(t *testing.T) {
 			before := snapshotRevokeState(t, &fixture, classID, "nft-1")
 
 			_, err = NewMsgServer(fixture.keeper).Revoke(
-				sdk.WrapSDKContext(fixture.ctx),
+				fixture.ctx,
 				&nfttypes.MsgRevokeRequest{
 					ClassId: classID, NftId: "nft-1", Controller: controller,
 				},
@@ -523,7 +523,7 @@ func TestRevokeRollsBackWhenLifecycleWriteFails(t *testing.T) {
 	)
 
 	_, err = NewMsgServer(failingKeeper).Revoke(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		&nfttypes.MsgRevokeRequest{
 			ClassId: classID, NftId: "nft-1", Controller: controller,
 		},
@@ -558,7 +558,7 @@ func createNFTForRevokeTest(
 	classRequest := validCreateClassRequest(controller)
 	classRequest.Revocable = revocable
 	classResponse, err := NewMsgServer(fixture.keeper).CreateClass(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		classRequest,
 	)
 	require.NoError(t, err)
@@ -569,7 +569,7 @@ func createNFTForRevokeTest(
 	fixture.accountKeeper.accounts[string(ownerAddress)] =
 		authtypes.NewBaseAccountWithAddress(ownerAddress)
 	_, err = NewMsgServer(fixture.keeper).Mint(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		validMintRequest(classResponse.ClassId, controller, owner),
 	)
 	require.NoError(t, err)

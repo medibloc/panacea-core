@@ -45,7 +45,7 @@ func TestStandardMsgSendTransfersActiveOwnerNFT(t *testing.T) {
 	original := *request
 
 	response, err := NewStandardMsgServer(fixture.keeper).Send(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		request,
 	)
 	require.NoError(t, err)
@@ -83,7 +83,7 @@ func TestStandardMsgSendTransfersActiveOwnerNFT(t *testing.T) {
 	}, parsedEvent)
 
 	queryResponse, err := NewQueryServer(fixture.keeper).NFTRecord(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		&nfttypes.QueryNFTRecordRequest{ClassId: classID, NftId: "nft-1"},
 	)
 	require.NoError(t, err)
@@ -99,7 +99,7 @@ func TestStandardMsgSendAllowsSelfTransfer(t *testing.T) {
 	)
 
 	_, err := NewStandardMsgServer(fixture.keeper).Send(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		&upstreamnft.MsgSend{
 			ClassId:  classID,
 			Id:       "nft-1",
@@ -128,7 +128,7 @@ func TestStandardMsgSendEnforcesAuthorizationAndPolicy(t *testing.T) {
 		receiver := fixture.accountAddress(t, sdk.AccAddress(bytes.Repeat([]byte{54}, 20)))
 
 		_, err := NewStandardMsgServer(fixture.keeper).Send(
-			sdk.WrapSDKContext(fixture.ctx),
+			fixture.ctx,
 			&upstreamnft.MsgSend{ClassId: classID, Id: "nft-1", Sender: owner, Receiver: receiver},
 		)
 		require.ErrorIs(t, err, nfttypes.ErrTransferNotAllowed)
@@ -153,7 +153,7 @@ func TestStandardMsgSendEnforcesAuthorizationAndPolicy(t *testing.T) {
 		receiver := fixture.accountAddress(t, sdk.AccAddress(bytes.Repeat([]byte{55}, 20)))
 
 		_, err = NewStandardMsgServer(fixture.keeper).Send(
-			sdk.WrapSDKContext(fixture.ctx),
+			fixture.ctx,
 			&upstreamnft.MsgSend{ClassId: classID, Id: "nft-1", Sender: owner, Receiver: receiver},
 		)
 		require.ErrorIs(t, err, nfttypes.ErrNFTRevoked)
@@ -171,7 +171,7 @@ func TestStandardMsgSendEnforcesAuthorizationAndPolicy(t *testing.T) {
 		receiver := fixture.accountAddress(t, sdk.AccAddress(bytes.Repeat([]byte{57}, 20)))
 
 		_, err := NewStandardMsgServer(fixture.keeper).Send(
-			sdk.WrapSDKContext(fixture.ctx),
+			fixture.ctx,
 			&upstreamnft.MsgSend{
 				ClassId: classID, Id: "nft-1", Sender: arbitrarySender, Receiver: receiver,
 			},
@@ -200,7 +200,7 @@ func TestStandardMsgSendEnforcesAuthorizationAndPolicy(t *testing.T) {
 				}
 				moduleReceiver := fixture.accountAddress(t, tc.address)
 				_, err := NewStandardMsgServer(fixture.keeper).Send(
-					sdk.WrapSDKContext(fixture.ctx),
+					fixture.ctx,
 					&upstreamnft.MsgSend{
 						ClassId: classID, Id: "nft-1", Sender: owner, Receiver: moduleReceiver,
 					},
@@ -224,7 +224,7 @@ func TestStandardMsgSendReturnsNFTNotExistsForUnusedAndBurnedIDs(t *testing.T) {
 	server := NewStandardMsgServer(fixture.keeper)
 
 	_, err := server.Send(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		&upstreamnft.MsgSend{
 			ClassId: classID, Id: "unused", Sender: controller, Receiver: receiver,
 		},
@@ -237,7 +237,7 @@ func TestStandardMsgSendReturnsNFTNotExistsForUnusedAndBurnedIDs(t *testing.T) {
 		nfttypes.BurnTombstone{ClassId: classID, NftId: "burned"},
 	))
 	_, err = server.Send(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		&upstreamnft.MsgSend{
 			ClassId: classID, Id: "burned", Sender: controller, Receiver: receiver,
 		},
@@ -300,7 +300,7 @@ func TestStandardMsgSendRejectsInconsistentNFTState(t *testing.T) {
 			receiver := fixture.accountAddress(t, sdk.AccAddress(bytes.Repeat([]byte{60}, 20)))
 
 			_, err := NewStandardMsgServer(fixture.keeper).Send(
-				sdk.WrapSDKContext(fixture.ctx),
+				fixture.ctx,
 				&upstreamnft.MsgSend{
 					ClassId: classID, Id: "nft-1", Sender: owner, Receiver: receiver,
 				},
@@ -404,7 +404,7 @@ func TestStandardMsgSendRejectsInvalidRequests(t *testing.T) {
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			_, err := NewStandardMsgServer(fixture.keeper).Send(
-				sdk.WrapSDKContext(fixture.ctx),
+				fixture.ctx,
 				tc.request,
 			)
 			require.ErrorIs(t, err, tc.targetErr)
@@ -436,7 +436,7 @@ func createNFTForSendTest(
 	classRequest := validCreateClassRequest(creator)
 	classRequest.TransferPolicy = policy
 	classResponse, err := NewMsgServer(fixture.keeper).CreateClass(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		classRequest,
 	)
 	require.NoError(t, err)
@@ -447,7 +447,7 @@ func createNFTForSendTest(
 	fixture.accountKeeper.accounts[string(ownerAddress)] =
 		authtypes.NewBaseAccountWithAddress(ownerAddress)
 	_, err = NewMsgServer(fixture.keeper).Mint(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		validMintRequest(classResponse.ClassId, creator, owner),
 	)
 	require.NoError(t, err)

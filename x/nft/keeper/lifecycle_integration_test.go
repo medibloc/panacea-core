@@ -49,14 +49,14 @@ func TestFullNFTLifecycleAcrossPanaceaAndStandardServices(t *testing.T) {
 	// Create the class with the creator as its initial controller.
 	classRequest := validCreateClassRequest(creator)
 	classResponse, err := panaceaMsg.CreateClass(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		classRequest,
 	)
 	require.NoError(t, err)
 	classID := classResponse.ClassId
 
 	classRecordResponse, err := panaceaQuery.ClassRecord(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		&nfttypes.QueryClassRecordRequest{ClassId: classID},
 	)
 	require.NoError(t, err)
@@ -70,14 +70,14 @@ func TestFullNFTLifecycleAcrossPanaceaAndStandardServices(t *testing.T) {
 	require.Zero(t, classRecordResponse.ClassRecord.MintedCount)
 
 	standardClass, err := standardQuery.Class(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		&upstreamnft.QueryClassRequest{ClassId: classID},
 	)
 	require.NoError(t, err)
 	require.NotNil(t, standardClass.Class)
 	require.Equal(t, classID, standardClass.Class.Id)
 	standardSupply, err := standardQuery.Supply(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		&upstreamnft.QuerySupplyRequest{ClassId: classID},
 	)
 	require.NoError(t, err)
@@ -89,7 +89,7 @@ func TestFullNFTLifecycleAcrossPanaceaAndStandardServices(t *testing.T) {
 		WithBlockTime(baseTime.Add(time.Hour)).
 		WithEventManager(sdk.NewEventManager())
 	_, err = panaceaMsg.UpdateController(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		&nfttypes.MsgUpdateControllerRequest{
 			ClassId:       classID,
 			Controller:    creator,
@@ -98,7 +98,7 @@ func TestFullNFTLifecycleAcrossPanaceaAndStandardServices(t *testing.T) {
 	)
 	require.NoError(t, err)
 	classRecordResponse, err = panaceaQuery.ClassRecord(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		&nfttypes.QueryClassRecordRequest{ClassId: classID},
 	)
 	require.NoError(t, err)
@@ -119,11 +119,11 @@ func TestFullNFTLifecycleAcrossPanaceaAndStandardServices(t *testing.T) {
 		WithEventManager(sdk.NewEventManager())
 	mintRequest := validMintRequest(classID, controller, firstOwner)
 	mintRequest.Data = metadata
-	_, err = panaceaMsg.Mint(sdk.WrapSDKContext(fixture.ctx), mintRequest)
+	_, err = panaceaMsg.Mint(fixture.ctx, mintRequest)
 	require.NoError(t, err)
 
 	nftRecordResponse, err := panaceaQuery.NFTRecord(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		&nfttypes.QueryNFTRecordRequest{ClassId: classID, NftId: mintRequest.NftId},
 	)
 	require.NoError(t, err)
@@ -143,19 +143,19 @@ func TestFullNFTLifecycleAcrossPanaceaAndStandardServices(t *testing.T) {
 	mintRecord := live.Mint
 
 	standardNFT, err := standardQuery.NFT(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		&upstreamnft.QueryNFTRequest{ClassId: classID, Id: mintRequest.NftId},
 	)
 	require.NoError(t, err)
 	require.Equal(t, mintRequest.Uri, standardNFT.Nft.Uri)
 	standardOwner, err := standardQuery.Owner(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		&upstreamnft.QueryOwnerRequest{ClassId: classID, Id: mintRequest.NftId},
 	)
 	require.NoError(t, err)
 	require.Equal(t, firstOwner, standardOwner.Owner)
 	standardSupply, err = standardQuery.Supply(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		&upstreamnft.QuerySupplyRequest{ClassId: classID},
 	)
 	require.NoError(t, err)
@@ -167,7 +167,7 @@ func TestFullNFTLifecycleAcrossPanaceaAndStandardServices(t *testing.T) {
 		WithBlockTime(baseTime.Add(3 * time.Hour)).
 		WithEventManager(sdk.NewEventManager())
 	_, err = standardMsg.Send(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		&upstreamnft.MsgSend{
 			ClassId:  classID,
 			Id:       mintRequest.NftId,
@@ -177,7 +177,7 @@ func TestFullNFTLifecycleAcrossPanaceaAndStandardServices(t *testing.T) {
 	)
 	require.NoError(t, err)
 	nftRecordResponse, err = panaceaQuery.NFTRecord(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		&nfttypes.QueryNFTRecordRequest{ClassId: classID, NftId: mintRequest.NftId},
 	)
 	require.NoError(t, err)
@@ -187,7 +187,7 @@ func TestFullNFTLifecycleAcrossPanaceaAndStandardServices(t *testing.T) {
 	require.Equal(t, mintRecord, live.Mint)
 	require.Equal(t, nfttypes.LiveNFTStatus_LIVE_NFT_STATUS_ACTIVE, live.Status)
 	standardOwner, err = standardQuery.Owner(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		&upstreamnft.QueryOwnerRequest{ClassId: classID, Id: mintRequest.NftId},
 	)
 	require.NoError(t, err)
@@ -202,7 +202,7 @@ func TestFullNFTLifecycleAcrossPanaceaAndStandardServices(t *testing.T) {
 		WithBlockTime(revokedAt).
 		WithEventManager(sdk.NewEventManager())
 	_, err = panaceaMsg.Revoke(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		&nfttypes.MsgRevokeRequest{
 			ClassId:    classID,
 			NftId:      mintRequest.NftId,
@@ -211,7 +211,7 @@ func TestFullNFTLifecycleAcrossPanaceaAndStandardServices(t *testing.T) {
 	)
 	require.NoError(t, err)
 	nftRecordResponse, err = panaceaQuery.NFTRecord(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		&nfttypes.QueryNFTRecordRequest{ClassId: classID, NftId: mintRequest.NftId},
 	)
 	require.NoError(t, err)
@@ -227,13 +227,13 @@ func TestFullNFTLifecycleAcrossPanaceaAndStandardServices(t *testing.T) {
 	revocation := live.Revocation
 
 	standardNFT, err = standardQuery.NFT(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		&upstreamnft.QueryNFTRequest{ClassId: classID, Id: mintRequest.NftId},
 	)
 	require.NoError(t, err)
 	require.NotNil(t, standardNFT.Nft)
 	standardOwner, err = standardQuery.Owner(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		&upstreamnft.QueryOwnerRequest{ClassId: classID, Id: mintRequest.NftId},
 	)
 	require.NoError(t, err)
@@ -246,7 +246,7 @@ func TestFullNFTLifecycleAcrossPanaceaAndStandardServices(t *testing.T) {
 		WithBlockTime(burnedAt).
 		WithEventManager(sdk.NewEventManager())
 	_, err = panaceaMsg.Burn(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		&nfttypes.MsgBurnRequest{
 			ClassId: classID,
 			NftId:   mintRequest.NftId,
@@ -256,7 +256,7 @@ func TestFullNFTLifecycleAcrossPanaceaAndStandardServices(t *testing.T) {
 	require.NoError(t, err)
 
 	nftRecordResponse, err = panaceaQuery.NFTRecord(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		&nfttypes.QueryNFTRecordRequest{ClassId: classID, NftId: mintRequest.NftId},
 	)
 	require.NoError(t, err)
@@ -274,18 +274,18 @@ func TestFullNFTLifecycleAcrossPanaceaAndStandardServices(t *testing.T) {
 	require.Equal(t, finalOwner, tombstone.BurnedBy)
 
 	_, err = standardQuery.NFT(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		&upstreamnft.QueryNFTRequest{ClassId: classID, Id: mintRequest.NftId},
 	)
 	require.Equal(t, codes.NotFound, status.Code(err))
 	standardOwner, err = standardQuery.Owner(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		&upstreamnft.QueryOwnerRequest{ClassId: classID, Id: mintRequest.NftId},
 	)
 	require.NoError(t, err)
 	require.Empty(t, standardOwner.Owner)
 	standardSupply, err = standardQuery.Supply(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		&upstreamnft.QuerySupplyRequest{ClassId: classID},
 	)
 	require.NoError(t, err)
@@ -294,14 +294,14 @@ func TestFullNFTLifecycleAcrossPanaceaAndStandardServices(t *testing.T) {
 	require.Zero(t, queryStandardBalance(t, &fixture, standardQuery, classID, finalOwner))
 
 	classRecordResponse, err = panaceaQuery.ClassRecord(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		&nfttypes.QueryClassRecordRequest{ClassId: classID},
 	)
 	require.NoError(t, err)
 	require.Equal(t, controller, classRecordResponse.ClassRecord.Policy.Controller)
 	require.Equal(t, uint64(1), classRecordResponse.ClassRecord.MintedCount)
 	liveRecords, err := panaceaQuery.NFTRecords(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		&nfttypes.QueryNFTRecordsRequest{ClassId: classID},
 	)
 	require.NoError(t, err)
@@ -329,7 +329,7 @@ func queryStandardBalance(
 ) uint64 {
 	t.Helper()
 	response, err := queryServer.Balance(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		&upstreamnft.QueryBalanceRequest{ClassId: classID, Owner: owner},
 	)
 	require.NoError(t, err)

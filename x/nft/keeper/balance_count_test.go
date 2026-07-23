@@ -34,7 +34,7 @@ func TestOwnerClassCountsTrackMintSendBurn(t *testing.T) {
 		request := validMintRequest(classID, controller, firstOwner)
 		request.NftId = nftID
 		_, err := NewMsgServer(fixture.keeper).Mint(
-			sdk.WrapSDKContext(fixture.ctx),
+			fixture.ctx,
 			request,
 		)
 		require.NoError(t, err)
@@ -43,7 +43,7 @@ func TestOwnerClassCountsTrackMintSendBurn(t *testing.T) {
 	requireOwnerClassCountMissing(t, &fixture, classID, secondOwner)
 
 	_, err := NewStandardMsgServer(fixture.keeper).Send(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		&upstreamnft.MsgSend{
 			ClassId:  classID,
 			Id:       "nft-2",
@@ -55,7 +55,7 @@ func TestOwnerClassCountsTrackMintSendBurn(t *testing.T) {
 	requireOwnerClassCount(t, &fixture, classID, firstOwner, 2)
 
 	_, err = NewStandardMsgServer(fixture.keeper).Send(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		&upstreamnft.MsgSend{
 			ClassId:  classID,
 			Id:       "nft-1",
@@ -68,7 +68,7 @@ func TestOwnerClassCountsTrackMintSendBurn(t *testing.T) {
 	requireOwnerClassCount(t, &fixture, classID, secondOwner, 1)
 
 	_, err = NewMsgServer(fixture.keeper).Burn(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		&nfttypes.MsgBurnRequest{
 			ClassId: classID,
 			NftId:   "nft-2",
@@ -80,7 +80,7 @@ func TestOwnerClassCountsTrackMintSendBurn(t *testing.T) {
 	requireOwnerClassCount(t, &fixture, classID, secondOwner, 1)
 
 	_, err = NewMsgServer(fixture.keeper).Burn(
-		sdk.WrapSDKContext(fixture.ctx),
+		fixture.ctx,
 		&nfttypes.MsgBurnRequest{
 			ClassId: classID,
 			NftId:   "nft-1",
@@ -102,7 +102,7 @@ func TestOwnerClassCountFailuresRollBackNFTMutations(t *testing.T) {
 		request.NftId = "nft-2"
 
 		_, err := NewMsgServer(fixture.keeper).Mint(
-			sdk.WrapSDKContext(fixture.ctx),
+			fixture.ctx,
 			request,
 		)
 		require.ErrorContains(t, err, "balance count overflows")
@@ -135,7 +135,7 @@ func TestOwnerClassCountFailuresRollBackNFTMutations(t *testing.T) {
 		))
 
 		_, err := NewStandardMsgServer(fixture.keeper).Send(
-			sdk.WrapSDKContext(fixture.ctx),
+			fixture.ctx,
 			&upstreamnft.MsgSend{
 				ClassId: classID, Id: "nft-1", Sender: owner, Receiver: receiver,
 			},
@@ -169,7 +169,7 @@ func TestOwnerClassCountFailuresRollBackNFTMutations(t *testing.T) {
 		))
 
 		_, err := NewStandardMsgServer(fixture.keeper).Send(
-			sdk.WrapSDKContext(fixture.ctx),
+			fixture.ctx,
 			&upstreamnft.MsgSend{
 				ClassId: classID, Id: "nft-1", Sender: owner, Receiver: receiver,
 			},
@@ -213,7 +213,7 @@ func TestOwnerClassCountFailuresRollBackNFTMutations(t *testing.T) {
 			before := snapshotRevokeState(t, &fixture, classID, "nft-1")
 
 			_, err := NewMsgServer(fixture.keeper).Burn(
-				sdk.WrapSDKContext(fixture.ctx),
+				fixture.ctx,
 				&nfttypes.MsgBurnRequest{ClassId: classID, NftId: "nft-1", Owner: owner},
 			)
 			require.ErrorContains(t, err, test.errorString)
