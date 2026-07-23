@@ -8,6 +8,9 @@ import "cosmos_proto/cosmos.proto";
 option go_package = "github.com/medibloc/panacea-core/x/pnft/types";
 option java_multiple_files = true;
 
+// Msg is retained only for wire compatibility with legacy PNFT transactions
+// and messages embedded in historical gov, group, and authz Any values.
+// PNFT execution is disabled; new integrations must use panacea.nft.v1.Msg.
 service Msg {
   option (cosmos.msg.v1.service) = true;
 

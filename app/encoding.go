@@ -20,6 +20,8 @@ func MakeEncodingConfig() params.EncodingConfig {
 	std.RegisterInterfaces(encodingConfig.InterfaceRegistry)
 	ModuleBasics.RegisterLegacyAminoCodec(encodingConfig.Amino)
 	ModuleBasics.RegisterInterfaces(encodingConfig.InterfaceRegistry)
+	// PNFT is no longer an application module, but its message types remain
+	// registered so historical transactions and stored Any values can decode.
 	pnfttypes.RegisterInterfaces(encodingConfig.InterfaceRegistry)
 	if err := encodingConfig.InterfaceRegistry.SigningContext().Validate(); err != nil {
 		panic(err)

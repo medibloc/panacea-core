@@ -358,6 +358,8 @@ func New(
 	app.ModuleManager.RegisterInvariants(app.CrisisKeeper)
 	app.configurator = module.NewConfigurator(app.appCodec, app.MsgServiceRouter(), app.GRPCQueryRouter())
 	app.ModuleManager.RegisterServices(app.configurator)
+	// Retain disabled PNFT routes so messages in historical proposals fail
+	// deterministically instead of depending on a removed stateful module.
 	pnfttypes.RegisterMsgServer(app.configurator.MsgServer(), pnftlegacy.NewMsgServer())
 
 	// RegisterUpgradeHandlers is used for registering any on-chain upgrades.
