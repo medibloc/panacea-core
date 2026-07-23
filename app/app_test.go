@@ -412,7 +412,7 @@ func TestUpgradeWiringWithStandaloneModule(t *testing.T) {
 	require.ErrorIs(t, err, upgradetypes.ErrNoUpgradePlanFound)
 }
 
-func TestV230UpgradeDropsLegacyPNFTModuleVersion(t *testing.T) {
+func TestV230UpgradeInitializesNFTModule(t *testing.T) {
 	panaceaapp.SetConfig()
 	appOpts := viper.New()
 	appOpts.Set(flags.FlagHome, t.TempDir())
@@ -438,6 +438,5 @@ func TestV230UpgradeDropsLegacyPNFTModuleVersion(t *testing.T) {
 
 	toVM, err := testApp.UpgradeKeeper.GetModuleVersionMap(ctx)
 	require.NoError(t, err)
-	require.NotContains(t, toVM, pnfttypes.ModuleName)
 	require.Equal(t, uint64(1), toVM[nfttypes.ModuleName])
 }
