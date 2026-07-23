@@ -258,7 +258,7 @@ func decryptKey(key encryptedKey, passwd string) ([]byte, error) {
 		return nil, fmt.Errorf("fail to get an expected MAC: %w", err)
 	}
 	if !bytes.Equal(expectedMac, mac) {
-		return nil, fmt.Errorf("mac verification was failed. the password might be wrong.")
+		return nil, errors.New("mac verification failed; the password might be wrong")
 	}
 
 	return aesCTRXOR(derivedKey[:cipherKeySize], iv, cipherText)
