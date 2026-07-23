@@ -67,6 +67,23 @@ func TestMsgDIDValidateBasicRejectsNilDocument(t *testing.T) {
 	}
 }
 
+func TestMsgDIDValidateBasicRejectsNilSignature(t *testing.T) {
+	doc := newDIDDocument()
+	fromAddr := getFromAddress(t).String()
+	verificationMethodID := doc.VerificationMethods[0].Id
+	createMsg := types.NewMsgCreateDIDResponse(doc.Id, doc, verificationMethodID, nil, fromAddr)
+
+	require.ErrorIs(t, createMsg.ValidateBasic(), types.ErrInvalidSignature)
+	require.ErrorIs(t,
+		types.NewMsgUpdateDID(doc.Id, doc, verificationMethodID, nil, fromAddr).ValidateBasic(),
+		types.ErrInvalidSignature,
+	)
+	require.ErrorIs(t,
+		types.NewMsgDeactivateDIDRequest(doc.Id, verificationMethodID, nil, fromAddr).ValidateBasic(),
+		types.ErrInvalidSignature,
+	)
+}
+
 func getFromAddress(t *testing.T) sdk.AccAddress {
 	fromAddr, err := sdk.AccAddressFromBech32("panacea154p6kyu9kqgvcmq63w3vpn893ssy6anpu8ykfq")
 	require.NoError(t, err)
