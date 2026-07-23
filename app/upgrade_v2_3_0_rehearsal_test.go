@@ -1,0 +1,183 @@
+package app_test
+
+import (
+	"path/filepath"
+	"testing"
+	"time"
+
+	"cosmossdk.io/core/header"
+	"cosmossdk.io/log"
+	"cosmossdk.io/store/metrics"
+	"cosmossdk.io/store/rootmulti"
+	storetypes "cosmossdk.io/store/types"
+	upgradetypes "cosmossdk.io/x/upgrade/types"
+	abci "github.com/cometbft/cometbft/abci/types"
+	cmtproto "github.com/cometbft/cometbft/proto/tendermint/types"
+	dbm "github.com/cosmos/cosmos-db"
+	"github.com/cosmos/cosmos-sdk/client/flags"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	aoltypes "github.com/medibloc/panacea-core/v2/x/aol/types"
+	nfttypes "github.com/medibloc/panacea-core/v2/x/nft/types"
+	pnfttypes "github.com/medibloc/panacea-core/v2/x/pnft/types"
+	"github.com/spf13/viper"
+	"github.com/stretchr/testify/require"
+
+	panaceaapp "github.com/medibloc/panacea-core/v2/app"
+	"github.com/medibloc/panacea-core/v2/app/upgrades/v2_3_0"
+)
+
+func TestV230StoreUpgradeAndRestartRehearsal(t *testing.T) {
+	panaceaapp.SetConfig()
+
+	const (
+		legacyHeight  = int64(2)
+		upgradeHeight = int64(3)
+	)
+	var (
+		preservedKey   = []byte("v2.3.0-rehearsal/preserved")
+		preservedValue = []byte("stable-state")
+		legacyPNFTKey  = []byte("legacy-pnft")
+		legacyPNFTData = []byte("discarded")
+	)
+
+	homeDir := t.TempDir()
+	dataDir := filepath.Join(homeDir, "data")
+	appOpts := viper.New()
+	appOpts.Set(flags.FlagHome, homeDir)
+	plan := upgradetypes.Plan{Name: v2_3_0.UpgradeName, Height: upgradeHeight}
+	blockTime := time.Now().UTC()
+
+	// Use the current app only as a source of persistent store keys, codecs, and
+	// the upgrade keeper. Its stores are never loaded or committed.
+	templateDB := dbm.NewMemDB()
+	templateApp := panaceaapp.New(log.NewNopLogger(), templateDB, nil, false, appOpts)
+	fromVM := templateApp.ModuleManager.GetVersionMap()
+	delete(fromVM, nfttypes.ModuleName)
+	fromVM[pnfttypes.ModuleName] = 1
+
+	// Build the previous binary's topology directly, so the two new NFT IAVL
+	// stores have never existed in the physical database.
+	legacyDB := openRehearsalDB(t, dataDir)
+	legacyStore := rootmulti.NewStore(legacyDB, log.NewNopLogger(), metrics.NewNoOpMetrics())
+	for name, key := range templateApp.GetKVStoreKey() {
+		if name == nfttypes.StoreKey || name == nfttypes.PolicyStoreKey {
+			continue
+		}
+		legacyStore.MountStoreWithDB(key, storetypes.StoreTypeIAVL, nil)
+	}
+	pnftKey := storetypes.NewKVStoreKey(pnfttypes.StoreKey)
+	legacyStore.MountStoreWithDB(pnftKey, storetypes.StoreTypeIAVL, nil)
+	require.NoError(t, legacyStore.LoadLatestVersion())
+
+	legacyCtx := sdk.NewContext(
+		legacyStore,
+		cmtproto.Header{Height: 1, Time: blockTime},
+		false,
+		log.NewNopLogger(),
+	).WithHeaderInfo(header.Info{Height: 1, Time: blockTime})
+	require.NoError(t, templateApp.UpgradeKeeper.SetModuleVersionMap(legacyCtx, fromVM))
+	require.NoError(t, templateApp.UpgradeKeeper.ScheduleUpgrade(legacyCtx, plan))
+	require.NoError(t, templateApp.UpgradeKeeper.DumpUpgradeInfoToDisk(upgradeHeight, plan))
+	legacyCtx.KVStore(templateApp.GetKey(aoltypes.StoreKey)).Set(preservedKey, preservedValue)
+	legacyStore.GetStore(pnftKey).(storetypes.KVStore).Set(legacyPNFTKey, legacyPNFTData)
+	require.Equal(t, int64(1), legacyStore.Commit().Version)
+	require.Equal(t, legacyHeight, legacyStore.Commit().Version)
+	require.Equal(
+		t,
+		legacyPNFTData,
+		legacyStore.GetStore(pnftKey).(storetypes.KVStore).Get(legacyPNFTKey),
+	)
+	legacyStoreNames := rehearsalStoreNames(t, legacyStore, legacyHeight)
+	require.Contains(t, legacyStoreNames, pnfttypes.StoreKey)
+	require.NotContains(t, legacyStoreNames, nfttypes.StoreKey)
+	require.NotContains(t, legacyStoreNames, nfttypes.PolicyStoreKey)
+	require.NoError(t, templateDB.Close())
+	require.NoError(t, legacyDB.Close())
+
+	// The new binary reads the real upgrade-info file while it is constructed.
+	// Loading the latest version therefore applies the production v2.3.0 loader.
+	upgradeDB := openRehearsalDB(t, dataDir)
+	upgradedApp := panaceaapp.New(log.NewNopLogger(), upgradeDB, nil, false, appOpts)
+	require.NoError(t, upgradedApp.LoadLatestVersion())
+	require.Equal(t, legacyHeight, upgradedApp.LastBlockHeight())
+
+	upgradeCtx := upgradedApp.NewUncachedContext(
+		false,
+		cmtproto.Header{Height: upgradeHeight, Time: blockTime},
+	).WithHeaderInfo(header.Info{Height: upgradeHeight, Time: blockTime})
+	_, err := upgradedApp.PreBlocker(upgradeCtx, &abci.RequestFinalizeBlock{Height: upgradeHeight})
+	require.NoError(t, err)
+
+	toVM, err := upgradedApp.UpgradeKeeper.GetModuleVersionMap(upgradeCtx)
+	require.NoError(t, err)
+	require.Equal(t, uint64(1), toVM[nfttypes.ModuleName])
+	require.Equal(t, uint64(1), toVM[pnfttypes.ModuleName])
+	require.Equal(t, upgradeHeight, upgradedApp.CommitMultiStore().Commit().Version)
+	require.NoError(t, upgradeDB.Close())
+
+	// A second process using the same binary must load the committed result
+	// without applying the store upgrade again.
+	restartDB := openRehearsalDB(t, dataDir)
+	restartedApp := panaceaapp.New(log.NewNopLogger(), restartDB, nil, false, appOpts)
+	require.NoError(t, restartedApp.LoadLatestVersion())
+	require.Equal(t, upgradeHeight, restartedApp.LastBlockHeight())
+
+	restartCtx := restartedApp.NewUncachedContext(
+		false,
+		cmtproto.Header{Height: upgradeHeight, Time: blockTime},
+	).WithHeaderInfo(header.Info{Height: upgradeHeight, Time: blockTime})
+	require.Equal(
+		t,
+		preservedValue,
+		restartCtx.KVStore(restartedApp.GetKey(aoltypes.StoreKey)).Get(preservedKey),
+	)
+
+	restartedVM, err := restartedApp.UpgradeKeeper.GetModuleVersionMap(restartCtx)
+	require.NoError(t, err)
+	require.Equal(t, uint64(1), restartedVM[nfttypes.ModuleName])
+	require.Equal(t, uint64(1), restartedVM[pnfttypes.ModuleName])
+	doneHeight, err := restartedApp.UpgradeKeeper.GetDoneHeight(restartCtx, v2_3_0.UpgradeName)
+	require.NoError(t, err)
+	require.Equal(t, upgradeHeight, doneHeight)
+	_, err = restartedApp.UpgradeKeeper.GetUpgradePlan(restartCtx)
+	require.ErrorIs(t, err, upgradetypes.ErrNoUpgradePlanFound)
+
+	genesis, err := restartedApp.NFTKeeper.ExportGenesis(restartCtx)
+	require.NoError(t, err)
+	require.NotNil(t, genesis.NftState)
+	require.Empty(t, genesis.NftState.Classes)
+	require.Empty(t, genesis.NftState.Entries)
+	require.Empty(t, genesis.ClassPolicies)
+	require.Empty(t, genesis.Lifecycles)
+	require.Empty(t, genesis.Tombstones)
+
+	committedStoreNames := rehearsalStoreNames(
+		t,
+		restartedApp.CommitMultiStore().(*rootmulti.Store),
+		upgradeHeight,
+	)
+	require.Contains(t, committedStoreNames, nfttypes.StoreKey)
+	require.Contains(t, committedStoreNames, nfttypes.PolicyStoreKey)
+	require.NotContains(t, committedStoreNames, pnfttypes.StoreKey)
+	require.NoError(t, restartDB.Close())
+}
+
+func openRehearsalDB(t *testing.T, dataDir string) dbm.DB {
+	t.Helper()
+
+	db, err := dbm.NewDB("application", dbm.GoLevelDBBackend, dataDir)
+	require.NoError(t, err)
+	return db
+}
+
+func rehearsalStoreNames(t *testing.T, store *rootmulti.Store, height int64) []string {
+	t.Helper()
+
+	commitInfo, err := store.GetCommitInfo(height)
+	require.NoError(t, err)
+	names := make([]string, 0, len(commitInfo.StoreInfos))
+	for _, storeInfo := range commitInfo.StoreInfos {
+		names = append(names, storeInfo.Name)
+	}
+	return names
+}
