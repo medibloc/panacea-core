@@ -20,7 +20,6 @@ func MakeEncodingConfig() params.EncodingConfig {
 	std.RegisterInterfaces(encodingConfig.InterfaceRegistry)
 	ModuleBasics.RegisterLegacyAminoCodec(encodingConfig.Amino)
 	ModuleBasics.RegisterInterfaces(encodingConfig.InterfaceRegistry)
-	pnfttypes.RegisterCodec(encodingConfig.Amino)
 	pnfttypes.RegisterInterfaces(encodingConfig.InterfaceRegistry)
 	if err := encodingConfig.InterfaceRegistry.SigningContext().Validate(); err != nil {
 		panic(err)

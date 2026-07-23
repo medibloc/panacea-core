@@ -4,6 +4,7 @@ import (
 	"context"
 	"testing"
 
+	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/std"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	signingtypes "github.com/cosmos/cosmos-sdk/types/tx/signing"
@@ -19,8 +20,8 @@ import (
 )
 
 func TestCustomMsgsRetainValidateBasic(t *testing.T) {
-	// These messages predate SDK v0.50. Keep the optional validation contract
-	// instead of mechanically duplicating every check in the MsgServer layer.
+	// These executable messages predate SDK v0.50. Keep the optional validation
+	// contract instead of mechanically duplicating every check in MsgServer.
 	testCases := []struct {
 		name string
 		msg  sdk.Msg
@@ -32,13 +33,6 @@ func TestCustomMsgsRetainValidateBasic(t *testing.T) {
 		{name: "did/CreateDID", msg: &didtypes.MsgCreateDIDRequest{}},
 		{name: "did/UpdateDID", msg: &didtypes.MsgUpdateDIDRequest{}},
 		{name: "did/DeactivateDID", msg: &didtypes.MsgDeactivateDIDRequest{}},
-		{name: "pnft/CreateDenom", msg: &pnfttypes.MsgCreateDenomRequest{}},
-		{name: "pnft/UpdateDenom", msg: &pnfttypes.MsgUpdateDenomRequest{}},
-		{name: "pnft/DeleteDenom", msg: &pnfttypes.MsgDeleteDenomRequest{}},
-		{name: "pnft/TransferDenom", msg: &pnfttypes.MsgTransferDenomRequest{}},
-		{name: "pnft/MintPNFT", msg: &pnfttypes.MsgMintPNFTRequest{}},
-		{name: "pnft/TransferPNFT", msg: &pnfttypes.MsgTransferPNFTRequest{}},
-		{name: "pnft/BurnPNFT", msg: &pnfttypes.MsgBurnPNFTRequest{}},
 	}
 
 	for _, tc := range testCases {
@@ -66,7 +60,7 @@ func TestCustomMsgLegacyAminoJSONSignBytesEquivalence(t *testing.T) {
 	std.RegisterInterfaces(encodingConfig.InterfaceRegistry)
 	aoltypes.RegisterCodec(encodingConfig.Amino)
 	didtypes.RegisterCodec(encodingConfig.Amino)
-	pnfttypes.RegisterCodec(encodingConfig.Amino)
+	registerPNFTLegacyAminoReferenceTypes(encodingConfig.Amino)
 	aoltypes.RegisterInterfaces(encodingConfig.InterfaceRegistry)
 	didtypes.RegisterInterfaces(encodingConfig.InterfaceRegistry)
 	pnfttypes.RegisterInterfaces(encodingConfig.InterfaceRegistry)
@@ -196,7 +190,6 @@ func TestCustomMsgSignerInferenceMatchesLegacyGetSigners(t *testing.T) {
 	)
 	aoltypes.RegisterInterfaces(encodingConfig.InterfaceRegistry)
 	didtypes.RegisterInterfaces(encodingConfig.InterfaceRegistry)
-	pnfttypes.RegisterInterfaces(encodingConfig.InterfaceRegistry)
 	require.NoError(t, encodingConfig.InterfaceRegistry.SigningContext().Validate())
 
 	addr1 := sdk.AccAddress(repeatedBytes(1)).String()
@@ -215,13 +208,6 @@ func TestCustomMsgSignerInferenceMatchesLegacyGetSigners(t *testing.T) {
 		{name: "did/CreateDID", msg: &didtypes.MsgCreateDIDRequest{FromAddress: addr1}},
 		{name: "did/UpdateDID", msg: &didtypes.MsgUpdateDIDRequest{FromAddress: addr1}},
 		{name: "did/DeactivateDID", msg: &didtypes.MsgDeactivateDIDRequest{FromAddress: addr1}},
-		{name: "pnft/CreateDenom", msg: &pnfttypes.MsgCreateDenomRequest{Creator: addr1}},
-		{name: "pnft/UpdateDenom", msg: &pnfttypes.MsgUpdateDenomRequest{Updater: addr1}},
-		{name: "pnft/DeleteDenom", msg: &pnfttypes.MsgDeleteDenomRequest{Remover: addr1}},
-		{name: "pnft/TransferDenom", msg: &pnfttypes.MsgTransferDenomRequest{Sender: addr1}},
-		{name: "pnft/MintPNFT", msg: &pnfttypes.MsgMintPNFTRequest{Creator: addr1}},
-		{name: "pnft/TransferPNFT", msg: &pnfttypes.MsgTransferPNFTRequest{Sender: addr1}},
-		{name: "pnft/BurnPNFT", msg: &pnfttypes.MsgBurnPNFTRequest{Burner: addr1}},
 	}
 
 	for _, tc := range testCases {
@@ -238,6 +224,40 @@ func TestCustomMsgSignerInferenceMatchesLegacyGetSigners(t *testing.T) {
 			actual, _, err := encodingConfig.Codec.GetMsgV1Signers(tc.msg)
 			require.NoError(t, err)
 			require.Equal(t, expected, actual)
+		})
+	}
+}
+
+func TestPNFTMsgAnnotatedSigners(t *testing.T) {
+	configureTestBech32()
+
+	encodingConfig := MakeEncodingConfig(
+		WithCustomGetSigners(aoltypes.CustomGetSigners()...),
+	)
+	pnfttypes.RegisterInterfaces(encodingConfig.InterfaceRegistry)
+
+	require.NoError(t, encodingConfig.InterfaceRegistry.SigningContext().Validate())
+
+	address := sdk.AccAddress(repeatedBytes(1)).String()
+	expectedSigner := sdk.MustAccAddressFromBech32(address)
+
+	testCases := []struct {
+		typeName  protoreflect.FullName
+		fieldName protoreflect.Name
+	}{
+		{typeName: "panacea.pnft.v2.MsgCreateDenomRequest", fieldName: "creator"},
+		{typeName: "panacea.pnft.v2.MsgUpdateDenomRequest", fieldName: "updater"},
+		{typeName: "panacea.pnft.v2.MsgDeleteDenomRequest", fieldName: "remover"},
+		{typeName: "panacea.pnft.v2.MsgTransferDenomRequest", fieldName: "sender"},
+		{typeName: "panacea.pnft.v2.MsgMintPNFTRequest", fieldName: "creator"},
+		{typeName: "panacea.pnft.v2.MsgTransferPNFTRequest", fieldName: "sender"},
+		{typeName: "panacea.pnft.v2.MsgBurnPNFTRequest", fieldName: "burner"},
+	}
+
+	for _, tc := range testCases {
+		t.Run(string(tc.typeName), func(t *testing.T) {
+			signers := annotatedSigners(t, encodingConfig, tc.typeName, tc.fieldName, address)
+			require.Equal(t, [][]byte{expectedSigner}, signers)
 		})
 	}
 }
@@ -268,6 +288,18 @@ func TestDIDMsgAnnotatedSigners(t *testing.T) {
 			require.Equal(t, [][]byte{expectedSigner}, signers)
 		})
 	}
+}
+
+func registerPNFTLegacyAminoReferenceTypes(cdc *codec.LegacyAmino) {
+	// This registry exists only to reproduce pre-v0.50 sign bytes as a test
+	// oracle. Production SIGN_MODE_LEGACY_AMINO_JSON uses proto annotations.
+	cdc.RegisterConcrete(&pnfttypes.MsgCreateDenomRequest{}, "pnft/CreateDenom", nil)
+	cdc.RegisterConcrete(&pnfttypes.MsgUpdateDenomRequest{}, "pnft/UpdateDenom", nil)
+	cdc.RegisterConcrete(&pnfttypes.MsgDeleteDenomRequest{}, "pnft/DeleteDenom", nil)
+	cdc.RegisterConcrete(&pnfttypes.MsgTransferDenomRequest{}, "pnft/TransferDenom", nil)
+	cdc.RegisterConcrete(&pnfttypes.MsgMintPNFTRequest{}, "pnft/MintPNFT", nil)
+	cdc.RegisterConcrete(&pnfttypes.MsgTransferPNFTRequest{}, "pnft/TransferPNFT", nil)
+	cdc.RegisterConcrete(&pnfttypes.MsgBurnPNFTRequest{}, "pnft/BurnPNFT", nil)
 }
 
 type signerCase struct {
