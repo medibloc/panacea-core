@@ -155,6 +155,8 @@ func TestMaximumPageListQueryStoreReads(t *testing.T) {
 }
 
 type maximumPageQueryFixture struct {
+	keeper   Keeper
+	ctx      sdk.Context
 	goCtx    context.Context
 	classID  string
 	owner    string
@@ -187,6 +189,8 @@ func newMaximumPageClassesFixture(
 	}
 	fixture.ctx = fixture.ctx.WithEventManager(sdk.NewEventManager())
 	return maximumPageQueryFixture{
+		keeper:   fixture.keeper,
+		ctx:      fixture.ctx,
 		goCtx:    sdk.WrapSDKContext(fixture.ctx),
 		standard: NewStandardQueryServer(fixture.keeper),
 		panacea:  NewQueryServer(fixture.keeper),
@@ -233,6 +237,8 @@ func newMaximumPageNFTFixture(
 	}
 	fixture.ctx = fixture.ctx.WithEventManager(sdk.NewEventManager())
 	return maximumPageQueryFixture{
+		keeper:   fixture.keeper,
+		ctx:      fixture.ctx,
 		goCtx:    sdk.WrapSDKContext(fixture.ctx),
 		classID:  classResponse.ClassId,
 		owner:    owner,
@@ -242,11 +248,15 @@ func newMaximumPageNFTFixture(
 }
 
 type maximumPageNFTFilter struct {
-	name                string
-	expectedNFTReads    storeReadCounters
-	expectedPolicyReads storeReadCounters
-	standardRequest     func(maximumPageQueryFixture) *upstreamnft.QueryNFTsRequest
-	panaceaRequest      func(maximumPageQueryFixture) *nfttypes.QueryNFTRecordsRequest
+	name                 string
+	includeClass         bool
+	includeOwner         bool
+	expectedNFTReads     storeReadCounters
+	expectedPolicyReads  storeReadCounters
+	pageCacheNFTReads    storeReadCounters
+	pageCachePolicyReads storeReadCounters
+	standardRequest      func(maximumPageQueryFixture) *upstreamnft.QueryNFTsRequest
+	panaceaRequest       func(maximumPageQueryFixture) *nfttypes.QueryNFTRecordsRequest
 }
 
 func maximumPageNFTFilters() []maximumPageNFTFilter {
@@ -255,13 +265,20 @@ func maximumPageNFTFilters() []maximumPageNFTFilter {
 	}
 	return []maximumPageNFTFilter{
 		{
-			name: "class",
+			name:         "class",
+			includeClass: true,
 			expectedNFTReads: storeReadCounters{
 				gets:          401,
 				iterators:     1,
 				iteratorNexts: 100,
 			},
 			expectedPolicyReads: storeReadCounters{gets: 402},
+			pageCacheNFTReads: storeReadCounters{
+				gets:          202,
+				iterators:     1,
+				iteratorNexts: 100,
+			},
+			pageCachePolicyReads: storeReadCounters{gets: 202},
 			standardRequest: func(fixture maximumPageQueryFixture) *upstreamnft.QueryNFTsRequest {
 				return &upstreamnft.QueryNFTsRequest{
 					ClassId:    fixture.classID,
@@ -276,13 +293,20 @@ func maximumPageNFTFilters() []maximumPageNFTFilter {
 			},
 		},
 		{
-			name: "owner",
+			name:         "owner",
+			includeOwner: true,
 			expectedNFTReads: storeReadCounters{
 				gets:          500,
 				iterators:     1,
 				iteratorNexts: 100,
 			},
 			expectedPolicyReads: storeReadCounters{gets: 400},
+			pageCacheNFTReads: storeReadCounters{
+				gets:          302,
+				iterators:     1,
+				iteratorNexts: 100,
+			},
+			pageCachePolicyReads: storeReadCounters{gets: 202},
 			standardRequest: func(fixture maximumPageQueryFixture) *upstreamnft.QueryNFTsRequest {
 				return &upstreamnft.QueryNFTsRequest{
 					Owner:      fixture.owner,
@@ -297,13 +321,21 @@ func maximumPageNFTFilters() []maximumPageNFTFilter {
 			},
 		},
 		{
-			name: "class_owner",
+			name:         "class_owner",
+			includeClass: true,
+			includeOwner: true,
 			expectedNFTReads: storeReadCounters{
 				gets:          501,
 				iterators:     1,
 				iteratorNexts: 100,
 			},
 			expectedPolicyReads: storeReadCounters{gets: 402},
+			pageCacheNFTReads: storeReadCounters{
+				gets:          302,
+				iterators:     1,
+				iteratorNexts: 100,
+			},
+			pageCachePolicyReads: storeReadCounters{gets: 202},
 			standardRequest: func(fixture maximumPageQueryFixture) *upstreamnft.QueryNFTsRequest {
 				return &upstreamnft.QueryNFTsRequest{
 					ClassId:    fixture.classID,
