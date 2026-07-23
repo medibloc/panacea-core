@@ -19,9 +19,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/input"
 	"github.com/cosmos/cosmos-sdk/client/tx"
-	sdkcodec "github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/go-bip39"
+	"github.com/cosmos/gogoproto/proto"
 	"github.com/medibloc/panacea-core/v2/x/did/internal/secp256k1util"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -325,7 +325,7 @@ func getPrivKeyFromKeyStore(verificationMethodID string, reader *bufio.Reader) (
 }
 
 // signUsingCurrentSeq generates a signature using the current sequence stored in the blockchain.
-func signUsingCurrentSeq(clientCtx client.Context, did string, privKey crypto.PrivKey, data sdkcodec.ProtoMarshaler) ([]byte, error) {
+func signUsingCurrentSeq(clientCtx client.Context, did string, privKey crypto.PrivKey, data proto.Message) ([]byte, error) {
 	queryClient := types.NewQueryClient(clientCtx)
 
 	params := &types.QueryDIDRequest{

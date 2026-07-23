@@ -16,6 +16,15 @@ func TestMustGetSignBytesWithSeq(t *testing.T) {
 	signBytes := mustGetSignBytesWithSeq(&doc, 100)
 	require.NotNil(t, signBytes)
 
+	marshaledDoc, err := doc.Marshal()
+	require.NoError(t, err)
+	expectedSignBytes, err := (&DataWithSeq{
+		Data:     marshaledDoc,
+		Sequence: 100,
+	}).Marshal()
+	require.NoError(t, err)
+	require.Equal(t, expectedSignBytes, signBytes)
+
 	dataWithSeq := DataWithSeq{}
 	require.NoError(t, dataWithSeq.Unmarshal(signBytes))
 

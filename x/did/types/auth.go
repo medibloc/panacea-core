@@ -4,14 +4,14 @@ import (
 	"fmt"
 
 	"github.com/cometbft/cometbft/crypto"
-	sdkcodec "github.com/cosmos/cosmos-sdk/codec"
+	"github.com/cosmos/gogoproto/proto"
 )
 
-func Sign(signableData sdkcodec.ProtoMarshaler, seq uint64, privKey crypto.PrivKey) ([]byte, error) {
+func Sign(signableData proto.Message, seq uint64, privKey crypto.PrivKey) ([]byte, error) {
 	return privKey.Sign(mustGetSignBytesWithSeq(signableData, seq))
 }
 
-func Verify(signature []byte, signableData sdkcodec.ProtoMarshaler, seq uint64, pubKey crypto.PubKey) (uint64, bool) {
+func Verify(signature []byte, signableData proto.Message, seq uint64, pubKey crypto.PubKey) (uint64, bool) {
 	signBytes := mustGetSignBytesWithSeq(signableData, seq)
 
 	if !pubKey.VerifySignature(signBytes, signature) {
@@ -22,8 +22,8 @@ func Verify(signature []byte, signableData sdkcodec.ProtoMarshaler, seq uint64, 
 
 // mustGetSignBytesWithSeq returns a byte slice which is the combination of data and seq.
 // The return value is deterministic, so that it can be used for signing.
-func mustGetSignBytesWithSeq(signableData sdkcodec.ProtoMarshaler, seq uint64) []byte {
-	dAtA, err := signableData.Marshal()
+func mustGetSignBytesWithSeq(signableData proto.Message, seq uint64) []byte {
+	dAtA, err := proto.Marshal(signableData)
 	if err != nil {
 		panic(fmt.Sprintf("marshal failed: %s, signableData: %s", err.Error(), signableData))
 	}
