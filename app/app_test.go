@@ -22,6 +22,7 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	"github.com/cosmos/cosmos-sdk/x/authz"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	govmodule "github.com/cosmos/cosmos-sdk/x/gov"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
@@ -251,6 +252,69 @@ func TestLegacyPNFTProposalExecutionFails(t *testing.T) {
 		require.NotNil(t, executionEvent)
 		require.Contains(t, executionEvent.Logs, pnftlegacy.DisabledErrorMessage)
 	})
+}
+
+func TestLegacyPNFTAuthzExecFailsAndRollsBack(t *testing.T) {
+	testApp, granter, ctx := newPNFTProposalTestApp(t)
+	grantee := sdk.AccAddress(bytes.Repeat([]byte{31}, 20))
+	recipient := sdk.AccAddress(bytes.Repeat([]byte{32}, 20))
+	coin := sdk.NewInt64Coin(sdk.DefaultBondDenom, 1)
+	amount := sdk.NewCoins(coin)
+	sendMsg := banktypes.NewMsgSend(granter, recipient, amount)
+	legacyMsg := newLegacyProposalPNFTMsg(granter.String())
+
+	for _, msg := range []sdk.Msg{sendMsg, legacyMsg} {
+		require.NoError(t, testApp.AuthzKeeper.SaveGrant(
+			ctx,
+			grantee,
+			granter,
+			authz.NewGenericAuthorization(sdk.MsgTypeURL(msg)),
+			nil,
+		))
+	}
+	exec := authz.NewMsgExec(grantee, []sdk.Msg{sendMsg, legacyMsg})
+	handler := testApp.MsgServiceRouter().Handler(&exec)
+	require.NotNil(t, handler)
+
+	parentSenderBalance := testApp.BankKeeper.GetBalance(ctx, granter, sdk.DefaultBondDenom)
+	parentRecipientBalance := testApp.BankKeeper.GetBalance(ctx, recipient, sdk.DefaultBondDenom)
+	// BaseApp executes a transaction in a cache context and commits it only on
+	// success. Keep the write function unused to exercise the same error path.
+	cacheCtx, _ := ctx.CacheContext()
+	response, err := handler(cacheCtx, &exec)
+	require.Nil(t, response)
+	require.ErrorIs(t, err, sdkerrors.ErrInvalidRequest)
+	require.ErrorContains(t, err, pnftlegacy.DisabledErrorMessage)
+
+	require.Equal(
+		t,
+		parentSenderBalance.Sub(coin),
+		testApp.BankKeeper.GetBalance(cacheCtx, granter, sdk.DefaultBondDenom),
+	)
+	require.Equal(
+		t,
+		parentRecipientBalance.Add(coin),
+		testApp.BankKeeper.GetBalance(cacheCtx, recipient, sdk.DefaultBondDenom),
+	)
+	require.Equal(
+		t,
+		parentSenderBalance,
+		testApp.BankKeeper.GetBalance(ctx, granter, sdk.DefaultBondDenom),
+	)
+	require.Equal(
+		t,
+		parentRecipientBalance,
+		testApp.BankKeeper.GetBalance(ctx, recipient, sdk.DefaultBondDenom),
+	)
+
+	authorization, expiration := testApp.AuthzKeeper.GetAuthorization(
+		ctx,
+		grantee,
+		granter,
+		sdk.MsgTypeURL(legacyMsg),
+	)
+	require.IsType(t, &authz.GenericAuthorization{}, authorization)
+	require.Nil(t, expiration)
 }
 
 func newPNFTProposalTestApp(t *testing.T) (*panaceaapp.App, sdk.AccAddress, sdk.Context) {
