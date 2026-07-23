@@ -39,6 +39,10 @@ import (
 
 var ChainID string
 
+// defaultQueryGasLimit gives newly initialized nodes bounded REST/gRPC query
+// work with more than five times the measured maximum NFT page gas.
+const defaultQueryGasLimit uint64 = 10_000_000
+
 // NewRootCmd creates a new root command for simd. It is called once in the
 // main function.
 func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
@@ -124,6 +128,7 @@ func initAppConfig() (string, interface{}) {
 
 	srvCfg := serverconfig.DefaultConfig()
 	srvCfg.MinGasPrices = "5umed"
+	srvCfg.QueryGasLimit = defaultQueryGasLimit
 
 	PanaceaAppConfig := CustomAppConfig{Config: *srvCfg}
 

@@ -9,11 +9,13 @@ import (
 	"time"
 
 	svrcmd "github.com/cosmos/cosmos-sdk/server/cmd"
+	serverconfig "github.com/cosmos/cosmos-sdk/server/config"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	genutiltypes "github.com/cosmos/cosmos-sdk/x/genutil/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	govv1types "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	"github.com/stretchr/testify/require"
 
 	panaceaapp "github.com/medibloc/panacea-core/v2/app"
@@ -157,6 +159,13 @@ func TestNewRootCmdCommandTree(t *testing.T) {
 		root.SetErr(io.Discard)
 
 		require.NoError(t, svrcmd.Execute(root, "", home))
+
+		appConfigReader := viper.New()
+		appConfigReader.SetConfigFile(filepath.Join(home, "config", "app.toml"))
+		require.NoError(t, appConfigReader.ReadInConfig())
+		appConfig, err := serverconfig.GetConfig(appConfigReader)
+		require.NoError(t, err)
+		require.Equal(t, uint64(10_000_000), appConfig.QueryGasLimit)
 
 		appGenesis, err := genutiltypes.AppGenesisFromFile(filepath.Join(home, "config", "genesis.json"))
 		require.NoError(t, err)
