@@ -32,6 +32,101 @@ func TestModuleConstants(t *testing.T) {
 	require.Equal(t, "panacea.nft.v1.NFTData", NFTDataInterfaceName)
 }
 
+func TestPublicProtobufFieldNumberContract(t *testing.T) {
+	contracts := map[protoreflect.FullName]map[protoreflect.Name]protoreflect.FieldNumber{
+		"panacea.nft.v1.BasicNFTData": {
+			"name": 1, "description": 2, "image_uri": 3,
+		},
+		"panacea.nft.v1.ClassPolicy": {
+			"class_id": 1, "creator": 2, "controller": 3, "transfer_policy": 4,
+			"revocable": 5, "max_supply": 6,
+		},
+		"panacea.nft.v1.MintRecord": {
+			"minted_at": 1, "minted_by": 2,
+		},
+		"panacea.nft.v1.Revocation": {
+			"revoked_at": 1, "revoked_by": 2,
+		},
+		"panacea.nft.v1.LifecycleRecord": {
+			"class_id": 1, "nft_id": 2, "mint": 3, "revocation": 4,
+		},
+		"panacea.nft.v1.BurnTombstone": {
+			"class_id": 1, "nft_id": 2, "mint": 3, "uri": 4, "uri_hash": 5,
+			"data": 6, "revocation": 7, "burned_at": 8, "burned_by": 9,
+		},
+		"panacea.nft.v1.ClassRecord": {
+			"class": 1, "policy": 2, "minted_count": 3,
+		},
+		"panacea.nft.v1.LiveNFTRecord": {
+			"nft": 1, "owner": 2, "status": 3, "mint": 4, "revocation": 5,
+		},
+		"panacea.nft.v1.NFTRecord": {
+			"live": 1, "burn_tombstone": 2,
+		},
+		"panacea.nft.v1.GenesisState": {
+			"nft_state": 1, "class_policies": 2, "lifecycles": 3, "tombstones": 4,
+		},
+		"panacea.nft.v1.EventClassCreated": {
+			"class_id": 1, "creator": 2,
+		},
+		"panacea.nft.v1.EventControllerUpdated": {
+			"class_id": 1, "old_controller": 2, "new_controller": 3,
+		},
+		"panacea.nft.v1.EventNFTRevoked": {
+			"class_id": 1, "nft_id": 2, "controller": 3,
+		},
+		"panacea.nft.v1.MsgCreateClassRequest": {
+			"creator": 1, "local_class_id": 2, "name": 3, "symbol": 4, "description": 5,
+			"uri": 6, "uri_hash": 7, "transfer_policy": 8, "revocable": 9, "max_supply": 10,
+		},
+		"panacea.nft.v1.MsgCreateClassResponse": {
+			"class_id": 1,
+		},
+		"panacea.nft.v1.MsgUpdateControllerRequest": {
+			"class_id": 1, "controller": 2, "new_controller": 3,
+		},
+		"panacea.nft.v1.MsgMintRequest": {
+			"class_id": 1, "nft_id": 2, "controller": 3, "recipient": 4,
+			"uri": 5, "uri_hash": 6, "data": 7,
+		},
+		"panacea.nft.v1.MsgRevokeRequest": {
+			"class_id": 1, "nft_id": 2, "controller": 3,
+		},
+		"panacea.nft.v1.MsgBurnRequest": {
+			"class_id": 1, "nft_id": 2, "owner": 3,
+		},
+		"panacea.nft.v1.QueryClassRecordRequest": {
+			"class_id": 1,
+		},
+		"panacea.nft.v1.QueryClassRecordResponse": {
+			"class_record": 1,
+		},
+		"panacea.nft.v1.QueryNFTRecordRequest": {
+			"class_id": 1, "nft_id": 2,
+		},
+		"panacea.nft.v1.QueryNFTRecordResponse": {
+			"nft_record": 1,
+		},
+		"panacea.nft.v1.QueryNFTRecordsRequest": {
+			"class_id": 1, "owner": 2, "pagination": 3,
+		},
+		"panacea.nft.v1.QueryNFTRecordsResponse": {
+			"nft_records": 1, "pagination": 2,
+		},
+	}
+
+	for messageName, expectedFields := range contracts {
+		t.Run(string(messageName), func(t *testing.T) {
+			fields := messageDescriptor(t, messageName).Fields()
+			for fieldName, expectedNumber := range expectedFields {
+				field := fields.ByName(fieldName)
+				require.NotNil(t, field, "missing field %s", fieldName)
+				require.Equal(t, expectedNumber, field.Number(), "field %s", fieldName)
+			}
+		})
+	}
+}
+
 func TestSentinelErrorContract(t *testing.T) {
 	testCases := []struct {
 		name string
