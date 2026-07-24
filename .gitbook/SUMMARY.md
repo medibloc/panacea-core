@@ -19,7 +19,7 @@
 
 * [AOL](specifications/aol.md)
 * [DID](specifications/did.md)
-* [PNFT](specifications/pnft.md)
+* [NFT](specifications/nft.md)
 
 ## Resources
 

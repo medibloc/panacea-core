@@ -781,130 +781,119 @@ so that Panacea can verify that you are the DID owner.
 Deactivating a DID is not the same as deleting a DID. DIDs cannot be deleted permanently. They can just be deactivated.
 And DIDs cannot be reused to create another DID Documents forever.
 
-## PNFT
+## NFT
 
-### Creating a Denom
-To issue an NFT, you first need to create a Denom. The `--denom-id` value is optional; if left empty, a random UUID will be generated.
+{% hint style="warning" %}
+Panacea v2.3 removes the legacy `pnft` runtime module, store, queries, and CLI
+commands. Legacy PNFT state is not migrated. Historical protobuf messages remain
+decode-only, and attempts to execute them fail.
+{% endhint %}
+
+### Creating a class
+
+The class creator becomes its initial controller. The transfer policy,
+revocability, and lifetime maximum supply are immutable. A maximum supply of
+`0` means unlimited.
 
 ```bash
-panacead tx pnft create-denom \
-  --denom-id <your_denom_id> \
-  --denom-name <your_denom_name> \
-  --denom-description <your_denom_description> \
-  --denom-symbol <your_denom_symbol> \
-  --denom-uri <your_denom_uri> \
-  --denom-uri-hash <your_denom_hash> \
-  --denom-data <your_denom_data> \
-  --from <key or address> \
+panacead tx nft create-class \
+  <local-class-id> <name> <symbol> <transfer-policy> <revocable> <max-supply> \
+  --description <description> \
+  --uri <uri> \
+  --uri-hash <sha256:lowercase-hex> \
+  --from <creator-key-or-address> \
   --chain-id <chain-id> \
   --fees 1000000umed
 ```
 
-You can confirm the creation of the denom with the following query:
+The response contains the generated class ID in
+`<creator-address>:<local-class-id>` form.
+
+### Updating the controller
+
+Only the current controller can assign a new controller.
 
 ```bash
-panacead q pnft get-denom <denom_id>
-
-## Response
-denom:
-  data: This is panacea denom data
-  description: panacea denom detail
-  id: 6a0e781a-c4a8-43ff-b15f-1a885adda8e3
-  name: panacea denom
-  owner: panacea1a392sz78y3hx72aegsczuu29v3rx7l8p9vxgqk
-  symbol: panacea
-  uri: https://medibloc.org
-  uri_hash: hash...
-```
-
-### Updating a Denom
-You can update a denom. All fields except the id are updatable.
-
-```bash
-panacead tx pnft update-denom <denom_id> \
-  --denom-name <update_denom_name> \
-  --denom-description <update_denom_description> \
-  --denom-symbol <update_denom_symbol> \
-  --denom-uri <update_denom_uri> \
-  --denom-uri-hash <update_denom_hash> \
-  --denom-data <update_denom_data> \
-  --from <key or address> \
+panacead tx nft update-controller <class-id> <new-controller> \
+  --from <current-controller> \
   --chain-id <chain-id> \
   --fees 1000000umed
 ```
 
-### Transferring a Denom
-You can change the owner of a denom. Only the current owner (`sender_address`) can initiate this transfer.
+### Minting an NFT
+
+Only the current class controller can mint. The recipient becomes the initial
+owner. Use `--data` with a JSON-encoded `google.protobuf.Any` only when adding
+`/panacea.nft.v1.BasicNFTData`; run the command with `--help` for its exact
+input form.
 
 ```bash
-panacead tx pnft transfer-denom <denom_id> <sender_address> <receiver_address> \
-  --from <sender_key or sender_address> \
+panacead tx nft mint <class-id> <nft-id> <recipient> \
+  --uri <uri> \
+  --uri-hash <sha256:lowercase-hex> \
+  --from <controller> \
   --chain-id <chain-id> \
   --fees 1000000umed
 ```
 
-### Deleting a Denom
-A denom can be deleted. Only the current owner (`remover_address`) can initiate this deletion.
+### Transferring an NFT
+
+Only the current owner can send an NFT, and the class transfer policy must
+allow owner transfers.
 
 ```bash
-panacead tx pnft delete-denom <denom_id> \
-  --from <remover_address> \
+panacead tx nft send <class-id> <nft-id> <receiver> \
+  --from <current-owner> \
   --chain-id <chain-id> \
   --fees 1000000umed
 ```
 
+### Revoking an NFT
 
-### Minting PNFT
-You can mint an NFT, but only the owner of the corresponding Denom has the right to do so.
+Only the current class controller can revoke an NFT, and the class must have
+been created as revocable. Revocation is irreversible but does not change the
+owner or live supply.
 
 ```bash
-panacead tx pnft mint-pnft <denom_id> <id> \
-  --pnft-name <your_nft_name> \
-  --pnft-description <your_nft_description> \
-  --pnft--uri <your_nft_uri> \
-  --pnft-uri-hash <your_nft_uri_hash> \
-  --pnft-data <your_nft_data> \
-  --from <key or address> \
+panacead tx nft revoke <class-id> <nft-id> \
+  --from <controller> \
   --chain-id <chain-id> \
   --fees 1000000umed
 ```
 
-The NFT can be queried with the following:
+### Burning an NFT
+
+Only the current owner can burn an NFT. Burn permanently removes the standard
+NFT and records a tombstone; the same NFT ID cannot be minted again.
 
 ```bash
-panacead q pnft get-pnf <denom_id> <id>
-
-# Response
-pnft:
-  created_at: "2024-03-20T00:27:12.970988074Z"
-  creator: panacea1a392sz78y3hx72aegsczuu29v3rx7l8p9vxgqk
-  data: ""
-  denom_id: 6a0e781a-c4a8-43ff-b15f-1a885adda8e3
-  description: ""
-  id: token1
-  name: med
-  owner: panacea1a392sz78y3hx72aegsczuu29v3rx7l8p9vxgqk
-  uri: ""
-  uri_hash: ""
-```
-
-### Transferring PNFT
-You can transfer the ownership of an NFT to another account.
-
-```bash
-panacead tx pnft transfer-pnft <denom_id> <id> <receiver> \
-  --from <key or address> \
+panacead tx nft burn <class-id> <nft-id> \
+  --from <current-owner> \
   --chain-id <chain-id> \
   --fees 1000000umed
 ```
 
-### Burning PNFT
-An NFT can be burned, which is an action that can only be performed by the owner.
-This command permanently removes the specified PNFT from the blockchain. Once an NFT is burned, it cannot be recovered, so this action should be considered final and irreversible.
+### Querying NFTs
+
+Standard queries return live Cosmos NFT state:
 
 ```bash
-panacead tx pnft burn-pnft <denom_id> <id> \
-  --from <key or address> \
-  --chain-id <chain-id> \
-  --fees 1000000umed
+panacead query nft class <class-id>
+panacead query nft classes
+panacead query nft nft <class-id> <nft-id>
+panacead query nft nfts [class-id] --owner <owner>
+panacead query nft owner <class-id> <nft-id>
+panacead query nft balance <owner> <class-id>
+panacead query nft supply <class-id>
 ```
+
+Panacea queries include policy, lifecycle, and permanent burn tombstones:
+
+```bash
+panacead query nft class-record <class-id>
+panacead query nft nft-record <class-id> <nft-id>
+panacead query nft nft-records --class-id <class-id> --owner <owner>
+```
+
+`nfts` and `nft-records` accept class, owner, or both filters. List queries are
+paginated and return at most 100 entries per page.
