@@ -40,8 +40,8 @@ import (
 var ChainID string
 
 const (
-	// defaultQueryGasLimit gives newly initialized nodes more than five times
-	// the measured maximum NFT page gas.
+	// defaultQueryGasLimit gives newly initialized nodes more than three times
+	// the highest measured maximum-payload NFT page gas.
 	defaultQueryGasLimit uint64 = 10_000_000
 
 	// defaultAPIRPCWriteTimeout bounds REST response handling like the SDK's

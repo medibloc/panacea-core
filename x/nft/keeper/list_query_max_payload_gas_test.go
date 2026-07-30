@@ -78,6 +78,55 @@ func TestMaximumPayloadPageQueryGas(t *testing.T) {
 	}
 }
 
+func TestMaximumPayloadOwnerPageAcrossClassesQueryGas(t *testing.T) {
+	fixture := newMaximumPayloadOwnerAcrossClassesFixture(t)
+	const expectedGas uint64 = 3060426
+
+	t.Run("standard nfts", func(t *testing.T) {
+		goCtx, meter := contextWithQueryGasMeter(fixture.goCtx)
+		response, err := fixture.standard.NFTs(
+			goCtx,
+			&upstreamnft.QueryNFTsRequest{
+				Owner: fixture.owner,
+				Pagination: &query.PageRequest{
+					Limit: maximumQueryPageLimit,
+				},
+			},
+		)
+		require.NoError(t, err)
+		require.Len(t, response.Nfts, int(maximumQueryPageLimit))
+		require.NotEmpty(t, response.Pagination.NextKey)
+		classIDs := make(map[string]struct{}, len(response.Nfts))
+		for _, token := range response.Nfts {
+			classIDs[token.ClassId] = struct{}{}
+		}
+		require.Len(t, classIDs, int(maximumQueryPageLimit))
+		require.Equal(t, expectedGas, meter.GasConsumed())
+	})
+
+	t.Run("panacea nft records", func(t *testing.T) {
+		goCtx, meter := contextWithQueryGasMeter(fixture.goCtx)
+		response, err := fixture.panacea.NFTRecords(
+			goCtx,
+			&nfttypes.QueryNFTRecordsRequest{
+				Owner: fixture.owner,
+				Pagination: &query.PageRequest{
+					Limit: maximumQueryPageLimit,
+				},
+			},
+		)
+		require.NoError(t, err)
+		require.Len(t, response.NftRecords, int(maximumQueryPageLimit))
+		require.NotEmpty(t, response.Pagination.NextKey)
+		classIDs := make(map[string]struct{}, len(response.NftRecords))
+		for _, record := range response.NftRecords {
+			classIDs[record.Nft.ClassId] = struct{}{}
+		}
+		require.Len(t, classIDs, int(maximumQueryPageLimit))
+		require.Equal(t, expectedGas, meter.GasConsumed())
+	})
+}
+
 func newMaximumPayloadClassesFixture(t testing.TB) maximumPageQueryFixture {
 	t.Helper()
 	fixture := newKeeperFixture(t, true, true)
@@ -131,12 +180,7 @@ func newMaximumPayloadNFTFixture(t testing.TB) maximumPageQueryFixture {
 	require.NoError(t, err)
 	require.Len(t, classResponse.ClassId, 131)
 
-	data, err := cdctypes.NewAnyWithValue(&nfttypes.BasicNFTData{
-		Description: strings.Repeat("d", maximumPayloadNFTDataBytes-3),
-	})
-	require.NoError(t, err)
-	require.Equal(t, nfttypes.BasicNFTDataTypeURL, data.TypeUrl)
-	require.Len(t, data.Value, maximumPayloadNFTDataBytes)
+	data := maximumPayloadNFTData(t)
 
 	server := NewMsgServer(fixture.keeper)
 	for index := 0; index < maximumPageBenchmarkStateSize; index++ {
@@ -158,6 +202,65 @@ func newMaximumPayloadNFTFixture(t testing.TB) maximumPageQueryFixture {
 		standard: NewStandardQueryServer(fixture.keeper),
 		panacea:  NewQueryServer(fixture.keeper),
 	}
+}
+
+func newMaximumPayloadOwnerAcrossClassesFixture(
+	t testing.TB,
+) maximumPageQueryFixture {
+	t.Helper()
+	fixture := newKeeperFixture(t, true, true)
+	fixture.ctx = fixture.ctx.WithBlockTime(
+		time.Date(2026, time.July, 23, 0, 0, 0, 0, time.UTC),
+	)
+	creatorAddress := sdk.AccAddress(bytes.Repeat([]byte{121}, 32))
+	ownerAddress := sdk.AccAddress(bytes.Repeat([]byte{122}, 32))
+	creator := fixture.accountAddress(t, creatorAddress)
+	owner := fixture.accountAddress(t, ownerAddress)
+	require.Len(t, creator, 66)
+	require.Len(t, owner, 66)
+	for _, address := range []sdk.AccAddress{creatorAddress, ownerAddress} {
+		fixture.accountKeeper.accounts[string(address)] =
+			authtypes.NewBaseAccountWithAddress(address)
+	}
+
+	data := maximumPayloadNFTData(t)
+	server := NewMsgServer(fixture.keeper)
+	for index := 0; index < maximumPageBenchmarkStateSize; index++ {
+		classResponse, err := server.CreateClass(
+			fixture.ctx,
+			maximumPayloadClassRequest(creator, index),
+		)
+		require.NoError(t, err)
+		require.Len(t, classResponse.ClassId, 131)
+
+		request := validMintRequest(classResponse.ClassId, creator, owner)
+		request.NftId = maximumPayloadIdentifier("n", index)
+		request.Uri = strings.Repeat("u", maximumPayloadURIBytes)
+		request.Data = &cdctypes.Any{
+			TypeUrl: data.TypeUrl,
+			Value:   append([]byte(nil), data.Value...),
+		}
+		_, err = server.Mint(fixture.ctx, request)
+		require.NoError(t, err)
+	}
+	fixture.ctx = fixture.ctx.WithEventManager(sdk.NewEventManager())
+	return maximumPageQueryFixture{
+		goCtx:    fixture.ctx,
+		owner:    owner,
+		standard: NewStandardQueryServer(fixture.keeper),
+		panacea:  NewQueryServer(fixture.keeper),
+	}
+}
+
+func maximumPayloadNFTData(t testing.TB) *cdctypes.Any {
+	t.Helper()
+	data, err := cdctypes.NewAnyWithValue(&nfttypes.BasicNFTData{
+		Description: strings.Repeat("d", maximumPayloadNFTDataBytes-3),
+	})
+	require.NoError(t, err)
+	require.Equal(t, nfttypes.BasicNFTDataTypeURL, data.TypeUrl)
+	require.Len(t, data.Value, maximumPayloadNFTDataBytes)
+	return data
 }
 
 func maximumPayloadClassRequest(
