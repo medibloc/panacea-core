@@ -31,6 +31,7 @@ import (
 	capabilitytypes "github.com/cosmos/ibc-go/modules/capability/types"
 	ibctransfertypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
 	ibcclienttypes "github.com/cosmos/ibc-go/v8/modules/core/02-client/types"
+	ibcconnectiontypes "github.com/cosmos/ibc-go/v8/modules/core/03-connection/types"
 	ibcexported "github.com/cosmos/ibc-go/v8/modules/core/exported"
 	ibctm "github.com/cosmos/ibc-go/v8/modules/light-clients/07-tendermint"
 	"github.com/spf13/viper"
@@ -103,6 +104,40 @@ func TestIBCGovernanceWiring(t *testing.T) {
 	require.True(t, legacyRouter.HasRoute(ibcclienttypes.RouterKey))
 	require.NotNil(t, testApp.MsgServiceRouter().Handler(&ibcclienttypes.MsgRecoverClient{}))
 	require.NotNil(t, testApp.MsgServiceRouter().Handler(&ibcclienttypes.MsgIBCSoftwareUpgrade{}))
+}
+
+func TestIBCLegacyParamSubspaceWiring(t *testing.T) {
+	panaceaapp.SetConfig()
+	appOpts := viper.New()
+	appOpts.Set(flags.FlagHome, t.TempDir())
+	testApp := panaceaapp.New(log.NewNopLogger(), dbm.NewMemDB(), nil, false, appOpts)
+	require.NoError(t, testApp.LoadLatestVersion())
+
+	ctx := testApp.NewUncachedContext(false, cmtproto.Header{})
+	ibcSubspace := testApp.GetSubspace(ibcexported.ModuleName)
+	transferSubspace := testApp.GetSubspace(ibctransfertypes.ModuleName)
+
+	require.True(t, ibcSubspace.HasKeyTable())
+	require.True(t, transferSubspace.HasKeyTable())
+
+	expectedClientParams := ibcclienttypes.NewParams("06-solomachine", "07-tendermint")
+	expectedConnectionParams := ibcconnectiontypes.DefaultParams()
+	expectedTransferParams := ibctransfertypes.NewParams(true, false)
+
+	ibcSubspace.SetParamSet(ctx, &expectedClientParams)
+	ibcSubspace.SetParamSet(ctx, &expectedConnectionParams)
+	transferSubspace.SetParamSet(ctx, &expectedTransferParams)
+
+	var actualClientParams ibcclienttypes.Params
+	var actualConnectionParams ibcconnectiontypes.Params
+	var actualTransferParams ibctransfertypes.Params
+	ibcSubspace.GetParamSet(ctx, &actualClientParams)
+	ibcSubspace.GetParamSet(ctx, &actualConnectionParams)
+	transferSubspace.GetParamSet(ctx, &actualTransferParams)
+
+	require.Equal(t, expectedClientParams, actualClientParams)
+	require.Equal(t, expectedConnectionParams, actualConnectionParams)
+	require.Equal(t, expectedTransferParams, actualTransferParams)
 }
 
 func TestNFTRuntimeAndPNFTCompatibilityWiring(t *testing.T) {
