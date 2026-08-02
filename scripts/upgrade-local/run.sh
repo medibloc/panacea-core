@@ -6,7 +6,7 @@ REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 
 REHEARSAL_ROOT="${PANACEA_REHEARSAL_ROOT:-$REPO_ROOT/.local/upgrade/cosmos-sdk-v0.50/rehearsal}"
 OLD_TAG="${PANACEA_REHEARSAL_OLD_TAG:-v2.2.1}"
-UPGRADE_NAME="${PANACEA_REHEARSAL_UPGRADE_NAME:-pan-19-noop-rehearsal}"
+UPGRADE_NAME="${PANACEA_REHEARSAL_UPGRADE_NAME:-v2.3.0}"
 CHAIN_ID="${PANACEA_REHEARSAL_CHAIN_ID:-panacea-local-upgrade-rehearsal}"
 MONIKER="${PANACEA_REHEARSAL_MONIKER:-panacea-rehearsal-validator}"
 VALIDATOR_KEY="${PANACEA_REHEARSAL_VALIDATOR_KEY:-validator}"
@@ -40,13 +40,13 @@ PROPOSAL_ID_FILE="$REHEARSAL_ROOT/proposal-id"
 GO_BUILD_CACHE="${PANACEA_REHEARSAL_GOCACHE:-$REHEARSAL_ROOT/go-build-cache}"
 
 log() {
-  printf '[pan-19] %s\n' "$*"
+  printf '[upgrade-rehearsal] %s\n' "$*"
 }
 
 fail() {
-  printf '[pan-19] ERROR: %s\n' "$*" >&2
+  printf '[upgrade-rehearsal] ERROR: %s\n' "$*" >&2
   if [ -f "$LOG_FILE" ]; then
-    printf '\n[pan-19] Last cosmovisor log lines:\n' >&2
+    printf '\n[upgrade-rehearsal] Last cosmovisor log lines:\n' >&2
     tail -n 80 "$LOG_FILE" >&2 || true
   fi
   exit 1
@@ -57,8 +57,8 @@ usage() {
 Usage: $0 [command]
 
 Commands:
-  run             Clean, build old/new binaries, init a local chain, run the full no-op Cosmovisor rehearsal.
-  build           Build the $OLD_TAG old binary and the current no-op new binary into .local/.
+  run             Clean, build old/new binaries, init a local chain, run the full $UPGRADE_NAME Cosmovisor rehearsal.
+  build           Build the $OLD_TAG old binary and the current $UPGRADE_NAME binary into .local/.
   init            Reset local chain state and initialize Cosmovisor home from existing binaries.
   start           Start Cosmovisor in the background.
   submit-upgrade  Submit the $UPGRADE_NAME software-upgrade proposal.
@@ -181,7 +181,7 @@ build_binaries() {
   make -C "$OLD_SRC" build LEDGER_ENABLED=false BUILDDIR="$BIN_ROOT/old" VERSION="${OLD_TAG#v}" COMMIT="$old_commit"
   cp "$BIN_ROOT/old/panacead" "$OLD_BIN"
 
-  log "Building current no-op new binary for $UPGRADE_NAME"
+  log "Building current new binary for $UPGRADE_NAME"
   make -C "$REPO_ROOT" build LEDGER_ENABLED=false BUILDDIR="$BIN_ROOT/new"
   cp "$BIN_ROOT/new/panacead" "$NEW_BIN"
 
@@ -438,8 +438,8 @@ submit_upgrade() {
   log "Submitting software-upgrade proposal $UPGRADE_NAME at height $target"
   broadcast_tx "$bin" tx gov submit-legacy-proposal software-upgrade "$UPGRADE_NAME" \
     --from "$VALIDATOR_KEY" \
-    --title "PAN-19 no-op rehearsal" \
-    --description "Temporary local-only no-op upgrade rehearsal for PAN-19." \
+    --title "$UPGRADE_NAME local upgrade rehearsal" \
+    --description "Local Cosmovisor rehearsal of the $UPGRADE_NAME upgrade handler." \
     --deposit "$PROPOSAL_DEPOSIT" \
     --upgrade-height "$target" \
     --upgrade-info "{}" \
@@ -553,7 +553,7 @@ run_all() {
   wait_for_upgrade_switch
   smoke_bank_send post-upgrade
 
-  log "PAN-19 no-op upgrade rehearsal completed"
+  log "$UPGRADE_NAME upgrade rehearsal completed"
   status_summary
 
   if [ "$KEEP_RUNNING" != "1" ]; then
