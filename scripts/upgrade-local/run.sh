@@ -182,7 +182,9 @@ build_binaries() {
   cp "$BIN_ROOT/old/panacead" "$OLD_BIN"
 
   log "Building current new binary for $UPGRADE_NAME"
-  make -C "$REPO_ROOT" build LEDGER_ENABLED=false BUILDDIR="$BIN_ROOT/new"
+  # A rehearsal build must not update the checked-out module files. The build
+  # still uses -mod=readonly, so incomplete dependencies fail instead.
+  make --old-file=go.sum -C "$REPO_ROOT" build LEDGER_ENABLED=false BUILDDIR="$BIN_ROOT/new"
   cp "$BIN_ROOT/new/panacead" "$NEW_BIN"
 
   log "Old binary: $OLD_BIN"
