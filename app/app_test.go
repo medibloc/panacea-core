@@ -525,6 +525,17 @@ func TestUpgradeWiringWithStandaloneModule(t *testing.T) {
 	require.ErrorIs(t, err, upgradetypes.ErrNoUpgradePlanFound)
 }
 
+func TestProductionUpgradeHandlersExcludeObsoleteRehearsal(t *testing.T) {
+	panaceaapp.SetConfig()
+	appOpts := viper.New()
+	appOpts.Set(flags.FlagHome, t.TempDir())
+	testApp := panaceaapp.New(log.NewNopLogger(), dbm.NewMemDB(), nil, false, appOpts)
+	require.NoError(t, testApp.LoadLatestVersion())
+
+	require.True(t, testApp.UpgradeKeeper.HasHandler(v2_3_0.UpgradeName))
+	require.False(t, testApp.UpgradeKeeper.HasHandler("pan-19-noop-rehearsal"))
+}
+
 func TestV230UpgradeInitializesNFTModule(t *testing.T) {
 	panaceaapp.SetConfig()
 	appOpts := viper.New()
