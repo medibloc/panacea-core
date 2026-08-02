@@ -393,10 +393,22 @@ set_tx_common_flags() {
 
 balance_of() {
   local addr="$1"
-  local bin result
+  local bin result amount
   bin="$(current_panacead)"
-  result="$("$bin" query bank balances "$addr" --denom "$DENOM" --node "$NODE_RPC" --output json)"
-  jq -r --arg denom "$DENOM" '.amount // .balance.amount // ([.balances[]? | select(.denom == $denom) | .amount][0]) // "0"' <<<"$result"
+  if ! result="$("$bin" query bank balances "$addr" --node "$NODE_RPC" --output json 2>&1)"; then
+    printf '%s\n' "$result" >&2
+    return 1
+  fi
+  if ! jq -e . >/dev/null 2>&1 <<<"$result"; then
+    printf 'bank balance query did not return JSON: %s\n' "$result" >&2
+    return 1
+  fi
+  amount="$(jq -r --arg denom "$DENOM" '.amount // .balance.amount // ([.balances[]? | select(.denom == $denom) | .amount][0]) // "0"' <<<"$result")"
+  if [[ ! "$amount" =~ ^[0-9]+$ ]]; then
+    printf 'bank balance query returned a non-numeric amount: %s\n' "$amount" >&2
+    return 1
+  fi
+  printf '%s\n' "$amount"
 }
 
 smoke_bank_send() {
@@ -406,13 +418,17 @@ smoke_bank_send() {
 
   bin="$(current_panacead)"
   recipient="$(recipient_addr)"
-  before="$(balance_of "$recipient")"
+  if ! before="$(balance_of "$recipient")"; then
+    fail "could not query the recipient balance before the $label bank send"
+  fi
 
   log "Running $label bank send smoke test: $SMOKE_AMOUNT to $recipient"
   broadcast_tx "$bin" tx bank send "$VALIDATOR_KEY" "$recipient" "$SMOKE_AMOUNT" --from "$VALIDATOR_KEY" "${TX_COMMON_FLAGS[@]}"
   wait_for_next_block
 
-  after="$(balance_of "$recipient")"
+  if ! after="$(balance_of "$recipient")"; then
+    fail "could not query the recipient balance after the $label bank send"
+  fi
   if [ "$after" -le "$before" ]; then
     fail "$label bank send did not increase recipient balance: before=$before after=$after"
   fi
