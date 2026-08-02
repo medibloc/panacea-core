@@ -16,6 +16,15 @@ import (
 	dbm "github.com/cosmos/cosmos-db"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/module"
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
+	slashingtypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
+	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
+	ibctransfertypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
+	ibcclienttypes "github.com/cosmos/ibc-go/v8/modules/core/02-client/types"
+	ibcconnectiontypes "github.com/cosmos/ibc-go/v8/modules/core/03-connection/types"
+	ibcexported "github.com/cosmos/ibc-go/v8/modules/core/exported"
 	aoltypes "github.com/medibloc/panacea-core/v2/x/aol/types"
 	nfttypes "github.com/medibloc/panacea-core/v2/x/nft/types"
 	pnfttypes "github.com/medibloc/panacea-core/v2/x/pnft/types"
@@ -53,9 +62,7 @@ func TestV230StoreUpgradeAndRestartRehearsal(t *testing.T) {
 	// the upgrade keeper. Its stores are never loaded or committed.
 	templateDB := dbm.NewMemDB()
 	templateApp := panaceaapp.New(log.NewNopLogger(), templateDB, nil, false, appOpts)
-	fromVM := templateApp.ModuleManager.GetVersionMap()
-	delete(fromVM, nfttypes.ModuleName)
-	fromVM[pnfttypes.ModuleName] = 1
+	fromVM := v230LegacyVersionMap(templateApp.ModuleManager.GetVersionMap())
 
 	// Build the previous binary's topology directly, so the two new NFT IAVL
 	// stores have never existed in the physical database.
@@ -67,6 +74,9 @@ func TestV230StoreUpgradeAndRestartRehearsal(t *testing.T) {
 		}
 		legacyStore.MountStoreWithDB(key, storetypes.StoreTypeIAVL, nil)
 	}
+	for _, key := range templateApp.GetTransientStoreKey() {
+		legacyStore.MountStoreWithDB(key, storetypes.StoreTypeTransient, nil)
+	}
 	pnftKey := storetypes.NewKVStoreKey(pnfttypes.StoreKey)
 	legacyStore.MountStoreWithDB(pnftKey, storetypes.StoreTypeIAVL, nil)
 	require.NoError(t, legacyStore.LoadLatestVersion())
@@ -77,6 +87,14 @@ func TestV230StoreUpgradeAndRestartRehearsal(t *testing.T) {
 		false,
 		log.NewNopLogger(),
 	).WithHeaderInfo(header.Info{Height: 1, Time: blockTime})
+	legacyIBCSubspace := templateApp.GetSubspace(ibcexported.ModuleName)
+	legacyIBCClientParams := ibcclienttypes.NewParams(ibcexported.Solomachine, ibcexported.Tendermint)
+	legacyIBCConnectionParams := ibcconnectiontypes.DefaultParams()
+	legacyIBCSubspace.SetParamSet(legacyCtx, &legacyIBCClientParams)
+	legacyIBCSubspace.SetParamSet(legacyCtx, &legacyIBCConnectionParams)
+	legacyTransferParams := ibctransfertypes.NewParams(false, true)
+	legacyTransferSubspace := templateApp.GetSubspace(ibctransfertypes.ModuleName)
+	legacyTransferSubspace.SetParamSet(legacyCtx, &legacyTransferParams)
 	require.NoError(t, templateApp.UpgradeKeeper.SetModuleVersionMap(legacyCtx, fromVM))
 	require.NoError(t, templateApp.UpgradeKeeper.ScheduleUpgrade(legacyCtx, plan))
 	require.NoError(t, templateApp.UpgradeKeeper.DumpUpgradeInfoToDisk(upgradeHeight, plan))
@@ -130,8 +148,7 @@ func TestV230StoreUpgradeAndRestartRehearsal(t *testing.T) {
 	require.NoError(t, interruptedPreBlockErr)
 	interruptedVM, interruptedVMErr := interruptedApp.UpgradeKeeper.GetModuleVersionMap(interruptedCtx)
 	require.NoError(t, interruptedVMErr)
-	require.Equal(t, uint64(1), interruptedVM[nfttypes.ModuleName])
-	require.Equal(t, uint64(1), interruptedVM[pnfttypes.ModuleName])
+	requireV230MigratedModuleVersions(t, interruptedVM)
 	interruptedDoneHeight, interruptedDoneErr := interruptedApp.UpgradeKeeper.GetDoneHeight(
 		interruptedCtx,
 		v2_3_0.UpgradeName,
@@ -176,8 +193,7 @@ func TestV230StoreUpgradeAndRestartRehearsal(t *testing.T) {
 
 	toVM, err := upgradedApp.UpgradeKeeper.GetModuleVersionMap(upgradeCtx)
 	require.NoError(t, err)
-	require.Equal(t, uint64(1), toVM[nfttypes.ModuleName])
-	require.Equal(t, uint64(1), toVM[pnfttypes.ModuleName])
+	requireV230MigratedModuleVersions(t, toVM)
 	require.Equal(t, upgradeHeight, upgradedApp.CommitMultiStore().Commit().Version)
 	require.NoError(t, upgradeDB.Close())
 
@@ -200,8 +216,7 @@ func TestV230StoreUpgradeAndRestartRehearsal(t *testing.T) {
 
 	restartedVM, err := restartedApp.UpgradeKeeper.GetModuleVersionMap(restartCtx)
 	require.NoError(t, err)
-	require.Equal(t, uint64(1), restartedVM[nfttypes.ModuleName])
-	require.Equal(t, uint64(1), restartedVM[pnfttypes.ModuleName])
+	requireV230MigratedModuleVersions(t, restartedVM)
 	doneHeight, err := restartedApp.UpgradeKeeper.GetDoneHeight(restartCtx, v2_3_0.UpgradeName)
 	require.NoError(t, err)
 	require.Equal(t, upgradeHeight, doneHeight)
@@ -226,6 +241,31 @@ func TestV230StoreUpgradeAndRestartRehearsal(t *testing.T) {
 	require.Contains(t, committedStoreNames, nfttypes.PolicyStoreKey)
 	require.NotContains(t, committedStoreNames, pnfttypes.StoreKey)
 	require.NoError(t, restartDB.Close())
+}
+
+func v230LegacyVersionMap(current module.VersionMap) module.VersionMap {
+	current[authtypes.ModuleName] = 4
+	current[stakingtypes.ModuleName] = 4
+	current[slashingtypes.ModuleName] = 3
+	current[govtypes.ModuleName] = 4
+	current[ibcexported.ModuleName] = 4
+	current[ibctransfertypes.ModuleName] = 3
+	delete(current, nfttypes.ModuleName)
+	current[pnfttypes.ModuleName] = 1
+	return current
+}
+
+func requireV230MigratedModuleVersions(t *testing.T, versions module.VersionMap) {
+	t.Helper()
+
+	require.Equal(t, uint64(5), versions[authtypes.ModuleName])
+	require.Equal(t, uint64(5), versions[stakingtypes.ModuleName])
+	require.Equal(t, uint64(4), versions[slashingtypes.ModuleName])
+	require.Equal(t, uint64(5), versions[govtypes.ModuleName])
+	require.Equal(t, uint64(6), versions[ibcexported.ModuleName])
+	require.Equal(t, uint64(5), versions[ibctransfertypes.ModuleName])
+	require.Equal(t, uint64(1), versions[nfttypes.ModuleName])
+	require.Equal(t, uint64(1), versions[pnfttypes.ModuleName])
 }
 
 func openRehearsalDB(t *testing.T, dataDir string) dbm.DB {
