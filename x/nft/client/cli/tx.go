@@ -7,8 +7,8 @@ import (
 	"github.com/medibloc/panacea-core/v2/x/nft/types"
 )
 
-// GetTxCmd returns the custom NFT transaction root. Panacea transaction
-// commands are added to this root by AutoCLI.
+// GetTxCmd returns the custom NFT transaction root. AutoCLI adds the Panacea
+// commands that do not require custom argument handling to this root.
 func GetTxCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:                        types.ModuleName,
@@ -18,6 +18,9 @@ func GetTxCmd() *cobra.Command {
 		RunE:                       client.ValidateCmd,
 	}
 
-	cmd.AddCommand(NewSendCmd())
+	cmd.AddCommand(
+		NewMintCmd(),
+		NewSendCmd(),
+	)
 	return cmd
 }

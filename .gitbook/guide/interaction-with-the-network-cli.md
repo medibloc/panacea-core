@@ -823,14 +823,14 @@ panacead tx nft update-controller <class-id> <new-controller> \
 ### Minting an NFT
 
 Only the current class controller can mint. The recipient becomes the initial
-owner. Use `--data` with a JSON-encoded `google.protobuf.Any` only when adding
-`/panacea.nft.v1.BasicNFTData`; run the command with `--help` for its exact
-input form.
+owner. The optional `--data` flag accepts only a JSON-encoded
+`/panacea.nft.v1.BasicNFTData` value.
 
 ```bash
 panacead tx nft mint <class-id> <nft-id> <recipient> \
   --uri <uri> \
   --uri-hash <sha256:lowercase-hex> \
+  --data '{"@type":"/panacea.nft.v1.BasicNFTData","name":"Certificate #1","description":"Completion certificate","image_uri":"https://example.com/nft-1.png"}' \
   --from <controller> \
   --chain-id <chain-id> \
   --fees 1000000umed

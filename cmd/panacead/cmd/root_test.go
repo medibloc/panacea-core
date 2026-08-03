@@ -202,6 +202,7 @@ func TestNewRootCmdCommandTree(t *testing.T) {
 }
 
 func TestNFTTransactionCommandsGenerateMessages(t *testing.T) {
+	panaceaapp.SetConfig()
 	signer := sdk.AccAddress(bytes.Repeat([]byte{1}, 20)).String()
 	receiver := sdk.AccAddress(bytes.Repeat([]byte{2}, 20)).String()
 
@@ -211,7 +212,29 @@ func TestNFTTransactionCommandsGenerateMessages(t *testing.T) {
 		expectedTypeURL  string
 		expectedSignerKV string
 		expectedIDKV     string
+		expectedJSON     []string
 	}{
+		{
+			name: "Panacea mint with basic metadata",
+			args: []string{
+				"tx", "nft", "mint", "class-id", "nft-id", receiver,
+				"--uri", "https://example.com/nft-1.json",
+				"--uri-hash", "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+				"--data", `{"@type":"/panacea.nft.v1.BasicNFTData","name":"Certificate #1","description":"Completion certificate","image_uri":"https://example.com/nft-1.png"}`,
+			},
+			expectedTypeURL:  "/panacea.nft.v1.MsgMintRequest",
+			expectedSignerKV: `"controller":"` + signer + `"`,
+			expectedIDKV:     `"nft_id":"nft-id"`,
+			expectedJSON: []string{
+				`"recipient":"` + receiver + `"`,
+				`"uri":"https://example.com/nft-1.json"`,
+				`"uri_hash":"sha256:0000000000000000000000000000000000000000000000000000000000000000"`,
+				`"data":{"@type":"/panacea.nft.v1.BasicNFTData"`,
+				`"name":"Certificate #1"`,
+				`"description":"Completion certificate"`,
+				`"image_uri":"https://example.com/nft-1.png"`,
+			},
+		},
 		{
 			name:             "Panacea revoke",
 			args:             []string{"tx", "nft", "revoke", "class-id", "nft-id"},
@@ -248,6 +271,9 @@ func TestNFTTransactionCommandsGenerateMessages(t *testing.T) {
 			require.Contains(t, output.String(), testCase.expectedSignerKV)
 			require.Contains(t, output.String(), `"class_id":"class-id"`)
 			require.Contains(t, output.String(), testCase.expectedIDKV)
+			for _, expected := range testCase.expectedJSON {
+				require.Contains(t, output.String(), expected)
+			}
 		})
 	}
 }
