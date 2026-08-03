@@ -96,8 +96,6 @@ func TestDIDDocument_Invalid(t *testing.T) {
 	require.False(t, types.NewDIDDocument(did, types.WithKeyAgreements(invalidVerificationRelationships)).Valid())
 	require.False(t, types.NewDIDDocument(did, types.WithCapabilityInvocations(invalidVerificationRelationships)).Valid())
 	require.False(t, types.NewDIDDocument(did, types.WithCapabilityDelegations(invalidVerificationRelationships)).Valid())
-	require.False(t, types.NewDIDDocument(did, types.WithCapabilityDelegations(invalidVerificationRelationships)).Valid())
-	require.False(t, types.NewDIDDocument(did, types.WithCapabilityDelegations(invalidVerificationRelationships)).Valid())
 	require.False(t, types.NewDIDDocument(did, types.WithServices(invalidServices)).Valid())
 
 }

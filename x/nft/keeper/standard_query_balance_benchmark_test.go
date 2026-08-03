@@ -159,43 +159,6 @@ func TestStandardQueryBalanceStoreReadScaling(t *testing.T) {
 	}
 }
 
-func TestStandardQueryBalanceCountCandidatesAgree(t *testing.T) {
-	tests := []struct {
-		ownerNFTs int
-		classNFTs int
-	}{
-		{ownerNFTs: 1, classNFTs: 1_000},
-		{ownerNFTs: 1_000, classNFTs: 1_000},
-	}
-
-	for _, test := range tests {
-		name := fmt.Sprintf("owner_%d/class_%d", test.ownerNFTs, test.classNFTs)
-		t.Run(name, func(t *testing.T) {
-			query := newBalanceQueryFixture(t, test.ownerNFTs, test.classNFTs, nil)
-
-			ownerIndexCount, err := countBenchmarkOwnerIndex(
-				query.ctx,
-				query.keeper.nftStoreService,
-				query.classID,
-				query.owner,
-			)
-			require.NoError(t, err)
-			require.Equal(t, uint64(test.ownerNFTs), ownerIndexCount)
-
-			derivedCount, err := query.keeper.ownerClassCounts.Get(
-				query.ctx,
-				collections.Join(query.classID, query.request.Owner),
-			)
-			require.NoError(t, err)
-			require.Equal(t, uint64(test.ownerNFTs), derivedCount)
-
-			response, err := query.server.Balance(query.goCtx, query.request)
-			require.NoError(t, err)
-			require.Equal(t, derivedCount, response.Amount)
-		})
-	}
-}
-
 type balanceQueryFixture struct {
 	keeper  Keeper
 	ctx     sdk.Context

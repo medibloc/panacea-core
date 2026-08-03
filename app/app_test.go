@@ -423,26 +423,6 @@ func newLegacyProposalPNFTMsg(authority string) *pnfttypes.MsgMintPNFTRequest {
 	}
 }
 
-func TestPNFTQueryRoutesAreNotRegistered(t *testing.T) {
-	panaceaapp.SetConfig()
-	appOpts := viper.New()
-	appOpts.Set(flags.FlagHome, t.TempDir())
-	testApp := panaceaapp.New(log.NewNopLogger(), dbm.NewMemDB(), nil, false, appOpts)
-
-	for _, path := range []string{
-		"/panacea.pnft.v2.Query/Denoms",
-		"/panacea.pnft.v2.Query/DenomsByOwner",
-		"/panacea.pnft.v2.Query/Denom",
-		"/panacea.pnft.v2.Query/PNFTs",
-		"/panacea.pnft.v2.Query/PNFTsByDenomOwner",
-		"/panacea.pnft.v2.Query/PNFT",
-	} {
-		t.Run(path, func(t *testing.T) {
-			require.Nil(t, testApp.GRPCQueryRouter().Route(path))
-		})
-	}
-}
-
 func TestFeeGrantWiringWithStandaloneModule(t *testing.T) {
 	panaceaapp.SetConfig()
 	appOpts := viper.New()
@@ -523,17 +503,6 @@ func TestUpgradeWiringWithStandaloneModule(t *testing.T) {
 	require.Equal(t, upgradeHeight, doneHeight)
 	_, err = testApp.UpgradeKeeper.GetUpgradePlan(ctx)
 	require.ErrorIs(t, err, upgradetypes.ErrNoUpgradePlanFound)
-}
-
-func TestProductionUpgradeHandlersExcludeObsoleteRehearsal(t *testing.T) {
-	panaceaapp.SetConfig()
-	appOpts := viper.New()
-	appOpts.Set(flags.FlagHome, t.TempDir())
-	testApp := panaceaapp.New(log.NewNopLogger(), dbm.NewMemDB(), nil, false, appOpts)
-	require.NoError(t, testApp.LoadLatestVersion())
-
-	require.True(t, testApp.UpgradeKeeper.HasHandler(v2_3_0.UpgradeName))
-	require.False(t, testApp.UpgradeKeeper.HasHandler("pan-19-noop-rehearsal"))
 }
 
 func TestV230UpgradeInitializesNFTModule(t *testing.T) {

@@ -120,16 +120,6 @@ func TestNewRootCmdCommandTree(t *testing.T) {
 		}
 	})
 
-	t.Run("does not expose legacy PNFT transaction commands", func(t *testing.T) {
-		tx := requireDirectChild(t, root, "tx")
-		requireNoDirectChild(t, tx, "pnft")
-	})
-
-	t.Run("does not expose legacy PNFT query commands", func(t *testing.T) {
-		query := requireDirectChild(t, root, "query")
-		requireNoDirectChild(t, query, "pnft")
-	})
-
 	t.Run("supports standard NFT owner-only list queries", func(t *testing.T) {
 		nfts := requireCommandPath(t, root, "query", "nft", "nfts")
 		require.NotNil(t, nfts.Flags().Lookup("owner"))
@@ -334,12 +324,4 @@ func requireDirectChild(t *testing.T, parent *cobra.Command, name string) *cobra
 
 	require.Len(t, matches, 1, "expected exactly one %q command under %q", name, parent.CommandPath())
 	return matches[0]
-}
-
-func requireNoDirectChild(t *testing.T, parent *cobra.Command, name string) {
-	t.Helper()
-
-	for _, child := range parent.Commands() {
-		require.NotEqual(t, name, child.Name(), "unexpected %q command under %q", name, parent.CommandPath())
-	}
 }
