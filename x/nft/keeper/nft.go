@@ -491,7 +491,7 @@ func (k Keeper) loadNFTState(
 		return storedNFTState{}, fmt.Errorf("nft lifecycle has no mint time for %s/%s", classID, nftID)
 	}
 	if state.hasLifecycle {
-		canonicalMinter, _, err := k.canonicalAddress("stored minted_by", state.lifecycle.Mint.MintedBy)
+		canonicalMinter, _, err := k.canonicalNonModuleAccount("stored minted_by", state.lifecycle.Mint.MintedBy)
 		if err != nil {
 			return storedNFTState{}, fmt.Errorf("nft lifecycle has invalid minter for %s/%s: %w", classID, nftID, err)
 		}
@@ -519,7 +519,7 @@ func (k Keeper) loadNFTState(
 				nftID,
 			)
 		}
-		canonicalRevoker, _, err := k.canonicalAddress("stored revoked_by", revocation.RevokedBy)
+		canonicalRevoker, _, err := k.canonicalNonModuleAccount("stored revoked_by", revocation.RevokedBy)
 		if err != nil {
 			return storedNFTState{}, fmt.Errorf(
 				"nft lifecycle has invalid revoker for %s/%s: %w",
