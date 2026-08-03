@@ -76,6 +76,9 @@ func (k Keeper) verifyExportedStandardKeys(ctx sdk.Context, data types.GenesisSt
 	); err != nil {
 		return err
 	}
+	if err := k.verifyClassTotalSupplyMembership(ctx, data); err != nil {
+		return err
+	}
 	if err := k.verifyUpstreamPrefixCount(
 		ctx,
 		upstreamkeeper.NFTKey,
@@ -193,6 +196,36 @@ func (k Keeper) verifyExportedOwnerIndexes(ctx sdk.Context, data types.GenesisSt
 		expectedCount,
 		"standard nft reverse owner index",
 	)
+}
+
+func (k Keeper) verifyClassTotalSupplyMembership(ctx sdk.Context, data types.GenesisState) error {
+	classIDs := make(map[string]struct{}, len(data.NftState.Classes))
+	for _, class := range data.NftState.Classes {
+		classIDs[class.Id] = struct{}{}
+	}
+
+	prefix := upstreamkeeper.ClassTotalSupply
+	store := k.nftStoreService.OpenKVStore(ctx)
+	iterator, err := store.Iterator(prefix, storetypes.PrefixEndBytes(prefix))
+	if err != nil {
+		return fmt.Errorf("iterate class total supply keys: %w", err)
+	}
+
+	var membershipErr error
+	for ; iterator.Valid(); iterator.Next() {
+		classID := string(iterator.Key()[len(prefix):])
+		if _, exists := classIDs[classID]; !exists {
+			membershipErr = fmt.Errorf(
+				"class total supply for %s has no standard class",
+				classID,
+			)
+			break
+		}
+	}
+	if err := iterator.Close(); err != nil {
+		return fmt.Errorf("close class total supply key iterator: %w", err)
+	}
+	return membershipErr
 }
 
 func (k Keeper) verifyUpstreamPrefixCount(

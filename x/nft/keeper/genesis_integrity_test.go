@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"bytes"
+	"fmt"
 	"testing"
 
 	"cosmossdk.io/collections"
@@ -106,6 +107,23 @@ func TestExportGenesisRejectsInvalidDerivedSupply(t *testing.T) {
 
 			_, err := fixture.keeper.ExportGenesis(fixture.ctx)
 			require.ErrorContains(t, err, test.errorString)
+		})
+	}
+}
+
+func TestExportGenesisRejectsOrphanClassTotalSupply(t *testing.T) {
+	for _, supply := range []uint64{0, 1} {
+		t.Run(fmt.Sprintf("supply %d", supply), func(t *testing.T) {
+			fixture := newKeeperFixture(t, true, true)
+			store := fixture.keeper.nftStoreService.OpenKVStore(fixture.ctx)
+			supplyKey := append(
+				append([]byte(nil), upstreamkeeper.ClassTotalSupply...),
+				[]byte("orphan-class")...,
+			)
+			require.NoError(t, store.Set(supplyKey, sdk.Uint64ToBigEndian(supply)))
+
+			_, err := fixture.keeper.ExportGenesis(fixture.ctx)
+			require.ErrorContains(t, err, "class total supply for orphan-class has no standard class")
 		})
 	}
 }
