@@ -1,14 +1,14 @@
 package params
 
 import (
+	"bytes"
 	"context"
+	"os"
 	"testing"
 
-	"github.com/cosmos/cosmos-sdk/codec"
-	"github.com/cosmos/cosmos-sdk/std"
+	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	signingtypes "github.com/cosmos/cosmos-sdk/types/tx/signing"
-	"github.com/cosmos/cosmos-sdk/x/auth/migrations/legacytx"
 	authsigning "github.com/cosmos/cosmos-sdk/x/auth/signing"
 	gogoproto "github.com/cosmos/gogoproto/proto"
 	aoltypes "github.com/medibloc/panacea-core/v2/x/aol/types"
@@ -49,137 +49,46 @@ func TestCustomMsgsRetainValidateBasic(t *testing.T) {
 	}
 }
 
-func TestCustomMsgLegacyAminoJSONSignBytesEquivalence(t *testing.T) {
+func TestAOLDIDLegacyAminoJSONSignBytesMatchV221Golden(t *testing.T) {
 	configureTestBech32()
 
 	encodingConfig := MakeEncodingConfig(
 		WithCustomGetSigners(aoltypes.CustomGetSigners()...),
 		WithAminoJSONEncoderModifiers(didtypes.AminoJSONEncoderModifiers()...),
+		WithV221LegacyAminoJSONCompatibility(legacyAminoJSONBareMessageTypeURLs()...),
 	)
-	std.RegisterLegacyAminoCodec(encodingConfig.Amino)
-	std.RegisterInterfaces(encodingConfig.InterfaceRegistry)
-	aoltypes.RegisterCodec(encodingConfig.Amino)
-	didtypes.RegisterCodec(encodingConfig.Amino)
-	registerPNFTLegacyAminoReferenceTypes(encodingConfig.Amino)
 	aoltypes.RegisterInterfaces(encodingConfig.InterfaceRegistry)
 	didtypes.RegisterInterfaces(encodingConfig.InterfaceRegistry)
-	pnfttypes.RegisterInterfaces(encodingConfig.InterfaceRegistry)
-
 	require.NoError(t, encodingConfig.InterfaceRegistry.SigningContext().Validate())
-
-	legacytx.RegressionTestingAminoCodec = encodingConfig.Amino
-	t.Cleanup(func() {
-		legacytx.RegressionTestingAminoCodec = nil
-	})
 
 	addr1 := sdk.AccAddress(repeatedBytes(1)).String()
 	addr2 := sdk.AccAddress(repeatedBytes(2)).String()
-	did, verificationMethodID, doc := validDIDDocument(t)
-	complexDID, complexVerificationMethodID, complexDoc := complexDIDDocument(t)
+	did := "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm"
+	verificationMethodID := didtypes.NewVerificationMethodID(did, "key1")
+	verificationMethod := didtypes.NewVerificationMethod(verificationMethodID, didtypes.ES256K_2019, did, []byte{1, 2, 3, 4, 5})
+	doc := didtypes.NewDIDDocument(
+		did,
+		didtypes.WithController(did),
+		didtypes.WithVerificationMethods([]*didtypes.VerificationMethod{&verificationMethod}),
+		didtypes.WithAuthentications([]didtypes.VerificationRelationship{didtypes.NewVerificationRelationship(verificationMethodID)}),
+	)
 
-	testCases := []struct {
-		name    string
-		msg     sdk.Msg
-		signers []signerCase
-	}{
-		{
-			name:    "aol/CreateTopic",
-			msg:     &aoltypes.MsgCreateTopicRequest{TopicName: "topic", Description: "desc", OwnerAddress: addr1},
-			signers: []signerCase{newSignerCase(addr1, 0)},
-		},
-		{
-			name:    "aol/AddWriter",
-			msg:     &aoltypes.MsgAddWriterRequest{TopicName: "topic", Moniker: "writer", Description: "desc", WriterAddress: addr2, OwnerAddress: addr1},
-			signers: []signerCase{newSignerCase(addr1, 0)},
-		},
-		{
-			name:    "aol/DeleteWriter",
-			msg:     &aoltypes.MsgDeleteWriterRequest{TopicName: "topic", WriterAddress: addr2, OwnerAddress: addr1},
-			signers: []signerCase{newSignerCase(addr1, 0)},
-		},
-		{
-			name:    "aol/AddRecord without fee payer",
-			msg:     &aoltypes.MsgAddRecordRequest{TopicName: "topic", Key: []byte("key"), Value: []byte("value"), WriterAddress: addr2, OwnerAddress: addr1},
-			signers: []signerCase{newSignerCase(addr2, 0)},
-		},
-		{
-			name: "aol/AddRecord with fee payer",
-			msg:  &aoltypes.MsgAddRecordRequest{TopicName: "topic", Key: []byte("key"), Value: []byte("value"), WriterAddress: addr2, OwnerAddress: addr1, FeePayerAddress: addr1},
-			signers: []signerCase{
-				newSignerCase(addr1, 0),
-				newSignerCase(addr2, 1),
-			},
-		},
-		{
-			name:    "did/CreateDID",
-			msg:     &didtypes.MsgCreateDIDRequest{Did: did, Document: doc, VerificationMethodId: verificationMethodID, Signature: []byte("signature"), FromAddress: addr1},
-			signers: []signerCase{newSignerCase(addr1, 0)},
-		},
-		{
-			name:    "did/UpdateDID",
-			msg:     &didtypes.MsgUpdateDIDRequest{Did: did, Document: doc, VerificationMethodId: verificationMethodID, Signature: []byte("signature"), FromAddress: addr1},
-			signers: []signerCase{newSignerCase(addr1, 0)},
-		},
-		{
-			name:    "did/CreateDID with JSON-LD document edge cases",
-			msg:     &didtypes.MsgCreateDIDRequest{Did: complexDID, Document: complexDoc, VerificationMethodId: complexVerificationMethodID, Signature: []byte("signature"), FromAddress: addr1},
-			signers: []signerCase{newSignerCase(addr1, 0)},
-		},
-		{
-			name:    "did/UpdateDID with JSON-LD document edge cases",
-			msg:     &didtypes.MsgUpdateDIDRequest{Did: complexDID, Document: complexDoc, VerificationMethodId: complexVerificationMethodID, Signature: []byte("signature"), FromAddress: addr1},
-			signers: []signerCase{newSignerCase(addr1, 0)},
-		},
-		{
-			name:    "did/DeactivateDID",
-			msg:     &didtypes.MsgDeactivateDIDRequest{Did: did, VerificationMethodId: verificationMethodID, Signature: []byte("signature"), FromAddress: addr1},
-			signers: []signerCase{newSignerCase(addr1, 0)},
-		},
-		{
-			name:    "pnft/CreateDenom",
-			msg:     &pnfttypes.MsgCreateDenomRequest{Id: "denom", Name: "name", Symbol: "symbol", Description: "desc", Uri: "uri", UriHash: "hash", Data: "data", Creator: addr1},
-			signers: []signerCase{newSignerCase(addr1, 0)},
-		},
-		{
-			name:    "pnft/UpdateDenom",
-			msg:     &pnfttypes.MsgUpdateDenomRequest{Id: "denom", Name: "name", Symbol: "symbol", Description: "desc", Uri: "uri", UriHash: "hash", Data: "data", Updater: addr1},
-			signers: []signerCase{newSignerCase(addr1, 0)},
-		},
-		{
-			name:    "pnft/DeleteDenom",
-			msg:     &pnfttypes.MsgDeleteDenomRequest{Id: "denom", Remover: addr1},
-			signers: []signerCase{newSignerCase(addr1, 0)},
-		},
-		{
-			name:    "pnft/TransferDenom",
-			msg:     &pnfttypes.MsgTransferDenomRequest{Id: "denom", Sender: addr1, Receiver: addr2},
-			signers: []signerCase{newSignerCase(addr1, 0)},
-		},
-		{
-			name:    "pnft/MintPNFT",
-			msg:     &pnfttypes.MsgMintPNFTRequest{DenomId: "denom", Id: "pnft", Name: "name", Description: "desc", Uri: "uri", UriHash: "hash", Data: "data", Creator: addr1},
-			signers: []signerCase{newSignerCase(addr1, 0)},
-		},
-		{
-			name:    "pnft/TransferPNFT",
-			msg:     &pnfttypes.MsgTransferPNFTRequest{DenomId: "denom", Id: "pnft", Sender: addr1, Receiver: addr2},
-			signers: []signerCase{newSignerCase(addr1, 0)},
-		},
-		{
-			name:    "pnft/BurnPNFT",
-			msg:     &pnfttypes.MsgBurnPNFTRequest{DenomId: "denom", Id: "pnft", Burner: addr1},
-			signers: []signerCase{newSignerCase(addr1, 0)},
-		},
+	messages := []sdk.Msg{
+		&aoltypes.MsgCreateTopicRequest{TopicName: "topic", Description: "desc", OwnerAddress: addr1},
+		&aoltypes.MsgAddWriterRequest{TopicName: "topic", Moniker: "writer", Description: "desc", WriterAddress: addr2, OwnerAddress: addr1},
+		&aoltypes.MsgDeleteWriterRequest{TopicName: "topic", WriterAddress: addr2, OwnerAddress: addr1},
+		&aoltypes.MsgAddRecordRequest{TopicName: "topic", Key: []byte("key"), Value: []byte("value"), WriterAddress: addr2, OwnerAddress: addr1, FeePayerAddress: addr1},
+		&didtypes.MsgCreateDIDRequest{Did: did, Document: &doc, VerificationMethodId: verificationMethodID, Signature: []byte("signature"), FromAddress: addr1},
+		&didtypes.MsgUpdateDIDRequest{Did: did, Document: &doc, VerificationMethodId: verificationMethodID, Signature: []byte("signature"), FromAddress: addr1},
+		&didtypes.MsgDeactivateDIDRequest{Did: did, VerificationMethodId: verificationMethodID, Signature: []byte("signature"), FromAddress: addr1},
 	}
 
-	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
-			for _, signer := range tc.signers {
-				legacySignBytes, newSignBytes := legacyAndAminoJSONSignBytes(t, encodingConfig, tc.msg, signer)
-				require.Equal(t, string(legacySignBytes), string(newSignBytes))
-			}
-		})
-	}
+	actual := signBytes(t, encodingConfig, signingtypes.SignMode_SIGN_MODE_LEGACY_AMINO_JSON, messages, newSignerCase(addr1, 0))
+	// Generated by the v2.2.1 tag with Cosmos SDK v0.47.10
+	// legacytx.StdSignBytes, not by the current v0.50 encoder.
+	expected, err := os.ReadFile("testdata/v2.2.1_aol_did_legacy_amino_sign_doc.json")
+	require.NoError(t, err)
+	require.Equal(t, string(bytes.TrimSpace(expected)), string(actual))
 }
 
 func TestCustomMsgSignerInferenceMatchesLegacyGetSigners(t *testing.T) {
@@ -290,18 +199,6 @@ func TestDIDMsgAnnotatedSigners(t *testing.T) {
 	}
 }
 
-func registerPNFTLegacyAminoReferenceTypes(cdc *codec.LegacyAmino) {
-	// This registry exists only to reproduce pre-v0.50 sign bytes as a test
-	// oracle. Production SIGN_MODE_LEGACY_AMINO_JSON uses proto annotations.
-	cdc.RegisterConcrete(&pnfttypes.MsgCreateDenomRequest{}, "pnft/CreateDenom", nil)
-	cdc.RegisterConcrete(&pnfttypes.MsgUpdateDenomRequest{}, "pnft/UpdateDenom", nil)
-	cdc.RegisterConcrete(&pnfttypes.MsgDeleteDenomRequest{}, "pnft/DeleteDenom", nil)
-	cdc.RegisterConcrete(&pnfttypes.MsgTransferDenomRequest{}, "pnft/TransferDenom", nil)
-	cdc.RegisterConcrete(&pnfttypes.MsgMintPNFTRequest{}, "pnft/MintPNFT", nil)
-	cdc.RegisterConcrete(&pnfttypes.MsgTransferPNFTRequest{}, "pnft/TransferPNFT", nil)
-	cdc.RegisterConcrete(&pnfttypes.MsgBurnPNFTRequest{}, "pnft/BurnPNFT", nil)
-}
-
 type signerCase struct {
 	address       string
 	accountNumber uint64
@@ -316,7 +213,7 @@ func newSignerCase(address string, offset uint64) signerCase {
 	}
 }
 
-func legacyAndAminoJSONSignBytes(t *testing.T, encodingConfig EncodingConfig, msg sdk.Msg, signer signerCase) ([]byte, []byte) {
+func signBytes(t *testing.T, encodingConfig EncodingConfig, signMode signingtypes.SignMode, msgs []sdk.Msg, signer signerCase) []byte {
 	t.Helper()
 
 	const (
@@ -327,16 +224,12 @@ func legacyAndAminoJSONSignBytes(t *testing.T, encodingConfig EncodingConfig, ms
 	)
 
 	fee := sdk.NewCoins(sdk.NewInt64Coin("umed", 10))
-	stdFee := legacytx.StdFee{Amount: fee, Gas: gas}
-
-	expected := legacytx.StdSignBytes(chainID, signer.accountNumber, signer.sequence, timeoutHeight, stdFee, []sdk.Msg{msg}, memo)
-
 	txBuilder := encodingConfig.TxConfig.NewTxBuilder()
 	txBuilder.SetFeeAmount(fee)
 	txBuilder.SetGasLimit(gas)
 	txBuilder.SetMemo(memo)
 	txBuilder.SetTimeoutHeight(timeoutHeight)
-	require.NoError(t, txBuilder.SetMsgs(msg))
+	require.NoError(t, txBuilder.SetMsgs(msgs...))
 
 	signerData := authsigning.SignerData{
 		Address:       signer.address,
@@ -347,13 +240,25 @@ func legacyAndAminoJSONSignBytes(t *testing.T, encodingConfig EncodingConfig, ms
 	actual, err := authsigning.GetSignBytesAdapter(
 		context.Background(),
 		encodingConfig.TxConfig.SignModeHandler(),
-		signingtypes.SignMode_SIGN_MODE_LEGACY_AMINO_JSON,
+		signMode,
 		signerData,
 		txBuilder.GetTx(),
 	)
 	require.NoError(t, err)
 
-	return expected, actual
+	return actual
+}
+
+func legacyAminoJSONBareMessageTypeURLs() []string {
+	return []string{
+		codectypes.MsgTypeURL(&aoltypes.MsgCreateTopicRequest{}),
+		codectypes.MsgTypeURL(&aoltypes.MsgAddWriterRequest{}),
+		codectypes.MsgTypeURL(&aoltypes.MsgDeleteWriterRequest{}),
+		codectypes.MsgTypeURL(&aoltypes.MsgAddRecordRequest{}),
+		codectypes.MsgTypeURL(&didtypes.MsgCreateDIDRequest{}),
+		codectypes.MsgTypeURL(&didtypes.MsgUpdateDIDRequest{}),
+		codectypes.MsgTypeURL(&didtypes.MsgDeactivateDIDRequest{}),
+	}
 }
 
 func annotatedSigners(t *testing.T, encodingConfig EncodingConfig, typeName protoreflect.FullName, fieldName protoreflect.Name, address string) [][]byte {
@@ -372,26 +277,6 @@ func annotatedSigners(t *testing.T, encodingConfig EncodingConfig, typeName prot
 	signers, err := encodingConfig.InterfaceRegistry.SigningContext().GetSigners(msg)
 	require.NoError(t, err)
 	return signers
-}
-
-func validDIDDocument(t *testing.T) (string, string, *didtypes.DIDDocument) {
-	t.Helper()
-
-	did := "did:panacea:7Prd74ry1Uct87nZqL3ny7aR7Cg46JamVbJgk8azVgUm"
-	verificationMethodID := didtypes.NewVerificationMethodID(did, "key1")
-	verificationMethod := didtypes.NewVerificationMethod(verificationMethodID, didtypes.ES256K_2019, did, []byte{1, 2, 3, 4, 5})
-	service := didtypes.NewService("service1", "LinkedDomains", "https://service.org")
-	doc := didtypes.NewDIDDocument(
-		did,
-		didtypes.WithController(did),
-		didtypes.WithVerificationMethods([]*didtypes.VerificationMethod{&verificationMethod}),
-		didtypes.WithAuthentications([]didtypes.VerificationRelationship{didtypes.NewVerificationRelationship(verificationMethodID)}),
-		didtypes.WithAssertionMethods([]didtypes.VerificationRelationship{didtypes.NewVerificationRelationshipDedicated(verificationMethod)}),
-		didtypes.WithServices([]*didtypes.Service{&service}),
-	)
-	require.True(t, doc.Valid())
-
-	return did, verificationMethodID, &doc
 }
 
 func complexDIDDocument(t *testing.T) (string, string, *didtypes.DIDDocument) {

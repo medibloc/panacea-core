@@ -15,8 +15,9 @@ import (
 type EncodingConfigOption func(*encodingConfigOptions)
 
 type encodingConfigOptions struct {
-	customGetSigners          []txsigning.CustomGetSigner
-	aminoJSONEncoderModifiers []func(aminojson.Encoder) aminojson.Encoder
+	customGetSigners                   []txsigning.CustomGetSigner
+	aminoJSONEncoderModifiers          []func(aminojson.Encoder) aminojson.Encoder
+	legacyAminoJSONBareMessageTypeURLs []string
 }
 
 func WithCustomGetSigners(customGetSigners ...txsigning.CustomGetSigner) EncodingConfigOption {
@@ -28,6 +29,15 @@ func WithCustomGetSigners(customGetSigners ...txsigning.CustomGetSigner) Encodin
 func WithAminoJSONEncoderModifiers(modifiers ...func(aminojson.Encoder) aminojson.Encoder) EncodingConfigOption {
 	return func(options *encodingConfigOptions) {
 		options.aminoJSONEncoderModifiers = append(options.aminoJSONEncoderModifiers, modifiers...)
+	}
+}
+
+// WithV221LegacyAminoJSONCompatibility preserves the pre-v0.50 bare JSON
+// representation for the listed top-level message type URLs. Remove it after
+// all clients migrate to SIGN_MODE_DIRECT.
+func WithV221LegacyAminoJSONCompatibility(typeURLs ...string) EncodingConfigOption {
+	return func(options *encodingConfigOptions) {
+		options.legacyAminoJSONBareMessageTypeURLs = append(options.legacyAminoJSONBareMessageTypeURLs, typeURLs...)
 	}
 }
 
@@ -64,19 +74,27 @@ func MakeEncodingConfig(configOptions ...EncodingConfigOption) EncodingConfig {
 		aminoJSONEncoder = modifier(aminoJSONEncoder)
 	}
 
+	legacyAminoJSONHandler := txsigning.SignModeHandler(aminojson.NewSignModeHandler(aminojson.SignModeHandlerOptions{
+		FileResolver: interfaceRegistry,
+		Encoder:      &aminoJSONEncoder,
+	}))
+	if len(options.legacyAminoJSONBareMessageTypeURLs) > 0 {
+		legacyAminoJSONHandler = newLegacyAminoJSONCompatHandler(
+			legacyAminoJSONHandler,
+			options.legacyAminoJSONBareMessageTypeURLs,
+		)
+	}
+
 	// SIGN_MODE_TEXTUAL is intentionally not enabled. It requires an online coin
 	// metadata query and does not support offline signing. Panacea retains direct,
-	// direct-aux, and legacy Amino JSON signing for existing client compatibility.
+	// direct-aux, and legacy Amino JSON signing during the client migration.
 	txConfig, err := tx.NewTxConfigWithOptions(protoCodec, tx.ConfigOptions{
 		EnabledSignModes: []signingtypes.SignMode{
 			signingtypes.SignMode_SIGN_MODE_DIRECT,
 			signingtypes.SignMode_SIGN_MODE_DIRECT_AUX,
 		},
 		CustomSignModes: []txsigning.SignModeHandler{
-			aminojson.NewSignModeHandler(aminojson.SignModeHandlerOptions{
-				FileResolver: interfaceRegistry,
-				Encoder:      &aminoJSONEncoder,
-			}),
+			legacyAminoJSONHandler,
 		},
 		SigningOptions: &signingOptions,
 	})

@@ -1,6 +1,7 @@
 package app
 
 import (
+	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/cosmos-sdk/std"
 	"github.com/medibloc/panacea-core/v2/app/params"
 	aoltypes "github.com/medibloc/panacea-core/v2/x/aol/types"
@@ -13,9 +14,18 @@ func MakeEncodingConfig() params.EncodingConfig {
 	encodingConfig := params.MakeEncodingConfig(
 		params.WithCustomGetSigners(aoltypes.CustomGetSigners()...),
 		params.WithAminoJSONEncoderModifiers(didtypes.AminoJSONEncoderModifiers()...),
+		params.WithV221LegacyAminoJSONCompatibility(
+			codectypes.MsgTypeURL(&aoltypes.MsgCreateTopicRequest{}),
+			codectypes.MsgTypeURL(&aoltypes.MsgAddWriterRequest{}),
+			codectypes.MsgTypeURL(&aoltypes.MsgDeleteWriterRequest{}),
+			codectypes.MsgTypeURL(&aoltypes.MsgAddRecordRequest{}),
+			codectypes.MsgTypeURL(&didtypes.MsgCreateDIDRequest{}),
+			codectypes.MsgTypeURL(&didtypes.MsgUpdateDIDRequest{}),
+			codectypes.MsgTypeURL(&didtypes.MsgDeactivateDIDRequest{}),
+		),
 	)
-	// Keep legacy Amino registrations for SIGN_MODE_LEGACY_AMINO_JSON
-	// and compatibility with existing clients and hardware wallets.
+	// Keep legacy Amino registrations while existing clients migrate to
+	// SIGN_MODE_DIRECT. AOL/DID sign bytes retain their v2.2.1 representation.
 	std.RegisterLegacyAminoCodec(encodingConfig.Amino)
 	std.RegisterInterfaces(encodingConfig.InterfaceRegistry)
 	ModuleBasics.RegisterLegacyAminoCodec(encodingConfig.Amino)
