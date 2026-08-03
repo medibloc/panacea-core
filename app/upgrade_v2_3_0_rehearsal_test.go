@@ -46,7 +46,7 @@ func TestV230StoreUpgradeAndRestartRehearsal(t *testing.T) {
 		preservedKey    = []byte("v2.3.0-rehearsal/preserved")
 		preservedValue  = []byte("stable-state")
 		legacyPNFTKey   = []byte("legacy-pnft")
-		legacyPNFTData  = []byte("discarded")
+		legacyPNFTData  = []byte("retained")
 		uncommittedKey  = []byte("v2.3.0-rehearsal/uncommitted")
 		uncommittedData = []byte("must-not-persist")
 	)
@@ -68,6 +68,8 @@ func TestV230StoreUpgradeAndRestartRehearsal(t *testing.T) {
 	// stores have never existed in the physical database.
 	legacyDB := openRehearsalDB(t, dataDir)
 	legacyStore := rootmulti.NewStore(legacyDB, log.NewNopLogger(), metrics.NewNoOpMetrics())
+	pnftKey := templateApp.GetKey(pnfttypes.StoreKey)
+	require.NotNil(t, pnftKey)
 	for name, key := range templateApp.GetKVStoreKey() {
 		if name == nfttypes.StoreKey || name == nfttypes.PolicyStoreKey {
 			continue
@@ -77,8 +79,6 @@ func TestV230StoreUpgradeAndRestartRehearsal(t *testing.T) {
 	for _, key := range templateApp.GetTransientStoreKey() {
 		legacyStore.MountStoreWithDB(key, storetypes.StoreTypeTransient, nil)
 	}
-	pnftKey := storetypes.NewKVStoreKey(pnfttypes.StoreKey)
-	legacyStore.MountStoreWithDB(pnftKey, storetypes.StoreTypeIAVL, nil)
 	require.NoError(t, legacyStore.LoadLatestVersion())
 
 	legacyCtx := sdk.NewContext(
@@ -213,6 +213,11 @@ func TestV230StoreUpgradeAndRestartRehearsal(t *testing.T) {
 		preservedValue,
 		restartCtx.KVStore(restartedApp.GetKey(aoltypes.StoreKey)).Get(preservedKey),
 	)
+	require.Equal(
+		t,
+		legacyPNFTData,
+		restartCtx.KVStore(restartedApp.GetKey(pnfttypes.StoreKey)).Get(legacyPNFTKey),
+	)
 
 	restartedVM, err := restartedApp.UpgradeKeeper.GetModuleVersionMap(restartCtx)
 	require.NoError(t, err)
@@ -239,7 +244,7 @@ func TestV230StoreUpgradeAndRestartRehearsal(t *testing.T) {
 	)
 	require.Contains(t, committedStoreNames, nfttypes.StoreKey)
 	require.Contains(t, committedStoreNames, nfttypes.PolicyStoreKey)
-	require.NotContains(t, committedStoreNames, pnfttypes.StoreKey)
+	require.Contains(t, committedStoreNames, pnfttypes.StoreKey)
 	require.NoError(t, restartDB.Close())
 }
 

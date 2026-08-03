@@ -24,6 +24,7 @@ import (
 	burntypes "github.com/medibloc/panacea-core/v2/x/burn/types"
 	didtypes "github.com/medibloc/panacea-core/v2/x/did/types"
 	nfttypes "github.com/medibloc/panacea-core/v2/x/nft/types"
+	pnfttypes "github.com/medibloc/panacea-core/v2/x/pnft/types"
 )
 
 func (appKeepers *AppKeepersWithKey) GenerateKeys() {
@@ -35,6 +36,9 @@ func (appKeepers *AppKeepersWithKey) GenerateKeys() {
 		authzkeeper.StoreKey, group.StoreKey,
 		ibcexported.StoreKey, ibctransfertypes.StoreKey,
 		aoltypes.StoreKey, didtypes.StoreKey, burntypes.StoreKey,
+		// Keep the inactive PNFT store mounted as a permanent tombstone. No
+		// module or keeper may consume or reuse this legacy state.
+		pnfttypes.StoreKey,
 		nfttypes.StoreKey, nfttypes.PolicyStoreKey,
 	)
 

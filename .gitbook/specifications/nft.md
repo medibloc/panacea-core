@@ -42,9 +42,11 @@ List queries require bounded pagination. The maximum page size is 100.
 
 ## Legacy PNFT compatibility
 
-The `panacea.pnft.v2` module, store, REST and gRPC queries, and `pnft` CLI
-commands are removed in v2.3. Legacy PNFT state is not migrated to the new NFT
-stores.
+The `panacea.pnft.v2` module, REST and gRPC queries, and `pnft` CLI commands are
+removed in v2.3. The legacy `pnft` store remains mounted as an inactive,
+permanently reserved tombstone so every node retains the same committed store
+topology. No module or keeper reads or writes this state, and it is not migrated
+to the new NFT stores.
 
 Historical PNFT protobuf message types remain registered only so old
 transactions and existing governance, group, or authorization records can be

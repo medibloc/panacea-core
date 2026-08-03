@@ -5,6 +5,8 @@ const (
 	// compatibility. It does not represent an active application module.
 	ModuleName = "pnft"
 
-	// StoreKey identifies the legacy PNFT KV store removed by the v2.3 upgrade.
+	// StoreKey identifies the permanently reserved legacy PNFT KV store. The
+	// v2.3 application keeps it mounted as an inactive tombstone, but no module
+	// or keeper may consume or reuse its state.
 	StoreKey = ModuleName
 )

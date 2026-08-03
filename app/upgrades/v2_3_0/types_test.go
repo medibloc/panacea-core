@@ -14,9 +14,9 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestStoreUpgradeAddsNFTStoresAndDeletesLegacyPNFTStore(t *testing.T) {
+func TestStoreUpgradeAddsNFTStoresAndRetainsLegacyPNFTStore(t *testing.T) {
 	require.Equal(t, []string{nfttypes.StoreKey, nfttypes.PolicyStoreKey}, Upgrade.StoreUpgrades.Added)
-	require.Equal(t, []string{pnfttypes.StoreKey}, Upgrade.StoreUpgrades.Deleted)
+	require.Empty(t, Upgrade.StoreUpgrades.Deleted)
 
 	db := dbm.NewMemDB()
 	legacyStore := rootmulti.NewStore(db, log.NewNopLogger(), metrics.NewNoOpMetrics())
@@ -28,7 +28,7 @@ func TestStoreUpgradeAddsNFTStoresAndDeletesLegacyPNFTStore(t *testing.T) {
 
 	pnftStore := legacyStore.GetStore(pnftKey).(storetypes.KVStore)
 	stableStore := legacyStore.GetStore(stableKey).(storetypes.KVStore)
-	pnftStore.Set([]byte("legacy"), []byte("discarded"))
+	pnftStore.Set([]byte("legacy"), []byte("retained"))
 	stableStore.Set([]byte("preserved"), []byte("value"))
 	require.Equal(t, int64(1), legacyStore.Commit().Version)
 
@@ -36,11 +36,13 @@ func TestStoreUpgradeAddsNFTStoresAndDeletesLegacyPNFTStore(t *testing.T) {
 	nftKey := storetypes.NewKVStoreKey(nfttypes.StoreKey)
 	policyKey := storetypes.NewKVStoreKey(nfttypes.PolicyStoreKey)
 	upgradedStore.MountStoreWithDB(stableKey, storetypes.StoreTypeIAVL, nil)
+	upgradedStore.MountStoreWithDB(pnftKey, storetypes.StoreTypeIAVL, nil)
 	upgradedStore.MountStoreWithDB(nftKey, storetypes.StoreTypeIAVL, nil)
 	upgradedStore.MountStoreWithDB(policyKey, storetypes.StoreTypeIAVL, nil)
 	loader := upgradetypes.UpgradeStoreLoader(2, &Upgrade.StoreUpgrades)
 	require.NoError(t, loader(upgradedStore))
 	require.Equal(t, []byte("value"), upgradedStore.GetStore(stableKey).(storetypes.KVStore).Get([]byte("preserved")))
+	require.Equal(t, []byte("retained"), upgradedStore.GetStore(pnftKey).(storetypes.KVStore).Get([]byte("legacy")))
 
 	require.NotNil(t, upgradedStore.GetStore(nftKey))
 	require.NotNil(t, upgradedStore.GetStore(policyKey))
@@ -52,5 +54,9 @@ func TestStoreUpgradeAddsNFTStoresAndDeletesLegacyPNFTStore(t *testing.T) {
 	for _, storeInfo := range commitInfo.StoreInfos {
 		storeNames = append(storeNames, storeInfo.Name)
 	}
-	require.ElementsMatch(t, []string{"stable", nfttypes.StoreKey, nfttypes.PolicyStoreKey}, storeNames)
+	require.ElementsMatch(
+		t,
+		[]string{"stable", pnfttypes.StoreKey, nfttypes.StoreKey, nfttypes.PolicyStoreKey},
+		storeNames,
+	)
 }
