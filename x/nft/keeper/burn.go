@@ -6,8 +6,10 @@ import (
 
 	"cosmossdk.io/collections"
 	upstreamnft "cosmossdk.io/x/nft"
+	abci "github.com/cometbft/cometbft/abci/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	"github.com/cosmos/gogoproto/proto"
 	"github.com/medibloc/panacea-core/v2/x/nft/types"
 )
 
@@ -109,20 +111,13 @@ func (k Keeper) burnNFT(
 	if err := k.nftKeeper.Burn(cacheCtx, classID, nftID); err != nil {
 		return fmt.Errorf("burn standard nft: %w", err)
 	}
-	events := cacheCtx.EventManager().ABCIEvents()
-	if len(events) != 1 {
-		return fmt.Errorf(
-			"burn standard nft emitted %d events instead of one",
-			len(events),
-		)
-	}
-	parsedEvent, err := sdk.ParseTypedEvent(events[0])
-	if err != nil {
-		return fmt.Errorf("decode standard nft burn event: %w", err)
-	}
-	burnEvent, ok := parsedEvent.(*upstreamnft.EventBurn)
-	if !ok || burnEvent.ClassId != classID || burnEvent.Id != nftID || burnEvent.Owner != owner {
-		return fmt.Errorf("burn standard nft emitted an unexpected event")
+	if err := validateBurnEvent(
+		cacheCtx.EventManager().ABCIEvents(),
+		classID,
+		nftID,
+		owner,
+	); err != nil {
+		return err
 	}
 	if err := k.lifecycles.Remove(cacheCtx, key); err != nil {
 		return fmt.Errorf("remove nft lifecycle: %w", err)
@@ -134,5 +129,31 @@ func (k Keeper) burnNFT(
 		return err
 	}
 	writeCache()
+	return nil
+}
+
+func validateBurnEvent(events []abci.Event, classID, nftID, owner string) error {
+	burnEventType := proto.MessageName(&upstreamnft.EventBurn{})
+	burnEventCount := 0
+	for _, event := range events {
+		if event.Type != burnEventType {
+			continue
+		}
+		burnEventCount++
+		parsedEvent, err := sdk.ParseTypedEvent(event)
+		if err != nil {
+			return fmt.Errorf("decode standard nft burn event: %w", err)
+		}
+		burnEvent, ok := parsedEvent.(*upstreamnft.EventBurn)
+		if !ok || burnEvent.ClassId != classID || burnEvent.Id != nftID || burnEvent.Owner != owner {
+			return fmt.Errorf("burn standard nft emitted an unexpected event")
+		}
+	}
+	if burnEventCount != 1 {
+		return fmt.Errorf(
+			"burn standard nft emitted %d EventBurn events instead of one",
+			burnEventCount,
+		)
+	}
 	return nil
 }

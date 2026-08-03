@@ -99,15 +99,75 @@ func TestBurnMovesActiveNFTToPermanentTombstone(t *testing.T) {
 	require.Empty(t, ownerResponse.Owner)
 
 	events := fixture.ctx.EventManager().ABCIEvents()
-	require.Len(t, events, 1)
-	parsedEvent, err := sdk.ParseTypedEvent(events[0])
-	require.NoError(t, err)
-	require.Equal(t, &upstreamnft.EventBurn{
-		ClassId: classID,
-		Id:      "nft-1",
-		Owner:   owner,
-	}, parsedEvent)
+	require.NoError(t, validateBurnEvent(events, classID, "nft-1", owner))
 	assertClassNFTInvariants(t, &fixture, classID, 2, 1, 1)
+}
+
+func TestValidateBurnEventAllowsUnrelatedEvents(t *testing.T) {
+	const (
+		classID = "panacea1creator:certificate"
+		nftID   = "nft-1"
+		owner   = "panacea1owner"
+	)
+	burnEvent, err := sdk.TypedEventToEvent(&upstreamnft.EventBurn{
+		ClassId: classID,
+		Id:      nftID,
+		Owner:   owner,
+	})
+	require.NoError(t, err)
+	events := sdk.Events{
+		sdk.NewEvent("cosmos.nft.v1beta1.EventBurnAudit"),
+		burnEvent,
+	}.ToABCIEvents()
+
+	require.NoError(t, validateBurnEvent(events, classID, nftID, owner))
+}
+
+func TestValidateBurnEventRejectsInvalidBurnEvents(t *testing.T) {
+	const (
+		classID = "panacea1creator:certificate"
+		nftID   = "nft-1"
+		owner   = "panacea1owner"
+	)
+	matchingEvent, err := sdk.TypedEventToEvent(&upstreamnft.EventBurn{
+		ClassId: classID,
+		Id:      nftID,
+		Owner:   owner,
+	})
+	require.NoError(t, err)
+	mismatchedEvent, err := sdk.TypedEventToEvent(&upstreamnft.EventBurn{
+		ClassId: classID,
+		Id:      nftID,
+		Owner:   "panacea1other",
+	})
+	require.NoError(t, err)
+
+	for _, tc := range []struct {
+		name   string
+		events sdk.Events
+	}{
+		{
+			name:   "missing burn event",
+			events: sdk.Events{sdk.NewEvent("cosmos.nft.v1beta1.EventBurnAudit")},
+		},
+		{
+			name:   "duplicate burn event",
+			events: sdk.Events{matchingEvent, matchingEvent},
+		},
+		{
+			name:   "mismatched burn event",
+			events: sdk.Events{mismatchedEvent},
+		},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			require.Error(t, validateBurnEvent(
+				tc.events.ToABCIEvents(),
+				classID,
+				nftID,
+				owner,
+			))
+		})
+	}
 }
 
 func TestBurnPreservesRevocationInTombstone(t *testing.T) {
@@ -517,7 +577,7 @@ func TestBurnRollsBackWhenUpstreamBurnEventFails(t *testing.T) {
 		fixture.ctx,
 		&nfttypes.MsgBurnRequest{ClassId: classID, NftId: "nft-1", Owner: owner},
 	)
-	require.ErrorContains(t, err, "emitted 0 events instead of one")
+	require.ErrorContains(t, err, "emitted 0 EventBurn events instead of one")
 	require.Equal(t, 6, bytesToStringCalls)
 	require.Equal(t, before, snapshotRevokeState(t, &fixture, classID, "nft-1"))
 	require.Equal(t, balanceBefore, fixture.keeper.nftKeeper.GetBalance(
