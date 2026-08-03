@@ -204,7 +204,7 @@ proto-lint:
 	@$(protoImage) buf lint --error-format=json
 
 proto-check-breaking:
-	@$(protoImage) buf breaking --against $(HTTPS_GIT)#branch=main
+	@$(protoImage) buf breaking --exclude-imports --against $(HTTPS_GIT)#branch=main
 
 proto-update-deps:
 	@echo "Updating Protobuf dependencies"

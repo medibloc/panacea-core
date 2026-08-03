@@ -9,6 +9,16 @@ deps:
 breaking:
   use:
     - FILE
+  ignore:
+    # The v2.3.0 upgrade intentionally removes the retired PNFT query/state
+    # contract. Keep the retained panacea/pnft/v2/tx.proto under breaking checks
+    # for historical Any decoding and legacy message compatibility. Remove these
+    # ignores after the v2.3.0 schema becomes the main-branch baseline.
+    - panacea/pnft/v2/denom.proto
+    - panacea/pnft/v2/event.proto
+    - panacea/pnft/v2/genesis.proto
+    - panacea/pnft/v2/pnft.proto
+    - panacea/pnft/v2/query.proto
 lint:
   use:
     - DEFAULT

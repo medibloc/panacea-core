@@ -27,6 +27,9 @@ jobs:
     - name: Check protobuf generation
       run: make proto-check-generated
 
+    - name: Check protobuf compatibility
+      run: make proto-check-breaking
+
     - name: Build (+ generating proto and docs)
       run: make all
 
