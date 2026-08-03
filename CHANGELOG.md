@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### Breaking changes
+
+- Replace the stateful legacy PNFT module with the Panacea NFT module backed by
+  the standard `nft` store and the `panacea_nft` policy store. Existing PNFT
+  state and query APIs are intentionally not migrated. Historical PNFT
+  protobuf messages remain decodable for transaction and proposal history, but
+  any attempt to execute them after the upgrade is rejected.
+
 ## [v2.2.0](https://github.com/medibloc/panacea-core/releases/tag/v2.2.0) - 2024-03-14
 
 ### Improvements

@@ -13,7 +13,10 @@ var Upgrade = upgrades.Upgrade{
 	UpgradeName:          UpgradeName,
 	CreateUpgradeHandler: CreateUpgradeHandler,
 	StoreUpgrades: storetypes.StoreUpgrades{
-		Added:   []string{nfttypes.StoreKey, nfttypes.PolicyStoreKey},
+		Added: []string{nfttypes.StoreKey, nfttypes.PolicyStoreKey},
+		// pnft is permanently reserved. In-place upgraded nodes may retain its
+		// orphaned IAVL data, so reusing this key could diverge from fresh or
+		// state-synced nodes.
 		Deleted: []string{pnfttypes.StoreKey},
 	},
 }
