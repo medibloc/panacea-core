@@ -784,9 +784,10 @@ And DIDs cannot be reused to create another DID Documents forever.
 ## NFT
 
 {% hint style="warning" %}
-Panacea v2.3 removes the legacy `pnft` runtime module, store, queries, and CLI
-commands. Legacy PNFT state is not migrated. Historical protobuf messages remain
-decode-only, and attempts to execute them fail.
+Panacea v2.3 removes the legacy `pnft` runtime module, queries, and CLI commands.
+The `pnft` store remains mounted as an inactive, permanently reserved tombstone;
+no module or keeper reads or writes it, and its state is not migrated. Historical
+protobuf messages remain decode-only, and attempts to execute them fail.
 {% endhint %}
 
 ### Creating a class
