@@ -127,6 +127,42 @@ func TestMintCreatesActiveNFTRecord(t *testing.T) {
 	}, parsedEvent)
 }
 
+func TestMintRejectsZeroBlockTime(t *testing.T) {
+	fixture := newKeeperFixture(t, true, true)
+	classID, controller := createClassForMintTest(
+		t,
+		&fixture,
+		sdk.AccAddress(bytes.Repeat([]byte{24}, 20)),
+		10,
+	)
+	recipientAddress := sdk.AccAddress(bytes.Repeat([]byte{25}, 20))
+	recipient := fixture.accountAddress(t, recipientAddress)
+	fixture.ctx = fixture.ctx.
+		WithBlockTime(time.Time{}).
+		WithEventManager(sdk.NewEventManager())
+	request := validMintRequest(classID, controller, recipient)
+
+	_, err := NewMsgServer(fixture.keeper).Mint(fixture.ctx, request)
+	require.ErrorContains(t, err, "cannot mint nft")
+	require.ErrorContains(t, err, "at zero block time")
+
+	require.False(t, fixture.keeper.nftKeeper.HasNFT(fixture.ctx, classID, request.NftId))
+	require.Empty(t, fixture.keeper.nftKeeper.GetOwner(fixture.ctx, classID, request.NftId))
+	require.Zero(t, fixture.keeper.nftKeeper.GetTotalSupply(fixture.ctx, classID))
+	require.Zero(t, fixture.keeper.nftKeeper.GetBalance(fixture.ctx, classID, recipientAddress))
+	lifecycleExists, err := fixture.keeper.lifecycles.Has(
+		fixture.ctx,
+		collections.Join(classID, request.NftId),
+	)
+	require.NoError(t, err)
+	require.False(t, lifecycleExists)
+	mintedCount, err := fixture.keeper.mintedCounts.Get(fixture.ctx, classID)
+	require.NoError(t, err)
+	require.Zero(t, mintedCount)
+	requireOwnerClassCountMissing(t, &fixture, classID, recipient)
+	require.Empty(t, fixture.ctx.EventManager().Events())
+}
+
 func TestMintValidatesAnyWireDataWithOrWithoutCache(t *testing.T) {
 	fixture := newKeeperFixture(t, true, true)
 	classID, controller := createClassForMintTest(

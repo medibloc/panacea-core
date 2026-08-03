@@ -61,12 +61,20 @@ func (k Keeper) mintNFT(
 	if err != nil {
 		return err
 	}
+	mintedAt := ctx.BlockTime()
+	if mintedAt.IsZero() {
+		return fmt.Errorf(
+			"cannot mint nft %s in class %s at zero block time",
+			token.Id,
+			token.ClassId,
+		)
+	}
 
 	lifecycle := types.LifecycleRecord{
 		ClassId: token.ClassId,
 		NftId:   token.Id,
 		Mint: &types.MintRecord{
-			MintedAt: ctx.BlockTime(),
+			MintedAt: mintedAt,
 			MintedBy: controller,
 		},
 	}
