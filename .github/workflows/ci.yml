@@ -7,22 +7,28 @@ on:
     - main
     - release/v*.*.*
   pull_request:  # for all PRs regardless of its base branch
+  workflow_dispatch:
 
 jobs:
 
   build:
     name: Build and Test
     runs-on: ubuntu-latest
+    env:
+      GOTOOLCHAIN: local
     steps:
 
-    - name: Set up Go 1.x
-      uses: actions/setup-go@v3
-      with:
-        go-version: 1.22
-      id: go
-
     - name: Check out code into the Go module directory
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Set up Go from go.mod
+      uses: actions/setup-go@v5
+      with:
+        go-version-file: go.mod
+        cache: true
+      id: go
 
     - name: Check protobuf generation
       run: make proto-check-generated
@@ -39,10 +45,61 @@ jobs:
     - name: Lint
       uses: golangci/golangci-lint-action@v3
       with:
-        version: latest
+        version: v2.11.4
 
     - name: Publish coverage.html as an artifact
-      uses: actions/upload-artifact@master
+      uses: actions/upload-artifact@v4
       with:
         name: coverage
         path: artifacts/coverage.html
+
+  cosmovisor-rehearsal:
+    name: Independent Cosmovisor operator rehearsal
+    if: >-
+      (github.event_name == 'push' && startsWith(github.ref, 'refs/heads/release/v')) ||
+      github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      GOTOOLCHAIN: local
+      PANACEA_REHEARSAL_ROOT: ${{ github.workspace }}/.local/upgrade/cosmos-sdk-v0.50/rehearsal
+    steps:
+
+    - name: Check out code and tag history
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Prepare rehearsal diagnostics
+      run: mkdir -p .local/cosmovisor-ci
+
+    - name: Set up Go from go.mod
+      uses: actions/setup-go@v5
+      with:
+        go-version-file: go.mod
+        cache: true
+
+    - name: Install pinned Cosmovisor
+      run: |
+        echo "$(go env GOPATH)/bin" >> "$GITHUB_PATH"
+        go install cosmossdk.io/tools/cosmovisor/cmd/cosmovisor@v1.5.0
+
+    - name: Run independent single-validator Cosmovisor rehearsal
+      shell: bash
+      run: |
+        set -o pipefail
+        ./scripts/upgrade-local/run.sh run 2>&1 | tee .local/cosmovisor-ci/console.log
+
+    - name: Publish Cosmovisor rehearsal diagnostics
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: cosmovisor-rehearsal-${{ github.run_id }}-${{ github.run_attempt }}
+        path: |
+          .local/cosmovisor-ci/
+          .local/upgrade/cosmos-sdk-v0.50/rehearsal/logs/
+          .local/upgrade/cosmos-sdk-v0.50/rehearsal/proposal-id
+          .local/upgrade/cosmos-sdk-v0.50/rehearsal/upgrade-height
+        include-hidden-files: true
+        if-no-files-found: error
+        retention-days: 30
