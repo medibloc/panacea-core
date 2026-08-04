@@ -1,6 +1,6 @@
-export VERSION := $(shell echo $(shell git describe --tags) | sed 's/^v//')
-export CMTVERSION := $(shell go list -m github.com/cometbft/cometbft | sed 's:.* ::')
-export COMMIT := $(shell git log -1 --format='%H')
+export VERSION := $(shell echo $(shell git describe --tags 2>/dev/null) | sed 's/^v//')
+export CMTVERSION := $(shell awk '$$1 == "github.com/cometbft/cometbft" { if ($$2 == "=>") version = $$4; else version = $$2 } END { print version }' go.mod)
+export COMMIT := $(shell git log -1 --format='%H' 2>/dev/null)
 LEDGER_ENABLED ?= true
 BINDIR ?= $(GOPATH)/bin
 BUILDDIR ?= $(CURDIR)/build
@@ -102,7 +102,7 @@ BUILD_TARGETS := build install
 
 build: BUILD_ARGS=-o $(BUILDDIR)/
 build-linux:
-	GOOS=linux GOARCH=$(if $(findstring aarch64,$(shell uname -m)) || $(findstring arm64,$(shell uname -m)),arm64,amd64) LEDGER_ENABLED=false $(MAKE) build
+	GOOS=linux GOARCH=$(if $(filter aarch64 arm64,$(shell uname -m)),arm64,amd64) LEDGER_ENABLED=false $(MAKE) build
 
 test: proto-gen-test
 	mkdir -p $(ARTIFACT_DIR)
