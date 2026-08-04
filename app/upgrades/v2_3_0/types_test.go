@@ -2,6 +2,7 @@ package v2_3_0
 
 import (
 	"testing"
+	"time"
 
 	"cosmossdk.io/log"
 	"cosmossdk.io/store/metrics"
@@ -9,10 +10,67 @@ import (
 	storetypes "cosmossdk.io/store/types"
 	upgradetypes "cosmossdk.io/x/upgrade/types"
 	dbm "github.com/cosmos/cosmos-db"
+	govv1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
 	nfttypes "github.com/medibloc/panacea-core/v2/x/nft/types"
 	pnfttypes "github.com/medibloc/panacea-core/v2/x/pnft/types"
 	"github.com/stretchr/testify/require"
 )
+
+func TestNormalizeMigratedExpeditedVotingPeriod(t *testing.T) {
+	t.Parallel()
+
+	t.Run("short legacy period is clamped", func(t *testing.T) {
+		regular := 20 * time.Second
+		expedited := govv1.DefaultExpeditedPeriod
+		params := govv1.DefaultParams()
+		params.VotingPeriod = &regular
+		params.ExpeditedVotingPeriod = &expedited
+
+		require.NoError(t, normalizeMigratedExpeditedVotingPeriod(&params))
+		require.Equal(t, 10*time.Second, *params.ExpeditedVotingPeriod)
+	})
+
+	t.Run("valid mainnet periods remain unchanged", func(t *testing.T) {
+		regular := 3 * 24 * time.Hour
+		expedited := 24 * time.Hour
+		params := govv1.DefaultParams()
+		params.VotingPeriod = &regular
+		params.ExpeditedVotingPeriod = &expedited
+		originalRegular := params.VotingPeriod
+		originalExpedited := params.ExpeditedVotingPeriod
+
+		require.NoError(t, normalizeMigratedExpeditedVotingPeriod(&params))
+		require.Same(t, originalRegular, params.VotingPeriod)
+		require.Equal(t, 3*24*time.Hour, *params.VotingPeriod)
+		require.Same(t, originalExpedited, params.ExpeditedVotingPeriod)
+		require.Equal(t, 24*time.Hour, *params.ExpeditedVotingPeriod)
+	})
+
+	t.Run("nil inputs fail closed", func(t *testing.T) {
+		require.ErrorContains(t, normalizeMigratedExpeditedVotingPeriod(nil), "nil governance params")
+
+		params := govv1.DefaultParams()
+		params.VotingPeriod = nil
+		require.ErrorContains(t, normalizeMigratedExpeditedVotingPeriod(&params), "without regular voting period")
+
+		regular := 20 * time.Second
+		params.VotingPeriod = &regular
+		params.ExpeditedVotingPeriod = nil
+		require.ErrorContains(t, normalizeMigratedExpeditedVotingPeriod(&params), "nil expedited voting period")
+	})
+
+	for _, regular := range []time.Duration{-time.Nanosecond, 0, time.Nanosecond} {
+		regular := regular
+		t.Run("regular period cannot be safely halved/"+regular.String(), func(t *testing.T) {
+			expedited := regular
+			params := govv1.DefaultParams()
+			params.VotingPeriod = &regular
+			params.ExpeditedVotingPeriod = &expedited
+
+			require.ErrorContains(t, normalizeMigratedExpeditedVotingPeriod(&params), "cannot derive")
+		})
+	}
+}
 
 func TestStoreUpgradeAddsNFTStoresAndRetainsLegacyPNFTStore(t *testing.T) {
 	require.Equal(t, []string{nfttypes.StoreKey, nfttypes.PolicyStoreKey}, Upgrade.StoreUpgrades.Added)

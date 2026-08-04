@@ -132,6 +132,13 @@ func TestNewRootCmdCommandTree(t *testing.T) {
 		requireCommandPath(t, root, "tx", "staking", "delegate")
 	})
 
+	t.Run("rejects the removed positional client config command", func(t *testing.T) {
+		configCommand := requireDirectChild(t, root, "config")
+		require.NotNil(t, configCommand.Args)
+		require.NotNil(t, configCommand.RunE)
+		require.ErrorContains(t, configCommand.Args(configCommand, []string{"chain-id"}), "unknown command")
+	})
+
 	t.Run("has unique command names", func(t *testing.T) {
 		requireUniqueChildNames(t, root)
 	})
@@ -199,6 +206,17 @@ func TestNewRootCmdCommandTree(t *testing.T) {
 		require.Equal(t, "0.500000000000000000", govGenesis.Params.ProposalCancelRatio)
 		require.Empty(t, govGenesis.Params.ProposalCancelDest)
 	})
+}
+
+func TestRemovedPositionalClientConfigCommandFailsAtExecuteBoundary(t *testing.T) {
+	root, _ := panaceacmd.NewRootCmd()
+	root.SilenceErrors = true
+	root.SilenceUsage = true
+	root.SetOut(io.Discard)
+	root.SetErr(io.Discard)
+	root.SetArgs([]string{"config", "chain-id"})
+
+	require.ErrorContains(t, root.Execute(), `unknown command "chain-id" for "panacead config"`)
 }
 
 func TestNFTTransactionCommandsGenerateMessages(t *testing.T) {

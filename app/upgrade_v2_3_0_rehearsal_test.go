@@ -19,6 +19,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
+	govv1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
 	slashingtypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	ibctransfertypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
@@ -33,6 +34,7 @@ import (
 
 	panaceaapp "github.com/medibloc/panacea-core/v2/app"
 	"github.com/medibloc/panacea-core/v2/app/upgrades/v2_3_0"
+	"github.com/medibloc/panacea-core/v2/types/assets"
 )
 
 func TestV230StoreUpgradeAndRestartRehearsal(t *testing.T) {
@@ -95,6 +97,8 @@ func TestV230StoreUpgradeAndRestartRehearsal(t *testing.T) {
 	legacyTransferParams := ibctransfertypes.NewParams(false, true)
 	legacyTransferSubspace := templateApp.GetSubspace(ibctransfertypes.ModuleName)
 	legacyTransferSubspace.SetParamSet(legacyCtx, &legacyTransferParams)
+	legacyGovParams := v230LegacyGovernanceParams()
+	require.NoError(t, templateApp.GovKeeper.Params.Set(legacyCtx, legacyGovParams))
 	require.NoError(t, templateApp.UpgradeKeeper.SetModuleVersionMap(legacyCtx, fromVM))
 	require.NoError(t, templateApp.UpgradeKeeper.ScheduleUpgrade(legacyCtx, plan))
 	require.NoError(t, templateApp.UpgradeKeeper.DumpUpgradeInfoToDisk(upgradeHeight, plan))
@@ -146,6 +150,7 @@ func TestV230StoreUpgradeAndRestartRehearsal(t *testing.T) {
 		&abci.RequestFinalizeBlock{Height: upgradeHeight},
 	)
 	require.NoError(t, interruptedPreBlockErr)
+	requireValidV230MigratedGovernanceParams(t, interruptedCtx, interruptedApp, legacyGovParams)
 	interruptedVM, interruptedVMErr := interruptedApp.UpgradeKeeper.GetModuleVersionMap(interruptedCtx)
 	require.NoError(t, interruptedVMErr)
 	requireV230MigratedModuleVersions(t, interruptedVM)
@@ -190,6 +195,7 @@ func TestV230StoreUpgradeAndRestartRehearsal(t *testing.T) {
 	)
 	_, err := upgradedApp.PreBlocker(upgradeCtx, &abci.RequestFinalizeBlock{Height: upgradeHeight})
 	require.NoError(t, err)
+	requireValidV230MigratedGovernanceParams(t, upgradeCtx, upgradedApp, legacyGovParams)
 
 	toVM, err := upgradedApp.UpgradeKeeper.GetModuleVersionMap(upgradeCtx)
 	require.NoError(t, err)
@@ -222,6 +228,7 @@ func TestV230StoreUpgradeAndRestartRehearsal(t *testing.T) {
 	restartedVM, err := restartedApp.UpgradeKeeper.GetModuleVersionMap(restartCtx)
 	require.NoError(t, err)
 	requireV230MigratedModuleVersions(t, restartedVM)
+	requireValidV230MigratedGovernanceParams(t, restartCtx, restartedApp, legacyGovParams)
 	doneHeight, err := restartedApp.UpgradeKeeper.GetDoneHeight(restartCtx, v2_3_0.UpgradeName)
 	require.NoError(t, err)
 	require.Equal(t, upgradeHeight, doneHeight)
@@ -246,6 +253,42 @@ func TestV230StoreUpgradeAndRestartRehearsal(t *testing.T) {
 	require.Contains(t, committedStoreNames, nfttypes.PolicyStoreKey)
 	require.Contains(t, committedStoreNames, pnfttypes.StoreKey)
 	require.NoError(t, restartDB.Close())
+}
+
+func v230LegacyGovernanceParams() govv1.Params {
+	params := govv1.DefaultParams()
+	minDepositTokens := sdk.TokensFromConsensusPower(100000, sdk.DefaultPowerReduction)
+	params.MinDeposit = sdk.NewCoins(sdk.NewCoin(assets.MicroMedDenom, minDepositTokens))
+	votingPeriod := 3 * 24 * time.Hour
+	params.VotingPeriod = &votingPeriod
+
+	// These fields do not exist in the v0.47/v4 governance store. The v4 -> v5
+	// module migration must populate them before the Panacea upgrade handler
+	// applies its chain-specific expedited-deposit policy.
+	params.ExpeditedMinDeposit = nil
+	params.ExpeditedVotingPeriod = nil
+	params.ExpeditedThreshold = ""
+	params.ProposalCancelRatio = ""
+	params.ProposalCancelDest = ""
+	params.MinDepositRatio = ""
+	return params
+}
+
+func requireValidV230MigratedGovernanceParams(
+	t *testing.T,
+	ctx sdk.Context,
+	testApp *panaceaapp.App,
+	legacy govv1.Params,
+) {
+	t.Helper()
+
+	params, err := testApp.GovKeeper.Params.Get(ctx)
+	require.NoError(t, err)
+	require.Equal(t, legacy.MinDeposit, params.MinDeposit)
+	require.Equal(t, legacy.VotingPeriod, params.VotingPeriod)
+	require.NotNil(t, params.ExpeditedMinDeposit)
+	require.NotNil(t, params.ExpeditedVotingPeriod)
+	require.NoError(t, params.ValidateBasic())
 }
 
 func v230LegacyVersionMap(current module.VersionMap) module.VersionMap {

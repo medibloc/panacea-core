@@ -23,7 +23,17 @@ import (
 	"github.com/medibloc/panacea-core/v2/types/assets"
 )
 
-func TestV230UpgradeConfiguresExpeditedGovernanceDeposit(t *testing.T) {
+func TestV230UpgradeConfiguresExpeditedGovernanceParamsForShortLegacyVotingPeriod(t *testing.T) {
+	testV230UpgradeGovernanceParams(t, 20*time.Second, 10*time.Second)
+}
+
+func TestV230UpgradePreservesValidMigratedGovernanceVotingPeriods(t *testing.T) {
+	testV230UpgradeGovernanceParams(t, 3*24*time.Hour, govv1.DefaultExpeditedPeriod)
+}
+
+func testV230UpgradeGovernanceParams(t *testing.T, legacyVotingPeriod, expectedExpeditedVotingPeriod time.Duration) {
+	t.Helper()
+
 	panaceaapp.SetConfig()
 	appOpts := viper.New()
 	appOpts.Set(flags.FlagHome, t.TempDir())
@@ -43,6 +53,7 @@ func TestV230UpgradeConfiguresExpeditedGovernanceDeposit(t *testing.T) {
 
 	expectedMinDeposit := sdk.NewCoins(sdk.NewInt64Coin(assets.MicroMedDenom, 100_000_000_000))
 	legacyParams := govv1.DefaultParams()
+	legacyParams.VotingPeriod = &legacyVotingPeriod
 	legacyParams.MinDeposit = expectedMinDeposit
 	legacyParams.ExpeditedMinDeposit = nil
 	legacyParams.ExpeditedVotingPeriod = nil
@@ -71,5 +82,9 @@ func TestV230UpgradeConfiguresExpeditedGovernanceDeposit(t *testing.T) {
 		expectedMinDeposit.MulInt(math.NewInt(govv1.DefaultMinExpeditedDepositTokensRatio)),
 		sdk.Coins(params.ExpeditedMinDeposit),
 	)
+	require.NotNil(t, params.VotingPeriod)
+	require.Equal(t, legacyVotingPeriod, *params.VotingPeriod)
+	require.NotNil(t, params.ExpeditedVotingPeriod)
+	require.Equal(t, expectedExpeditedVotingPeriod, *params.ExpeditedVotingPeriod)
 	require.NoError(t, params.ValidateBasic())
 }

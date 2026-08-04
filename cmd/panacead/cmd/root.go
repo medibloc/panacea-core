@@ -154,10 +154,23 @@ func initCometBFTConfig() *cmbtcfg.Config {
 }
 
 func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig, basicManager module.BasicManager) {
+	configCommand := confixcmd.ConfigCommand()
+	// Cosmos SDK v0.47 accepted positional client config operations such as
+	// `panacead config chain-id`. Confix uses explicit get/set targets in v0.50.
+	// Without an Args validator, an obsolete positional invocation prints help
+	// and exits successfully, which lets upgrade automation silently skip the
+	// intended config change.
+	configCommand.Args = cobra.NoArgs
+	// Cobra otherwise treats a parent with subcommands but no Run/RunE as
+	// non-runnable and prints help before evaluating Args. A help-only RunE
+	// makes the command executable so the Args contract is enforced first.
+	configCommand.RunE = func(cmd *cobra.Command, _ []string) error {
+		return cmd.Help()
+	}
 	rootCmd.AddCommand(
 		InitCmd(basicManager, app.DefaultNodeHome),
 		debug.Cmd(),
-		confixcmd.ConfigCommand(),
+		configCommand,
 		cmbtcli.NewCompletionCmd(rootCmd, true),
 		pruning.Cmd(newApp, app.DefaultNodeHome),
 		snapshot.Cmd(newApp),
