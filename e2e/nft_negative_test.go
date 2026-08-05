@@ -165,6 +165,22 @@ func TestNFTNegativeStateIntegrity(t *testing.T) {
 	expectNegativeSuccess(t, ctx, network, "negative-update-controller", creator.KeyName(),
 		"nft", "update-controller", classID, controller.FormattedAddress(),
 	)
+	t.Run("no-op controller update is committed and atomic", func(t *testing.T) {
+		result := assertDeliverFailureLeavesNFTState(
+			t,
+			ctx,
+			network,
+			"negative-no-op-controller-update",
+			creator.KeyName(),
+			"sdk",
+			18,
+			classID,
+			nil,
+			trackedAddresses,
+			"nft", "update-controller", classID, controller.FormattedAddress(),
+		)
+		require.Contains(t, result.RawLog, "new controller must differ from current controller")
+	})
 	mintNegativeNFT(t, ctx, network, "negative-mint-primary", controller, classID, negativePrimaryNFTID, owner.FormattedAddress())
 
 	lockedClassID := createNegativeClass(
@@ -928,7 +944,7 @@ func assertDeliverFailureLeavesNFTState(
 	recordIDs []string,
 	trackedAddresses []string,
 	command ...string,
-) {
+) *harness.TxResult {
 	t.Helper()
 	before := captureNegativeNFTSnapshot(t, ctx, network, step+"-before", classID, recordIDs, trackedAddresses)
 	result, err := network.BroadcastAndWaitTxExpectDeliverFailure(
@@ -946,6 +962,7 @@ func assertDeliverFailureLeavesNFTState(
 	assertFailureHasNoNFTEvents(t, result)
 	after := captureNegativeNFTSnapshot(t, ctx, network, step+"-after", classID, recordIDs, trackedAddresses)
 	require.Equal(t, before, after, "failed transaction changed NFT state or derived indexes")
+	return result
 }
 
 func captureNegativeNFTSnapshot(

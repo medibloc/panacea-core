@@ -929,9 +929,6 @@ func validateUpgradeStakingPreservation(before, after upgradeStakingCheckpoint) 
 	if afterSigning.IndexOffset < beforeSigning.IndexOffset {
 		return fmt.Errorf("validator signing index offset regressed from %d to %d", beforeSigning.IndexOffset, afterSigning.IndexOffset)
 	}
-	if afterSigning.MissedBlocksCounter < beforeSigning.MissedBlocksCounter {
-		return fmt.Errorf("validator missed blocks counter regressed from %d to %d", beforeSigning.MissedBlocksCounter, afterSigning.MissedBlocksCounter)
-	}
 	return nil
 }
 

@@ -139,6 +139,24 @@ func TestDiscoverP0P1ReleaseGateSuitesRejectsMissingDuplicateAndMixedRuns(t *tes
 	require.ErrorContains(t, err, "duplicate")
 }
 
+func TestDiscoverP0P1ReleaseGateSuitesAllowsKnownFunctionalSupplementAndRejectsUnknown(t *testing.T) {
+	root := t.TempDir()
+	for index, testName := range requiredP0P1ReleaseGateTests {
+		writeP0P1GateRunFixture(t, root, fmt.Sprintf("run-%012x", index+1), testName, testP0P1CurrentImageID)
+	}
+	for index, testName := range supplementalP0P1ReleaseGateTests {
+		writeP0P1GateRunFixture(t, root, fmt.Sprintf("run-%012x", index+100), testName, testP0P1CurrentImageID)
+	}
+
+	suites, err := discoverP0P1ReleaseGateSuites(root)
+	require.NoError(t, err)
+	require.Len(t, suites, len(requiredP0P1ReleaseGateTests))
+
+	writeP0P1GateRunFixture(t, root, "run-bbbbbbbbbbbb", "TestUnknownLiveSuite", testP0P1CurrentImageID)
+	_, err = discoverP0P1ReleaseGateSuites(root)
+	require.ErrorContains(t, err, `unexpected run "TestUnknownLiveSuite"`)
+}
+
 func TestReadP0P1SwitchImageIDsRequiresExactlyOneSwitchPerDeclaredNode(t *testing.T) {
 	runDir := t.TempDir()
 	finalNodes := map[string]string{

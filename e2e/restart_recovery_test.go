@@ -174,6 +174,59 @@ func TestRestartRecoveryNodeBoundaries(t *testing.T) {
 	_, err = network.RequireSameHistoryAtHeight(ctx, afterValidatorProgress.Height, validator, fullNode)
 	require.NoError(t, err)
 
+	fullNodeKillHeight, err := validator.Height(ctx)
+	require.NoError(t, err)
+	require.NoError(t, network.WaitForFullNode(ctx, fullNodeKillHeight))
+	beforeFullNodeKill, err := network.CaptureRecoveryCheckpoint(
+		ctx,
+		"before-fullnode-sigkill",
+		fullNode,
+		fullNodeKillHeight,
+	)
+	require.NoError(t, err)
+	require.NoError(t, network.RestartFullNodeAbruptly(ctx, "fullnode-crash-recovery", 0))
+	require.NoError(t, network.WaitForNodeHeight(ctx, fullNode, fullNodeKillHeight+1))
+	afterFullNodeKillSameHeight, err := network.CaptureRecoveryCheckpoint(
+		ctx,
+		"after-fullnode-sigkill-history",
+		fullNode,
+		fullNodeKillHeight,
+	)
+	require.NoError(t, err)
+	afterFullNodeKillProgress, err := network.CaptureRecoveryCheckpoint(
+		ctx,
+		"after-fullnode-sigkill-head",
+		fullNode,
+		0,
+	)
+	require.NoError(t, err)
+	require.NoError(t, harness.ValidateRecoveryContinuity(
+		beforeFullNodeKill,
+		afterFullNodeKillSameHeight,
+		afterFullNodeKillProgress,
+	))
+	require.Equal(
+		t,
+		burnedState,
+		captureRecoveryBoundaryState(
+			t,
+			ctx,
+			network,
+			"burned-after-fullnode-sigkill",
+			classID,
+			recoveryNFTID,
+			owner.FormattedAddress(),
+		),
+	)
+	require.NoError(t, network.WaitForHeight(ctx, afterFullNodeKillProgress.Height))
+	_, err = network.RequireSameHistoryAtHeight(
+		ctx,
+		afterFullNodeKillProgress.Height,
+		validator,
+		fullNode,
+	)
+	require.NoError(t, err)
+
 	snapshotHeight, err := fullNode.Height(ctx)
 	require.NoError(t, err)
 	beforeSnapshotRestore, err := network.CaptureRecoveryCheckpoint(ctx, "before-fullnode-snapshot-restore", fullNode, snapshotHeight)

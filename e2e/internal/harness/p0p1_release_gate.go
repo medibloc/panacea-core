@@ -31,6 +31,22 @@ var requiredP0P1ReleaseGateTests = []string{
 	"TestLocalDockerNetworkAndEndpointFaults",
 }
 
+// supplementalP0P1ReleaseGateTests are the successful live runs produced by
+// the standalone all command in addition to the P0/P1 evidence above. They are
+// validated as clean source runs, but are deliberately omitted from the P0/P1
+// gate manifest. Keeping this allowlist explicit preserves fail-closed handling
+// for an unknown run in the aggregate's fresh artifact root.
+var supplementalP0P1ReleaseGateTests = []string{
+	"TestSmokeNodeBoundary",
+	"TestV221Compatibility",
+	"TestNFTNegativeStateIntegrity",
+	"TestNFTNegativeProtocolBoundaries",
+	"TestRestartRecoveryNodeBoundaries",
+	"TestPortableApplicationSnapshotRestoreAndFreshFullNodeSync",
+	"TestFourValidatorQuorumFaultAndRecovery",
+	"TestFullNodeLoadAndResourceBaseline",
+}
+
 var oldImageP0P1ReleaseGateTests = map[string]struct{}{
 	"TestV221ToCurrentMultiValidatorUpgrade":        {},
 	"TestV221ToCurrentLegacyPNFTAdversarialUpgrade": {},
@@ -424,7 +440,13 @@ func discoverP0P1ReleaseGateSuites(root string) ([]P0P1ReleaseGateSuiteEvidence,
 			return nil, fmt.Errorf("read P0/P1 run %s: %w", entry.Name(), err)
 		}
 		if !isRequiredP0P1ReleaseGateTest(manifest.TestName) {
-			return nil, fmt.Errorf("fresh P0/P1 aggregate contains unexpected run %q in %s", manifest.TestName, entry.Name())
+			if !isSupplementalP0P1ReleaseGateTest(manifest.TestName) {
+				return nil, fmt.Errorf("fresh P0/P1 aggregate contains unexpected run %q in %s", manifest.TestName, entry.Name())
+			}
+			if err := validateUpgradeCoverageSourceRun(runDir); err != nil {
+				return nil, fmt.Errorf("supplemental functional suite %q is not successful and cleaned: %w", manifest.TestName, err)
+			}
+			continue
 		}
 		if _, duplicate := found[manifest.TestName]; duplicate {
 			return nil, fmt.Errorf("P0/P1 aggregate contains duplicate run for %q", manifest.TestName)
@@ -471,6 +493,15 @@ func discoverP0P1ReleaseGateSuites(root string) ([]P0P1ReleaseGateSuiteEvidence,
 func isRequiredP0P1ReleaseGateTest(testName string) bool {
 	for _, required := range requiredP0P1ReleaseGateTests {
 		if testName == required {
+			return true
+		}
+	}
+	return false
+}
+
+func isSupplementalP0P1ReleaseGateTest(testName string) bool {
+	for _, supplemental := range supplementalP0P1ReleaseGateTests {
+		if testName == supplemental {
 			return true
 		}
 	}

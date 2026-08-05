@@ -55,6 +55,7 @@ mise exec go@1.23.12 -- ./scripts/e2e/run.sh release-hardening
 mise exec go@1.23.12 -- ./scripts/e2e/run.sh release-hardening-inner
 mise exec go@1.23.12 -- ./scripts/e2e/run.sh load
 mise exec go@1.23.12 -- ./scripts/e2e/run.sh all
+mise exec go@1.23.12 -- ./scripts/e2e/run.sh help
 ```
 
 `build` is the clean-build contract: it builds the current worktree node
@@ -68,6 +69,11 @@ Interchaintest's Docker wildcard host-port RPC dial blocked even while the
 nodes themselves are healthy. `unit` still uses `go test` for both isolated
 nested modules.
 
+`restart` runs its two recovery scenarios in separate test-binary processes.
+If Docker reports the exact transient `failed to bind host port ... address
+already in use` setup race, that scenario is retried once; every other failure
+is returned immediately.
+
 Every Docker suite command selects an explicit canonical test regex and has a Go test
 deadline in addition to the bounded waits inside the harness:
 
@@ -75,17 +81,17 @@ deadline in addition to the bounded waits inside the harness:
 |---|---:|---:|---|
 | `smoke` | 1 validator + 1 full node | 12m per invocation | Current `v2.3.0` image NFT lifecycle, endpoint parity, pagination, the isolated failure-artifact probe, and unsupported DB-backend startup rejection |
 | `v2.2.1` | 1 validator + 1 full node | 12m | Fresh-network compatibility at immutable v2.2.1 source |
-| `negative` | fresh 1 validator + 1 full node networks | 40m | Pagination, authorization/state integrity, protocol boundaries, and raw signed-wire rejection paths |
+| `negative` | fresh 1 validator + 1 full node networks | 40m | Authorization/state integrity, protocol boundaries, and raw signed-wire rejection paths |
 | `restart` | fresh 1 validator + 1 full node networks | 35m | Graceful and abrupt restart, export/bootstrap, portable application snapshot restore, and fresh full-node block sync |
 | `consensus` | 4 validators + 1 full node | 18m | One-validator tolerance, quorum loss, committed transaction recovery, and common-history catch-up with same-height block ID/app hash, peer, and catching-up proof |
-| `upgrade` | 4 validators + 1 full node | 18m | Coordinated exact `v2.2.1` to `v2.3.0` image switch, delayed-validator catch-up, migration/state preservation, and post-upgrade lifecycle |
-| `upgrade-deep` | 4 validators + 1 full node | 45m per scenario | Connected P0/P1 transaction/state matrix and normal plus adversarial legacy-PNFT upgrade paths |
+| `upgrade` | 4 validators + 1 full node | 35m | Coordinated exact `v2.2.1` to `v2.3.0` image switch, delayed-validator catch-up, the connected P0 transaction/state matrix, migration/state preservation, and post-upgrade lifecycle |
+| `upgrade-deep` | 4 validators + 1 full node | 50m per scenario | The normal connected P0 matrix plus the adversarial legacy-PNFT upgrade path |
 | `upgrade-chaos` | 4 validators + 1 full node | 40m | Three deterministic switch orders, bounded quorum stalls, forced restart, delayed-node catch-up, and single-history recovery |
 | `ibc-upgrade` | Panacea + pinned Osmosis + Hermes | 45m | Existing-channel ICS-20 transfer, in-flight acknowledgement, timeout/refund, relayer restart, and post-upgrade bidirectional continuity |
 | `state-sync` | current-version validator sources + new full node | 20m | Actual CometBFT state sync, corrupt/unavailable/bad-trust failures, restart, and history parity; the connected `upgrade-deep` lane separately proves joining upgraded sources |
 | `config-compat` | v2.2.1 node home on current binary | 25m | v0.47 config preservation/migration and current endpoint/config-command contracts |
 | `network-faults` | run-owned validator/full-node network | 25m | Container-scoped partition, proxy delay/jitter/loss, DNS/container recreation, endpoint isolation, slow-client/churn, and WebSocket recovery |
-| `release-builds` | functional host platform + linux/amd64 + linux/arm64 | 6h total; 24m per architecture upgrade | Clean-HEAD provenance, functional-image identity capture, cold dependency provenance, warm-offline builds, pinned no-network Docker compilation, host binary checksum equivalence, version/smoke, and a real upgrade on each architecture |
+| `release-builds` | functional host platform + linux/amd64 + linux/arm64 | 6h total; 35m per architecture upgrade | Clean-HEAD provenance, functional-image identity capture, cold dependency provenance, warm-offline builds, pinned no-network Docker compilation, host binary checksum equivalence, version/smoke, and a real upgrade on each architecture |
 | `load` | 1 validator + 1 full node | 25m | Boundary datasets, concurrent REST/gRPC load, mixed transactions, query-gas rejection, and required peer/catching-up/mempool/resource observations |
 
 The load suite is an observational baseline, not a production SLA. Its pass
@@ -100,22 +106,27 @@ It is the existing short local baseline, not the separate P2 quick/release soak;
 running it does not satisfy any P2 operational-validation completion condition.
 
 `compatibility` combines smoke and v2.2.1 compatibility.
-`all` is the complete local aggregate: harness unit tests, compatibility,
-negative, restart, consensus, upgrade, and load. The aggregate is deliberately
-long-running. Override an individual budget only when the execution environment
-requires it, for example
+`all` is the complete functional aggregate. It runs harness unit tests, builds
+the shared current and v2.2.1 images once, and then runs smoke, v2.2.1,
+negative, restart, consensus, both normal and adversarial upgrades, upgrade
+chaos, IBC upgrade continuity, state sync, config compatibility, local network
+faults, and load. It does not run `release-builds`. The aggregate is
+deliberately long-running. Override an individual budget only when the
+execution environment requires it, for example
 `E2E_LOAD_TIMEOUT=35m mise exec go@1.23.12 -- ./scripts/e2e/run.sh load`.
 
-`release-hardening` is the serial P0/P1 follow-up gate. It combines
-the deep/chaos upgrade, IBC, state-sync, config, local network-fault, and both
-release-architecture suites. It intentionally excludes P2 soak, production
-snapshot, and real ingress/firewall checks; those are tracked by the separate
-operational-validation goal. `release-builds` can be run alone when
-only the cold/offline and multi-architecture release evidence is required. The
-release commands record a failed release-run artifact before image construction
-when tracked, staged, or untracked source changes exist; commit the exact source
-to be certified first. The standalone runner also has a bounded 6-hour total
-deadline, configurable with `E2E_RELEASE_TOTAL_TIMEOUT_SECONDS`.
+`release-hardening` is the serial artifact-first release gate. Its exact inner
+sequence is clean-source check, `all`, `release-builds`, a second clean-source
+check, and coverage merge/gate creation. It intentionally excludes P2 soak,
+production snapshot, and real ingress/firewall checks; those are tracked by the
+separate operational-validation goal. The aggregate has a bounded 12-hour total
+deadline, configurable with
+`E2E_RELEASE_AGGREGATE_TOTAL_TIMEOUT_SECONDS`. `release-builds` can be run alone
+when only the cold/offline and multi-architecture release evidence is required;
+its separate child deadline is six hours, configurable with
+`E2E_RELEASE_TOTAL_TIMEOUT_SECONDS`. The release commands record a failed
+release-run artifact before image construction when tracked, staged, or
+untracked source changes exist; commit the exact source to be certified first.
 `release-hardening-inner` is the aggregate runner's bounded child command; run
 the public `release-hardening` wrapper in normal operation so timeout and
 artifact-first failure handling cover the full sequence.

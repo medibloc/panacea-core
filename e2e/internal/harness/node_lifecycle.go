@@ -1,7 +1,6 @@
 package harness
 
 import (
-	"bytes"
 	"context"
 	"errors"
 	"fmt"
@@ -9,18 +8,6 @@ import (
 
 	"github.com/strangelove-ventures/interchaintest/v8/chain/cosmos"
 )
-
-func runStoppedNodeOperation(stop, operation, start func() error) error {
-	if stop == nil || operation == nil || start == nil {
-		return errors.New("stop, operation, and start callbacks are required")
-	}
-	if err := stop(); err != nil {
-		return err
-	}
-	operationErr := operation()
-	startErr := start()
-	return errors.Join(operationErr, startErr)
-}
 
 // NodeRestartEvidence proves that one concrete node reopened its persisted
 // database, retained the pre-restart history point, and advanced afterwards.
@@ -33,17 +20,12 @@ type NodeRestartEvidence struct {
 }
 
 func (n *Network) GracefulRestartNode(ctx context.Context, node *cosmos.ChainNode) (NodeRestartEvidence, error) {
-	return n.restartNode(ctx, node, false)
-}
-
-func (n *Network) ForceKillAndRestartNode(ctx context.Context, node *cosmos.ChainNode) (NodeRestartEvidence, error) {
-	return n.restartNode(ctx, node, true)
+	return n.restartNode(ctx, node)
 }
 
 func (n *Network) restartNode(
 	ctx context.Context,
 	node *cosmos.ChainNode,
-	force bool,
 ) (NodeRestartEvidence, error) {
 	if node == nil {
 		return NodeRestartEvidence{}, errors.New("node is required")
@@ -52,13 +34,8 @@ func (n *Network) restartNode(
 	if err != nil {
 		return NodeRestartEvidence{}, err
 	}
-	mode := "graceful"
-	if force {
-		mode = "sigkill"
-		err = node.DockerClient.ContainerKill(ctx, node.ContainerID(), "SIGKILL")
-	} else {
-		err = node.StopContainer(ctx)
-	}
+	const mode = "graceful"
+	err = node.StopContainer(ctx)
 	if err != nil {
 		return NodeRestartEvidence{}, fmt.Errorf("%s stop %s: %w", mode, node.Name(), err)
 	}
@@ -99,38 +76,4 @@ func (n *Network) restartNode(
 		return NodeRestartEvidence{}, err
 	}
 	return evidence, nil
-}
-
-// ExportStateTwiceAtHeight must be called while all long-running node
-// containers are stopped. It executes two independent exports against the
-// preserved full-node volume and requires byte-for-byte determinism.
-func (n *Network) ExportStateTwiceAtHeight(ctx context.Context, height int64) ([]byte, error) {
-	if height <= 0 {
-		return nil, fmt.Errorf("export height must be positive, got %d", height)
-	}
-	first, err := n.Chain.ExportState(ctx, height)
-	if err != nil {
-		return nil, fmt.Errorf("first state export at height %d: %w", height, err)
-	}
-	second, err := n.Chain.ExportState(ctx, height)
-	if err != nil {
-		return nil, fmt.Errorf("second state export at height %d: %w", height, err)
-	}
-	if !bytes.Equal([]byte(first), []byte(second)) {
-		_ = n.artifacts.write("recovery/export-first.json", []byte(first))
-		_ = n.artifacts.write("recovery/export-second.json", []byte(second))
-		return nil, fmt.Errorf("state exports at height %d are not byte-identical", height)
-	}
-	if err := n.artifacts.write("recovery/export.json", []byte(first)); err != nil {
-		return nil, fmt.Errorf("record state export: %w", err)
-	}
-	if err := n.artifacts.writeJSON("recovery/export-evidence.json", map[string]any{
-		"recorded_at": time.Now().UTC(),
-		"height":      height,
-		"bytes":       len(first),
-		"equal":       true,
-	}); err != nil {
-		return nil, err
-	}
-	return []byte(first), nil
 }

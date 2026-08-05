@@ -80,6 +80,60 @@ func (n *Network) startNodeAfterRecovery(ctx context.Context, step string, node 
 	return err
 }
 
+func (n *Network) killNodeForRecovery(ctx context.Context, step string, node *cosmos.ChainNode) error {
+	containerID := node.ContainerID()
+	_, err := n.runRecoveryAction(step, "sigkill", node, func() ([]byte, []byte, error) {
+		if err := node.DockerClient.ContainerKill(ctx, containerID, "SIGKILL"); err != nil {
+			return nil, nil, err
+		}
+		waited, waitErrors := node.DockerClient.ContainerWait(
+			ctx,
+			containerID,
+			dockercontainer.WaitConditionNotRunning,
+		)
+		select {
+		case response := <-waited:
+			if response.Error != nil {
+				return nil, nil, fmt.Errorf("wait for SIGKILL exit: %s", response.Error.Message)
+			}
+			return []byte(fmt.Sprintf("exit status %d", response.StatusCode)), nil, nil
+		case waitErr := <-waitErrors:
+			return nil, nil, fmt.Errorf("wait for SIGKILL exit: %w", waitErr)
+		case <-ctx.Done():
+			return nil, nil, fmt.Errorf("wait for SIGKILL exit: %w", ctx.Err())
+		}
+	})
+	return err
+}
+
+func (n *Network) restartNodeAbruptly(
+	ctx context.Context,
+	step string,
+	role string,
+	node *cosmos.ChainNode,
+	afterRestart func() error,
+) error {
+	if node.DockerClient == nil || node.ContainerID() == "" {
+		return fmt.Errorf("%s %s has no running container identity", role, node.Name())
+	}
+
+	n.txMu.Lock()
+	defer n.txMu.Unlock()
+	if err := runRecoveryStoppedOperation(
+		func() error { return n.killNodeForRecovery(ctx, step, node) },
+		nil,
+		func() error { return n.startNodeAfterRecovery(ctx, step, node) },
+	); err != nil {
+		return fmt.Errorf("abrupt %s restart on %s: %w", role, node.Name(), err)
+	}
+	if afterRestart != nil {
+		if err := afterRestart(); err != nil {
+			return fmt.Errorf("abrupt %s restart on %s: %w", role, node.Name(), err)
+		}
+	}
+	return nil
+}
+
 // RestartFullNodeGracefully closes and reopens the selected full-node
 // container while serializing against transaction broadcasts. The start phase
 // is attempted even if stop-side artifact recording reports an error.
@@ -104,6 +158,21 @@ func (n *Network) RestartFullNodeGracefully(
 	return nil
 }
 
+// RestartFullNodeAbruptly delivers SIGKILL to the selected full node, observes
+// the container's non-running state, and starts the same container and mounted
+// database again. The caller must subsequently prove history, state, and
+// forward-progress continuity through public query boundaries.
+func (n *Network) RestartFullNodeAbruptly(
+	ctx context.Context,
+	step string,
+	fullNodeIndex int,
+) error {
+	if fullNodeIndex < 0 || fullNodeIndex >= len(n.Chain.FullNodes) {
+		return fmt.Errorf("full-node index %d is out of range", fullNodeIndex)
+	}
+	return n.restartNodeAbruptly(ctx, step, "full-node", n.Chain.FullNodes[fullNodeIndex], nil)
+}
+
 // RestartValidatorAbruptly delivers SIGKILL to the selected validator,
 // observes the container's non-running state, starts the same container and
 // mounted database again, and requires CometBFT's post-crash consensus-WAL
@@ -117,51 +186,17 @@ func (n *Network) RestartValidatorAbruptly(
 		return fmt.Errorf("validator index %d is out of range", validatorIndex)
 	}
 	node := n.Chain.Validators[validatorIndex]
-	if node.DockerClient == nil || node.ContainerID() == "" {
-		return fmt.Errorf("validator %s has no running container identity", node.Name())
-	}
-	n.txMu.Lock()
-	defer n.txMu.Unlock()
 	replaySince := time.Now().UTC()
 
-	err := runRecoveryStoppedOperation(
-		func() error {
-			_, err := n.runRecoveryAction(step, "sigkill", node, func() ([]byte, []byte, error) {
-				if err := node.DockerClient.ContainerKill(ctx, node.ContainerID(), "SIGKILL"); err != nil {
-					return nil, nil, err
-				}
-				waited, waitErrors := node.DockerClient.ContainerWait(
-					ctx,
-					node.ContainerID(),
-					dockercontainer.WaitConditionNotRunning,
-				)
-				select {
-				case response := <-waited:
-					if response.Error != nil {
-						return nil, nil, fmt.Errorf("wait for SIGKILL exit: %s", response.Error.Message)
-					}
-					return []byte(fmt.Sprintf("exit status %d", response.StatusCode)), nil, nil
-				case waitErr := <-waitErrors:
-					return nil, nil, fmt.Errorf("wait for SIGKILL exit: %w", waitErr)
-				case <-ctx.Done():
-					return nil, nil, fmt.Errorf("wait for SIGKILL exit: %w", ctx.Err())
-				}
-			})
+	return n.restartNodeAbruptly(ctx, step, "validator", node, func() error {
+		replayCtx, replayCancel := context.WithTimeout(ctx, 30*time.Second)
+		defer replayCancel()
+		if err := n.waitForValidatorWALReplay(replayCtx, step, node, replaySince); err != nil {
+			n.artifacts.recordFailure("recovery-wal-replay-"+step, err)
 			return err
-		},
-		nil,
-		func() error { return n.startNodeAfterRecovery(ctx, step, node) },
-	)
-	if err != nil {
-		return fmt.Errorf("abrupt validator restart on %s: %w", node.Name(), err)
-	}
-	replayCtx, replayCancel := context.WithTimeout(ctx, 30*time.Second)
-	defer replayCancel()
-	if err := n.waitForValidatorWALReplay(replayCtx, step, node, replaySince); err != nil {
-		n.artifacts.recordFailure("recovery-wal-replay-"+step, err)
-		return fmt.Errorf("abrupt validator restart on %s: %w", node.Name(), err)
-	}
-	return nil
+		}
+		return nil
+	})
 }
 
 func classifyWALReplayEvidence(logs []byte) error {

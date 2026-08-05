@@ -39,10 +39,10 @@ Commands:
   ibc-upgrade              Run IBC continuity across the upgrade
   network-faults           Run local Docker network fault tests
   release-builds           Build and verify multi-architecture release images
-  release-hardening        Run the complete artifact-first P0/P1 gate
-  release-hardening-inner  Run the inner P0/P1 suite sequence
+  release-hardening        Run the complete artifact-first release gate
+  release-hardening-inner  Run the internal release-gate sequence
   load                     Run the short load/resource baseline
-  all                      Run the historical general E2E suite
+  all                      Run every functional live suite (no release build)
   help                     Show this help
 EOF
 }
@@ -97,18 +97,18 @@ E2E_TEST_TIMEOUT=${E2E_TEST_TIMEOUT:-12m}
 E2E_NEGATIVE_TIMEOUT=${E2E_NEGATIVE_TIMEOUT:-40m}
 E2E_RESTART_TIMEOUT=${E2E_RESTART_TIMEOUT:-35m}
 E2E_CONSENSUS_TIMEOUT=${E2E_CONSENSUS_TIMEOUT:-18m}
-E2E_UPGRADE_TIMEOUT=${E2E_UPGRADE_TIMEOUT:-18m}
-E2E_UPGRADE_DEEP_TIMEOUT=${E2E_UPGRADE_DEEP_TIMEOUT:-45m}
+E2E_UPGRADE_TIMEOUT=${E2E_UPGRADE_TIMEOUT:-35m}
+E2E_UPGRADE_DEEP_TIMEOUT=${E2E_UPGRADE_DEEP_TIMEOUT:-50m}
 E2E_UPGRADE_CHAOS_TIMEOUT=${E2E_UPGRADE_CHAOS_TIMEOUT:-40m}
 E2E_STATE_SYNC_TIMEOUT=${E2E_STATE_SYNC_TIMEOUT:-20m}
 E2E_CONFIG_COMPAT_TIMEOUT=${E2E_CONFIG_COMPAT_TIMEOUT:-25m}
 E2E_IBC_UPGRADE_TIMEOUT=${E2E_IBC_UPGRADE_TIMEOUT:-45m}
 E2E_NETWORK_FAULT_TIMEOUT=${E2E_NETWORK_FAULT_TIMEOUT:-25m}
-E2E_RELEASE_UPGRADE_TIMEOUT=${E2E_RELEASE_UPGRADE_TIMEOUT:-24m}
+E2E_RELEASE_UPGRADE_TIMEOUT=${E2E_RELEASE_UPGRADE_TIMEOUT:-35m}
 E2E_RELEASE_TOTAL_TIMEOUT_SECONDS=${E2E_RELEASE_TOTAL_TIMEOUT_SECONDS:-21600}
 E2E_RELEASE_CLEANUP_TIMEOUT_SECONDS=${E2E_RELEASE_CLEANUP_TIMEOUT_SECONDS:-60}
 E2E_RELEASE_FORCE_EXIT_TIMEOUT_SECONDS=${E2E_RELEASE_FORCE_EXIT_TIMEOUT_SECONDS:-5}
-E2E_RELEASE_AGGREGATE_TOTAL_TIMEOUT_SECONDS=${E2E_RELEASE_AGGREGATE_TOTAL_TIMEOUT_SECONDS:-20400}
+E2E_RELEASE_AGGREGATE_TOTAL_TIMEOUT_SECONDS=${E2E_RELEASE_AGGREGATE_TOTAL_TIMEOUT_SECONDS:-43200}
 E2E_RELEASE_AGGREGATE_CLEANUP_TIMEOUT_SECONDS=${E2E_RELEASE_AGGREGATE_CLEANUP_TIMEOUT_SECONDS:-120}
 E2E_RELEASE_AGGREGATE_FORCE_EXIT_TIMEOUT_SECONDS=${E2E_RELEASE_AGGREGATE_FORCE_EXIT_TIMEOUT_SECONDS:-10}
 E2E_RELEASE_AGGREGATE_CHILD_EXIT_MARGIN_SECONDS=${E2E_RELEASE_AGGREGATE_CHILD_EXIT_MARGIN_SECONDS:-5}
@@ -444,29 +444,89 @@ v221_body() {
 
 negative_body() {
 	run_current_test PANACEA_E2E "$E2E_NEGATIVE_TIMEOUT" \
-		'^(TestNFTNegativePagination|TestNFTNegativeStateIntegrity|TestNFTNegativeProtocolBoundaries)$'
+		'^(TestNFTNegativeStateIntegrity|TestNFTNegativeProtocolBoundaries)$'
+}
+
+run_current_test_with_host_port_retry() {
+	retry_suite_flag=$1
+	retry_suite_timeout=$2
+	retry_suite_pattern=$3
+	build_test_binary
+	resolve_docker_host
+	prepare_go_dirs
+
+	attempt=1
+	while :; do
+		attempt_log=$(mktemp "$E2E_ROOT/host-port-retry.XXXXXX")
+		attempt_status_file="$attempt_log.status"
+		(
+			set +e
+			run_current_test "$retry_suite_flag" "$retry_suite_timeout" "$retry_suite_pattern"
+			attempt_status=$?
+			printf '%s\n' "$attempt_status" >"$attempt_status_file"
+			exit 0
+		) 2>&1 | tee "$attempt_log"
+
+		if [ ! -s "$attempt_status_file" ]; then
+			rm -f "$attempt_log" "$attempt_status_file"
+			printf 'restart E2E attempt did not record an exit status\n' >&2
+			return 125
+		fi
+		attempt_status=$(sed -n '1p' "$attempt_status_file")
+		case "$attempt_status" in
+			'' | *[!0-9]*)
+				rm -f "$attempt_log" "$attempt_status_file"
+				printf 'restart E2E attempt recorded invalid exit status: %s\n' "$attempt_status" >&2
+				return 125
+				;;
+		esac
+		retryable=0
+		if grep -Eq 'failed to bind host port .*address already in use' "$attempt_log"; then
+			retryable=1
+		fi
+		rm -f "$attempt_log" "$attempt_status_file"
+
+		if [ "$attempt_status" -eq 0 ]; then
+			return 0
+		fi
+		if [ "$attempt" -ge 2 ] || [ "$retryable" -ne 1 ]; then
+			return "$attempt_status"
+		fi
+		printf 'retrying restart E2E once after Docker host-port allocation race\n' >&2
+		attempt=$((attempt + 1))
+	done
 }
 
 restart_body() {
-	run_current_test PANACEA_E2E_RESTART "$E2E_RESTART_TIMEOUT" \
-		'^(TestRestartRecoveryNodeBoundaries|TestPortableApplicationSnapshotRestoreAndFreshFullNodeSync)$'
+	run_current_test_with_host_port_retry PANACEA_E2E_RESTART "$E2E_RESTART_TIMEOUT" \
+		'^TestRestartRecoveryNodeBoundaries$'
+	run_current_test_with_host_port_retry PANACEA_E2E_RESTART "$E2E_RESTART_TIMEOUT" \
+		'^TestPortableApplicationSnapshotRestoreAndFreshFullNodeSync$'
 }
 
 consensus_body() {
 	run_current_test PANACEA_E2E_CONSENSUS "$E2E_CONSENSUS_TIMEOUT" \
-		'^TestFourValidatorQuorumFailureAndRecovery$'
+		'^TestFourValidatorQuorumFaultAndRecovery$'
+}
+
+run_upgrade_normal_test() {
+	upgrade_normal_timeout=$1
+	run_upgrade_test PANACEA_E2E_UPGRADE "$upgrade_normal_timeout" \
+		'^TestV221ToCurrentMultiValidatorUpgrade$'
 }
 
 upgrade_body() {
-	run_upgrade_test PANACEA_E2E_UPGRADE "$E2E_UPGRADE_TIMEOUT" \
-		'^TestV221ToCurrentMultiValidatorUpgrade$'
+	run_upgrade_normal_test "$E2E_UPGRADE_TIMEOUT"
+}
+
+upgrade_legacy_pnft_body() {
+	run_upgrade_test PANACEA_E2E_UPGRADE "$E2E_UPGRADE_DEEP_TIMEOUT" \
+		'^TestV221ToCurrentLegacyPNFTAdversarialUpgrade$'
 }
 
 upgrade_deep_body() {
-	run_upgrade_test PANACEA_E2E_UPGRADE "$E2E_UPGRADE_DEEP_TIMEOUT" \
-		'^TestV221ToCurrentMultiValidatorUpgrade$'
-	run_upgrade_test PANACEA_E2E_UPGRADE "$E2E_UPGRADE_DEEP_TIMEOUT" \
-		'^TestV221ToCurrentLegacyPNFTAdversarialUpgrade$'
+	run_upgrade_normal_test "$E2E_UPGRADE_DEEP_TIMEOUT"
+	upgrade_legacy_pnft_body
 }
 
 upgrade_chaos_body() {
@@ -569,16 +629,7 @@ coverage_merge() {
 
 release_hardening_inner_body() {
 	check_clean
-	unit_body
-	# The suite bodies below share the exact same two images. Build them once in
-	# this process; release-builds intentionally performs its own staged rebuild.
-	build_images
-	upgrade_deep_body
-	upgrade_chaos_body
-	ibc_upgrade_body
-	state_sync_body
-	config_compat_body
-	network_faults_body
+	all_body
 	release_builds_body
 	check_clean
 	coverage_merge
@@ -586,15 +637,19 @@ release_hardening_inner_body() {
 
 all_body() {
 	unit_body
-	# Preserve suite order while reusing each shared image once.
-	build_current_image
+	# Every functional lane shares these exact two images. Build each once.
+	build_images
 	smoke_body
-	build_v221_image
 	v221_body
 	negative_body
 	restart_body
 	consensus_body
-	upgrade_body
+	upgrade_deep_body
+	upgrade_chaos_body
+	ibc_upgrade_body
+	state_sync_body
+	config_compat_body
+	network_faults_body
 	load_body
 }
 

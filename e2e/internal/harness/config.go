@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"regexp"
+	"strconv"
 	"strings"
 
 	interchaintest "github.com/strangelove-ventures/interchaintest/v8"
@@ -66,6 +67,13 @@ type Topology struct {
 	SnapshotInterval   uint64
 	SnapshotKeepRecent uint32
 	EnableTelemetry    bool
+
+	// Test-only genesis overrides. Their zero values leave source genesis intact.
+	StakingUnbondingTime          string
+	SlashingSignedBlocksWindow    int64
+	SlashingMinSignedPerWindow    string
+	SlashingDowntimeJailDuration  string
+	SlashingSlashFractionDowntime string
 }
 
 // NewPanaceaChainSpec returns the thin Panacea adapter used by every suite.
@@ -116,6 +124,37 @@ func NewPanaceaChainSpec(runID string, image ImageRef, topology Topology) (*inte
 			"timeout_commit": topology.TimeoutCommit,
 		}
 	}
+	genesisOverrides := []cosmos.GenesisKV{
+		cosmos.NewGenesisKV("app_state.gov.params.voting_period", "20s"),
+		cosmos.NewGenesisKV("app_state.gov.params.max_deposit_period", "20s"),
+		cosmos.NewGenesisKV("app_state.gov.params.min_deposit.0.denom", "umed"),
+		cosmos.NewGenesisKV("app_state.gov.params.min_deposit.0.amount", "1"),
+	}
+	if value := strings.TrimSpace(topology.StakingUnbondingTime); value != "" {
+		genesisOverrides = append(genesisOverrides,
+			cosmos.NewGenesisKV("app_state.staking.params.unbonding_time", value),
+		)
+	}
+	if topology.SlashingSignedBlocksWindow != 0 {
+		genesisOverrides = append(genesisOverrides,
+			cosmos.NewGenesisKV(
+				"app_state.slashing.params.signed_blocks_window",
+				strconv.FormatInt(topology.SlashingSignedBlocksWindow, 10),
+			),
+		)
+	}
+	for _, override := range []struct {
+		path  string
+		value string
+	}{
+		{path: "app_state.slashing.params.min_signed_per_window", value: topology.SlashingMinSignedPerWindow},
+		{path: "app_state.slashing.params.downtime_jail_duration", value: topology.SlashingDowntimeJailDuration},
+		{path: "app_state.slashing.params.slash_fraction_downtime", value: topology.SlashingSlashFractionDowntime},
+	} {
+		if value := strings.TrimSpace(override.value); value != "" {
+			genesisOverrides = append(genesisOverrides, cosmos.NewGenesisKV(override.path, value))
+		}
+	}
 
 	return &interchaintest.ChainSpec{
 		Name:          chainName,
@@ -142,12 +181,7 @@ func NewPanaceaChainSpec(runID string, image ImageRef, topology Topology) (*inte
 				UIDGID:     "0:0",
 			}},
 			UsingChainIDFlagCLI: false,
-			ModifyGenesis: cosmos.ModifyGenesis([]cosmos.GenesisKV{
-				cosmos.NewGenesisKV("app_state.gov.params.voting_period", "20s"),
-				cosmos.NewGenesisKV("app_state.gov.params.max_deposit_period", "20s"),
-				cosmos.NewGenesisKV("app_state.gov.params.min_deposit.0.denom", "umed"),
-				cosmos.NewGenesisKV("app_state.gov.params.min_deposit.0.amount", "1"),
-			}),
+			ModifyGenesis:       cosmos.ModifyGenesis(genesisOverrides),
 			ConfigFileOverrides: map[string]any{
 				"config/app.toml":    appOverrides,
 				"config/config.toml": cometOverrides,

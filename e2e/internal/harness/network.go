@@ -25,18 +25,25 @@ import (
 
 // Config controls one isolated Interchaintest network.
 type Config struct {
-	Image                ImageRef
-	NumValidators        int
-	NumFullNodes         int
-	RunID                string
-	ArtifactRoot         string
-	DBBackend            string
-	TimeoutCommit        string
-	QueryGasLimit        uint64
-	SnapshotInterval     uint64
-	SnapshotKeepRecent   uint32
-	EnableTelemetry      bool
-	SetupFailureCategory NetworkFaultCategory
+	Image              ImageRef
+	NumValidators      int
+	NumFullNodes       int
+	RunID              string
+	ArtifactRoot       string
+	DBBackend          string
+	TimeoutCommit      string
+	QueryGasLimit      uint64
+	SnapshotInterval   uint64
+	SnapshotKeepRecent uint32
+	EnableTelemetry    bool
+
+	// Test-only genesis overrides. Their zero values leave source genesis intact.
+	StakingUnbondingTime          string
+	SlashingSignedBlocksWindow    int64
+	SlashingMinSignedPerWindow    string
+	SlashingDowntimeJailDuration  string
+	SlashingSlashFractionDowntime string
+	SetupFailureCategory          NetworkFaultCategory
 
 	// Export bootstrap material is deliberately private and is cleared before
 	// Config is retained by the artifact store. Use StartFromExport instead of
@@ -85,16 +92,7 @@ func Start(ctx context.Context, t *testing.T, cfg Config) (network *Network, ret
 		}
 	}
 
-	spec, err := NewPanaceaChainSpec(runID, cfg.Image, Topology{
-		Validators:         cfg.NumValidators,
-		FullNodes:          cfg.NumFullNodes,
-		DBBackend:          cfg.DBBackend,
-		TimeoutCommit:      cfg.TimeoutCommit,
-		QueryGasLimit:      cfg.QueryGasLimit,
-		SnapshotInterval:   cfg.SnapshotInterval,
-		SnapshotKeepRecent: cfg.SnapshotKeepRecent,
-		EnableTelemetry:    cfg.EnableTelemetry,
-	})
+	spec, err := NewPanaceaChainSpec(runID, cfg.Image, topologyFromConfig(cfg))
 	if err != nil {
 		return nil, err
 	}
@@ -142,6 +140,24 @@ func Start(ctx context.Context, t *testing.T, cfg Config) (network *Network, ret
 	}
 
 	return startDockerNetwork(ctx, t, runID, chain, store)
+}
+
+func topologyFromConfig(cfg Config) Topology {
+	return Topology{
+		Validators:                    cfg.NumValidators,
+		FullNodes:                     cfg.NumFullNodes,
+		DBBackend:                     cfg.DBBackend,
+		TimeoutCommit:                 cfg.TimeoutCommit,
+		QueryGasLimit:                 cfg.QueryGasLimit,
+		SnapshotInterval:              cfg.SnapshotInterval,
+		SnapshotKeepRecent:            cfg.SnapshotKeepRecent,
+		EnableTelemetry:               cfg.EnableTelemetry,
+		StakingUnbondingTime:          cfg.StakingUnbondingTime,
+		SlashingSignedBlocksWindow:    cfg.SlashingSignedBlocksWindow,
+		SlashingMinSignedPerWindow:    cfg.SlashingMinSignedPerWindow,
+		SlashingDowntimeJailDuration:  cfg.SlashingDowntimeJailDuration,
+		SlashingSlashFractionDowntime: cfg.SlashingSlashFractionDowntime,
+	}
 }
 
 func startDockerNetwork(

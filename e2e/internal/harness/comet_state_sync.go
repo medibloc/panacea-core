@@ -809,18 +809,6 @@ func (n *Network) waitForCometStateSyncProvidersWithHooks(
 	}
 }
 
-func latestProviderSnapshotHeight(providers []CometStateSyncProviderEvidence) (int64, bool) {
-	var latest int64
-	for _, provider := range providers {
-		for _, height := range provider.CompletedSnapshotHeights {
-			if height > latest {
-				latest = height
-			}
-		}
-	}
-	return latest, latest > 0
-}
-
 func latestCommonProviderSnapshotHeight(providers []CometStateSyncProviderEvidence) (int64, bool) {
 	if len(providers) == 0 {
 		return 0, false

@@ -20,12 +20,13 @@ import (
 )
 
 const (
-	upgradeName                   = "v2.3.0"
-	upgradeBinaryVersion          = "2.3.0"
-	upgradeLegacyPNFTUnsignedPath = "upgrade/legacy-pnft-unsigned.json"
-	upgradeLegacyPNFTSignedPath   = "upgrade/legacy-pnft-signed.json"
-	legacyPNFTDisabledMessage     = "legacy PNFT messages are disabled"
-	upgradeV221Commit             = "a1b342939ba6ac3092aeebbee6a2fa741a34d47f"
+	upgradeName                      = "v2.3.0"
+	upgradeBinaryVersion             = "2.3.0"
+	upgradeLegacyPNFTUnsignedPath    = "upgrade/legacy-pnft-unsigned.json"
+	upgradeLegacyPNFTSignedPath      = "upgrade/legacy-pnft-signed.json"
+	legacyPNFTDisabledMessage        = "legacy PNFT messages are disabled"
+	upgradeV221Commit                = "a1b342939ba6ac3092aeebbee6a2fa741a34d47f"
+	upgradeP0InvariantValidatorIndex = 1
 )
 
 type upgradePreservedState struct {
@@ -53,6 +54,7 @@ type upgradeRunScenario struct {
 	Name                         string
 	LegacyPNFTAdversarialFixture bool
 	RunPostUpgradeStateSync      bool
+	RunP0BoundaryMatrix          bool
 }
 
 type legacyPNFTUpgradeRunState struct {
@@ -123,6 +125,7 @@ func TestV221ToCurrentMultiValidatorUpgrade(t *testing.T) {
 	runV221ToCurrentMultiValidatorUpgrade(t, upgradeRunScenario{
 		Name:                    "normal-empty-legacy-pnft",
 		RunPostUpgradeStateSync: true,
+		RunP0BoundaryMatrix:     true,
 	})
 }
 
@@ -140,17 +143,25 @@ func runV221ToCurrentMultiValidatorUpgrade(t *testing.T, scenario upgradeRunScen
 	}
 	require.NotEmpty(t, scenario.Name)
 
-	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Minute)
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Minute)
 	defer cancel()
 
-	network, err := harness.Start(ctx, t, harness.Config{
+	networkConfig := harness.Config{
 		Image:              harness.V221Image(),
 		NumValidators:      4,
 		NumFullNodes:       1,
 		TimeoutCommit:      "1s",
 		SnapshotInterval:   5,
 		SnapshotKeepRecent: 3,
-	})
+	}
+	if scenario.RunP0BoundaryMatrix {
+		networkConfig.StakingUnbondingTime = "600s"
+		networkConfig.SlashingSignedBlocksWindow = 100
+		networkConfig.SlashingMinSignedPerWindow = "0.800000000000000000"
+		networkConfig.SlashingDowntimeJailDuration = "300s"
+		networkConfig.SlashingSlashFractionDowntime = "0.010000000000000000"
+	}
+	network, err := harness.Start(ctx, t, networkConfig)
 	require.NoError(t, err)
 	defer network.RecordTestPanic()
 	require.Len(t, network.Chain.Validators, 4)
@@ -163,6 +174,7 @@ func runV221ToCurrentMultiValidatorUpgrade(t *testing.T, scenario upgradeRunScen
 		"name":                            scenario.Name,
 		"legacy_pnft_adversarial_fixture": scenario.LegacyPNFTAdversarialFixture,
 		"run_post_upgrade_state_sync":     scenario.RunPostUpgradeStateSync,
+		"run_p0_boundary_matrix":          scenario.RunP0BoundaryMatrix,
 	}))
 
 	startHeight, err := network.Chain.Height(ctx)
@@ -195,6 +207,11 @@ func runV221ToCurrentMultiValidatorUpgrade(t *testing.T, scenario upgradeRunScen
 		upgradeV221ExpectedModuleVersions,
 	)
 	require.NoError(t, err)
+	var p0GenesisBefore upgradeP0GenesisContractEvidence
+	if scenario.RunP0BoundaryMatrix {
+		p0GenesisBefore, err = captureUpgradeP0GenesisContract(ctx, network, "pre-upgrade", networkConfig)
+		require.NoError(t, err)
+	}
 	preserved := prepareUpgradeState(t, ctx, network)
 	preUpgradeCheckpoint, err := captureUpgradeStateCheckpoint(
 		ctx,
@@ -222,6 +239,14 @@ func runV221ToCurrentMultiValidatorUpgrade(t *testing.T, scenario upgradeRunScen
 	require.NoError(t, err)
 	compatibleSignedBankTx, err := prepareV221CompatibleSignedBankTx(ctx, network)
 	require.NoError(t, err)
+	var legacyAminoCustomTxs upgradeV221LegacyAminoCustomTxsFixture
+	var haltMempoolTxs upgradeHaltMempoolFixture
+	if scenario.RunP0BoundaryMatrix {
+		legacyAminoCustomTxs, err = prepareV221LegacyAminoCustomTxs(ctx, network)
+		require.NoError(t, err)
+		haltMempoolTxs, err = prepareV221UpgradeHaltMempoolTxs(ctx, network)
+		require.NoError(t, err)
+	}
 	var legacyPNFTRun *legacyPNFTUpgradeRunState
 	if scenario.LegacyPNFTAdversarialFixture {
 		legacyCreator := buildAndFundNFTWallet(t, ctx, network, "upgrade-legacy-pnft-adversarial-creator")
@@ -243,6 +268,18 @@ func runV221ToCurrentMultiValidatorUpgrade(t *testing.T, scenario upgradeRunScen
 	}
 	stakingPreparation, err := prepareUpgradeStakingMatrix(ctx, network, 0)
 	require.NoError(t, err)
+	var p0QueueFixture upgradeP0StakingQueueFixture
+	var p0QueueEvidence upgradeP0StakingQueueEvidence
+	var p0SlashingFixture upgradeP0SlashingFixture
+	var p0SlashingEvidence upgradeP0SlashingEvidence
+	if scenario.RunP0BoundaryMatrix {
+		var p0QueueBefore upgradeP0StakingQueueCheckpoint
+		p0QueueFixture, p0QueueBefore, err = prepareUpgradeP0StakingQueue(ctx, network)
+		require.NoError(t, err)
+		p0QueueEvidence.Before = p0QueueBefore
+		p0SlashingFixture, p0SlashingEvidence, err = prepareUpgradeP0Slashing(ctx, network)
+		require.NoError(t, err)
+	}
 	authzFeegrantPreparation := prepareUpgradeAuthzFeegrant(t, ctx, network)
 	groupVestingPreparation, err := prepareUpgradeGroupVestingMatrix(ctx, network)
 	require.NoError(t, err)
@@ -254,7 +291,11 @@ func runV221ToCurrentMultiValidatorUpgrade(t *testing.T, scenario upgradeRunScen
 	// Voting alone consumes roughly twenty one-second blocks. The deep matrix
 	// then takes height-pinned checkpoints and deterministic exports on the old
 	// binary, so retain enough headroom for slower CI Docker hosts.
-	upgradeHeight := proposalBaseHeight + 90
+	upgradeHeightOffset := int64(90)
+	if scenario.RunP0BoundaryMatrix {
+		upgradeHeightOffset = 120
+	}
+	upgradeHeight := proposalBaseHeight + upgradeHeightOffset
 	proposalTx, err := network.BroadcastAndWaitTx(
 		ctx,
 		"upgrade-submit-proposal",
@@ -304,6 +345,28 @@ func runV221ToCurrentMultiValidatorUpgrade(t *testing.T, scenario upgradeRunScen
 		}))
 	}
 	require.NoError(t, waitForProposalPassed(ctx, network, proposalID))
+	if scenario.RunP0BoundaryMatrix {
+		queueStartHeight := upgradeHeight - 45
+		require.NoError(t, network.WaitForHeight(ctx, queueStartHeight))
+		require.NoError(t, network.WaitForFullNode(ctx, queueStartHeight))
+		observedQueueStartHeight, heightErr := network.Chain.Height(ctx)
+		require.NoError(t, heightErr)
+		require.Less(t, observedQueueStartHeight, upgradeHeight-10,
+			"P0 staking queues require at least ten committing blocks before the upgrade halt")
+		p0QueueEvidence, err = beginUpgradeP0StakingQueues(
+			ctx,
+			network,
+			p0QueueFixture,
+			p0QueueEvidence.Before,
+		)
+		require.NoError(t, err)
+		require.NoError(t, network.AppendArtifactJSON("upgrade/timeline.jsonl", map[string]any{
+			"event":           "p0-staking-time-queues-started",
+			"recorded_at":     time.Now().UTC(),
+			"observed_height": observedQueueStartHeight,
+			"upgrade_height":  upgradeHeight,
+		}))
+	}
 	preUpgradeGov, err := captureUpgradeGovCheckpoint(ctx, network, "pre-upgrade", proposalID)
 	require.NoError(t, err)
 	preUpgradeStaking, err := captureUpgradeStakingCheckpoint(
@@ -337,6 +400,10 @@ func runV221ToCurrentMultiValidatorUpgrade(t *testing.T, scenario upgradeRunScen
 	)
 	require.NoError(t, err)
 	require.NoError(t, captureV221CompatibleSignedBankTxPreUpgrade(ctx, network, &compatibleSignedBankTx))
+	if scenario.RunP0BoundaryMatrix {
+		require.NoError(t, captureV221LegacyAminoCustomTxsPreUpgrade(ctx, network, &legacyAminoCustomTxs))
+		require.NoError(t, captureV221UpgradeHaltMempoolTxsPreUpgrade(ctx, network, &haltMempoolTxs))
+	}
 
 	preHaltBlock := captureOldPreHaltBlock(t, ctx, network, upgradeHeight-1)
 	require.NoError(t, network.WriteArtifactJSON("upgrade/pre-halt-block.json", map[string]any{
@@ -348,6 +415,21 @@ func runV221ToCurrentMultiValidatorUpgrade(t *testing.T, scenario upgradeRunScen
 	haltEvidence, haltErr := waitForOldBinaryUpgradeHalt(ctx, network, upgradeHeight)
 	require.NoError(t, network.WriteArtifactJSON("upgrade/old-binary-halt.json", haltEvidence))
 	require.NoError(t, haltErr)
+	fullNode := network.Chain.FullNodes[0]
+	if scenario.RunP0BoundaryMatrix {
+		require.NoError(t, stopUpgradeP0SlashingTargetAtHalt(
+			ctx,
+			network,
+			upgradeHeight,
+			&p0SlashingEvidence,
+		))
+		require.NoError(t, submitV221UpgradeHaltMempoolTxsAtHalt(
+			ctx,
+			network,
+			fullNode,
+			&haltMempoolTxs,
+		))
+	}
 
 	currentImage := harness.CurrentImage()
 	quorumValidators := []*cosmos.ChainNode{
@@ -355,8 +437,10 @@ func runV221ToCurrentMultiValidatorUpgrade(t *testing.T, scenario upgradeRunScen
 		network.Chain.Validators[1],
 		network.Chain.Validators[2],
 	}
-	fullNode := network.Chain.FullNodes[0]
-	quorumNodes := append(append([]*cosmos.ChainNode{}, quorumValidators...), fullNode)
+	quorumNodes := append([]*cosmos.ChainNode{}, quorumValidators...)
+	if !scenario.RunP0BoundaryMatrix {
+		quorumNodes = append(quorumNodes, fullNode)
+	}
 	quorumSwitchCtx, quorumSwitchCancel := context.WithTimeout(ctx, 3*time.Minute)
 	quorumSwitches, err := network.SwitchNodeImagesTogether(
 		quorumSwitchCtx,
@@ -381,14 +465,57 @@ func runV221ToCurrentMultiValidatorUpgrade(t *testing.T, scenario upgradeRunScen
 	postUpgradeTarget := upgradeHeight + 3
 	postCtx, postCancel := context.WithTimeout(ctx, 90*time.Second)
 	require.NoError(t, network.WaitForNodeHeight(postCtx, network.Chain.Validators[0], postUpgradeTarget))
-	require.NoError(t, network.WaitForFullNode(postCtx, postUpgradeTarget))
 	postCancel()
+	postUpgradeHistoryNodes := append([]*cosmos.ChainNode{}, quorumNodes...)
+	if scenario.RunP0BoundaryMatrix {
+		carrierCommitCtx, carrierCommitCancel := context.WithTimeout(ctx, 2*time.Minute)
+		require.NoError(t, assertV221UpgradeHaltMempoolTxsCommittedOnNode(
+			carrierCommitCtx,
+			network,
+			network.Chain.Validators[0],
+			&haltMempoolTxs,
+		))
+		carrierCommitCancel()
+
+		fullNodeSwitch, switchErr := network.SwitchNodeImage(ctx, "mempool-carrier-full-node", fullNode, currentImage)
+		require.NoError(t, switchErr)
+		fullNodeIdentity, identityErr := captureUpgradeNodeVersion(ctx, network, fullNode, "full-node-current")
+		require.NoError(t, identityErr)
+		assertCurrentUpgradeBinaryIdentity(t, fullNodeIdentity)
+		fullNodeCtx, fullNodeCancel := context.WithTimeout(ctx, 90*time.Second)
+		require.NoError(t, network.WaitForFullNode(fullNodeCtx, postUpgradeTarget))
+		fullNodeCancel()
+		require.NoError(t, network.AppendArtifactJSON("upgrade/timeline.jsonl", map[string]any{
+			"event":  "mempool-carrier-full-node-switched",
+			"node":   fullNode.Name(),
+			"switch": fullNodeSwitch,
+		}))
+		postUpgradeHistoryNodes = append(postUpgradeHistoryNodes, fullNode)
+		p0GenesisAfter, paramsErr := captureUpgradeP0GenesisContract(ctx, network, "post-upgrade", networkConfig)
+		require.NoError(t, paramsErr)
+		require.Equal(t, p0GenesisBefore.Params, p0GenesisAfter.Params)
+		require.NoError(t, network.WriteArtifactJSON("upgrade/p0/genesis-contract.json", map[string]any{
+			"configured_overrides": networkConfig,
+			"pre_upgrade":          p0GenesisBefore,
+			"post_upgrade":         p0GenesisAfter,
+		}))
+		require.NoError(t, captureUpgradeP0StakingQueuesPendingAfterUpgrade(
+			ctx,
+			network,
+			p0QueueFixture,
+			&p0QueueEvidence,
+		))
+	} else {
+		postCtx, postCancel = context.WithTimeout(ctx, 90*time.Second)
+		require.NoError(t, network.WaitForFullNode(postCtx, postUpgradeTarget))
+		postCancel()
+	}
 	firstObservedHeight, err := network.Chain.Validators[0].Height(ctx)
 	require.NoError(t, err)
 	require.GreaterOrEqual(t, firstObservedHeight, postUpgradeTarget)
-	firstPostBlockEvidence, err := network.RequireSameHistoryAtHeight(ctx, upgradeHeight, quorumNodes...)
+	firstPostBlockEvidence, err := network.RequireSameHistoryAtHeight(ctx, upgradeHeight, postUpgradeHistoryNodes...)
 	require.NoError(t, err)
-	migratedStateEvidence, err := network.RequireSameHistoryAtHeight(ctx, upgradeHeight+1, quorumNodes...)
+	migratedStateEvidence, err := network.RequireSameHistoryAtHeight(ctx, upgradeHeight+1, postUpgradeHistoryNodes...)
 	require.NoError(t, err)
 	require.NoError(t, network.WriteArtifactJSON("upgrade/first-post-upgrade-block.json", map[string]any{
 		"first_post_upgrade_block_height": upgradeHeight,
@@ -406,6 +533,14 @@ func runV221ToCurrentMultiValidatorUpgrade(t *testing.T, scenario upgradeRunScen
 	}))
 
 	delayed := network.Chain.Validators[3]
+	if scenario.RunP0BoundaryMatrix {
+		require.NoError(t, waitForUpgradeP0SlashingJail(
+			ctx,
+			network,
+			p0SlashingFixture,
+			&p0SlashingEvidence,
+		))
+	}
 	delayedSwitch, err := network.SwitchNodeImage(ctx, "delayed-validator", delayed, currentImage)
 	require.NoError(t, err)
 	delayedIdentity, err := captureUpgradeNodeVersion(ctx, network, delayed, "delayed-current")
@@ -421,6 +556,20 @@ func runV221ToCurrentMultiValidatorUpgrade(t *testing.T, scenario upgradeRunScen
 		"height":      postUpgradeTarget,
 		"switch":      delayedSwitch,
 	}))
+	if scenario.RunP0BoundaryMatrix {
+		require.NoError(t, exerciseUpgradeP0Unjail(
+			ctx,
+			network,
+			p0SlashingFixture,
+			&p0SlashingEvidence,
+		))
+		require.NoError(t, completeUpgradeP0StakingQueues(
+			ctx,
+			network,
+			p0QueueFixture,
+			&p0QueueEvidence,
+		))
+	}
 
 	allNodes := append([]*cosmos.ChainNode{}, network.Chain.Validators...)
 	allNodes = append(allNodes, network.Chain.FullNodes[0])
@@ -462,13 +611,37 @@ func runV221ToCurrentMultiValidatorUpgrade(t *testing.T, scenario upgradeRunScen
 	postUpgradeGov, err := captureUpgradeGovCheckpoint(ctx, network, "post-upgrade", proposalID)
 	require.NoError(t, err)
 	assertUpgradeGovMigration(t, preUpgradeGov, postUpgradeGov)
-	postUpgradeStaking, err := captureAndValidateUpgradeStakingPreservation(
-		ctx,
-		network,
-		stakingPreparation.Fixture,
-		preUpgradeStaking,
-	)
-	require.NoError(t, err)
+	var postUpgradeStaking upgradeStakingCheckpoint
+	if scenario.RunP0BoundaryMatrix {
+		postUpgradeStaking, err = captureUpgradeStakingCheckpoint(
+			ctx,
+			network,
+			stakingPreparation.Fixture,
+			"post-upgrade-preservation",
+			preUpgradeStaking.TxHashes,
+		)
+		require.NoError(t, err)
+		require.NoError(t, validateUpgradeP0StakingPreservationWithSlashing(
+			preUpgradeStaking,
+			postUpgradeStaking,
+			p0SlashingEvidence,
+			p0QueueEvidence,
+		))
+		require.NoError(t, network.WriteArtifactJSON("upgrade/staking/p0-preservation-validation.json", map[string]any{
+			"pre_upgrade":  preUpgradeStaking,
+			"post_upgrade": postUpgradeStaking,
+			"slashing":     p0SlashingEvidence,
+			"time_queues":  p0QueueEvidence,
+		}))
+	} else {
+		postUpgradeStaking, err = captureAndValidateUpgradeStakingPreservation(
+			ctx,
+			network,
+			stakingPreparation.Fixture,
+			preUpgradeStaking,
+		)
+		require.NoError(t, err)
+	}
 	_, err = captureAndValidateUpgradeAuthzFeegrantPreserved(
 		ctx,
 		network,
@@ -489,11 +662,30 @@ func runV221ToCurrentMultiValidatorUpgrade(t *testing.T, scenario upgradeRunScen
 		"post-upgrade-preservation",
 	)
 	require.NoError(t, err)
-	require.NoError(t, validateUpgradeSystemModulePreservation(preUpgradeSystemModules, postUpgradeSystemModules))
+	if scenario.RunP0BoundaryMatrix {
+		supplyAccounting, accountingErr := validateUpgradeSystemModulePreservationWithSlashing(
+			preUpgradeSystemModules,
+			postUpgradeSystemModules,
+			p0SlashingEvidence,
+		)
+		require.NoError(t, accountingErr)
+		require.NoError(t, network.WriteArtifactJSON(
+			"upgrade/system-modules/p0-slashing-supply-accounting.json",
+			supplyAccounting,
+		))
+	} else {
+		require.NoError(t, validateUpgradeSystemModulePreservation(preUpgradeSystemModules, postUpgradeSystemModules))
+	}
+	postUpgradeInvariantValidator := 3
+	if scenario.RunP0BoundaryMatrix {
+		// Keep independent stop/start probes off both validator 3, which owns the
+		// jail/unjail proof, and validator 2, which owns deterministic exports.
+		postUpgradeInvariantValidator = upgradeP0InvariantValidatorIndex
+	}
 	postUpgradeInvariant, err := network.AssertValidatorInvariantsAtHeight(
 		ctx,
 		"post-upgrade",
-		3,
+		postUpgradeInvariantValidator,
 		postUpgradeSystemModules.Height,
 	)
 	require.NoError(t, err)
@@ -537,6 +729,13 @@ func runV221ToCurrentMultiValidatorUpgrade(t *testing.T, scenario upgradeRunScen
 	}
 	require.NoError(t, recordUpgradeHistoricalTx(ctx, network, "post-upgrade", systemPreparation.BurnTxHash))
 	require.NoError(t, broadcastV221CompatibleSignedBankTxAfterUpgrade(ctx, network, &compatibleSignedBankTx))
+	if scenario.RunP0BoundaryMatrix {
+		require.NoError(t, broadcastV221LegacyAminoCustomTxsAfterUpgrade(
+			ctx,
+			network,
+			&legacyAminoCustomTxs,
+		))
+	}
 	if legacyPNFTRun != nil {
 		require.NoError(t, assertOldBinarySignedLegacyPNFTDisabled(ctx, network, legacyPNFTRun.Prepared))
 		isolation, isolationErr := createStandardNFTAtLegacyIDs(
@@ -655,15 +854,37 @@ func runV221ToCurrentMultiValidatorUpgrade(t *testing.T, scenario upgradeRunScen
 	)
 	require.NoError(t, err)
 	require.NoError(t, validateUpgradeSystemModulePreservation(systemMutation.Checkpoint, postRestartSystemModules))
+	postRestartInvariantValidator := 3
+	if scenario.RunP0BoundaryMatrix {
+		// Use a second healthy validator so neither the P0 jail target nor the
+		// earlier export target accumulates seven misses in the short window.
+		postRestartInvariantValidator = 1
+	}
 	postRestartInvariant, err := network.AssertValidatorInvariantsAtHeight(
 		ctx,
 		"post-restart",
-		3,
+		postRestartInvariantValidator,
 		postRestartSystemModules.Height,
 	)
 	require.NoError(t, err)
 	require.True(t, postRestartInvariant.AllInvariantsPassed)
 	require.NoError(t, assertV221CompatibleSignedBankTxAfterRestart(ctx, network, compatibleSignedBankTx))
+	if scenario.RunP0BoundaryMatrix {
+		require.NoError(t, assertV221LegacyAminoCustomTxsAfterRestart(ctx, network, legacyAminoCustomTxs))
+		require.NoError(t, assertV221UpgradeHaltMempoolTxsAfterRestart(ctx, network, haltMempoolTxs))
+		require.NoError(t, captureUpgradeP0StakingQueuesAfterRestart(
+			ctx,
+			network,
+			p0QueueFixture,
+			&p0QueueEvidence,
+		))
+		require.NoError(t, captureUpgradeP0SlashingAfterRestart(
+			ctx,
+			network,
+			p0SlashingFixture,
+			&p0SlashingEvidence,
+		))
+	}
 	if legacyPNFTRun != nil {
 		require.NotNil(t, legacyPNFTRun.Isolation)
 		require.NoError(t, assertStandardNFTAtLegacyIDsPersisted(ctx, network, *legacyPNFTRun.Isolation))
@@ -824,7 +1045,7 @@ func runV221ToCurrentMultiValidatorUpgrade(t *testing.T, scenario upgradeRunScen
 			require.NotNil(t, restored.NFTRecord.BurnTombstone, phase)
 		}
 	}
-	require.NoError(t, recordConnectedUpgradeCoverage(network, connectedUpgradeCoverageInput{
+	coverageInput := connectedUpgradeCoverageInput{
 		Scenario:              scenario,
 		Preserved:             preserved,
 		ProposalID:            proposalID,
@@ -835,7 +1056,14 @@ func runV221ToCurrentMultiValidatorUpgrade(t *testing.T, scenario upgradeRunScen
 		NFT:                   nftAfterRestart,
 		LegacyPNFT:            legacyPNFTRun,
 		CompatibleSignedBank:  compatibleSignedBankTx,
-	}))
+	}
+	if scenario.RunP0BoundaryMatrix {
+		coverageInput.HaltMempool = &haltMempoolTxs
+		coverageInput.StakingTimeQueues = &p0QueueEvidence
+		coverageInput.SlashingJail = &p0SlashingEvidence
+		coverageInput.LegacyAminoCustom = &legacyAminoCustomTxs
+	}
+	require.NoError(t, recordConnectedUpgradeCoverage(network, coverageInput))
 }
 
 const preservedAddressKey = "upgrade-preserved"

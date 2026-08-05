@@ -28,6 +28,24 @@ func TestRunStoppedNodeOperationRestartsAfterOperationFailure(t *testing.T) {
 	require.Equal(t, []string{"stop", "operation", "start"}, calls)
 }
 
+func TestRunStoppedNodeOperationRestartsAfterStopFailure(t *testing.T) {
+	var calls []string
+	err := runRecoveryStoppedOperation(
+		func() error {
+			calls = append(calls, "stop")
+			return errors.New("wait for SIGKILL exit failed")
+		},
+		nil,
+		func() error {
+			calls = append(calls, "start")
+			return nil
+		},
+	)
+
+	require.ErrorContains(t, err, "wait for SIGKILL exit failed")
+	require.Equal(t, []string{"stop", "start"}, calls)
+}
+
 func TestClassifyWALReplayEvidence(t *testing.T) {
 	t.Parallel()
 

@@ -24,15 +24,16 @@ import (
 )
 
 const (
-	upgradeBurnAddress                     = "panacea100000000000000000000000000000000nqmafp"
-	upgradeSystemBurnAmount                = "2000000"
-	upgradeSystemDenom                     = "umed"
-	upgradeSystemPreUpgradeCheckpointPhase = "pre-upgrade-checkpoint"
-	upgradeSystemLocalhostClientID         = "09-localhost"
-	upgradeSystemLocalhostConnectionID     = "connection-localhost"
-	upgradeSystemV221IBCGoVersion          = "github.com/cosmos/ibc-go/v7@v7.3.2"
-	upgradeSystemLocalhostProjectionReason = "ibc-go v7.3.2 exports its runtime localhost connection but validates only connection-{N}; InitGenesis deterministically recreates this sentinel"
-	upgradeSystemMintRESTBoundary          = "rest"
+	upgradeBurnAddress                      = "panacea100000000000000000000000000000000nqmafp"
+	upgradeSystemBurnAmount                 = "2000000"
+	upgradeSystemDenom                      = "umed"
+	upgradeSystemPreUpgradeCheckpointPhase  = "pre-upgrade-checkpoint"
+	upgradeSystemLocalhostClientID          = "09-localhost"
+	upgradeSystemLocalhostConnectionID      = "connection-localhost"
+	upgradeSystemV221IBCGoVersion           = "github.com/cosmos/ibc-go/v7@v7.3.2"
+	upgradeSystemLocalhostProjectionReason  = "ibc-go v7.3.2 exports its runtime localhost connection but validates only connection-{N}; InitGenesis deterministically recreates this sentinel"
+	upgradeSystemMintRESTBoundary           = "rest"
+	upgradeSystemModuleExportValidatorIndex = 2
 )
 
 var upgradeSystemModuleNames = []string{
@@ -117,6 +118,13 @@ type upgradeSystemMutation struct {
 	EndHeight       int64                         `json:"end_height"`
 	BlocksCommitted int64                         `json:"blocks_committed"`
 	Checkpoint      upgradeSystemModuleCheckpoint `json:"checkpoint"`
+}
+
+type upgradeP0SystemSupplyAccounting struct {
+	BeforeSupply string `json:"before_supply"`
+	AfterSupply  string `json:"after_supply"`
+	SlashBurn    string `json:"slash_burn"`
+	MintAccrual  string `json:"mint_accrual"`
 }
 
 func prepareUpgradeSystemModules(
@@ -801,7 +809,7 @@ func captureUpgradeSystemModuleCheckpoint(
 	if !systemModulePhaseIsSafe(phase) {
 		return upgradeSystemModuleCheckpoint{}, fmt.Errorf("invalid system-module phase %q", phase)
 	}
-	exportNode := network.Chain.Validators[3]
+	exportNode := network.Chain.Validators[upgradeSystemModuleExportValidatorIndex]
 	height, err := exportNode.Height(ctx)
 	if err != nil {
 		return upgradeSystemModuleCheckpoint{}, fmt.Errorf("query system-module export height: %w", err)
@@ -820,7 +828,7 @@ func captureUpgradeSystemModuleCheckpoint(
 	exportEvidence, err := network.ExportValidatorGenesisDeterministically(
 		ctx,
 		"upgrade-system-"+phase,
-		3,
+		upgradeSystemModuleExportValidatorIndex,
 		height,
 	)
 	if err != nil {
@@ -1219,36 +1227,90 @@ func validateUpgradeSystemModulePreservation(
 	before upgradeSystemModuleCheckpoint,
 	after upgradeSystemModuleCheckpoint,
 ) error {
+	_, err := validateUpgradeSystemModulePreservationWithSupplyBurn(
+		before,
+		after,
+		sdkmath.ZeroInt(),
+	)
+	return err
+}
+
+func validateUpgradeSystemModulePreservationWithSlashing(
+	before upgradeSystemModuleCheckpoint,
+	after upgradeSystemModuleCheckpoint,
+	slashing upgradeP0SlashingEvidence,
+) (upgradeP0SystemSupplyAccounting, error) {
+	beforeTokens, ok := sdkmath.NewIntFromString(slashing.Before.Validator.Tokens)
+	if !ok || !beforeTokens.IsPositive() {
+		return upgradeP0SystemSupplyAccounting{}, fmt.Errorf(
+			"pre-slash validator tokens %q must be a positive integer",
+			slashing.Before.Validator.Tokens,
+		)
+	}
+	jailedTokens, ok := sdkmath.NewIntFromString(slashing.Jailed.Validator.Tokens)
+	if !ok || jailedTokens.IsNegative() {
+		return upgradeP0SystemSupplyAccounting{}, fmt.Errorf(
+			"jailed validator tokens %q must be a non-negative integer",
+			slashing.Jailed.Validator.Tokens,
+		)
+	}
+	slashBurn := beforeTokens.Sub(jailedTokens)
+	if !slashBurn.IsPositive() {
+		return upgradeP0SystemSupplyAccounting{}, fmt.Errorf(
+			"observed validator slash burn %s must be positive",
+			slashBurn,
+		)
+	}
+	return validateUpgradeSystemModulePreservationWithSupplyBurn(before, after, slashBurn)
+}
+
+func validateUpgradeSystemModulePreservationWithSupplyBurn(
+	before upgradeSystemModuleCheckpoint,
+	after upgradeSystemModuleCheckpoint,
+	slashBurn sdkmath.Int,
+) (upgradeP0SystemSupplyAccounting, error) {
+	accounting := upgradeP0SystemSupplyAccounting{SlashBurn: slashBurn.String()}
 	if err := validateUpgradeSystemModuleCheckpoint(before); err != nil {
-		return fmt.Errorf("before checkpoint: %w", err)
+		return accounting, fmt.Errorf("before checkpoint: %w", err)
 	}
 	if err := validateUpgradeSystemModuleCheckpoint(after); err != nil {
-		return fmt.Errorf("after checkpoint: %w", err)
+		return accounting, fmt.Errorf("after checkpoint: %w", err)
 	}
 	if after.Height <= before.Height {
-		return fmt.Errorf("system-module height did not advance: before=%d after=%d", before.Height, after.Height)
+		return accounting, fmt.Errorf("system-module height did not advance: before=%d after=%d", before.Height, after.Height)
 	}
 	if !canonicalUpgradeSystemValuesEqual(before.MintParams, after.MintParams) {
-		return errors.New("mint params changed")
+		return accounting, errors.New("mint params changed")
 	}
 	consensusEqual, err := upgradeSystemConsensusStatesEqual(before.ConsensusParams, after.ConsensusParams)
 	if err != nil {
-		return fmt.Errorf("compare consensus params across upgrade: %w", err)
+		return accounting, fmt.Errorf("compare consensus params across upgrade: %w", err)
 	}
 	if !consensusEqual {
-		return errors.New("consensus params changed")
+		return accounting, errors.New("consensus params changed")
 	}
 	if !canonicalUpgradeSystemValuesEqual(before.LegacyParams, after.LegacyParams) {
-		return errors.New("legacy params state changed")
+		return accounting, errors.New("legacy params state changed")
 	}
 	beforeSupply, _ := sdkmath.NewIntFromString(before.Supply)
 	afterSupply, _ := sdkmath.NewIntFromString(after.Supply)
-	if afterSupply.LT(beforeSupply) {
-		return fmt.Errorf("supply decreased across preservation boundary: before=%s after=%s", beforeSupply, afterSupply)
+	accounting.BeforeSupply = beforeSupply.String()
+	accounting.AfterSupply = afterSupply.String()
+	accounting.MintAccrual = afterSupply.Add(slashBurn).Sub(beforeSupply).String()
+	if afterSupply.Add(slashBurn).LT(beforeSupply) {
+		if slashBurn.IsZero() {
+			return accounting, fmt.Errorf("supply decreased across preservation boundary: before=%s after=%s", beforeSupply, afterSupply)
+		}
+		return accounting, fmt.Errorf(
+			"supply decrease exceeds observed slash burn: before=%s after=%s slash=%s",
+			beforeSupply,
+			afterSupply,
+			slashBurn,
+		)
 	}
 	for _, moduleName := range []string{"burn", "capability", "crisis"} {
 		if before.Export.ModuleDigests[moduleName] != after.Export.ModuleDigests[moduleName] {
-			return fmt.Errorf(
+			return accounting, fmt.Errorf(
 				"%s module state changed: before=%s after=%s",
 				moduleName,
 				before.Export.ModuleDigests[moduleName],
@@ -1256,7 +1318,7 @@ func validateUpgradeSystemModulePreservation(
 			)
 		}
 	}
-	return nil
+	return accounting, nil
 }
 
 func queryAllUpgradeLegacyParams(

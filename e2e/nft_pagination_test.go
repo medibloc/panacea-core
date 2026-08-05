@@ -375,52 +375,6 @@ func collectStandardClassOpaquePages(
 	return nil
 }
 
-func assertPanaceaListBoundaries(
-	t *testing.T,
-	ctx context.Context,
-	network *harness.Network,
-	height int64,
-	classID string,
-	owner string,
-	wantKeys []string,
-) {
-	t.Helper()
-	arguments := []string{
-		"nft", "nft-records",
-		"--class-id", classID,
-		"--owner", owner,
-		"--limit", "100",
-		"--height", strconv.FormatInt(height, 10),
-	}
-	cliRaw, err := network.FullNodeCLIQuery(ctx, "pagination-panacea-cli", arguments...)
-	require.NoError(t, err)
-	grpcRaw, err := network.FullNodeGRPCQuery(ctx, "pagination-panacea-grpc", arguments...)
-	require.NoError(t, err)
-	require.JSONEq(t, string(cliRaw), string(grpcRaw))
-
-	values := url.Values{}
-	values.Set("class_id", classID)
-	values.Set("owner", owner)
-	values.Set("pagination.limit", "100")
-	restRaw, err := network.FullNodeRESTGetAtHeight(
-		ctx,
-		nil,
-		"pagination-panacea-rest",
-		"/panacea/nft/v1/nfts?"+values.Encode(),
-		height,
-	)
-	require.NoError(t, err)
-	require.JSONEq(t, string(cliRaw), string(restRaw))
-
-	var response nftRecordsQueryResponse
-	require.NoError(t, json.Unmarshal(cliRaw, &response))
-	require.Equal(t, wantKeys, panaceaNFTRecordKeys(response.NFTRecords))
-	for _, record := range response.NFTRecords {
-		require.Equal(t, owner, record.Owner)
-		require.Equal(t, "LIVE_NFT_STATUS_ACTIVE", record.Status)
-	}
-}
-
 func standardNFTKeys(nfts []*upstreamnft.NFT) []string {
 	keys := make([]string, 0, len(nfts))
 	for _, nft := range nfts {
@@ -705,6 +659,17 @@ func assertNFTPaginationRESTRejections(
 			require.ErrorContains(t, err, testCase.wantDetail)
 		}
 	}
+
+	filterlessPath := panaceaPaginationSpec{limit: 1}.restPath("/panacea/nft/v1/nfts")
+	_, err := network.FullNodeRESTGetAtHeight(
+		ctx,
+		nil,
+		"pagination-reject-custom-missing-filter",
+		filterlessPath,
+		height,
+	)
+	require.ErrorContains(t, err, "HTTP 400")
+	require.ErrorContains(t, err, "must provide at least one of class_id or owner")
 }
 
 // Offset and count-total are deliberately absent from the custom CLI. Limit

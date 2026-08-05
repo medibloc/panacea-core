@@ -25,6 +25,167 @@ func upgradeSignedTxContainerPath(homeDir, relativePath string) (string, error) 
 	return path.Join(homeDir, clean), nil
 }
 
+func classifyAcceptedCheckTx(result TxResult) error {
+	if strings.TrimSpace(result.Height) != "0" {
+		if result.HeightInt64() > 0 {
+			return fmt.Errorf("transaction reached committed height %s instead of returning CheckTx evidence", result.Height)
+		}
+		return fmt.Errorf("CheckTx acceptance returned invalid broadcast height %q", result.Height)
+	}
+	if result.Code != 0 {
+		return fmt.Errorf(
+			"CheckTx failed: codespace=%s code=%d raw_log=%s",
+			result.Codespace,
+			result.Code,
+			result.RawLog,
+		)
+	}
+	return nil
+}
+
+// BroadcastSignedTxFileCheckTx sync-broadcasts a prebuilt signed transaction
+// from the node home and returns only accepted CheckTx evidence. It deliberately
+// does not poll query-tx or wait for the transaction to commit.
+func (n *Network) BroadcastSignedTxFileCheckTx(
+	ctx context.Context,
+	step string,
+	node *cosmos.ChainNode,
+	relativePath string,
+) (*TxResult, error) {
+	n.txMu.Lock()
+	defer n.txMu.Unlock()
+
+	_, result, err := n.broadcastSignedTxFileCheckTxLocked(
+		ctx,
+		step,
+		node,
+		relativePath,
+		"checktx_acceptance",
+		"",
+		0,
+	)
+	return result, err
+}
+
+// BroadcastSignedTxFileExpectCheckTxFailure sync-broadcasts a prebuilt signed
+// transaction and proves that CheckTx rejected it with the exact stable
+// codespace and code. An expected rejection is returned as evidence and does
+// not wait for, or claim, a committed transaction.
+func (n *Network) BroadcastSignedTxFileExpectCheckTxFailure(
+	ctx context.Context,
+	step string,
+	node *cosmos.ChainNode,
+	relativePath string,
+	expectedCodespace string,
+	expectedCode uint32,
+) (*TxResult, error) {
+	if strings.TrimSpace(expectedCodespace) == "" {
+		return nil, errors.New("expected CheckTx codespace is required")
+	}
+	if expectedCode == 0 {
+		return nil, errors.New("expected CheckTx code must be nonzero")
+	}
+
+	n.txMu.Lock()
+	defer n.txMu.Unlock()
+
+	_, result, err := n.broadcastSignedTxFileCheckTxLocked(
+		ctx,
+		step,
+		node,
+		relativePath,
+		"checktx_rejection",
+		expectedCodespace,
+		expectedCode,
+	)
+	return result, err
+}
+
+func (n *Network) broadcastSignedTxFileCheckTxLocked(
+	ctx context.Context,
+	step string,
+	node *cosmos.ChainNode,
+	relativePath string,
+	expectedOutcome string,
+	expectedCodespace string,
+	expectedCode uint32,
+) (string, *TxResult, error) {
+	if strings.TrimSpace(step) == "" {
+		return "", nil, errors.New("transaction step is required")
+	}
+	if node == nil {
+		return "", nil, errors.New("transaction node is required")
+	}
+	containerPath, err := upgradeSignedTxContainerPath(node.HomeDir(), relativePath)
+	if err != nil {
+		return "", nil, err
+	}
+
+	requestID := fmt.Sprintf("%s-%d", step, time.Now().UTC().UnixNano())
+	request := map[string]any{
+		"request_id":       requestID,
+		"recorded_at":      time.Now().UTC(),
+		"step":             step,
+		"node":             node.Name(),
+		"arguments":        []string{"broadcast-signed-file", relativePath},
+		"expected_outcome": expectedOutcome,
+	}
+	if expectedCode != 0 {
+		request["expected_codespace"] = expectedCodespace
+		request["expected_code"] = expectedCode
+	}
+	if err := n.artifacts.appendJSONLine("tx/requests.jsonl", request); err != nil {
+		n.artifacts.recordFailure("record-tx-request", err)
+		return requestID, nil, fmt.Errorf("record signed transaction request %s: %w", step, err)
+	}
+
+	stdout, stderr, execErr := node.Exec(ctx, node.NodeCommand(
+		"tx", "broadcast", containerPath,
+		"--broadcast-mode", "sync",
+		"--output", "json",
+	), node.Chain.Config().Env)
+	broadcastEvidence := map[string]any{
+		"request_id":       requestID,
+		"recorded_at":      time.Now().UTC(),
+		"step":             step,
+		"stdout":           jsonOrString(stdout),
+		"stderr":           boundedString(stderr, txStderrMaxBytes),
+		"exec_error":       errorString(execErr),
+		"expected_outcome": expectedOutcome,
+	}
+	if expectedCode != 0 {
+		broadcastEvidence["expected_codespace"] = expectedCodespace
+		broadcastEvidence["expected_code"] = expectedCode
+	}
+	if err := n.artifacts.appendJSONLine("tx/broadcast-results.jsonl", broadcastEvidence); err != nil {
+		n.artifacts.recordFailure("record-tx-broadcast", err)
+		return requestID, nil, fmt.Errorf("record signed transaction broadcast %s: %w", step, err)
+	}
+	if execErr != nil {
+		err := fmt.Errorf("broadcast signed transaction %s: %w: %s", step, execErr, boundedString(stderr, txStderrMaxBytes))
+		n.artifacts.recordFailure("broadcast-tx-"+step, err)
+		return requestID, nil, err
+	}
+
+	broadcast, err := parseTxResult(stdout)
+	if err != nil {
+		err = fmt.Errorf("decode CheckTx response for %s: %w", step, err)
+		n.artifacts.recordFailure("decode-checktx-"+step, err)
+		return requestID, nil, err
+	}
+	if expectedCode == 0 {
+		err = classifyAcceptedCheckTx(broadcast)
+	} else {
+		err = classifyExpectedCheckTxFailure(broadcast, expectedCodespace, expectedCode)
+	}
+	if err != nil {
+		err = fmt.Errorf("CheckTx %s: %w", step, err)
+		n.artifacts.recordFailure("checktx-"+step, err)
+		return requestID, &broadcast, err
+	}
+	return requestID, &broadcast, nil
+}
+
 // BroadcastSignedTxFileAndWaitDeliverFailure broadcasts a prebuilt signed
 // transaction from the node home. Keeping the transaction as a file supports
 // historical message types whose CLI command was intentionally removed in the
@@ -68,72 +229,20 @@ func (n *Network) broadcastSignedTxFileAndWait(
 	n.txMu.Lock()
 	defer n.txMu.Unlock()
 
-	if strings.TrimSpace(step) == "" {
-		return nil, errors.New("transaction step is required")
-	}
-	if node == nil {
-		return nil, errors.New("transaction node is required")
-	}
 	if expectedCode != 0 && strings.TrimSpace(expectedCodespace) == "" {
 		return nil, errors.New("expected deliver failure codespace and non-zero code are required")
 	}
-	containerPath, err := upgradeSignedTxContainerPath(node.HomeDir(), relativePath)
+	requestID, broadcast, err := n.broadcastSignedTxFileCheckTxLocked(
+		ctx,
+		step,
+		node,
+		relativePath,
+		"checktx_acceptance",
+		"",
+		0,
+	)
 	if err != nil {
-		return nil, err
-	}
-
-	requestID := fmt.Sprintf("%s-%d", step, time.Now().UTC().UnixNano())
-	request := map[string]any{
-		"request_id":  requestID,
-		"recorded_at": time.Now().UTC(),
-		"step":        step,
-		"node":        node.Name(),
-		"arguments":   []string{"broadcast-signed-file", relativePath},
-	}
-	if err := n.artifacts.appendJSONLine("tx/requests.jsonl", request); err != nil {
-		n.artifacts.recordFailure("record-tx-request", err)
-		return nil, fmt.Errorf("record signed transaction request %s: %w", step, err)
-	}
-
-	stdout, stderr, execErr := node.Exec(ctx, node.NodeCommand(
-		"tx", "broadcast", containerPath,
-		"--broadcast-mode", "sync",
-		"--output", "json",
-	), node.Chain.Config().Env)
-	broadcastEvidence := map[string]any{
-		"request_id":  requestID,
-		"recorded_at": time.Now().UTC(),
-		"step":        step,
-		"stdout":      jsonOrString(stdout),
-		"stderr":      boundedString(stderr, txStderrMaxBytes),
-		"exec_error":  errorString(execErr),
-	}
-	if err := n.artifacts.appendJSONLine("tx/broadcast-results.jsonl", broadcastEvidence); err != nil {
-		n.artifacts.recordFailure("record-tx-broadcast", err)
-		return nil, fmt.Errorf("record signed transaction broadcast %s: %w", step, err)
-	}
-	if execErr != nil {
-		err := fmt.Errorf("broadcast signed transaction %s: %w: %s", step, execErr, boundedString(stderr, txStderrMaxBytes))
-		n.artifacts.recordFailure("broadcast-tx-"+step, err)
-		return nil, err
-	}
-
-	broadcast, err := parseTxResult(stdout)
-	if err != nil {
-		err = fmt.Errorf("decode CheckTx response for %s: %w", step, err)
-		n.artifacts.recordFailure("decode-checktx-"+step, err)
-		return nil, err
-	}
-	if broadcast.Code != 0 {
-		err = fmt.Errorf(
-			"CheckTx %s failed: codespace=%s code=%d raw_log=%s",
-			step,
-			broadcast.Codespace,
-			broadcast.Code,
-			broadcast.RawLog,
-		)
-		n.artifacts.recordFailure("checktx-"+step, err)
-		return &broadcast, err
+		return broadcast, err
 	}
 
 	committed, err := n.waitForCommittedTx(ctx, requestID, step, broadcast.TxHash)

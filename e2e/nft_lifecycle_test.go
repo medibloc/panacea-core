@@ -456,22 +456,6 @@ func buildAndFundNFTWallet(
 	return wallet
 }
 
-func queryClassRecord(
-	t *testing.T,
-	ctx context.Context,
-	network *harness.Network,
-	step string,
-	classID string,
-) classRecordQueryResponse {
-	t.Helper()
-	raw, err := network.FullNodeCLIQuery(ctx, step, "nft", "class-record", classID)
-	require.NoError(t, err)
-	var response classRecordQueryResponse
-	require.NoError(t, json.Unmarshal(raw, &response))
-	require.NotEmpty(t, response.ClassRecord.Class.ID)
-	return response
-}
-
 func queryNFTRecord(
 	t *testing.T,
 	ctx context.Context,

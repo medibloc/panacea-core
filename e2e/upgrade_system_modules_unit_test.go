@@ -13,6 +13,14 @@ import (
 	"github.com/medibloc/panacea-core/v2/e2e/internal/harness"
 )
 
+func TestUpgradeSystemModuleExportDoesNotPerturbP0SlashingTarget(t *testing.T) {
+	t.Parallel()
+
+	require.NotEqual(t, upgradeP0SlashingValidatorIndex, upgradeSystemModuleExportValidatorIndex)
+	require.NotEqual(t, upgradeP0SlashingValidatorIndex, upgradeP0InvariantValidatorIndex)
+	require.NotEqual(t, upgradeSystemModuleExportValidatorIndex, upgradeP0InvariantValidatorIndex)
+}
+
 func TestDecodeUpgradeSystemModuleExportRequiresAndCanonicalizesEveryModule(t *testing.T) {
 	t.Parallel()
 

@@ -193,6 +193,13 @@ func TestValidateUpgradeStakingPreservationAllowsAccrualButRejectsStateLoss(t *t
 
 	require.NoError(t, validateUpgradeStakingPreservation(before, after))
 
+	// missed_blocks_counter is a sliding-window cardinality, not a monotonic
+	// sequence. Old misses legitimately expire while identity and index_offset
+	// continue forward.
+	expiredMiss := before
+	expiredMiss.State.SigningInfo.MissedBlocksCounter = 4
+	require.NoError(t, validateUpgradeStakingPreservation(expiredMiss, after))
+
 	lost := after
 	lost.State.Delegation.Balance.Amount = "99"
 	require.ErrorContains(t, validateUpgradeStakingPreservation(before, lost), "delegation balance")
