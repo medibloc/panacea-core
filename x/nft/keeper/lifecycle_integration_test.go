@@ -131,7 +131,7 @@ func TestFullNFTLifecycleAcrossPanaceaAndStandardServices(t *testing.T) {
 	require.NotNil(t, live)
 	require.Equal(t, firstOwner, live.Owner)
 	require.Equal(t, nfttypes.LiveNFTStatus_LIVE_NFT_STATUS_ACTIVE, live.Status)
-	require.Equal(t, &nfttypes.MintRecord{
+	require.Equal(t, nfttypes.MintRecord{
 		MintedAt: mintedAt,
 		MintedBy: controller,
 	}, live.Mint)

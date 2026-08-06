@@ -80,7 +80,7 @@ func TestMintCreatesActiveNFTRecord(t *testing.T) {
 	require.Equal(t, &nfttypes.LifecycleRecord{
 		ClassId: classID,
 		NftId:   request.NftId,
-		Mint: &nfttypes.MintRecord{
+		Mint: nfttypes.MintRecord{
 			MintedAt: mintTime,
 			MintedBy: controller,
 		},
@@ -510,7 +510,7 @@ func TestMintRejectsInconsistentNFTState(t *testing.T) {
 			nfttypes.LifecycleRecord{
 				ClassId: classID,
 				NftId:   request.NftId,
-				Mint: &nfttypes.MintRecord{
+				Mint: nfttypes.MintRecord{
 					MintedAt: fixture.ctx.BlockTime(),
 					MintedBy: controller,
 				},
@@ -611,7 +611,7 @@ func TestQueryNFTRecordErrorMapping(t *testing.T) {
 		nfttypes.LifecycleRecord{
 			ClassId: classID,
 			NftId:   "nft-1",
-			Mint: &nfttypes.MintRecord{
+			Mint: nfttypes.MintRecord{
 				MintedAt: fixture.ctx.BlockTime(),
 				MintedBy: controller,
 			},

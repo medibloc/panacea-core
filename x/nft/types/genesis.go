@@ -340,9 +340,9 @@ func validateGenesisMintRecord(
 	recordType string,
 	classID string,
 	nftID string,
-	mint *MintRecord,
+	mint MintRecord,
 ) error {
-	if mint == nil {
+	if mint.MintedAt.IsZero() && mint.MintedBy == "" {
 		return fmt.Errorf("%s has no mint record for %s/%s", recordType, classID, nftID)
 	}
 	if mint.MintedAt.IsZero() {
@@ -363,7 +363,7 @@ func validateGenesisRevocation(
 	recordType string,
 	classID string,
 	nftID string,
-	mint *MintRecord,
+	mint MintRecord,
 	revocation *Revocation,
 ) error {
 	if revocation == nil {

@@ -5,7 +5,7 @@ import "amino/amino.proto";
 import "cosmos/msg/v1/msg.proto";
 import "cosmos_proto/cosmos.proto";
 
-option go_package = "github.com/medibloc/panacea-core/x/pnft/types";
+option go_package = "github.com/medibloc/panacea-core/v2/x/pnft/types";
 option java_multiple_files = true;
 
 // Msg is retained only for wire compatibility with legacy PNFT transactions

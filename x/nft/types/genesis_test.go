@@ -99,6 +99,13 @@ func TestValidateGenesisRejectsInconsistentCombinedState(t *testing.T) {
 			},
 		},
 		{
+			name:          "lifecycle without mint record",
+			expectedError: "has no mint record",
+			mutate: func(genesis *GenesisState) {
+				genesis.Lifecycles[0].Mint = MintRecord{}
+			},
+		},
+		{
 			name:          "empty owner entry",
 			expectedError: "must not be empty",
 			mutate: func(genesis *GenesisState) {
@@ -125,6 +132,13 @@ func TestValidateGenesisRejectsInconsistentCombinedState(t *testing.T) {
 			expectedError: "burn predates mint",
 			mutate: func(genesis *GenesisState) {
 				genesis.Tombstones[0].BurnedAt = genesis.Tombstones[0].Mint.MintedAt.Add(-time.Second)
+			},
+		},
+		{
+			name:          "tombstone without mint record",
+			expectedError: "has no mint record",
+			mutate: func(genesis *GenesisState) {
+				genesis.Tombstones[0].Mint = MintRecord{}
 			},
 		},
 		{
@@ -209,7 +223,7 @@ func validCombinedGenesis(t *testing.T, addressCodec coreaddress.Codec) *Genesis
 		Lifecycles: []*LifecycleRecord{{
 			ClassId: classID,
 			NftId:   "nft-1",
-			Mint: &MintRecord{
+			Mint: MintRecord{
 				MintedAt: mintedAt,
 				MintedBy: creator,
 			},
@@ -217,7 +231,7 @@ func validCombinedGenesis(t *testing.T, addressCodec coreaddress.Codec) *Genesis
 		Tombstones: []*BurnTombstone{{
 			ClassId: classID,
 			NftId:   "nft-2",
-			Mint: &MintRecord{
+			Mint: MintRecord{
 				MintedAt: mintedAt,
 				MintedBy: creator,
 			},

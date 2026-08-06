@@ -99,7 +99,9 @@ func TestNFTRecordRejectsInvalidTombstone(t *testing.T) {
 		{
 			name:          "missing mint record",
 			expectedError: "no mint record",
-			mutate:        func(tombstone *nfttypes.BurnTombstone) { tombstone.Mint = nil },
+			mutate: func(tombstone *nfttypes.BurnTombstone) {
+				tombstone.Mint = nfttypes.MintRecord{}
+			},
 		},
 		{
 			name:          "burn predates mint",

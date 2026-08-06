@@ -9,42 +9,42 @@ option go_package = "cosmossdk.io/x/nft";
 
 // Class defines the class of the nft type.
 message Class {
-  // id defines the unique identifier of the NFT classification.
+  // id defines the unique identifier of the NFT classification, similar to the contract address of ERC721
   string id = 1;
 
-  // name defines the human-readable name of the NFT classification.
+  // name defines the human-readable name of the NFT classification. Optional
   string name = 2;
 
-  // symbol is an abbreviated name for the NFT classification.
+  // symbol is an abbreviated name for nft classification. Optional
   string symbol = 3;
 
-  // description is a brief description of the NFT classification.
+  // description is a brief description of nft classification. Optional
   string description = 4;
 
-  // uri points to class metadata stored off chain.
+  // uri for the class metadata stored off chain. It can define schema for Class and NFT `Data` attributes. Optional
   string uri = 5;
 
-  // uri_hash is a hash of the document pointed to by uri.
+  // uri_hash is a hash of the document pointed by uri. Optional
   string uri_hash = 6;
 
-  // data is app-specific class metadata.
+  // data is the app specific metadata of the NFT class. Optional
   google.protobuf.Any data = 7;
 }
 
-// NFT defines an NFT.
+// NFT defines the NFT.
 message NFT {
-  // class_id identifies the NFT class.
+  // class_id associated with the NFT, similar to the contract address of ERC721
   string class_id = 1;
 
-  // id uniquely identifies the NFT within its class.
+  // id is a unique identifier of the NFT
   string id = 2;
 
-  // uri points to NFT metadata stored off chain.
+  // uri for the NFT metadata stored off chain
   string uri = 3;
 
-  // uri_hash is a hash of the document pointed to by uri.
+  // uri_hash is a hash of the document pointed by uri
   string uri_hash = 4;
 
-  // data is app-specific NFT metadata.
+  // data is an app specific data of the NFT. Optional
   google.protobuf.Any data = 10;
 }

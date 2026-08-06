@@ -17,7 +17,8 @@ enum TransferPolicy {
   TRANSFER_POLICY_OWNER_TRANSFERABLE = 2;
 }
 
-// LiveNFTStatus defines the lifecycle state of a live NFT.
+// LiveNFTStatus is derived from revocation: ACTIVE when revocation is absent
+// and REVOKED when revocation is present. UNSPECIFIED is never returned.
 enum LiveNFTStatus {
   LIVE_NFT_STATUS_UNSPECIFIED = 0;
   LIVE_NFT_STATUS_ACTIVE = 1;
@@ -65,7 +66,7 @@ message Revocation {
 message LifecycleRecord {
   string class_id = 1;
   string nft_id = 2;
-  MintRecord mint = 3;
+  MintRecord mint = 3 [(gogoproto.nullable) = false];
   Revocation revocation = 4;
 }
 
@@ -73,7 +74,7 @@ message LifecycleRecord {
 message BurnTombstone {
   string class_id = 1;
   string nft_id = 2;
-  MintRecord mint = 3;
+  MintRecord mint = 3 [(gogoproto.nullable) = false];
   string uri = 4;
   string uri_hash = 5;
   google.protobuf.Any data = 6 [(cosmos_proto.accepts_interface) = "panacea.nft.v1.NFTData"];
@@ -97,7 +98,7 @@ message LiveNFTRecord {
   cosmos.nft.v1beta1.NFT nft = 1;
   string owner = 2 [(cosmos_proto.scalar) = "cosmos.AddressString"];
   LiveNFTStatus status = 3;
-  MintRecord mint = 4;
+  MintRecord mint = 4 [(gogoproto.nullable) = false];
   Revocation revocation = 5;
 }
 

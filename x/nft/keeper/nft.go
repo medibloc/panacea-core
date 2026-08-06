@@ -73,7 +73,7 @@ func (k Keeper) mintNFT(
 	lifecycle := types.LifecycleRecord{
 		ClassId: token.ClassId,
 		NftId:   token.Id,
-		Mint: &types.MintRecord{
+		Mint: types.MintRecord{
 			MintedAt: mintedAt,
 			MintedBy: controller,
 		},
@@ -246,7 +246,7 @@ func (k Keeper) canonicalBurnTombstone(
 			nftID,
 		)
 	}
-	if tombstone.Mint == nil {
+	if tombstone.Mint.MintedAt.IsZero() && tombstone.Mint.MintedBy == "" {
 		return types.BurnTombstone{}, fmt.Errorf(
 			"nft tombstone has no mint record for %s/%s",
 			classID,
@@ -484,7 +484,8 @@ func (k Keeper) loadNFTState(
 			nftID,
 		)
 	}
-	if state.hasLifecycle && state.lifecycle.Mint == nil {
+	if state.hasLifecycle &&
+		state.lifecycle.Mint.MintedAt.IsZero() && state.lifecycle.Mint.MintedBy == "" {
 		return storedNFTState{}, fmt.Errorf("nft lifecycle has no mint record for %s/%s", classID, nftID)
 	}
 	if state.hasLifecycle && state.lifecycle.Mint.MintedAt.IsZero() {

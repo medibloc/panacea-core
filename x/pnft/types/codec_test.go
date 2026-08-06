@@ -9,7 +9,23 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/gogoproto/proto"
 	"github.com/stretchr/testify/require"
+	"google.golang.org/protobuf/types/descriptorpb"
 )
+
+func TestLegacyProtoGoPackageUsesModuleMajorVersion(t *testing.T) {
+	descriptor, err := proto.HybridResolver.FindDescriptorByName(
+		"panacea.pnft.v2.MsgCreateDenomRequest",
+	)
+	require.NoError(t, err)
+
+	options, ok := descriptor.ParentFile().Options().(*descriptorpb.FileOptions)
+	require.True(t, ok)
+	require.Equal(
+		t,
+		"github.com/medibloc/panacea-core/v2/x/pnft/types",
+		options.GetGoPackage(),
+	)
+}
 
 func TestLegacyMsgAnyRoundTrip(t *testing.T) {
 	registry := cdctypes.NewInterfaceRegistry()

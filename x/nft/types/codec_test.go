@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"testing"
+	"time"
 
 	errorsmod "cosmossdk.io/errors"
 	upstreamnft "cosmossdk.io/x/nft"
@@ -125,6 +126,26 @@ func TestPublicProtobufFieldNumberContract(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestMintRecordValueFieldWireCompatibility(t *testing.T) {
+	// This is the wire encoding produced before mint became a non-nullable Go
+	// value: LifecycleRecord.mint (field 3) contains minted_at (field 1) and
+	// minted_by (field 2).
+	legacyWire := []byte{0x1a, 0x07, 0x0a, 0x02, 0x08, 0x01, 0x12, 0x01, 'm'}
+
+	var decoded LifecycleRecord
+	require.NoError(t, proto.Unmarshal(legacyWire, &decoded))
+	require.Equal(t, time.Unix(1, 0).UTC(), decoded.Mint.MintedAt)
+	require.Equal(t, "m", decoded.Mint.MintedBy)
+
+	encoded, err := proto.Marshal(&decoded)
+	require.NoError(t, err)
+	require.Equal(t, legacyWire, encoded)
+
+	var absent LifecycleRecord
+	require.NoError(t, proto.Unmarshal(nil, &absent))
+	require.Equal(t, MintRecord{}, absent.Mint)
 }
 
 func TestSentinelErrorContract(t *testing.T) {
