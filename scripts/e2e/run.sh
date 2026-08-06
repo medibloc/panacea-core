@@ -78,9 +78,9 @@ esac
 
 cd "$repo_root"
 
-E2E_GO_VERSION=${E2E_GO_VERSION:-1.23.12}
-if [ "$E2E_GO_VERSION" != 1.23.12 ]; then
-	printf 'E2E_GO_VERSION must be 1.23.12, got: %s\n' "$E2E_GO_VERSION" >&2
+E2E_GO_VERSION=${E2E_GO_VERSION:-1.26.5}
+if [ "$E2E_GO_VERSION" != 1.26.5 ]; then
+	printf 'E2E_GO_VERSION must be 1.26.5, got: %s\n' "$E2E_GO_VERSION" >&2
 	exit 2
 fi
 E2E_GOTOOLCHAIN=${E2E_GOTOOLCHAIN:-local}

@@ -356,8 +356,8 @@ func writeP0P1ReleaseBuildFixture(t *testing.T, dir, sourceCommit string) {
 	for _, name := range []string{"source-status.txt", "source-diff.patch", "source-status-final.txt", "source-diff-final.patch"} {
 		writeP0P1GateTestFile(t, filepath.Join(dir, name), "")
 	}
-	writeP0P1GateTestFile(t, filepath.Join(dir, "base-images.txt"), `FROM golang:1.23.12-bullseye@sha256:161b8513c09cbfa4c174fd32e46eddc5eddf487a43958b9cf8b07d628e9e0f85 AS build-env
-FROM debian:bullseye-slim@sha256:cba95a21c96c1f5fc2470081829363eed57706634f7dc26e8c6712934303d57a
+	writeP0P1GateTestFile(t, filepath.Join(dir, "base-images.txt"), `FROM golang:1.26.5-trixie@sha256:8229e3b2cf7fc08878a86977547e3119c173681c3cc4a64c38cf0c6fe0b42fa8 AS build-env
+FROM debian:trixie-slim@sha256:3a39a0592364683e6bab97937b72cad5a8fa6dcbbee90edb3bb48c7f8e94f258
 `)
 	for _, name := range []string{
 		"dependencies-current.jsonl", "dependencies-v2.2.1.jsonl", "dependencies-e2e.jsonl",

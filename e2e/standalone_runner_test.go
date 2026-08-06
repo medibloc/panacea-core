@@ -31,8 +31,8 @@ func TestStandaloneUnitCommandUsesPinnedNestedModuleBoundary(t *testing.T) {
 	fakeGo := filepath.Join(goRoot, "bin", "go")
 	writeExecutable(t, fakeGo, `#!/bin/sh
 case "${1:-}:${2:-}" in
-  version:) printf '%s\n' 'go version go1.23.12 contract/arch' ;;
-  env:GOVERSION) printf '%s\n' 'go1.23.12' ;;
+  version:) printf '%s\n' 'go version go1.26.5 contract/arch' ;;
+  env:GOVERSION) printf '%s\n' 'go1.26.5' ;;
   env:GOROOT) printf '%s\n' "$RUNNER_TEST_GOROOT" ;;
   env:GOTOOLDIR) printf '%s\n' "$RUNNER_TEST_GOTOOLDIR" ;;
   env:GOBIN) printf '%s\n' "$RUNNER_TEST_GOROOT/bin" ;;
@@ -45,7 +45,7 @@ case "${1:-}:${2:-}" in
 esac
 `)
 	writeExecutable(t, filepath.Join(toolDir, "compile"), `#!/bin/sh
-printf '%s\n' 'compile version go1.23.12'
+printf '%s\n' 'compile version go1.26.5'
 `)
 
 	command := exec.Command(runner, "unit")
@@ -54,7 +54,7 @@ printf '%s\n' 'compile version go1.23.12'
 		"E2E_ROOT="+testRoot,
 		"E2E_GOCACHE="+filepath.Join(testRoot, "go-build"),
 		"E2E_GOMODCACHE="+filepath.Join(testRoot, "go-mod"),
-		"E2E_GO_VERSION=1.23.12",
+		"E2E_GO_VERSION=1.26.5",
 		"E2E_GO_BINARY="+fakeGo,
 		"E2E_GOTOOLCHAIN=local",
 		"RUNNER_TEST_GOROOT="+goRoot,
@@ -91,13 +91,13 @@ func TestStandaloneRunnerRejectsToolchainPolicyOverridesBeforeWork(t *testing.T)
 	}{
 		{
 			name:        "automatic toolchain selection",
-			environment: []string{"E2E_GO_VERSION=1.23.12", "E2E_GOTOOLCHAIN=auto"},
+			environment: []string{"E2E_GO_VERSION=1.26.5", "E2E_GOTOOLCHAIN=auto"},
 			diagnostic:  "E2E_GOTOOLCHAIN must be local",
 		},
 		{
 			name:        "different expected Go version",
 			environment: []string{"E2E_GO_VERSION=1.25.7", "E2E_GOTOOLCHAIN=local"},
-			diagnostic:  "E2E_GO_VERSION must be 1.23.12",
+			diagnostic:  "E2E_GO_VERSION must be 1.26.5",
 		},
 	} {
 		t.Run(testCase.name, func(t *testing.T) {
@@ -171,8 +171,8 @@ func TestStandaloneRestartHostPortRetryBehavior(t *testing.T) {
 			fakeGo := filepath.Join(goRoot, "bin", "go")
 			writeExecutable(t, fakeGo, `#!/bin/sh
 case "${1:-}:${2:-}" in
-  version:) printf '%s\n' 'go version go1.23.12 contract/arch' ;;
-  env:GOVERSION) printf '%s\n' 'go1.23.12' ;;
+  version:) printf '%s\n' 'go version go1.26.5 contract/arch' ;;
+  env:GOVERSION) printf '%s\n' 'go1.26.5' ;;
   env:GOROOT) printf '%s\n' "$RUNNER_TEST_GOROOT" ;;
   env:GOTOOLDIR) printf '%s\n' "$RUNNER_TEST_GOTOOLDIR" ;;
   env:GOBIN) printf '%s\n' "$RUNNER_TEST_GOROOT/bin" ;;
@@ -182,7 +182,7 @@ case "${1:-}:${2:-}" in
 esac
 `)
 			writeExecutable(t, filepath.Join(toolDir, "compile"), `#!/bin/sh
-printf '%s\n' 'compile version go1.23.12'
+printf '%s\n' 'compile version go1.26.5'
 `)
 			fakeDocker := filepath.Join(testRoot, "docker")
 			writeExecutable(t, fakeDocker, `#!/bin/sh
@@ -221,7 +221,7 @@ esac
 				"E2E_ROOT="+testRoot,
 				"E2E_GOCACHE="+filepath.Join(testRoot, "go-build"),
 				"E2E_GOMODCACHE="+filepath.Join(testRoot, "go-mod"),
-				"E2E_GO_VERSION=1.23.12",
+				"E2E_GO_VERSION=1.26.5",
 				"E2E_GO_BINARY="+fakeGo,
 				"E2E_GOTOOLCHAIN=local",
 				"E2E_DOCKER_HOST=unix:///tmp/panacea-e2e-fake-docker.sock",

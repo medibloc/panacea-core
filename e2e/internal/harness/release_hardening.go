@@ -282,8 +282,11 @@ func ParseReleasePinnedBaseImages(contents []byte) ([]ReleasePinnedBaseImage, er
 	if len(images) < 2 {
 		return nil, fmt.Errorf("Dockerfile has %d pinned base images, want at least two", len(images))
 	}
-	if images[0].Stage != "build-env" || !strings.HasPrefix(images[0].Reference, "golang:1.23.12-") {
-		return nil, fmt.Errorf("first release base must be the staged Go 1.23.12 builder, got %+v", images[0])
+	if images[0].Stage != "build-env" || images[0].Reference != "golang:1.26.5-trixie" {
+		return nil, fmt.Errorf("first release base must be the staged Go 1.26.5 Trixie builder, got %+v", images[0])
+	}
+	if images[1].Reference != "debian:trixie-slim" {
+		return nil, fmt.Errorf("final release base must be Debian Trixie slim, got %+v", images[1])
 	}
 	return images, nil
 }

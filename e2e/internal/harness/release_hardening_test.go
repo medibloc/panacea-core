@@ -98,23 +98,29 @@ func TestReleaseHostImageIdentityRequiresMatchingFunctionalAndReleaseBinaries(t 
 	require.ErrorContains(t, duplicate.Validate(), "duplicate")
 }
 
-func TestParseReleasePinnedBaseImagesRejectsFloatingOrWrongGoBuilder(t *testing.T) {
-	valid := []byte(`FROM golang:1.23.12-bullseye@sha256:161b8513c09cbfa4c174fd32e46eddc5eddf487a43958b9cf8b07d628e9e0f85 AS build-env
-FROM debian:bullseye-slim@sha256:cba95a21c96c1f5fc2470081829363eed57706634f7dc26e8c6712934303d57a
+func TestParseReleasePinnedBaseImagesRejectsFloatingOrUnsupportedBase(t *testing.T) {
+	valid := []byte(`FROM golang:1.26.5-trixie@sha256:8229e3b2cf7fc08878a86977547e3119c173681c3cc4a64c38cf0c6fe0b42fa8 AS build-env
+FROM debian:trixie-slim@sha256:3a39a0592364683e6bab97937b72cad5a8fa6dcbbee90edb3bb48c7f8e94f258
 `)
 	images, err := ParseReleasePinnedBaseImages(valid)
 	require.NoError(t, err)
 	require.Len(t, images, 2)
 	require.Equal(t, "build-env", images[0].Stage)
 
-	_, err = ParseReleasePinnedBaseImages([]byte("FROM golang:1.23.12-bullseye AS build-env\nFROM debian:bullseye-slim\n"))
+	_, err = ParseReleasePinnedBaseImages([]byte("FROM golang:1.26.5-trixie AS build-env\nFROM debian:trixie-slim\n"))
 	require.ErrorContains(t, err, "not pinned")
 
-	wrongGo := []byte(`FROM golang:1.24.0-bullseye@sha256:161b8513c09cbfa4c174fd32e46eddc5eddf487a43958b9cf8b07d628e9e0f85 AS build-env
-FROM debian:bullseye-slim@sha256:cba95a21c96c1f5fc2470081829363eed57706634f7dc26e8c6712934303d57a
+	wrongGo := []byte(`FROM golang:1.24.0-trixie@sha256:8229e3b2cf7fc08878a86977547e3119c173681c3cc4a64c38cf0c6fe0b42fa8 AS build-env
+FROM debian:trixie-slim@sha256:3a39a0592364683e6bab97937b72cad5a8fa6dcbbee90edb3bb48c7f8e94f258
 `)
 	_, err = ParseReleasePinnedBaseImages(wrongGo)
-	require.ErrorContains(t, err, "Go 1.23.12")
+	require.ErrorContains(t, err, "Go 1.26.5")
+
+	wrongRuntime := []byte(`FROM golang:1.26.5-trixie@sha256:8229e3b2cf7fc08878a86977547e3119c173681c3cc4a64c38cf0c6fe0b42fa8 AS build-env
+FROM debian:bookworm-slim@sha256:3a39a0592364683e6bab97937b72cad5a8fa6dcbbee90edb3bb48c7f8e94f258
+`)
+	_, err = ParseReleasePinnedBaseImages(wrongRuntime)
+	require.ErrorContains(t, err, "Debian Trixie")
 }
 
 // TestValidateReleaseHardeningArtifact is normally skipped. The release

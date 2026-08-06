@@ -7,17 +7,17 @@ the independent single-validator Cosmovisor rehearsal.
 ## Prerequisites
 
 - Docker with BuildKit and the current daemon reachable from `docker context inspect`
-- Go 1.23.12 selected locally (`GOTOOLCHAIN=local` is enforced by default)
+- Go 1.26.5 selected locally (`GOTOOLCHAIN=local` is enforced by default)
 - the full Git history containing commit `a1b342939ba6ac3092aeebbee6a2fa741a34d47f`
 
 Verify the complete selected toolchain before running a suite:
 
 ```sh
-mise exec go@1.23.12 -- ./scripts/e2e/run.sh check
+mise exec go@1.26.5 -- ./scripts/e2e/run.sh check
 ```
 
-Prefer selecting Go 1.23.12 with the local version manager so the command above
-prints `go1.23.12`. The runner enforces `GOTOOLCHAIN=local` and `GOWORK=off` for
+Prefer selecting Go 1.26.5 with the local version manager so the command above
+prints `go1.26.5`. The runner enforces `GOTOOLCHAIN=local` and `GOWORK=off` for
 the nested E2E module, so it cannot silently download a different toolchain or
 join an ambient workspace. The preflight checks the selected `go` command,
 `GOVERSION`, `GOROOT`, `GOTOOLDIR` and compiler identity before compilation. It
@@ -29,33 +29,33 @@ mixes installations.
 From the repository root:
 
 ```sh
-mise exec go@1.23.12 -- ./scripts/e2e/run.sh check
-mise exec go@1.23.12 -- ./scripts/e2e/run.sh check-clean
-mise exec go@1.23.12 -- ./scripts/e2e/run.sh build-current
-mise exec go@1.23.12 -- ./scripts/e2e/run.sh build-v2.2.1
-mise exec go@1.23.12 -- ./scripts/e2e/run.sh build-images
-mise exec go@1.23.12 -- ./scripts/e2e/run.sh build-test-binary
-mise exec go@1.23.12 -- ./scripts/e2e/run.sh build
-mise exec go@1.23.12 -- ./scripts/e2e/run.sh unit
-mise exec go@1.23.12 -- ./scripts/e2e/run.sh smoke
-mise exec go@1.23.12 -- ./scripts/e2e/run.sh v2.2.1
-mise exec go@1.23.12 -- ./scripts/e2e/run.sh compatibility
-mise exec go@1.23.12 -- ./scripts/e2e/run.sh negative
-mise exec go@1.23.12 -- ./scripts/e2e/run.sh restart
-mise exec go@1.23.12 -- ./scripts/e2e/run.sh consensus
-mise exec go@1.23.12 -- ./scripts/e2e/run.sh upgrade
-mise exec go@1.23.12 -- ./scripts/e2e/run.sh upgrade-deep
-mise exec go@1.23.12 -- ./scripts/e2e/run.sh upgrade-chaos
-mise exec go@1.23.12 -- ./scripts/e2e/run.sh state-sync
-mise exec go@1.23.12 -- ./scripts/e2e/run.sh config-compat
-mise exec go@1.23.12 -- ./scripts/e2e/run.sh ibc-upgrade
-mise exec go@1.23.12 -- ./scripts/e2e/run.sh network-faults
-mise exec go@1.23.12 -- ./scripts/e2e/run.sh release-builds
-mise exec go@1.23.12 -- ./scripts/e2e/run.sh release-hardening
-mise exec go@1.23.12 -- ./scripts/e2e/run.sh release-hardening-inner
-mise exec go@1.23.12 -- ./scripts/e2e/run.sh load
-mise exec go@1.23.12 -- ./scripts/e2e/run.sh all
-mise exec go@1.23.12 -- ./scripts/e2e/run.sh help
+mise exec go@1.26.5 -- ./scripts/e2e/run.sh check
+mise exec go@1.26.5 -- ./scripts/e2e/run.sh check-clean
+mise exec go@1.26.5 -- ./scripts/e2e/run.sh build-current
+mise exec go@1.26.5 -- ./scripts/e2e/run.sh build-v2.2.1
+mise exec go@1.26.5 -- ./scripts/e2e/run.sh build-images
+mise exec go@1.26.5 -- ./scripts/e2e/run.sh build-test-binary
+mise exec go@1.26.5 -- ./scripts/e2e/run.sh build
+mise exec go@1.26.5 -- ./scripts/e2e/run.sh unit
+mise exec go@1.26.5 -- ./scripts/e2e/run.sh smoke
+mise exec go@1.26.5 -- ./scripts/e2e/run.sh v2.2.1
+mise exec go@1.26.5 -- ./scripts/e2e/run.sh compatibility
+mise exec go@1.26.5 -- ./scripts/e2e/run.sh negative
+mise exec go@1.26.5 -- ./scripts/e2e/run.sh restart
+mise exec go@1.26.5 -- ./scripts/e2e/run.sh consensus
+mise exec go@1.26.5 -- ./scripts/e2e/run.sh upgrade
+mise exec go@1.26.5 -- ./scripts/e2e/run.sh upgrade-deep
+mise exec go@1.26.5 -- ./scripts/e2e/run.sh upgrade-chaos
+mise exec go@1.26.5 -- ./scripts/e2e/run.sh state-sync
+mise exec go@1.26.5 -- ./scripts/e2e/run.sh config-compat
+mise exec go@1.26.5 -- ./scripts/e2e/run.sh ibc-upgrade
+mise exec go@1.26.5 -- ./scripts/e2e/run.sh network-faults
+mise exec go@1.26.5 -- ./scripts/e2e/run.sh release-builds
+mise exec go@1.26.5 -- ./scripts/e2e/run.sh release-hardening
+mise exec go@1.26.5 -- ./scripts/e2e/run.sh release-hardening-inner
+mise exec go@1.26.5 -- ./scripts/e2e/run.sh load
+mise exec go@1.26.5 -- ./scripts/e2e/run.sh all
+mise exec go@1.26.5 -- ./scripts/e2e/run.sh help
 ```
 
 `build` is the clean-build contract: it builds the current worktree node
@@ -113,7 +113,7 @@ chaos, IBC upgrade continuity, state sync, config compatibility, local network
 faults, and load. It does not run `release-builds`. The aggregate is
 deliberately long-running. Override an individual budget only when the
 execution environment requires it, for example
-`E2E_LOAD_TIMEOUT=35m mise exec go@1.23.12 -- ./scripts/e2e/run.sh load`.
+`E2E_LOAD_TIMEOUT=35m mise exec go@1.26.5 -- ./scripts/e2e/run.sh load`.
 
 `release-hardening` is the serial artifact-first release gate. Its exact inner
 sequence is clean-source check, `all`, `release-builds`, a second clean-source

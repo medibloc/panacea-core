@@ -168,8 +168,8 @@ func runV221ToCurrentMultiValidatorUpgrade(t *testing.T, scenario upgradeRunScen
 	require.Len(t, network.Chain.FullNodes, 1)
 	toolchainEvidence, err := network.CaptureAndRecordGoToolchainEvidence(ctx)
 	require.NoError(t, err)
-	require.Equal(t, "go1.23.12", toolchainEvidence.GOVersion)
-	require.Contains(t, toolchainEvidence.CompilerVersion, "go1.23.12")
+	require.Equal(t, "go1.26.5", toolchainEvidence.GOVersion)
+	require.Contains(t, toolchainEvidence.CompilerVersion, "go1.26.5")
 	require.NoError(t, network.WriteArtifactJSON("upgrade/scenario.json", map[string]any{
 		"name":                            scenario.Name,
 		"legacy_pnft_adversarial_fixture": scenario.LegacyPNFTAdversarialFixture,

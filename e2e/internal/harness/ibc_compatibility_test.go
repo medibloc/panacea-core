@@ -24,7 +24,7 @@ func TestParseAndValidateIBCBinaryVersionLongUsesEffectiveDependencies(t *testin
 build_tags: netgo
 commit: a1b342939ba6ac3092aeebbee6a2fa741a34d47f
 cosmos_sdk_version: v0.47.10
-go: go version go1.23.12 linux/amd64
+go: go version go1.26.5 linux/amd64
 name: panacea-core
 server_name: panacead
 version: 2.2.1
@@ -482,7 +482,7 @@ func validIBCCompatibilityMatrixFixture(t *testing.T) IBCCompatibilityMatrix {
 				Version: IBCBinaryVersionIdentity{
 					Name: contract.Name, AppName: contract.AppName, Version: contract.Version,
 					Commit: contract.Commit, CosmosSDKVersion: contract.CosmosSDKVersion,
-					GoVersion: "go version go1.23.12 linux/amd64", Dependencies: dependencies,
+					GoVersion: "go version go1.26.5 linux/amd64", Dependencies: dependencies,
 				},
 				BinaryPath: path, BinarySHA256: strings.Repeat(checksumByte, 64),
 			}},

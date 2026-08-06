@@ -27,7 +27,7 @@ func TestStageGitSourceMaterializesOnlyTheCommittedTree(t *testing.T) {
 	))
 	require.NoError(t, os.WriteFile(
 		filepath.Join(repo, "go.mod"),
-		[]byte("module example.invalid/panacea\n\ngo 1.23.12\n"),
+		[]byte("module example.invalid/panacea\n\ngo 1.26.5\n"),
 		0o600,
 	))
 	require.NoError(t, os.WriteFile(

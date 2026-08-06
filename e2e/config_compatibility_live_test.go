@@ -79,7 +79,7 @@ func TestV047NodeHomeConfigCompatibility(t *testing.T) {
 	require.Len(t, network.Chain.FullNodes, 1)
 	toolchainEvidence, err := network.CaptureAndRecordGoToolchainEvidence(ctx)
 	require.NoError(t, err)
-	require.Equal(t, "go1.23.12", toolchainEvidence.GOVersion)
+	require.Equal(t, "go1.26.5", toolchainEvidence.GOVersion)
 
 	fullNode := network.Chain.FullNodes[0]
 	generated, err := readConfigCompatibilityNodeHome(ctx, fullNode)

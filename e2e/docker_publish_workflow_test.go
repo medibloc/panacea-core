@@ -16,11 +16,11 @@ func TestDockerPublishBuildsAndPushesIndependentlyOfE2E(t *testing.T) {
 	for _, contract := range []string{
 		"branches: [main]",
 		"tags: ['v*.*.*']",
-		"actions/checkout@v4",
-		"docker/setup-buildx-action@v3",
-		"docker/login-action@v3",
-		"docker/metadata-action@v5",
-		"docker/build-push-action@v6",
+		"actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0",
+		"docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3.12.0",
+		"docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3.7.0",
+		"docker/metadata-action@c299e40c65443455700f0fdfc63efafe5b349051 # v5.10.0",
+		"docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6.19.2",
 		"context: .",
 		"push: true",
 		"tags: ${{ steps.meta.outputs.tags }}",
@@ -28,6 +28,19 @@ func TestDockerPublishBuildsAndPushesIndependentlyOfE2E(t *testing.T) {
 	} {
 		require.Contains(t, workflow, contract)
 	}
+	usesCount := 0
+	for _, line := range strings.Split(workflow, "\n") {
+		line = strings.TrimSpace(line)
+		if !strings.HasPrefix(line, "uses:") {
+			continue
+		}
+		usesCount++
+		action := strings.Fields(strings.TrimSpace(strings.TrimPrefix(line, "uses:")))[0]
+		_, revision, found := strings.Cut(action, "@")
+		require.True(t, found, "action must include a revision: %s", action)
+		require.Regexp(t, `^[0-9a-f]{40}$`, revision, "action must use an immutable commit SHA: %s", action)
+	}
+	require.Equal(t, 5, usesCount)
 	for _, forbidden := range []string{
 		"scripts/e2e/",
 		"release-hardening",

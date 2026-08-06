@@ -82,15 +82,61 @@ require_tool() {
 }
 
 assert_safe_root() {
-  case "$REHEARSAL_ROOT" in
-    "$REPO_ROOT/.local/"* | /private/tmp/* | /tmp/*)
+  local canonical_root canonical_repo_local canonical_tmp
+
+  canonical_root="$(canonicalize_directory_path "$REHEARSAL_ROOT")" ||
+    fail "cannot resolve rehearsal root safely: $REHEARSAL_ROOT"
+  canonical_repo_local="$(canonicalize_directory_path "$REPO_ROOT/.local")" ||
+    fail "cannot resolve repository .local path safely"
+  if [ "$canonical_repo_local" != "$REPO_ROOT/.local" ]; then
+    fail "repository .local must not be a symlink: $REPO_ROOT/.local"
+  fi
+  canonical_tmp="$(canonicalize_directory_path /tmp)" ||
+    fail "cannot resolve /tmp safely"
+
+  # Destructive commands are restricted to descendants (never the directory
+  # itself) of repository-owned .local or the host temporary directory.
+  # Physical resolution blocks both '..' traversal and symlink escapes.
+  case "$canonical_root" in
+    "$canonical_repo_local/"* | "$canonical_tmp/"*)
       return
       ;;
   esac
 
-  if [ "${PANACEA_REHEARSAL_ALLOW_EXTERNAL_ROOT:-0}" != "1" ]; then
-    fail "refusing to remove or initialize outside repo .local/: $REHEARSAL_ROOT"
+  fail "refusing to remove or initialize outside repository .local or the temporary directory: $REHEARSAL_ROOT"
+}
+
+canonicalize_directory_path() {
+  local candidate suffix leaf parent physical
+  candidate=$1
+  suffix=
+
+  [ -n "$candidate" ] || return 1
+  case "$candidate" in
+    /*) ;;
+    *) candidate="$PWD/$candidate" ;;
+  esac
+
+  if [ -e "$candidate" ] && [ ! -d "$candidate" ]; then
+    return 1
   fi
+
+  # Resolve the nearest existing directory physically, then append only
+  # components that were proven not to be traversal tokens.
+  while [ ! -d "$candidate" ]; do
+    leaf=${candidate##*/}
+    case "$leaf" in
+      '' | . | ..) return 1 ;;
+    esac
+    suffix="/$leaf$suffix"
+    parent=${candidate%/*}
+    [ -n "$parent" ] || parent=/
+    [ "$parent" != "$candidate" ] || return 1
+    candidate=$parent
+  done
+
+  physical="$(CDPATH='' cd -P -- "$candidate" && pwd -P)" || return 1
+  printf '%s%s\n' "$physical" "$suffix"
 }
 
 require_common_tools() {
@@ -251,8 +297,8 @@ init_chain() {
 
   log "Initializing $CHAIN_ID in $DAEMON_HOME"
   "$old" init "$MONIKER" --chain-id "$CHAIN_ID" --home "$DAEMON_HOME"
-  "$old" keys add "$VALIDATOR_KEY" --home "$DAEMON_HOME" --keyring-backend test --output json >"$REHEARSAL_ROOT/$VALIDATOR_KEY-key.json"
-  "$old" keys add "$RECIPIENT_KEY" --home "$DAEMON_HOME" --keyring-backend test --output json >"$REHEARSAL_ROOT/$RECIPIENT_KEY-key.json"
+  "$old" keys add "$VALIDATOR_KEY" --home "$DAEMON_HOME" --keyring-backend test --output json >/dev/null
+  "$old" keys add "$RECIPIENT_KEY" --home "$DAEMON_HOME" --keyring-backend test --output json >/dev/null
 
   "$old" genesis add-genesis-account "$VALIDATOR_KEY" "1000000000000$DENOM" --home "$DAEMON_HOME" --keyring-backend test
   "$old" genesis add-genesis-account "$RECIPIENT_KEY" "1000000000$DENOM" --home "$DAEMON_HOME" --keyring-backend test
