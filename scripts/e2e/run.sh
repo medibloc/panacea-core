@@ -32,6 +32,7 @@ Commands:
   restart                  Run restart, snapshot, and sync recovery tests
   consensus                Run four-validator quorum recovery tests
   upgrade                  Run the v2.2.1-to-current upgrade test
+  cosmovisor               Run an explicit old-to-current Cosmovisor rehearsal
   upgrade-deep             Run normal and legacy-PNFT upgrade matrices
   upgrade-chaos            Run upgrade-boundary chaos tests
   state-sync               Run state-sync success and rejection tests
@@ -65,7 +66,7 @@ case "$command_name" in
 		;;
 	check | check-clean | build-current | build-v2.2.1 | build-images | \
 		build-test-binary | build | unit | smoke | v2.2.1 | compatibility | \
-		negative | restart | consensus | upgrade | upgrade-deep | \
+		negative | restart | consensus | upgrade | cosmovisor | upgrade-deep | \
 		upgrade-chaos | state-sync | config-compat | ibc-upgrade | \
 		network-faults | release-builds | release-hardening | \
 		release-hardening-inner | load | all) ;;
@@ -529,6 +530,31 @@ upgrade_deep_body() {
 	upgrade_legacy_pnft_body
 }
 
+cosmovisor_body() {
+	if [ -z "${PANACEA_REHEARSAL_OLD_TAG:-}" ]; then
+		printf 'cosmovisor requires PANACEA_REHEARSAL_OLD_TAG (for example, v2.2.1)\n' >&2
+		exit 2
+	fi
+	if [ -z "${PANACEA_REHEARSAL_UPGRADE_NAME:-}" ]; then
+		printf 'cosmovisor requires PANACEA_REHEARSAL_UPGRADE_NAME (for example, v2.3.0)\n' >&2
+		exit 2
+	fi
+	if [ "$PANACEA_REHEARSAL_OLD_TAG" = "$PANACEA_REHEARSAL_UPGRADE_NAME" ]; then
+		printf 'cosmovisor old tag and upgrade name must differ: %s\n' \
+			"$PANACEA_REHEARSAL_OLD_TAG" >&2
+		exit 2
+	fi
+
+	check_go
+	rehearsal_root=${PANACEA_REHEARSAL_ROOT:-"$E2E_ROOT/cosmovisor"}
+	GOTOOLCHAIN="$E2E_GOTOOLCHAIN" \
+		GOWORK=off \
+		PANACEA_REHEARSAL_ROOT="$rehearsal_root" \
+		PANACEA_REHEARSAL_OLD_TAG="$PANACEA_REHEARSAL_OLD_TAG" \
+		PANACEA_REHEARSAL_UPGRADE_NAME="$PANACEA_REHEARSAL_UPGRADE_NAME" \
+		"$repo_root/scripts/upgrade-local/run.sh" run
+}
+
 upgrade_chaos_body() {
 	run_upgrade_test PANACEA_E2E_UPGRADE_CHAOS "$E2E_UPGRADE_CHAOS_TIMEOUT" \
 		'^TestV221UpgradeBoundaryChaos$'
@@ -695,6 +721,7 @@ case "$command_name" in
 		build_images
 		upgrade_body
 		;;
+	cosmovisor) cosmovisor_body ;;
 	upgrade-deep)
 		build_images
 		upgrade_deep_body

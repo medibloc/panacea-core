@@ -111,6 +111,61 @@ func TestStandaloneRunnerRejectsToolchainPolicyOverridesBeforeWork(t *testing.T)
 	}
 }
 
+func TestCosmovisorRehearsalIsExplicitAndManualOnly(t *testing.T) {
+	contents, err := os.ReadFile("../scripts/e2e/run.sh")
+	require.NoError(t, err)
+	runner := string(contents)
+	body := shellFunctionBody(t, runner, "cosmovisor_body")
+
+	require.Contains(t, body, `${PANACEA_REHEARSAL_OLD_TAG:-}`)
+	require.Contains(t, body, `${PANACEA_REHEARSAL_UPGRADE_NAME:-}`)
+	require.Contains(t, body, `if [ "$PANACEA_REHEARSAL_OLD_TAG" = "$PANACEA_REHEARSAL_UPGRADE_NAME" ]`)
+	require.Contains(t, body, `GOWORK=off`)
+	require.Contains(t, body, `PANACEA_REHEARSAL_ROOT="$rehearsal_root"`)
+	require.Contains(t, body, `"$repo_root/scripts/upgrade-local/run.sh" run`)
+	functions := shellFunctions(t, runner)
+	allReachable := reachableShellFunctionsFrom(functions["all_body"], functions)
+	require.False(t, allReachable["cosmovisor_body"])
+
+	for _, testCase := range []struct {
+		name        string
+		environment []string
+		diagnostic  string
+	}{
+		{
+			name:       "missing old tag",
+			diagnostic: "requires PANACEA_REHEARSAL_OLD_TAG",
+		},
+		{
+			name:        "missing upgrade name",
+			environment: []string{"PANACEA_REHEARSAL_OLD_TAG=v2.2.1"},
+			diagnostic:  "requires PANACEA_REHEARSAL_UPGRADE_NAME",
+		},
+		{
+			name: "equal versions",
+			environment: []string{
+				"PANACEA_REHEARSAL_OLD_TAG=v2.3.0",
+				"PANACEA_REHEARSAL_UPGRADE_NAME=v2.3.0",
+			},
+			diagnostic: "old tag and upgrade name must differ",
+		},
+	} {
+		t.Run(testCase.name, func(t *testing.T) {
+			command := exec.Command("../scripts/e2e/run.sh", "cosmovisor")
+			command.Env = append(standaloneRunnerTestEnv(), testCase.environment...)
+			output, commandErr := command.CombinedOutput()
+			requireExitCode(t, commandErr, 2, output)
+			require.Contains(t, string(output), testCase.diagnostic)
+		})
+	}
+
+	ciContents, err := os.ReadFile("../.github/workflows/ci.yml")
+	require.NoError(t, err)
+	ci := string(ciContents)
+	require.NotContains(t, ci, "cosmovisor-rehearsal")
+	require.NotContains(t, ci, "workflow_dispatch:")
+}
+
 func TestStandaloneLiveSuitesRunThePrecompiledTestBinaryDirectly(t *testing.T) {
 	contents, err := os.ReadFile("../scripts/e2e/run.sh")
 	require.NoError(t, err)
@@ -457,7 +512,7 @@ func standaloneRunnerTestEnv() []string {
 	prefixes := []string{
 		"E2E_ROOT=", "E2E_GOCACHE=", "E2E_GOMODCACHE=", "E2E_GO_VERSION=",
 		"E2E_GO_BINARY=", "E2E_GOTOOLCHAIN=", "GOTOOLCHAIN=", "GOWORK=",
-		"RUNNER_TEST_",
+		"PANACEA_REHEARSAL_", "RUNNER_TEST_",
 	}
 	filtered := make([]string, 0, len(os.Environ()))
 	for _, item := range os.Environ() {

@@ -1,14 +1,15 @@
 # Panacea real-node E2E tests
 
 This module runs real `panacead` processes in Docker through Interchaintest.
-It does not call or source `scripts/upgrade-local/run.sh`; that script remains
-the independent single-validator Cosmovisor rehearsal.
+The opt-in `cosmovisor` command delegates to the independent single-validator
+`scripts/upgrade-local/run.sh` rehearsal; the Docker suites do not call it.
 
 ## Prerequisites
 
 - Docker with BuildKit and the current daemon reachable from `docker context inspect`
 - Go 1.26.5 selected locally (`GOTOOLCHAIN=local` is enforced by default)
 - the full Git history containing commit `a1b342939ba6ac3092aeebbee6a2fa741a34d47f`
+- Cosmovisor v1.5.0 on `PATH` when running the `cosmovisor` command
 
 Verify the complete selected toolchain before running a suite:
 
@@ -44,6 +45,9 @@ mise exec go@1.26.5 -- ./scripts/e2e/run.sh negative
 mise exec go@1.26.5 -- ./scripts/e2e/run.sh restart
 mise exec go@1.26.5 -- ./scripts/e2e/run.sh consensus
 mise exec go@1.26.5 -- ./scripts/e2e/run.sh upgrade
+PANACEA_REHEARSAL_OLD_TAG=v2.2.1 \
+PANACEA_REHEARSAL_UPGRADE_NAME=v2.3.0 \
+mise exec go@1.26.5 -- ./scripts/e2e/run.sh cosmovisor
 mise exec go@1.26.5 -- ./scripts/e2e/run.sh upgrade-deep
 mise exec go@1.26.5 -- ./scripts/e2e/run.sh upgrade-chaos
 mise exec go@1.26.5 -- ./scripts/e2e/run.sh state-sync
@@ -85,6 +89,7 @@ deadline in addition to the bounded waits inside the harness:
 | `restart` | fresh 1 validator + 1 full node networks | 35m | Graceful and abrupt restart, export/bootstrap, portable application snapshot restore, and fresh full-node block sync |
 | `consensus` | 4 validators + 1 full node | 18m | One-validator tolerance, quorum loss, committed transaction recovery, and common-history catch-up with same-height block ID/app hash, peer, and catching-up proof |
 | `upgrade` | 4 validators + 1 full node | 35m | Coordinated exact `v2.2.1` to `v2.3.0` image switch, delayed-validator catch-up, the connected P0 transaction/state matrix, migration/state preservation, and post-upgrade lifecycle |
+| `cosmovisor` | 1 validator, native binaries | manual; 180s per runtime wait | Explicit old Git tag to current-checkout process/symlink switch, pre/post-upgrade bank sends, proposal passage, and post-upgrade block production |
 | `upgrade-deep` | 4 validators + 1 full node | 50m per scenario | The normal connected P0 matrix plus the adversarial legacy-PNFT upgrade path |
 | `upgrade-chaos` | 4 validators + 1 full node | 40m | Three deterministic switch orders, bounded quorum stalls, forced restart, delayed-node catch-up, and single-history recovery |
 | `ibc-upgrade` | Panacea + pinned Osmosis + Hermes | 45m | Existing-channel ICS-20 transfer, in-flight acknowledgement, timeout/refund, relayer restart, and post-upgrade bidirectional continuity |
@@ -151,7 +156,8 @@ catching up, and report at least one connected peer before comparing the exact
 block ID and post-FinalizeBlock app hash at that height. The upgrade suite
 switches Interchaintest-managed node images from `v2.2.1` to `v2.3.0` and proves
 consensus and state migration. It does not test Cosmovisor and does not call
-`scripts/upgrade-local/run.sh`.
+`scripts/upgrade-local/run.sh`. The separate `cosmovisor` command delegates to
+that script and is not part of `all` or `release-hardening`.
 
 The first run downloads Go modules on the host into `.local/e2e/go-mod`.
 Panacea's Docker compile itself receives a generated vendor tree, uses pinned
@@ -254,7 +260,18 @@ archive the resulting `E2E_ROOT` before publishing. Use distinct roots for
 concurrent or repeated runs; no command reads another run's node homes or
 artifacts.
 
-The independent Cosmovisor operator rehearsal remains in CI for release branches
-and manual dispatch. It runs `scripts/upgrade-local/run.sh run` and stays
-separate from the standalone `upgrade` E2E command; neither implementation
-calls or sources the other.
+The independent Cosmovisor operator rehearsal is manual-only and is absent from
+GitHub Actions. Install the pinned tool locally if needed:
+
+```sh
+GOBIN="$PWD/.local/bin" mise exec go@1.26.5 -- \
+  go install cosmossdk.io/tools/cosmovisor/cmd/cosmovisor@v1.5.0
+```
+
+Then put `.local/bin` on `PATH` and invoke `cosmovisor` with both version inputs
+shown in the command list. `PANACEA_REHEARSAL_OLD_TAG` selects the Git tag used
+to build the genesis binary. `PANACEA_REHEARSAL_UPGRADE_NAME` selects the
+on-chain plan name and Cosmovisor upgrade directory, while the new binary is
+always built from the current checkout. The command rejects missing or equal
+values so a release-branch rename cannot silently choose a misleading binary
+pair. Artifacts default to `.local/e2e/cosmovisor/`.

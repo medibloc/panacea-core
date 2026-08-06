@@ -30,7 +30,7 @@ func TestStandaloneRunnerAdvertisesCompleteInterface(t *testing.T) {
 			"check", "check-clean", "build-current", "build-v2.2.1",
 			"build-images", "build-test-binary", "build", "unit", "smoke",
 			"v2.2.1", "compatibility", "negative", "restart", "consensus",
-			"upgrade", "upgrade-deep", "upgrade-chaos", "state-sync",
+			"upgrade", "cosmovisor", "upgrade-deep", "upgrade-chaos", "state-sync",
 			"config-compat", "ibc-upgrade", "network-faults", "release-builds",
 			"release-hardening", "release-hardening-inner", "load", "all",
 		} {
