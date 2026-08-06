@@ -14,6 +14,12 @@
    },
    {
      "url": "./tmp-swagger-gen/panacea/did/v2/query.swagger.json"
+   },
+   {
+     "url": "./tmp-swagger-gen/panacea/nft/v1/query.swagger.json"
+   },
+   {
+     "url": "./tmp-swagger-gen/cosmos/nft/v1beta1/query.swagger.json"
    }
  ]
 }
