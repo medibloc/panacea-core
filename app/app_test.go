@@ -178,6 +178,21 @@ func TestNFTRuntimeAndPNFTCompatibilityWiring(t *testing.T) {
 	require.Empty(t, exported.ClassPolicies)
 }
 
+func TestProductionGRPCRouterExcludesSDKTestServices(t *testing.T) {
+	panaceaapp.SetConfig()
+	appOpts := viper.New()
+	appOpts.Set(flags.FlagHome, t.TempDir())
+	testApp := panaceaapp.New(log.NewNopLogger(), dbm.NewMemDB(), nil, false, appOpts)
+
+	for _, route := range []string{
+		"/testpb.Query/Echo",
+		"/testpb.Query/SayHello",
+		"/testpb.Query/TestAny",
+	} {
+		require.Nil(t, testApp.GRPCQueryRouter().Route(route), route)
+	}
+}
+
 func TestPNFTMsgRouteUsesLegacyRejectionServer(t *testing.T) {
 	panaceaapp.SetConfig()
 	appOpts := viper.New()
