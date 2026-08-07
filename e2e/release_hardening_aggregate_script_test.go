@@ -610,6 +610,7 @@ exit 0
 
 func TestReleaseHardeningAggregateRunnerPassesCapturedCommitAndDeadlineToInnerRunner(t *testing.T) {
 	repoRoot, scriptPath := copyReleaseHardeningAggregateRunner(t)
+	t.Setenv("E2E_RELEASE_AGGREGATE_BASE_ROOT", filepath.Join(repoRoot, "leaked-aggregate-base"))
 	fakeBin := filepath.Join(repoRoot, "fake-bin")
 	require.NoError(t, os.MkdirAll(fakeBin, 0o700))
 	runnerArgs := filepath.Join(repoRoot, "runner-args.txt")
@@ -686,9 +687,9 @@ func aggregateRunnerTestEnv() []string {
 		"E2E_GOCACHE=",
 		"E2E_GOMODCACHE=",
 		"E2E_RELEASE_HARDENING_RUN_ID=",
-		"E2E_RELEASE_AGGREGATE_TOTAL_TIMEOUT_SECONDS=",
-		"E2E_RELEASE_AGGREGATE_CLEANUP_TIMEOUT_SECONDS=",
-		"E2E_RELEASE_AGGREGATE_FORCE_EXIT_TIMEOUT_SECONDS=",
+		"E2E_RELEASE_AGGREGATE_",
+		"E2E_CURRENT_SOURCE_COMMIT=",
+		"COMMIT=",
 		"E2E_RUNNER=",
 		"DOCKER=",
 		"AGGREGATE_TEST_",
