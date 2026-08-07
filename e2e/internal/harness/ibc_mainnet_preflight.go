@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"net"
 	"net/http"
 	"net/url"
 	"os"
@@ -32,7 +33,8 @@ const (
 
 	osmosisMainnetPreflightArtifactPath = "ibc/mainnet-preflight.json"
 	osmosisMainnetPreflightSchema       = "panacea.osmosis-mainnet-preflight/v1"
-	osmosisMainnetPreflightTimeout      = 15 * time.Second
+	osmosisMainnetPreflightTimeout      = 45 * time.Second
+	osmosisMainnetRequestTimeout        = 8 * time.Second
 	osmosisMainnetMaxResponseBytes      = 4 << 20
 	osmosisMainnetMaxBlockAge           = 10 * time.Minute
 	osmosisNodeInfoDependencyScope      = "original-module-path-version-only"
@@ -327,9 +329,14 @@ func runOsmosisMainnetPreflight(
 
 func getOsmosisJSON(ctx context.Context, client *http.Client, endpoint string, target any) error {
 	for attempt := 1; ; attempt++ {
-		err := getOsmosisJSONOnce(ctx, client, endpoint, target)
+		requestCtx, cancel := context.WithTimeout(ctx, osmosisMainnetRequestTimeout)
+		err := getOsmosisJSONOnce(requestCtx, client, endpoint, target)
+		cancel()
 		if err == nil {
 			return nil
+		}
+		if ctx.Err() != nil {
+			return err
 		}
 		delay, retry := osmosisMainnetRetryDelay(attempt)
 		if !retry || !retryableOsmosisReadError(err) {
@@ -357,18 +364,22 @@ func (e *osmosisHTTPStatusError) Error() string {
 
 func retryableOsmosisReadError(err error) bool {
 	var statusErr *osmosisHTTPStatusError
-	if !errors.As(err, &statusErr) {
-		return false
+	if errors.As(err, &statusErr) {
+		switch statusErr.statusCode {
+		case http.StatusTooManyRequests,
+			http.StatusBadGateway,
+			http.StatusServiceUnavailable,
+			http.StatusGatewayTimeout:
+			return true
+		default:
+			return false
+		}
 	}
-	switch statusErr.statusCode {
-	case http.StatusTooManyRequests,
-		http.StatusBadGateway,
-		http.StatusServiceUnavailable,
-		http.StatusGatewayTimeout:
+	if errors.Is(err, context.DeadlineExceeded) || errors.Is(err, io.EOF) || errors.Is(err, io.ErrUnexpectedEOF) {
 		return true
-	default:
-		return false
 	}
+	var networkErr net.Error
+	return errors.As(err, &networkErr) && (networkErr.Timeout() || networkErr.Temporary())
 }
 
 func osmosisMainnetRetryDelay(completedAttempt int) (time.Duration, bool) {

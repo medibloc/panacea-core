@@ -370,6 +370,35 @@ func TestOsmosisMainnetPreflightRetriesTransientServiceUnavailable(t *testing.T)
 	}
 }
 
+func TestOsmosisMainnetPreflightRetriesTransientNetworkTimeout(t *testing.T) {
+	now := time.Date(2026, 8, 4, 11, 5, 0, 0, time.UTC)
+	transport := &transientOsmosisStatusRoundTripper{
+		now:       now,
+		statusErr: context.DeadlineExceeded,
+	}
+	client := &http.Client{Transport: transport}
+
+	evidence, err := runOsmosisMainnetPreflight(
+		context.Background(),
+		client,
+		OsmosisMainnetPreflightConfig{
+			RPCEndpoint:  "https://rpc.example",
+			RESTEndpoint: "https://rest.example",
+			Timeout:      5 * time.Second,
+		},
+		now,
+	)
+	if err != nil {
+		t.Fatalf("transient network timeout was not recovered by a bounded retry: %v", err)
+	}
+	if !evidence.Passed {
+		t.Fatalf("preflight did not pass after transient network recovery: %#v", evidence)
+	}
+	if transport.statusAttempts != 2 {
+		t.Fatalf("status attempts = %d, want 2", transport.statusAttempts)
+	}
+}
+
 func TestOsmosisMainnetPreflightFailsClosedWithArtifactEvidence(t *testing.T) {
 	t.Parallel()
 
@@ -539,6 +568,7 @@ type fixtureRoundTripper struct {
 type transientOsmosisStatusRoundTripper struct {
 	now            time.Time
 	statusAttempts int
+	statusErr      error
 }
 
 func (t *transientOsmosisStatusRoundTripper) RoundTrip(req *http.Request) (*http.Response, error) {
@@ -547,6 +577,9 @@ func (t *transientOsmosisStatusRoundTripper) RoundTrip(req *http.Request) (*http
 	case "https://rpc.example/status":
 		t.statusAttempts++
 		if t.statusAttempts == 1 {
+			if t.statusErr != nil {
+				return nil, t.statusErr
+			}
 			return &http.Response{
 				StatusCode: http.StatusServiceUnavailable,
 				Status:     "503 Service Unavailable",
