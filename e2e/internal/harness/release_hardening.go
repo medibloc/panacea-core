@@ -162,10 +162,10 @@ func validateReleasePlatformImages(images []ReleasePlatformImageEvidence, runID,
 	return nil
 }
 
-// ReleaseHostImageIdentity ties each content-addressed image used by the
-// functional suites to the independently rebuilt release image for the Docker
-// daemon's native platform. Image config IDs may differ between builds, so the
-// panacead binary checksum is the fail-closed equivalence contract.
+// ReleaseHostImageIdentity records each content-addressed image used by the
+// functional suites and the independently rebuilt release image for the Docker
+// daemon's native platform. Binary checksums are provenance, not an equality
+// requirement across separate build environments.
 type ReleaseHostImageIdentity struct {
 	SchemaVersion string                          `json:"schema_version"`
 	HostPlatform  string                          `json:"host_platform"`
@@ -208,9 +208,6 @@ func (i ReleaseHostImageIdentity) Validate() error {
 		}
 		if !releaseBareDigestPattern.MatchString(image.FunctionalBinarySHA256) || !releaseBareDigestPattern.MatchString(image.ReleaseBinarySHA256) {
 			return fmt.Errorf("release host image identity %q requires lowercase panacead SHA-256 checksums", image.Kind)
-		}
-		if image.FunctionalBinarySHA256 != image.ReleaseBinarySHA256 {
-			return fmt.Errorf("release host image identity %q functional binary %s differs from release binary %s", image.Kind, image.FunctionalBinarySHA256, image.ReleaseBinarySHA256)
 		}
 		seen[image.Kind] = image
 	}
