@@ -64,6 +64,14 @@ func TestReleaseHardeningRunnerDoesNotDowngradeRequiredEvidenceToSkips(t *testin
 	require.NotContains(t, strings.ToLower(script), ":latest")
 }
 
+func TestReleaseHardeningRunnerInvokesPanaceadForImageVersionChecks(t *testing.T) {
+	contents, err := os.ReadFile("../scripts/e2e/release-hardening.sh")
+	require.NoError(t, err)
+	script := string(contents)
+
+	require.Equal(t, 2, strings.Count(script, `--entrypoint /usr/bin/panacead "$image_ref" version --long`))
+}
+
 func TestReleaseHardeningRunnerPinsInputsToConfiguredGoVersion(t *testing.T) {
 	contents, err := os.ReadFile("../scripts/e2e/release-hardening.sh")
 	require.NoError(t, err)
@@ -229,6 +237,50 @@ func TestReleaseHardeningRunnerRejectsInvalidRootBeforeCreatingIt(t *testing.T) 
 	require.Contains(t, string(status), "stage=validate-paths\n")
 	require.NoFileExists(t, filepath.Join(artifactDir, "watchdog-pid.txt"))
 	requireNoReleaseRunnerWorkDir(t, canonicalRepoRoot)
+}
+
+func TestReleaseHardeningRunnerRemovesReadOnlyModuleCacheDirectories(t *testing.T) {
+	repoRoot, scriptPath := copyReleaseHardeningRunner(t)
+	fakeBin := filepath.Join(repoRoot, "fake-bin")
+	require.NoError(t, os.MkdirAll(fakeBin, 0o700))
+	require.NoError(t, os.WriteFile(
+		filepath.Join(fakeBin, "git"),
+		[]byte(`#!/bin/sh
+case "${1:-}" in
+  rev-parse)
+    for work_dir in "$PWD"/.local/e2e/release-*-work; do
+      [ -d "$work_dir" ] || continue
+      mkdir -p "$work_dir/go-mod/example.invalid/module@v1.0.0"
+      : >"$work_dir/go-mod/example.invalid/module@v1.0.0/go.mod"
+      chmod 500 "$work_dir/go-mod/example.invalid/module@v1.0.0" "$work_dir/go-mod/example.invalid" "$work_dir/go-mod"
+    done
+    printf '%s\n' 0123456789abcdef0123456789abcdef01234567
+    ;;
+  status)
+    printf '%s\n' '?? injected-dirty-file'
+    ;;
+  diff) ;;
+  *) exit 97 ;;
+esac
+`),
+		0o700,
+	))
+
+	command := exec.Command("sh", scriptPath)
+	command.Env = append(releaseRunnerTestEnv(),
+		"PANACEA_E2E_RELEASE_HARDENING=1",
+		"PATH="+fakeBin+string(os.PathListSeparator)+os.Getenv("PATH"),
+	)
+	output, err := command.CombinedOutput()
+	requireExitCode(t, err, 2, output)
+	requireNoReleaseRunnerWorkDir(t, repoRoot)
+
+	artifactDir := requireOneReleaseRunnerArtifact(t, repoRoot)
+	status, readErr := os.ReadFile(filepath.Join(artifactDir, "status.txt"))
+	require.NoError(t, readErr)
+	require.Contains(t, string(status), "result=failed\n")
+	require.Contains(t, string(status), "exit_code=2\n")
+	require.Contains(t, string(status), "stage=validate-clean-source\n")
 }
 
 func TestReleaseHardeningRunnerFailsClosedWhenProcessEnumerationIsUnavailable(t *testing.T) {

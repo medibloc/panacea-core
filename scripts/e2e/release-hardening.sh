@@ -356,7 +356,15 @@ cleanup_release_hardening() {
   # validation or relocation failed. Accept only either exact run-owned shape.
   case "$work_dir" in
     "$bootstrap_artifact_root"/release-*-work | "$release_artifact_root"/release-*-work)
-      rm -rf -- "$work_dir"
+      # Go's module cache deliberately makes module directories read-only.
+      # Restore owner write permission on directories only so rm can unlink
+      # their contents without following or mutating symlink targets.
+      if ! find "$work_dir" -type d -exec chmod u+w {} +; then
+        cleanup_failed=1
+      fi
+      if ! rm -rf -- "$work_dir"; then
+        cleanup_failed=1
+      fi
       ;;
     *)
       printf 'refused unsafe work directory cleanup: %s\n' "$work_dir" >"$artifact_dir/cleanup-work-dir-error.txt"
@@ -866,7 +874,8 @@ build_and_verify_image() {
   test "$actual_platform" = "$platform"
   version_container="panacea-version-$kind-$suffix-$$"
   track_release_container "$version_container"
-  "$DOCKER" run --rm --name "$version_container" --platform "$platform" "$image_ref" version --long \
+  "$DOCKER" run --rm --name "$version_container" --platform "$platform" \
+    --entrypoint /usr/bin/panacead "$image_ref" version --long \
     >"$artifact_dir/$kind-$suffix-version.txt"
   untrack_release_container "$version_container"
   grep -Fq "version: $version" "$artifact_dir/$kind-$suffix-version.txt"
@@ -1034,7 +1043,8 @@ warm_offline_buildkit_image() {
   "$DOCKER" image inspect "$image_ref" >"$artifact_dir/warm-offline-$kind-$suffix-image-inspect.json"
   warm_version_container="panacea-warm-version-$kind-$suffix-$$"
   track_release_container "$warm_version_container"
-  "$DOCKER" run --rm --name "$warm_version_container" --platform "$platform" "$image_ref" version --long \
+  "$DOCKER" run --rm --name "$warm_version_container" --platform "$platform" \
+    --entrypoint /usr/bin/panacead "$image_ref" version --long \
     >"$artifact_dir/warm-offline-$kind-$suffix-version.txt"
   untrack_release_container "$warm_version_container"
   grep -Fq "version: $version" "$artifact_dir/warm-offline-$kind-$suffix-version.txt"
