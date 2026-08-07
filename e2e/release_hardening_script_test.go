@@ -64,6 +64,16 @@ func TestReleaseHardeningRunnerDoesNotDowngradeRequiredEvidenceToSkips(t *testin
 	require.NotContains(t, strings.ToLower(script), ":latest")
 }
 
+func TestReleaseHardeningRunnerPinsInputsToConfiguredGoVersion(t *testing.T) {
+	contents, err := os.ReadFile("../scripts/e2e/release-hardening.sh")
+	require.NoError(t, err)
+	script := string(contents)
+
+	require.Contains(t, script, `index($2, "golang:" version "-") == 1`)
+	require.Contains(t, script, `grep -Fqx "go $E2E_GO_VERSION"`)
+	require.NotContains(t, strings.ReplaceAll(script, `\`, ""), "1.23.12")
+}
+
 func TestReleaseHardeningMultiarchUpgradeUsesBuiltImageTags(t *testing.T) {
 	contents, err := os.ReadFile("../scripts/e2e/release-hardening.sh")
 	require.NoError(t, err)

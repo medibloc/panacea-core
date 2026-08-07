@@ -642,8 +642,12 @@ if grep -Ev '^FROM [^[:space:]@]+@sha256:[0-9a-f]{64}( AS [[:alnum:]_.-]+)?$' "$
   echo "every E2E Dockerfile base image must be pinned by sha256 digest" >&2
   exit 1
 fi
-grep -Eq '^FROM golang:1\.23\.12-[^@]+@sha256:[0-9a-f]{64} AS build-env$' "$artifact_dir/base-images.txt"
-grep -Eq '^go 1\.23\.12$' "$current_source/e2e/go.mod"
+awk -v version="$E2E_GO_VERSION" '
+  $1 == "FROM" && index($2, "golang:" version "-") == 1 &&
+    $3 == "AS" && $4 == "build-env" { found = 1 }
+  END { exit found ? 0 : 1 }
+' "$artifact_dir/base-images.txt"
+grep -Fqx "go $E2E_GO_VERSION" "$current_source/e2e/go.mod"
 grep -Eq '^[[:space:]]+github\.com/strangelove-ventures/interchaintest/v8 v8\.8\.1$' \
   "$current_source/e2e/go.mod"
 
