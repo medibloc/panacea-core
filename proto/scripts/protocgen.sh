@@ -34,8 +34,7 @@ trap 'exit 1' HUP INT TERM
 echo "Generating gogo proto code"
 cp -R "$repo_root/proto" "$generation_root/proto"
 cd "$generation_root/proto"
-find ./panacea -name '*.proto' \
-  -exec buf generate --template buf.gen.gogo.yaml {} \;
+buf generate --template buf.gen.gogo.yaml --path ./panacea
 
 # move proto files to the right places
 module_path=$(awk '$1 == "module" { print $2; exit }' "$repo_root/go.mod")
@@ -79,16 +78,25 @@ if [ -d "$generated_module_dir" ]; then
 fi
 
 generated_manifest=$generation_root/generated-files.txt
+generated_manifest_unsorted=$generation_root/generated-files-unsorted.txt
 (
   cd "$staged_repo_root"
   find ./x -type f \( -name '*.pb.go' -o -name '*.pb.gw.go' \) -print \
-    | LC_ALL=C sort >"$generated_manifest"
+    >"$generated_manifest_unsorted"
 )
+LC_ALL=C sort "$generated_manifest_unsorted" >"$generated_manifest"
 
 if [ ! -s "$generated_manifest" ]; then
   echo "protobuf generation produced no Go files" >&2
   exit 1
 fi
+
+existing_generated_manifest=$generation_root/existing-generated-files.txt
+(
+  cd "$repo_root"
+  find ./x -type f \( -name '*.pb.go' -o -name '*.pb.gw.go' \) -print \
+    >"$existing_generated_manifest"
+)
 
 cp -R "$staged_repo_root"/. "$repo_root"/
 
@@ -96,10 +104,9 @@ cp -R "$staged_repo_root"/. "$repo_root"/
 # that were not produced by this run so deleted or renamed protos cannot linger.
 (
   cd "$repo_root"
-  find ./x -type f \( -name '*.pb.go' -o -name '*.pb.gw.go' \) -print |
-    while IFS= read -r generated_file; do
-      if ! grep -Fqx "$generated_file" "$generated_manifest"; then
-        rm -f -- "$generated_file"
-      fi
-    done
+  while IFS= read -r generated_file; do
+    if ! grep -Fqx "$generated_file" "$generated_manifest"; then
+      rm -f -- "$generated_file"
+    fi
+  done <"$existing_generated_manifest"
 )
