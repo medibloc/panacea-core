@@ -511,7 +511,7 @@ func forceKillPIDFromFile(t *testing.T, path string) {
 }
 
 func TestReleaseDockerfileBasesAreDigestPinned(t *testing.T) {
-	for _, dockerfile := range []string{"docker/Dockerfile", "docker/Dockerfile.release"} {
+	for _, dockerfile := range []string{"../Dockerfile", "docker/Dockerfile", "docker/Dockerfile.release"} {
 		contents, err := os.ReadFile(dockerfile)
 		require.NoError(t, err)
 		images, err := harness.ParseReleasePinnedBaseImages(contents)
@@ -521,4 +521,64 @@ func TestReleaseDockerfileBasesAreDigestPinned(t *testing.T) {
 			require.Regexp(t, `^sha256:[0-9a-f]{64}$`, image.Digest)
 		}
 	}
+}
+
+func TestEveryCurrentReleaseArtifactUsesCanonicalStaticBuildContract(t *testing.T) {
+	const buildContract = "panacea-linux-static-v1"
+
+	makefile, err := os.ReadFile("../Makefile")
+	require.NoError(t, err)
+	require.Contains(t, string(makefile), "release-build:")
+	require.Contains(t, string(makefile), "RELEASE_BUILD_CONTRACT := "+buildContract)
+	require.Contains(t, string(makefile), "override RELEASE_BUILD_MOD := vendor")
+	require.Contains(t, string(makefile), "go build -mod=$(RELEASE_BUILD_MOD)")
+
+	builder, err := os.ReadFile("../scripts/release/build-validator.sh")
+	require.NoError(t, err)
+	require.Contains(t, string(builder), "release-build")
+	require.Contains(t, string(builder), "RELEASE_GOARCH=")
+	require.Contains(t, string(builder), "RELEASE_OUTPUT=")
+	require.Contains(t, string(builder), "build_contract="+buildContract)
+	require.Contains(t, string(builder), "dependency_mode=vendor")
+	require.Contains(t, string(builder), `"$validator_go_binary" mod vendor`)
+	require.NotContains(t, string(builder), "\n\tinstall\n")
+
+	for _, dockerfile := range []string{"../Dockerfile", "docker/Dockerfile", "docker/Dockerfile.release"} {
+		contents, err := os.ReadFile(dockerfile)
+		require.NoError(t, err)
+		dockerBuild := string(contents)
+		require.Contains(t, dockerBuild, "release-build")
+		require.Contains(t, dockerBuild, "RELEASE_GOARCH=")
+		require.Contains(t, dockerBuild, "RELEASE_OUTPUT=")
+		if dockerfile != "docker/Dockerfile" {
+			require.Contains(t, dockerBuild, `org.medibloc.panacea.build-contract="`+buildContract+`"`)
+		}
+	}
+
+	workflow, err := os.ReadFile("../.github/workflows/docker-publish.yml")
+	require.NoError(t, err)
+	publish := string(workflow)
+	require.Contains(t, publish, "platforms: linux/amd64,linux/arm64")
+	require.Contains(t, publish, "panacea_vendor=")
+	require.Contains(t, publish, "PANACEA_CMT_VERSION=")
+	require.NotContains(t, publish, "actions/setup-go@v")
+}
+
+func TestCanonicalStaticBuildContractCannotBeDowngradedByMakeArguments(t *testing.T) {
+	command := exec.Command(
+		"make", "-n", "-C", "..", "release-build",
+		"LEDGER_ENABLED=false",
+		"VERSION=2.3.0",
+		"COMMIT=0123456789abcdef0123456789abcdef01234567",
+		"RELEASE_GOARCH=amd64",
+		"RELEASE_OUTPUT=/tmp/panacea-release-contract-test",
+		"RELEASE_BUILD_MOD=readonly",
+		"RELEASE_BUILD_FLAGS=unsafe",
+	)
+	output, err := command.CombinedOutput()
+	require.NoErrorf(t, err, "make dry-run output:\n%s", output)
+	contract := string(output)
+	require.Contains(t, contract, `go build -mod=vendor -tags "netgo"`)
+	require.NotContains(t, contract, "go build -mod=readonly")
+	require.NotContains(t, contract, " unsafe ")
 }

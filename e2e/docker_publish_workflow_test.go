@@ -17,6 +17,7 @@ func TestDockerPublishBuildsAndPushesIndependentlyOfE2E(t *testing.T) {
 		"branches: [main]",
 		"tags: ['v*.*.*']",
 		"actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0",
+		"actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5",
 		"docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3.12.0",
 		"docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3.7.0",
 		"docker/metadata-action@c299e40c65443455700f0fdfc63efafe5b349051 # v5.10.0",
@@ -40,7 +41,7 @@ func TestDockerPublishBuildsAndPushesIndependentlyOfE2E(t *testing.T) {
 		require.True(t, found, "action must include a revision: %s", action)
 		require.Regexp(t, `^[0-9a-f]{40}$`, revision, "action must use an immutable commit SHA: %s", action)
 	}
-	require.Equal(t, 5, usesCount)
+	require.Equal(t, 6, usesCount)
 	for _, forbidden := range []string{
 		"scripts/e2e/",
 		"release-hardening",

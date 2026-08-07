@@ -11,8 +11,10 @@ ARG PANACEA_VERSION=worktree
 ARG PANACEA_COMMIT=unknown
 ARG PANACEA_CMT_VERSION=unknown
 ARG PANACEA_TM_VERSION=unknown
+ARG TARGETARCH
 RUN --network=none --mount=type=cache,target=/root/.cache/go-build \
     set -eu \
+    && case "${TARGETARCH}" in amd64|arm64) ;; *) echo "unsupported target architecture: ${TARGETARCH}" >&2; exit 2 ;; esac \
     && grep -Eq -- '-mod=(readonly|\$\(GO_BUILD_MOD\))' Makefile \
     && sed -i 's/-mod=readonly/-mod=$(GO_BUILD_MOD)/' Makefile \
     && grep -Fq -- '-mod=$(GO_BUILD_MOD)' Makefile \
@@ -23,13 +25,27 @@ RUN --network=none --mount=type=cache,target=/root/.cache/go-build \
         -e 's/^export TMVERSION :=.*/export TMVERSION ?= unknown/' \
         Makefile \
     && touch go.sum \
-    && make build \
-        LEDGER_ENABLED=false \
-        GO_BUILD_MOD=vendor \
-        VERSION="${PANACEA_VERSION}" \
-        COMMIT="${PANACEA_COMMIT}" \
-        CMTVERSION="${PANACEA_CMT_VERSION}" \
-        TMVERSION="${PANACEA_TM_VERSION}" \
+    && if grep -q '^release-build:' Makefile; then \
+        make \
+            VERSION="${PANACEA_VERSION}" \
+            COMMIT="${PANACEA_COMMIT}" \
+            CMTVERSION="${PANACEA_CMT_VERSION}" \
+            LEDGER_ENABLED=false \
+            COSMOS_BUILD_OPTIONS= \
+            BUILD_TAGS= \
+            RELEASE_GOARCH="${TARGETARCH}" \
+            RELEASE_OUTPUT=/src/panacea-core/build/panacead \
+            release-build; \
+      else \
+        CGO_ENABLED=0 GOAMD64=v1 GOARM64=v8.0 \
+        make build \
+            LEDGER_ENABLED=false \
+            GO_BUILD_MOD=vendor \
+            VERSION="${PANACEA_VERSION}" \
+            COMMIT="${PANACEA_COMMIT}" \
+            CMTVERSION="${PANACEA_CMT_VERSION}" \
+            TMVERSION="${PANACEA_TM_VERSION}"; \
+      fi \
     && cd /src/panacea-core/scripts/e2e/faultproxy \
     && CGO_ENABLED=0 GOWORK=off go build -mod=readonly -trimpath \
         -o /src/panacea-e2e-faultproxy .

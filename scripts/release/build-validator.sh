@@ -4,8 +4,9 @@
 #
 # The builder accepts only a clean, exactly tagged source tree. It downloads
 # the pinned official Go toolchain into a repository-local ignored directory,
-# verifies the upstream checksum, and emits a static native Linux binary plus
-# provenance under artifacts/. It never installs or restarts panacead.
+# verifies the upstream checksum, stages the tagged commit in an isolated source
+# directory, and emits a static native Linux binary plus provenance under
+# artifacts/. It never installs or restarts panacead.
 
 set -eu
 umask 077
@@ -212,7 +213,35 @@ validator_gocache="$validator_build_root/cache/go-build-$validator_go_arch"
 validator_gomodcache="$validator_build_root/cache/go-mod"
 validator_stage_bin=$(mktemp -d "$validator_build_root/bin.XXXXXX")
 validator_tmp_dir=$(mktemp -d "$validator_build_root/tmp.XXXXXX")
+validator_staged_binary="$validator_stage_bin/panacead"
+validator_source_dir=$(mktemp -d "$validator_build_root/source.XXXXXX")
+validator_source_tar="$validator_tmp_dir/source.tar"
 mkdir -p "$validator_gopath" "$validator_gocache" "$validator_gomodcache"
+
+git archive --format=tar --output="$validator_source_tar" "$source_commit"
+tar -xf "$validator_source_tar" -C "$validator_source_dir"
+
+cd "$validator_source_dir"
+env \
+	LC_ALL=C \
+	TZ=UTC \
+	TMPDIR="$validator_tmp_dir" \
+	GOENV=off \
+	GOTOOLCHAIN=local \
+	GOWORK=off \
+	GOFLAGS=-buildvcs=false \
+	GOEXPERIMENT= \
+	GOFIPS140=off \
+	GODEBUG= \
+	GOPATH="$validator_gopath" \
+	GOCACHE="$validator_gocache" \
+	GOMODCACHE="$validator_gomodcache" \
+	GOPROXY="$validator_goproxy" \
+	GOSUMDB="$validator_gosumdb" \
+	GOPRIVATE= \
+	GONOPROXY= \
+	GONOSUMDB= \
+	"$validator_go_binary" mod vendor
 
 printf 'Building Panacea %s (%s) with Go %s\n' \
 	"$release_version" "$validator_platform" "$validator_go_version"
@@ -252,9 +281,11 @@ env \
 	BUILD_TAGS= \
 	build_tags=netgo \
 	build_tags_comma_sep=netgo \
-	install
+	RELEASE_GOARCH="$validator_go_arch" \
+	RELEASE_OUTPUT="$validator_staged_binary" \
+	release-build
+cd "$repo_root"
 
-validator_staged_binary="$validator_stage_bin/panacead"
 [ -x "$validator_staged_binary" ] || die "build did not produce $validator_staged_binary"
 
 validator_version_output=$("$validator_staged_binary" version --long)
@@ -300,6 +331,8 @@ printf '%s\n' "$validator_compiler_version" >"$validator_artifact_dir/compiler-v
 	printf 'build_tags=netgo\n'
 	printf 'cosmos_build_options=\n'
 	printf 'extra_build_tags=\n'
+	printf 'build_contract=panacea-linux-static-v1\n'
+	printf 'dependency_mode=vendor\n'
 	printf 'binary=%s\n' "$validator_binary_name"
 	printf 'binary_sha256=%s\n' "$validator_binary_sha256"
 } >"$validator_artifact_dir/build-info.txt"

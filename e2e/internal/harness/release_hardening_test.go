@@ -62,7 +62,7 @@ func TestReleaseHardeningManifestRequiresBothArchitecturesAndRealUpgrades(t *tes
 	require.ErrorContains(t, wrongNonHostCommit.Validate(), "want")
 }
 
-func TestReleaseHostImageIdentityAllowsDifferentFunctionalAndReleaseBinaryChecksums(t *testing.T) {
+func TestReleaseHostImageIdentityRequiresMatchingFunctionalAndReleaseBinaryChecksums(t *testing.T) {
 	valid := ReleaseHostImageIdentity{
 		SchemaVersion: ReleaseHostImageIdentitySchemaVersion,
 		HostPlatform:  "linux/amd64",
@@ -90,7 +90,7 @@ func TestReleaseHostImageIdentityAllowsDifferentFunctionalAndReleaseBinaryChecks
 	mismatch := valid
 	mismatch.Images = append([]ReleaseHostImageIdentityEntry(nil), valid.Images...)
 	mismatch.Images[0].ReleaseBinarySHA256 = "3333333333333333333333333333333333333333333333333333333333333333"
-	require.NoError(t, mismatch.Validate())
+	require.ErrorContains(t, mismatch.Validate(), "differs")
 
 	duplicate := valid
 	duplicate.Images = append([]ReleaseHostImageIdentityEntry(nil), valid.Images...)

@@ -9,25 +9,25 @@ COPY --from=panacea_vendor . ./vendor
 ARG PANACEA_VERSION=worktree
 ARG PANACEA_COMMIT=unknown
 ARG PANACEA_CMT_VERSION=unknown
+ARG TARGETARCH
 RUN --network=none --mount=type=cache,target=/root/.cache/go-build \
     set -eu \
-    && grep -Eq -- '-mod=(readonly|\$\(GO_BUILD_MOD\))' Makefile \
-    && sed -i 's/-mod=readonly/-mod=$(GO_BUILD_MOD)/' Makefile \
-    && grep -Fq -- '-mod=$(GO_BUILD_MOD)' Makefile \
-    && sed -i \
-        -e 's/^export VERSION :=.*/export VERSION ?= worktree/' \
-        -e 's/^export COMMIT :=.*/export COMMIT ?= unknown/' \
-        -e 's/^export CMTVERSION :=.*/export CMTVERSION ?= unknown/' \
-        Makefile \
+    && case "${TARGETARCH}" in amd64|arm64) ;; *) echo "unsupported target architecture: ${TARGETARCH}" >&2; exit 2 ;; esac \
     && touch go.sum \
-    && make build \
-        LEDGER_ENABLED=false \
-        GO_BUILD_MOD=vendor \
+    && make \
         VERSION="${PANACEA_VERSION}" \
         COMMIT="${PANACEA_COMMIT}" \
-        CMTVERSION="${PANACEA_CMT_VERSION}"
+        CMTVERSION="${PANACEA_CMT_VERSION}" \
+        LEDGER_ENABLED=false \
+        COSMOS_BUILD_OPTIONS= \
+        BUILD_TAGS= \
+        RELEASE_GOARCH="${TARGETARCH}" \
+        RELEASE_OUTPUT=/src/panacea-core/build/panacead \
+        release-build
 
 FROM debian:trixie-slim@sha256:3a39a0592364683e6bab97937b72cad5a8fa6dcbbee90edb3bb48c7f8e94f258
+
+LABEL org.medibloc.panacea.build-contract="panacea-linux-static-v1"
 
 COPY --from=build-env /src/panacea-core/build/panacead /usr/bin/panacead
 RUN chmod 0755 /usr/bin/panacead

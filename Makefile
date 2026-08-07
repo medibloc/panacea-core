@@ -45,6 +45,11 @@ whitespace += $(whitespace)
 comma := ,
 
 ARTIFACT_DIR := artifacts
+GO_BUILD_MOD ?= readonly
+RELEASE_BUILD_CONTRACT := panacea-linux-static-v1
+override RELEASE_BUILD_MOD := vendor
+RELEASE_GOARCH ?=
+RELEASE_OUTPUT ?= $(BUILDDIR)/panacead
 
 # DB backend selection
 ifeq (cleveldb,$(findstring cleveldb,$(COSMOS_BUILD_OPTIONS)))
@@ -104,18 +109,45 @@ build: BUILD_ARGS=-o $(BUILDDIR)/
 build-linux:
 	GOOS=linux GOARCH=$(if $(filter aarch64 arm64,$(shell uname -m)),arm64,amd64) LEDGER_ENABLED=false $(MAKE) build
 
+# release-build is the only supported build contract for distributable Linux
+# validator binaries and current-version release images. The contract requires
+# a materialized vendor directory and callers must disable Ledger while Make
+# parses the build-tag configuration.
+override release_ldflags = -X github.com/cosmos/cosmos-sdk/version.Name=panacea-core \
+		  -X github.com/cosmos/cosmos-sdk/version.AppName=panacead \
+		  -X github.com/cosmos/cosmos-sdk/version.Version=$(VERSION) \
+		  -X github.com/cosmos/cosmos-sdk/version.Commit=$(COMMIT) \
+		  -X "github.com/cosmos/cosmos-sdk/version.BuildTags=netgo" \
+		  -X github.com/cometbft/cometbft/version.TMCoreSemVer=$(CMTVERSION) \
+		  -w -s
+override release_ldflags := $(strip $(release_ldflags))
+override RELEASE_BUILD_FLAGS := -tags "netgo" -ldflags '$(release_ldflags)' -trimpath
+
+release-build: go.sum
+	@case "$(RELEASE_GOARCH)" in \
+		amd64|arm64) ;; \
+		*) echo "RELEASE_GOARCH must be amd64 or arm64" >&2; exit 2 ;; \
+	esac
+	@mkdir -p "$(dir $(RELEASE_OUTPUT))"
+	LC_ALL=C TZ=UTC GOENV=off GOTOOLCHAIN=local GOWORK=off \
+		GOFLAGS=-buildvcs=false GOEXPERIMENT= GOFIPS140=off GODEBUG= \
+		GOOS=linux GOARCH="$(RELEASE_GOARCH)" GOAMD64=v1 GOARM64=v8.0 \
+		CGO_ENABLED=0 \
+		go build -mod=$(RELEASE_BUILD_MOD) $(RELEASE_BUILD_FLAGS) \
+			-o "$(RELEASE_OUTPUT)" ./cmd/panacead
+
 test: proto-gen-test
 	mkdir -p $(ARTIFACT_DIR)
 	go test -covermode=count -coverprofile=$(ARTIFACT_DIR)/coverage.out ./...
 	go tool cover -html=$(ARTIFACT_DIR)/coverage.out -o $(ARTIFACT_DIR)/coverage.html
 
 $(BUILD_TARGETS): go.sum $(BUILDDIR)/
-	go $@ -mod=readonly $(BUILD_FLAGS) $(BUILD_ARGS) ./...
+	go $@ -mod=$(GO_BUILD_MOD) $(BUILD_FLAGS) $(BUILD_ARGS) ./...
 
 $(BUILDDIR)/:
 	mkdir -p $(BUILDDIR)/
 
-.PHONY: build build-linux
+.PHONY: build build-linux release-build
 
 distclean: clean
 clean:

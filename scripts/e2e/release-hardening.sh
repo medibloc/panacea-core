@@ -933,6 +933,14 @@ release_current_sha256=$(awk 'NR == 1 { print $1 }' \
   "$artifact_dir/current-$functional_host_suffix-binary-sha256.txt")
 release_old_sha256=$(awk 'NR == 1 { print $1 }' \
   "$artifact_dir/v2.2.1-$functional_host_suffix-binary-sha256.txt")
+if [ "$functional_current_sha256" != "$release_current_sha256" ]; then
+  echo "functional current panacead checksum differs from the host-platform release build" >&2
+  exit 1
+fi
+if [ "$functional_old_sha256" != "$release_old_sha256" ]; then
+  echo "functional v2.2.1 panacead checksum differs from the host-platform release build" >&2
+  exit 1
+fi
 {
   printf '{\n'
   printf '  "schema_version": "1",\n'

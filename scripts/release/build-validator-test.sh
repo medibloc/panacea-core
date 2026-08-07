@@ -22,7 +22,7 @@ module example.com/panacea-validator-builder-test
 go 1.26.5
 EOF
 cat >"$fixture_repo/Makefile" <<'EOF'
-install:
+release-build:
 	@false
 EOF
 cat >"$fixture_go_tree/go/bin/go" <<'EOF'
@@ -30,6 +30,7 @@ cat >"$fixture_go_tree/go/bin/go" <<'EOF'
 case "$*" in
 version) printf 'go version go1.26.5 linux/%s\n' "${FAKE_GO_ARCH:-amd64}" ;;
 'tool compile -V=full') printf 'compile version go1.26.5\n' ;;
+'mod vendor') mkdir -p vendor; : >vendor/modules.txt ;;
 *) printf 'unexpected fake go arguments: %s\n' "$*" >&2; exit 2 ;;
 esac
 EOF
@@ -68,6 +69,10 @@ fixture_build_tags=
 fixture_build_tags_comma_sep=
 fixture_cosmos_build_options=not-cleared
 fixture_extra_build_tags=not-cleared
+fixture_release_goarch=
+fixture_release_output=
+fixture_go_build_mod=
+fixture_target=
 for fixture_arg in "$@"; do
 	case "$fixture_arg" in
 	VERSION=*) fixture_version=${fixture_arg#VERSION=} ;;
@@ -77,6 +82,11 @@ for fixture_arg in "$@"; do
 	build_tags_comma_sep=*) fixture_build_tags_comma_sep=${fixture_arg#build_tags_comma_sep=} ;;
 	COSMOS_BUILD_OPTIONS=*) fixture_cosmos_build_options=${fixture_arg#COSMOS_BUILD_OPTIONS=} ;;
 	BUILD_TAGS=*) fixture_extra_build_tags=${fixture_arg#BUILD_TAGS=} ;;
+	RELEASE_GOARCH=*) fixture_release_goarch=${fixture_arg#RELEASE_GOARCH=} ;;
+	RELEASE_OUTPUT=*) fixture_release_output=${fixture_arg#RELEASE_OUTPUT=} ;;
+	GO_BUILD_MOD=*) fixture_go_build_mod=${fixture_arg#GO_BUILD_MOD=} ;;
+	*=*) ;;
+	*) fixture_target=$fixture_arg ;;
 	esac
 done
 [ "$fixture_ledger_enabled" = false ]
@@ -86,8 +96,13 @@ done
 [ -z "$fixture_extra_build_tags" ]
 [ -z "${COSMOS_BUILD_OPTIONS:-}" ]
 [ -z "${BUILD_TAGS:-}" ]
-: "${GOBIN:?}"
-cat >"$GOBIN/panacead" <<PANACEAD
+[ "$fixture_target" = release-build ]
+[ "$fixture_release_goarch" = "$GOARCH" ]
+[ -z "$fixture_go_build_mod" ]
+[ -f vendor/modules.txt ]
+: "${fixture_release_output:?}"
+mkdir -p "$(dirname "$fixture_release_output")"
+cat >"$fixture_release_output" <<PANACEAD
 #!/bin/sh
 if [ "\${1:-}" = version ] && [ "\${2:-}" = --long ]; then
 	printf 'name: panacea-core\\nversion: %s\\ncommit: %s\\nbuild_tags: netgo\\ngo: go version go1.26.5 linux/%s\\n' '$fixture_version' '$fixture_commit' '$GOARCH'
@@ -95,7 +110,7 @@ if [ "\${1:-}" = version ] && [ "\${2:-}" = --long ]; then
 fi
 exit 2
 PANACEAD
-chmod +x "$GOBIN/panacead"
+chmod +x "$fixture_release_output"
 EOF
 cat >"$fixture_fake_bin/file" <<'EOF'
 #!/bin/sh
@@ -138,6 +153,8 @@ grep -q '^gofips140=off$' "$fixture_artifacts/build-info.txt"
 grep -q '^build_tags=netgo$' "$fixture_artifacts/build-info.txt"
 grep -q '^cosmos_build_options=$' "$fixture_artifacts/build-info.txt"
 grep -q '^extra_build_tags=$' "$fixture_artifacts/build-info.txt"
+grep -q '^build_contract=panacea-linux-static-v1$' "$fixture_artifacts/build-info.txt"
+grep -q '^dependency_mode=vendor$' "$fixture_artifacts/build-info.txt"
 grep -q '^microarchitecture=GOAMD64=v1$' "$fixture_artifacts/build-info.txt"
 grep -q '^aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa  panacead-linux-amd64$' \
 	"$fixture_artifacts/panacead-linux-amd64.sha256"

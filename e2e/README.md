@@ -250,9 +250,13 @@ The E2E module is intentionally absent from the root `Makefile` and GitHub CI
 workflows. Root builds and `go test ./...` also do not enter this nested module.
 An operator must invoke `scripts/e2e/run.sh` explicitly, retain the selected
 artifact directory, and review its manifest and cleanup result. The ordinary
-Docker publish workflow builds and pushes independently; it neither runs E2E nor
-consumes `release/gate-manifest.json`. Consequently, a passing GitHub workflow
-is not evidence that any standalone E2E command passed.
+Docker publish workflow, the tagged validator builder, and the current-version
+E2E images all use the `panacea-linux-static-v1` target: Go 1.26.5, a verified
+vendor tree, `CGO_ENABLED=0`, `netgo`, fixed amd64/arm64 microarchitecture
+baselines, explicit version/commit metadata, and `-trimpath`. The publish
+workflow still builds and pushes independently; it neither runs E2E nor consumes
+`release/gate-manifest.json`. Consequently, a passing GitHub workflow is not
+evidence that any standalone E2E command passed.
 
 For a release candidate, run `release-hardening` from a clean committed HEAD on
 a host that can actually execute both `linux/amd64` and `linux/arm64`, then
