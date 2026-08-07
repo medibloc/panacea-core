@@ -9,6 +9,11 @@ deps:
 breaking:
   use:
     - FILE
+  ignore_only:
+    # The module-major-version migration changes only the generated Go import
+    # path. Keep every other FILE-level compatibility check for this message.
+    FILE_SAME_GO_PACKAGE:
+      - panacea/pnft/v2/tx.proto
   ignore:
     # The v2.3.0 upgrade intentionally removes the retired PNFT query/state
     # contract. Keep the retained panacea/pnft/v2/tx.proto under breaking checks
