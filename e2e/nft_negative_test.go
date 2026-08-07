@@ -171,7 +171,7 @@ func TestNFTNegativeStateIntegrity(t *testing.T) {
 			ctx,
 			network,
 			"negative-no-op-controller-update",
-			creator.KeyName(),
+			controller.KeyName(),
 			"sdk",
 			18,
 			classID,
