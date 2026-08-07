@@ -966,16 +966,17 @@ fi
 } >"$artifact_dir/host-image-identity.json"
 
 stage=warm-offline-buildkit-build
+builder_container_name="buildx_buildkit_${builder_name}0"
 builder_container=$(
   "$DOCKER" ps \
-    --filter "label=com.docker.buildx.builder=$builder_name" \
+    --filter "name=^/$builder_container_name$" \
     --format '{{.ID}}'
 )
-# Intentional field splitting verifies that the label selected one container.
+# Intentional field splitting verifies that the exact name selected one container.
 # shellcheck disable=SC2086
 set -- $builder_container
 if [ "$#" -ne 1 ]; then
-  echo "expected exactly one BuildKit container for $builder_name, got: $builder_container" >&2
+  echo "expected exactly one BuildKit container named $builder_container_name, got: $builder_container" >&2
   exit 1
 fi
 builder_container=$1

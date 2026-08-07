@@ -72,6 +72,16 @@ func TestReleaseHardeningRunnerInvokesPanaceadForImageVersionChecks(t *testing.T
 	require.Equal(t, 2, strings.Count(script, `--entrypoint /usr/bin/panacead "$image_ref" version --long`))
 }
 
+func TestReleaseHardeningRunnerFindsBuildKitContainerByExactName(t *testing.T) {
+	contents, err := os.ReadFile("../scripts/e2e/release-hardening.sh")
+	require.NoError(t, err)
+	script := string(contents)
+
+	require.Contains(t, script, `builder_container_name="buildx_buildkit_${builder_name}0"`)
+	require.Contains(t, script, `--filter "name=^/$builder_container_name$"`)
+	require.NotContains(t, script, `com.docker.buildx.builder`)
+}
+
 func TestReleaseHardeningRunnerPinsInputsToConfiguredGoVersion(t *testing.T) {
 	contents, err := os.ReadFile("../scripts/e2e/release-hardening.sh")
 	require.NoError(t, err)
