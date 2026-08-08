@@ -117,6 +117,24 @@ func TestReleaseHardeningMultiarchUpgradeUsesBuiltImageTags(t *testing.T) {
 	require.NotContains(t, script, `PANACEA_E2E_V221_IMAGE_VERSION="$image_version"`)
 }
 
+func TestReleaseHardeningMultiarchUpgradeUsesAllowedWorkRootAndPreservesEvidence(t *testing.T) {
+	contents, err := os.ReadFile("../scripts/e2e/release-hardening.sh")
+	require.NoError(t, err)
+	script := string(contents)
+
+	require.Contains(t, script, `upgrade_work_root="$current_source/.local/e2e/release-upgrade-$suffix"`)
+	require.Contains(t, script, `PANACEA_E2E_ROOT="$upgrade_work_root"`)
+	require.Contains(t, script, `mv "$upgrade_work_root" "$upgrade_root"`)
+	require.Contains(t, script, `if [ "$upgrade_exit_code" -ne 0 ]; then`)
+	require.NotContains(t, script, `PANACEA_E2E_ROOT="$upgrade_root"`)
+
+	moveEvidence := strings.Index(script, `mv "$upgrade_work_root" "$upgrade_root"`)
+	checkExitCode := strings.Index(script, `if [ "$upgrade_exit_code" -ne 0 ]; then`)
+	require.NotEqual(t, -1, moveEvidence)
+	require.NotEqual(t, -1, checkExitCode)
+	require.Less(t, moveEvidence, checkExitCode, "failed upgrade evidence must move before propagating the exit code")
+}
+
 func TestReleaseHardeningMultiarchUpgradeRunsPrecompiledTestBinaryDirectly(t *testing.T) {
 	contents, err := os.ReadFile("../scripts/e2e/release-hardening.sh")
 	require.NoError(t, err)

@@ -1094,12 +1094,17 @@ while IFS='|' read -r platform image_kind current_image_ref image_digest image_i
   suffix=${platform#linux/}
   current_repository=${current_image_ref%%:*}
   old_repository="panacea-e2e-release-v2.2.1-$suffix"
+  upgrade_work_root="$current_source/.local/e2e/release-upgrade-$suffix"
   upgrade_root="$artifact_dir/upgrade-$suffix"
-  mkdir -p "$upgrade_root"
-  (
-    cd "$current_source/e2e"
+  if [ -e "$upgrade_work_root" ] || [ -e "$upgrade_root" ]; then
+    echo "refusing to reuse multiarch upgrade artifact paths for $suffix" >&2
+    exit 2
+  fi
+  upgrade_exit_code=0
+  if (
+    cd "$current_source/e2e" || exit 2
     PANACEA_E2E_UPGRADE=1 \
-    PANACEA_E2E_ROOT="$upgrade_root" \
+    PANACEA_E2E_ROOT="$upgrade_work_root" \
     PANACEA_E2E_IMAGE_REPOSITORY="$current_repository" \
     PANACEA_E2E_V221_IMAGE_REPOSITORY="$old_repository" \
     PANACEA_E2E_IMAGE_VERSION="$run_id" \
@@ -1111,7 +1116,18 @@ while IFS='|' read -r platform image_kind current_image_ref image_digest image_i
       "$release_test_binary" -test.timeout "$E2E_RELEASE_UPGRADE_TIMEOUT" \
         -test.count=1 -test.v -test.run '^TestV221ToCurrentMultiValidatorUpgrade$' \
         >"$artifact_dir/upgrade-$suffix.log" 2>&1
-  )
+  ); then
+    upgrade_exit_code=0
+  else
+    upgrade_exit_code=$?
+  fi
+  if [ -e "$upgrade_work_root" ]; then
+    mv "$upgrade_work_root" "$upgrade_root"
+  fi
+  if [ "$upgrade_exit_code" -ne 0 ]; then
+    exit "$upgrade_exit_code"
+  fi
+  test -d "$upgrade_root"
   printf 'platform=%s\nresult=passed\n' "$platform" >"$artifact_dir/upgrade-$suffix-result.txt"
 done <"$artifact_dir/image-index.txt"
 
