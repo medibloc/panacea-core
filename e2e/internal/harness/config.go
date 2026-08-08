@@ -68,6 +68,11 @@ type Topology struct {
 	SnapshotKeepRecent uint32
 	EnableTelemetry    bool
 
+	// DisableOptionalCPUFeatures is reserved for cross-architecture runtime
+	// tests. Some host emulators advertise amd64 CPU features whose crypto
+	// instructions do not behave correctly, while native validator hosts do.
+	DisableOptionalCPUFeatures bool
+
 	// Test-only genesis overrides. Their zero values leave source genesis intact.
 	StakingUnbondingTime          string
 	SlashingSignedBlocksWindow    int64
@@ -155,6 +160,10 @@ func NewPanaceaChainSpec(runID string, image ImageRef, topology Topology) (*inte
 			genesisOverrides = append(genesisOverrides, cosmos.NewGenesisKV(override.path, value))
 		}
 	}
+	runtimeEnv := []string(nil)
+	if topology.DisableOptionalCPUFeatures {
+		runtimeEnv = []string{"GODEBUG=cpu.all=off"}
+	}
 
 	return &interchaintest.ChainSpec{
 		Name:          chainName,
@@ -175,6 +184,7 @@ func NewPanaceaChainSpec(runID string, image ImageRef, topology Topology) (*inte
 			GasAdjustment:  1.3,
 			Gas:            "auto",
 			TrustingPeriod: "336h",
+			Env:            runtimeEnv,
 			Images: []ibc.DockerImage{{
 				Repository: image.Repository,
 				Version:    image.Version,

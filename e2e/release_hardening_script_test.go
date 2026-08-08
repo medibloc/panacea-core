@@ -135,6 +135,19 @@ func TestReleaseHardeningMultiarchUpgradeUsesAllowedWorkRootAndPreservesEvidence
 	require.Less(t, moveEvidence, checkExitCode, "failed upgrade evidence must move before propagating the exit code")
 }
 
+func TestReleaseHardeningMultiarchUpgradeDisablesOptionalCPUFeaturesOnlyForEmulation(t *testing.T) {
+	contents, err := os.ReadFile("../scripts/e2e/release-hardening.sh")
+	require.NoError(t, err)
+	script := string(contents)
+
+	require.Contains(t, script, `if [ "$platform" != "$functional_host_platform" ]; then`)
+	require.Contains(t, script, `upgrade_emulated=1`)
+	require.Contains(t, script, `upgrade_godebug=cpu.all=off`)
+	require.Contains(t, script, `PANACEA_E2E_DISABLE_OPTIONAL_CPU_FEATURES="$upgrade_emulated"`)
+	require.Contains(t, script, `upgrade-$suffix-runtime.txt`)
+	require.Contains(t, script, `emulated=%s`)
+}
+
 func TestReleaseHardeningMultiarchUpgradeRunsPrecompiledTestBinaryDirectly(t *testing.T) {
 	contents, err := os.ReadFile("../scripts/e2e/release-hardening.sh")
 	require.NoError(t, err)

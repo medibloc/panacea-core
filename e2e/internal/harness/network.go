@@ -37,6 +37,10 @@ type Config struct {
 	SnapshotKeepRecent uint32
 	EnableTelemetry    bool
 
+	// DisableOptionalCPUFeatures is for a release image running under a
+	// non-native CPU emulator. It must remain false for native E2E runs.
+	DisableOptionalCPUFeatures bool
+
 	// Test-only genesis overrides. Their zero values leave source genesis intact.
 	StakingUnbondingTime          string
 	SlashingSignedBlocksWindow    int64
@@ -152,6 +156,7 @@ func topologyFromConfig(cfg Config) Topology {
 		SnapshotInterval:              cfg.SnapshotInterval,
 		SnapshotKeepRecent:            cfg.SnapshotKeepRecent,
 		EnableTelemetry:               cfg.EnableTelemetry,
+		DisableOptionalCPUFeatures:    cfg.DisableOptionalCPUFeatures,
 		StakingUnbondingTime:          cfg.StakingUnbondingTime,
 		SlashingSignedBlocksWindow:    cfg.SlashingSignedBlocksWindow,
 		SlashingMinSignedPerWindow:    cfg.SlashingMinSignedPerWindow,

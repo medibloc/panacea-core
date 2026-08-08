@@ -1096,6 +1096,19 @@ while IFS='|' read -r platform image_kind current_image_ref image_digest image_i
   old_repository="panacea-e2e-release-v2.2.1-$suffix"
   upgrade_work_root="$current_source/.local/e2e/release-upgrade-$suffix"
   upgrade_root="$artifact_dir/upgrade-$suffix"
+  upgrade_emulated=0
+  upgrade_godebug=default
+  if [ "$platform" != "$functional_host_platform" ]; then
+    upgrade_emulated=1
+    upgrade_godebug=cpu.all=off
+  fi
+  {
+    printf 'platform=%s\n' "$platform"
+    printf 'host_platform=%s\n' "$functional_host_platform"
+    printf 'emulated=%s\n' "$upgrade_emulated"
+    printf 'godebug=%s\n' "$upgrade_godebug"
+    printf 'contract=optional CPU features are disabled only when the release image platform differs from the native functional-image platform\n'
+  } >"$artifact_dir/upgrade-$suffix-runtime.txt"
   if [ -e "$upgrade_work_root" ] || [ -e "$upgrade_root" ]; then
     echo "refusing to reuse multiarch upgrade artifact paths for $suffix" >&2
     exit 2
@@ -1111,6 +1124,7 @@ while IFS='|' read -r platform image_kind current_image_ref image_digest image_i
     PANACEA_E2E_V221_IMAGE_VERSION="$run_id" \
     PANACEA_E2E_CURRENT_BINARY_VERSION="$E2E_CURRENT_BINARY_VERSION" \
     PANACEA_E2E_CURRENT_COMMIT="$source_commit" \
+    PANACEA_E2E_DISABLE_OPTIONAL_CPU_FEATURES="$upgrade_emulated" \
     GOTOOLCHAIN="$E2E_GOTOOLCHAIN" GOWORK=off GOPROXY=off GOSUMDB=off \
     GOMODCACHE="$cold_mod_cache" GOCACHE="$cold_build_cache" \
       "$release_test_binary" -test.timeout "$E2E_RELEASE_UPGRADE_TIMEOUT" \

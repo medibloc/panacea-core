@@ -41,6 +41,7 @@ func TestNewPanaceaChainSpecBuildsIsolatedRealNodeTopology(t *testing.T) {
 	}}, cfg.Images)
 	require.Equal(t, 1, *spec.NumValidators)
 	require.Equal(t, 1, *spec.NumFullNodes)
+	require.Empty(t, cfg.Env)
 
 	appOverrides, ok := cfg.ConfigFileOverrides["config/app.toml"].(testutil.Toml)
 	require.True(t, ok)
@@ -49,6 +50,20 @@ func TestNewPanaceaChainSpecBuildsIsolatedRealNodeTopology(t *testing.T) {
 	cometOverrides, ok := cfg.ConfigFileOverrides["config/config.toml"].(testutil.Toml)
 	require.True(t, ok)
 	require.Equal(t, "goleveldb", cometOverrides["db_backend"])
+}
+
+func TestNewPanaceaChainSpecDisablesOptionalCPUFeaturesOnlyWhenRequested(t *testing.T) {
+	t.Parallel()
+
+	spec, err := NewPanaceaChainSpec(
+		"emulated-amd64-a1b2c3",
+		ImageRef{Repository: "panacea-e2e", Version: "current"},
+		Topology{Validators: 1, DisableOptionalCPUFeatures: true},
+	)
+	require.NoError(t, err)
+	cfg, err := spec.Config(zap.NewNop())
+	require.NoError(t, err)
+	require.Equal(t, []string{"GODEBUG=cpu.all=off"}, cfg.Env)
 }
 
 func TestNewPanaceaChainSpecAllowsExplicitDiagnosticDBBackendOverride(t *testing.T) {
@@ -187,6 +202,7 @@ func TestTopologyFromConfigCarriesTestGenesisOverrides(t *testing.T) {
 		SlashingMinSignedPerWindow:    "0.500000000000000000",
 		SlashingDowntimeJailDuration:  "7s",
 		SlashingSlashFractionDowntime: "0.010000000000000000",
+		DisableOptionalCPUFeatures:    true,
 	})
 
 	require.Equal(t, 4, topology.Validators)
@@ -196,6 +212,7 @@ func TestTopologyFromConfigCarriesTestGenesisOverrides(t *testing.T) {
 	require.Equal(t, "0.500000000000000000", topology.SlashingMinSignedPerWindow)
 	require.Equal(t, "7s", topology.SlashingDowntimeJailDuration)
 	require.Equal(t, "0.010000000000000000", topology.SlashingSlashFractionDowntime)
+	require.True(t, topology.DisableOptionalCPUFeatures)
 }
 
 func TestPanaceaGenesisModifierLeavesStakingAndSlashingDefaultsWhenOverridesAreZero(t *testing.T) {

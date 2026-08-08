@@ -147,12 +147,13 @@ func runV221ToCurrentMultiValidatorUpgrade(t *testing.T, scenario upgradeRunScen
 	defer cancel()
 
 	networkConfig := harness.Config{
-		Image:              harness.V221Image(),
-		NumValidators:      4,
-		NumFullNodes:       1,
-		TimeoutCommit:      "1s",
-		SnapshotInterval:   5,
-		SnapshotKeepRecent: 3,
+		Image:                      harness.V221Image(),
+		NumValidators:              4,
+		NumFullNodes:               1,
+		TimeoutCommit:              "1s",
+		SnapshotInterval:           5,
+		SnapshotKeepRecent:         3,
+		DisableOptionalCPUFeatures: os.Getenv("PANACEA_E2E_DISABLE_OPTIONAL_CPU_FEATURES") == "1",
 	}
 	if scenario.RunP0BoundaryMatrix {
 		networkConfig.StakingUnbondingTime = "600s"
@@ -175,6 +176,7 @@ func runV221ToCurrentMultiValidatorUpgrade(t *testing.T, scenario upgradeRunScen
 		"legacy_pnft_adversarial_fixture": scenario.LegacyPNFTAdversarialFixture,
 		"run_post_upgrade_state_sync":     scenario.RunPostUpgradeStateSync,
 		"run_p0_boundary_matrix":          scenario.RunP0BoundaryMatrix,
+		"optional_cpu_features_disabled":  networkConfig.DisableOptionalCPUFeatures,
 	}))
 
 	startHeight, err := network.Chain.Height(ctx)
