@@ -57,6 +57,12 @@ func TestUpgradeChaosAfterHandlerRecoveryStopsWhenKilledValidatorCannotRestart(t
 	require.False(t, switchCalled)
 }
 
+func TestUpgradeChaosQuorumRecoveryBudgetExceedsBoundaryFaultBudget(t *testing.T) {
+	t.Parallel()
+
+	require.Greater(t, upgradeChaosQuorumRecoveryTimeout, upgradeChaosBoundaryKillTimeout)
+}
+
 func TestDecodeUpgradeChaosPlanRequiresPermutationAndQuorumKill(t *testing.T) {
 	t.Parallel()
 

@@ -32,6 +32,7 @@ const (
 	upgradeChaosBoundaryAfterFirstPostUpgradeCommit upgradeChaosBoundary = "after-first-post-upgrade-commit"
 	upgradeChaosBoundaryPollInterval                                     = 25 * time.Millisecond
 	upgradeChaosBoundaryKillTimeout                                      = 90 * time.Second
+	upgradeChaosQuorumRecoveryTimeout                                    = 2 * time.Minute
 	upgradeChaosLogCaptureTimeout                                        = 15 * time.Second
 	upgradeChaosPreRestartLogDirectory                                   = "chaos/upgraded-container-logs/pre-coordinated-restart"
 	upgradeChaosPreRestartLogManifest                                    = upgradeChaosPreRestartLogDirectory + "/manifest.json"
@@ -1041,7 +1042,7 @@ func runUpgradeBoundaryChaosPlan(t *testing.T, ctx context.Context, plan upgrade
 	forcedObserver := boundaryObserver
 	boundaryEvidence.RecoveryStartHeight = upgradeHeight
 
-	firstProgressCtx, firstProgressCancel := context.WithTimeout(ctx, 90*time.Second)
+	firstProgressCtx, firstProgressCancel := context.WithTimeout(ctx, upgradeChaosQuorumRecoveryTimeout)
 	firstProgress, err := network.WaitForQuorumProgress(
 		firstProgressCtx,
 		"first-post-upgrade-commit-after-boundary-recovery",
@@ -1054,7 +1055,7 @@ func runUpgradeBoundaryChaosPlan(t *testing.T, ctx context.Context, plan upgrade
 		boundaryEvidence.RecoveryError = err.Error()
 	}
 	require.NoError(t, err)
-	recoveryCtx, recoveryCancel := context.WithTimeout(ctx, 90*time.Second)
+	recoveryCtx, recoveryCancel := context.WithTimeout(ctx, upgradeChaosQuorumRecoveryTimeout)
 	forcedRecovery, err := network.WaitForQuorumProgress(
 		recoveryCtx,
 		"upgrade-boundary-validator-rejoin-progress",
