@@ -82,6 +82,20 @@ func TestReleaseHardeningRunnerFindsBuildKitContainerByExactName(t *testing.T) {
 	require.NotContains(t, script, `com.docker.buildx.builder`)
 }
 
+func TestReleaseHardeningRunnerIgnoresDockerInspectTrailingNewlineAfterNetworkDisconnect(t *testing.T) {
+	contents, err := os.ReadFile("../scripts/e2e/release-hardening.sh")
+	require.NoError(t, err)
+	script := string(contents)
+
+	// docker inspect --format always appends a final newline. Command
+	// substitution removes it, so an empty network map remains truly empty.
+	require.Contains(t, script, `builder_networks_before=$(`)
+	require.Contains(t, script, `if [ -z "$builder_networks_before" ]; then`)
+	require.Contains(t, script, `builder_networks_after=$(`)
+	require.Contains(t, script, `if [ -n "$builder_networks_after" ]; then`)
+	require.NotContains(t, script, `if [ -s "$artifact_dir/builder-networks-after-offline.txt" ]; then`)
+}
+
 func TestReleaseHardeningRunnerPinsInputsToConfiguredGoVersion(t *testing.T) {
 	contents, err := os.ReadFile("../scripts/e2e/release-hardening.sh")
 	require.NoError(t, err)

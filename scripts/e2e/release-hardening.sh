@@ -982,24 +982,31 @@ fi
 builder_container=$1
 # Docker's Go template is intentionally single-quoted for the shell.
 # shellcheck disable=SC2016
-"$DOCKER" inspect --format '{{range $name, $_ := .NetworkSettings.Networks}}{{$name}}{{println}}{{end}}' \
-  "$builder_container" >"$artifact_dir/builder-networks-before-offline.txt"
-if [ ! -s "$artifact_dir/builder-networks-before-offline.txt" ]; then
+builder_networks_before=$(
+  "$DOCKER" inspect --format '{{range $name, $_ := .NetworkSettings.Networks}}{{$name}}{{println}}{{end}}' \
+    "$builder_container"
+)
+if [ -z "$builder_networks_before" ]; then
   echo "BuildKit container has no network to disconnect for the offline proof" >&2
   exit 1
 fi
+printf '%s\n' "$builder_networks_before" >"$artifact_dir/builder-networks-before-offline.txt"
 while IFS= read -r builder_network; do
   [ -n "$builder_network" ] || continue
   "$DOCKER" network disconnect "$builder_network" "$builder_container"
 done <"$artifact_dir/builder-networks-before-offline.txt"
 # Docker's Go template is intentionally single-quoted for the shell.
 # shellcheck disable=SC2016
-"$DOCKER" inspect --format '{{range $name, $_ := .NetworkSettings.Networks}}{{$name}}{{println}}{{end}}' \
-  "$builder_container" >"$artifact_dir/builder-networks-after-offline.txt"
-if [ -s "$artifact_dir/builder-networks-after-offline.txt" ]; then
+builder_networks_after=$(
+  "$DOCKER" inspect --format '{{range $name, $_ := .NetworkSettings.Networks}}{{$name}}{{println}}{{end}}' \
+    "$builder_container"
+)
+if [ -n "$builder_networks_after" ]; then
+  printf '%s\n' "$builder_networks_after" >"$artifact_dir/builder-networks-after-offline.txt"
   echo "BuildKit container still has a network after offline isolation" >&2
   exit 1
 fi
+: >"$artifact_dir/builder-networks-after-offline.txt"
 
 warm_offline_buildkit_image() {
   platform=$1
