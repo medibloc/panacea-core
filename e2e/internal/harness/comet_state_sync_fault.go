@@ -223,7 +223,7 @@ func (n *Network) ExpectCometStateSyncUnavailableProviders(
 	failureCtx, cancelFailure := context.WithTimeout(ctx, failureTimeout)
 	startResult := make(chan error, 1)
 	go func() {
-		startResult <- node.StartContainer(failureCtx)
+		startResult <- startDetachedCometStateSyncNode(failureCtx, node)
 	}()
 	logs, logEvidence := waitForCometStateSyncUnavailableProviderFailure(failureCtx, node, startedAt.UTC())
 	cancelFailure()
@@ -478,7 +478,7 @@ func (n *Network) ExpectCometStateSyncCorruptedChunks(
 	failureCtx, cancelFailure := context.WithTimeout(ctx, failureTimeout)
 	startResult := make(chan error, 1)
 	go func() {
-		startResult <- node.StartContainer(failureCtx)
+		startResult <- startDetachedCometStateSyncNode(failureCtx, node)
 	}()
 	logs, logEvidence := waitForCometStateSyncCorruptedChunkFailure(failureCtx, node, startedAt.UTC())
 	cancelFailure()

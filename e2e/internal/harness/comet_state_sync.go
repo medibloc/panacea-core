@@ -11,6 +11,8 @@ import (
 	"sync/atomic"
 	"time"
 
+	rpchttp "github.com/cometbft/cometbft/rpc/client/http"
+	libclient "github.com/cometbft/cometbft/rpc/jsonrpc/client"
 	"github.com/strangelove-ventures/interchaintest/v8/chain/cosmos"
 	"github.com/strangelove-ventures/interchaintest/v8/testutil"
 	"go.uber.org/zap"
@@ -250,7 +252,7 @@ func (n *Network) RunCometStateSync(
 
 	evidence.StateSyncStartedAt = time.Now().UTC()
 	startCtx, cancelStart := context.WithTimeout(ctx, normalized.CompletionTimeout)
-	startErr := node.StartContainer(startCtx)
+	startErr := startDetachedCometStateSyncNode(startCtx, node)
 	if startErr != nil {
 		cancelStart()
 		return evidence, fmt.Errorf("start detached state-sync node: %w", startErr)
@@ -307,7 +309,7 @@ func (n *Network) RunCometStateSync(
 		return evidence, fmt.Errorf("stop restored node before restart: %w", err)
 	}
 	restartStartedAt := time.Now().UTC()
-	if err := node.StartContainer(ctx); err != nil {
+	if err := startDetachedCometStateSyncNode(ctx, node); err != nil {
 		return evidence, fmt.Errorf("restart restored state-sync node: %w", err)
 	}
 	evidence.AfterRestart, err = captureCometStateSyncAgreement(ctx, normalized.RPCSources[0], node)
@@ -452,7 +454,7 @@ func (n *Network) ExpectCometStateSyncBadTrustHash(
 	failureCtx, cancelFailure := context.WithTimeout(ctx, failureTimeout)
 	startResult := make(chan error, 1)
 	go func() {
-		startResult <- node.StartContainer(failureCtx)
+		startResult <- startDetachedCometStateSyncNode(failureCtx, node)
 	}()
 	logs, logEvidence := waitForCometStateSyncBadTrustRejection(failureCtx, node, startedAt.UTC())
 	cancelFailure()
@@ -866,6 +868,96 @@ func (n *Network) newDetachedCometStateSyncNode(
 		return nil, fmt.Errorf("create detached state-sync node volume: %w", err)
 	}
 	return node, nil
+}
+
+// startDetachedCometStateSyncNode preserves ChainNode's startup lifecycle so
+// that its temporary host-port reservation listeners are released. It then
+// replaces the RPC client because some Docker implementations report a
+// wildcard HostIP (0.0.0.0 or ::), which is valid for binding but not a
+// portable RPC destination.
+func startDetachedCometStateSyncNode(ctx context.Context, node *cosmos.ChainNode) error {
+	if node == nil || node.DockerClient == nil {
+		return errors.New("detached state-sync node and Docker client are required")
+	}
+
+	// ChainNode.StartContainer installs its client from Docker's reported
+	// HostIP. Bound the call because a wildcard destination is not a portable
+	// client address and is unreachable on Docker Desktop/Colima. Even when
+	// that readiness probe expires, the lifecycle has released its port
+	// reservations and the container may be healthy; verify that explicitly
+	// before continuing.
+	bootstrapCtx, cancelBootstrap := context.WithTimeout(ctx, 8*time.Second)
+	bootstrapErr := node.StartContainer(bootstrapCtx)
+	cancelBootstrap()
+	container, inspectErr := node.DockerClient.ContainerInspect(ctx, node.ContainerID())
+	if inspectErr != nil {
+		return errors.Join(fmt.Errorf("inspect detached state-sync container: %w", inspectErr), bootstrapErr)
+	}
+	if container.State == nil || !container.State.Running {
+		if bootstrapErr == nil {
+			bootstrapErr = errors.New("detached state-sync container is not running after startup")
+		}
+		return fmt.Errorf("start detached state-sync container: %w", bootstrapErr)
+	}
+	if node.GrpcConn != nil {
+		_ = node.GrpcConn.Close()
+		node.GrpcConn = nil
+	}
+
+	hostAddress, err := node.GetHostAddress(ctx, "26657/tcp")
+	if err != nil {
+		return fmt.Errorf("resolve detached state-sync RPC address: %w", err)
+	}
+	rpcClient, rpcAddress, err := newDetachedCometStateSyncRPCClient(hostAddress)
+	if err != nil {
+		return err
+	}
+	node.Client = rpcClient
+
+	ticker := time.NewTicker(500 * time.Millisecond)
+	defer ticker.Stop()
+	var lastErr error
+	for {
+		status, statusErr := node.Client.Status(ctx)
+		if statusErr == nil && status != nil && !status.SyncInfo.CatchingUp {
+			return nil
+		}
+		switch {
+		case statusErr != nil:
+			lastErr = statusErr
+		case status == nil:
+			lastErr = errors.New("detached state-sync RPC returned an empty status")
+		default:
+			lastErr = fmt.Errorf(
+				"still catching up: height(%d) catching-up(%t)",
+				status.SyncInfo.LatestBlockHeight,
+				status.SyncInfo.CatchingUp,
+			)
+		}
+
+		select {
+		case <-ctx.Done():
+			return fmt.Errorf("wait for detached state-sync RPC readiness at %s: last error=%v: %w", rpcAddress, lastErr, ctx.Err())
+		case <-ticker.C:
+		}
+	}
+}
+
+func newDetachedCometStateSyncRPCClient(hostAddress string) (*rpchttp.HTTP, string, error) {
+	rpcAddress, err := normalizeHostAddress(hostAddress)
+	if err != nil {
+		return nil, "", fmt.Errorf("normalize detached state-sync RPC address: %w", err)
+	}
+	httpClient, err := libclient.DefaultHTTPClient(rpcAddress)
+	if err != nil {
+		return nil, "", fmt.Errorf("create detached state-sync HTTP client: %w", err)
+	}
+	httpClient.Timeout = 10 * time.Second
+	rpcClient, err := rpchttp.NewWithClient(rpcAddress, "/websocket", httpClient)
+	if err != nil {
+		return nil, "", fmt.Errorf("create detached state-sync RPC client: %w", err)
+	}
+	return rpcClient, rpcAddress, nil
 }
 
 func (n *Network) initializeDetachedCometStateSyncNode(

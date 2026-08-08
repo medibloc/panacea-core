@@ -55,3 +55,16 @@ func TestNormalizeHostAddress(t *testing.T) {
 		}
 	}
 }
+
+func TestDetachedCometStateSyncRPCClientNormalizesWildcardBinding(t *testing.T) {
+	client, address, err := newDetachedCometStateSyncRPCClient("http://0.0.0.0:26657")
+	if err != nil {
+		t.Fatalf("newDetachedCometStateSyncRPCClient: %v", err)
+	}
+	if client == nil {
+		t.Fatal("newDetachedCometStateSyncRPCClient returned a nil client")
+	}
+	if address != "http://127.0.0.1:26657" {
+		t.Fatalf("RPC address = %q, want %q", address, "http://127.0.0.1:26657")
+	}
+}
