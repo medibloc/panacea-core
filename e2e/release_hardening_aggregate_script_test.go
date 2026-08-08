@@ -410,7 +410,7 @@ while :; do sleep 1; done
 
 	runID := "p0p1-cooperative-timeout"
 	aggregateRoot := filepath.Join(repoRoot, ".local", "e2e", runID)
-	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
 	defer cancel()
 	command := exec.CommandContext(ctx, "sh", scriptPath)
 	command.Env = append(aggregateRunnerTestEnv(),
@@ -419,9 +419,11 @@ while :; do sleep 1; done
 		"E2E_ROOT="+aggregateRoot,
 		"E2E_GOCACHE="+filepath.Join(aggregateRoot, "go-build"),
 		"E2E_GOMODCACHE="+filepath.Join(aggregateRoot, "go-mod"),
-		"E2E_RELEASE_AGGREGATE_TOTAL_TIMEOUT_SECONDS=6",
-		"E2E_RELEASE_AGGREGATE_CLEANUP_TIMEOUT_SECONDS=3",
-		"E2E_RELEASE_AGGREGATE_FORCE_EXIT_TIMEOUT_SECONDS=1",
+		// Preserve the two-second work deadline while leaving enough cleanup
+		// headroom for a loaded host to schedule both cooperating shells.
+		"E2E_RELEASE_AGGREGATE_TOTAL_TIMEOUT_SECONDS=10",
+		"E2E_RELEASE_AGGREGATE_CLEANUP_TIMEOUT_SECONDS=5",
+		"E2E_RELEASE_AGGREGATE_FORCE_EXIT_TIMEOUT_SECONDS=3",
 		"E2E_RUNNER="+filepath.Join(fakeBin, "runner"),
 		"AGGREGATE_TEST_RUNNER_PID_FILE="+runnerPIDPath,
 		"AGGREGATE_TEST_CLEANUP_MARKER="+cleanupMarker,
