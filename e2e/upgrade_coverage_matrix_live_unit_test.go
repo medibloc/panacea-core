@@ -63,6 +63,11 @@ func TestBuildConnectedUpgradeCoverageMatrixIsHonestAboutSeparateIBCLane(t *test
 				require.Equal(t, harness.UpgradeQueryBoundaryREST, claim.Boundary)
 				require.NotEmpty(t, claim.HistoricalHeightEvidence)
 			}
+			if row.Area == harness.UpgradeCoverageAreaDID && claim.Boundary == harness.UpgradeQueryBoundaryCLI {
+				require.True(t, claim.HistoricalHeightSupported)
+				require.Len(t, claim.Evidence, 1)
+				require.True(t, claim.Evidence[0].HistoricalHeight)
+			}
 		}
 		if row.Area == harness.UpgradeCoverageAreaIBCTransfer || row.Area == harness.UpgradeCoverageAreaLegacyPNFT {
 			require.Equal(t, harness.UpgradeCoverageStatusNotRun, row.Status)

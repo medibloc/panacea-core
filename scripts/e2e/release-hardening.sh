@@ -29,8 +29,17 @@ E2E_RELEASE_FORCE_EXIT_TIMEOUT_SECONDS=${E2E_RELEASE_FORCE_EXIT_TIMEOUT_SECONDS:
 E2E_RELEASE_WORK_TIMEOUT_SECONDS=unvalidated
 E2E_FUNCTIONAL_CURRENT_IMAGE=${E2E_FUNCTIONAL_CURRENT_IMAGE:-panacea-e2e-current:local}
 E2E_FUNCTIONAL_OLD_IMAGE=${E2E_FUNCTIONAL_OLD_IMAGE:-panacea-e2e-v2.2.1:local}
+E2E_FUNCTIONAL_IMAGES_PREBUILT=${E2E_FUNCTIONAL_IMAGES_PREBUILT:-0}
 E2E_RUNNER=${E2E_RUNNER:-"$repo_root/scripts/e2e/run.sh"}
 DOCKER=${DOCKER:-docker}
+
+case "$E2E_FUNCTIONAL_IMAGES_PREBUILT" in
+  0 | 1) ;;
+  *)
+    echo "E2E_FUNCTIONAL_IMAGES_PREBUILT must be 0 or 1, got: $E2E_FUNCTIONAL_IMAGES_PREBUILT" >&2
+    exit 2
+    ;;
+esac
 
 run_id="release-$(date -u +%Y%m%d%H%M%S)-$$"
 # Bootstrap evidence always starts below the repository-owned E2E root. This
@@ -608,8 +617,18 @@ export DOCKER_HOST
 stage=validate-go-toolchain
 sh "$script_dir/check-go-toolchain.sh" >"$artifact_dir/go-toolchain-validation.txt" 2>&1
 
-stage=build-functional-images
-E2E_ROOT="$E2E_ROOT" \
+if [ "$E2E_FUNCTIONAL_IMAGES_PREBUILT" -eq 1 ]; then
+  stage=validate-prebuilt-functional-images
+  {
+    printf 'reused=true\n'
+    printf 'current_ref=%s\n' "$E2E_FUNCTIONAL_CURRENT_IMAGE"
+    "$DOCKER" image inspect "$E2E_FUNCTIONAL_CURRENT_IMAGE" --format 'current_id={{.Id}} platform={{.Os}}/{{.Architecture}}'
+    printf 'old_ref=%s\n' "$E2E_FUNCTIONAL_OLD_IMAGE"
+    "$DOCKER" image inspect "$E2E_FUNCTIONAL_OLD_IMAGE" --format 'old_id={{.Id}} platform={{.Os}}/{{.Architecture}}'
+  } >"$artifact_dir/functional-image-build.log" 2>&1
+else
+  stage=build-functional-images
+  E2E_ROOT="$E2E_ROOT" \
 	E2E_GOCACHE="$E2E_GOCACHE" \
 	E2E_GOMODCACHE="$E2E_GOMODCACHE" \
 	E2E_GO_VERSION="$E2E_GO_VERSION" \
@@ -623,6 +642,7 @@ E2E_ROOT="$E2E_ROOT" \
 	DOCKER="$DOCKER" \
 	"$E2E_RUNNER" build-images \
 	>"$artifact_dir/functional-image-build.log" 2>&1
+fi
 
 stage=validate-clean-source
 git status --porcelain=v1 --untracked-files=all >"$artifact_dir/source-status-after-functional-build.txt"

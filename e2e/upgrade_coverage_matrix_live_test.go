@@ -497,7 +497,7 @@ func connectedUpgradeQueryCoverage(area harness.UpgradeCoverageArea, adversarial
 	case harness.UpgradeCoverageAreaSlashing:
 		set(harness.UpgradeQueryBoundaryCLI, "upgrade-staking-post-restart-signing-info", true, "slashing state is queried through a height-pinned CLI command")
 	case harness.UpgradeCoverageAreaDID:
-		set(harness.UpgradeQueryBoundaryCLI, "upgrade-post-restart-updated-did", false, "DID documents are queried through the CLI")
+		set(harness.UpgradeQueryBoundaryCLI, "upgrade-post-restart-updated-did", true, "DID documents are queried through a height-pinned CLI command")
 	case harness.UpgradeCoverageAreaAOL:
 		set(harness.UpgradeQueryBoundaryCLI, "upgrade-aol-post-restart-topic", true, "AOL state is queried through the CLI")
 		set(harness.UpgradeQueryBoundaryREST, "upgrade-aol-post-restart-owner-topics", true, "AOL pagination is queried through REST")

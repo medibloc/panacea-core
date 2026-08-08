@@ -367,6 +367,12 @@ func TestStandaloneAllRunsEveryFunctionalLiveTestAndFeedsTheReleaseGate(t *testi
 		"coverage_merge",
 	}, "\n\t"), strings.TrimSpace(releaseBody),
 		"release-hardening must clean-check, run all functional suites, run release builds, recheck source, then merge coverage")
+
+	releaseBuildsBody := functions["release_builds_body"]
+	require.Contains(t, releaseBuildsBody,
+		`if [ "$current_image_built" -eq 1 ] && [ "$v221_image_built" -eq 1 ]; then`)
+	require.Contains(t, releaseBuildsBody,
+		`E2E_FUNCTIONAL_IMAGES_PREBUILT="$functional_images_prebuilt"`)
 }
 
 type optInLiveTest struct {

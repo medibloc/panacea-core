@@ -587,6 +587,10 @@ load_body() {
 
 release_builds_body() {
 	resolve_docker_host
+	functional_images_prebuilt=0
+	if [ "$current_image_built" -eq 1 ] && [ "$v221_image_built" -eq 1 ]; then
+		functional_images_prebuilt=1
+	fi
 	release_total=$E2E_RELEASE_TOTAL_TIMEOUT_SECONDS
 	if [ -n "${E2E_RELEASE_AGGREGATE_WORK_DEADLINE_EPOCH:-}" ]; then
 		now_epoch=$(date -u +%s)
@@ -620,6 +624,7 @@ release_builds_body() {
 		E2E_RELEASE_FORCE_EXIT_TIMEOUT_SECONDS="$E2E_RELEASE_FORCE_EXIT_TIMEOUT_SECONDS" \
 		E2E_FUNCTIONAL_CURRENT_IMAGE="$E2E_CURRENT_IMAGE" \
 		E2E_FUNCTIONAL_OLD_IMAGE="$E2E_V221_IMAGE" \
+		E2E_FUNCTIONAL_IMAGES_PREBUILT="$functional_images_prebuilt" \
 		E2E_RUNNER="$runner" \
 		DOCKER="$DOCKER" \
 		DOCKER_HOST="$E2E_DOCKER_HOST" \

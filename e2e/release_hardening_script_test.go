@@ -106,6 +106,20 @@ func TestReleaseHardeningRunnerPinsInputsToConfiguredGoVersion(t *testing.T) {
 	require.NotContains(t, strings.ReplaceAll(script, `\`, ""), "1.23.12")
 }
 
+func TestReleaseHardeningRunnerCanReuseTheExactAggregateFunctionalImages(t *testing.T) {
+	contents, err := os.ReadFile("../scripts/e2e/release-hardening.sh")
+	require.NoError(t, err)
+	script := string(contents)
+
+	require.Contains(t, script, `E2E_FUNCTIONAL_IMAGES_PREBUILT=${E2E_FUNCTIONAL_IMAGES_PREBUILT:-0}`)
+	require.Contains(t, script, `if [ "$E2E_FUNCTIONAL_IMAGES_PREBUILT" -eq 1 ]; then`)
+	require.Contains(t, script, `stage=validate-prebuilt-functional-images`)
+	require.Contains(t, script, `"$DOCKER" image inspect "$E2E_FUNCTIONAL_CURRENT_IMAGE"`)
+	require.Contains(t, script, `"$DOCKER" image inspect "$E2E_FUNCTIONAL_OLD_IMAGE"`)
+	require.Equal(t, 1, strings.Count(script, `"$E2E_RUNNER" build-images`),
+		"only the non-prebuilt branch may rebuild functional images")
+}
+
 func TestReleaseHardeningMultiarchUpgradeUsesBuiltImageTags(t *testing.T) {
 	contents, err := os.ReadFile("../scripts/e2e/release-hardening.sh")
 	require.NoError(t, err)
