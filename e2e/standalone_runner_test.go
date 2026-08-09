@@ -180,7 +180,7 @@ func TestStandaloneLiveSuitesRunThePrecompiledTestBinaryDirectly(t *testing.T) {
 	}
 }
 
-func TestStandaloneRestartSuiteIsolatesTestsAndOnlyRetriesHostPortRaces(t *testing.T) {
+func TestStandaloneRestartAndConsensusSuitesOnlyRetryHostPortRaces(t *testing.T) {
 	contents, err := os.ReadFile("../scripts/e2e/run.sh")
 	require.NoError(t, err)
 	runner := string(contents)
@@ -193,6 +193,11 @@ func TestStandaloneRestartSuiteIsolatesTestsAndOnlyRetriesHostPortRaces(t *testi
 	require.NotContains(t, restartBody,
 		"TestRestartRecoveryNodeBoundaries|TestPortableApplicationSnapshotRestoreAndFreshFullNodeSync")
 
+	consensusBody := shellFunctionBody(t, runner, "consensus_body")
+	require.Equal(t, 1, strings.Count(consensusBody, "run_current_test_with_host_port_retry"),
+		"the validator stop/start scenario must retry a Docker host-port allocation race once")
+	require.Contains(t, consensusBody, "^TestFourValidatorQuorumFaultAndRecovery$")
+
 	retryBody := shellFunctionBody(t, runner, "run_current_test_with_host_port_retry")
 	require.Contains(t, retryBody, "failed to bind host port .*address already in use")
 	require.Contains(t, retryBody, "run_current_test")
@@ -200,19 +205,38 @@ func TestStandaloneRestartSuiteIsolatesTestsAndOnlyRetriesHostPortRaces(t *testi
 		"the infrastructure-only retry must be bounded to one retry")
 }
 
-func TestStandaloneRestartHostPortRetryBehavior(t *testing.T) {
+func TestStandaloneHostPortRetryBehavior(t *testing.T) {
 	runner, err := filepath.Abs("../scripts/e2e/run.sh")
 	require.NoError(t, err)
 
 	for _, testCase := range []struct {
 		name            string
+		commandName     string
 		failureMode     string
 		wantExit        int
 		wantInvocations int
 		wantRetry       bool
+		firstPattern    string
+		lastPattern     string
 	}{
-		{name: "exact Docker host-port race", failureMode: "host-port", wantInvocations: 3, wantRetry: true},
-		{name: "ordinary test failure", failureMode: "ordinary", wantExit: 23, wantInvocations: 1},
+		{
+			name: "restart exact Docker host-port race", commandName: "restart",
+			failureMode: "restart-host-port", wantInvocations: 3, wantRetry: true,
+			firstPattern: "^TestRestartRecoveryNodeBoundaries$",
+			lastPattern:  "^TestPortableApplicationSnapshotRestoreAndFreshFullNodeSync$",
+		},
+		{
+			name: "restart ordinary test failure", commandName: "restart",
+			failureMode: "restart-ordinary", wantExit: 23, wantInvocations: 1,
+			firstPattern: "^TestRestartRecoveryNodeBoundaries$",
+			lastPattern:  "^TestRestartRecoveryNodeBoundaries$",
+		},
+		{
+			name: "consensus exact Docker host-port race", commandName: "consensus",
+			failureMode: "consensus-host-port", wantInvocations: 2, wantRetry: true,
+			firstPattern: "^TestFourValidatorQuorumFaultAndRecovery$",
+			lastPattern:  "^TestFourValidatorQuorumFaultAndRecovery$",
+		},
 	} {
 		t.Run(testCase.name, func(t *testing.T) {
 			testRoot, tempErr := os.MkdirTemp("/tmp", "panacea-e2e-restart-retry-")
@@ -257,7 +281,7 @@ case "$*" in
   *TestRestartRecoveryNodeBoundaries*)
     if [ ! -e "$RUNNER_TEST_RETRY_MARKER" ]; then
       : >"$RUNNER_TEST_RETRY_MARKER"
-      if [ "$RUNNER_TEST_FAILURE_MODE" = host-port ]; then
+      if [ "$RUNNER_TEST_FAILURE_MODE" = restart-host-port ]; then
         printf '%s\n' 'failed to bind host port 0.0.0.0:55230/tcp: address already in use' >&2
         exit 1
       fi
@@ -266,11 +290,18 @@ case "$*" in
     fi
     ;;
   *TestPortableApplicationSnapshotRestoreAndFreshFullNodeSync*) ;;
+  *TestFourValidatorQuorumFaultAndRecovery*)
+    if [ ! -e "$RUNNER_TEST_RETRY_MARKER" ]; then
+      : >"$RUNNER_TEST_RETRY_MARKER"
+      printf '%s\n' 'failed to bind host port 0.0.0.0:54274/tcp: address already in use' >&2
+      exit 1
+    fi
+    ;;
   *) printf 'unexpected test pattern: %s\n' "$*" >&2; exit 96 ;;
 esac
 `)
 
-			command := exec.Command(runner, "restart")
+			command := exec.Command(runner, testCase.commandName)
 			command.Dir = ".."
 			command.Env = append(standaloneRunnerTestEnv(),
 				"E2E_ROOT="+testRoot,
@@ -298,13 +329,13 @@ esac
 			require.NoError(t, readErr)
 			records := strings.Split(strings.TrimSpace(string(invocations)), "\n")
 			require.Len(t, records, testCase.wantInvocations)
-			require.Contains(t, records[0], "^TestRestartRecoveryNodeBoundaries$")
+			require.Contains(t, records[0], testCase.firstPattern)
+			require.Contains(t, records[len(records)-1], testCase.lastPattern)
 			if testCase.wantRetry {
-				require.Contains(t, string(output), "retrying restart E2E once")
-				require.Contains(t, records[1], "^TestRestartRecoveryNodeBoundaries$")
-				require.Contains(t, records[2], "^TestPortableApplicationSnapshotRestoreAndFreshFullNodeSync$")
+				require.Contains(t, string(output), "retrying live E2E once")
+				require.Contains(t, records[1], testCase.firstPattern)
 			} else {
-				require.NotContains(t, string(output), "retrying restart E2E once")
+				require.NotContains(t, string(output), "retrying live E2E once")
 			}
 		})
 	}

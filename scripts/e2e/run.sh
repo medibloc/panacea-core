@@ -470,14 +470,14 @@ run_current_test_with_host_port_retry() {
 
 		if [ ! -s "$attempt_status_file" ]; then
 			rm -f "$attempt_log" "$attempt_status_file"
-			printf 'restart E2E attempt did not record an exit status\n' >&2
+			printf 'live E2E attempt did not record an exit status\n' >&2
 			return 125
 		fi
 		attempt_status=$(sed -n '1p' "$attempt_status_file")
 		case "$attempt_status" in
 			'' | *[!0-9]*)
 				rm -f "$attempt_log" "$attempt_status_file"
-				printf 'restart E2E attempt recorded invalid exit status: %s\n' "$attempt_status" >&2
+				printf 'live E2E attempt recorded invalid exit status: %s\n' "$attempt_status" >&2
 				return 125
 				;;
 		esac
@@ -493,7 +493,7 @@ run_current_test_with_host_port_retry() {
 		if [ "$attempt" -ge 2 ] || [ "$retryable" -ne 1 ]; then
 			return "$attempt_status"
 		fi
-		printf 'retrying restart E2E once after Docker host-port allocation race\n' >&2
+		printf 'retrying live E2E once after Docker host-port allocation race\n' >&2
 		attempt=$((attempt + 1))
 	done
 }
@@ -506,7 +506,7 @@ restart_body() {
 }
 
 consensus_body() {
-	run_current_test PANACEA_E2E_CONSENSUS "$E2E_CONSENSUS_TIMEOUT" \
+	run_current_test_with_host_port_retry PANACEA_E2E_CONSENSUS "$E2E_CONSENSUS_TIMEOUT" \
 		'^TestFourValidatorQuorumFaultAndRecovery$'
 }
 
