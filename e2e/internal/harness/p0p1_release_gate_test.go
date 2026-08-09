@@ -363,18 +363,23 @@ FROM debian:trixie-slim@sha256:3a39a0592364683e6bab97937b72cad5a8fa6dcbbee90edb3
 		"dependencies-current.jsonl", "dependencies-v2.2.1.jsonl", "dependencies-e2e.jsonl",
 		"go-env.json", "buildx-version.txt", "docker-host.txt", "source-files-sha256.txt",
 		"builder-cache-before-build.txt", "builder-networks-before-offline.txt",
+		"builder-network-cycles.txt",
 		"warm-offline-buildkit-contract.txt",
 	} {
 		writeP0P1GateTestFile(t, filepath.Join(dir, name), "evidence\n")
 	}
 	writeP0P1GateTestFile(t, filepath.Join(dir, "builder-cache-record-ids-before-build.txt"), "")
 	writeP0P1GateTestFile(t, filepath.Join(dir, "builder-networks-after-offline.txt"), "")
+	writeP0P1GateTestFile(t, filepath.Join(dir, "builder-network-cycles.txt"), "platform=linux/amd64 disconnected=true reconnected=true\nplatform=linux/arm64 disconnected=true reconnected=true\n")
 	var imageIndex string
 	for _, image := range manifest.Images {
 		imageIndex += fmt.Sprintf("%s|%s|%s|%s|%s|%s|%s|%s\n", image.Platform, image.Kind, image.ImageRef, image.ImageDigest, image.ImageID, image.BinarySHA256, image.Version, image.SourceCommit)
 	}
 	writeP0P1GateTestFile(t, filepath.Join(dir, "image-index.txt"), imageIndex)
 	for _, platform := range []string{"amd64", "arm64"} {
+		writeP0P1GateTestFile(t, filepath.Join(dir, "builder-networks-"+platform+"-before-offline.txt"), "buildx-network\n")
+		writeP0P1GateTestFile(t, filepath.Join(dir, "builder-networks-"+platform+"-after-offline.txt"), "")
+		writeP0P1GateTestFile(t, filepath.Join(dir, "builder-networks-"+platform+"-after-reconnect.txt"), "buildx-network\n")
 		for _, kind := range []string{"current", "v2.2.1"} {
 			prefix := kind + "-" + platform
 			releaseImageID := testP0P1ReleaseCurrentImageID

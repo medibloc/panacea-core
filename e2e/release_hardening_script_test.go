@@ -96,6 +96,32 @@ func TestReleaseHardeningRunnerIgnoresDockerInspectTrailingNewlineAfterNetworkDi
 	require.NotContains(t, script, `if [ -s "$artifact_dir/builder-networks-after-offline.txt" ]; then`)
 }
 
+func TestReleaseHardeningRunnerProvesOfflineBuildsPerPlatformBeforeSwitchingMetadata(t *testing.T) {
+	contents, err := os.ReadFile("../scripts/e2e/release-hardening.sh")
+	require.NoError(t, err)
+	script := string(contents)
+
+	loopStart := strings.Index(script, "for platform in linux/amd64 linux/arm64; do")
+	require.NotEqual(t, -1, loopStart)
+	loop := script[loopStart:]
+	steps := []string{
+		`build_and_verify_image "$platform" "$suffix" current`,
+		`build_and_verify_image "$platform" "$suffix" v2.2.1`,
+		`disconnect_builder_networks "$suffix"`,
+		`warm_offline_buildkit_image "$platform" "$suffix" current`,
+		`warm_offline_buildkit_image "$platform" "$suffix" v2.2.1`,
+		`reconnect_builder_networks "$suffix"`,
+	}
+	previous := -1
+	for _, step := range steps {
+		index := strings.Index(loop, step)
+		require.Greater(t, index, previous, "step %q must follow the preceding per-platform step", step)
+		previous = index
+	}
+	require.Contains(t, script, `builder-networks-$suffix-after-offline.txt`)
+	require.Contains(t, script, `builder-networks-$suffix-after-reconnect.txt`)
+}
+
 func TestReleaseHardeningRunnerPinsInputsToConfiguredGoVersion(t *testing.T) {
 	contents, err := os.ReadFile("../scripts/e2e/release-hardening.sh")
 	require.NoError(t, err)

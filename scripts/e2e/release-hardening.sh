@@ -938,54 +938,6 @@ build_and_verify_image() {
     >>"$artifact_dir/image-index.txt"
 }
 
-stage=build-multiarch-images
-: >"$artifact_dir/image-index.txt"
-for platform in linux/amd64 linux/arm64; do
-  suffix=${platform#linux/}
-  build_and_verify_image "$platform" "$suffix" current "$current_source" "$current_vendor"
-  build_and_verify_image "$platform" "$suffix" v2.2.1 "$old_source" "$old_vendor"
-done
-"$DOCKER" buildx du --builder "$builder_name" >"$artifact_dir/builder-cache-after-build.txt"
-
-stage=write-host-image-identity
-release_current_ref="panacea-e2e-release-current-$functional_host_suffix:$run_id"
-release_old_ref="panacea-e2e-release-v2.2.1-$functional_host_suffix:$run_id"
-functional_current_id=$("$DOCKER" image inspect "$E2E_FUNCTIONAL_CURRENT_IMAGE" --format '{{.Id}}')
-functional_old_id=$("$DOCKER" image inspect "$E2E_FUNCTIONAL_OLD_IMAGE" --format '{{.Id}}')
-release_current_id=$("$DOCKER" image inspect "$release_current_ref" --format '{{.Id}}')
-release_old_id=$("$DOCKER" image inspect "$release_old_ref" --format '{{.Id}}')
-functional_current_sha256=$(awk 'NR == 1 { print $1 }' \
-  "$artifact_dir/functional-current-$functional_host_suffix-binary-sha256.txt")
-functional_old_sha256=$(awk 'NR == 1 { print $1 }' \
-  "$artifact_dir/functional-v2.2.1-$functional_host_suffix-binary-sha256.txt")
-release_current_sha256=$(awk 'NR == 1 { print $1 }' \
-  "$artifact_dir/current-$functional_host_suffix-binary-sha256.txt")
-release_old_sha256=$(awk 'NR == 1 { print $1 }' \
-  "$artifact_dir/v2.2.1-$functional_host_suffix-binary-sha256.txt")
-if [ "$functional_current_sha256" != "$release_current_sha256" ]; then
-  echo "functional current panacead checksum differs from the host-platform release build" >&2
-  exit 1
-fi
-if [ "$functional_old_sha256" != "$release_old_sha256" ]; then
-  echo "functional v2.2.1 panacead checksum differs from the host-platform release build" >&2
-  exit 1
-fi
-{
-  printf '{\n'
-  printf '  "schema_version": "1",\n'
-  printf '  "host_platform": "%s",\n' "$functional_host_platform"
-  printf '  "images": [\n'
-  printf '    {"kind":"current","functional_image_ref":"%s","functional_image_id":"%s","functional_binary_sha256":"%s","release_image_ref":"%s","release_image_id":"%s","release_binary_sha256":"%s"},\n' \
-    "$E2E_FUNCTIONAL_CURRENT_IMAGE" "$functional_current_id" "$functional_current_sha256" \
-    "$release_current_ref" "$release_current_id" "$release_current_sha256"
-  printf '    {"kind":"v2.2.1","functional_image_ref":"%s","functional_image_id":"%s","functional_binary_sha256":"%s","release_image_ref":"%s","release_image_id":"%s","release_binary_sha256":"%s"}\n' \
-    "$E2E_FUNCTIONAL_OLD_IMAGE" "$functional_old_id" "$functional_old_sha256" \
-    "$release_old_ref" "$release_old_id" "$release_old_sha256"
-  printf '  ]\n'
-  printf '}\n'
-} >"$artifact_dir/host-image-identity.json"
-
-stage=warm-offline-buildkit-build
 builder_container_name="buildx_buildkit_${builder_name}0"
 builder_container=$(
   "$DOCKER" ps \
@@ -1011,22 +963,62 @@ if [ -z "$builder_networks_before" ]; then
   exit 1
 fi
 printf '%s\n' "$builder_networks_before" >"$artifact_dir/builder-networks-before-offline.txt"
-while IFS= read -r builder_network; do
-  [ -n "$builder_network" ] || continue
-  "$DOCKER" network disconnect "$builder_network" "$builder_container"
-done <"$artifact_dir/builder-networks-before-offline.txt"
-# Docker's Go template is intentionally single-quoted for the shell.
-# shellcheck disable=SC2016
-builder_networks_after=$(
-  "$DOCKER" inspect --format '{{range $name, $_ := .NetworkSettings.Networks}}{{$name}}{{println}}{{end}}' \
-    "$builder_container"
-)
-if [ -n "$builder_networks_after" ]; then
-  printf '%s\n' "$builder_networks_after" >"$artifact_dir/builder-networks-after-offline.txt"
-  echo "BuildKit container still has a network after offline isolation" >&2
-  exit 1
-fi
 : >"$artifact_dir/builder-networks-after-offline.txt"
+: >"$artifact_dir/builder-network-cycles.txt"
+
+disconnect_builder_networks() {
+  suffix=$1
+  # Docker's Go template is intentionally single-quoted for the shell.
+  # shellcheck disable=SC2016
+  builder_networks_current=$(
+    "$DOCKER" inspect --format '{{range $name, $_ := .NetworkSettings.Networks}}{{$name}}{{println}}{{end}}' \
+      "$builder_container"
+  )
+  if [ "$builder_networks_current" != "$builder_networks_before" ]; then
+    printf '%s\n' "$builder_networks_current" >"$artifact_dir/builder-networks-$suffix-before-offline.txt"
+    echo "BuildKit container networks changed before the $suffix offline proof" >&2
+    exit 1
+  fi
+  printf '%s\n' "$builder_networks_current" >"$artifact_dir/builder-networks-$suffix-before-offline.txt"
+  while IFS= read -r builder_network; do
+    [ -n "$builder_network" ] || continue
+    "$DOCKER" network disconnect "$builder_network" "$builder_container"
+  done <"$artifact_dir/builder-networks-$suffix-before-offline.txt"
+  # Docker's Go template is intentionally single-quoted for the shell.
+  # shellcheck disable=SC2016
+  builder_networks_after=$(
+    "$DOCKER" inspect --format '{{range $name, $_ := .NetworkSettings.Networks}}{{$name}}{{println}}{{end}}' \
+      "$builder_container"
+  )
+  : >"$artifact_dir/builder-networks-$suffix-after-offline.txt"
+  if [ -n "$builder_networks_after" ]; then
+    printf '%s\n' "$builder_networks_after" >"$artifact_dir/builder-networks-$suffix-after-offline.txt"
+    printf '%s\n' "$builder_networks_after" >"$artifact_dir/builder-networks-after-offline.txt"
+    echo "BuildKit container still has a network during the $suffix offline proof" >&2
+    exit 1
+  fi
+}
+
+reconnect_builder_networks() {
+  suffix=$1
+  while IFS= read -r builder_network; do
+    [ -n "$builder_network" ] || continue
+    "$DOCKER" network connect "$builder_network" "$builder_container"
+  done <"$artifact_dir/builder-networks-before-offline.txt"
+  # Docker's Go template is intentionally single-quoted for the shell.
+  # shellcheck disable=SC2016
+  builder_networks_reconnected=$(
+    "$DOCKER" inspect --format '{{range $name, $_ := .NetworkSettings.Networks}}{{$name}}{{println}}{{end}}' \
+      "$builder_container"
+  )
+  printf '%s\n' "$builder_networks_reconnected" >"$artifact_dir/builder-networks-$suffix-after-reconnect.txt"
+  if [ "$builder_networks_reconnected" != "$builder_networks_before" ]; then
+    echo "BuildKit container networks were not restored after the $suffix offline proof" >&2
+    exit 1
+  fi
+  printf 'platform=linux/%s disconnected=true reconnected=true\n' "$suffix" \
+    >>"$artifact_dir/builder-network-cycles.txt"
+}
 
 warm_offline_buildkit_image() {
   platform=$1
@@ -1079,18 +1071,70 @@ warm_offline_buildkit_image() {
   grep -Fq "commit: $commit" "$artifact_dir/warm-offline-$kind-$suffix-version.txt"
 }
 
+stage=build-multiarch-images
+: >"$artifact_dir/image-index.txt"
 for platform in linux/amd64 linux/arm64; do
   suffix=${platform#linux/}
+  stage="build-multiarch-images-$suffix"
+  build_and_verify_image "$platform" "$suffix" current "$current_source" "$current_vendor"
+  build_and_verify_image "$platform" "$suffix" v2.2.1 "$old_source" "$old_vendor"
+
+  # BuildKit's registry source metadata is platform-specific. Run each warm
+  # offline proof immediately after its cold builds, before resolving another
+  # platform can replace the cached manifest selection for the same index.
+  stage="warm-offline-buildkit-build-$suffix"
+  disconnect_builder_networks "$suffix"
   warm_offline_buildkit_image "$platform" "$suffix" current "$current_source" "$current_vendor"
   warm_offline_buildkit_image "$platform" "$suffix" v2.2.1 "$old_source" "$old_vendor"
+  reconnect_builder_networks "$suffix"
 done
+"$DOCKER" buildx du --builder "$builder_name" >"$artifact_dir/builder-cache-after-build.txt"
 printf '%s\n' \
-  'builder_networks=none' \
+  'builder_networks=none-during-each-platform-build' \
+  'builder_networks_restored_between_platforms=true' \
   'registry_access=unavailable' \
   'cache_mode=warm' \
   'platforms=linux/amd64,linux/arm64' \
   'images=current,v2.2.1' \
   >"$artifact_dir/warm-offline-buildkit-contract.txt"
+
+stage=write-host-image-identity
+release_current_ref="panacea-e2e-release-current-$functional_host_suffix:$run_id"
+release_old_ref="panacea-e2e-release-v2.2.1-$functional_host_suffix:$run_id"
+functional_current_id=$("$DOCKER" image inspect "$E2E_FUNCTIONAL_CURRENT_IMAGE" --format '{{.Id}}')
+functional_old_id=$("$DOCKER" image inspect "$E2E_FUNCTIONAL_OLD_IMAGE" --format '{{.Id}}')
+release_current_id=$("$DOCKER" image inspect "$release_current_ref" --format '{{.Id}}')
+release_old_id=$("$DOCKER" image inspect "$release_old_ref" --format '{{.Id}}')
+functional_current_sha256=$(awk 'NR == 1 { print $1 }' \
+  "$artifact_dir/functional-current-$functional_host_suffix-binary-sha256.txt")
+functional_old_sha256=$(awk 'NR == 1 { print $1 }' \
+  "$artifact_dir/functional-v2.2.1-$functional_host_suffix-binary-sha256.txt")
+release_current_sha256=$(awk 'NR == 1 { print $1 }' \
+  "$artifact_dir/current-$functional_host_suffix-binary-sha256.txt")
+release_old_sha256=$(awk 'NR == 1 { print $1 }' \
+  "$artifact_dir/v2.2.1-$functional_host_suffix-binary-sha256.txt")
+if [ "$functional_current_sha256" != "$release_current_sha256" ]; then
+  echo "functional current panacead checksum differs from the host-platform release build" >&2
+  exit 1
+fi
+if [ "$functional_old_sha256" != "$release_old_sha256" ]; then
+  echo "functional v2.2.1 panacead checksum differs from the host-platform release build" >&2
+  exit 1
+fi
+{
+  printf '{\n'
+  printf '  "schema_version": "1",\n'
+  printf '  "host_platform": "%s",\n' "$functional_host_platform"
+  printf '  "images": [\n'
+  printf '    {"kind":"current","functional_image_ref":"%s","functional_image_id":"%s","functional_binary_sha256":"%s","release_image_ref":"%s","release_image_id":"%s","release_binary_sha256":"%s"},\n' \
+    "$E2E_FUNCTIONAL_CURRENT_IMAGE" "$functional_current_id" "$functional_current_sha256" \
+    "$release_current_ref" "$release_current_id" "$release_current_sha256"
+  printf '    {"kind":"v2.2.1","functional_image_ref":"%s","functional_image_id":"%s","functional_binary_sha256":"%s","release_image_ref":"%s","release_image_id":"%s","release_binary_sha256":"%s"}\n' \
+    "$E2E_FUNCTIONAL_OLD_IMAGE" "$functional_old_id" "$functional_old_sha256" \
+    "$release_old_ref" "$release_old_id" "$release_old_sha256"
+  printf '  ]\n'
+  printf '}\n'
+} >"$artifact_dir/host-image-identity.json"
 
 stage=require-multiarch-upgrade-gate
 if [ "${PANACEA_E2E_RELEASE_MULTIARCH_UPGRADE:-}" != "1" ]; then

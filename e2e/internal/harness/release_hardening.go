@@ -344,6 +344,7 @@ func ValidateReleaseHardeningArtifact(manifestPath string) error {
 		"source-files-sha256.txt",
 		"builder-cache-before-build.txt",
 		"builder-networks-before-offline.txt",
+		"builder-network-cycles.txt",
 		"warm-offline-buildkit-contract.txt",
 	} {
 		if err := requireNonemptyReleaseArtifact(dir, dependencyFile); err != nil {
@@ -390,9 +391,27 @@ func ValidateReleaseHardeningArtifact(manifestPath string) error {
 		}
 		indexedImages[key] = struct{}{}
 	}
+	networkCycles, err := os.ReadFile(filepath.Join(dir, "builder-network-cycles.txt"))
+	if err != nil {
+		return err
+	}
 
 	for _, platform := range releaseExpectedPlatforms {
 		suffix := strings.TrimPrefix(platform, "linux/")
+		if !strings.Contains(string(networkCycles), "platform="+platform+" disconnected=true reconnected=true\n") {
+			return fmt.Errorf("release evidence is missing the completed BuildKit network cycle for %s", platform)
+		}
+		for _, name := range []string{
+			"builder-networks-" + suffix + "-before-offline.txt",
+			"builder-networks-" + suffix + "-after-reconnect.txt",
+		} {
+			if err := requireNonemptyReleaseArtifact(dir, name); err != nil {
+				return err
+			}
+		}
+		if err := requireEmptyReleaseArtifact(dir, "builder-networks-"+suffix+"-after-offline.txt"); err != nil {
+			return err
+		}
 		for _, kind := range releaseExpectedImageKinds {
 			record := manifestImages[kind+"|"+platform]
 			prefix := kind + "-" + suffix
