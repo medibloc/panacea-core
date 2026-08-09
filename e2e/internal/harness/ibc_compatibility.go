@@ -716,9 +716,9 @@ func (m IBCCompatibilityMatrix) Validate() error {
 	if err := m.Osmosis.SourceContract.Validate(); err != nil {
 		validationErrors = append(validationErrors, fmt.Errorf("Osmosis pinned source contract: %w", err))
 	}
-	if m.Osmosis.SourceContract.Commit != m.MainnetPreflight.NodeInfo.Binary.Commit ||
-		m.Osmosis.SourceContract.Commit != m.Osmosis.PreUpgrade.Contract.Commit {
-		validationErrors = append(validationErrors, errors.New("Osmosis source, live-mainnet, and local binary commits do not match"))
+	if m.Osmosis.SourceContract.Commit != m.Osmosis.PreUpgrade.Contract.Commit ||
+		m.Osmosis.SourceContract.Commit != m.Osmosis.PostUpgrade.Contract.Commit {
+		validationErrors = append(validationErrors, errors.New("Osmosis pinned source and local binary commits do not match"))
 	}
 	if m.Panacea.PreUpgrade.ChainID == m.Osmosis.PreUpgrade.ChainID {
 		validationErrors = append(validationErrors, errors.New("Panacea and Osmosis compatibility contracts must use distinct chains"))

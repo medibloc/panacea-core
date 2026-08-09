@@ -6,6 +6,7 @@ import (
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
+	"encoding/json"
 	"errors"
 	"io"
 	"net/http"
@@ -343,8 +344,16 @@ func TestOsmosisMainnetPreflightConfirmsActiveChannelAndLimitsMiddlewareClaim(t 
 		t.Fatalf("node-info observation scope = %#v", evidence.NodeInfo)
 	}
 	evidence.Status.CometBFTVersion = "0.38.19"
+	evidence.NodeInfo.CometBFT = "0.38.19"
+	evidence.NodeInfo.Binary.Version = "31.0.1"
+	evidence.NodeInfo.Binary.Commit = "bc6abe805b25deaaff79d282ae186586f0859d7a"
+	for index := range evidence.NodeInfo.Binary.Dependencies {
+		if evidence.NodeInfo.Binary.Dependencies[index].Path == cometBFTModulePath {
+			evidence.NodeInfo.Binary.Dependencies[index].Version = "v0.38.21"
+		}
+	}
 	if err := evidence.Validate(); err != nil {
-		t.Fatalf("compatible public RPC CometBFT patch rejected: %v", err)
+		t.Fatalf("compatible public node patch rejected: %v", err)
 	}
 }
 
@@ -378,6 +387,89 @@ func TestValidateOsmosisStatusResponseRequiresPinnedCometBFTMinorLine(t *testing
 			}
 			if !testCase.wantPass && err == nil {
 				t.Fatalf("incompatible version %q accepted", testCase.version)
+			}
+		})
+	}
+}
+
+func TestValidateOsmosisNodeInfoResponseRequiresPinnedCompatibilityLines(t *testing.T) {
+	t.Parallel()
+
+	decodeFixture := func(t *testing.T) osmosisNodeInfoResponse {
+		t.Helper()
+		var response osmosisNodeInfoResponse
+		if err := json.Unmarshal([]byte(osmosisNodeInfoFixture()), &response); err != nil {
+			t.Fatalf("decode Osmosis node-info fixture: %v", err)
+		}
+		return response
+	}
+	setDependency := func(response *osmosisNodeInfoResponse, path, version string) {
+		for index := range response.ApplicationVersion.BuildDeps {
+			if response.ApplicationVersion.BuildDeps[index].Path == path {
+				response.ApplicationVersion.BuildDeps[index].Version = version
+				return
+			}
+		}
+	}
+
+	for _, testCase := range []struct {
+		name     string
+		mutate   func(*osmosisNodeInfoResponse)
+		wantPass bool
+	}{
+		{name: "pinned patch", wantPass: true},
+		{
+			name: "older public patch",
+			mutate: func(response *osmosisNodeInfoResponse) {
+				response.DefaultNodeInfo.Version = "0.38.19"
+				response.ApplicationVersion.Version = "31.0.1"
+				response.ApplicationVersion.GitCommit = "bc6abe805b25deaaff79d282ae186586f0859d7a"
+				setDependency(response, cometBFTModulePath, "v0.38.21")
+			},
+			wantPass: true,
+		},
+		{
+			name: "previous app minor",
+			mutate: func(response *osmosisNodeInfoResponse) {
+				response.ApplicationVersion.Version = "30.0.5"
+			},
+		},
+		{
+			name: "next app minor",
+			mutate: func(response *osmosisNodeInfoResponse) {
+				response.ApplicationVersion.Version = "31.1.0"
+			},
+		},
+		{
+			name: "previous CometBFT minor",
+			mutate: func(response *osmosisNodeInfoResponse) {
+				response.DefaultNodeInfo.Version = "0.37.18"
+			},
+		},
+		{
+			name: "wrong IBC-Go patch",
+			mutate: func(response *osmosisNodeInfoResponse) {
+				setDependency(response, ibcGoV8ModulePath, "v8.6.0")
+			},
+		},
+		{
+			name: "malformed commit",
+			mutate: func(response *osmosisNodeInfoResponse) {
+				response.ApplicationVersion.GitCommit = "deadbeef"
+			},
+		},
+	} {
+		t.Run(testCase.name, func(t *testing.T) {
+			response := decodeFixture(t)
+			if testCase.mutate != nil {
+				testCase.mutate(&response)
+			}
+			_, err := validateOsmosisNodeInfoResponse(response)
+			if testCase.wantPass && err != nil {
+				t.Fatalf("compatible node-info rejected: %v", err)
+			}
+			if !testCase.wantPass && err == nil {
+				t.Fatal("incompatible node-info unexpectedly accepted")
 			}
 		})
 	}
@@ -498,6 +590,24 @@ func TestIBCCompatibilityMatrixRejectsMutableRuntimeEvidence(t *testing.T) {
 	matrix := validIBCCompatibilityMatrixFixture(t)
 	if err := matrix.Validate(); err != nil {
 		t.Fatalf("valid compatibility matrix rejected: %v", err)
+	}
+
+	publicPatch := matrix
+	publicPatch.MainnetPreflight.Status.CometBFTVersion = "0.38.19"
+	publicPatch.MainnetPreflight.NodeInfo.CometBFT = "0.38.19"
+	publicPatch.MainnetPreflight.NodeInfo.Binary.Version = "31.0.1"
+	publicPatch.MainnetPreflight.NodeInfo.Binary.Commit = "bc6abe805b25deaaff79d282ae186586f0859d7a"
+	publicPatch.MainnetPreflight.NodeInfo.Binary.Dependencies = append(
+		[]IBCDependencyContract(nil),
+		matrix.MainnetPreflight.NodeInfo.Binary.Dependencies...,
+	)
+	for index := range publicPatch.MainnetPreflight.NodeInfo.Binary.Dependencies {
+		if publicPatch.MainnetPreflight.NodeInfo.Binary.Dependencies[index].Path == cometBFTModulePath {
+			publicPatch.MainnetPreflight.NodeInfo.Binary.Dependencies[index].Version = "v0.38.21"
+		}
+	}
+	if err := publicPatch.Validate(); err != nil {
+		t.Fatalf("compatible public node patch rejected by matrix: %v", err)
 	}
 
 	tampered := matrix

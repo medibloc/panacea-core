@@ -191,13 +191,13 @@ func (e OsmosisMainnetPreflightEvidence) Validate() error {
 		validationErrors = append(validationErrors, errors.New("Osmosis mainnet status did not confirm the pinned live chain"))
 	}
 	if !e.NodeInfo.Available || e.NodeInfo.Network != osmosisMainnetChainID ||
-		e.NodeInfo.CometBFT != strings.TrimPrefix(PinnedIBCProvenance().Osmosis.CometBFTVersion, "v") {
+		!sameCometBFTMinorLine(e.NodeInfo.CometBFT, PinnedIBCProvenance().Osmosis.CometBFTVersion) {
 		validationErrors = append(validationErrors, errors.New("Osmosis mainnet node-info did not confirm the pinned live chain"))
 	}
 	if e.NodeInfo.DependencyObservationScope != osmosisNodeInfoDependencyScope || e.NodeInfo.ReplacementMetadataObserved {
 		validationErrors = append(validationErrors, errors.New("Osmosis node-info dependency observation scope is overstated"))
 	}
-	if err := validateIBCBinaryVersionIdentity(e.NodeInfo.Binary, osmosisNodeInfoObservableContract()); err != nil {
+	if err := validateOsmosisMainnetNodeIdentity(e.NodeInfo.Binary); err != nil {
 		validationErrors = append(validationErrors, fmt.Errorf("Osmosis mainnet binary: %w", err))
 	}
 	if err := validateOsmosisMainnetChannelEvidence(e.Channel); err != nil {
@@ -486,15 +486,21 @@ func validateOsmosisStatusResponse(response osmosisStatusResponse, now time.Time
 // sameCometBFTMinorLine permits public RPC operators to run different patch
 // releases from the pinned Osmosis application binary. Mainnet consensus does
 // not require every RPC node to expose the same CometBFT patch version. The
-// exact application dependency remains enforced through REST node-info and the
-// digest-pinned local counterparty image.
+// public REST contract still requires the v0.38 line; the digest-pinned local
+// counterparty image retains the exact v0.38.22 dependency check.
 func sameCometBFTMinorLine(observed, pinned string) bool {
-	observedMajor, observedMinor, observedOK := cometBFTMajorMinor(observed)
-	pinnedMajor, pinnedMinor, pinnedOK := cometBFTMajorMinor(pinned)
+	observedMajor, observedMinor, observedOK := strictThreePartVersionMajorMinor(observed)
+	pinnedMajor, pinnedMinor, pinnedOK := strictThreePartVersionMajorMinor(pinned)
 	return observedOK && pinnedOK && observedMajor == pinnedMajor && observedMinor == pinnedMinor
 }
 
-func cometBFTMajorMinor(version string) (int, int, bool) {
+func sameOsmosisAppMinorLine(observed, pinned string) bool {
+	observedMajor, observedMinor, observedOK := strictThreePartVersionMajorMinor(observed)
+	pinnedMajor, pinnedMinor, pinnedOK := strictThreePartVersionMajorMinor(pinned)
+	return observedOK && pinnedOK && observedMajor == pinnedMajor && observedMinor == pinnedMinor
+}
+
+func strictThreePartVersionMajorMinor(version string) (int, int, bool) {
 	parts := strings.Split(strings.TrimPrefix(strings.TrimSpace(version), "v"), ".")
 	if len(parts) != 3 {
 		return 0, 0, false
@@ -570,17 +576,84 @@ func validateOsmosisNodeInfoResponse(response osmosisNodeInfoResponse) (OsmosisM
 	if evidence.Network != osmosisMainnetChainID {
 		validationErrors = append(validationErrors, fmt.Errorf("Osmosis node-info network = %q, want %q", evidence.Network, osmosisMainnetChainID))
 	}
-	wantComet := strings.TrimPrefix(PinnedIBCProvenance().Osmosis.CometBFTVersion, "v")
-	if evidence.CometBFT != wantComet {
-		validationErrors = append(validationErrors, fmt.Errorf("Osmosis node-info CometBFT = %q, want %q", evidence.CometBFT, wantComet))
+	wantComet := PinnedIBCProvenance().Osmosis.CometBFTVersion
+	if !sameCometBFTMinorLine(evidence.CometBFT, wantComet) {
+		validationErrors = append(validationErrors, fmt.Errorf(
+			"Osmosis node-info CometBFT = %q, want the same major.minor line as %q",
+			evidence.CometBFT,
+			strings.TrimPrefix(wantComet, "v"),
+		))
+	}
+	if err := validateOsmosisMainnetNodeIdentity(identity); err != nil {
+		validationErrors = append(validationErrors, err)
+	}
+	return evidence, errors.Join(validationErrors...)
+}
+
+// validateOsmosisMainnetNodeIdentity accepts patch-level differences exposed
+// by public mainnet RPC operators while preserving the protocol-relevant v31.0
+// contract. The local counterparty image is validated separately against the
+// exact digest-pinned v31.0.2 binary, commit, and dependency set.
+func validateOsmosisMainnetNodeIdentity(identity IBCBinaryVersionIdentity) error {
+	contract := osmosisNodeInfoObservableContract()
+	var validationErrors []error
+	if identity.Name != contract.Name {
+		validationErrors = append(validationErrors, fmt.Errorf("binary name = %q, want %q", identity.Name, contract.Name))
+	}
+	if identity.AppName != contract.AppName {
+		validationErrors = append(validationErrors, fmt.Errorf("binary app name = %q, want %q", identity.AppName, contract.AppName))
+	}
+	if !sameOsmosisAppMinorLine(identity.Version, contract.Version) {
+		validationErrors = append(validationErrors, fmt.Errorf(
+			"binary version = %q, want the same major.minor line as %q",
+			identity.Version,
+			contract.Version,
+		))
+	}
+	if err := validateGitCommit(identity.Commit); err != nil {
+		validationErrors = append(validationErrors, fmt.Errorf("binary commit %q: %w", identity.Commit, err))
+	}
+	if identity.CosmosSDKVersion != contract.CosmosSDKVersion {
+		validationErrors = append(validationErrors, fmt.Errorf(
+			"binary Cosmos SDK identity = %q, want %q",
+			identity.CosmosSDKVersion,
+			contract.CosmosSDKVersion,
+		))
 	}
 	if strings.TrimSpace(identity.GoVersion) == "" {
 		validationErrors = append(validationErrors, errors.New("Osmosis node-info Go version is empty"))
 	}
-	if err := validateIBCBinaryVersionIdentity(identity, osmosisNodeInfoObservableContract()); err != nil {
-		validationErrors = append(validationErrors, err)
+
+	seen := make(map[string]struct{}, len(identity.Dependencies))
+	for _, dependency := range identity.Dependencies {
+		if _, duplicate := seen[dependency.Path]; duplicate {
+			validationErrors = append(validationErrors, fmt.Errorf("binary contains duplicate dependency %s", dependency.Path))
+		}
+		seen[dependency.Path] = struct{}{}
 	}
-	return evidence, errors.Join(validationErrors...)
+	for _, expected := range contract.Dependencies {
+		observed, ok := identity.Dependency(expected.Path)
+		if expected.Path == cometBFTModulePath {
+			if !ok || observed.Replacement != nil || !sameCometBFTMinorLine(observed.Version, expected.Version) {
+				validationErrors = append(validationErrors, fmt.Errorf(
+					"binary dependency %s = %s, want the same major.minor line as %s",
+					expected.Path,
+					formatDependencyContract(observed, ok),
+					formatDependencyContract(expected, true),
+				))
+			}
+			continue
+		}
+		if !ok || !dependencyContractEqual(observed, expected) {
+			validationErrors = append(validationErrors, fmt.Errorf(
+				"binary dependency %s = %s, want %s",
+				expected.Path,
+				formatDependencyContract(observed, ok),
+				formatDependencyContract(expected, true),
+			))
+		}
+	}
+	return errors.Join(validationErrors...)
 }
 
 type osmosisChannelResponse struct {
