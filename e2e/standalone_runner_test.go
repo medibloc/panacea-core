@@ -201,8 +201,16 @@ func TestStandaloneRestartAndConsensusSuitesOnlyRetryHostPortRaces(t *testing.T)
 	retryBody := shellFunctionBody(t, runner, "run_current_test_with_host_port_retry")
 	require.Contains(t, retryBody, "failed to bind host port .*address already in use")
 	require.Contains(t, retryBody, "run_current_test")
+	require.Contains(t, retryBody, "archive_host_port_retry_attempt",
+		"retryable failure evidence must not remain in the aggregate gate's run-* namespace")
 	require.Contains(t, retryBody, `"$attempt" -ge 2`,
 		"the infrastructure-only retry must be bounded to one retry")
+
+	archiveBody := shellFunctionBody(t, runner, "archive_host_port_retry_attempt")
+	require.Contains(t, archiveBody, "host-port-retry-artifacts")
+	require.Contains(t, archiveBody, "aggregate_gate_input=false")
+	require.Contains(t, archiveBody, "failed to bind host port .*address already in use",
+		"only an exact Docker host-port allocation race may leave the aggregate input namespace")
 }
 
 func TestStandaloneHostPortRetryBehavior(t *testing.T) {
@@ -242,6 +250,7 @@ func TestStandaloneHostPortRetryBehavior(t *testing.T) {
 			testRoot, tempErr := os.MkdirTemp("/tmp", "panacea-e2e-restart-retry-")
 			require.NoError(t, tempErr)
 			t.Cleanup(func() { require.NoError(t, os.RemoveAll(testRoot)) })
+			failedRunName := "run-aaaaaaaaaaaa"
 
 			goRoot := filepath.Join(testRoot, "fake-goroot")
 			toolDir := filepath.Join(goRoot, "pkg", "tool", "contract_arch")
@@ -281,10 +290,13 @@ case "$*" in
   *TestRestartRecoveryNodeBoundaries*)
     if [ ! -e "$RUNNER_TEST_RETRY_MARKER" ]; then
       : >"$RUNNER_TEST_RETRY_MARKER"
+      mkdir -p "$E2E_ROOT/run-aaaaaaaaaaaa"
       if [ "$RUNNER_TEST_FAILURE_MODE" = restart-host-port ]; then
+        printf '%s\n' '{"build_error":"failed to bind host port 0.0.0.0:55230/tcp: address already in use"}' >"$E2E_ROOT/run-aaaaaaaaaaaa/manifest.json"
         printf '%s\n' 'failed to bind host port 0.0.0.0:55230/tcp: address already in use' >&2
         exit 1
       fi
+      printf '%s\n' '{"build_error":"application state mismatch"}' >"$E2E_ROOT/run-aaaaaaaaaaaa/manifest.json"
       printf '%s\n' 'application state mismatch' >&2
       exit 23
     fi
@@ -293,6 +305,8 @@ case "$*" in
   *TestFourValidatorQuorumFaultAndRecovery*)
     if [ ! -e "$RUNNER_TEST_RETRY_MARKER" ]; then
       : >"$RUNNER_TEST_RETRY_MARKER"
+      mkdir -p "$E2E_ROOT/run-aaaaaaaaaaaa"
+      printf '%s\n' '{"build_error":"failed to bind host port 0.0.0.0:54274/tcp: address already in use"}' >"$E2E_ROOT/run-aaaaaaaaaaaa/manifest.json"
       printf '%s\n' 'failed to bind host port 0.0.0.0:54274/tcp: address already in use' >&2
       exit 1
     fi
@@ -333,9 +347,23 @@ esac
 			require.Contains(t, records[len(records)-1], testCase.lastPattern)
 			if testCase.wantRetry {
 				require.Contains(t, string(output), "retrying live E2E once")
+				require.Contains(t, string(output), "archived retryable Docker host-port race evidence")
 				require.Contains(t, records[1], testCase.firstPattern)
+				require.NoDirExists(t, filepath.Join(testRoot, failedRunName))
+				archives, globErr := filepath.Glob(filepath.Join(
+					testRoot, "host-port-retry-artifacts", "host-port-retry.*"))
+				require.NoError(t, globErr)
+				require.Len(t, archives, 1)
+				require.FileExists(t, filepath.Join(archives[0], failedRunName, "manifest.json"))
+				require.FileExists(t, filepath.Join(archives[0], "attempt.log"))
+				require.FileExists(t, filepath.Join(archives[0], "attempt.status"))
+				metadata, metadataErr := os.ReadFile(filepath.Join(archives[0], "metadata.txt"))
+				require.NoError(t, metadataErr)
+				require.Contains(t, string(metadata), "aggregate_gate_input=false")
 			} else {
 				require.NotContains(t, string(output), "retrying live E2E once")
+				require.DirExists(t, filepath.Join(testRoot, failedRunName),
+					"ordinary failures must remain in the aggregate input namespace")
 			}
 		})
 	}

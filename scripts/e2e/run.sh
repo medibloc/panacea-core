@@ -448,6 +448,56 @@ negative_body() {
 		'^(TestNFTNegativeStateIntegrity|TestNFTNegativeProtocolBoundaries)$'
 }
 
+snapshot_e2e_run_dirs() {
+	snapshot_file=$1
+	: >"$snapshot_file"
+	for snapshot_run_dir in "$E2E_ROOT"/run-*; do
+		[ -d "$snapshot_run_dir" ] || continue
+		printf '%s\n' "${snapshot_run_dir##*/}" >>"$snapshot_file"
+	done
+}
+
+archive_host_port_retry_attempt() {
+	archive_attempt_log=$1
+	archive_attempt_status_file=$2
+	archive_runs_before=$3
+	archive_suite_pattern=$4
+	archive_attempt=$5
+	archive_dir="$E2E_ROOT/host-port-retry-artifacts/${archive_attempt_log##*/}"
+
+	mkdir -p "$E2E_ROOT/host-port-retry-artifacts"
+	mkdir "$archive_dir"
+	for archive_run_dir in "$E2E_ROOT"/run-*; do
+		[ -d "$archive_run_dir" ] || continue
+		archive_run_name=${archive_run_dir##*/}
+		if grep -Fxq "$archive_run_name" "$archive_runs_before"; then
+			continue
+		fi
+		if [ ! -f "$archive_run_dir/manifest.json" ] || \
+			! grep -Eq 'failed to bind host port .*address already in use' "$archive_run_dir/manifest.json"; then
+			printf 'refusing to archive non-port-race E2E run before retry: %s\n' "$archive_run_dir" >&2
+			return 125
+		fi
+	done
+	for archive_run_dir in "$E2E_ROOT"/run-*; do
+		[ -d "$archive_run_dir" ] || continue
+		archive_run_name=${archive_run_dir##*/}
+		if grep -Fxq "$archive_run_name" "$archive_runs_before"; then
+			continue
+		fi
+		mv "$archive_run_dir" "$archive_dir/$archive_run_name"
+	done
+	mv "$archive_attempt_log" "$archive_dir/attempt.log"
+	mv "$archive_attempt_status_file" "$archive_dir/attempt.status"
+	{
+		printf 'reason=docker-host-port-allocation-race\n'
+		printf 'suite_pattern=%s\n' "$archive_suite_pattern"
+		printf 'attempt=%s\n' "$archive_attempt"
+		printf 'aggregate_gate_input=false\n'
+	} >"$archive_dir/metadata.txt"
+	printf 'archived retryable Docker host-port race evidence: %s\n' "$archive_dir" >&2
+}
+
 run_current_test_with_host_port_retry() {
 	retry_suite_flag=$1
 	retry_suite_timeout=$2
@@ -460,6 +510,8 @@ run_current_test_with_host_port_retry() {
 	while :; do
 		attempt_log=$(mktemp "$E2E_ROOT/host-port-retry.XXXXXX")
 		attempt_status_file="$attempt_log.status"
+		attempt_runs_before=$(mktemp "$E2E_ROOT/host-port-runs-before.XXXXXX")
+		snapshot_e2e_run_dirs "$attempt_runs_before"
 		(
 			set +e
 			run_current_test "$retry_suite_flag" "$retry_suite_timeout" "$retry_suite_pattern"
@@ -469,14 +521,14 @@ run_current_test_with_host_port_retry() {
 		) 2>&1 | tee "$attempt_log"
 
 		if [ ! -s "$attempt_status_file" ]; then
-			rm -f "$attempt_log" "$attempt_status_file"
+			rm -f "$attempt_log" "$attempt_status_file" "$attempt_runs_before"
 			printf 'live E2E attempt did not record an exit status\n' >&2
 			return 125
 		fi
 		attempt_status=$(sed -n '1p' "$attempt_status_file")
 		case "$attempt_status" in
 			'' | *[!0-9]*)
-				rm -f "$attempt_log" "$attempt_status_file"
+				rm -f "$attempt_log" "$attempt_status_file" "$attempt_runs_before"
 				printf 'live E2E attempt recorded invalid exit status: %s\n' "$attempt_status" >&2
 				return 125
 				;;
@@ -485,14 +537,21 @@ run_current_test_with_host_port_retry() {
 		if grep -Eq 'failed to bind host port .*address already in use' "$attempt_log"; then
 			retryable=1
 		fi
-		rm -f "$attempt_log" "$attempt_status_file"
 
 		if [ "$attempt_status" -eq 0 ]; then
+			rm -f "$attempt_log" "$attempt_status_file" "$attempt_runs_before"
 			return 0
 		fi
 		if [ "$attempt" -ge 2 ] || [ "$retryable" -ne 1 ]; then
+			rm -f "$attempt_log" "$attempt_status_file" "$attempt_runs_before"
 			return "$attempt_status"
 		fi
+		if ! archive_host_port_retry_attempt "$attempt_log" "$attempt_status_file" \
+			"$attempt_runs_before" "$retry_suite_pattern" "$attempt"; then
+			rm -f "$attempt_runs_before"
+			return 125
+		fi
+		rm -f "$attempt_runs_before"
 		printf 'retrying live E2E once after Docker host-port allocation race\n' >&2
 		attempt=$((attempt + 1))
 	done
