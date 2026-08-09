@@ -187,7 +187,7 @@ func (e OsmosisMainnetPreflightEvidence) Validate() error {
 		validationErrors = append(validationErrors, errors.New("Osmosis mainnet expected fixture was mutated"))
 	}
 	if !e.Status.Available || e.Status.Network != osmosisMainnetChainID || e.Status.CatchingUp ||
-		e.Status.LatestBlockHeight < 1 || e.Status.CometBFTVersion != strings.TrimPrefix(PinnedIBCProvenance().Osmosis.CometBFTVersion, "v") {
+		e.Status.LatestBlockHeight < 1 || !sameCometBFTMinorLine(e.Status.CometBFTVersion, PinnedIBCProvenance().Osmosis.CometBFTVersion) {
 		validationErrors = append(validationErrors, errors.New("Osmosis mainnet status did not confirm the pinned live chain"))
 	}
 	if !e.NodeInfo.Available || e.NodeInfo.Network != osmosisMainnetChainID ||
@@ -466,9 +466,13 @@ func validateOsmosisStatusResponse(response osmosisStatusResponse, now time.Time
 	if evidence.Network != osmosisMainnetChainID {
 		validationErrors = append(validationErrors, fmt.Errorf("Osmosis status network = %q, want %q", evidence.Network, osmosisMainnetChainID))
 	}
-	wantComet := strings.TrimPrefix(PinnedIBCProvenance().Osmosis.CometBFTVersion, "v")
-	if evidence.CometBFTVersion != wantComet {
-		validationErrors = append(validationErrors, fmt.Errorf("Osmosis status CometBFT = %q, want %q", evidence.CometBFTVersion, wantComet))
+	wantComet := PinnedIBCProvenance().Osmosis.CometBFTVersion
+	if !sameCometBFTMinorLine(evidence.CometBFTVersion, wantComet) {
+		validationErrors = append(validationErrors, fmt.Errorf(
+			"Osmosis status CometBFT = %q, want the same major.minor line as %q",
+			evidence.CometBFTVersion,
+			strings.TrimPrefix(wantComet, "v"),
+		))
 	}
 	if evidence.CatchingUp {
 		validationErrors = append(validationErrors, errors.New("Osmosis mainnet status reports catching_up=true"))
@@ -477,6 +481,41 @@ func validateOsmosisStatusResponse(response osmosisStatusResponse, now time.Time
 		validationErrors = append(validationErrors, fmt.Errorf("Osmosis latest block time %s is not fresh relative to %s", evidence.LatestBlockTime, now))
 	}
 	return evidence, errors.Join(validationErrors...)
+}
+
+// sameCometBFTMinorLine permits public RPC operators to run different patch
+// releases from the pinned Osmosis application binary. Mainnet consensus does
+// not require every RPC node to expose the same CometBFT patch version. The
+// exact application dependency remains enforced through REST node-info and the
+// digest-pinned local counterparty image.
+func sameCometBFTMinorLine(observed, pinned string) bool {
+	observedMajor, observedMinor, observedOK := cometBFTMajorMinor(observed)
+	pinnedMajor, pinnedMinor, pinnedOK := cometBFTMajorMinor(pinned)
+	return observedOK && pinnedOK && observedMajor == pinnedMajor && observedMinor == pinnedMinor
+}
+
+func cometBFTMajorMinor(version string) (int, int, bool) {
+	parts := strings.Split(strings.TrimPrefix(strings.TrimSpace(version), "v"), ".")
+	if len(parts) != 3 {
+		return 0, 0, false
+	}
+	values := make([]int, len(parts))
+	for index, part := range parts {
+		if part == "" {
+			return 0, 0, false
+		}
+		for _, character := range part {
+			if character < '0' || character > '9' {
+				return 0, 0, false
+			}
+		}
+		value, err := strconv.Atoi(part)
+		if err != nil {
+			return 0, 0, false
+		}
+		values[index] = value
+	}
+	return values[0], values[1], true
 }
 
 type osmosisBuildDependency struct {

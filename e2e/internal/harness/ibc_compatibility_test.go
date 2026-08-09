@@ -342,6 +342,45 @@ func TestOsmosisMainnetPreflightConfirmsActiveChannelAndLimitsMiddlewareClaim(t 
 	if evidence.NodeInfo.DependencyObservationScope != osmosisNodeInfoDependencyScope || evidence.NodeInfo.ReplacementMetadataObserved {
 		t.Fatalf("node-info observation scope = %#v", evidence.NodeInfo)
 	}
+	evidence.Status.CometBFTVersion = "0.38.19"
+	if err := evidence.Validate(); err != nil {
+		t.Fatalf("compatible public RPC CometBFT patch rejected: %v", err)
+	}
+}
+
+func TestValidateOsmosisStatusResponseRequiresPinnedCometBFTMinorLine(t *testing.T) {
+	t.Parallel()
+
+	now := time.Date(2026, 8, 9, 0, 0, 0, 0, time.UTC)
+	for _, testCase := range []struct {
+		name     string
+		version  string
+		wantPass bool
+	}{
+		{name: "older compatible patch", version: "0.38.17", wantPass: true},
+		{name: "current public patch", version: "0.38.19", wantPass: true},
+		{name: "pinned patch", version: "0.38.22", wantPass: true},
+		{name: "previous minor", version: "0.37.18", wantPass: false},
+		{name: "next minor", version: "0.39.0", wantPass: false},
+		{name: "missing patch", version: "0.38", wantPass: false},
+		{name: "prerelease", version: "0.38.22-rc1", wantPass: false},
+	} {
+		t.Run(testCase.name, func(t *testing.T) {
+			response := osmosisStatusResponse{}
+			response.Result.NodeInfo.Network = osmosisMainnetChainID
+			response.Result.NodeInfo.Version = testCase.version
+			response.Result.SyncInfo.LatestBlockHeight = "68119031"
+			response.Result.SyncInfo.LatestBlockTime = now.Add(-5 * time.Second)
+
+			_, err := validateOsmosisStatusResponse(response, now)
+			if testCase.wantPass && err != nil {
+				t.Fatalf("compatible version %q rejected: %v", testCase.version, err)
+			}
+			if !testCase.wantPass && err == nil {
+				t.Fatalf("incompatible version %q accepted", testCase.version)
+			}
+		})
+	}
 }
 
 func TestOsmosisMainnetPreflightRetriesTransientServiceUnavailable(t *testing.T) {

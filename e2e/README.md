@@ -167,9 +167,13 @@ for that initial materialization.
 
 The IBC upgrade lane performs a read-only Osmosis mainnet preflight immediately
 before creating its local Docker topology. It queries exactly one explicit RPC
-endpoint and one explicit REST endpoint to confirm `osmosis-1`, the pinned
-v31.0.2 binary identity plus observable SDK/IBC-Go/CometBFT build metadata, and the active
-`transfer/channel-82 -> transfer/channel-1` `ics20-1` fixture. Defaults are
+endpoint and one explicit REST endpoint to confirm `osmosis-1`, a live RPC node
+on the pinned CometBFT v0.38 compatibility line, the exact v31.0.2 application
+binary identity plus observable SDK/IBC-Go/CometBFT build metadata, and the active
+`transfer/channel-82 -> transfer/channel-1` `ics20-1` fixture. Public mainnet RPC
+operators may run different v0.38 patch releases; exact v0.38.22 application
+dependency matching remains mandatory through REST node-info and the local
+digest-pinned Osmosis image. Defaults are
 `https://rpc.osmosis.zone` and `https://lcd.osmosis.zone`; operators may replace
 them with `PANACEA_E2E_OSMOSIS_MAINNET_RPC_ENDPOINT` and
 `PANACEA_E2E_OSMOSIS_MAINNET_REST_ENDPOINT`. There is no skip, retry endpoint,
