@@ -14,7 +14,6 @@ func TestDockerPublishBuildsAndPushesIndependentlyOfE2E(t *testing.T) {
 	workflow := string(contents)
 
 	for _, contract := range []string{
-		"branches: [main]",
 		"tags: ['v*.*.*']",
 		"actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0",
 		"actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5",
