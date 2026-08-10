@@ -2,7 +2,6 @@
 
 [![license](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 ![ci](https://github.com/medibloc/panacea-core/actions/workflows/ci.yml/badge.svg)
-![ci-docker-publish](https://github.com/medibloc/panacea-core/actions/workflows/docker-publish.yml/badge.svg)
 
 Panacea is a blockchain which is the key infrastructure for our services to reinvent the healthcare experience, developed by **[MediBloc](https://medibloc.org)**.
 
