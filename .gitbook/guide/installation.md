@@ -3,7 +3,7 @@
 
 ## Install Go
 
-[Go 1.22+](https://golang.org/doc/install) is required.
+[Go 1.26.5](https://golang.org/doc/install) is required.
 
 ## Install the `panacead`
 
@@ -12,7 +12,7 @@ please clone the `panacea-core` project and build it.
 
 ```bash
 # Make sure to checkout the correct branch.
-git clone -b v2.2.0-1 https://github.com/medibloc/panacea-core
+git clone -b v2.3.0 https://github.com/medibloc/panacea-core
 cd panacea-core
 make install  # All binaries are installed in $GOPATH/bin
 ```
@@ -20,7 +20,7 @@ make install  # All binaries are installed in $GOPATH/bin
 Verify that the `panacead` binary is installed successfully.
 ```bash
 $ panacead version
-2.2.0-1
+2.3.0
 ```
 
 ## Import `panacea-core` as a Go dependency
@@ -33,7 +33,7 @@ As a workaround, please add `replace` directives in your `go.mod` as below.
 ```
 module your.com/yours
 
-go 1.22
+go 1.26.5
 
 replace (
     github.com/99designs/keyring => github.com/cosmos/keyring v1.2.0

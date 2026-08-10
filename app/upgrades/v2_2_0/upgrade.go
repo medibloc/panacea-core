@@ -1,6 +1,10 @@
 package v2_2_0
 
 import (
+	"context"
+
+	sdkmath "cosmossdk.io/math"
+	upgradetypes "cosmossdk.io/x/upgrade/types"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
@@ -14,12 +18,13 @@ import (
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	slashingtypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
-	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 	"github.com/medibloc/panacea-core/v2/app/keepers"
 )
 
 func CreateUpgradeHandle(mm *module.Manager, configurator module.Configurator, keepers *keepers.AppKeepersWithKey) upgradetypes.UpgradeHandler {
-	return func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
+	return func(ctx context.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
+		sdkCtx := sdk.UnwrapSDKContext(ctx)
+
 		// Set param key table for params module migration
 		subspaces := keepers.ParamsKeeper.GetSubspaces()
 		for _, subspace := range subspaces {
@@ -53,7 +58,9 @@ func CreateUpgradeHandle(mm *module.Manager, configurator module.Configurator, k
 		baseAppLegacySS := keepers.ParamsKeeper.Subspace(baseapp.Paramspace).WithKeyTable(paramstypes.ConsensusParamsKeyTable())
 
 		// Migrate Tendermint consensus parameters from x/params module to a dedicated x/consensus module.
-		baseapp.MigrateParams(ctx, baseAppLegacySS, &keepers.ConsensusParamsKeeper)
+		if err := baseapp.MigrateParams(sdkCtx, baseAppLegacySS, keepers.ConsensusParamsKeeper.ParamsStore); err != nil {
+			return fromVM, err
+		}
 
 		// Note: this migration is optional,
 		// You can include x/gov proposal migration documented in [UPGRADING.md](https://github.com/cosmos/cosmos-sdk/blob/main/UPGRADING.md)
@@ -63,8 +70,11 @@ func CreateUpgradeHandle(mm *module.Manager, configurator module.Configurator, k
 			return fromVM, err
 		}
 		// Current, panacea chain MinCommissionRate is 3%. So, we need to change minCommissionRate zero to 5%.
-		params := keepers.StakingKeeper.GetParams(ctx)
-		params.MinCommissionRate = sdk.NewDecWithPrec(3, 2)
+		params, err := keepers.StakingKeeper.GetParams(ctx)
+		if err != nil {
+			return fromVM, err
+		}
+		params.MinCommissionRate = sdkmath.LegacyNewDecWithPrec(3, 2)
 		if err := keepers.StakingKeeper.SetParams(ctx, params); err != nil {
 			return fromVM, err
 		}

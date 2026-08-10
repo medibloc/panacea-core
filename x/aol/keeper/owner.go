@@ -1,7 +1,10 @@
 package keeper
 
 import (
-	"github.com/cosmos/cosmos-sdk/store/prefix"
+	"fmt"
+
+	"cosmossdk.io/store/prefix"
+	storetypes "cosmossdk.io/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/medibloc/panacea-core/v2/types/compkey"
 	"github.com/medibloc/panacea-core/v2/x/aol/types"
@@ -30,8 +33,12 @@ func (k Keeper) HasOwner(ctx sdk.Context, key types.OwnerCompositeKey) bool {
 
 func (k Keeper) GetAllOwners(ctx sdk.Context) ([]types.OwnerCompositeKey, []types.Owner) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.OwnerKeyPrefix)
-	iterator := sdk.KVStorePrefixIterator(store, []byte{})
-	defer iterator.Close()
+	iterator := storetypes.KVStorePrefixIterator(store, []byte{})
+	defer func() {
+		if err := iterator.Close(); err != nil {
+			panic(fmt.Errorf("close owner iterator: %w", err))
+		}
+	}()
 
 	keys := make([]types.OwnerCompositeKey, 0)
 	values := make([]types.Owner, 0)

@@ -1,25 +1,35 @@
-FROM golang:1.22.0-bullseye AS build-env
+FROM golang:1.26.5-trixie@sha256:8229e3b2cf7fc08878a86977547e3119c173681c3cc4a64c38cf0c6fe0b42fa8 AS build-env
 
-# Install minimum necessary dependencies,
-ENV PACKAGES make git gcc
-RUN apt-get update -y
-RUN apt-get install -y $PACKAGES
+ENV GOTOOLCHAIN=local
 
-# Add 'panacea-core' source files
-COPY . /src/panacea-core
-
-# Set working directory for the 'panacea-core' build
 WORKDIR /src/panacea-core
+COPY . ./
+COPY --from=panacea_vendor . ./vendor
 
-# Install panacea-core
-RUN make clean && make build
+ARG TARGETARCH
+ARG PANACEA_VERSION=dev
+ARG PANACEA_COMMIT=unknown
+ARG PANACEA_CMT_VERSION=unknown
+RUN --network=none --mount=type=cache,target=/root/.cache/go-build \
+    set -eu \
+    && case "${TARGETARCH}" in amd64|arm64) ;; *) echo "unsupported target architecture: ${TARGETARCH}" >&2; exit 2 ;; esac \
+    && touch go.sum \
+    && make \
+        VERSION="${PANACEA_VERSION}" \
+        COMMIT="${PANACEA_COMMIT}" \
+        CMTVERSION="${PANACEA_CMT_VERSION}" \
+        LEDGER_ENABLED=false \
+        COSMOS_BUILD_OPTIONS= \
+        BUILD_TAGS= \
+        RELEASE_GOARCH="${TARGETARCH}" \
+        RELEASE_OUTPUT=/src/panacea-core/build/panacead \
+        release-build
 
-# Final image
-FROM debian:bullseye-slim
+FROM debian:trixie-slim@sha256:3a39a0592364683e6bab97937b72cad5a8fa6dcbbee90edb3bb48c7f8e94f258
 
-# Copy over binaries from the build-env
+LABEL org.medibloc.panacea.build-contract="panacea-linux-static-v1"
+
 COPY --from=build-env /src/panacea-core/build/panacead /usr/bin/panacead
-
-RUN chmod +x /usr/bin/panacead
+RUN chmod 0755 /usr/bin/panacead
 
 EXPOSE 26656 26657 1317 9090

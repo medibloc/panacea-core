@@ -1,23 +1,26 @@
 package testsuite
 
 import (
-	dbm "github.com/cometbft/cometbft-db"
+	"cosmossdk.io/log"
+	"cosmossdk.io/store"
+	"cosmossdk.io/store/metrics"
+	storetypes "cosmossdk.io/store/types"
+	upgradekeeper "cosmossdk.io/x/upgrade/keeper"
+	upgradetypes "cosmossdk.io/x/upgrade/types"
 	"github.com/cometbft/cometbft/crypto/secp256k1"
-	"github.com/cometbft/cometbft/libs/log"
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	"github.com/cometbft/cometbft/types/time"
+	dbm "github.com/cosmos/cosmos-db"
 	"github.com/cosmos/cosmos-sdk/codec"
+	addresscodec "github.com/cosmos/cosmos-sdk/codec/address"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
-	"github.com/cosmos/cosmos-sdk/store"
-	storetypes "github.com/cosmos/cosmos-sdk/store/types"
+	"github.com/cosmos/cosmos-sdk/runtime"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	"github.com/cosmos/cosmos-sdk/x/auth/tx"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
-	capabilitykeeper "github.com/cosmos/cosmos-sdk/x/capability/keeper"
-	capabilitytypes "github.com/cosmos/cosmos-sdk/x/capability/types"
 	distrkeeper "github.com/cosmos/cosmos-sdk/x/distribution/keeper"
 	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
@@ -26,12 +29,12 @@ import (
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
-	upgradekeeper "github.com/cosmos/cosmos-sdk/x/upgrade/keeper"
-	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
-	ibctransferkeeper "github.com/cosmos/ibc-go/v7/modules/apps/transfer/keeper"
-	ibctransfertypes "github.com/cosmos/ibc-go/v7/modules/apps/transfer/types"
-	ibcexported "github.com/cosmos/ibc-go/v7/modules/core/exported"
-	ibckeeper "github.com/cosmos/ibc-go/v7/modules/core/keeper"
+	capabilitykeeper "github.com/cosmos/ibc-go/modules/capability/keeper"
+	capabilitytypes "github.com/cosmos/ibc-go/modules/capability/types"
+	ibctransferkeeper "github.com/cosmos/ibc-go/v8/modules/apps/transfer/keeper"
+	ibctransfertypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
+	ibcexported "github.com/cosmos/ibc-go/v8/modules/core/exported"
+	ibckeeper "github.com/cosmos/ibc-go/v8/modules/core/keeper"
 	aolkeeper "github.com/medibloc/panacea-core/v2/x/aol/keeper"
 	aoltypes "github.com/medibloc/panacea-core/v2/x/aol/types"
 	burnkeeper "github.com/medibloc/panacea-core/v2/x/burn/keeper"
@@ -66,10 +69,12 @@ type TestSuite struct {
 }
 
 func (suite *TestSuite) SetupTest() {
-	keyParams := sdk.NewKVStoreKeys(
+	keyParams := storetypes.NewKVStoreKeys(
 		aoltypes.StoreKey,
 		authtypes.StoreKey,
 		banktypes.StoreKey,
+		stakingtypes.StoreKey,
+		distrtypes.StoreKey,
 		paramstypes.StoreKey,
 		didtypes.StoreKey,
 		ibcexported.StoreKey,
@@ -77,20 +82,28 @@ func (suite *TestSuite) SetupTest() {
 		ibctransfertypes.StoreKey,
 		upgradetypes.StoreKey,
 	)
-	tKeyParams := sdk.NewTransientStoreKey(paramstypes.TStoreKey)
-	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
+	tKeyParams := storetypes.NewTransientStoreKeys(paramstypes.TStoreKey)
+	memKeys := storetypes.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
 
 	encodingConfig := newTestCodec()
 	db := dbm.NewMemDB()
-	ms := store.NewCommitMultiStore(db)
+	ms := store.NewCommitMultiStore(db, log.NewNopLogger(), metrics.NewNoOpMetrics())
 	ctx := sdk.NewContext(ms, tmproto.Header{Time: time.Now()}, false, log.NewNopLogger())
 
-	ms.MountStoreWithDB(tKeyParams, storetypes.StoreTypeTransient, db)
+	for _, v := range tKeyParams {
+		ms.MountStoreWithDB(v, storetypes.StoreTypeTransient, db)
+	}
 	for _, v := range keyParams {
 		ms.MountStoreWithDB(v, storetypes.StoreTypeIAVL, db)
 	}
+	for _, v := range memKeys {
+		ms.MountStoreWithDB(v, storetypes.StoreTypeMemory, db)
+	}
 
-	sdk.GetConfig().SetBech32PrefixForAccount("panacea", "panaceapub")
+	sdkConfig := sdk.GetConfig()
+	sdkConfig.SetBech32PrefixForAccount("panacea", "panaceapub")
+	sdkConfig.SetBech32PrefixForValidator("panaceavaloper", "panaceavaloperpub")
+	sdkConfig.SetBech32PrefixForConsensusNode("panaceavalcons", "panaceavalconspub")
 
 	suite.Require().NoError(ms.LoadLatestVersion())
 
@@ -105,47 +118,45 @@ func (suite *TestSuite) SetupTest() {
 		burntypes.ModuleName:           {authtypes.Burner},
 	}
 
-	modAccAddrs := make(map[string]bool)
-	for acc := range maccPerms {
-		modAccAddrs[authtypes.NewModuleAddress(acc).String()] = true
-	}
-
 	appCodec := encodingConfig.Codec
 	legacyAmino := encodingConfig.Amino
+	addressCodec := addresscodec.NewBech32Codec(sdkConfig.GetBech32AccountAddrPrefix())
+	validatorAddressCodec := addresscodec.NewBech32Codec(sdkConfig.GetBech32ValidatorAddrPrefix())
+	consensusAddressCodec := addresscodec.NewBech32Codec(sdkConfig.GetBech32ConsensusAddrPrefix())
 	paramsKeeper := paramskeeper.NewKeeper(
 		appCodec,
 		legacyAmino,
 		keyParams[paramstypes.StoreKey],
-		tKeyParams)
+		tKeyParams[paramstypes.TStoreKey])
 
 	suite.CapabilityKeeper = capabilitykeeper.NewKeeper(appCodec, keyParams[capabilitytypes.StoreKey], memKeys[capabilitytypes.MemStoreKey])
 
 	scopedIBCKeeper := suite.CapabilityKeeper.ScopeToModule(ibcexported.ModuleName)
+	scopedTransferKeeper := suite.CapabilityKeeper.ScopeToModule(ibctransfertypes.ModuleName)
 
 	suite.Ctx = ctx
 	suite.AccountKeeper = authkeeper.NewAccountKeeper(
 		appCodec,
-		keyParams[authtypes.StoreKey],
+		runtime.NewKVStoreService(keyParams[authtypes.StoreKey]),
 		authtypes.ProtoBaseAccount,
 		maccPerms,
-		"panacea",
+		addressCodec,
+		sdkConfig.GetBech32AccountAddrPrefix(),
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
-	if err := suite.AccountKeeper.SetParams(ctx, authtypes.DefaultParams()); err != nil {
-		panic(err)
-	}
+	suite.Require().NoError(suite.AccountKeeper.Params.Set(ctx, authtypes.DefaultParams()))
 	suite.AolKeeper = *aolkeeper.NewKeeper(
 		appCodec,
 		keyParams[aoltypes.StoreKey],
-		memKeys[aoltypes.MemStoreKey],
 	)
 	suite.AolMsgServer = aolkeeper.NewMsgServerImpl(suite.AolKeeper)
 	suite.BankKeeper = bankkeeper.NewBaseKeeper(
 		appCodec,
-		keyParams[banktypes.StoreKey],
+		runtime.NewKVStoreService(keyParams[banktypes.StoreKey]),
 		suite.AccountKeeper,
 		BlockedAddresses(maccPerms),
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
+		log.NewNopLogger(),
 	)
 	if err := suite.BankKeeper.SetParams(ctx, banktypes.DefaultParams()); err != nil {
 		panic(err)
@@ -153,33 +164,36 @@ func (suite *TestSuite) SetupTest() {
 	suite.BurnKeeper = *burnkeeper.NewKeeper(suite.BankKeeper)
 	suite.StakingKeeper = stakingkeeper.NewKeeper(
 		appCodec,
-		keyParams[stakingtypes.StoreKey],
+		runtime.NewKVStoreService(keyParams[stakingtypes.StoreKey]),
 		suite.AccountKeeper,
 		suite.BankKeeper,
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
+		validatorAddressCodec,
+		consensusAddressCodec,
 	)
 	suite.DistrKeeper = distrkeeper.NewKeeper(
-		appCodec, keyParams[distrtypes.StoreKey], suite.AccountKeeper, suite.BankKeeper,
+		appCodec, runtime.NewKVStoreService(keyParams[distrtypes.StoreKey]), suite.AccountKeeper, suite.BankKeeper,
 		suite.StakingKeeper, "test_fee_collector",
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
 	skipUpgradeHeights := map[int64]bool{}
 	homePath := suite.T().TempDir()
-	suite.UpgradeKeeper = upgradekeeper.NewKeeper(skipUpgradeHeights, keyParams[upgradetypes.StoreKey], appCodec, homePath, NewTestProtocolVersionSetter(), authtypes.NewModuleAddress(govtypes.ModuleName).String())
+	suite.UpgradeKeeper = upgradekeeper.NewKeeper(skipUpgradeHeights, runtime.NewKVStoreService(keyParams[upgradetypes.StoreKey]), appCodec, homePath, NewTestProtocolVersionSetter(), authtypes.NewModuleAddress(govtypes.ModuleName).String())
 	suite.IBCKeeper = ibckeeper.NewKeeper(
 		appCodec, keyParams[ibcexported.StoreKey], paramsKeeper.Subspace(ibcexported.ModuleName), suite.StakingKeeper, suite.UpgradeKeeper, scopedIBCKeeper,
+		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
 	suite.TransferKeeper = ibctransferkeeper.NewKeeper(
 		appCodec, keyParams[ibctransfertypes.StoreKey], paramsKeeper.Subspace(ibctransfertypes.ModuleName),
 		suite.IBCKeeper.ChannelKeeper,
-		suite.IBCKeeper.ChannelKeeper, &suite.IBCKeeper.PortKeeper,
-		suite.AccountKeeper, suite.BankKeeper, scopedIBCKeeper,
+		suite.IBCKeeper.ChannelKeeper, suite.IBCKeeper.PortKeeper,
+		suite.AccountKeeper, suite.BankKeeper, scopedTransferKeeper,
+		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
 
 	suite.DIDKeeper = *didkeeper.NewKeeper(
 		appCodec,
 		keyParams[didtypes.StoreKey],
-		memKeys[didtypes.MemStoreKey],
 	)
 	suite.DIDMsgServer = didkeeper.NewMsgServerImpl(suite.DIDKeeper)
 }

@@ -1,7 +1,10 @@
 package keeper
 
 import (
-	"github.com/cosmos/cosmos-sdk/store/prefix"
+	"fmt"
+
+	"cosmossdk.io/store/prefix"
+	storetypes "cosmossdk.io/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/medibloc/panacea-core/v2/types/compkey"
 	"github.com/medibloc/panacea-core/v2/x/aol/types"
@@ -31,8 +34,12 @@ func (k Keeper) HasRecord(ctx sdk.Context, key types.RecordCompositeKey) bool {
 // GetAllRecords returns all records
 func (k Keeper) GetAllRecords(ctx sdk.Context) ([]types.RecordCompositeKey, []types.Record) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.RecordKeyPrefix)
-	iterator := sdk.KVStorePrefixIterator(store, []byte{})
-	defer iterator.Close()
+	iterator := storetypes.KVStorePrefixIterator(store, []byte{})
+	defer func() {
+		if err := iterator.Close(); err != nil {
+			panic(fmt.Errorf("close record iterator: %w", err))
+		}
+	}()
 
 	keys := make([]types.RecordCompositeKey, 0)
 	values := make([]types.Record, 0)

@@ -1,0 +1,11 @@
+syntax = "proto3";
+package panacea.nft.v1;
+
+import "cosmos_proto/cosmos.proto";
+
+option go_package = "github.com/medibloc/panacea-core/v2/x/nft/types";
+option java_multiple_files = true;
+option (cosmos_proto.declare_interface) = {
+  name: "NFTData"
+  description: "Metadata accepted by the Panacea NFT module."
+};

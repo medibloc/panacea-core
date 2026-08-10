@@ -34,6 +34,56 @@ func TestMsgCreateDID(t *testing.T) {
 	)
 }
 
+func TestMsgDIDValidateBasicRejectsNilDocument(t *testing.T) {
+	doc := newDIDDocument()
+	fromAddr := getFromAddress(t)
+
+	tests := []struct {
+		name string
+		msg  interface{ ValidateBasic() error }
+	}{
+		{
+			name: "create DID",
+			msg: &types.MsgCreateDIDRequest{
+				Did:         doc.Id,
+				Signature:   []byte("my-sig"),
+				FromAddress: fromAddr.String(),
+			},
+		},
+		{
+			name: "update DID",
+			msg: &types.MsgUpdateDIDRequest{
+				Did:         doc.Id,
+				Signature:   []byte("my-sig"),
+				FromAddress: fromAddr.String(),
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			require.ErrorIs(t, tt.msg.ValidateBasic(), types.ErrInvalidDIDDocument)
+		})
+	}
+}
+
+func TestMsgDIDValidateBasicRejectsNilSignature(t *testing.T) {
+	doc := newDIDDocument()
+	fromAddr := getFromAddress(t).String()
+	verificationMethodID := doc.VerificationMethods[0].Id
+	createMsg := types.NewMsgCreateDIDResponse(doc.Id, doc, verificationMethodID, nil, fromAddr)
+
+	require.ErrorIs(t, createMsg.ValidateBasic(), types.ErrInvalidSignature)
+	require.ErrorIs(t,
+		types.NewMsgUpdateDID(doc.Id, doc, verificationMethodID, nil, fromAddr).ValidateBasic(),
+		types.ErrInvalidSignature,
+	)
+	require.ErrorIs(t,
+		types.NewMsgDeactivateDIDRequest(doc.Id, verificationMethodID, nil, fromAddr).ValidateBasic(),
+		types.ErrInvalidSignature,
+	)
+}
+
 func getFromAddress(t *testing.T) sdk.AccAddress {
 	fromAddr, err := sdk.AccAddressFromBech32("panacea154p6kyu9kqgvcmq63w3vpn893ssy6anpu8ykfq")
 	require.NoError(t, err)

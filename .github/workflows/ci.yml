@@ -13,16 +13,30 @@ jobs:
   build:
     name: Build and Test
     runs-on: ubuntu-latest
+    env:
+      GOTOOLCHAIN: local
     steps:
 
-    - name: Set up Go 1.x
-      uses: actions/setup-go@v3
+    - name: Check out code into the Go module directory
+      uses: actions/checkout@v4
       with:
-        go-version: 1.22
+        fetch-depth: 0
+
+    - name: Set up Go from go.mod
+      uses: actions/setup-go@v5
+      with:
+        go-version-file: go.mod
+        cache: true
       id: go
 
-    - name: Check out code into the Go module directory
-      uses: actions/checkout@v3
+    - name: Check protobuf generation
+      run: make proto-check-generated
+
+    - name: Check protobuf compatibility
+      run: make proto-check-breaking
+
+    - name: Test upgrade rehearsal safety rails
+      run: ./scripts/upgrade-local/run-test.sh
 
     - name: Build (+ generating proto and docs)
       run: make all
@@ -31,12 +45,12 @@ jobs:
       run: make test
 
     - name: Lint
-      uses: golangci/golangci-lint-action@v3
+      uses: golangci/golangci-lint-action@ba0d7d2ec06a0ea1cb5fa41b2e4a3ab91d21278a # v9.3.0
       with:
-        version: latest
+        version: v2.12.2
 
     - name: Publish coverage.html as an artifact
-      uses: actions/upload-artifact@master
+      uses: actions/upload-artifact@v4
       with:
         name: coverage
         path: artifacts/coverage.html

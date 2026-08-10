@@ -4,7 +4,6 @@ import (
 	"encoding/base64"
 	"testing"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/suite"
 
 	"github.com/medibloc/panacea-core/v2/types/testsuite"
@@ -27,7 +26,7 @@ func (suite *queryDIDTestSuite) TestDIDDocumentWithSeq() {
 	didKeeper.SetDIDDocument(suite.Ctx, did, docWithSeq)
 
 	req := types.QueryDIDRequest{DidBase64: base64.StdEncoding.EncodeToString([]byte(did))}
-	res, err := didKeeper.DID(sdk.WrapSDKContext(suite.Ctx), &req)
+	res, err := didKeeper.DID(suite.Ctx, &req)
 	suite.Require().NoError(err)
 	suite.Require().NotNil(res)
 	suite.Require().Equal(docWithSeq, *res.DidDocumentWithSeq)

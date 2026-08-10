@@ -1,9 +1,9 @@
 package v2_0_5
 
 import (
-	storetypes "github.com/cosmos/cosmos-sdk/store/types"
+	storetypes "cosmossdk.io/store/types"
+	"cosmossdk.io/x/feegrant"
 	"github.com/cosmos/cosmos-sdk/x/authz"
-	"github.com/cosmos/cosmos-sdk/x/feegrant"
 	"github.com/medibloc/panacea-core/v2/app/upgrades"
 )
 

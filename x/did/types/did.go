@@ -6,7 +6,6 @@ import (
 	"crypto/sha256"
 	"encoding/json"
 	"fmt"
-	"log"
 	"regexp"
 	"strings"
 
@@ -244,7 +243,7 @@ func (doc DIDDocument) Valid() bool {
 	}
 
 	for _, verificationMethod := range doc.VerificationMethods {
-		if !verificationMethod.Valid(doc.Id) {
+		if verificationMethod == nil || !verificationMethod.Valid(doc.Id) {
 			return false
 		}
 	}
@@ -266,7 +265,7 @@ func (doc DIDDocument) Valid() bool {
 	}
 
 	for _, service := range doc.Services {
-		if !service.Valid() {
+		if service == nil || !service.Valid() {
 			return false
 		}
 	}
@@ -402,7 +401,8 @@ func ValidateKeyType(keyType string) bool {
 	if keyType == "" {
 		return false
 	}
-	log.Printf("[warn] unknown key type: %s\n", keyType) // TODO: Use tendermint logger
+	// Verification method types are extensible. Unknown non-empty types may be
+	// stored, but only supported types can authorize DID changes.
 	return true
 }
 

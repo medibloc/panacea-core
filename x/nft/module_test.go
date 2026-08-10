@@ -1,0 +1,225 @@
+package nft
+
+import (
+	"context"
+	"net/http"
+	"net/http/httptest"
+	"testing"
+
+	"cosmossdk.io/core/address"
+	"cosmossdk.io/log"
+	"cosmossdk.io/store"
+	"cosmossdk.io/store/metrics"
+	storetypes "cosmossdk.io/store/types"
+	upstreamnft "cosmossdk.io/x/nft"
+	cmtproto "github.com/cometbft/cometbft/proto/tendermint/types"
+	dbm "github.com/cosmos/cosmos-db"
+	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/codec"
+	addresscodec "github.com/cosmos/cosmos-sdk/codec/address"
+	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
+	"github.com/cosmos/cosmos-sdk/runtime"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/module"
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	grpc "github.com/cosmos/gogoproto/grpc"
+	gatewayruntime "github.com/grpc-ecosystem/grpc-gateway/runtime"
+	"github.com/medibloc/panacea-core/v2/x/nft/keeper"
+	"github.com/medibloc/panacea-core/v2/x/nft/types"
+	"github.com/stretchr/testify/require"
+	googlegrpc "google.golang.org/grpc"
+)
+
+func TestAppModuleBasicRegistersAllNFTInterfaces(t *testing.T) {
+	registry := cdctypes.NewInterfaceRegistry()
+	sdk.RegisterInterfaces(registry)
+	NewAppModuleBasic(addresscodec.NewBech32Codec("panacea")).RegisterInterfaces(registry)
+
+	for _, message := range []sdk.Msg{
+		&upstreamnft.MsgSend{},
+		&types.MsgCreateClassRequest{},
+		&types.MsgUpdateControllerRequest{},
+		&types.MsgMintRequest{},
+		&types.MsgRevokeRequest{},
+		&types.MsgBurnRequest{},
+	} {
+		packed, err := cdctypes.NewAnyWithValue(message)
+		require.NoError(t, err)
+
+		var unpacked sdk.Msg
+		require.NoError(t, registry.UnpackAny(packed, &unpacked))
+		require.IsType(t, message, unpacked)
+	}
+
+	require.Equal(
+		t,
+		[]string{types.BasicNFTDataTypeURL},
+		registry.ListImplementations(types.NFTDataInterfaceName),
+	)
+}
+
+func TestAppModuleBasicGenesisContract(t *testing.T) {
+	addressCodec := addresscodec.NewBech32Codec("panacea")
+	basic := NewAppModuleBasic(addressCodec)
+	cdc := newModuleTestCodec()
+
+	defaultGenesis := basic.DefaultGenesis(cdc)
+	var decoded types.GenesisState
+	require.NoError(t, cdc.UnmarshalJSON(defaultGenesis, &decoded))
+	require.NotNil(t, decoded.NftState)
+	require.NoError(t, basic.ValidateGenesis(cdc, nil, defaultGenesis))
+
+	nilNFTState := cdc.MustMarshalJSON(&types.GenesisState{})
+	require.ErrorContains(t, basic.ValidateGenesis(cdc, nil, nilNFTState), "nft_state must not be nil")
+}
+
+func TestAppModuleBasicRegistersStandardAndPanaceaGatewayRoutes(t *testing.T) {
+	basic := NewAppModuleBasic(addresscodec.NewBech32Codec("panacea"))
+	mux := gatewayruntime.NewServeMux()
+	require.NotPanics(t, func() {
+		basic.RegisterGRPCGatewayRoutes(client.Context{}, mux)
+	})
+
+	for _, path := range []string{
+		"/cosmos/nft/v1beta1/nfts",
+		"/panacea/nft/v1/nfts",
+	} {
+		request := httptest.NewRequest(http.MethodGet, path, nil)
+		response := httptest.NewRecorder()
+		mux.ServeHTTP(response, request)
+		require.NotEqual(t, http.StatusNotFound, response.Code, path)
+	}
+
+	request := httptest.NewRequest(http.MethodGet, "/unregistered/nft/route", nil)
+	response := httptest.NewRecorder()
+	mux.ServeHTTP(response, request)
+	require.Equal(t, http.StatusNotFound, response.Code)
+}
+
+func TestAppModuleEmptyGenesisRoundTrip(t *testing.T) {
+	moduleKeeper, sdkContext, addressCodec, cdc := newModuleTestKeeper(t)
+	appModule := NewAppModule(addressCodec, moduleKeeper)
+	defaultGenesis := appModule.DefaultGenesis(cdc)
+
+	updates := appModule.InitGenesis(sdkContext, cdc, defaultGenesis)
+	require.Empty(t, updates)
+	firstExport := appModule.ExportGenesis(sdkContext, cdc)
+	secondExport := appModule.ExportGenesis(sdkContext, cdc)
+	require.JSONEq(t, string(defaultGenesis), string(firstExport))
+	require.Equal(t, firstExport, secondExport)
+	require.Equal(t, uint64(1), appModule.ConsensusVersion())
+}
+
+func TestAppModuleRegistersOnlyPolicyAwareRuntimeServices(t *testing.T) {
+	appModule := NewAppModule(addresscodec.NewBech32Codec("panacea"), keeper.Keeper{})
+	configurator := &countingConfigurator{}
+
+	appModule.RegisterServices(configurator)
+
+	require.Equal(t, []string{
+		"panacea.nft.v1.Msg",
+		"cosmos.nft.v1beta1.Msg",
+	}, configurator.msgServer.services)
+	require.Equal(t, []string{
+		"panacea.nft.v1.Query",
+		"cosmos.nft.v1beta1.Query",
+	}, configurator.queryServer.services)
+	require.IsType(
+		t,
+		keeper.NewStandardMsgServer(keeper.Keeper{}),
+		configurator.msgServer.implementations["cosmos.nft.v1beta1.Msg"],
+	)
+	require.IsType(
+		t,
+		keeper.NewStandardQueryServer(keeper.Keeper{}),
+		configurator.queryServer.implementations["cosmos.nft.v1beta1.Query"],
+	)
+	require.Empty(t, configurator.directServices)
+	require.Zero(t, configurator.migrations)
+}
+
+type moduleTestAccountKeeper struct {
+	addressCodec address.Codec
+}
+
+func (k moduleTestAccountKeeper) GetModuleAddress(name string) sdk.AccAddress {
+	if name == upstreamnft.ModuleName {
+		return authtypes.NewModuleAddress(name)
+	}
+	return nil
+}
+
+func (moduleTestAccountKeeper) GetAccount(context.Context, sdk.AccAddress) sdk.AccountI { return nil }
+
+func (k moduleTestAccountKeeper) AddressCodec() address.Codec { return k.addressCodec }
+
+type moduleTestBankKeeper struct{}
+
+func (moduleTestBankKeeper) SpendableCoins(context.Context, sdk.AccAddress) sdk.Coins { return nil }
+
+func newModuleTestCodec() *codec.ProtoCodec {
+	registry := cdctypes.NewInterfaceRegistry()
+	sdk.RegisterInterfaces(registry)
+	types.RegisterInterfaces(registry)
+	return codec.NewProtoCodec(registry)
+}
+
+func newModuleTestKeeper(t *testing.T) (keeper.Keeper, sdk.Context, address.Codec, *codec.ProtoCodec) {
+	t.Helper()
+
+	cdc := newModuleTestCodec()
+	addressCodec := addresscodec.NewBech32Codec("panacea")
+	nftKey := storetypes.NewKVStoreKey(types.StoreKey)
+	policyKey := storetypes.NewKVStoreKey(types.PolicyStoreKey)
+	database := dbm.NewMemDB()
+	multiStore := store.NewCommitMultiStore(database, log.NewNopLogger(), metrics.NewNoOpMetrics())
+	multiStore.MountStoreWithDB(nftKey, storetypes.StoreTypeIAVL, database)
+	multiStore.MountStoreWithDB(policyKey, storetypes.StoreTypeIAVL, database)
+	require.NoError(t, multiStore.LoadLatestVersion())
+
+	moduleKeeper := keeper.NewKeeper(
+		cdc,
+		runtime.NewKVStoreService(nftKey),
+		runtime.NewKVStoreService(policyKey),
+		moduleTestAccountKeeper{addressCodec: addressCodec},
+		moduleTestBankKeeper{},
+		[]sdk.AccAddress{authtypes.NewModuleAddress(upstreamnft.ModuleName)},
+	)
+	ctx := sdk.NewContext(multiStore, cmtproto.Header{}, false, log.NewNopLogger())
+	return moduleKeeper, ctx, addressCodec, cdc
+}
+
+type countingConfigurator struct {
+	msgServer      countingGRPCServer
+	queryServer    countingGRPCServer
+	directServices []string
+	migrations     int
+}
+
+func (c *countingConfigurator) RegisterService(descriptor *googlegrpc.ServiceDesc, _ interface{}) {
+	c.directServices = append(c.directServices, descriptor.ServiceName)
+}
+
+func (*countingConfigurator) Error() error { return nil }
+
+func (c *countingConfigurator) MsgServer() grpc.Server { return &c.msgServer }
+
+func (c *countingConfigurator) QueryServer() grpc.Server { return &c.queryServer }
+
+func (c *countingConfigurator) RegisterMigration(string, uint64, module.MigrationHandler) error {
+	c.migrations++
+	return nil
+}
+
+type countingGRPCServer struct {
+	services        []string
+	implementations map[string]interface{}
+}
+
+func (s *countingGRPCServer) RegisterService(descriptor *googlegrpc.ServiceDesc, implementation interface{}) {
+	s.services = append(s.services, descriptor.ServiceName)
+	if s.implementations == nil {
+		s.implementations = make(map[string]interface{})
+	}
+	s.implementations[descriptor.ServiceName] = implementation
+}

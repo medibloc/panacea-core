@@ -2,18 +2,23 @@ package cmd
 
 import (
 	"errors"
-	"github.com/cosmos/cosmos-sdk/client/config"
-	"github.com/cosmos/cosmos-sdk/client/pruning"
-	"github.com/cosmos/cosmos-sdk/client/snapshot"
-	"github.com/medibloc/panacea-core/v2/app/params"
-	"github.com/spf13/viper"
 	"io"
 	"os"
 
-	dbm "github.com/cometbft/cometbft-db"
+	"cosmossdk.io/log"
+	confixcmd "cosmossdk.io/tools/confix/cmd"
+	"github.com/cosmos/cosmos-sdk/client/config"
+	"github.com/cosmos/cosmos-sdk/client/pruning"
+	"github.com/cosmos/cosmos-sdk/client/snapshot"
+	addresscodec "github.com/cosmos/cosmos-sdk/codec/address"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/module"
+	"github.com/medibloc/panacea-core/v2/app/params"
+	"github.com/spf13/viper"
+
 	cmbtcfg "github.com/cometbft/cometbft/config"
 	cmbtcli "github.com/cometbft/cometbft/libs/cli"
-	"github.com/cometbft/cometbft/libs/log"
+	dbm "github.com/cosmos/cosmos-db"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 
@@ -34,11 +39,33 @@ import (
 
 var ChainID string
 
+const (
+	// defaultQueryGasLimit gives newly initialized nodes more than three times
+	// the highest measured maximum-payload NFT page gas.
+	defaultQueryGasLimit uint64 = 10_000_000
+
+	// defaultAPIRPCWriteTimeout bounds REST response handling like the SDK's
+	// existing default read timeout.
+	defaultAPIRPCWriteTimeout uint = 10
+)
+
 // NewRootCmd creates a new root command for simd. It is called once in the
 // main function.
 func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 	// Set config for prefixes
 	app.SetConfig()
+
+	tempHome, err := os.MkdirTemp("", "panacea-autocli-")
+	if err != nil {
+		panic(err)
+	}
+	defer func() {
+		_ = os.RemoveAll(tempHome)
+	}()
+
+	tempAppOpts := viper.New()
+	tempAppOpts.Set(flags.FlagHome, tempHome)
+	tempApp := app.New(log.NewNopLogger(), dbm.NewMemDB(), nil, false, tempAppOpts)
 
 	encodingConfig := app.MakeEncodingConfig()
 	initClientCtx := client.Context{}.
@@ -80,7 +107,17 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 		},
 	}
 
-	initRootCmd(rootCmd, encodingConfig)
+	initRootCmd(rootCmd, encodingConfig, tempApp.BasicManager())
+
+	autoCliOpts := tempApp.AutoCliOpts()
+	autoCliOpts.AddressCodec = addresscodec.NewBech32Codec(sdk.GetConfig().GetBech32AccountAddrPrefix())
+	autoCliOpts.ValidatorAddressCodec = addresscodec.NewBech32Codec(sdk.GetConfig().GetBech32ValidatorAddrPrefix())
+	autoCliOpts.ConsensusAddressCodec = addresscodec.NewBech32Codec(sdk.GetConfig().GetBech32ConsensusAddrPrefix())
+	autoCliOpts.ClientCtx = initClientCtx
+	if err := autoCliOpts.EnhanceRootCommand(rootCmd); err != nil {
+		panic(err)
+	}
+
 	overwriteFlagDefaults(rootCmd, map[string]string{
 		flags.FlagChainID:        ChainID,
 		flags.FlagKeyringBackend: "test",
@@ -97,6 +134,9 @@ func initAppConfig() (string, interface{}) {
 
 	srvCfg := serverconfig.DefaultConfig()
 	srvCfg.MinGasPrices = "5umed"
+	srvCfg.QueryGasLimit = defaultQueryGasLimit
+	srvCfg.API.RPCWriteTimeout = defaultAPIRPCWriteTimeout
+	srvCfg.GRPC.MaxSendMsgSize = serverconfig.DefaultGRPCMaxRecvMsgSize
 
 	PanaceaAppConfig := CustomAppConfig{Config: *srvCfg}
 
@@ -113,11 +153,24 @@ func initCometBFTConfig() *cmbtcfg.Config {
 	return cfg
 }
 
-func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
+func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig, basicManager module.BasicManager) {
+	configCommand := confixcmd.ConfigCommand()
+	// Cosmos SDK v0.47 accepted positional client config operations such as
+	// `panacead config chain-id`. Confix uses explicit get/set targets in v0.50.
+	// Without an Args validator, an obsolete positional invocation prints help
+	// and exits successfully, which lets upgrade automation silently skip the
+	// intended config change.
+	configCommand.Args = cobra.NoArgs
+	// Cobra otherwise treats a parent with subcommands but no Run/RunE as
+	// non-runnable and prints help before evaluating Args. A help-only RunE
+	// makes the command executable so the Args contract is enforced first.
+	configCommand.RunE = func(cmd *cobra.Command, _ []string) error {
+		return cmd.Help()
+	}
 	rootCmd.AddCommand(
-		InitCmd(app.ModuleBasics, app.DefaultNodeHome),
+		InitCmd(basicManager, app.DefaultNodeHome),
 		debug.Cmd(),
-		config.Cmd(),
+		configCommand,
 		cmbtcli.NewCompletionCmd(rootCmd, true),
 		pruning.Cmd(newApp, app.DefaultNodeHome),
 		snapshot.Cmd(newApp),
@@ -127,11 +180,11 @@ func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
 
 	// add keybase, auxiliary RPC, query, and tx child commands
 	rootCmd.AddCommand(
-		rpc.StatusCommand(),
-		genesisCommand(encodingConfig),
+		server.StatusCommand(),
+		genesisCommand(encodingConfig, basicManager),
 		queryCommand(),
-		txCommand(),
-		keys.Commands(app.DefaultNodeHome),
+		txCommand(basicManager),
+		keys.Commands(),
 	)
 }
 
@@ -140,8 +193,8 @@ func addModuleInitFlags(startCmd *cobra.Command) {
 }
 
 // genesisCommand builds genesis-related `simd genesis` command. Users may provide application specific commands as a parameter
-func genesisCommand(encodingConfig params.EncodingConfig, cmds ...*cobra.Command) *cobra.Command {
-	cmd := genutilcli.GenesisCoreCommand(encodingConfig.TxConfig, app.ModuleBasics, app.DefaultNodeHome)
+func genesisCommand(encodingConfig params.EncodingConfig, basicManager module.BasicManager, cmds ...*cobra.Command) *cobra.Command {
+	cmd := genutilcli.Commands(encodingConfig.TxConfig, basicManager, app.DefaultNodeHome)
 
 	for _, sub_cmd := range cmds {
 		cmd.AddCommand(sub_cmd)
@@ -154,30 +207,27 @@ func queryCommand() *cobra.Command {
 		Use:                        "query",
 		Aliases:                    []string{"q"},
 		Short:                      "Querying subcommands",
-		DisableFlagParsing:         true,
+		DisableFlagParsing:         false,
 		SuggestionsMinimumDistance: 2,
 		RunE:                       client.ValidateCmd,
 	}
 
 	cmd.AddCommand(
 		rpc.QueryEventForTxCmd(),
-		authcmd.GetAccountCmd(),
 		rpc.ValidatorCommand(),
-		rpc.BlockCommand(),
+		server.QueryBlockCmd(),
 		authcmd.QueryTxsByEventsCmd(),
 		authcmd.QueryTxCmd(),
 	)
 
-	app.ModuleBasics.AddQueryCommands(cmd)
-
 	return cmd
 }
 
-func txCommand() *cobra.Command {
+func txCommand(basicManager module.BasicManager) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:                        "tx",
 		Short:                      "Transactions subcommands",
-		DisableFlagParsing:         true,
+		DisableFlagParsing:         false,
 		SuggestionsMinimumDistance: 2,
 		RunE:                       client.ValidateCmd,
 	}
@@ -191,59 +241,13 @@ func txCommand() *cobra.Command {
 		authcmd.GetBroadcastCommand(),
 		authcmd.GetEncodeCommand(),
 		authcmd.GetDecodeCommand(),
-		authcmd.GetAuxToFeeCommand(),
+		authcmd.GetSimulateCmd(),
 	)
 
-	app.ModuleBasics.AddTxCommands(cmd)
-	//cmd.PersistentFlags().String(flags.FlagChainID, "", "The network chain ID")
+	basicManager.AddTxCommands(cmd)
 
 	return cmd
 }
-
-/*// newApp is an AppCreator
-func (a appCreator) newApp(logger log.Logger, db dbm.DB, traceStore io.Writer, appOpts servertypes.AppOptions) servertypes.Application {
-	baseappOptions := server.DefaultBaseappOptions(appOpts)
-
-	skipUpgradeHeights := make(map[int64]bool)
-	for _, h := range cast.ToIntSlice(appOpts.Get(server.FlagUnsafeSkipUpgrades)) {
-		skipUpgradeHeights[int64(h)] = true
-	}
-
-	return app.New(
-		logger, db, traceStore, true, skipUpgradeHeights,
-		cast.ToString(appOpts.Get(flags.FlagHome)),
-		cast.ToUint(appOpts.Get(server.FlagInvCheckPeriod)),
-		a.encCfg,
-		// this line is used by starport scaffolding # stargate/root/appArgument
-		appOpts,
-		baseappOptions...,
-	)
-}
-
-// appExport creates a new simapp (optionally at a given height)
-func (a appCreator) appExport(
-	logger log.Logger, db dbm.DB, traceStore io.Writer, height int64, forZeroHeight bool, jailAllowedAddrs []string,
-	appOpts servertypes.AppOptions) (servertypes.ExportedApp, error) {
-
-	var anApp *app.App
-
-	homePath, ok := appOpts.Get(flags.FlagHome).(string)
-	if !ok || homePath == "" {
-		return servertypes.ExportedApp{}, errors.New("application home not set")
-	}
-
-	if height != -1 {
-		anApp = app.New(logger, db, traceStore, false, map[int64]bool{}, homePath, uint(1), a.encCfg, appOpts)
-
-		if err := anApp.LoadHeight(height); err != nil {
-			return servertypes.ExportedApp{}, err
-		}
-	} else {
-		anApp = app.New(logger, db, traceStore, true, map[int64]bool{}, homePath, uint(1), a.encCfg, appOpts)
-	}
-
-	return anApp.ExportAppStateAndValidators(forZeroHeight, jailAllowedAddrs)
-}*/
 
 // newApp creates the application
 func newApp(
@@ -252,7 +256,6 @@ func newApp(
 	traceStore io.Writer,
 	appOpts servertypes.AppOptions,
 ) servertypes.Application {
-
 	baseappOptions := server.DefaultBaseappOptions(appOpts)
 
 	return app.New(

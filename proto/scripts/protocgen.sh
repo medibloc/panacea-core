@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
 #== Requirements ==
 #
@@ -18,19 +18,95 @@
 # go get github.com/regen-network/cosmos-proto@latest # doesn't work in install mode
 
 
-set -eo pipefail
+set -eu
+
+script_dir=$(CDPATH='' cd "$(dirname "$0")" && pwd)
+repo_root=$(CDPATH='' cd "$script_dir/../.." && pwd)
+generation_root=$(mktemp -d "${TMPDIR:-/tmp}/panacea-protocgen.XXXXXX")
+
+cleanup() {
+  rm -rf -- "$generation_root"
+}
+
+trap cleanup EXIT
+trap 'exit 1' HUP INT TERM
 
 echo "Generating gogo proto code"
-cd proto
-proto_dirs=$(find ./panacea -path -prune -o -name '*.proto' -print0 | xargs -0 -n1 dirname | sort | uniq)
-for dir in $proto_dirs; do
-  for file in $(find "${dir}" -maxdepth 1 -name '*.proto'); do
-    buf generate --template buf.gen.gogo.yaml $file
-  done
-done
-
-cd ..
+cp -R "$repo_root/proto" "$generation_root/proto"
+cd "$generation_root/proto"
+buf generate --template buf.gen.gogo.yaml --path ./panacea
 
 # move proto files to the right places
-cp -r github.com/medibloc/panacea-core/* ./
-rm -rf github.com
+module_path=$(awk '$1 == "module" { print $2; exit }' "$repo_root/go.mod")
+case "$module_path" in
+  */*) ;;
+  *)
+    echo "failed to determine a valid module path from go.mod" >&2
+    exit 1
+    ;;
+esac
+
+case "$module_path" in
+  /*|../*|*/../*|*/..|./*|*/./*|*/.)
+    echo "refusing to use unsafe module path: $module_path" >&2
+    exit 1
+    ;;
+esac
+
+generated_module_dir=$generation_root/$module_path
+module_version=${module_path##*/}
+staged_repo_root=$generation_root/staged-repo
+mkdir -p "$staged_repo_root"
+
+# Older protos still generate below the pre-v2 import path. Copy those entries
+# individually so the module-version directory itself is not copied to ./v2.
+case "$module_version" in
+  v[2-9]|v[1-9][0-9]*)
+    generated_legacy_dir=$generation_root/${module_path%/*}
+    if [ -d "$generated_legacy_dir" ]; then
+      for generated_entry in "$generated_legacy_dir"/*; do
+        [ -e "$generated_entry" ] || continue
+        [ "$generated_entry" = "$generated_module_dir" ] && continue
+        cp -R "$generated_entry" "$staged_repo_root"/
+      done
+    fi
+    ;;
+esac
+
+if [ -d "$generated_module_dir" ]; then
+  cp -R "$generated_module_dir"/. "$staged_repo_root"/
+fi
+
+generated_manifest=$generation_root/generated-files.txt
+generated_manifest_unsorted=$generation_root/generated-files-unsorted.txt
+(
+  cd "$staged_repo_root"
+  find ./x -type f \( -name '*.pb.go' -o -name '*.pb.gw.go' \) -print \
+    >"$generated_manifest_unsorted"
+)
+LC_ALL=C sort "$generated_manifest_unsorted" >"$generated_manifest"
+
+if [ ! -s "$generated_manifest" ]; then
+  echo "protobuf generation produced no Go files" >&2
+  exit 1
+fi
+
+existing_generated_manifest=$generation_root/existing-generated-files.txt
+(
+  cd "$repo_root"
+  find ./x -type f \( -name '*.pb.go' -o -name '*.pb.gw.go' \) -print \
+    >"$existing_generated_manifest"
+)
+
+cp -R "$staged_repo_root"/. "$repo_root"/
+
+# All protobuf Go files below x/ are generated from proto/panacea. Remove files
+# that were not produced by this run so deleted or renamed protos cannot linger.
+(
+  cd "$repo_root"
+  while IFS= read -r generated_file; do
+    if ! grep -Fqx "$generated_file" "$generated_manifest"; then
+      rm -f -- "$generated_file"
+    fi
+  done <"$existing_generated_manifest"
+)

@@ -19,9 +19,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/input"
 	"github.com/cosmos/cosmos-sdk/client/tx"
-	sdkcodec "github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/go-bip39"
+	"github.com/cosmos/gogoproto/proto"
 	"github.com/medibloc/panacea-core/v2/x/did/internal/secp256k1util"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -282,14 +282,16 @@ func newMsgCreateDID(fromAddress sdk.AccAddress, privKey secp256k1.PrivKey) (typ
 
 // readDIDDocFrom reads a DID document from a JSON file.
 // It returns an error if the JSON file is invalid or the DID document loaded is invalid.
-func readDIDDocFrom(path string) (types.DIDDocument, error) {
-	var doc types.DIDDocument
-
+func readDIDDocFrom(path string) (doc types.DIDDocument, err error) {
 	file, err := os.Open(path)
 	if err != nil {
 		return doc, err
 	}
-	defer file.Close()
+	defer func() {
+		if closeErr := file.Close(); closeErr != nil {
+			err = errors.Join(err, fmt.Errorf("close DID document file: %w", closeErr))
+		}
+	}()
 
 	// Use gogoproto's jsonpb to handle camelCase and custom types as well as snake_case.
 	if err := jsonpb.Unmarshal(file, &doc); err != nil {
@@ -323,7 +325,7 @@ func getPrivKeyFromKeyStore(verificationMethodID string, reader *bufio.Reader) (
 }
 
 // signUsingCurrentSeq generates a signature using the current sequence stored in the blockchain.
-func signUsingCurrentSeq(clientCtx client.Context, did string, privKey crypto.PrivKey, data sdkcodec.ProtoMarshaler) ([]byte, error) {
+func signUsingCurrentSeq(clientCtx client.Context, did string, privKey crypto.PrivKey, data proto.Message) ([]byte, error) {
 	queryClient := types.NewQueryClient(clientCtx)
 
 	params := &types.QueryDIDRequest{

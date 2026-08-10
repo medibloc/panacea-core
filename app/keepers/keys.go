@@ -1,46 +1,50 @@
 package keepers
 
 import (
-	storetypes "github.com/cosmos/cosmos-sdk/store/types"
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	storetypes "cosmossdk.io/store/types"
+	evidencetypes "cosmossdk.io/x/evidence/types"
+	"cosmossdk.io/x/feegrant"
+	upgradetypes "cosmossdk.io/x/upgrade/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	authzkeeper "github.com/cosmos/cosmos-sdk/x/authz/keeper"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
-	capabilitytypes "github.com/cosmos/cosmos-sdk/x/capability/types"
 	consensusparamtypes "github.com/cosmos/cosmos-sdk/x/consensus/types"
 	crisistypes "github.com/cosmos/cosmos-sdk/x/crisis/types"
 	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
-	evidencetypes "github.com/cosmos/cosmos-sdk/x/evidence/types"
-	"github.com/cosmos/cosmos-sdk/x/feegrant"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	"github.com/cosmos/cosmos-sdk/x/group"
 	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	slashingtypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
-	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
-	ibctransfertypes "github.com/cosmos/ibc-go/v7/modules/apps/transfer/types"
-	ibcexported "github.com/cosmos/ibc-go/v7/modules/core/exported"
+	capabilitytypes "github.com/cosmos/ibc-go/modules/capability/types"
+	ibctransfertypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
+	ibcexported "github.com/cosmos/ibc-go/v8/modules/core/exported"
 	aoltypes "github.com/medibloc/panacea-core/v2/x/aol/types"
 	burntypes "github.com/medibloc/panacea-core/v2/x/burn/types"
 	didtypes "github.com/medibloc/panacea-core/v2/x/did/types"
+	nfttypes "github.com/medibloc/panacea-core/v2/x/nft/types"
 	pnfttypes "github.com/medibloc/panacea-core/v2/x/pnft/types"
 )
 
 func (appKeepers *AppKeepersWithKey) GenerateKeys() {
-	appKeepers.keys = sdk.NewKVStoreKeys(
+	appKeepers.keys = storetypes.NewKVStoreKeys(
 		authtypes.StoreKey, banktypes.StoreKey, stakingtypes.StoreKey, crisistypes.StoreKey,
 		minttypes.StoreKey, distrtypes.StoreKey, slashingtypes.StoreKey,
 		govtypes.StoreKey, paramstypes.StoreKey, consensusparamtypes.StoreKey, upgradetypes.StoreKey, feegrant.StoreKey,
 		evidencetypes.StoreKey, capabilitytypes.StoreKey,
 		authzkeeper.StoreKey, group.StoreKey,
 		ibcexported.StoreKey, ibctransfertypes.StoreKey,
-		aoltypes.StoreKey, didtypes.StoreKey, burntypes.StoreKey, pnfttypes.StoreKey,
+		aoltypes.StoreKey, didtypes.StoreKey, burntypes.StoreKey,
+		// Keep the inactive PNFT store mounted as a permanent tombstone. No
+		// module or keeper may consume or reuse this legacy state.
+		pnfttypes.StoreKey,
+		nfttypes.StoreKey, nfttypes.PolicyStoreKey,
 	)
 
-	appKeepers.tkeys = sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
+	appKeepers.tkeys = storetypes.NewTransientStoreKeys(paramstypes.TStoreKey)
 
-	appKeepers.memKeys = sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
+	appKeepers.memKeys = storetypes.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
 }
 
 // GetSubspace gets existing substore from keeper.
@@ -66,7 +70,8 @@ func (appKeepers *AppKeepersWithKey) GetMemoryStoreKey() map[string]*storetypes.
 
 // GetKey returns the KVStoreKey for the provided store key.
 //
-// NOTE: This is solely to be used for testing purposes.
+// Application modules should use their scoped store services. This raw key is
+// exposed for app-level store migrations and tests.
 func (appKeepers *AppKeepersWithKey) GetKey(storeKey string) *storetypes.KVStoreKey {
 	return appKeepers.keys[storeKey]
 }

@@ -3,7 +3,6 @@ package keeper_test
 import (
 	"testing"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/medibloc/panacea-core/v2/types/testsuite"
 	aoltypes "github.com/medibloc/panacea-core/v2/x/aol/types"
 	"github.com/stretchr/testify/suite"
@@ -23,7 +22,7 @@ func (suite *aolMsgServerTestSuite) BeforeTest(_, _ string) {
 
 func (suite *aolMsgServerTestSuite) TestMsgServer() {
 	ctx := suite.Ctx
-	goCtx := sdk.WrapSDKContext(ctx)
+	goCtx := ctx
 	aolKeeper := suite.AolKeeper
 	aolMsgServer := suite.AolMsgServer
 

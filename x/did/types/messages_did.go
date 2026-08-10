@@ -42,10 +42,10 @@ func (msg *MsgCreateDIDRequest) ValidateBasic() error {
 	if !ValidateDID(msg.Did) {
 		return errors.Wrapf(ErrInvalidDID, "did: %v", msg.Did)
 	}
-	if !msg.Document.Valid() {
+	if msg.Document == nil || !msg.Document.Valid() {
 		return errors.Wrapf(ErrInvalidDIDDocument, "DIDDocument: %v", msg.Document)
 	}
-	if msg.Signature == nil || len(msg.Signature) == 0 {
+	if len(msg.Signature) == 0 {
 		return errors.Wrapf(ErrInvalidSignature, "Signature: %v", msg.Signature)
 	}
 
@@ -83,10 +83,10 @@ func (msg *MsgUpdateDIDRequest) ValidateBasic() error {
 	if !ValidateDID(msg.Did) {
 		return errors.Wrapf(ErrInvalidDID, "DID: %v", msg.Did)
 	}
-	if !msg.Document.Valid() {
+	if msg.Document == nil || !msg.Document.Valid() {
 		return errors.Wrapf(ErrInvalidDIDDocument, "DIDDocument: %v", msg.Document)
 	}
-	if msg.Signature == nil || len(msg.Signature) == 0 {
+	if len(msg.Signature) == 0 {
 		return errors.Wrapf(ErrInvalidSignature, "Signature: %v", msg.Signature)
 	}
 	addr, err := sdk.AccAddressFromBech32(msg.FromAddress)
@@ -131,7 +131,7 @@ func (msg *MsgDeactivateDIDRequest) ValidateBasic() error {
 	if !ValidateDID(msg.Did) {
 		return errors.Wrapf(ErrInvalidDID, "DID: %v", msg.Did)
 	}
-	if msg.Signature == nil || len(msg.Signature) == 0 {
+	if len(msg.Signature) == 0 {
 		return errors.Wrapf(ErrInvalidSignature, "Signature: %v", msg.Signature)
 	}
 

@@ -4,12 +4,12 @@ import "github.com/medibloc/panacea-core/v2/types/compkey"
 
 // this line is used by starport scaffolding # ibc/genesistype/import
 
-// DefaultIndex is the default capability global index
+// DefaultIndex is the default AOL global index.
 const DefaultIndex uint64 = 1
 
 const GenesisKeySeparator = "/"
 
-// DefaultGenesis returns the default Capability genesis state
+// DefaultGenesis returns the default AOL genesis state.
 func DefaultGenesis() *GenesisState {
 	return &GenesisState{
 		Owners:  map[string]*Owner{},

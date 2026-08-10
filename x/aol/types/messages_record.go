@@ -38,10 +38,13 @@ func (msg *MsgAddRecordRequest) GetSigners() []sdk.AccAddress {
 		if err != nil {
 			panic(err)
 		}
+		if feePayerAddress.Equals(writerAddress) {
+			return []sdk.AccAddress{writerAddress}
+		}
 		return []sdk.AccAddress{feePayerAddress, writerAddress}
-	} else {
-		return []sdk.AccAddress{writerAddress}
 	}
+
+	return []sdk.AccAddress{writerAddress}
 }
 
 func (msg *MsgAddRecordRequest) GetSignBytes() []byte {

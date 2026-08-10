@@ -1,0 +1,62 @@
+syntax = "proto3";
+package panacea.nft.v1;
+
+import "cosmos/base/query/v1beta1/pagination.proto";
+import "cosmos_proto/cosmos.proto";
+import "google/api/annotations.proto";
+import "panacea/nft/v1/nft.proto";
+
+option go_package = "github.com/medibloc/panacea-core/v2/x/nft/types";
+option java_multiple_files = true;
+
+// Query defines the Panacea NFT query service.
+service Query {
+  rpc ClassRecord(QueryClassRecordRequest) returns (QueryClassRecordResponse) {
+    option (google.api.http).get = "/panacea/nft/v1/classes/{class_id}";
+  }
+
+  rpc NFTRecord(QueryNFTRecordRequest) returns (QueryNFTRecordResponse) {
+    option (google.api.http).get = "/panacea/nft/v1/nfts/{class_id}/{nft_id}";
+  }
+
+  rpc NFTRecords(QueryNFTRecordsRequest) returns (QueryNFTRecordsResponse) {
+    option (google.api.http).get = "/panacea/nft/v1/nfts";
+  }
+}
+
+// QueryClassRecordRequest requests one class and its policy.
+message QueryClassRecordRequest {
+  string class_id = 1;
+}
+
+// QueryClassRecordResponse returns one class and its policy.
+message QueryClassRecordResponse {
+  ClassRecord class_record = 1;
+}
+
+// QueryNFTRecordRequest requests one live or burned NFT record.
+message QueryNFTRecordRequest {
+  string class_id = 1;
+  string nft_id = 2;
+}
+
+// QueryNFTRecordResponse returns one live NFT or burn tombstone.
+message QueryNFTRecordResponse {
+  NFTRecord nft_record = 1;
+}
+
+// QueryNFTRecordsRequest lists live NFT records by class, owner, or both.
+message QueryNFTRecordsRequest {
+  string class_id = 1;
+  string owner = 2 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+
+  // pagination accepts key, limit, and reverse. A zero limit defaults to 100;
+  // limits above 100, non-zero offset, or count_total=true are rejected.
+  cosmos.base.query.v1beta1.PageRequest pagination = 3;
+}
+
+// QueryNFTRecordsResponse returns live NFT records and an opaque cursor.
+message QueryNFTRecordsResponse {
+  repeated LiveNFTRecord nft_records = 1;
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}

@@ -1,7 +1,10 @@
 package keeper
 
 import (
-	"github.com/cosmos/cosmos-sdk/store/prefix"
+	"fmt"
+
+	"cosmossdk.io/store/prefix"
+	storetypes "cosmossdk.io/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/medibloc/panacea-core/v2/types/compkey"
 	"github.com/medibloc/panacea-core/v2/x/aol/types"
@@ -37,8 +40,12 @@ func (k Keeper) RemoveWriter(ctx sdk.Context, key types.WriterCompositeKey) {
 // GetAllWriters returns all writers
 func (k Keeper) GetAllWriters(ctx sdk.Context) ([]types.WriterCompositeKey, []types.Writer) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.WriterKeyPrefix)
-	iterator := sdk.KVStorePrefixIterator(store, []byte{})
-	defer iterator.Close()
+	iterator := storetypes.KVStorePrefixIterator(store, []byte{})
+	defer func() {
+		if err := iterator.Close(); err != nil {
+			panic(fmt.Errorf("close writer iterator: %w", err))
+		}
+	}()
 
 	keys := make([]types.WriterCompositeKey, 0)
 	values := make([]types.Writer, 0)

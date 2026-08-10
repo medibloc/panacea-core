@@ -1,12 +1,34 @@
 version: v1
 name: buf.build/medibloc/panacea-core
 deps:
+  - buf.build/protocolbuffers/wellknowntypes
   - buf.build/googleapis/googleapis
+  - buf.build/cosmos/cosmos-proto
   - buf.build/cosmos/gogo-proto
   - buf.build/cosmos/cosmos-sdk
 breaking:
   use:
     - FILE
+  ignore_only:
+    # The module-major-version migration changes only the generated Go import
+    # path. Keep every other FILE-level compatibility check for this message.
+    FILE_SAME_GO_PACKAGE:
+      - panacea/pnft/v2/tx.proto
+  ignore:
+    # The v2.3.0 upgrade intentionally removes the retired PNFT query/state
+    # contract. Keep the retained panacea/pnft/v2/tx.proto under breaking checks
+    # for historical Any decoding and legacy message compatibility. Remove these
+    # ignores after the v2.3.0 schema becomes the main-branch baseline.
+    - panacea/pnft/v2/denom.proto
+    - panacea/pnft/v2/event.proto
+    - panacea/pnft/v2/genesis.proto
+    - panacea/pnft/v2/pnft.proto
+    - panacea/pnft/v2/query.proto
 lint:
   use:
     - DEFAULT
+  except:
+    - SERVICE_SUFFIX
+  ignore_only:
+    RPC_REQUEST_STANDARD_NAME:
+      - cosmos/nft/v1beta1/tx.proto

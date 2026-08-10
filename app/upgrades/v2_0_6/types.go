@@ -1,7 +1,7 @@
 package v2_0_6
 
 import (
-	storetypes "github.com/cosmos/cosmos-sdk/store/types"
+	storetypes "cosmossdk.io/store/types"
 	"github.com/medibloc/panacea-core/v2/app/upgrades"
 )
 

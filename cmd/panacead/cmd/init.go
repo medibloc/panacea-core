@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"bufio"
+	"cosmossdk.io/math"
 	"encoding/json"
 	"fmt"
 	cfg "github.com/cometbft/cometbft/config"
@@ -32,9 +33,11 @@ import (
 	tmjson "github.com/cometbft/cometbft/libs/json"
 	"github.com/cosmos/cosmos-sdk/codec"
 
-	"github.com/cometbft/cometbft/types"
+	cmttypes "github.com/cometbft/cometbft/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
+	"github.com/cosmos/cosmos-sdk/version"
+	genutiltypes "github.com/cosmos/cosmos-sdk/x/genutil/types"
 	"github.com/medibloc/panacea-core/v2/types/assets"
 	"github.com/spf13/cobra"
 )
@@ -133,36 +136,40 @@ func InitCmd(mbm module.BasicManager, defaultNodeHome string) *cobra.Command {
 				sdk.DefaultBondDenom = defaultDenom
 			}
 			appGenState := mbm.DefaultGenesis(cdc)
-			genDoc := &types.GenesisDoc{}
+			appGenesis := &genutiltypes.AppGenesis{}
 			if _, err := os.Stat(genFile); err != nil {
 				if !os.IsNotExist(err) {
 					return err
 				}
 			} else {
-				genDoc, err = types.GenesisDocFromFile(genFile)
+				appGenesis, err = genutiltypes.AppGenesisFromFile(genFile)
 				if err != nil {
 					return errors.Wrap(err, "Failed to read genesis doc from file")
 				}
 			}
 
-			genDoc.ChainID = chainID
-			genDoc.Validators = nil
-			genDoc.InitialHeight = initHeight
-			genDoc.ConsensusParams = &types.ConsensusParams{
-				Block:     types.DefaultBlockParams(),
-				Evidence:  types.DefaultEvidenceParams(),
-				Validator: types.DefaultValidatorParams(),
-				Version:   types.DefaultVersionParams(),
+			appGenesis.AppName = version.AppName
+			appGenesis.AppVersion = version.Version
+			appGenesis.ChainID = chainID
+			appGenesis.InitialHeight = initHeight
+			appGenesis.Consensus = &genutiltypes.ConsensusGenesis{
+				Validators: nil,
+				Params: &cmttypes.ConsensusParams{
+					Block:     cmttypes.DefaultBlockParams(),
+					Evidence:  cmttypes.DefaultEvidenceParams(),
+					Validator: cmttypes.DefaultValidatorParams(),
+					Version:   cmttypes.DefaultVersionParams(),
+				},
 			}
 
-			appState, err := overrideGenesis(cdc, genDoc, appGenState)
+			appState, err := overrideGenesis(cdc, appGenesis, appGenState)
 			if err != nil {
 				return errors.Wrap(err, "Failed to marshal default genesis state")
 			}
 
-			genDoc.AppState = appState
+			appGenesis.AppState = appState
 
-			if err = genutil.ExportGenesisFile(genDoc, genFile); err != nil {
+			if err = genutil.ExportGenesisFile(appGenesis, genFile); err != nil {
 				return errors.Wrap(err, "Failed to export genesis file")
 			}
 
@@ -183,7 +190,7 @@ func InitCmd(mbm module.BasicManager, defaultNodeHome string) *cobra.Command {
 }
 
 // overrideGenesis overrides some parameters in the genesis doc to the panacea-specific values.
-func overrideGenesis(cdc codec.JSONCodec, genDoc *types.GenesisDoc, appState map[string]json.RawMessage) (json.RawMessage, error) {
+func overrideGenesis(cdc codec.JSONCodec, appGenesis *genutiltypes.AppGenesis, appState map[string]json.RawMessage) (json.RawMessage, error) {
 	var stakingGenState stakingtypes.GenesisState
 	if err := cdc.UnmarshalJSON(appState[stakingtypes.ModuleName], &stakingGenState); err != nil {
 		return nil, err
@@ -191,18 +198,18 @@ func overrideGenesis(cdc codec.JSONCodec, genDoc *types.GenesisDoc, appState map
 	stakingGenState.Params.UnbondingTime = unbondingPeriod
 	stakingGenState.Params.MaxValidators = 50
 	stakingGenState.Params.BondDenom = assets.MicroMedDenom
-	stakingGenState.Params.MinCommissionRate = sdk.NewDecWithPrec(5, 2)
+	stakingGenState.Params.MinCommissionRate = math.LegacyNewDecWithPrec(5, 2)
 	appState[stakingtypes.ModuleName] = cdc.MustMarshalJSON(&stakingGenState)
 
 	var mintGenState minttypes.GenesisState
 	if err := cdc.UnmarshalJSON(appState[minttypes.ModuleName], &mintGenState); err != nil {
 		return nil, err
 	}
-	mintGenState.Minter = minttypes.InitialMinter(sdk.NewDecWithPrec(7, 2)) // 7% inflation
+	mintGenState.Minter = minttypes.InitialMinter(math.LegacyNewDecWithPrec(7, 2)) // 7% inflation
 	mintGenState.Params.MintDenom = assets.MicroMedDenom
-	mintGenState.Params.InflationRateChange = sdk.NewDecWithPrec(3, 2) // 3%
-	mintGenState.Params.InflationMin = sdk.NewDecWithPrec(7, 2)        // 7%
-	mintGenState.Params.InflationMax = sdk.NewDecWithPrec(10, 2)       // 10%
+	mintGenState.Params.InflationRateChange = math.LegacyNewDecWithPrec(3, 2) // 3%
+	mintGenState.Params.InflationMin = math.LegacyNewDecWithPrec(7, 2)        // 7%
+	mintGenState.Params.InflationMax = math.LegacyNewDecWithPrec(10, 2)       // 10%
 	mintGenState.Params.BlocksPerYear = uint64(60*60*24*365) / uint64(blockTimeSec)
 	appState[minttypes.ModuleName] = cdc.MustMarshalJSON(&mintGenState)
 
@@ -210,7 +217,7 @@ func overrideGenesis(cdc codec.JSONCodec, genDoc *types.GenesisDoc, appState map
 	if err := cdc.UnmarshalJSON(appState[distrtypes.ModuleName], &distrGenState); err != nil {
 		return nil, err
 	}
-	distrGenState.Params.CommunityTax = sdk.ZeroDec()
+	distrGenState.Params.CommunityTax = math.LegacyZeroDec()
 	appState[distrtypes.ModuleName] = cdc.MustMarshalJSON(&distrGenState)
 
 	var govGenState govv1types.GenesisState
@@ -219,17 +226,29 @@ func overrideGenesis(cdc codec.JSONCodec, genDoc *types.GenesisDoc, appState map
 	}
 	minDepositTokens := sdk.TokensFromConsensusPower(100000, sdk.DefaultPowerReduction) // 100,000 MED
 	govGenState.Params.MinDeposit = sdk.Coins{sdk.NewCoin(assets.MicroMedDenom, minDepositTokens)}
+	govGenState.Params.ExpeditedMinDeposit = sdk.Coins{
+		sdk.NewCoin(
+			assets.MicroMedDenom,
+			minDepositTokens.MulRaw(govv1types.DefaultMinExpeditedDepositTokensRatio),
+		),
+	}
 	maxDepositPeriod := 60 * 60 * 24 * 14 * time.Second // 14 days
 	govGenState.Params.MaxDepositPeriod = &maxDepositPeriod
 	votingPeriod := 60 * 60 * 24 * 3 * time.Second // 3 days (shortened voting period: https://www.mintscan.io/medibloc/proposals/5)
 	govGenState.Params.VotingPeriod = &votingPeriod
+	expeditedVotingPeriod := govv1types.DefaultExpeditedPeriod
+	govGenState.Params.ExpeditedVotingPeriod = &expeditedVotingPeriod
+	govGenState.Params.ExpeditedThreshold = govv1types.DefaultExpeditedThreshold.String()
+	if err := govGenState.Params.ValidateBasic(); err != nil {
+		return nil, fmt.Errorf("invalid governance params: %w", err)
+	}
 	appState[govtypes.ModuleName] = cdc.MustMarshalJSON(&govGenState)
 
 	var crisisGenState crisistypes.GenesisState
 	if err := cdc.UnmarshalJSON(appState[crisistypes.ModuleName], &crisisGenState); err != nil {
 		return nil, err
 	}
-	crisisGenState.ConstantFee = sdk.NewCoin(assets.MicroMedDenom, sdk.NewInt(1000000000000)) // Spend 1,000,000 MED for invariants check
+	crisisGenState.ConstantFee = sdk.NewCoin(assets.MicroMedDenom, math.NewInt(1000000000000)) // Spend 1,000,000 MED for invariants check
 	appState[crisistypes.ModuleName] = cdc.MustMarshalJSON(&crisisGenState)
 
 	var slashingGenState slashingtypes.GenesisState
@@ -237,14 +256,14 @@ func overrideGenesis(cdc codec.JSONCodec, genDoc *types.GenesisDoc, appState map
 		return nil, err
 	}
 	slashingGenState.Params.SignedBlocksWindow = 10000
-	slashingGenState.Params.MinSignedPerWindow = sdk.NewDecWithPrec(5, 2)
-	slashingGenState.Params.SlashFractionDoubleSign = sdk.NewDecWithPrec(5, 2) // 5%
-	slashingGenState.Params.SlashFractionDowntime = sdk.NewDecWithPrec(1, 4)   // 0.01%
+	slashingGenState.Params.MinSignedPerWindow = math.LegacyNewDecWithPrec(5, 2)
+	slashingGenState.Params.SlashFractionDoubleSign = math.LegacyNewDecWithPrec(5, 2) // 5%
+	slashingGenState.Params.SlashFractionDowntime = math.LegacyNewDecWithPrec(1, 4)   // 0.01%
 	appState[slashingtypes.ModuleName] = cdc.MustMarshalJSON(&slashingGenState)
 
 	// Override Tendermint consensus params: https://docs.tendermint.com/master/tendermint-core/using-tendermint.html#fields
-	genDoc.ConsensusParams.Evidence.MaxAgeDuration = unbondingPeriod // should correspond with unbondingPeriod for handling Nothing-At-Stake attacks
-	genDoc.ConsensusParams.Evidence.MaxAgeNumBlocks = int64(unbondingPeriod.Seconds()) / blockTimeSec
+	appGenesis.Consensus.Params.Evidence.MaxAgeDuration = unbondingPeriod // should correspond with unbondingPeriod for handling Nothing-At-Stake attacks
+	appGenesis.Consensus.Params.Evidence.MaxAgeNumBlocks = int64(unbondingPeriod.Seconds()) / blockTimeSec
 
 	return tmjson.Marshal(appState)
 }

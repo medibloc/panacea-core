@@ -96,10 +96,18 @@ func TestDIDDocument_Invalid(t *testing.T) {
 	require.False(t, types.NewDIDDocument(did, types.WithKeyAgreements(invalidVerificationRelationships)).Valid())
 	require.False(t, types.NewDIDDocument(did, types.WithCapabilityInvocations(invalidVerificationRelationships)).Valid())
 	require.False(t, types.NewDIDDocument(did, types.WithCapabilityDelegations(invalidVerificationRelationships)).Valid())
-	require.False(t, types.NewDIDDocument(did, types.WithCapabilityDelegations(invalidVerificationRelationships)).Valid())
-	require.False(t, types.NewDIDDocument(did, types.WithCapabilityDelegations(invalidVerificationRelationships)).Valid())
 	require.False(t, types.NewDIDDocument(did, types.WithServices(invalidServices)).Valid())
 
+}
+
+func TestDIDDocument_InvalidNilNestedMessage(t *testing.T) {
+	doc := getValidDIDDocument()
+	doc.VerificationMethods = append(doc.VerificationMethods, nil)
+	require.False(t, doc.Valid())
+
+	doc = getValidDIDDocument()
+	doc.Services = append(doc.Services, nil)
+	require.False(t, doc.Valid())
 }
 
 func TestDIDDocument_VerificationMethodByID(t *testing.T) {

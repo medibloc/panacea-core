@@ -1,6 +1,8 @@
 package app
 
 import (
+	"sync"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -14,14 +16,17 @@ var (
 	ValidatorPubKeyPrefix  = AccountAddressPrefix + "valoperpub"
 	ConsNodeAddressPrefix  = AccountAddressPrefix + "valcons"
 	ConsNodePubKeyPrefix   = AccountAddressPrefix + "valconspub"
+	setConfigOnce          sync.Once
 )
 
 func SetConfig() {
-	config := sdk.GetConfig()
-	config.SetPurpose(44)
-	config.SetCoinType(371)
-	config.SetBech32PrefixForAccount(AccountAddressPrefix, AccountPubKeyPrefix)
-	config.SetBech32PrefixForValidator(ValidatorAddressPrefix, ValidatorPubKeyPrefix)
-	config.SetBech32PrefixForConsensusNode(ConsNodeAddressPrefix, ConsNodePubKeyPrefix)
-	config.Seal()
+	setConfigOnce.Do(func() {
+		config := sdk.GetConfig()
+		config.SetPurpose(44)
+		config.SetCoinType(371)
+		config.SetBech32PrefixForAccount(AccountAddressPrefix, AccountPubKeyPrefix)
+		config.SetBech32PrefixForValidator(ValidatorAddressPrefix, ValidatorPubKeyPrefix)
+		config.SetBech32PrefixForConsensusNode(ConsNodeAddressPrefix, ConsNodePubKeyPrefix)
+		config.Seal()
+	})
 }
