@@ -11,7 +11,17 @@ env:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: linux/amd64
+            runner: ubuntu-24.04
+            artifact: amd64
+          - platform: linux/arm64
+            runner: ubuntu-24.04-arm
+            artifact: arm64
+    runs-on: ${{ matrix.runner }}
     permissions:
       contents: read
       packages: write
@@ -34,9 +44,11 @@ jobs:
           test -n "$version"
           test -n "$commit"
           test -n "$cmt_version"
-          printf 'version=%s\n' "$version" >>"$GITHUB_OUTPUT"
-          printf 'commit=%s\n' "$commit" >>"$GITHUB_OUTPUT"
-          printf 'cmt_version=%s\n' "$cmt_version" >>"$GITHUB_OUTPUT"
+          {
+            printf 'version=%s\n' "$version"
+            printf 'commit=%s\n' "$commit"
+            printf 'cmt_version=%s\n' "$cmt_version"
+          } >>"$GITHUB_OUTPUT"
 
       - name: Set up Go from go.mod
         uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5
@@ -68,18 +80,98 @@ jobs:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
       - name: Build and push Docker image
+        id: build
         uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6.19.2
         with:
           context: .
           file: ./Dockerfile
-          platforms: linux/amd64,linux/arm64
+          platforms: ${{ matrix.platform }}
           build-contexts: |
             panacea_vendor=.local/docker-release-vendor
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
+          outputs: type=image,name=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }},push-by-digest=true,name-canonical=true,push=true
           labels: ${{ steps.meta.outputs.labels }}
           provenance: mode=max
           build-args: |
             PANACEA_VERSION=${{ steps.source.outputs.version }}
             PANACEA_COMMIT=${{ steps.source.outputs.commit }}
             PANACEA_CMT_VERSION=${{ steps.source.outputs.cmt_version }}
+
+      - name: Export image digest
+        shell: bash
+        env:
+          DIGEST: ${{ steps.build.outputs.digest }}
+        run: |
+          set -euo pipefail
+          digest=${DIGEST#sha256:}
+          [[ "$digest" =~ ^[0-9a-f]{64}$ ]]
+          mkdir -p "${RUNNER_TEMP}/digests"
+          touch "${RUNNER_TEMP}/digests/${digest}"
+
+      - name: Upload image digest
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: digests-${{ matrix.artifact }}
+          path: ${{ runner.temp }}/digests/*
+          if-no-files-found: error
+          retention-days: 1
+
+  publish:
+    needs: build
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3.12.0
+
+      - name: Log in to ${{ env.REGISTRY }}
+        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3.7.0
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Download image digests
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          path: ${{ runner.temp }}/digests
+          pattern: digests-*
+          merge-multiple: true
+
+      - name: Extract Docker metadata
+        id: meta
+        uses: docker/metadata-action@c299e40c65443455700f0fdfc63efafe5b349051 # v5.10.0
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+
+      - name: Create and inspect multi-platform image
+        shell: bash
+        env:
+          TAGS: ${{ steps.meta.outputs.tags }}
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+
+          digest_files=("${RUNNER_TEMP}"/digests/*)
+          test "${#digest_files[@]}" -eq 2
+
+          tag_args=()
+          tag_refs=()
+          while IFS= read -r tag; do
+            test -n "$tag" || continue
+            tag_args+=(--tag "$tag")
+            tag_refs+=("$tag")
+          done <<<"$TAGS"
+          test "${#tag_refs[@]}" -gt 0
+
+          image_refs=()
+          for digest_file in "${digest_files[@]}"; do
+            digest=$(basename "$digest_file")
+            [[ "$digest" =~ ^[0-9a-f]{64}$ ]]
+            image_refs+=("${REGISTRY}/${IMAGE_NAME}@sha256:${digest}")
+          done
+
+          docker buildx imagetools create "${tag_args[@]}" "${image_refs[@]}"
+          docker buildx imagetools inspect "${tag_refs[0]}"
