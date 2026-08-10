@@ -1,6 +1,17 @@
 # Changelog
 
-## Unreleased
+## [v2.3.0](https://github.com/medibloc/panacea-core/releases/tag/v2.3.0) - 2026-08-10
+
+### Consensus and dependency upgrades
+
+- Upgrade Cosmos SDK from v0.47.10 to v0.50.15, CometBFT from the effective
+  v0.37.18 build to v0.38.23, and IBC-Go from v7.3.2 to v8.8.0.
+- Require Go 1.26.5 for source builds. Official statically linked Linux
+  validator binaries are provided for amd64 and arm64.
+- Add the production `v2.3.0` upgrade handler. It runs the SDK and IBC module
+  migrations, adds the `nft` and `panacea_nft` stores, and normalizes migrated
+  expedited-governance parameters from the chain's existing governance
+  settings.
 
 ### Breaking changes
 
@@ -10,6 +21,42 @@
   state and query APIs are intentionally not migrated. Historical PNFT protobuf
   messages remain decodable for transaction and proposal history, but any
   attempt to execute them after the upgrade is rejected.
+- Replace hand-written module CLI registration with the Cosmos SDK v0.50
+  AutoCLI command tree. Operators and integrations must verify their command
+  invocations against the v2.3.0 CLI before the upgrade.
+- Replace the old `panacead config <key>` client command shape with
+  `panacead config get client <key>` and
+  `panacead config set client <key> <value>`.
+- Serve gRPC-Web through the API listener instead of a separate gRPC-Web
+  address. Remove the obsolete `--grpc-web.address` startup flag and migrate
+  reverse proxies or clients that use the old endpoint.
+- Drop application and snapshot database support for `cleveldb`, `boltdb`, and
+  `badgerdb`. Existing nodes must use `goleveldb` or be rebuilt from a supported
+  snapshot, state-sync source, or full replay before starting v2.3.0.
+
+### Panacea NFT
+
+- Add an integrated NFT module backed by the Cosmos SDK standard NFT store and
+  a Panacea policy store, including class creation, minting, transfer-policy
+  enforcement, controller updates, irreversible revocation, and burn
+  tombstones.
+- Add standard and Panacea-specific transaction, query, CLI, REST, gRPC, and
+  Swagger contracts with bounded pagination.
+- Add deterministic store-integrity checks, genesis import/export, owner-class
+  balance indexes, and query-path caching for bounded large-page behavior.
+
+### Compatibility and operations
+
+- Preserve v2.2.1 legacy Amino JSON sign bytes for supported AOL and DID
+  messages while retaining direct and direct-aux signing. Textual signing is
+  intentionally not enabled.
+- Preserve and migrate existing IBC core and transfer state across the
+  v2.2.1-to-v2.3.0 upgrade.
+- Add the SDK v0.50 config migration command and a production runbook for
+  `app.toml`, `client.toml`, manual CometBFT `config.toml` review, database
+  backend checks, and gRPC-Web endpoint migration.
+- Set finite defaults for query gas, API write timeouts, and gRPC send sizes on
+  newly initialized homes. Existing homes require explicit operator review.
 
 ## [v2.2.0](https://github.com/medibloc/panacea-core/releases/tag/v2.2.0) - 2024-03-14
 
@@ -188,4 +235,3 @@
 
 - [\#63](https://github.com/medibloc/panacea-core/pull/63) Add a new option: `halt-height` and Upgrade `medibloc/cosmos-sdk` to [v0.35.7-internal](https://github.com/medibloc/cosmos-sdk/releases/tag/v0.35.7-internal).
     - This feature will be introduced from the cosmos-sdk [v0.36.0](https://github.com/cosmos/cosmos-sdk/pull/4059).
-
