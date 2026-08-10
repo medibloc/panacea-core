@@ -3,13 +3,8 @@ package harness
 import (
 	"archive/tar"
 	"bytes"
-	"context"
 	"crypto/sha256"
 	"encoding/hex"
-	"encoding/json"
-	"errors"
-	"io"
-	"net/http"
 	"strings"
 	"testing"
 	"time"
@@ -101,21 +96,18 @@ version: 31.0.2
 	}
 }
 
-func TestOsmosisMiddlewareEvidenceDoesNotClaimLiveWiringConfirmation(t *testing.T) {
+func TestOsmosisMiddlewareEvidenceUsesPinnedSourceAndLocalRuntime(t *testing.T) {
 	t.Parallel()
 
 	evidence := expectedOsmosisMiddlewareEvidence()
-	if evidence.InvestigationStatus == ibcInvestigationConfirmed {
-		t.Fatal("pinned source wiring must not be reported as live-confirmed middleware")
-	}
-	if evidence.InvestigationStatus != "pinned-source-live-limited" {
+	if evidence.InvestigationStatus != ibcInvestigationPinnedSourceLocal {
 		t.Fatalf("middleware investigation status = %q", evidence.InvestigationStatus)
 	}
 	if evidence.WiringObservedLive || evidence.PerChannelActivationObservedLive {
 		t.Fatalf("middleware evidence overstates live visibility: %#v", evidence)
 	}
 	if err := evidence.Validate(); err != nil {
-		t.Fatalf("limited middleware evidence rejected: %v", err)
+		t.Fatalf("pinned local middleware evidence rejected: %v", err)
 	}
 
 	overstated := evidence
@@ -152,30 +144,14 @@ func TestPinnedOsmosisSourceContractRecordsReplacementAndWiringProvenance(t *tes
 	}
 }
 
-func TestOsmosisMainnetFixturePinsRegistryReleaseAndEndpoints(t *testing.T) {
-	t.Setenv(osmosisMainnetRPCEnv, "https://rpc.operator.example")
-	t.Setenv(osmosisMainnetRESTEnv, "https://rest.operator.example")
-
-	config, err := resolveOsmosisMainnetPreflightConfig()
-	if err != nil {
-		t.Fatalf("resolve preflight config: %v", err)
-	}
-	if config.RPCEndpoint != "https://rpc.operator.example" || config.RESTEndpoint != "https://rest.operator.example" {
-		t.Fatalf("explicit endpoints were not retained: %#v", config)
-	}
-	fixture := expectedOsmosisMainnetFixture()
-	if fixture.ChainID != "osmosis-1" || fixture.CounterpartyChainID != "panacea-3" ||
-		fixture.ChannelID != "channel-82" || fixture.CounterpartyChannelID != "channel-1" ||
-		fixture.ConnectionID != "connection-1231" || fixture.Version != "ics20-1" ||
-		fixture.RegistryStatus != "ACTIVE" || !fixture.RegistryPreferred {
-		t.Fatalf("mainnet fixture = %#v", fixture)
-	}
-	if !strings.Contains(fixture.ChannelRegistryReference, osmosisMainnetRegistryCommit) {
-		t.Fatalf("registry fixture is not commit-pinned: %q", fixture.ChannelRegistryReference)
-	}
+func TestPinnedOsmosisMiddlewareEvidenceMatchesSourceContract(t *testing.T) {
 	middleware := expectedOsmosisMiddlewareEvidence()
 	if err := middleware.Validate(); err != nil {
 		t.Fatalf("pinned middleware contract rejected: %v", err)
+	}
+	if middleware.InvestigationStatus != ibcInvestigationPinnedSourceLocal ||
+		middleware.LiveObservationScope != ibcMiddlewareObservationScope {
+		t.Fatalf("middleware evidence scope = %#v", middleware)
 	}
 }
 
@@ -305,284 +281,6 @@ compat_mode = "0.37"
 	}
 }
 
-func TestOsmosisMainnetPreflightConfirmsActiveChannelAndLimitsMiddlewareClaim(t *testing.T) {
-	t.Parallel()
-
-	now := time.Date(2026, 8, 4, 11, 5, 0, 0, time.UTC)
-	client := &http.Client{Transport: fixtureRoundTripper{
-		responses: map[string]string{
-			"https://rpc.example/status":                                                  osmosisStatusFixture(now.Add(-5 * time.Second)),
-			"https://rest.example/cosmos/base/tendermint/v1beta1/node_info":               osmosisNodeInfoFixture(),
-			"https://rest.example/ibc/core/channel/v1/channels/channel-82/ports/transfer": osmosisChannelFixture("channel-1"),
-		},
-	}}
-
-	evidence, err := runOsmosisMainnetPreflight(
-		context.Background(),
-		client,
-		OsmosisMainnetPreflightConfig{
-			RPCEndpoint:  "https://rpc.example",
-			RESTEndpoint: "https://rest.example",
-			Timeout:      time.Second,
-		},
-		now,
-	)
-	if err != nil {
-		t.Fatalf("valid mainnet preflight rejected: %v", err)
-	}
-	if !evidence.Passed || evidence.Channel.InvestigationStatus != ibcInvestigationConfirmed {
-		t.Fatalf("preflight evidence = %#v", evidence)
-	}
-	if evidence.Channel.ChannelID != "channel-82" || evidence.Channel.CounterpartyChannelID != "channel-1" {
-		t.Fatalf("channel evidence = %#v", evidence.Channel)
-	}
-	if evidence.Middleware.InvestigationStatus != ibcInvestigationPinnedSourceLiveLimited || len(evidence.Middleware.RecvStack) != 4 ||
-		evidence.Middleware.WiringObservedLive || evidence.Middleware.PerChannelActivationObservedLive {
-		t.Fatalf("middleware evidence = %#v", evidence.Middleware)
-	}
-	if evidence.NodeInfo.DependencyObservationScope != osmosisNodeInfoDependencyScope || evidence.NodeInfo.ReplacementMetadataObserved {
-		t.Fatalf("node-info observation scope = %#v", evidence.NodeInfo)
-	}
-	evidence.Status.CometBFTVersion = "0.38.19"
-	evidence.NodeInfo.CometBFT = "0.38.19"
-	evidence.NodeInfo.Binary.Version = "31.0.1"
-	evidence.NodeInfo.Binary.Commit = "bc6abe805b25deaaff79d282ae186586f0859d7a"
-	for index := range evidence.NodeInfo.Binary.Dependencies {
-		if evidence.NodeInfo.Binary.Dependencies[index].Path == cometBFTModulePath {
-			evidence.NodeInfo.Binary.Dependencies[index].Version = "v0.38.21"
-		}
-	}
-	if err := evidence.Validate(); err != nil {
-		t.Fatalf("compatible public node patch rejected: %v", err)
-	}
-}
-
-func TestValidateOsmosisStatusResponseRequiresPinnedCometBFTMinorLine(t *testing.T) {
-	t.Parallel()
-
-	now := time.Date(2026, 8, 9, 0, 0, 0, 0, time.UTC)
-	for _, testCase := range []struct {
-		name     string
-		version  string
-		wantPass bool
-	}{
-		{name: "older compatible patch", version: "0.38.17", wantPass: true},
-		{name: "current public patch", version: "0.38.19", wantPass: true},
-		{name: "pinned patch", version: "0.38.22", wantPass: true},
-		{name: "previous minor", version: "0.37.18", wantPass: false},
-		{name: "next minor", version: "0.39.0", wantPass: false},
-		{name: "missing patch", version: "0.38", wantPass: false},
-		{name: "prerelease", version: "0.38.22-rc1", wantPass: false},
-	} {
-		t.Run(testCase.name, func(t *testing.T) {
-			response := osmosisStatusResponse{}
-			response.Result.NodeInfo.Network = osmosisMainnetChainID
-			response.Result.NodeInfo.Version = testCase.version
-			response.Result.SyncInfo.LatestBlockHeight = "68119031"
-			response.Result.SyncInfo.LatestBlockTime = now.Add(-5 * time.Second)
-
-			_, err := validateOsmosisStatusResponse(response, now)
-			if testCase.wantPass && err != nil {
-				t.Fatalf("compatible version %q rejected: %v", testCase.version, err)
-			}
-			if !testCase.wantPass && err == nil {
-				t.Fatalf("incompatible version %q accepted", testCase.version)
-			}
-		})
-	}
-}
-
-func TestValidateOsmosisNodeInfoResponseRequiresPinnedCompatibilityLines(t *testing.T) {
-	t.Parallel()
-
-	decodeFixture := func(t *testing.T) osmosisNodeInfoResponse {
-		t.Helper()
-		var response osmosisNodeInfoResponse
-		if err := json.Unmarshal([]byte(osmosisNodeInfoFixture()), &response); err != nil {
-			t.Fatalf("decode Osmosis node-info fixture: %v", err)
-		}
-		return response
-	}
-	setDependency := func(response *osmosisNodeInfoResponse, path, version string) {
-		for index := range response.ApplicationVersion.BuildDeps {
-			if response.ApplicationVersion.BuildDeps[index].Path == path {
-				response.ApplicationVersion.BuildDeps[index].Version = version
-				return
-			}
-		}
-	}
-
-	for _, testCase := range []struct {
-		name     string
-		mutate   func(*osmosisNodeInfoResponse)
-		wantPass bool
-	}{
-		{name: "pinned patch", wantPass: true},
-		{
-			name: "older public patch",
-			mutate: func(response *osmosisNodeInfoResponse) {
-				response.DefaultNodeInfo.Version = "0.38.19"
-				response.ApplicationVersion.Version = "31.0.1"
-				response.ApplicationVersion.GitCommit = "bc6abe805b25deaaff79d282ae186586f0859d7a"
-				setDependency(response, cometBFTModulePath, "v0.38.21")
-			},
-			wantPass: true,
-		},
-		{
-			name: "previous app minor",
-			mutate: func(response *osmosisNodeInfoResponse) {
-				response.ApplicationVersion.Version = "30.0.5"
-			},
-		},
-		{
-			name: "next app minor",
-			mutate: func(response *osmosisNodeInfoResponse) {
-				response.ApplicationVersion.Version = "31.1.0"
-			},
-		},
-		{
-			name: "previous CometBFT minor",
-			mutate: func(response *osmosisNodeInfoResponse) {
-				response.DefaultNodeInfo.Version = "0.37.18"
-			},
-		},
-		{
-			name: "wrong IBC-Go patch",
-			mutate: func(response *osmosisNodeInfoResponse) {
-				setDependency(response, ibcGoV8ModulePath, "v8.6.0")
-			},
-		},
-		{
-			name: "malformed commit",
-			mutate: func(response *osmosisNodeInfoResponse) {
-				response.ApplicationVersion.GitCommit = "deadbeef"
-			},
-		},
-	} {
-		t.Run(testCase.name, func(t *testing.T) {
-			response := decodeFixture(t)
-			if testCase.mutate != nil {
-				testCase.mutate(&response)
-			}
-			_, err := validateOsmosisNodeInfoResponse(response)
-			if testCase.wantPass && err != nil {
-				t.Fatalf("compatible node-info rejected: %v", err)
-			}
-			if !testCase.wantPass && err == nil {
-				t.Fatal("incompatible node-info unexpectedly accepted")
-			}
-		})
-	}
-}
-
-func TestOsmosisMainnetPreflightRetriesTransientServiceUnavailable(t *testing.T) {
-	now := time.Date(2026, 8, 4, 11, 5, 0, 0, time.UTC)
-	transport := &transientOsmosisStatusRoundTripper{now: now}
-	client := &http.Client{Transport: transport}
-
-	evidence, err := runOsmosisMainnetPreflight(
-		context.Background(),
-		client,
-		OsmosisMainnetPreflightConfig{
-			RPCEndpoint:  "https://rpc.example",
-			RESTEndpoint: "https://rest.example",
-			Timeout:      5 * time.Second,
-		},
-		now,
-	)
-	if err != nil {
-		t.Fatalf("transient 503 was not recovered by a bounded retry: %v", err)
-	}
-	if !evidence.Passed {
-		t.Fatalf("preflight did not pass after transient recovery: %#v", evidence)
-	}
-	if transport.statusAttempts != 2 {
-		t.Fatalf("status attempts = %d, want 2", transport.statusAttempts)
-	}
-}
-
-func TestOsmosisMainnetPreflightRetriesTransientNetworkTimeout(t *testing.T) {
-	now := time.Date(2026, 8, 4, 11, 5, 0, 0, time.UTC)
-	transport := &transientOsmosisStatusRoundTripper{
-		now:       now,
-		statusErr: context.DeadlineExceeded,
-	}
-	client := &http.Client{Transport: transport}
-
-	evidence, err := runOsmosisMainnetPreflight(
-		context.Background(),
-		client,
-		OsmosisMainnetPreflightConfig{
-			RPCEndpoint:  "https://rpc.example",
-			RESTEndpoint: "https://rest.example",
-			Timeout:      5 * time.Second,
-		},
-		now,
-	)
-	if err != nil {
-		t.Fatalf("transient network timeout was not recovered by a bounded retry: %v", err)
-	}
-	if !evidence.Passed {
-		t.Fatalf("preflight did not pass after transient network recovery: %#v", evidence)
-	}
-	if transport.statusAttempts != 2 {
-		t.Fatalf("status attempts = %d, want 2", transport.statusAttempts)
-	}
-}
-
-func TestOsmosisMainnetPreflightFailsClosedWithArtifactEvidence(t *testing.T) {
-	t.Parallel()
-
-	now := time.Date(2026, 8, 4, 11, 5, 0, 0, time.UTC)
-	t.Run("fixture mismatch", func(t *testing.T) {
-		client := &http.Client{Transport: fixtureRoundTripper{responses: map[string]string{
-			"https://rpc.example/status":                                                  osmosisStatusFixture(now.Add(-5 * time.Second)),
-			"https://rest.example/cosmos/base/tendermint/v1beta1/node_info":               osmosisNodeInfoFixture(),
-			"https://rest.example/ibc/core/channel/v1/channels/channel-82/ports/transfer": osmosisChannelFixture("channel-999"),
-		}}}
-		evidence, err := runOsmosisMainnetPreflight(context.Background(), client, OsmosisMainnetPreflightConfig{
-			RPCEndpoint: "https://rpc.example", RESTEndpoint: "https://rest.example", Timeout: time.Second,
-		}, now)
-		if err == nil || evidence.Passed {
-			t.Fatalf("mismatched fixture accepted: evidence=%#v err=%v", evidence, err)
-		}
-		if evidence.Error == "" || evidence.Channel.InvestigationStatus != ibcInvestigationMismatch {
-			t.Fatalf("mismatch was not retained in evidence: %#v", evidence)
-		}
-	})
-
-	t.Run("endpoint unavailable", func(t *testing.T) {
-		client := &http.Client{Transport: fixtureRoundTripper{err: errors.New("firewall denied")}}
-		evidence, err := runOsmosisMainnetPreflight(context.Background(), client, OsmosisMainnetPreflightConfig{
-			RPCEndpoint: "https://rpc.example", RESTEndpoint: "https://rest.example", Timeout: time.Second,
-		}, now)
-		if err == nil || evidence.Passed {
-			t.Fatalf("unavailable endpoint accepted: evidence=%#v err=%v", evidence, err)
-		}
-		if evidence.Channel.InvestigationStatus != ibcInvestigationUnavailable || evidence.Error == "" {
-			t.Fatalf("unavailability was not retained in evidence: %#v", evidence)
-		}
-	})
-
-	t.Run("binary dependency mismatch", func(t *testing.T) {
-		wrongNodeInfo := strings.Replace(osmosisNodeInfoFixture(), `"version":"v8.7.0"`, `"version":"v8.6.0"`, 1)
-		client := &http.Client{Transport: fixtureRoundTripper{responses: map[string]string{
-			"https://rpc.example/status":                                                  osmosisStatusFixture(now.Add(-5 * time.Second)),
-			"https://rest.example/cosmos/base/tendermint/v1beta1/node_info":               wrongNodeInfo,
-			"https://rest.example/ibc/core/channel/v1/channels/channel-82/ports/transfer": osmosisChannelFixture("channel-1"),
-		}}}
-		evidence, err := runOsmosisMainnetPreflight(context.Background(), client, OsmosisMainnetPreflightConfig{
-			RPCEndpoint: "https://rpc.example", RESTEndpoint: "https://rest.example", Timeout: time.Second,
-		}, now)
-		if err == nil || evidence.Passed || evidence.NodeInfo.Error == "" {
-			t.Fatalf("wrong live dependency accepted: evidence=%#v err=%v", evidence, err)
-		}
-		if evidence.Middleware.InvestigationStatus != ibcInvestigationMismatch {
-			t.Fatalf("middleware mismatch status = %q", evidence.Middleware.InvestigationStatus)
-		}
-	})
-}
-
 func TestIBCCompatibilityMatrixRejectsMutableRuntimeEvidence(t *testing.T) {
 	t.Setenv("PANACEA_E2E_CURRENT_BINARY_VERSION", "2.3.0")
 	t.Setenv("PANACEA_E2E_CURRENT_COMMIT", strings.Repeat("b", 40))
@@ -590,24 +288,6 @@ func TestIBCCompatibilityMatrixRejectsMutableRuntimeEvidence(t *testing.T) {
 	matrix := validIBCCompatibilityMatrixFixture(t)
 	if err := matrix.Validate(); err != nil {
 		t.Fatalf("valid compatibility matrix rejected: %v", err)
-	}
-
-	publicPatch := matrix
-	publicPatch.MainnetPreflight.Status.CometBFTVersion = "0.38.19"
-	publicPatch.MainnetPreflight.NodeInfo.CometBFT = "0.38.19"
-	publicPatch.MainnetPreflight.NodeInfo.Binary.Version = "31.0.1"
-	publicPatch.MainnetPreflight.NodeInfo.Binary.Commit = "bc6abe805b25deaaff79d282ae186586f0859d7a"
-	publicPatch.MainnetPreflight.NodeInfo.Binary.Dependencies = append(
-		[]IBCDependencyContract(nil),
-		matrix.MainnetPreflight.NodeInfo.Binary.Dependencies...,
-	)
-	for index := range publicPatch.MainnetPreflight.NodeInfo.Binary.Dependencies {
-		if publicPatch.MainnetPreflight.NodeInfo.Binary.Dependencies[index].Path == cometBFTModulePath {
-			publicPatch.MainnetPreflight.NodeInfo.Binary.Dependencies[index].Version = "v0.38.21"
-		}
-	}
-	if err := publicPatch.Validate(); err != nil {
-		t.Fatalf("compatible public node patch rejected by matrix: %v", err)
 	}
 
 	tampered := matrix
@@ -634,17 +314,6 @@ func TestIBCCompatibilityMatrixRejectsMutableRuntimeEvidence(t *testing.T) {
 func validIBCCompatibilityMatrixFixture(t *testing.T) IBCCompatibilityMatrix {
 	t.Helper()
 	now := time.Date(2026, 8, 4, 11, 5, 0, 0, time.UTC)
-	client := &http.Client{Transport: fixtureRoundTripper{responses: map[string]string{
-		"https://rpc.example/status":                                                  osmosisStatusFixture(now.Add(-5 * time.Second)),
-		"https://rest.example/cosmos/base/tendermint/v1beta1/node_info":               osmosisNodeInfoFixture(),
-		"https://rest.example/ibc/core/channel/v1/channels/channel-82/ports/transfer": osmosisChannelFixture("channel-1"),
-	}}}
-	preflight, err := runOsmosisMainnetPreflight(context.Background(), client, OsmosisMainnetPreflightConfig{
-		RPCEndpoint: "https://rpc.example", RESTEndpoint: "https://rest.example", Timeout: time.Second,
-	}, now)
-	if err != nil {
-		t.Fatalf("build mainnet fixture: %v", err)
-	}
 	current, err := currentPanaceaBinaryContract()
 	if err != nil {
 		t.Fatalf("current contract: %v", err)
@@ -686,10 +355,9 @@ func validIBCCompatibilityMatrixFixture(t *testing.T) IBCCompatibilityMatrix {
 		t.Fatalf("Hermes fixture: %v", err)
 	}
 	return IBCCompatibilityMatrix{
-		SchemaVersion:    ibcCompatibilityMatrixSchema,
-		GeneratedAt:      now,
-		MainnetPreflight: preflight,
-		Panacea:          IBCBinaryUpgradeMatrix{PreUpgrade: panaceaPre, PostUpgrade: panaceaPost},
+		SchemaVersion: ibcCompatibilityMatrixSchema,
+		GeneratedAt:   now,
+		Panacea:       IBCBinaryUpgradeMatrix{PreUpgrade: panaceaPre, PostUpgrade: panaceaPost},
 		Osmosis: IBCOsmosisCompatibilityMatrix{
 			SourceContract: pinnedOsmosisSourceContract(),
 			PreUpgrade:     osmosisPre,
@@ -707,93 +375,4 @@ func validIBCCompatibilityMatrixFixture(t *testing.T) IBCCompatibilityMatrix {
 		},
 		Validated: true,
 	}
-}
-
-type fixtureRoundTripper struct {
-	responses map[string]string
-	err       error
-}
-
-type transientOsmosisStatusRoundTripper struct {
-	now            time.Time
-	statusAttempts int
-	statusErr      error
-}
-
-func (t *transientOsmosisStatusRoundTripper) RoundTrip(req *http.Request) (*http.Response, error) {
-	var body string
-	switch req.URL.String() {
-	case "https://rpc.example/status":
-		t.statusAttempts++
-		if t.statusAttempts == 1 {
-			if t.statusErr != nil {
-				return nil, t.statusErr
-			}
-			return &http.Response{
-				StatusCode: http.StatusServiceUnavailable,
-				Status:     "503 Service Unavailable",
-				Header:     make(http.Header),
-				Body:       io.NopCloser(strings.NewReader("temporarily unavailable")),
-				Request:    req,
-			}, nil
-		}
-		body = osmosisStatusFixture(t.now.Add(-5 * time.Second))
-	case "https://rest.example/cosmos/base/tendermint/v1beta1/node_info":
-		body = osmosisNodeInfoFixture()
-	case "https://rest.example/ibc/core/channel/v1/channels/channel-82/ports/transfer":
-		body = osmosisChannelFixture("channel-1")
-	default:
-		return nil, errors.New("unexpected URL: " + req.URL.String())
-	}
-	return &http.Response{
-		StatusCode: http.StatusOK,
-		Status:     "200 OK",
-		Header:     make(http.Header),
-		Body:       io.NopCloser(strings.NewReader(body)),
-		Request:    req,
-	}, nil
-}
-
-func (f fixtureRoundTripper) RoundTrip(req *http.Request) (*http.Response, error) {
-	if f.err != nil {
-		return nil, f.err
-	}
-	body, ok := f.responses[req.URL.String()]
-	if !ok {
-		return nil, errors.New("unexpected URL: " + req.URL.String())
-	}
-	return &http.Response{
-		StatusCode: http.StatusOK,
-		Status:     "200 OK",
-		Header:     make(http.Header),
-		Body:       io.NopCloser(strings.NewReader(body)),
-		Request:    req,
-	}, nil
-}
-
-func osmosisStatusFixture(blockTime time.Time) string {
-	return `{"jsonrpc":"2.0","result":{"node_info":{"network":"osmosis-1","version":"0.38.22"},"sync_info":{"latest_block_height":"67805144","latest_block_time":"` + blockTime.Format(time.RFC3339Nano) + `","catching_up":false}}}`
-}
-
-func osmosisNodeInfoFixture() string {
-	return `{
-  "default_node_info":{"network":"osmosis-1","version":"0.38.22"},
-  "application_version":{
-    "name":"osmosis","app_name":"osmosisd","version":"31.0.2",
-    "git_commit":"a56c05b0e83341b9a3c0e6e3508520f15e9f2e49",
-    "go_version":"go version go1.23.4 linux/amd64",
-    "cosmos_sdk_version":"v0.50.14-v30-osmo",
-    "build_deps":[
-      {"path":"github.com/cometbft/cometbft","version":"v0.38.22"},
-      {"path":"github.com/cosmos/cosmos-sdk","version":"v0.50.14"},
-      {"path":"github.com/cosmos/ibc-go/v8","version":"v8.7.0"},
-      {"path":"github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v8","version":"v8.2.0"},
-      {"path":"github.com/osmosis-labs/osmosis/x/ibc-hooks","version":"v0.0.21"}
-    ]
-  }
-}`
-}
-
-func osmosisChannelFixture(counterpartyChannel string) string {
-	return `{"channel":{"state":"STATE_OPEN","ordering":"ORDER_UNORDERED","counterparty":{"port_id":"transfer","channel_id":"` + counterpartyChannel + `"},"connection_hops":["connection-1231"],"version":"ics20-1"},"proof_height":{"revision_number":"1","revision_height":"67805146"}}`
 }

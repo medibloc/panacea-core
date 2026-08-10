@@ -74,7 +74,6 @@ func buildIBCUpgradeCoverageMatrix(evidence harness.IBCUpgradeContinuityEvidence
 			row.QueryCoverage[1] = harness.IBCUpgradeGRPCQueryCoverage()
 			row.Phases = []harness.UpgradeCoveragePhase{
 				passedIBCCoveragePhase(harness.UpgradeCoveragePhaseV221Preparation,
-					"ibc/mainnet-preflight.json",
 					"ibc/provenance.json", "ibc/osmosis-source-contract.json", "ibc/resolved-images.json",
 					"ibc/hermes/runtime-identity.json", "ibc/hermes/binary-sha256.txt",
 					"ibc/chains/panacea/pre-upgrade/identity.json",

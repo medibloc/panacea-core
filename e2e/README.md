@@ -96,7 +96,7 @@ deadline in addition to the bounded waits inside the harness:
 | `state-sync` | current-version validator sources + new full node | 20m | Actual CometBFT state sync, corrupt/unavailable/bad-trust failures, restart, and history parity; the connected `upgrade-deep` lane separately proves joining upgraded sources |
 | `config-compat` | v2.2.1 node home on current binary | 25m | v0.47 config preservation/migration and current endpoint/config-command contracts |
 | `network-faults` | run-owned validator/full-node network | 25m | Container-scoped partition, proxy delay/jitter/loss, DNS/container recreation, endpoint isolation, slow-client/churn, and WebSocket recovery |
-| `release-builds` | functional host platform + linux/amd64 + linux/arm64 | 6h total; 35m per architecture upgrade | Clean-HEAD provenance, functional-image identity capture, cold dependency provenance, warm-offline builds, pinned no-network Docker compilation, host binary checksum equivalence, version/smoke, and a real upgrade on each architecture |
+| `release-builds` | functional host platform + linux/amd64 + linux/arm64 | 6h total; 35m per architecture upgrade | Clean-HEAD provenance, functional-image identity capture, cold dependency provenance, pinned no-network Docker compilation, host binary checksum equivalence, version/smoke, and a real upgrade on each architecture |
 | `load` | 1 validator + 1 full node | 25m | Boundary datasets, concurrent REST/gRPC load, mixed transactions, query-gas rejection, and required peer/catching-up/mempool/resource observations |
 
 The load suite is an observational baseline, not a production SLA. Its pass
@@ -127,7 +127,7 @@ production snapshot, and real ingress/firewall checks; those are tracked by the
 separate operational-validation goal. The aggregate has a bounded 12-hour total
 deadline, configurable with
 `E2E_RELEASE_AGGREGATE_TOTAL_TIMEOUT_SECONDS`. `release-builds` can be run alone
-when only the cold/offline and multi-architecture release evidence is required;
+when only the clean-source and multi-architecture release evidence is required;
 its separate child deadline is six hours, configurable with
 `E2E_RELEASE_TOTAL_TIMEOUT_SECONDS`. The release commands record a failed
 release-run artifact before image construction when tracked, staged, or
@@ -165,31 +165,15 @@ multi-architecture base-image digests, and runs with networking disabled. A
 machine without the base images or Go module inputs still needs network access
 for that initial materialization.
 
-The IBC upgrade lane performs a read-only Osmosis mainnet preflight immediately
-before creating its local Docker topology. It queries exactly one explicit RPC
-endpoint and one explicit REST endpoint to confirm `osmosis-1`, a live RPC node
-on the pinned CometBFT v0.38 compatibility line, a v31.0 application node with
-the exact observable SDK, IBC-Go, packet-forward middleware, and IBC hooks
-contract, and the active `transfer/channel-82 -> transfer/channel-1` `ics20-1`
-fixture. Public mainnet RPC and REST operators may run different v31.0 and v0.38
-patch releases. The local counterparty still requires the exact digest-pinned
-v31.0.2 binary, source commit, and complete dependency contract. Defaults are
-`https://rpc.osmosis.zone` and `https://lcd.osmosis.zone`; operators may replace
-them with `PANACEA_E2E_OSMOSIS_MAINNET_RPC_ENDPOINT` and
-`PANACEA_E2E_OSMOSIS_MAINNET_REST_ENDPOINT`. There is no skip, retry endpoint,
-or fallback: a firewall failure, unavailable response, stale status, or fixture
-mismatch writes `ibc/mainnet-preflight.json` and fails before Docker starts.
-The preflight never broadcasts a public-network transaction.
-
-Osmosis REST node-info exposes the original Cosmos SDK module path/version and
-the effective SDK version, but not the Go replacement path. The local pinned
-binary's `version --long` output must therefore match the complete
+The IBC upgrade lane is self-contained and does not query Osmosis mainnet. Its
+local counterparty requires the exact digest-pinned v31.0.2 binary, source
+commit, and complete dependency contract. The local binary's `version --long`
+output must match the complete
 `github.com/cosmos/cosmos-sdk@v0.50.14 => github.com/osmosis-labs/cosmos-sdk@v0.50.14-v30-osmo`
 contract. `ibc/osmosis-source-contract.json` separately records the exact
 v31.0.2 commit, SHA-256-pinned `go.mod` and transfer-wiring source, and static
-receive/send stack. Live channel and node-info queries do not expose middleware
-wiring or per-channel middleware activation, so the evidence reports
-`pinned-source-live-limited`, never live-confirmed middleware.
+receive/send stack. The created local channel and binary metadata are recorded
+as `pinned-source-local-runtime` evidence.
 
 ## Isolation and diagnostics
 
@@ -228,7 +212,6 @@ diagnostics:
     wal-replay.jsonl          # forced-restart WAL catch-up/replay markers
     ...                       # restart, export, snapshot, and sync evidence
   upgrade/...                 # upgrade suite
-  ibc/mainnet-preflight.json  # fail-closed live Osmosis status/channel contract
   ibc/osmosis-source-contract.json # commit/hash-pinned dependency and wiring source facts
   ibc/chains/...              # version --long, binary and genesis checksums
   ibc-compatibility-matrix.json # old/new dependencies, channel, middleware, Hermes

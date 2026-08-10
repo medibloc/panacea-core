@@ -432,9 +432,8 @@ func (n *IBCTopology) recordIBCCompatibilityMatrix(ctx context.Context) error {
 	}
 	hermesInvariance, hermesInvarianceErr := n.captureHermesUpgradeInvariance(ctx)
 	matrix := IBCCompatibilityMatrix{
-		SchemaVersion:    ibcCompatibilityMatrixSchema,
-		GeneratedAt:      time.Now().UTC(),
-		MainnetPreflight: n.mainnetPreflight,
+		SchemaVersion: ibcCompatibilityMatrixSchema,
+		GeneratedAt:   time.Now().UTC(),
 		Panacea: IBCBinaryUpgradeMatrix{
 			PreUpgrade:  n.panaceaPreUpgradeBinary,
 			PostUpgrade: n.panaceaPostUpgradeBinary,
@@ -453,7 +452,7 @@ func (n *IBCTopology) recordIBCCompatibilityMatrix(ctx context.Context) error {
 			Ordering:         n.channel.Panacea.Ordering,
 			Version:          n.channel.Panacea.Version,
 		},
-		Middleware: n.mainnetPreflight.Middleware,
+		Middleware: expectedOsmosisMiddlewareEvidence(),
 		Hermes: IBCHermesCompatibilityMatrix{
 			RuntimeIdentity: hermesInvariance.PostUpgradeRuntimeIdentity,
 			CompatMode:      hermesInvariance.CompatMode,

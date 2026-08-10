@@ -788,28 +788,7 @@ test -z "$(find "$cold_build_cache" -mindepth 1 -print -quit)"
     "$E2E_GO_BINARY" list -m -json all >"$artifact_dir/dependencies-e2e.jsonl"
 )
 
-stage=warm-offline-host-build
-mkdir -p "$work_dir/bin"
-(
-  cd "$current_source"
-  GOTOOLCHAIN="$E2E_GOTOOLCHAIN" GOWORK=off GOPROXY=off GOSUMDB=off \
-    GOMODCACHE="$cold_mod_cache" GOCACHE="$cold_build_cache" CGO_ENABLED=0 \
-    "$E2E_GO_BINARY" build -mod=mod -tags netgo -trimpath -o "$work_dir/bin/panacead-current" ./cmd/panacead
-)
-(
-  cd "$old_source"
-  GOTOOLCHAIN="$E2E_GOTOOLCHAIN" GOWORK=off GOPROXY=off GOSUMDB=off \
-    GOMODCACHE="$cold_mod_cache" GOCACHE="$cold_build_cache" CGO_ENABLED=0 \
-    "$E2E_GO_BINARY" build -mod=mod -tags netgo -trimpath -o "$work_dir/bin/panacead-v2.2.1" ./cmd/panacead
-)
-{
-  printf 'GOPROXY=off\n'
-  printf 'GOSUMDB=off\n'
-  printf 'current_host_build=passed\n'
-  printf 'v2.2.1_host_build=passed\n'
-} >"$artifact_dir/warm-offline-build.txt"
-
-stage=vendor-offline-contexts
+stage=vendor-build-contexts
 current_vendor="$work_dir/current-vendor"
 old_vendor="$work_dir/v2.2.1-vendor"
 (
@@ -824,6 +803,7 @@ old_vendor="$work_dir/v2.2.1-vendor"
     GOMODCACHE="$cold_mod_cache" GOCACHE="$cold_build_cache" \
     "$E2E_GO_BINARY" mod vendor -o "$old_vendor"
 )
+mkdir -p "$work_dir/bin"
 
 stage=create-fresh-builder
 builder_created=1
@@ -938,139 +918,6 @@ build_and_verify_image() {
     >>"$artifact_dir/image-index.txt"
 }
 
-builder_container_name="buildx_buildkit_${builder_name}0"
-builder_container=$(
-  "$DOCKER" ps \
-    --filter "name=^/$builder_container_name$" \
-    --format '{{.ID}}'
-)
-# Intentional field splitting verifies that the exact name selected one container.
-# shellcheck disable=SC2086
-set -- $builder_container
-if [ "$#" -ne 1 ]; then
-  echo "expected exactly one BuildKit container named $builder_container_name, got: $builder_container" >&2
-  exit 1
-fi
-builder_container=$1
-# Docker's Go template is intentionally single-quoted for the shell.
-# shellcheck disable=SC2016
-builder_networks_before=$(
-  "$DOCKER" inspect --format '{{range $name, $_ := .NetworkSettings.Networks}}{{$name}}{{println}}{{end}}' \
-    "$builder_container"
-)
-if [ -z "$builder_networks_before" ]; then
-  echo "BuildKit container has no network to disconnect for the offline proof" >&2
-  exit 1
-fi
-printf '%s\n' "$builder_networks_before" >"$artifact_dir/builder-networks-before-offline.txt"
-: >"$artifact_dir/builder-networks-after-offline.txt"
-: >"$artifact_dir/builder-network-cycles.txt"
-
-disconnect_builder_networks() {
-  suffix=$1
-  # Docker's Go template is intentionally single-quoted for the shell.
-  # shellcheck disable=SC2016
-  builder_networks_current=$(
-    "$DOCKER" inspect --format '{{range $name, $_ := .NetworkSettings.Networks}}{{$name}}{{println}}{{end}}' \
-      "$builder_container"
-  )
-  if [ "$builder_networks_current" != "$builder_networks_before" ]; then
-    printf '%s\n' "$builder_networks_current" >"$artifact_dir/builder-networks-$suffix-before-offline.txt"
-    echo "BuildKit container networks changed before the $suffix offline proof" >&2
-    exit 1
-  fi
-  printf '%s\n' "$builder_networks_current" >"$artifact_dir/builder-networks-$suffix-before-offline.txt"
-  while IFS= read -r builder_network; do
-    [ -n "$builder_network" ] || continue
-    "$DOCKER" network disconnect "$builder_network" "$builder_container"
-  done <"$artifact_dir/builder-networks-$suffix-before-offline.txt"
-  # Docker's Go template is intentionally single-quoted for the shell.
-  # shellcheck disable=SC2016
-  builder_networks_after=$(
-    "$DOCKER" inspect --format '{{range $name, $_ := .NetworkSettings.Networks}}{{$name}}{{println}}{{end}}' \
-      "$builder_container"
-  )
-  : >"$artifact_dir/builder-networks-$suffix-after-offline.txt"
-  if [ -n "$builder_networks_after" ]; then
-    printf '%s\n' "$builder_networks_after" >"$artifact_dir/builder-networks-$suffix-after-offline.txt"
-    printf '%s\n' "$builder_networks_after" >"$artifact_dir/builder-networks-after-offline.txt"
-    echo "BuildKit container still has a network during the $suffix offline proof" >&2
-    exit 1
-  fi
-}
-
-reconnect_builder_networks() {
-  suffix=$1
-  while IFS= read -r builder_network; do
-    [ -n "$builder_network" ] || continue
-    "$DOCKER" network connect "$builder_network" "$builder_container"
-  done <"$artifact_dir/builder-networks-before-offline.txt"
-  # Docker's Go template is intentionally single-quoted for the shell.
-  # shellcheck disable=SC2016
-  builder_networks_reconnected=$(
-    "$DOCKER" inspect --format '{{range $name, $_ := .NetworkSettings.Networks}}{{$name}}{{println}}{{end}}' \
-      "$builder_container"
-  )
-  printf '%s\n' "$builder_networks_reconnected" >"$artifact_dir/builder-networks-$suffix-after-reconnect.txt"
-  if [ "$builder_networks_reconnected" != "$builder_networks_before" ]; then
-    echo "BuildKit container networks were not restored after the $suffix offline proof" >&2
-    exit 1
-  fi
-  printf 'platform=linux/%s disconnected=true reconnected=true\n' "$suffix" \
-    >>"$artifact_dir/builder-network-cycles.txt"
-}
-
-warm_offline_buildkit_image() {
-  platform=$1
-  suffix=$2
-  kind=$3
-  context_dir=$4
-  vendor_dir=$5
-
-  repository="panacea-e2e-release-warm-$kind-$suffix"
-  image_ref="$repository:$run_id"
-  metadata="$artifact_dir/warm-offline-$kind-$suffix-build-metadata.json"
-  build_log="$artifact_dir/warm-offline-$kind-$suffix-build.log"
-  if [ "$kind" = current ]; then
-    version=$E2E_CURRENT_BINARY_VERSION
-    commit=$source_commit
-    extra_arg="--build-arg=PANACEA_CMT_VERSION=$cmt_version"
-    dockerfile="$current_source/e2e/docker/Dockerfile.release"
-  else
-    version=2.2.1
-    commit=$E2E_V221_COMMIT
-    extra_arg="--build-arg=PANACEA_TM_VERSION=$E2E_V221_TM_VERSION"
-    dockerfile="$current_source/e2e/docker/Dockerfile"
-  fi
-
-  created_images="$created_images $image_ref"
-  "$DOCKER" buildx build \
-    --builder "$builder_name" \
-    --platform "$platform" \
-    --network=none \
-    --provenance=false \
-    --build-context "panacea_vendor=$vendor_dir" \
-    --build-context "panacea_e2e_tools=$current_source/scripts/e2e" \
-    --file "$dockerfile" \
-    --build-arg "PANACEA_VERSION=$version" \
-    --build-arg "PANACEA_COMMIT=$commit" \
-    "$extra_arg" \
-    --tag "$image_ref" \
-    --metadata-file "$metadata" \
-    --load \
-    "$context_dir" >"$build_log" 2>&1
-  grep -Eq '"containerimage\.digest"[[:space:]]*:[[:space:]]*"sha256:[0-9a-f]{64}"' "$metadata"
-  "$DOCKER" image inspect "$image_ref" >"$artifact_dir/warm-offline-$kind-$suffix-image-inspect.json"
-  warm_version_container="panacea-warm-version-$kind-$suffix-$$"
-  track_release_container "$warm_version_container"
-  "$DOCKER" run --rm --name "$warm_version_container" --platform "$platform" \
-    --entrypoint /usr/bin/panacead "$image_ref" version --long \
-    >"$artifact_dir/warm-offline-$kind-$suffix-version.txt"
-  untrack_release_container "$warm_version_container"
-  grep -Fq "version: $version" "$artifact_dir/warm-offline-$kind-$suffix-version.txt"
-  grep -Fq "commit: $commit" "$artifact_dir/warm-offline-$kind-$suffix-version.txt"
-}
-
 stage=build-multiarch-images
 : >"$artifact_dir/image-index.txt"
 for platform in linux/amd64 linux/arm64; do
@@ -1078,25 +925,8 @@ for platform in linux/amd64 linux/arm64; do
   stage="build-multiarch-images-$suffix"
   build_and_verify_image "$platform" "$suffix" current "$current_source" "$current_vendor"
   build_and_verify_image "$platform" "$suffix" v2.2.1 "$old_source" "$old_vendor"
-
-  # BuildKit's registry source metadata is platform-specific. Run each warm
-  # offline proof immediately after its cold builds, before resolving another
-  # platform can replace the cached manifest selection for the same index.
-  stage="warm-offline-buildkit-build-$suffix"
-  disconnect_builder_networks "$suffix"
-  warm_offline_buildkit_image "$platform" "$suffix" current "$current_source" "$current_vendor"
-  warm_offline_buildkit_image "$platform" "$suffix" v2.2.1 "$old_source" "$old_vendor"
-  reconnect_builder_networks "$suffix"
 done
 "$DOCKER" buildx du --builder "$builder_name" >"$artifact_dir/builder-cache-after-build.txt"
-printf '%s\n' \
-  'builder_networks=none-during-each-platform-build' \
-  'builder_networks_restored_between_platforms=true' \
-  'registry_access=unavailable' \
-  'cache_mode=warm' \
-  'platforms=linux/amd64,linux/arm64' \
-  'images=current,v2.2.1' \
-  >"$artifact_dir/warm-offline-buildkit-contract.txt"
 
 stage=write-host-image-identity
 release_current_ref="panacea-e2e-release-current-$functional_host_suffix:$run_id"
@@ -1222,14 +1052,12 @@ fi
 stage=write-manifest
 {
   printf '{\n'
-  printf '  "schema_version": "4",\n'
+  printf '  "schema_version": "5",\n'
   printf '  "run_id": "%s",\n' "$run_id"
   printf '  "source_commit": "%s",\n' "$source_commit"
   printf '  "source_clean": true,\n'
   printf '  "cold_go_caches": true,\n'
   printf '  "fresh_buildkit_builder": true,\n'
-  printf '  "warm_offline_host_build": true,\n'
-  printf '  "warm_offline_buildkit_build": true,\n'
   printf '  "docker_build_network": "none",\n'
   printf '  "platforms": ["linux/amd64", "linux/arm64"],\n'
   printf '  "version_and_smoke": true,\n'

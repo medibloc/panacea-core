@@ -45,7 +45,6 @@ func TestBuildIBCUpgradeCoverageMatrixIsHonestAboutIsolatedLane(t *testing.T) {
 				require.NotEmpty(t, phase.ArtifactPaths)
 				if phase.Name == harness.UpgradeCoveragePhaseV221Preparation {
 					require.Equal(t, []string{
-						"ibc/mainnet-preflight.json",
 						"ibc/provenance.json",
 						"ibc/osmosis-source-contract.json",
 						"ibc/resolved-images.json",

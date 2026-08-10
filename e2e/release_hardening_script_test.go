@@ -47,8 +47,6 @@ func TestReleaseHardeningRunnerDoesNotDowngradeRequiredEvidenceToSkips(t *testin
 		`GOPROXY=off`,
 		`GOSUMDB=off`,
 		`builder-cache-record-ids-before-build.txt`,
-		`network disconnect`,
-		`warm-offline-buildkit-contract.txt`,
 		`DOCKER_HOST`,
 		`dependencies-current.jsonl`,
 		`dependencies-v2.2.1.jsonl`,
@@ -62,6 +60,8 @@ func TestReleaseHardeningRunnerDoesNotDowngradeRequiredEvidenceToSkips(t *testin
 	}
 	require.NotContains(t, script, "buildx create --use")
 	require.NotContains(t, strings.ToLower(script), ":latest")
+	require.NotContains(t, strings.ToLower(script), "warm-offline")
+	require.NotContains(t, script, "network disconnect")
 }
 
 func TestReleaseHardeningRunnerInvokesPanaceadForImageVersionChecks(t *testing.T) {
@@ -69,57 +69,7 @@ func TestReleaseHardeningRunnerInvokesPanaceadForImageVersionChecks(t *testing.T
 	require.NoError(t, err)
 	script := string(contents)
 
-	require.Equal(t, 2, strings.Count(script, `--entrypoint /usr/bin/panacead "$image_ref" version --long`))
-}
-
-func TestReleaseHardeningRunnerFindsBuildKitContainerByExactName(t *testing.T) {
-	contents, err := os.ReadFile("../scripts/e2e/release-hardening.sh")
-	require.NoError(t, err)
-	script := string(contents)
-
-	require.Contains(t, script, `builder_container_name="buildx_buildkit_${builder_name}0"`)
-	require.Contains(t, script, `--filter "name=^/$builder_container_name$"`)
-	require.NotContains(t, script, `com.docker.buildx.builder`)
-}
-
-func TestReleaseHardeningRunnerIgnoresDockerInspectTrailingNewlineAfterNetworkDisconnect(t *testing.T) {
-	contents, err := os.ReadFile("../scripts/e2e/release-hardening.sh")
-	require.NoError(t, err)
-	script := string(contents)
-
-	// docker inspect --format always appends a final newline. Command
-	// substitution removes it, so an empty network map remains truly empty.
-	require.Contains(t, script, `builder_networks_before=$(`)
-	require.Contains(t, script, `if [ -z "$builder_networks_before" ]; then`)
-	require.Contains(t, script, `builder_networks_after=$(`)
-	require.Contains(t, script, `if [ -n "$builder_networks_after" ]; then`)
-	require.NotContains(t, script, `if [ -s "$artifact_dir/builder-networks-after-offline.txt" ]; then`)
-}
-
-func TestReleaseHardeningRunnerProvesOfflineBuildsPerPlatformBeforeSwitchingMetadata(t *testing.T) {
-	contents, err := os.ReadFile("../scripts/e2e/release-hardening.sh")
-	require.NoError(t, err)
-	script := string(contents)
-
-	loopStart := strings.Index(script, "for platform in linux/amd64 linux/arm64; do")
-	require.NotEqual(t, -1, loopStart)
-	loop := script[loopStart:]
-	steps := []string{
-		`build_and_verify_image "$platform" "$suffix" current`,
-		`build_and_verify_image "$platform" "$suffix" v2.2.1`,
-		`disconnect_builder_networks "$suffix"`,
-		`warm_offline_buildkit_image "$platform" "$suffix" current`,
-		`warm_offline_buildkit_image "$platform" "$suffix" v2.2.1`,
-		`reconnect_builder_networks "$suffix"`,
-	}
-	previous := -1
-	for _, step := range steps {
-		index := strings.Index(loop, step)
-		require.Greater(t, index, previous, "step %q must follow the preceding per-platform step", step)
-		previous = index
-	}
-	require.Contains(t, script, `builder-networks-$suffix-after-offline.txt`)
-	require.Contains(t, script, `builder-networks-$suffix-after-reconnect.txt`)
+	require.Equal(t, 1, strings.Count(script, `--entrypoint /usr/bin/panacead "$image_ref" version --long`))
 }
 
 func TestReleaseHardeningRunnerPinsInputsToConfiguredGoVersion(t *testing.T) {

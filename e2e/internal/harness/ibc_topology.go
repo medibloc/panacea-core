@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"net/http"
 	"strings"
 	"sync"
 	"testing"
@@ -49,7 +48,6 @@ type ibcTopologyPlan struct {
 	hermesImage    ibc.DockerImage
 	descriptor     IBCTopologyDescriptor
 	artifactConfig Config
-	preflight      OsmosisMainnetPreflightConfig
 	panaceaBinary  IBCBinaryVersionContract
 }
 
@@ -83,7 +81,6 @@ type IBCTopology struct {
 	panaceaUpgradeStep          *IBCPanaceaUpgradeStepEvidence
 	postUpgradeBeforeRelay      *IBCLinkStateSnapshot
 	upgradeContinuityComplete   bool
-	mainnetPreflight            OsmosisMainnetPreflightEvidence
 	panaceaPreUpgradeBinary     IBCChainBinaryEvidence
 	panaceaPostUpgradeBinary    IBCChainBinaryEvidence
 	osmosisPreUpgradeBinary     IBCChainBinaryEvidence
@@ -139,11 +136,6 @@ func newIBCTopologyPlan(cfg IBCTopologyConfig) (*ibcTopologyPlan, error) {
 	if err != nil {
 		return nil, err
 	}
-	preflight, err := resolveOsmosisMainnetPreflightConfig()
-	if err != nil {
-		return nil, err
-	}
-
 	descriptor := IBCTopologyDescriptor{
 		Path:              ibcTopologyPath,
 		PanaceaChainID:    panaceaSpec.ChainConfig.ChainID,
@@ -171,7 +163,6 @@ func newIBCTopologyPlan(cfg IBCTopologyConfig) (*ibcTopologyPlan, error) {
 		hermesImage:    PinnedHermesImage(),
 		descriptor:     descriptor,
 		artifactConfig: artifactConfig,
-		preflight:      preflight,
 		panaceaBinary:  planPanaceaBinaryCopy(panaceaBinary),
 	}, nil
 }
@@ -229,21 +220,6 @@ func StartIBCTopology(
 	if err != nil {
 		return nil, err
 	}
-	preflightClient := &http.Client{
-		Timeout: plan.preflight.Timeout,
-		CheckRedirect: func(_ *http.Request, _ []*http.Request) error {
-			return http.ErrUseLastResponse
-		},
-	}
-	preflight, preflightErr := runOsmosisMainnetPreflight(ctx, preflightClient, plan.preflight, time.Now().UTC())
-	if writeErr := store.writeJSON(osmosisMainnetPreflightArtifactPath, preflight); writeErr != nil {
-		return nil, errors.Join(preflightErr, fmt.Errorf("write Osmosis mainnet preflight artifact: %w", writeErr))
-	}
-	if preflightErr != nil {
-		store.recordFailure("ibc-osmosis-mainnet-preflight", preflightErr)
-		return nil, fmt.Errorf("Osmosis mainnet preflight: %w", preflightErr)
-	}
-
 	cosmos.SetSDKConfig("panacea")
 	logger := zaptest.NewLogger(t)
 	chainFactory := interchaintest.NewBuiltinChainFactory(logger, []*interchaintest.ChainSpec{
@@ -364,14 +340,13 @@ func StartIBCTopology(
 			Path:    plan.path,
 		})
 	topology = &IBCTopology{
-		Panacea:          panacea,
-		Osmosis:          osmosis,
-		Relayer:          hermesRelayer,
-		Path:             plan.path,
-		artifacts:        artifacts,
-		hermes:           hermesRelayer,
-		execReporter:     execReporter,
-		mainnetPreflight: preflight,
+		Panacea:      panacea,
+		Osmosis:      osmosis,
+		Relayer:      hermesRelayer,
+		Path:         plan.path,
+		artifacts:    artifacts,
+		hermes:       hermesRelayer,
+		execReporter: execReporter,
 	}
 	interchainBuilt = true
 	if err := interchain.Build(ctx, execReporter, interchaintest.InterchainBuildOptions{

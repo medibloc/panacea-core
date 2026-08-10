@@ -109,7 +109,6 @@ func TestReleaseRunnerUsesOnePinnedCurrentSourceForEveryBuildBoundary(t *testing
 		`dockerfile="$current_source/e2e/docker/Dockerfile.release"`,
 		`--build-context "panacea_e2e_tools=$current_source/scripts/e2e"`,
 		`build_and_verify_image "$platform" "$suffix" current "$current_source" "$current_vendor"`,
-		`warm_offline_buildkit_image "$platform" "$suffix" current "$current_source" "$current_vendor"`,
 	} {
 		require.Contains(t, script, contract)
 	}

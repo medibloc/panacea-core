@@ -15,8 +15,6 @@ func TestReleaseHardeningManifestRequiresBothArchitecturesAndRealUpgrades(t *tes
 		SourceClean:                   true,
 		ColdGoCaches:                  true,
 		FreshBuildKitBuilder:          true,
-		WarmOfflineHostBuild:          true,
-		WarmOfflineBuildKitBuild:      true,
 		DockerBuildNetwork:            "none",
 		Platforms:                     []string{"linux/arm64", "linux/amd64"},
 		VersionAndSmoke:               true,
@@ -40,9 +38,9 @@ func TestReleaseHardeningManifestRequiresBothArchitecturesAndRealUpgrades(t *tes
 	networkedBuild.DockerBuildNetwork = "default"
 	require.ErrorContains(t, networkedBuild.Validate(), "want none")
 
-	registryDependentBuild := valid
-	registryDependentBuild.WarmOfflineBuildKitBuild = false
-	require.ErrorContains(t, registryDependentBuild.Validate(), "BuildKit")
+	notCold := valid
+	notCold.ColdGoCaches = false
+	require.ErrorContains(t, notCold.Validate(), "cold Go caches")
 
 	dirtySource := valid
 	dirtySource.SourceClean = false

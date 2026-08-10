@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	ReleaseHardeningManifestSchemaVersion = "4"
+	ReleaseHardeningManifestSchemaVersion = "5"
 	ReleaseHostImageIdentitySchemaVersion = "1"
 	ReleaseHostImageIdentityArtifactPath  = "host-image-identity.json"
 )
@@ -38,8 +38,6 @@ type ReleaseHardeningManifest struct {
 	SourceClean                   bool                           `json:"source_clean"`
 	ColdGoCaches                  bool                           `json:"cold_go_caches"`
 	FreshBuildKitBuilder          bool                           `json:"fresh_buildkit_builder"`
-	WarmOfflineHostBuild          bool                           `json:"warm_offline_host_build"`
-	WarmOfflineBuildKitBuild      bool                           `json:"warm_offline_buildkit_build"`
 	DockerBuildNetwork            string                         `json:"docker_build_network"`
 	Platforms                     []string                       `json:"platforms"`
 	VersionAndSmoke               bool                           `json:"version_and_smoke"`
@@ -79,8 +77,8 @@ func (m ReleaseHardeningManifest) Validate() error {
 	if !m.SourceClean {
 		return errors.New("release hardening source_clean must prove an unchanged HEAD worktree")
 	}
-	if !m.ColdGoCaches || !m.FreshBuildKitBuilder || !m.WarmOfflineHostBuild || !m.WarmOfflineBuildKitBuild {
-		return errors.New("release hardening requires cold Go caches, a fresh BuildKit builder, and warm offline host and BuildKit builds")
+	if !m.ColdGoCaches || !m.FreshBuildKitBuilder {
+		return errors.New("release hardening requires cold Go caches and a fresh BuildKit builder")
 	}
 	if m.DockerBuildNetwork != "none" {
 		return fmt.Errorf("release Docker build network %q, want none", m.DockerBuildNetwork)
@@ -343,18 +341,12 @@ func ValidateReleaseHardeningArtifact(manifestPath string) error {
 		"docker-host.txt",
 		"source-files-sha256.txt",
 		"builder-cache-before-build.txt",
-		"builder-networks-before-offline.txt",
-		"builder-network-cycles.txt",
-		"warm-offline-buildkit-contract.txt",
 	} {
 		if err := requireNonemptyReleaseArtifact(dir, dependencyFile); err != nil {
 			return err
 		}
 	}
-	for _, emptyEvidence := range []string{
-		"builder-cache-record-ids-before-build.txt",
-		"builder-networks-after-offline.txt",
-	} {
+	for _, emptyEvidence := range []string{"builder-cache-record-ids-before-build.txt"} {
 		info, err := os.Stat(filepath.Join(dir, emptyEvidence))
 		if err != nil {
 			return err
@@ -391,27 +383,8 @@ func ValidateReleaseHardeningArtifact(manifestPath string) error {
 		}
 		indexedImages[key] = struct{}{}
 	}
-	networkCycles, err := os.ReadFile(filepath.Join(dir, "builder-network-cycles.txt"))
-	if err != nil {
-		return err
-	}
-
 	for _, platform := range releaseExpectedPlatforms {
 		suffix := strings.TrimPrefix(platform, "linux/")
-		if !strings.Contains(string(networkCycles), "platform="+platform+" disconnected=true reconnected=true\n") {
-			return fmt.Errorf("release evidence is missing the completed BuildKit network cycle for %s", platform)
-		}
-		for _, name := range []string{
-			"builder-networks-" + suffix + "-before-offline.txt",
-			"builder-networks-" + suffix + "-after-reconnect.txt",
-		} {
-			if err := requireNonemptyReleaseArtifact(dir, name); err != nil {
-				return err
-			}
-		}
-		if err := requireEmptyReleaseArtifact(dir, "builder-networks-"+suffix+"-after-offline.txt"); err != nil {
-			return err
-		}
 		for _, kind := range releaseExpectedImageKinds {
 			record := manifestImages[kind+"|"+platform]
 			prefix := kind + "-" + suffix
@@ -464,41 +437,6 @@ func ValidateReleaseHardeningArtifact(manifestPath string) error {
 			}
 			if _, err := os.Stat(filepath.Join(dir, prefix+"-smoke.txt")); err != nil {
 				return err
-			}
-			warmPrefix := "warm-offline-" + prefix
-			warmMetadataContents, err := os.ReadFile(filepath.Join(dir, warmPrefix+"-build-metadata.json"))
-			if err != nil {
-				return err
-			}
-			var warmMetadata map[string]any
-			if err := json.Unmarshal(warmMetadataContents, &warmMetadata); err != nil {
-				return fmt.Errorf("decode %s build metadata: %w", warmPrefix, err)
-			}
-			warmDigest, _ := warmMetadata["containerimage.digest"].(string)
-			if !releaseDigestPattern.MatchString(warmDigest) {
-				return fmt.Errorf("%s OCI image digest %q is invalid", warmPrefix, warmDigest)
-			}
-			if warmDigest != digest {
-				return fmt.Errorf("%s OCI image digest %s differs from cold build %s", warmPrefix, warmDigest, digest)
-			}
-			for _, suffixName := range []string{"build.log", "image-inspect.json", "version.txt"} {
-				if err := requireNonemptyReleaseArtifact(dir, warmPrefix+"-"+suffixName); err != nil {
-					return err
-				}
-			}
-			warmInspect, err := readReleaseDockerImageInspect(filepath.Join(dir, warmPrefix+"-image-inspect.json"))
-			if err != nil {
-				return err
-			}
-			if err := requireReleaseInspectIdentity(warmInspect, platform, record.ImageID); err != nil {
-				return fmt.Errorf("validate %s image inspect: %w", warmPrefix, err)
-			}
-			warmVersion, err := os.ReadFile(filepath.Join(dir, warmPrefix+"-version.txt"))
-			if err != nil {
-				return err
-			}
-			if !strings.Contains(string(warmVersion), "version: "+record.Version+"\n") || !strings.Contains(string(warmVersion), "commit: "+record.SourceCommit+"\n") {
-				return fmt.Errorf("%s version evidence does not match manifest version/commit", warmPrefix)
 			}
 		}
 

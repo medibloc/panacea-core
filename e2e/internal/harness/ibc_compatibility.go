@@ -15,7 +15,7 @@ import (
 
 const (
 	IBCCompatibilityMatrixArtifactPath = "ibc-compatibility-matrix.json"
-	ibcCompatibilityMatrixSchema       = "panacea.ibc-compatibility-matrix/v1"
+	ibcCompatibilityMatrixSchema       = "panacea.ibc-compatibility-matrix/v2"
 
 	panaceaV221SourceCommit = "a1b342939ba6ac3092aeebbee6a2fa741a34d47f"
 	panaceaCurrentVersion   = "2.3.0"
@@ -28,11 +28,8 @@ const (
 	ibcHooksModulePath   = "github.com/osmosis-labs/osmosis/x/ibc-hooks"
 	osmosisSDKModulePath = "github.com/osmosis-labs/cosmos-sdk"
 
-	ibcInvestigationConfirmed               = "confirmed"
-	ibcInvestigationPinnedSourceLiveLimited = "pinned-source-live-limited"
-	ibcInvestigationMismatch                = "mismatch"
-	ibcInvestigationUnavailable             = "unavailable"
-	ibcMiddlewareLiveObservationScope       = "channel-and-build-metadata-only"
+	ibcInvestigationPinnedSourceLocal = "pinned-source-local-runtime"
+	ibcMiddlewareObservationScope     = "local-channel-and-binary-metadata"
 )
 
 // IBCDependencyContract is an exact Go module path/version pair. Paths are
@@ -161,19 +158,6 @@ func pinnedOsmosisBinaryContract() IBCBinaryVersionContract {
 			{Path: ibcHooksModulePath, Version: "v0.0.21"},
 		},
 	}
-}
-
-// osmosisNodeInfoObservableContract removes replacement metadata because the
-// Cosmos node-info REST shape exposes only each original module path/version.
-// The exact replacement remains mandatory for local `version --long` and is
-// separately pinned in the Osmosis source contract artifact.
-func osmosisNodeInfoObservableContract() IBCBinaryVersionContract {
-	contract := pinnedOsmosisBinaryContract()
-	contract.Dependencies = append([]IBCDependencyContract(nil), contract.Dependencies...)
-	for index := range contract.Dependencies {
-		contract.Dependencies[index].Replacement = nil
-	}
-	return contract
 }
 
 func panaceaBinaryContractForImage(image ImageRef) (IBCBinaryVersionContract, error) {
@@ -546,8 +530,8 @@ type IBCMiddlewareInvestigationEvidence struct {
 func expectedOsmosisMiddlewareEvidence() IBCMiddlewareInvestigationEvidence {
 	source := pinnedOsmosisSourceContract()
 	return IBCMiddlewareInvestigationEvidence{
-		InvestigationStatus:              ibcInvestigationPinnedSourceLiveLimited,
-		LiveObservationScope:             ibcMiddlewareLiveObservationScope,
+		InvestigationStatus:              ibcInvestigationPinnedSourceLocal,
+		LiveObservationScope:             ibcMiddlewareObservationScope,
 		ChannelApplicationVersion:        "ics20-1",
 		WiringObservedLive:               false,
 		PerChannelActivationObservedLive: false,
@@ -566,15 +550,15 @@ func expectedOsmosisMiddlewareEvidence() IBCMiddlewareInvestigationEvidence {
 func (e IBCMiddlewareInvestigationEvidence) Validate() error {
 	want := expectedOsmosisMiddlewareEvidence()
 	var validationErrors []error
-	if e.InvestigationStatus != ibcInvestigationPinnedSourceLiveLimited {
+	if e.InvestigationStatus != ibcInvestigationPinnedSourceLocal {
 		validationErrors = append(validationErrors, fmt.Errorf(
 			"middleware investigation status = %q, want %q",
 			e.InvestigationStatus,
-			ibcInvestigationPinnedSourceLiveLimited,
+			ibcInvestigationPinnedSourceLocal,
 		))
 	}
-	if e.LiveObservationScope != ibcMiddlewareLiveObservationScope || e.ChannelApplicationVersion != "ics20-1" {
-		validationErrors = append(validationErrors, errors.New("middleware live evidence is not limited to channel and build metadata"))
+	if e.LiveObservationScope != ibcMiddlewareObservationScope || e.ChannelApplicationVersion != "ics20-1" {
+		validationErrors = append(validationErrors, errors.New("middleware evidence is not limited to local channel and binary metadata"))
 	}
 	if e.WiringObservedLive || e.PerChannelActivationObservedLive {
 		validationErrors = append(validationErrors, errors.New("middleware live evidence overstates wiring or per-channel activation visibility"))
@@ -593,26 +577,6 @@ func (e IBCMiddlewareInvestigationEvidence) Validate() error {
 		validationErrors = append(validationErrors, fmt.Errorf("middleware investigation recorded an error: %s", e.Error))
 	}
 	return errors.Join(validationErrors...)
-}
-
-func newOsmosisMiddlewareEvidence(
-	nodeInfo OsmosisMainnetNodeInfoEvidence,
-	channel OsmosisMainnetChannelEvidence,
-) (IBCMiddlewareInvestigationEvidence, error) {
-	evidence := expectedOsmosisMiddlewareEvidence()
-	evidence.ChannelApplicationVersion = channel.Version
-	evidence.Dependencies = nil
-	for _, path := range []string{pfmV8ModulePath, ibcHooksModulePath} {
-		dependency, ok := nodeInfo.Binary.Dependency(path)
-		if !ok {
-			return evidence, fmt.Errorf("live Osmosis node-info has no middleware dependency %s", path)
-		}
-		evidence.Dependencies = append(evidence.Dependencies, dependency)
-	}
-	if err := evidence.Validate(); err != nil {
-		return evidence, err
-	}
-	return evidence, nil
 }
 
 type IBCCompatibilityChannelContract struct {
@@ -660,25 +624,21 @@ type IBCHermesCompatibilityMatrix struct {
 }
 
 type IBCCompatibilityMatrix struct {
-	SchemaVersion    string                             `json:"schema_version"`
-	GeneratedAt      time.Time                          `json:"generated_at"`
-	MainnetPreflight OsmosisMainnetPreflightEvidence    `json:"mainnet_preflight"`
-	Panacea          IBCBinaryUpgradeMatrix             `json:"panacea"`
-	Osmosis          IBCOsmosisCompatibilityMatrix      `json:"osmosis"`
-	Channel          IBCCompatibilityChannelContract    `json:"channel"`
-	Middleware       IBCMiddlewareInvestigationEvidence `json:"middleware"`
-	Hermes           IBCHermesCompatibilityMatrix       `json:"hermes"`
-	Validated        bool                               `json:"validated"`
-	Error            string                             `json:"error,omitempty"`
+	SchemaVersion string                             `json:"schema_version"`
+	GeneratedAt   time.Time                          `json:"generated_at"`
+	Panacea       IBCBinaryUpgradeMatrix             `json:"panacea"`
+	Osmosis       IBCOsmosisCompatibilityMatrix      `json:"osmosis"`
+	Channel       IBCCompatibilityChannelContract    `json:"channel"`
+	Middleware    IBCMiddlewareInvestigationEvidence `json:"middleware"`
+	Hermes        IBCHermesCompatibilityMatrix       `json:"hermes"`
+	Validated     bool                               `json:"validated"`
+	Error         string                             `json:"error,omitempty"`
 }
 
 func (m IBCCompatibilityMatrix) Validate() error {
 	var validationErrors []error
 	if m.SchemaVersion != ibcCompatibilityMatrixSchema || m.GeneratedAt.IsZero() {
 		validationErrors = append(validationErrors, errors.New("IBC compatibility matrix metadata is incomplete"))
-	}
-	if err := m.MainnetPreflight.Validate(); err != nil {
-		validationErrors = append(validationErrors, fmt.Errorf("mainnet preflight: %w", err))
 	}
 	if err := m.Panacea.PreUpgrade.Validate(); err != nil {
 		validationErrors = append(validationErrors, fmt.Errorf("Panacea pre-upgrade binary: %w", err))
