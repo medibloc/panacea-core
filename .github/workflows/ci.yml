@@ -27,6 +27,9 @@ jobs:
       with:
         go-version-file: go.mod
         cache: true
+        cache-dependency-path: |
+          go.sum
+          e2e/go.sum
       id: go
 
     - name: Check protobuf generation
@@ -43,6 +46,10 @@ jobs:
 
     - name: Test
       run: make test
+
+    - name: Test e2e module
+      working-directory: e2e
+      run: go test ./...
 
     - name: Lint
       uses: golangci/golangci-lint-action@ba0d7d2ec06a0ea1cb5fa41b2e4a3ab91d21278a # v9.3.0
