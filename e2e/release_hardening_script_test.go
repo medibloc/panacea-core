@@ -683,3 +683,36 @@ func TestCanonicalStaticBuildContractCannotBeDowngradedByMakeArguments(t *testin
 	require.NotContains(t, contract, "go build -mod=readonly")
 	require.NotContains(t, contract, " unsafe ")
 }
+
+func TestDarwinReleaseBuildContractCannotBeDowngradedByMakeArguments(t *testing.T) {
+	command := exec.Command(
+		"make", "-n", "-C", "..", "release-build-darwin",
+		"LEDGER_ENABLED=false",
+		"VERSION=2.3.0",
+		"COMMIT=0123456789abcdef0123456789abcdef01234567",
+		"RELEASE_GOARCH=arm64",
+		"RELEASE_OUTPUT=/tmp/panacea-darwin-release-contract-test",
+		"RELEASE_BUILD_MOD=readonly",
+		"RELEASE_BUILD_FLAGS=unsafe",
+	)
+	output, err := command.CombinedOutput()
+	require.NoErrorf(t, err, "make dry-run output:\n%s", output)
+	contract := string(output)
+	require.Contains(t, contract, `GOOS=darwin GOARCH="arm64" GOAMD64=v1 GOARM64=v8.0`)
+	require.Contains(t, contract, "CGO_ENABLED=0")
+	require.Contains(t, contract, `go build -mod=vendor -tags "netgo"`)
+	require.NotContains(t, contract, "go build -mod=readonly")
+	require.NotContains(t, contract, " unsafe ")
+}
+
+func TestDarwinReleaseBuildRejectsUnsupportedArchitecture(t *testing.T) {
+	command := exec.Command(
+		"make", "-C", "..", "release-build-darwin",
+		"LEDGER_ENABLED=false",
+		"RELEASE_GOARCH=386",
+		"RELEASE_OUTPUT=/tmp/panacea-darwin-release-contract-test",
+	)
+	output, err := command.CombinedOutput()
+	require.Error(t, err)
+	require.Contains(t, string(output), "RELEASE_GOARCH must be amd64 or arm64")
+}

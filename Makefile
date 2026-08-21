@@ -136,6 +136,22 @@ release-build: go.sum
 		go build -mod=$(RELEASE_BUILD_MOD) $(RELEASE_BUILD_FLAGS) \
 			-o "$(RELEASE_OUTPUT)" ./cmd/panacead
 
+# release-build-darwin mirrors the distributable release metadata and dependency
+# contract without weakening the Linux validator contract. It emits a pure-Go
+# Mach-O binary for Intel or Apple Silicon and does not sign or package it.
+release-build-darwin: go.sum
+	@case "$(RELEASE_GOARCH)" in \
+		amd64|arm64) ;; \
+		*) echo "RELEASE_GOARCH must be amd64 or arm64" >&2; exit 2 ;; \
+	esac
+	@mkdir -p "$(dir $(RELEASE_OUTPUT))"
+	LC_ALL=C TZ=UTC GOENV=off GOTOOLCHAIN=local GOWORK=off \
+		GOFLAGS=-buildvcs=false GOEXPERIMENT= GOFIPS140=off GODEBUG= \
+		GOOS=darwin GOARCH="$(RELEASE_GOARCH)" GOAMD64=v1 GOARM64=v8.0 \
+		CGO_ENABLED=0 \
+		go build -mod=$(RELEASE_BUILD_MOD) $(RELEASE_BUILD_FLAGS) \
+			-o "$(RELEASE_OUTPUT)" ./cmd/panacead
+
 test: proto-gen-test
 	mkdir -p $(ARTIFACT_DIR)
 	go test -covermode=count -coverprofile=$(ARTIFACT_DIR)/coverage.out ./...
@@ -147,7 +163,7 @@ $(BUILD_TARGETS): go.sum $(BUILDDIR)/
 $(BUILDDIR)/:
 	mkdir -p $(BUILDDIR)/
 
-.PHONY: build build-linux release-build
+.PHONY: build build-linux release-build release-build-darwin
 
 distclean: clean
 clean:
