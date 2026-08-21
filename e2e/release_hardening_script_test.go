@@ -716,3 +716,10 @@ func TestDarwinReleaseBuildRejectsUnsupportedArchitecture(t *testing.T) {
 	require.Error(t, err)
 	require.Contains(t, string(output), "RELEASE_GOARCH must be amd64 or arm64")
 }
+
+func TestMacOSReleaseBuilderFixtures(t *testing.T) {
+	command := exec.Command("sh", "../scripts/release/build-macos-test.sh")
+	output, err := command.CombinedOutput()
+	require.NoErrorf(t, err, "macOS release builder fixture output:\n%s", output)
+	require.Contains(t, string(output), "macOS release builder fixtures passed")
+}
