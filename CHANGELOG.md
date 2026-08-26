@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+### Bug fixes
+
+- Upgrade IAVL from v1.2.2 to v1.2.5 so state-sync snapshot imports wait for
+  outstanding database batch writes before loading the restored tree.
+
 ## [v2.3.0](https://github.com/medibloc/panacea-core/releases/tag/v2.3.0) - 2026-08-10
 
 ### Consensus and dependency upgrades
