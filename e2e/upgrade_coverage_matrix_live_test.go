@@ -2,6 +2,7 @@ package e2e_test
 
 import (
 	"fmt"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -26,7 +27,10 @@ type connectedUpgradeCoverageInput struct {
 	LegacyAminoCustom     *upgradeV221LegacyAminoCustomTxsFixture
 }
 
-func buildConnectedUpgradeCoverageMatrix(input connectedUpgradeCoverageInput) harness.UpgradeCoverageMatrix {
+func buildConnectedUpgradeCoverageMatrix(
+	input connectedUpgradeCoverageInput,
+	targetVersion string,
+) harness.UpgradeCoverageMatrix {
 	passed := func(name harness.UpgradeCoveragePhaseName, paths ...string) harness.UpgradeCoveragePhase {
 		return harness.UpgradeCoveragePhase{
 			Name:          name,
@@ -408,7 +412,7 @@ func buildConnectedUpgradeCoverageMatrix(input connectedUpgradeCoverageInput) ha
 		RecordedAt:    time.Now().UTC(),
 		UpgradeName:   upgradeName,
 		SourceVersion: "2.2.1",
-		TargetVersion: upgradeBinaryVersion,
+		TargetVersion: strings.TrimSpace(targetVersion),
 		Rows:          rows,
 	}
 }
@@ -550,7 +554,10 @@ func recordConnectedUpgradeCoverage(
 	if err := validateConnectedUpgradeCoverageInput(input); err != nil {
 		return fmt.Errorf("validate connected upgrade coverage input: %w", err)
 	}
-	matrix := buildConnectedUpgradeCoverageMatrix(input)
+	matrix := buildConnectedUpgradeCoverageMatrix(
+		input,
+		os.Getenv("PANACEA_E2E_CURRENT_BINARY_VERSION"),
+	)
 	if err := matrix.Validate(); err != nil {
 		return fmt.Errorf("validate connected upgrade coverage matrix: %w", err)
 	}

@@ -1,6 +1,7 @@
 package e2e_test
 
 import (
+	"strings"
 	"time"
 
 	"github.com/medibloc/panacea-core/v2/e2e/internal/harness"
@@ -27,7 +28,10 @@ var ibcCoverageRequirements = []ibcCoverageRequirement{
 	{harness.UpgradeCoverageAreaIBCTransfer, harness.UpgradeCoveragePriorityP1},
 }
 
-func buildIBCUpgradeCoverageMatrix(evidence harness.IBCUpgradeContinuityEvidence) harness.UpgradeCoverageMatrix {
+func buildIBCUpgradeCoverageMatrix(
+	evidence harness.IBCUpgradeContinuityEvidence,
+	targetVersion string,
+) harness.UpgradeCoverageMatrix {
 	phaseNames := []harness.UpgradeCoveragePhaseName{
 		harness.UpgradeCoveragePhaseV221Preparation,
 		harness.UpgradeCoveragePhasePreUpgradeCheckpoint,
@@ -104,7 +108,7 @@ func buildIBCUpgradeCoverageMatrix(evidence harness.IBCUpgradeContinuityEvidence
 		RecordedAt:    time.Now().UTC(),
 		UpgradeName:   upgradeName,
 		SourceVersion: "2.2.1",
-		TargetVersion: upgradeBinaryVersion,
+		TargetVersion: strings.TrimSpace(targetVersion),
 		Rows:          rows,
 	}
 }

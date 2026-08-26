@@ -64,6 +64,20 @@ func TestReleaseHardeningRunnerDoesNotDowngradeRequiredEvidenceToSkips(t *testin
 	require.NotContains(t, script, "network disconnect")
 }
 
+func TestE2ERunnersDefaultToCurrentPatchReleaseVersion(t *testing.T) {
+	for _, scriptPath := range []string{
+		"../scripts/e2e/run.sh",
+		"../scripts/e2e/release-hardening.sh",
+	} {
+		contents, err := os.ReadFile(scriptPath)
+		require.NoError(t, err)
+		require.Contains(t, string(contents),
+			"E2E_CURRENT_BINARY_VERSION=${E2E_CURRENT_BINARY_VERSION:-2.3.1}",
+			scriptPath,
+		)
+	}
+}
+
 func TestReleaseHardeningRunnerInvokesPanaceadForImageVersionChecks(t *testing.T) {
 	contents, err := os.ReadFile("../scripts/e2e/release-hardening.sh")
 	require.NoError(t, err)

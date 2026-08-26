@@ -13,11 +13,12 @@ import (
 func TestDecodeConfigCompatibilityGRPCWebUnaryResponse(t *testing.T) {
 	t.Parallel()
 
+	const currentPatchVersion = "2.3.1"
 	want := &cmtservice.GetNodeInfoResponse{
 		DefaultNodeInfo: &p2p.DefaultNodeInfo{Network: "panacea-test"},
 		ApplicationVersion: &cmtservice.VersionInfo{
 			AppName: configCompatibilityGRPCWebAppName,
-			Version: upgradeBinaryVersion,
+			Version: currentPatchVersion,
 		},
 	}
 	payload, err := proto.Marshal(want)
@@ -33,11 +34,15 @@ func TestDecodeConfigCompatibilityGRPCWebUnaryResponse(t *testing.T) {
 	require.NoError(t, proto.Unmarshal(gotPayload, &got))
 	require.Equal(t, want.GetDefaultNodeInfo().Network, got.GetDefaultNodeInfo().Network)
 	require.Equal(t, want.GetApplicationVersion().Version, got.GetApplicationVersion().Version)
-	network, appName, appVersion, err := validateConfigCompatibilityGRPCWebNodeInfo(&got, "panacea-test")
+	network, appName, appVersion, err := validateConfigCompatibilityGRPCWebNodeInfo(
+		&got,
+		"panacea-test",
+		currentPatchVersion,
+	)
 	require.NoError(t, err)
 	require.Equal(t, "panacea-test", network)
 	require.Equal(t, configCompatibilityGRPCWebAppName, appName)
-	require.Equal(t, upgradeBinaryVersion, appVersion)
+	require.Equal(t, currentPatchVersion, appVersion)
 
 	_, _, _, err = decodeConfigCompatibilityGRPCWebUnaryResponse(
 		appendConfigCompatibilityGRPCWebFrame(nil, 0, payload),
@@ -68,10 +73,12 @@ func TestDecodeConfigCompatibilityGRPCWebUnaryResponse(t *testing.T) {
 
 	wrongApp := proto.Clone(want).(*cmtservice.GetNodeInfoResponse)
 	wrongApp.ApplicationVersion.AppName = "otherd"
-	_, _, _, err = validateConfigCompatibilityGRPCWebNodeInfo(wrongApp, "panacea-test")
+	_, _, _, err = validateConfigCompatibilityGRPCWebNodeInfo(wrongApp, "panacea-test", currentPatchVersion)
 	require.ErrorContains(t, err, "otherd")
-	_, _, _, err = validateConfigCompatibilityGRPCWebNodeInfo(want, "other-chain")
+	_, _, _, err = validateConfigCompatibilityGRPCWebNodeInfo(want, "other-chain", currentPatchVersion)
 	require.ErrorContains(t, err, "other-chain")
+	_, _, _, err = validateConfigCompatibilityGRPCWebNodeInfo(want, "panacea-test", "")
+	require.ErrorContains(t, err, "PANACEA_E2E_CURRENT_BINARY_VERSION")
 }
 
 func appendConfigCompatibilityGRPCWebFrame(body []byte, flags byte, payload []byte) []byte {

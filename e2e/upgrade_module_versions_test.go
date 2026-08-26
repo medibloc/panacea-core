@@ -195,7 +195,7 @@ func upgradeModuleVersionsQueryCommand(binaryVersion string) ([]string, error) {
 	case "2.2.1":
 		// Cosmos SDK v0.47 exposed the command with an underscore.
 		return []string{"upgrade", "module_versions"}, nil
-	case upgradeBinaryVersion:
+	case upgradeTargetVersion:
 		// Cosmos SDK v0.50 renamed it to the kebab-case command.
 		return []string{"upgrade", "module-versions"}, nil
 	default:
@@ -233,7 +233,7 @@ func TestUpgradeModuleVersionsQueryCommandIsVersionSpecific(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, []string{"upgrade", "module_versions"}, oldCommand)
 
-	currentCommand, err := upgradeModuleVersionsQueryCommand(upgradeBinaryVersion)
+	currentCommand, err := upgradeModuleVersionsQueryCommand(upgradeTargetVersion)
 	require.NoError(t, err)
 	require.Equal(t, []string{"upgrade", "module-versions"}, currentCommand)
 

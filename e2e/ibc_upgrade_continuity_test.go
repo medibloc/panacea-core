@@ -74,7 +74,10 @@ func TestIBCUpgradeContinuity(t *testing.T) {
 	require.Len(t, evidence.DenomTraceContinuity, 3)
 	require.Len(t, evidence.FinalBalances, 4)
 	require.Len(t, evidence.FinalEscrowBalances, 2)
-	require.NoError(t, topology.RecordUpgradeCoverageMatrix(buildIBCUpgradeCoverageMatrix(evidence)))
+	require.NoError(t, topology.RecordUpgradeCoverageMatrix(buildIBCUpgradeCoverageMatrix(
+		evidence,
+		os.Getenv("PANACEA_E2E_CURRENT_BINARY_VERSION"),
+	)))
 
 	_, err = topology.OpenTransferChannel(ctx)
 	require.Error(t, err, "the continuity suite must not bypass a failure by creating a replacement handshake")

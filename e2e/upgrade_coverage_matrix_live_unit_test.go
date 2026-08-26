@@ -43,7 +43,8 @@ func TestBuildConnectedUpgradeCoverageMatrixIsHonestAboutSeparateIBCLane(t *test
 			SignerAddress: "panacea1oldsigned",
 			TxHash:        "ABC123",
 		},
-	})
+	}, "2.3.1")
+	require.Equal(t, "2.3.1", matrix.TargetVersion)
 
 	require.NoError(t, matrix.Validate())
 	require.Len(t, matrix.Rows, 13)
@@ -127,7 +128,7 @@ func TestBuildConnectedUpgradeCoverageMatrixUsesAdversarialLegacyEvidence(t *tes
 		}},
 	}
 
-	matrix := buildConnectedUpgradeCoverageMatrix(input)
+	matrix := buildConnectedUpgradeCoverageMatrix(input, "2.3.1")
 	require.NoError(t, matrix.Validate())
 	for _, row := range matrix.Rows {
 		if row.Area != harness.UpgradeCoverageAreaLegacyPNFT {
@@ -213,7 +214,7 @@ func TestBuildConnectedUpgradeCoverageMatrixLinksStrengthenedP0Evidence(t *testi
 		StakingTimeQueues: &stakingQueues,
 		SlashingJail:      &slashing,
 		LegacyAminoCustom: &legacy,
-	})
+	}, "2.3.1")
 	require.NoError(t, matrix.Validate())
 
 	expected := map[harness.UpgradeCoverageArea]struct {
@@ -282,7 +283,7 @@ func TestBuildConnectedUpgradeCoverageMatrixMarksStrengthenedP0RowsNotRunInAdver
 		LegacyPNFT: &legacyPNFTUpgradeRunState{Prepared: preparedLegacyPNFTFixture{
 			Fixture: legacyPNFTFixture{DenomID: "panacea1legacy:denom", PNFTID: "legacy-nft"},
 		}},
-	})
+	}, "2.3.1")
 
 	wantNotRun := map[harness.UpgradeCoverageArea]struct{}{
 		harness.UpgradeCoverageAreaAuthBank: {},

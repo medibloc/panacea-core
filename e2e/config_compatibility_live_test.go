@@ -119,7 +119,9 @@ func TestV047NodeHomeConfigCompatibility(t *testing.T) {
 		require.NoError(t, network.WaitForNodeHeight(ctx, node, upgradeHeight+3))
 		stdout, stderr, versionErr := node.ExecBin(ctx, "version", "--long")
 		require.NoError(t, versionErr, "%s", stderr)
-		require.Contains(t, string(stdout), "version: 2.3.0")
+		identity, identityErr := decodeUpgradeBinaryIdentity(stdout)
+		require.NoError(t, identityErr)
+		assertCurrentUpgradeBinaryIdentity(t, identity)
 		require.NoError(t, network.WriteArtifact("config-compat/versions/"+node.Name()+".txt", stdout))
 	}
 	_, err = network.RequireSameHistoryAtHeight(ctx, upgradeHeight+2, allNodes...)
@@ -277,7 +279,11 @@ func probeConfigCompatibilityGRPCWeb(
 		return fail(fmt.Errorf("%s gRPC-Web node info is incomplete", phase))
 	}
 	evidence.Network, evidence.ApplicationName, evidence.ApplicationVersion, err =
-		validateConfigCompatibilityGRPCWebNodeInfo(&nodeInfo, expectedNetwork)
+		validateConfigCompatibilityGRPCWebNodeInfo(
+			&nodeInfo,
+			expectedNetwork,
+			os.Getenv("PANACEA_E2E_CURRENT_BINARY_VERSION"),
+		)
 	if err != nil {
 		return fail(fmt.Errorf("%s gRPC-Web node info: %w", phase, err))
 	}
@@ -300,9 +306,14 @@ func validateConfigCompatibilityGRPCWebContentType(contentType string) error {
 func validateConfigCompatibilityGRPCWebNodeInfo(
 	nodeInfo *cmtservice.GetNodeInfoResponse,
 	expectedNetwork string,
+	expectedApplicationVersion string,
 ) (string, string, string, error) {
 	if nodeInfo == nil || nodeInfo.GetDefaultNodeInfo() == nil || nodeInfo.GetApplicationVersion() == nil {
 		return "", "", "", errors.New("response is incomplete")
+	}
+	expectedApplicationVersion = strings.TrimSpace(expectedApplicationVersion)
+	if expectedApplicationVersion == "" {
+		return "", "", "", errors.New("PANACEA_E2E_CURRENT_BINARY_VERSION is required")
 	}
 	network := nodeInfo.GetDefaultNodeInfo().Network
 	applicationName := nodeInfo.GetApplicationVersion().AppName
@@ -310,13 +321,13 @@ func validateConfigCompatibilityGRPCWebNodeInfo(
 	if network != expectedNetwork {
 		return network, applicationName, applicationVersion, fmt.Errorf("network = %q, want %q", network, expectedNetwork)
 	}
-	if applicationName != configCompatibilityGRPCWebAppName || applicationVersion != upgradeBinaryVersion {
+	if applicationName != configCompatibilityGRPCWebAppName || applicationVersion != expectedApplicationVersion {
 		return network, applicationName, applicationVersion, fmt.Errorf(
 			"application identity = %q@%q, want %q@%q",
 			applicationName,
 			applicationVersion,
 			configCompatibilityGRPCWebAppName,
-			upgradeBinaryVersion,
+			expectedApplicationVersion,
 		)
 	}
 	return network, applicationName, applicationVersion, nil

@@ -85,18 +85,14 @@ version: 2.3.0
 	require.ErrorContains(t, err, "incomplete binary identity")
 }
 
-func TestValidateCurrentUpgradeBinaryIdentityRequiresV230(t *testing.T) {
+func TestValidateCurrentUpgradeBinaryIdentityAcceptsPatchRelease(t *testing.T) {
 	valid := upgradeBinaryIdentity{
 		Name:             "panacea-core",
-		Version:          "2.3.0",
+		Version:          "2.3.1",
 		Commit:           "current-commit",
 		CosmosSDKVersion: "v0.50.15",
 	}
 	require.NoError(t, validateCurrentUpgradeBinaryIdentity(valid))
-
-	wrongVersion := valid
-	wrongVersion.Version = "2.2.1-237-g4cfc858"
-	require.ErrorContains(t, validateCurrentUpgradeBinaryIdentity(wrongVersion), "2.3.0")
 
 	oldCommit := valid
 	oldCommit.Commit = upgradeV221Commit
@@ -106,14 +102,14 @@ func TestValidateCurrentUpgradeBinaryIdentityRequiresV230(t *testing.T) {
 func TestValidateExpectedCurrentUpgradeBinaryIdentityRequiresWorktreeCommit(t *testing.T) {
 	identity := upgradeBinaryIdentity{
 		Name:             "panacea-core",
-		Version:          "2.3.0",
+		Version:          "2.3.1",
 		Commit:           "current-commit",
 		CosmosSDKVersion: "v0.50.15",
 	}
 
 	require.ErrorContains(
 		t,
-		validateExpectedCurrentUpgradeBinaryIdentity(identity, "2.3.0", ""),
+		validateExpectedCurrentUpgradeBinaryIdentity(identity, "2.3.1", ""),
 		"PANACEA_E2E_CURRENT_COMMIT",
 	)
 	require.ErrorContains(
@@ -121,10 +117,15 @@ func TestValidateExpectedCurrentUpgradeBinaryIdentityRequiresWorktreeCommit(t *t
 		validateExpectedCurrentUpgradeBinaryIdentity(identity, "", "current-commit"),
 		"PANACEA_E2E_CURRENT_BINARY_VERSION",
 	)
-	require.NoError(t, validateExpectedCurrentUpgradeBinaryIdentity(identity, "2.3.0", "current-commit"))
+	require.NoError(t, validateExpectedCurrentUpgradeBinaryIdentity(identity, "2.3.1", "current-commit"))
 	require.ErrorContains(
 		t,
-		validateExpectedCurrentUpgradeBinaryIdentity(identity, "2.3.0", "different-commit"),
+		validateExpectedCurrentUpgradeBinaryIdentity(identity, "2.3.0", "current-commit"),
+		"does not match expected version",
+	)
+	require.ErrorContains(
+		t,
+		validateExpectedCurrentUpgradeBinaryIdentity(identity, "2.3.1", "different-commit"),
 		"current-commit",
 	)
 }

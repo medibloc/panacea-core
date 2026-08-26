@@ -20,7 +20,8 @@ func TestBuildIBCUpgradeCoverageMatrixIsHonestAboutIsolatedLane(t *testing.T) {
 			PortID: "transfer", ChannelID: "channel-0",
 		},
 	}}
-	matrix := buildIBCUpgradeCoverageMatrix(evidence)
+	matrix := buildIBCUpgradeCoverageMatrix(evidence, "2.3.1")
+	require.Equal(t, "2.3.1", matrix.TargetVersion)
 	require.NoError(t, matrix.Validate())
 	require.Len(t, matrix.Rows, 13)
 	for _, row := range matrix.Rows {

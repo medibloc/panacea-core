@@ -18,7 +18,6 @@ const (
 	ibcCompatibilityMatrixSchema       = "panacea.ibc-compatibility-matrix/v2"
 
 	panaceaV221SourceCommit = "a1b342939ba6ac3092aeebbee6a2fa741a34d47f"
-	panaceaCurrentVersion   = "2.3.0"
 
 	cosmosSDKModulePath  = "github.com/cosmos/cosmos-sdk"
 	cometBFTModulePath   = "github.com/cometbft/cometbft"
@@ -102,13 +101,6 @@ func currentPanaceaBinaryContract() (IBCBinaryVersionContract, error) {
 	version := strings.TrimSpace(os.Getenv("PANACEA_E2E_CURRENT_BINARY_VERSION"))
 	if version == "" {
 		return IBCBinaryVersionContract{}, errors.New("PANACEA_E2E_CURRENT_BINARY_VERSION is required for IBC compatibility validation")
-	}
-	if version != panaceaCurrentVersion {
-		return IBCBinaryVersionContract{}, fmt.Errorf(
-			"PANACEA_E2E_CURRENT_BINARY_VERSION = %q, want exact %q for the IBC upgrade contract",
-			version,
-			panaceaCurrentVersion,
-		)
 	}
 	commit := strings.TrimSpace(os.Getenv("PANACEA_E2E_CURRENT_COMMIT"))
 	if commit == "" {

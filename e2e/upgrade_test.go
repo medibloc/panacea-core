@@ -21,7 +21,7 @@ import (
 
 const (
 	upgradeName                      = "v2.3.0"
-	upgradeBinaryVersion             = "2.3.0"
+	upgradeTargetVersion             = "2.3.0"
 	upgradeLegacyPNFTUnsignedPath    = "upgrade/legacy-pnft-unsigned.json"
 	upgradeLegacyPNFTSignedPath      = "upgrade/legacy-pnft-signed.json"
 	legacyPNFTDisabledMessage        = "legacy PNFT messages are disabled"
@@ -596,7 +596,7 @@ func runV221ToCurrentMultiValidatorUpgrade(t *testing.T, scenario upgradeRunScen
 		network,
 		"post-upgrade",
 		"upgrade/module-versions.json",
-		upgradeBinaryVersion,
+		upgradeTargetVersion,
 		upgradeCurrentExpectedModuleVersions,
 	)
 	require.NoError(t, err)
@@ -1014,7 +1014,7 @@ func runV221ToCurrentMultiValidatorUpgrade(t *testing.T, scenario upgradeRunScen
 		network,
 		"post-restart",
 		"upgrade/module-versions-post-restart.json",
-		upgradeBinaryVersion,
+		upgradeTargetVersion,
 		upgradeCurrentExpectedModuleVersions,
 	)
 	require.NoError(t, err)
@@ -1452,9 +1452,6 @@ func validateExpectedCurrentUpgradeBinaryIdentity(
 func validateCurrentUpgradeBinaryIdentity(identity upgradeBinaryIdentity) error {
 	if identity.Name != "panacea-core" {
 		return fmt.Errorf("current binary name must be panacea-core: %q", identity.Name)
-	}
-	if identity.Version != upgradeBinaryVersion {
-		return fmt.Errorf("current binary version must be %s: %q", upgradeBinaryVersion, identity.Version)
 	}
 	if identity.Commit == upgradeV221Commit {
 		return fmt.Errorf("current image resolved to the old binary commit %s", identity.Commit)

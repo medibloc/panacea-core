@@ -156,14 +156,14 @@ func TestPinnedOsmosisMiddlewareEvidenceMatchesSourceContract(t *testing.T) {
 }
 
 func TestCurrentPanaceaBinaryContractRequiresExpectedBuildIdentity(t *testing.T) {
-	t.Setenv("PANACEA_E2E_CURRENT_BINARY_VERSION", "2.3.0")
+	t.Setenv("PANACEA_E2E_CURRENT_BINARY_VERSION", "2.3.1")
 	t.Setenv("PANACEA_E2E_CURRENT_COMMIT", strings.Repeat("b", 40))
 
 	contract, err := currentPanaceaBinaryContract()
 	if err != nil {
 		t.Fatalf("currentPanaceaBinaryContract: %v", err)
 	}
-	if contract.Version != "2.3.0" || contract.Commit != strings.Repeat("b", 40) {
+	if contract.Version != "2.3.1" || contract.Commit != strings.Repeat("b", 40) {
 		t.Fatalf("contract = %#v", contract)
 	}
 	if got := contract.DependencyVersion(ibcGoV8ModulePath); got != "v8.8.0" {
