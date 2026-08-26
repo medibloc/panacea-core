@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## [v2.3.1](https://github.com/medibloc/panacea-core/releases/tag/v2.3.1) - 2026-08-26
 
 ### Bug fixes
 
