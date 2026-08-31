@@ -136,7 +136,7 @@ Then, you need to edit several things in `~/.panacea/config/config.toml` file.
 
 enable = true
 
-rpc_servers = "15.165.191.68:26657,13.209.53.86:26657" # rpc addresses
+rpc_servers = "https://rpc.gopanacea.org:443,https://rpc.gopanacea.org:443" # rpc addresses
 trust_height = <trusted-block-height>
 trust_hash = "<trusted-block-hash>"
 trust_period = "336h0m0s" # 2/3 of 21 days (unbonding period)
@@ -172,7 +172,6 @@ If you want to participate in validating blocks as a validator,
 you can register yourself into the validator set by submitting a transaction.
 
 For more details, see the [CLI guide](interaction-with-the-network-cli.md#staking).
-
 
 
 
